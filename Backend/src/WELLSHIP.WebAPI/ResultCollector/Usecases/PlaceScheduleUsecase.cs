@@ -9,7 +9,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
         // TODO: DIするものはここから
     }
 
-    public IEnumerable<PlaceSchedule> GetList(string date, int teamId, int placeId)
+    public IEnumerable<PlaceSchedule> GetList(string? date, int? teamId, int? placeId)
     {
         // TODO: リポジトリを使ってデータアクセスする
         return

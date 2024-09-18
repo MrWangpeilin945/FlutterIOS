@@ -7,5 +7,5 @@ namespace Ryobi.WELLSHIP.WebAPI.ResultCollector.Usecases;
 /// </summary>
 public interface IPlaceScheduleUsecase
 {
-    public IEnumerable<PlaceSchedule> GetList(string date, int teamId, int placeId);
+    public IEnumerable<PlaceSchedule> GetList(string? date, int? teamId, int? placeId);
 }

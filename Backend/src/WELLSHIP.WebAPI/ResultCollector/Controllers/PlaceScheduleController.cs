@@ -16,7 +16,7 @@ public class PlaceScheduleController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<PlaceSchedule> GetList([FromQuery] string date, [FromQuery] int teamId, [FromQuery] int placeId)
+    public IEnumerable<PlaceSchedule> GetList([FromQuery] string? date, [FromQuery] int? teamId, [FromQuery] int? placeId)
     {
         var results = _placeScheduleUsecase.GetList(date, teamId, placeId);
         return results;
