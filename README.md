@@ -1,0 +1,126 @@
+# WELLSHIP
+
+## 外部ドキュメントのリンク
+
+TBD  
+設計書、API仕様書、ER図などのリンクを掲載する。
+
+## システム構成
+
+TBD  
+実装のためのシステム構成図を掲載する。
+
+## 使用技術
+
+### フロントエンド
+
+- node v
+- npm v
+- React v
+- Remix SPA Mode
+
+### バックエンド・CLIツール
+
+- C# 12
+- NET 8.0
+- ASP.NET Core
+
+### 機器連携アプリ
+
+- Flutter v
+
+## 環境構築の手順
+
+### Node.js
+
+Node.jsのバージョン共存のために[NVM for Windows](https://github.com/coreybutler/nvm-windows)を使用する。
+
+NVM for Windowsをインストールする。
+
+```bash
+winget install CoreyButler.NVMforWindows
+```
+
+必要なバージョンのNode.jsをインストールする
+
+```bash
+nvm install 22.4.1
+```
+
+バージョンを指定してNode.jsを切り替える
+
+```bash
+nvm use 22.4.1
+```
+
+選択中のバージョンを確認する
+
+```bash
+```
+
+### .NET
+
+.NET SDKをインストールする。
+
+```bash
+winget install Microsoft.DotNet.SDK.8
+```
+
+## ディレクトリ構造
+
+モノレポ構成とする。
+
+Excelで作成するUI設計書やマニュアルはこのGitリポジトリでは管理しない。
+
+```txt
+.
+├── Documents/
+│   ├── テーブル定義書
+│   └── WebAPI仕様書
+├── Database/
+│   ├── schema/
+│   │   └── create-database.sql
+│   └── migration  
+├── Frontend/
+│   └── 結果収集
+└── Backend/
+    ├── WELLSHIP.sln
+    ├── src/
+    │   ├── WELLSHIP.Core/
+    │   │   ├── WELLSHIP.Core.csproj
+    │   │   ├── Exceptions
+    │   │   └── Logging
+    │   ├── WELLSHIP.WebAPI/
+    │   │   ├── WELLSHIP.WebAPI.csproj
+    │   │   └── 結果収集/
+    │   │       ├── Controllers
+    │   │       ├── Usecases
+    │   │       ├── Domain/
+    │   │       │   ├── Enums
+    │   │       │   ├── Models
+    │   │       │   └── Repositories
+    │   │       └── Infrastructure/
+    │   │           └── RepositoryImpls
+    │   ├── WELLSHIP.APIModels/
+    │   │   ├── WELLSHIP.APIModels.csproj
+    │   │   └── 結果収集/
+    │   │       ├── Requests
+    │   │       └── Responses
+    │   └── WELLSHIP.CLI（仮置き）/
+    │       └── WELLSHIP.CLI.csproj（仮置き）
+    └── tests/
+        ├── WELLSHIP.WebAPI.Tests/
+        │   └── WELLSHIP.WebAPI.Tests.csproj/
+        │       └── 結果収集/
+        │           ├── Usecase
+        │           └── Domain/
+        │               └── Model
+        ├── WELLSHIP.CLI.Tests（仮置き）/
+        │   └── WELLSHIP.CLI.Tests.csproj（仮置き）
+        └── IntegrationTests
+```
+
+## Gitの運用ルール
+
+TBD  
+Git-Flowを採用する予定。
