@@ -1,4 +1,4 @@
-namespace WELLSHIP.WebAPI;
+namespace Ryobi.WELLSHIP.WebAPI;
 
 public class WeatherForecast
 {

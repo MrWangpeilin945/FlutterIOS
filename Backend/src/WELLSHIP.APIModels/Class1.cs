@@ -1,4 +1,4 @@
-namespace WELLSHIP.APIModels;
+namespace Ryobi.WELLSHIP.APIModels;
 
 public class Class1
 {

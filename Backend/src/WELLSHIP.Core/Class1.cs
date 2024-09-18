@@ -1,4 +1,4 @@
-namespace WELLSHIP.Core;
+namespace Ryobi.WELLSHIP.Core;
 
 public class Class1
 {

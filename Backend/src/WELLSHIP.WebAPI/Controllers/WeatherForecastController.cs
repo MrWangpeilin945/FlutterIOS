@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace WELLSHIP.WebAPI.Controllers;
+namespace Ryobi.WELLSHIP.WebAPI.Controllers;
 
 [ApiController]
 [Route("[controller]")]
