@@ -2,6 +2,7 @@ using NLog.Web;
 
 using Ryobi.WELLSHIP.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 using Ryobi.WELLSHIP.WebAPI.ResultCollector.Usecases;
+using Ryobi.WELLSHIP.WebAPI.ResultCollector.Utilities;
 
 namespace Ryobi.WELLSHIP.WebAPI;
 
@@ -18,6 +19,8 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllers();
+        builder.Services.AddHealthChecks()
+                        .AddCheck<HealthCheck>("database");
         builder.Services.AddScoped<PostgresConnector>();
         builder.Services.AddRepositories();
         builder.Services.AddUseCases();
@@ -50,6 +53,8 @@ public class Program
                 options.Path = "/redoc";
             });
         }
+
+        app.MapHealthChecks("/healthz");
         app.UseAuthorization();
         app.MapControllers();
 
