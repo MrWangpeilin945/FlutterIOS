@@ -1,4 +1,4 @@
-namespace Ryobi.WELLSHIP.Core.Tests;
+namespace Ryobi.Wellship.Core.Tests;
 
 public class UnitTest1
 {

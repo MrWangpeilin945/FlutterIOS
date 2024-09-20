@@ -1,4 +1,4 @@
-namespace Ryobi.WELLSHIP.APIModels.Responses;
+namespace Ryobi.Wellship.APIModels.Responses;
 
 /// <summary>
 /// 会場日程のレスポンスモデル

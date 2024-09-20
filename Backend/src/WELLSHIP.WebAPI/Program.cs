@@ -1,12 +1,14 @@
+using Microsoft.AspNetCore.Mvc;
+
 using NLog.Web;
 
-using Ryobi.WELLSHIP.WebAPI.ResultCollector.Domain.Repositories;
-using Ryobi.WELLSHIP.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
-using Ryobi.WELLSHIP.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
-using Ryobi.WELLSHIP.WebAPI.ResultCollector.Usecases;
-using Ryobi.WELLSHIP.WebAPI.ResultCollector.Utilities;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
+using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
+using Ryobi.Wellship.WebAPI.ResultCollector.Utilities;
 
-namespace Ryobi.WELLSHIP.WebAPI;
+namespace Ryobi.Wellship.WebAPI;
 
 /// <summary>
 /// メインのクラス
@@ -21,6 +23,12 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllers();
+        builder.Services.AddApiVersioning(options =>
+        {
+            options.ReportApiVersions = true;
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+        });
+
         builder.Services.AddHealthChecks()
                         .AddCheck<HealthCheck>("database");
         builder.Services.AddScoped<PostgresConnector>();

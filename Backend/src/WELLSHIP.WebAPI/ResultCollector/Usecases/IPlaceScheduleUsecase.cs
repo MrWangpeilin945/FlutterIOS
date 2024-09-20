@@ -1,6 +1,6 @@
-using Ryobi.WELLSHIP.APIModels.Responses;
+using Ryobi.Wellship.APIModels.Responses;
 
-namespace Ryobi.WELLSHIP.WebAPI.ResultCollector.Usecases;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 /// <summary>
 /// 会場日程ユースケースのインターフェース

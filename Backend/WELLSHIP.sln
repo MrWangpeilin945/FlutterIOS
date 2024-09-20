@@ -5,17 +5,17 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7E0422B5-7B61-4CBA-BF96-23C5B78933E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WELLSHIP.Core", "src\WELLSHIP.Core\WELLSHIP.Core.csproj", "{D4AFF34B-9D33-4B2C-BCF6-C1041E5FB4CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wellship.Core", "src\Wellship.Core\Wellship.Core.csproj", "{D4AFF34B-9D33-4B2C-BCF6-C1041E5FB4CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WELLSHIP.WebAPI", "src\WELLSHIP.WebAPI\WELLSHIP.WebAPI.csproj", "{E4B527A7-747B-49F5-AF2B-19227E5F81CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wellship.WebAPI", "src\Wellship.WebAPI\Wellship.WebAPI.csproj", "{E4B527A7-747B-49F5-AF2B-19227E5F81CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WELLSHIP.APIModels", "src\WELLSHIP.APIModels\WELLSHIP.APIModels.csproj", "{4D72D472-E2D7-4414-A253-FF0E09E571BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wellship.APIModels", "src\Wellship.APIModels\Wellship.APIModels.csproj", "{4D72D472-E2D7-4414-A253-FF0E09E571BF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{22D93CC2-A0F2-4FCD-9CD9-E051F52DA65F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WELLSHIP.Core.Tests", "tests\WELLSHIP.Core.Tests\WELLSHIP.Core.Tests.csproj", "{B8A4F8F8-7829-4642-ADC5-8C67C5EE2C13}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wellship.Core.Tests", "tests\Wellship.Core.Tests\Wellship.Core.Tests.csproj", "{B8A4F8F8-7829-4642-ADC5-8C67C5EE2C13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WELLSHIP.WebAPI.Tests", "tests\WELLSHIP.WebAPI.Tests\WELLSHIP.WebAPI.Tests.csproj", "{EF8F5230-057E-41CD-A91A-D5FC8B82797B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wellship.WebAPI.Tests", "tests\Wellship.WebAPI.Tests\Wellship.WebAPI.Tests.csproj", "{EF8F5230-057E-41CD-A91A-D5FC8B82797B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

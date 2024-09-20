@@ -1,4 +1,4 @@
-namespace Ryobi.WELLSHIP.WebAPI.ResultCollector.Domain.Repositories;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 /// <summary>
 /// ヘルスチェック用のリポジトリ

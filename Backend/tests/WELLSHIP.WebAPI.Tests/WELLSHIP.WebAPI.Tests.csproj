@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\WELLSHIP.WebAPI\WELLSHIP.WebAPI.csproj" />
+    <ProjectReference Include="..\..\src\Wellship.WebAPI\Wellship.WebAPI.csproj" />
   </ItemGroup>
 
 </Project>

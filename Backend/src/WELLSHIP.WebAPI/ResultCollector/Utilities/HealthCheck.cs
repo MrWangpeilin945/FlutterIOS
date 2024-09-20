@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-using Ryobi.WELLSHIP.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
-namespace Ryobi.WELLSHIP.WebAPI.ResultCollector.Utilities;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Utilities;
 
 public class HealthCheck : IHealthCheck
 {

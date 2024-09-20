@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Ryobi.WELLSHIP.APIModels.Responses;
-using Ryobi.WELLSHIP.WebAPI.ResultCollector.Usecases;
+using Ryobi.Wellship.APIModels.Responses;
+using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
-namespace Ryobi.WELLSHIP.WebAPI.ResultCollector.Controllers;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 
 [ApiController]
-[Route("[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 public class PlaceScheduleController : ControllerBase
 {
     private readonly IPlaceScheduleUsecase _placeScheduleUsecase;

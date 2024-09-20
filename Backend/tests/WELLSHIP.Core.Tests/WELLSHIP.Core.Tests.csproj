@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\WELLSHIP.Core\WELLSHIP.Core.csproj" />
+    <ProjectReference Include="..\..\src\Wellship.Core\Wellship.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -4,7 +4,7 @@ using Dapper;
 
 using Npgsql;
 
-namespace Ryobi.WELLSHIP.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 
 /// <summary>
 /// PostgreSQLに接続するためのコネクタ
