@@ -1,14 +1,20 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
+using Ryobi.WELLSHIP.WebAPI.ResultCollector.Domain.Repositories;
+
 namespace Ryobi.WELLSHIP.WebAPI.ResultCollector.Utilities;
 
 public class HealthCheck : IHealthCheck
 {
+    private readonly IHealthCheckRepository _healthCheckRepository;
+    public HealthCheck(IHealthCheckRepository healthCheckRepository)
+    {
+        _healthCheckRepository = healthCheckRepository;
+    }
+
     public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        var isHealthy = true;
-
-        // TODO: DBにSELECT 1などを投げる
+        var isHealthy = _healthCheckRepository.CheckDatabaseConnection();
 
         if (isHealthy)
         {

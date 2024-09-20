@@ -1,6 +1,8 @@
 using NLog.Web;
 
+using Ryobi.WELLSHIP.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.WELLSHIP.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
+using Ryobi.WELLSHIP.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
 using Ryobi.WELLSHIP.WebAPI.ResultCollector.Usecases;
 using Ryobi.WELLSHIP.WebAPI.ResultCollector.Utilities;
 
@@ -72,6 +74,7 @@ public static class IServiceCollectionExtension
     /// </summary>
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
+        services.AddScoped<IHealthCheckRepository, HealthCheckRepository>();
         return services;
     }
     /// <summary>
