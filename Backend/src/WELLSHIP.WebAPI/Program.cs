@@ -5,6 +5,7 @@ using NLog.Web;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
+using Ryobi.Wellship.WebAPI.ResultCollector.Middlewares;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 using Ryobi.Wellship.WebAPI.ResultCollector.Utilities;
 
@@ -65,6 +66,7 @@ public class Program
         }
 
         app.MapHealthChecks("/healthz");
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
         app.UseAuthorization();
         app.MapControllers();
 
