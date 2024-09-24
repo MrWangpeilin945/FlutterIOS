@@ -5,6 +5,10 @@
 TBD  
 設計書、API仕様書、ER図などのリンクを掲載する。
 
+- [アーキテクチャ設計書](http://10.191.26.49/wellship-docs/architecture/)
+- [WebAPI仕様書（設計用）](http://10.191.26.49/wellship-docs/webapi-design/)
+- [WebAPI仕様書（自動生成）](http://10.191.26.49/wellship/redoc/)
+
 ## システム構成
 
 TBD  
@@ -14,10 +18,11 @@ TBD
 
 ### フロントエンド
 
-- node v
+- Node.js v22.9.0
 - npm v
-- React v
-- Remix SPA Mode
+- React v18.2.0
+- Mantine v7.12.0
+- Remix SPA Mode 2.12.1
 
 ### バックエンド・CLIツール
 
