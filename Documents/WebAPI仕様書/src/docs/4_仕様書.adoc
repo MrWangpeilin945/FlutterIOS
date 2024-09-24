@@ -1,0 +1,8 @@
+
+= 仕様書
+
+WebAPIの仕様を示します。
+
+include::仕様書/AP001_会場日程取得.adoc[]
+include::仕様書/AP002_予約No存在確認.adoc[]
+include::仕様書/AP003_未受診の健診メニュー取得.adoc[]

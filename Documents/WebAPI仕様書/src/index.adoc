@@ -21,6 +21,7 @@ v0.1, 2024-09-24
 :stem: latexmath
 
 include::docs/1_はじめに.adoc[leveloffset=+1]
-include::docs/2_WebAPI一覧.adoc[leveloffset=+1]
-include::docs/3_仕様書.adoc[leveloffset=+1]
+include::docs/2_基本方針.adoc[leveloffset=+1]
+include::docs/3_WebAPI一覧.adoc[leveloffset=+1]
+include::docs/4_仕様書.adoc[leveloffset=+1]
 include::docs/改版履歴.adoc[leveloffset=+1]
