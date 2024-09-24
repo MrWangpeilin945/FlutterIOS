@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "build": "asciidoctor ./src/index.adoc -a linkcss -a copycss --destination-dir ./dist/ && cp -rf ./src/images/ ./dist/ && cp -f ./src/asciidoctor.css ./dist/asciidoctor.css"
+    }
+}
