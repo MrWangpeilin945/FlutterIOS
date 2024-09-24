@@ -1,4 +1,82 @@
 = フロントエンド
 
+== フレームワーク
+https://remix.run/[Remix] +
+※ https://remix.run/docs/en/main/guides/spa-mode[Remix SPA Mode]を使用
+
+== 使用するライブラリ
+
+[options="header"]
+|===
+|[green]#ライブラリ# | [green]#機能#
+|https://react-hook-form.com/[React Hook Form] |フォーム管理
+|https://zod.dev/[zod] |バリーション
+|https://jotai.org/[jotai] |状態管理
+|https://mantine.dev/[Mantine] |UI
+|https://tanstack.com/query/latest[TanStack Query] |データフェッチ(キャッシュ機能あり)
+|https://date-fns.org/[date-fnc] |日付操作
+|https://axios-http.com/[axios] |PromiseベースのHTTPクライアント
+|===
+
+== ライブラリ等のバージョン
+
+[options="header"]
+|===
+|[green]#ライブラリ#| [green]#バージョン#
+|https://nodejs.jp/[Node.js]| 22.9.0
+|https://ja.react.dev/[React]| 18.2.0
+|https://remix.run/[Remix]| 2.12.1
+|https://mantine.dev/[Mantine]| 7.12.0
+|===
+
 == ディレクトリ構造
 
+[source]
+ResultCollector <1>
+├──app
+│  ├──api <2>
+│  ├──components <3>
+│  ├──domain <4>
+│  ├──routes <5>
+│  └──utils <6>
+└──public <7>
+
+<1> 設定ファイル(*.config)や環境変数(.env)はrootフォルダ直下に配置
+
+<2> API呼び出しはTanStack Queryを使用 +
+apiフォルダ内の資産はOpenAPI設計書から出力したもののみ格納する(手編集NG)
+
+<3> コンポーネントはcomponentsフォルダ直下に格納する +
+小分けが必要になればサブディレクトリを作成する
+
+<4> 定数や共通のモデルはdomainフォルダに格納する
+
+<5> 画面はroutesフォルダに格納する +
+ファイル名はケバブケースとする
+
+<6> 共通関数はutilsフォルダに格納する +
+年齢計算とかaxiosのinterceptorなど
+
+<7> ソース以外の資産はpublicフォルダに格納する +
+資産が多くなりそうな場合はサブディレクトリを検討する
+
+== データ管理(作成中)
+* 認証情報(JWT)に持たせる
+** テナント情報、ユーザー情報など
+** ロールなどの権限も含みたい
+* 画面間のパラメータで受け渡しする
+** 対象者の情報
+** 検査中の項目
+** 一覧で表示対象の項目
+* 状態管理に持たせる
+** 選択している検査項目
+
+== エディター関連
+文字コード:: UTF-8(BOMなし)
+改行コード:: CRLF
+コードフォーマッタ:: https://biomejs.dev/ja/[Biome]をトライアル使用する
+CSS:: https://github.com/css-modules/css-modules[CSS Modules]を使用する
+
+== メモ
+* TanStack QueryでAPIキャッシュを行う
+** https://zenn.dev/eviry/articles/9bb81136a8cde0[TanStack Queryを用いたキャッシュハンドリング入門]
