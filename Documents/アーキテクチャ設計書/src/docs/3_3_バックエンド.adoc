@@ -33,21 +33,15 @@ image:../images/3_3_バックエンドアーキテクチャ.drawio.svg[]
 |WebAPIの入口としてHTTPリクエストを受け付ける。
 URIやHTTPメソッドなどを定義する。
 具体的な処理は書かずにUseCaseを呼び出す。
-|
+|a
 
 |UseCase
-|
-|
+|a
+|a
 
 |Domain
-|
-|
-
-|
-|
-|
-
-|
+|a
+|a
 
 |===
 
