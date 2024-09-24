@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Wellship.APIModels\Wellship.APIModels.csproj" />
+    <ProjectReference Include="..\Wellship.Core\Wellship.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
