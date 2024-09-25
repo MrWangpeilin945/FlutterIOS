@@ -10,7 +10,7 @@ https://remix.run/[Remix] +
 |===
 |[green]#ライブラリ# | [green]#機能#
 |https://react-hook-form.com/[React Hook Form] |フォーム管理
-|https://zod.dev/[zod] |バリーション
+|https://zod.dev/[zod] |バリデーション
 |https://jotai.org/[jotai] |状態管理
 |https://mantine.dev/[Mantine] |UI
 |https://tanstack.com/query/latest[TanStack Query] |データフェッチ(キャッシュ機能あり)
@@ -32,33 +32,43 @@ https://remix.run/[Remix] +
 == ディレクトリ構造
 
 [source]
-ResultCollector <1>
-├──app
-│  ├──api <2>
-│  ├──components <3>
-│  ├──domain <4>
-│  ├──routes <5>
-│  └──utils <6>
-└──public <7>
+.
+└── ResultCollector/ <.>
+    ├── app/
+    │   ├── api <.>
+    │   ├── components <.>
+    │   ├── domain <.>
+    │   ├── routes <.>
+    │   └── utils <.>
+    └── public <.>
 
-<1> 設定ファイル(*.config)や環境変数(.env)はrootフォルダ直下に配置
+<.> 設定ファイル(*.config)や環境変数(.env)はrootフォルダ直下に配置
 
-<2> API呼び出しはTanStack Queryを使用 +
+<.> API呼び出しはTanStack Queryを使用 +
 apiフォルダ内の資産はOpenAPI設計書から出力したもののみ格納する(手編集NG)
 
-<3> コンポーネントはcomponentsフォルダ直下に格納する +
+<.> コンポーネントはcomponentsフォルダ直下に格納する +
 小分けが必要になればサブディレクトリを作成する
 
-<4> 定数や共通のモデルはdomainフォルダに格納する
+<.> 定数や共通のモデルはdomainフォルダに格納する
 
-<5> 画面はroutesフォルダに格納する +
+<.> 画面はroutesフォルダに格納する +
 ファイル名はケバブケースとする
 
-<6> 共通関数はutilsフォルダに格納する +
+<.> 共通関数はutilsフォルダに格納する +
 年齢計算とかaxiosのinterceptorなど
 
-<7> ソース以外の資産はpublicフォルダに格納する +
+<.> ソース以外の資産(faviconや画像など)はpublicフォルダに格納する +
 資産が多くなりそうな場合はサブディレクトリを検討する
+
+== CSS
+
+トライアルでは https://github.com/css-modules/css-modules[CSS Modules]を使用する +
+CSSファイル(*.module.css)は `app/styles` フォルダに格納する +
+本開発では何を使用するかは以下の内容を基に再検討する
+
+* トライアルでCSS Modulesを使用してみた使用感
+* デザインチームから出てきたデザイン
 
 == データ管理(作成中)
 * 認証情報(JWT)に持たせる
@@ -70,13 +80,17 @@ apiフォルダ内の資産はOpenAPI設計書から出力したもののみ格�
 ** 一覧で表示対象の項目
 * 状態管理に持たせる
 ** 選択している検査項目
+** 健診機関で実施する健診メニュー
+
+TODO: 必要なパラメータは画面一覧から洗い出す
 
 == エディター関連
 文字コード:: UTF-8(BOMなし)
 改行コード:: CRLF
 コードフォーマッタ:: https://biomejs.dev/ja/[Biome]をトライアル使用する
-CSS:: https://github.com/css-modules/css-modules[CSS Modules]を使用する
 
 == メモ
 * TanStack QueryでAPIキャッシュを行う
 ** https://zenn.dev/eviry/articles/9bb81136a8cde0[TanStack Queryを用いたキャッシュハンドリング入門]
+
+* 未ログイン状態で直接URLを叩くなどしてログインが必要な画面に遷移してきた場合、ログイン画面に遷移する処理をどこで行うか
