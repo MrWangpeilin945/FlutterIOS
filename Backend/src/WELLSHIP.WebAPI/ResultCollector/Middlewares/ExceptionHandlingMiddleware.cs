@@ -20,12 +20,18 @@ public class ExceptionHandlingMiddleware
     /// コンストラクタ
     /// </summary>
     /// <param name="next">次のリクエストデリゲート</param>
+    /// <param name="logger">ロガー</param>
     public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
         _next = next;
         _logger = logger;
     }
 
+    /// <summary>
+    /// エラーハンドリング処理
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
     public async Task InvokeAsync(HttpContext context)
     {
         try
@@ -76,6 +82,7 @@ public class ExceptionHandlingMiddleware
             await WriteErrorResponseAsync(context, errorObject);
         }
     }
+
     private async Task WriteErrorResponseAsync(HttpContext context, ProblemDetails errorDetails)
     {
         var json = System.Text.Json.JsonSerializer.Serialize(errorDetails);
