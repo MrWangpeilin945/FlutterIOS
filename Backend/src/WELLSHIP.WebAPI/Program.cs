@@ -85,6 +85,7 @@ public static class IServiceCollectionExtension
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IHealthCheckRepository, HealthCheckRepository>();
+        services.AddScoped<IConsultRepository, ConsultRepository>();
         return services;
     }
     /// <summary>
@@ -93,6 +94,7 @@ public static class IServiceCollectionExtension
     public static IServiceCollection AddUseCases(this IServiceCollection services)
     {
         services.AddScoped<IPlaceScheduleUsecase, PlaceScheduleUsecase>();
+        services.AddScoped<IConsultUsecase, ConsultUsecase>();
         return services;
     }
 }
