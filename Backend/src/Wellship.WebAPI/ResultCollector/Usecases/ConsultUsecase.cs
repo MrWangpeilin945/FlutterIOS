@@ -12,7 +12,7 @@ public class ConsultUsecase : IConsultUsecase
     private readonly IConsultRepository _consultRepository;
 
     /// <summary>
-    /// 
+    /// コンストラクタ
     /// </summary>
     /// <param name="consultRepository">受診リポジトリ</param>
     public ConsultUsecase(IConsultRepository consultRepository)
