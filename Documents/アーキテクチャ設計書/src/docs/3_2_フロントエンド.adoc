@@ -105,3 +105,51 @@ TODO: 必要なパラメータは画面一覧から洗い出す
 * 未ログイン状態で直接URLを叩くなどしてログインが必要な画面に遷移してきた場合、ログイン画面に遷移する処理をどこで行うか
 ** 認証チェックだけの画面をコンポーネントとして作成し、認証が必要な画面についてはそのコンポーネントを読み込むようにする？ +
 (SSRだとカスタムフックを作成して認証処理をroot.tsxから呼び出せばできるっぽかったけど、SPAだと認証チェックを実装した別レイアウトを読み込まないといけないっぽい)
+
+実装例
+
+.app/components/secureLayout.tsx
+[source,js,indent=4]
+----
+import { useNavigate } from "@remix-run/react";
+import { useEffect } from "react";
+
+export default function SecureLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // 認証チェックを行う
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  return <>{children}</>;
+}
+----
+※ 認証チェックは仮
+
+.認証していないと使用できない画面.tsx
+[source,js,indent=4]
+----
+import SecureLayout from "../components/secureLayout";
+
+export default function Hoge() {
+  return (
+    <>
+      <SecureLayout>
+        <!-- ここにコードを記述 -->
+      </SecureLayout>
+    </>
+  );
+}
+----
+
+上記のように、認証が必要な画面で認証チェックを行うコンポーネントを読み込む +
+認証が不要な画面(ログイン画面など)はこのコンポーネントを読み込まなければOK
