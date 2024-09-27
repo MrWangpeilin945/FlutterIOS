@@ -1,22 +1,38 @@
+
 using Ryobi.Wellship.APIModels.Responses;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
+/// <summary>
+/// 会場日程ユースケース
+/// </summary>
 public class PlaceScheduleUsecase : IPlaceScheduleUsecase
 {
-    public PlaceScheduleUsecase()
+    private readonly IPlaceScheduleRepository _placeScheduleRepository;
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    public PlaceScheduleUsecase(IPlaceScheduleRepository placeScheduleRepository)
     {
-        // TODO: DIするものはここから
+        _placeScheduleRepository = placeScheduleRepository;
     }
 
-    public IEnumerable<PlaceSchedule> GetList(string? date, int? teamId, int? placeId)
+    /// <summary>
+    /// 班リストを取得する
+    /// </summary>
+    /// <param name="date">健診日</param>
+    public PlaceScheduleTeams GetTeams(DateOnly date)
     {
-        // TODO: リポジトリを使ってデータアクセスする
-        return
-        [
-            new(1, new DateOnly(2024, 09, 18), 1, "会場A", 3, "3班", "0900", "1200"),
-            new(2, new DateOnly(2024, 09, 18), 1, "会場A", 3, "3班", "1300", "1700"),
-            new(3, new DateOnly(2024, 09, 20), 3, "会場C", 5, "5班", "0900", "1200")
-        ];
+        var placeSchedules = _placeScheduleRepository.GetPlaceSchedules(date);
+
+        // 班でグループ化する
+        var results = placeSchedules.GroupBy(x => x.Team.Id)
+                                    .Select(x => new PlaceScheduleTeam(x.Key,
+                                                                       x.First().Team.Name,
+                                                                       x.Select(p => new Place(p.Place.Id,
+                                                                                               p.Place.Name)).ToList())).ToArray();
+        return new PlaceScheduleTeams(results);
     }
 }

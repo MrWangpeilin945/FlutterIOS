@@ -4,6 +4,7 @@ using NLog.Web;
 
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ResultCollector.Middlewares;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -86,6 +87,7 @@ public static class IServiceCollectionExtension
     {
         services.AddScoped<IHealthCheckRepository, HealthCheckRepository>();
         services.AddScoped<IConsultRepository, ConsultRepository>();
+        services.AddScoped<IPlaceScheduleRepository, PlaceScheduleRepository>();
         return services;
     }
     /// <summary>

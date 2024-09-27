@@ -1,7 +1,6 @@
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
-using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 
-namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
 
 /// <summary>
 /// 受診リポジトリ
