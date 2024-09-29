@@ -96,46 +96,14 @@ Excelで作成するUI設計書やマニュアルはこのGitリポジトリで�
 │   ├── テーブル定義書
 │   └── WebAPI仕様書
 ├── Database/
-│   ├── schema/
-│   │   └── create-database.sql
-│   └── migration  
+│   ├── DDL/
+│   └── ERD  
 ├── Frontend/
-│   └── 結果収集
+│   └── ResultCollector
 └── Backend/
     ├── WELLSHIP.sln
     ├── src/
-    │   ├── WELLSHIP.Core/
-    │   │   ├── WELLSHIP.Core.csproj
-    │   │   ├── Exceptions
-    │   │   └── Logging
-    │   ├── WELLSHIP.WebAPI/
-    │   │   ├── WELLSHIP.WebAPI.csproj
-    │   │   └── 結果収集/
-    │   │       ├── Controllers
-    │   │       ├── Usecases
-    │   │       ├── Domain/
-    │   │       │   ├── Enums
-    │   │       │   ├── Models
-    │   │       │   └── Repositories
-    │   │       └── Infrastructure/
-    │   │           └── RepositoryImpls
-    │   ├── WELLSHIP.APIModels/
-    │   │   ├── WELLSHIP.APIModels.csproj
-    │   │   └── 結果収集/
-    │   │       ├── Requests
-    │   │       └── Responses
-    │   └── WELLSHIP.CLI（仮置き）/
-    │       └── WELLSHIP.CLI.csproj（仮置き）
     └── tests/
-        ├── WELLSHIP.WebAPI.Tests/
-        │   └── WELLSHIP.WebAPI.Tests.csproj/
-        │       └── 結果収集/
-        │           ├── Usecase
-        │           └── Domain/
-        │               └── Model
-        ├── WELLSHIP.CLI.Tests（仮置き）/
-        │   └── WELLSHIP.CLI.Tests.csproj（仮置き）
-        └── IntegrationTests
 ```
 
 ## Gitの運用ルール
