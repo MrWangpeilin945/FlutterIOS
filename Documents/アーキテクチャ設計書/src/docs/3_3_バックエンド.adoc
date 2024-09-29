@@ -1,49 +1,188 @@
 = バックエンド
 
-== レイヤー
-
-== プロジェクトとソリューション構成
-
-== ディレクトリ構造
+== プロジェクト構成
 
 [source]
 .
-├── src
-│   └── Wellship.Backend
-└── tests
-    └── Wellship.Backend.Tests
+└── Backend/
+    ├── Wellship.sln
+    ├── src/
+    │   ├── Wellship.APIModels/
+    │   │   ├── Wellship.APIModels.csproj
+    │   │   └── ResultCollector/
+    │   │       ├── Requests
+    │   │       └── Response
+    │   ├── Wellship.Core/
+    │   │   ├── Wellship.Core.csproj
+    │   │   └── Exception
+    │   └── Wellship.WebAPI/
+    │       ├── Wellship.WebAPI.csproj
+    │       └── ResultCollector/
+    │           ├── Controllers
+    │           ├── Usecases
+    │           ├── Domain/
+    │           │   ├── Models
+    │           │   ├── Enums
+    │           │   └── Repositories
+    │           ├── Infrastructure/
+    │           │   ├── PostgreSQL/
+    │           │   │   └── RepositoryImpls
+    │           │   └── Http
+    │           ├── Utilities
+    │           └── Middlewares
+    └── tests/
+        ├── Wellship.Core.Tests/
+        │   └── Wellship.Core.Tests.csproj
+        └── Wellship.WebAPI.Tests/
+            └── Wellship.WebAPI.Tests.csproj/
+                └── ResultCollector/
+                    ├── Usecases
+                    └── Domain
+
+プロダクトコードとテストコードで大きく分割する。メインはWellship.WebAPIに実装するが、APIモデルや例外は他のアプリ（CLIアプリ）から参照することもあるため、プロジェクトを分離して参照可能にする。第二弾以降ではWELLSHIP共通機能となるものが出てくるが、初期開発時に分割するのは難しいため「結果収集（ResultCollector）」配下に配置する。
 
 == 名前空間
 
+Microsoftのガイドラインを参考に以下の名前空間とする。
+
+* `Ryobi.Wellship.{csproj名}.{ディレクトリ構成に従う}`
+
+https://learn.microsoft.com/ja-jp/dotnet/standard/design-guidelines/names-of-namespaces[名前空間の名前 - Framework Design Guidelines | Microsoft Learn]
+
+== ライブラリ
+
+[options="header"]
+|===
+|ライブラリ | 機能
+
+| Dapper| マイクロORM
+| Npgsql| PostgreSQLとの接続
+| Microsoft.AspNetCore.Mvc.Versioning| APIのバージョニング
+| nlog.Web.AspNetCore| ロギング
+| nswag.AspNetCore| WebAPI仕様書の自動生成
+| coverlet.collector| テストカバレッジ収集
+| fluentAssertions| 単体テストの記述方法拡張
+| Microsoft.NET.Test.Sdk| 単体テスト
+| Moq| 単体テストのモッキング
+| xunit.runner.visualstudio| 単体テスト
+| xunit| 単体テスト
+
+|===
 
 == レイヤー
 
 責務に応じてレイヤーを分離して、依存関係をコントロールする。
 
+image::../images/BackendLayer.drawio.svg[バックエンドレイヤー]
 
-.レイヤー一覧
-|===
-|レイヤー名 |説明 |サンプル 
-
-|Controller
-|WebAPIの入口としてHTTPリクエストを受け付ける。
-URIやHTTPメソッドなどを定義する。
-具体的な処理は書かずにUseCaseを呼び出す。
-|a
-
-|UseCase
-|a
-|a
-
-|Domain
-|a
-|a
-
+[cols="2,10"options="header"]
+|=== 
+| レイヤー名 | 説明
+| Controller
+| WebAPIの入口として、HTTPリクエストを受け付ける役割を果たす。URIやHTTPメソッドなどを定義する。具体的な処理は行わず、Usecaseを呼び出す。UsecaseのメソッドにはAPIのリクエストモデルが渡される。
+| Usecase
+| ビジネスロジックを含む中核的な部分であり、アプリケーションのユースケースを実装する。コントローラーからのリクエストを受け取り、ドメインモデルを利用して処理を実行する。データの永続化や外部サービスへのアクセスは行わない。Usecaseのメソッドでは、受け取ったリクエストモデルを解析・バリデーションし、ドメインモデルやエンティティに変換してドメインのルールを適用する。
+| Domain
+| ビジネスドメインの核となるルールや概念を表現する。エンティティ、値オブジェクトを定義し（本プロジェクトではModelsに格納）、ビジネスロジックをカプセル化する。これにより、アプリケーションのメインロジックを明確化し、再利用性を高める。また、ドメインイベントも定義することで、ドメイン内での重要な操作や状態変化を監視・通知することができる。
+| Infrastructure
+| データベースや外部サービスなど、アプリケーションのインフラストラクチャ層を表す。データの永続化や外部サービスへのアクセスを行う。PostgreSQLやHTTPなどの実際のデータソースに対するアクセスを実装するため、リポジトリやAPIクライアントの具体的な実装クラスを含むことができる。この層はデータアクセスの詳細を隠蔽し、ドメイン層によるビジネスルールの実行をサポートする。
 |===
 
 == エラーハンドリング
 
-ASP.NET Coreのミドルウェアでキャッチする。
+ASP.NET Coreのミドルウェアでキャッチするため、個別のメソッド内にTry-Catchを記述しない。
 
-== HTTPアクセス
+System.Exceptionをそのまま利用するのはNG。
+例外の種類に応じて、抽象クラスであるWellshipExceptionを継承したカスタム例外を定義する。
 
+HTTPステータスコードを設定することで、Usecaseのメソッド内で例外送出した際、クライアント側に設定したHTTPステータスコードが伝わる。
+
+image::../images/BackendCustomException.drawio.svg[カスタム例外]
+
+== データベースアクセス
+
+=== 接続方法
+
+PostgreSQLにはNpgsqlを使用してアクセスする。
+
+SQLと.NETオブジェクト間のマッピングにはマイクロORMであるDapperを使用する。
+EFCoreの場合とは異なり、クエリビルダ機能はないため開発者自身でSQLを記述する。
+
+各リポジトリは、接続共通部品であるPostgreConnectorをコンストラクタからDIする。
+
+=== リトライ
+
+アプリからPostgreSQLへの接続が瞬断した場合でも自動復旧できるようにPostgresConnectorにリトライ処理を入れる。リトライ処理はPollyというライブラリを使用する。
+
+== 効率的なバックエンド開発のために
+
+各種ツールを用いて、機械的な作業の省力化を目指す。
+
+=== 全体の流れ
+
+image::../images/BackendDevFlow.drawio.svg[バックエンド開発フロー]
+
+. WebAPI仕様書を作成する
+. APIModelとControllerを実装する
+. RedoclyからOpenAPI仕様を出力する
+. https://orval.dev/[Orval] でフロントエンド側のクライアントコードを生成する
+
+本来のスキーマ駆動開発はOpenAPI仕様をYAMLで記述してバックエンド・フロントエンド両方のコードを生成するが、YAMLによる仕様記述の学習コストが高いため、 https://github.com/RicoSuter/NSwag[NSwag] を用いてバックエンドの実装からOpenAPI仕様を出力する方式を採用する。
+
+=== サンプルのJSONからC#のClassを生成する
+
+WebAPI仕様書に記載したリクエストおよびレスポンスのJSON文字列をC#のClassに変換する必要がある。
+手動で変換すると時間がかかるため、 https://quicktype.io/[quicktype] というツールを使用する。
+CLIツールやVSCode拡張機能もあるが、最も簡単に使えるのは https://app.quicktype.io/[Webアプリ] である。
+
+JSON文字列を貼り付けると自動でC#のコードが生成される。
+
+なお、Webアプリであるがクライアント側で変換処理をしておりサーバ側にデータが送信されることはない。
+
+[quote, 'https://github.com/glideapps/quicktype[GitHub-glideapps/quicktype]']
+____
+app.quicktype.io is the most powerful and complete UI. The web app also works offline and doesn't send your sample data over the Internet, so paste away!
+____
+
+=== ユニットテストを記述する
+
+以下のレイヤーの各メソッドについてユニットテスト（単体テスト）を整備する。
+
+* Domain
+** Models
+* Usecase
+** リポジトリに依存する部分はMoqを使ってモッキングする
+
+生成AI（LLM）を活用して、プロダクトコードに対するテストコードの生成を省力化する。
+業務コードのためプライベートLLMを利用する必要がある。ビジネス戦略本部が提供している https://azurechat.rsoa.ryobi.co.jp/chat[AzureChat]を利用することが望ましい。
+
+以下にプロンプトの例を示すので、参考にされたい。
+
+[source,markdown]
+----
+
+## 前提
+
+- あなたはシニアプログラマとしてテストコードの整備を支援してください
+
+## 指示
+
+- ASP.NET Core 8でxUnitを使います。
+- テストコードは3Aパターンで書きます。
+  - Arrange、Act、Assertをコメントしてください。
+- Fluent Assertionsを使います。Assertは xxx.Should().BeTrue()のようにFluent Assertionsを生かした流暢な書き方にしてください。
+テストメソッド名は「簡潔な日本語で」命名してください。開発者以外にも分かるようにふるまいを表す名前にします。
+呼び出すプロダクションコードのメソッド名は不要です。
+- テストコードはプロダクションコードの名前空間やクラス名と対比してテストと分かるように付けます
+
+## 入力
+
+プロダクションコード
+
+## 出力
+
+テストコード
+---
+それでははじめます。
+
+----
