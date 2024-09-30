@@ -207,9 +207,9 @@ ____
 
 ----
 
-== WebAPI一覧からC#のクラスを作成する
+＝== WebAPI一覧からC#のクラスを作成する
 
-WebAPI一覧に以下の情報があります。
+WebAPI一覧に以下の情報がある。
 
 * HTTPメソッド
 * URI
@@ -223,4 +223,3 @@ WebAPI一覧をインプットにしてControllerのスケルトンができる�
 . WebAPI一覧をAzureChatに投入してPlantUMLまたはMermaid.jsのクラス図を出力させる
 . 出力させたクラス図を手動で調整する
 . 調整したクラス図（プレーンテキスト）をAzureChatに投入しC#のControllerを出力させる
-

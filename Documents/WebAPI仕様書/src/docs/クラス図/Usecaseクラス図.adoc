@@ -1,0 +1,133 @@
+= Usecase
+
+== 認証ユースケース
+
+[plantuml,Authentication-u-cd,svg]
+----
+@startuml
+class AuthenticationUsecase {
+  + Login(request: LoginRequest): JwtResponse
+}
+@enduml
+----
+
+== 管理者ユースケース
+
+[plantuml,Administrator-u-cd,svg]
+----
+@startuml
+class AdministratorUsecase {
+  + GetAdministrator(administratorId: int): AdministratorResponse
+}
+@enduml
+----
+
+== 会場日程ユースケース
+
+[plantuml,PlaceSchedule-u-cd,svg]
+----
+@startuml
+class PlaceScheduleUsecase {
+  + GetTeamPlaceSchedules(): List<PlaceScheduleResponse>
+  + GetTeams(teamId: int): List<PlaceScheduleResponse>
+  + GetPlaceStatus(placeScheduleId: int): 
+  + UpdatePlaceStatus(placeScheduleId: string, status: boolean): void
+}
+@enduml
+----
+
+== ホームメニューユースケース
+
+[plantuml,HomeMenu-u-cd,svg]
+----
+@startuml
+class HomeMenuUsecase {
+  + GetHomeMenuSettings(): List<HomeMenuSetting>
+}
+@enduml
+----
+
+== 健診メニューユースケース
+
+[plantuml,CheckupMenu-u-cd,svg]
+----
+@startuml
+class CheckupMenuUsecase {
+  + GetCheckupMenus(): List<CheckupMenu>
+}
+@enduml
+----
+
+== 受診ユースケース
+
+[plantuml,Consult-u-cd,svg]
+----
+@startuml
+class ConsultUsecase {
+  + VerifyReservationNo(request: VerifyReservationNoRequest): void
+  + GetUnexaminedMenus(consultId: int): List<UnexaminedMenu>
+  + GetSimpleExaminee(examineeId: int): ExamineeSimpleInfo
+  + GetDetailedExaminee(examineeId: int): ExamineeDetailedInfo
+  + ChangeIntegrationStatus(consultId: string, status: IntegrationStatus): void
+}
+@enduml
+----
+
+== 中止理由ユースケース
+
+[plantuml,CancelReason-u-cd,svg]
+----
+@startuml
+class CancelReasonUsecase {
+  + GetCancelReasons(): List<CancelReason>
+}
+@enduml
+----
+
+== 機器ユースケース
+
+[plantuml,Equipment-u-cd,svg]
+----
+@startuml
+class EquipmentUsecase {
+  + GetEquipmentSettings(): List<EquipmentSetting>
+}
+@enduml
+----
+
+== 検査結果ユースケース
+
+[plantuml,Result-u-cd,svg]
+----
+@startuml
+class ResultUsecase {
+  + VerifyResults(consultId: string, results: List<Result>): VerificationResponse
+  + RegisterResults(consultId: string, results: List<Result>): void
+}
+@enduml
+----
+
+== 進捗ユースケース
+
+[plantuml,Progress-u-cd,svg]
+----
+@startuml
+class ProgressUsecase {
+  + GetProgress(placeScheduleId: int): Progress
+}
+@enduml
+----
+
+== 基幹システム連携ユースケース
+
+[plantuml,Integration-u-cd,svg]
+----
+@startuml
+class IntegrationUsecase {
+  + GetIntegrationResults(placeScheduleId: int): List<IntegrateResult>
+  + ExportResults(placeScheduleId: string): void
+  + GetExportHistory(): List<ExportHistory>
+}
+@enduml
+----
+
