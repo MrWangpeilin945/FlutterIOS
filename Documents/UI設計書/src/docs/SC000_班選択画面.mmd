@@ -1,0 +1,35 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント 
+  participant RG as ログイン制御
+  participant BE as バックエンド   
+  User->>FE:班選択画面に遷移
+  FE->>RG:ログイン有無確認
+  RG-->>FE:ログイン有無を返す
+  alt ログイン未
+  FE->>User:ログイン用ポップアップ等の表示
+  else ログイン済
+  FE->>BE:AP003_班取得<br>[GET] /placeSchedules/teams?date={操作日当日}
+  BE-->>FE:レスポンスを取得
+  FE->>KN:共有ヘッダーに情報を取得
+  KN-->>FE:画面名等の情報を返す 
+  alt 400エラー or 500エラー or 200かつデータ件数が0件
+  FE->>User:エラーメッセージを表示
+  else 200かつ取得データが1件以上
+  activate FE
+   
+  loop 班情報ごとに
+  FE->>FE:取得したデータを班選択ボタンとして表示処理
+  end
+  FE-->>User:班選択画面の表示
+  end
+  deactivate FE  
+  note over User,FE:取得した情報を表示
+  activate FE
+  User->>FE:班選択ボタン押下
+  FE->>FE:班IDをパラメータに渡す<br>選択した班選択ボタンに色を付ける
+  FE-->>User:会場選択画面に遷移
+   end
