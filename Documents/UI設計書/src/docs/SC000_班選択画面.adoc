@@ -1,6 +1,6 @@
-== S000_班選択画面
+= S000_班選択画面
 
-[mermaid]
+[mermaid,SC000-sequence,svg]
 ....
 sequenceDiagram
 autonumber
