@@ -5,15 +5,11 @@
 TBD  
 設計書、API仕様書、ER図などのリンクを掲載する。
 
+- [UI設計書（シーケンス図）](http://10.191.26.49/wellship-docs/ui-design/)
 - [アーキテクチャ設計書](http://10.191.26.49/wellship-docs/architecture/)
 - [WebAPI仕様書（設計用）](http://10.191.26.49/wellship-docs/webapi-design/)
 - [WebAPI仕様書（自動生成）](http://10.191.26.49/wellship/redoc/)
 - [WebAPIカバレッジレポート](http://10.191.26.49/wellship-tests/)
-
-## システム構成
-
-TBD  
-実装のためのシステム構成図を掲載する。
 
 ## 使用技術
 
@@ -112,6 +108,8 @@ TBD
 Git-Flowを採用する予定。
 
 ## 環境変数
+
+### バックエンド
 
 |名称|説明|必須|例|
 |-----|-----|-----|-----|
