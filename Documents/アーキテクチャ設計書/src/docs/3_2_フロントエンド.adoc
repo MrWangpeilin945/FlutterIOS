@@ -121,7 +121,6 @@ https://www.twilio.com/ja-jp/blog/react-choose-functional-components-jp[React:�
 
 コンポーネントから呼び出し元の画面に値を返すときはコールバック関数を使用する +
 https://qiita.com/aliceroot0678/items/e4eabcbe3f9f79cada55[React 子から親へ入力内容を渡す] +
-https://qiita.com/aliceroot0678/items/e4eabcbe3f9f79cada55[React 子から親へ入力内容を渡す] +
 https://qiita.com/282Haniwa/items/46c01c9a8e2acc130d89[いいから黙ってpropsのコールバックは`on`から始めておけ]
 
 == メモ
