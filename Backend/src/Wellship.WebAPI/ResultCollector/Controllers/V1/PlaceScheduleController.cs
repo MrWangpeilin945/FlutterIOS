@@ -41,4 +41,40 @@ public class PlaceScheduleController : ControllerBase
         var results = _placeScheduleUsecase.GetTeams(dateOnlyDate);
         return Ok(results);
     }
+
+    /// <summary>
+    /// 班を指定して会場日程を取得する
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("api/v{version:apiVersion}/placeSchedules/places")]
+    public IActionResult GetTeamPlaceSchedules()
+    {
+        _placeScheduleUsecase.GetTeamPlaceSchedules();
+        return Ok();
+    }
+
+    /// <summary>
+    /// 会場状況を取得する
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("api/v{version:apiVersion}/placeSchedules/placeCloseStatus")]
+    public IActionResult GetPlaceStatus()
+    {
+        _placeScheduleUsecase.GetPlaceStatus();
+        return Ok();
+    }
+
+    /// <summary>
+    /// 会場状況を更新する
+    /// </summary>
+    /// <returns></returns>
+    [HttpPut]
+    [Route("api/v{version:apiVersion}/placeSchedules/placeCloseStatus")]
+    public IActionResult UpdatePlaceStatus()
+    {
+        _placeScheduleUsecase.UpdatePlaceStatus();
+        return Ok();
+    }
 }

@@ -1,0 +1,14 @@
+using Ryobi.Wellship.APIModels.Responses;
+
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
+
+/// <summary>
+/// 機器ユースケースのインターフェース
+/// </summary>
+public interface IEquipmentUsecase
+{
+    /// <summary>
+    /// 機器連携設定を取得する
+    /// </summary>
+    public void GetEquipmentSettings();
+}

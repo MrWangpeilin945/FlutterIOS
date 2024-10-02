@@ -5,7 +5,7 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 /// <summary>
-/// 受診ユースケースのインターフェース
+/// 受診ユースケース
 /// </summary>
 public class ConsultUsecase : IConsultUsecase
 {
@@ -35,4 +35,37 @@ public class ConsultUsecase : IConsultUsecase
             throw new ReservationNoNotFoundException("予約Noが存在しません。");
         }
     }
+
+    /// <summary>
+    /// 未受診の健診メニューを取得する
+    /// </summary>
+    public void GetUnexaminedMenus()
+    {
+
+    }
+
+    /// <summary>
+    /// 簡易な受診者情報を取得する
+    /// </summary>
+    public void GetSimpleExaminee()
+    {
+
+    }
+
+    /// <summary>
+    /// 詳細な受診者情報を取得する
+    /// </summary>
+    public void GetDetailedExaminee()
+    {
+
+    }
+
+    /// <summary>
+    /// 検査結果の連携状態を変更する
+    /// </summary>
+    public void ChangeIntegrationStatus()
+    {
+        
+    }
+
 }
