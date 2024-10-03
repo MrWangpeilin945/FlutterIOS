@@ -98,17 +98,42 @@ TODO: 必要なパラメータは画面一覧から洗い出す
 改行コード:: CRLF
 コードフォーマッタ:: https://biomejs.dev/ja/[Biome]をトライアル使用する
 
+== APIコール時の共通処理
+
+**未作成** +
+リトライ処理、共通のエラーハンドリングなどを実装する予定 +
+リトライ条件については要検討 +
+(ステータスコード、HTTPメソッドの種類での判断が可能か要調査)
+
+== コンポーネント作成ルール
+
+https://ja.react.dev/learn/your-first-component[初めてのコンポーネント(React公式)] +
+https://qiita.com/yusuke2310/items/aae90a6fc475ad0cb329[【React】コンポーネントとは？Reactにおけるルール]
+
+コンポーネントで扱うデータはコンポーネントに引数で渡されたデータのみとする +
+引数の渡し方はpropsとする？分割代入とする？ +
+https://qiita.com/cha_ayu418/items/7fe607bec2b4acf8b8d3[関数コンポーネントのpropsの渡し方と分割代入] 
+
+コンポーネントは関数コンポーネントとクラスコンポーネントのどちらで作成する？ +
+現在は関数コンポーネントのほうが主流っぽい？ +
+https://choippo.com/react-component/[【React】コンポーネントの基本と使い方を初心者向けに解説！] +
+https://www.twilio.com/ja-jp/blog/react-choose-functional-components-jp[React:関数コンポーネントとクラスコンポーネントの違い]
+
+コンポーネントから呼び出し元の画面に値を返すときはコールバック関数を使用する +
+https://qiita.com/aliceroot0678/items/e4eabcbe3f9f79cada55[React 子から親へ入力内容を渡す] +
+https://qiita.com/282Haniwa/items/46c01c9a8e2acc130d89[いいから黙ってpropsのコールバックは`on`から始めておけ]
+
 == メモ
 * TanStack QueryでAPIキャッシュを行う
 ** https://zenn.dev/eviry/articles/9bb81136a8cde0[TanStack Queryを用いたキャッシュハンドリング入門]
 
 * 未ログイン状態で直接URLを叩くなどしてログインが必要な画面に遷移してきた場合、ログイン画面に遷移する処理をどこで行うか
 ** 認証チェックだけの画面をコンポーネントとして作成し、認証が必要な画面についてはそのコンポーネントを読み込むようにする？ +
-(SSRだとカスタムフックを作成して認証処理をroot.tsxから呼び出せばできるっぽかったけど、SPAだと認証チェックを実装した別レイアウトを読み込まないといけないっぽい)
+(SSRだとカスタムフックを作成して認証処理をroot.tsxから呼び出せばできるみたいだったけど、SPAだと認証チェックを実装した別レイアウトを読み込まないといけない)
 
 実装例
 
-.app/components/secureLayout.tsx
+app/components/secureLayout.tsx
 [source,js,indent=4]
 ----
 import { useNavigate } from "@remix-run/react";
@@ -126,6 +151,7 @@ export default function SecureLayout({
     const token = localStorage.getItem("authToken");
 
     if (!token) {
+      // 未ログイン状態の時はログイン画面に遷移する
       navigate("/login");
     }
   }, [navigate]);
@@ -135,7 +161,7 @@ export default function SecureLayout({
 ----
 ※ 認証チェックは仮
 
-.認証していないと使用できない画面.tsx
+認証していないと使用できない画面.tsx
 [source,js,indent=4]
 ----
 import SecureLayout from "../components/secureLayout";
@@ -152,4 +178,4 @@ export default function Hoge() {
 ----
 
 上記のように、認証が必要な画面で認証チェックを行うコンポーネントを読み込む +
-認証が不要な画面(ログイン画面など)はこのコンポーネントを読み込まなければOK
+認証が不要な画面(ログイン画面など)はこのコンポーネントを読み込まなければいい

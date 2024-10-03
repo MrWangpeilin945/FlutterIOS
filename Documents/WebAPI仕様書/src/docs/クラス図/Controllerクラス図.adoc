@@ -1,0 +1,132 @@
+= Controller
+
+== 認証コントローラー
+
+[plantuml,Authentication-c-cd,svg]
+----
+@startuml
+class AuthenticationController {
+  + Login(request: LoginRequest): JwtResponse
+}
+@enduml
+----
+
+== 管理者コントローラー
+
+[plantuml,Administrator-c-cd,svg]
+----
+@startuml
+class AdministratorController {
+  + GetAdministrator(administratorId: int): AdministratorResponse
+}
+@enduml
+----
+
+== 会場日程コントローラー
+
+[plantuml,PlaceSchedule-c-cd,svg]
+----
+@startuml
+class PlaceScheduleController {
+  + GetTeamPlaceSchedules(): List<PlaceScheduleResponse>
+  + GetTeams(teamId: int): List<PlaceScheduleResponse>
+  + GetPlaceStatus(placeScheduleId: int): 
+  + UpdatePlaceStatus(placeScheduleId: string, status: boolean): void
+}
+@enduml
+----
+
+== ホームメニューコントローラー
+
+[plantuml,HomeMenu-c-cd,svg]
+----
+@startuml
+class HomeMenuController {
+  + GetHomeMenuSettings(): List<HomeMenuSetting>
+}
+@enduml
+----
+
+== 健診メニューコントローラー
+
+[plantuml,CheckupMenu-c-cd,svg]
+----
+@startuml
+class CheckupMenuController {
+  + GetCheckupMenus(): List<CheckupMenu>
+}
+@enduml
+----
+
+== 受診コントローラー
+
+[plantuml,Consult-c-cd,svg]
+----
+@startuml
+class ConsultController {
+  + VerifyReservationNo(request: VerifyReservationNoRequest): void
+  + GetUnexaminedMenus(consultId: int): List<UnexaminedMenu>
+  + GetSimpleExaminee(examineeId: int): ExamineeSimpleInfo
+  + GetDetailedExaminee(examineeId: int): ExamineeDetailedInfo
+  + ChangeIntegrationStatus(consultId: string, status: IntegrationStatus): void
+}
+@enduml
+----
+
+== 中止理由コントローラー
+
+[plantuml,CancelReason-c-cd,svg]
+----
+@startuml
+class CancelReasonController {
+  + GetCancelReasons(): List<CancelReason>
+}
+@enduml
+----
+
+== 機器コントローラー
+
+[plantuml,Equipment-c-cd,svg]
+----
+@startuml
+class EquipmentController {
+  + GetEquipmentSettings(): List<EquipmentSetting>
+}
+@enduml
+----
+
+== 検査結果コントローラー
+
+[plantuml,Result-c-cd,svg]
+----
+@startuml
+class ResultController {
+  + VerifyResults(consultId: string, results: List<Result>): VerificationResponse
+  + RegisterResults(consultId: string, results: List<Result>): void
+}
+@enduml
+----
+
+== 進捗コントローラー
+
+[plantuml,Progress-c-cd,svg]
+----
+@startuml
+class ProgressController {
+  + GetProgress(placeScheduleId: int): Progress
+}
+@enduml
+----
+
+== 基幹システム連携コントローラー
+
+[plantuml,Integration-c-cd,svg]
+----
+@startuml
+class IntegrationController {
+  + GetIntegrationResults(placeScheduleId: int): List<IntegrateResult>
+  + ExportResults(placeScheduleId: string): void
+  + GetExportHistory(): List<ExportHistory>
+}
+@enduml
+----

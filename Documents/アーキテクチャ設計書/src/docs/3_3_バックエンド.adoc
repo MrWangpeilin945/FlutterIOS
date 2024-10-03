@@ -41,6 +41,26 @@
 
 プロダクトコードとテストコードで大きく分割する。メインはWellship.WebAPIに実装するが、APIモデルや例外は他のアプリ（CLIアプリ）から参照することもあるため、プロジェクトを分離して参照可能にする。第二弾以降ではWELLSHIP共通機能となるものが出てくるが、初期開発時に分割するのは難しいため「結果収集（ResultCollector）」配下に配置する。
 
+[cols="1,3,8" options="header"]
+|===
+
+|区分|プロジェクト名 | 説明
+.3+^.^|src
+|Wellship.APIModels
+|APIモデル。例えばCLIツールから参照する場合があるので切り出す。
+|Wellship.Core
+| 例外など共通的な部分
+|Wellship.WebAPI
+| WebAPI本体
+
+.2+^.^|tests
+|Wellship.Core.Tests
+| Coreのユニットテスト
+|Wellship.WebAPI.Tests
+| WebAPIのユニットテスト
+
+|===
+
 == 名前空間
 
 Microsoftのガイドラインを参考に以下の名前空間とする。
@@ -51,7 +71,7 @@ https://learn.microsoft.com/ja-jp/dotnet/standard/design-guidelines/names-of-nam
 
 == ライブラリ
 
-[options="header"]
+[cols="4,6" options="header"]
 |===
 |ライブラリ | 機能
 
@@ -75,7 +95,7 @@ https://learn.microsoft.com/ja-jp/dotnet/standard/design-guidelines/names-of-nam
 
 image::../images/BackendLayer.drawio.svg[バックエンドレイヤー]
 
-[cols="2,10"options="header"]
+[cols="2,10" options="header"]
 |=== 
 | レイヤー名 | 説明
 | Controller
@@ -186,3 +206,20 @@ ____
 それでははじめます。
 
 ----
+
+＝== WebAPI一覧からC#のクラスを作成する
+
+WebAPI一覧に以下の情報がある。
+
+* HTTPメソッド
+* URI
+* 概要説明
+
+WebAPI一覧をインプットにしてControllerのスケルトンができると便利である。
+
+表形式のデータを一足飛びにC#のコードにすると修正があった場合の手間が大きい。そこでプレーンテキストでUMLのクラス図を出力させて中間生成物とするのがよい。
+
+. WebAPI一覧を作成する
+. WebAPI一覧をAzureChatに投入してPlantUMLまたはMermaid.jsのクラス図を出力させる
+. 出力させたクラス図を手動で調整する
+. 調整したクラス図（プレーンテキスト）をAzureChatに投入しC#のControllerを出力させる
