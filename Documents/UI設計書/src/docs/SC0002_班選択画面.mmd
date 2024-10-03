@@ -8,6 +8,7 @@ autonumber
   participant BE as バックエンド   
   User->>FE:班選択画面に遷移
   FE->>RG:ログイン有無確認
+  note over FE,RG:共通処理
   RG-->>FE:ログイン有無を返す
   alt ログイン未
   FE->>User:ログイン用ポップアップ等の表示
@@ -16,9 +17,9 @@ autonumber
   BE-->>FE:レスポンスを取得
   FE->>KN:共有ヘッダーに情報を取得
   KN-->>FE:画面名等の情報を返す 
-  alt 400エラー or 500エラー or 200かつデータ件数が0件
+  alt 400エラー or 500エラー or (200かつデータ件数が0件)
   FE->>User:エラーメッセージを表示
-  else 200かつ取得データが1件以上
+  else httpステータスコードが200かつ取得データが1件以上
   activate FE
    
   loop 班情報ごとに
