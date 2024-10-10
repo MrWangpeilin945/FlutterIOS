@@ -7,7 +7,7 @@ TBD
 
 - [UI設計書（シーケンス図）](http://10.191.26.49/wellship-docs/ui-design/)
 - [アーキテクチャ設計書](http://10.191.26.49/wellship-docs/architecture/)
-- [WebAPI仕様書（設計用）](http://10.191.26.49/wellship-docs/webapi-design/)
+- [API設計書](http://10.191.26.49/wellship-docs/webapi-design/)
 - [WebAPI仕様書（自動生成）](http://10.191.26.49/wellship/redoc/)
 - [WebAPIカバレッジレポート](http://10.191.26.49/wellship-tests/)
 
@@ -90,7 +90,7 @@ Excelで作成するUI設計書やマニュアルはこのGitリポジトリで�
 .
 ├── Documents/
 │   ├── テーブル定義書
-│   └── WebAPI仕様書
+│   └── API設計書
 ├── Database/
 │   ├── DDL/
 │   └── ERD  

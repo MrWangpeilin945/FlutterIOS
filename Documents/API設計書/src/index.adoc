@@ -1,4 +1,4 @@
-= WELLSHIP WebAPI仕様書
+= WELLSHIP API設計書
 ヘルスケアソリューションカンパニーウェルネスビジネス事業部
 v0.1, 2024-09-24
 :doctype: article
