@@ -23,5 +23,5 @@ v0.1, 2024-08-07
 include::docs/1_はじめに.adoc[leveloffset=+1]
 include::docs/2_システムアーキテクチャ.adoc[leveloffset=+1]
 include::docs/3_1_アプリケーションアーキテクチャ.adoc[leveloffset=+1]
-include::docs/4_基盤共通機能.adoc[leveloffset=+1]
+// include::docs/4_基盤共通機能.adoc[leveloffset=+1]
 include::docs/改版履歴.adoc[leveloffset=+1]

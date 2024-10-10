@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16.4
+    container_name: wellship-db
+    restart: always
+    ports:
+      - "15432:5432"
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "p@ssw0rd"
+      POSTGRES_DB: "postgres"
+      PGPASSWORD: "p@ssw0rd"
