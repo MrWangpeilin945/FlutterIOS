@@ -6,7 +6,7 @@ AP1004,班を指定して会場日程を取得する,GET,/placeSchedules/places
 AP1005,ホームメニュー項目を取得する,GET,/homeMenus
 AP1006,検査メニュー一覧を取得する,GET,/examMenus
 AP1007,受診番号を検証する,POST,/consult/consultNumber/verify
-AP1008,未受診の検査メニューを取得する,GET,/consult/{consultId}/unexaminedMenus
+AP1008,未受診の検査メニューを取得する,GET,/consult/{consultNumber}/unexaminedMenus
 AP1009,簡易な受診者情報を取得する,GET,/examinees/{examineeId}/simple
 AP1010,詳細な受診者情報を取得する,GET,/examinees/{examineeId}/detail
 AP1011,中止理由を取得する,GET,/cancelReasons

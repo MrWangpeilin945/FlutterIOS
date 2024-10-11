@@ -10,7 +10,7 @@
 
 [source]
 ----
-[GET] /consult/{reservationNo}/unexaminedMenus
+[GET] /consult/{consultNumber}/unexaminedMenus
 ----
 
 === リクエストヘッダー
@@ -21,7 +21,7 @@
 |===
 |名称|必須|型|説明|具体例
 
-|reservatioNo
+|consultNumber
 |Yes
 |string
 |受診番号
