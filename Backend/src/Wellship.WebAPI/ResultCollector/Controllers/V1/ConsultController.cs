@@ -1,6 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
@@ -35,6 +38,20 @@ public class ConsultController : ControllerBase
     public IActionResult VerifyReservationNoAsync([FromBody] ReservationNoRequest reservationNoRequest)
     {
         _consultUsecase.VerifyReservationNo(reservationNoRequest);
+        return Ok();
+    }
+
+    /// <summary>
+    /// 未受診の検査メニューを取得する
+    /// </summary>
+    /// <param name="consultNumber">受診番号</param>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UnexaminedMenuList))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpGet]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/unexaminedMenus")]
+    public IActionResult GetUnexaminedMenus([FromRoute][Required] string consultNumber)
+    {
         return Ok();
     }
 }

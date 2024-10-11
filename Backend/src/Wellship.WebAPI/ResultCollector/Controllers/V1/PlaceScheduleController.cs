@@ -26,7 +26,7 @@ public class PlaceScheduleController : ControllerBase
     /// <summary>
     /// 日付を指定して班と会場のリストを取得する
     /// </summary>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<PlaceScheduleTeams>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceScheduleTeams))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/placeSchedules/teams")]
