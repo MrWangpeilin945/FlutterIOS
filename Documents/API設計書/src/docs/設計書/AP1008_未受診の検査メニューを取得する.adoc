@@ -1,0 +1,67 @@
+== AP1008_未受診の検査メニューを取得する
+
+=== 概要
+
+* 受診番号入力画面から利用する
+* 受診番号を指定して、未受診の検査メニューリストを取得する
+* 検査メニューは表示順の昇順でソートする
+
+=== URI
+
+[source]
+----
+[GET] /consult/{reservationNo}/unexaminedMenus
+----
+
+=== リクエストヘッダー
+
+=== パスパラメータ
+
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|reservatioNo
+|Yes
+|string
+|受診番号
+|`012345678`
+
+|===
+
+=== クエリパラメータ
+
+なし
+
+=== リクエストボディ
+
+なし
+
+=== レスポンスボディ
+
+[source,json]
+----
+{
+  "consultId": 1234,
+  "examineeId" : 1,
+  "examineeName":"青空 太郎",
+  "unexaminedMenus": [
+    {
+      "examMenuId": 3,
+      "examMenuName": "身体計測"
+    },
+    {
+      "examMenuId": 9,
+      "examMenuName": "血圧"
+    }
+  ]
+}
+----
+
+=== ステータスコード
+
+* 200 OK
+* 400 BadRequest
+** 入力した受診番号の形式が不正である
+* 404 NotFound
+** 受診番号の受診データが存在しない
