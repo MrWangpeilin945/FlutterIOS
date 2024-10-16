@@ -1,6 +1,6 @@
 ID,名称,Method,URI
 AP1001,ログインする,POST,/login
-AP1002,職員の情報を取得する,GET,/staffs /{staffId}
+AP1002,職員の情報を取得する,GET,/staffs/{staffId}
 AP1003,班で集約して会場リストを取得する,GET,/placeSchedules/teams
 AP1004,班を指定して会場日程を取得する,GET,/placeSchedules/places
 AP1005,ホームメニュー項目を取得する,GET,/homeMenus
