@@ -3,13 +3,13 @@ using System.Text.Json.Serialization;
 namespace Ryobi.Wellship.APIModels.Requests;
 
 /// <summary>
-/// 予約No検証用リクエストモデル
+/// 受診番号検証用リクエストモデル
 /// </summary>
-public class ReservationNoRequest
+public class ConsultNumberRequest
 {
     /// <summary>
-    /// 予約No
+    /// 受診番号
     /// </summary>
-    [JsonPropertyName("reservationNo")]
-    public string ReservationNo { get; set; } = "";
+    [JsonPropertyName("consultNumber")]
+    public string ConsultNumber { get; set; } = "";
 }

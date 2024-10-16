@@ -3,19 +3,19 @@ using System.Net;
 namespace Ryobi.Wellship.Core.Exceptions;
 
 /// <summary>
-/// 予約Noが存在しない例外
+/// 受診番号が存在しない例外
 /// </summary>
-public class ReservationNoNotFoundException : WellshipException
+public class ConsultNumberNotFoundException : WellshipException
 {
     /// <summary>
     /// メッセージを付けて例外オブジェクトを生成します。
     /// </summary>
-    public ReservationNoNotFoundException(string? message) : base(message) { }
+    public ConsultNumberNotFoundException(string? message) : base(message) { }
 
     /// <summary>
     /// 引数なしで例外オブジェクトを生成します。
     /// </summary>
-    public ReservationNoNotFoundException() { }
+    public ConsultNumberNotFoundException() { }
 
     /// <summary>
     /// 例外ハンドリングミドルウェアで返すHTTPステータスコード

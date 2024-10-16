@@ -8,6 +8,6 @@ public interface IConsultRepository
     /// <summary>
     /// 受診が存在するか
     /// </summary>
-    /// <param name="reservationNo">予約No</param>
-    public bool ConsultExists(string reservationNo);
+    /// <param name="consultNumber">受診番号</param>
+    public bool ConsultExists(string consultNumber);
 }

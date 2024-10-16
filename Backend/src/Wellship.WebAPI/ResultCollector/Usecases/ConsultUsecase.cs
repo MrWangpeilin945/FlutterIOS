@@ -21,18 +21,18 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 予約Noの受診が存在するか確認する
+    /// 受診番号の受診が存在するか確認する
     /// </summary>
-    /// <param name="reservationNoRequest">予約Noリクエスト</param>
+    /// <param name="consultNumberRequest">受診番号リクエスト</param>
     /// <returns>受診が存在するか</returns>
-    public void VerifyReservationNo(ReservationNoRequest reservationNoRequest)
+    public void VerifyConsultNumber(ConsultNumberRequest consultNumberRequest)
     {
-        var reservationNo = reservationNoRequest.ReservationNo;
-        var consultExists = _consultRepository.ConsultExists(reservationNo);
+        var consultNumber = consultNumberRequest.ConsultNumber;
+        var consultExists = _consultRepository.ConsultExists(consultNumber);
 
         if (!consultExists)
         {
-            throw new ReservationNoNotFoundException("予約Noが存在しません。");
+            throw new ConsultNumberNotFoundException("受診番号が存在しません。");
         }
     }
 }

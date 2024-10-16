@@ -8,9 +8,9 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 public interface IConsultUsecase
 {
     /// <summary>
-    /// 予約Noの受診が存在するか確認する
+    /// 受診番号の受診が存在するか確認する
     /// </summary>
-    /// <param name="reservationNoRequest">予約Noリクエスト</param>
+    /// <param name="consultNumberRequest">受診番号リクエスト</param>
     /// <returns>受診が存在するか</returns>
-    public void VerifyReservationNo(ReservationNoRequest reservationNoRequest);
+    public void VerifyConsultNumber(ConsultNumberRequest consultNumberRequest);
 }

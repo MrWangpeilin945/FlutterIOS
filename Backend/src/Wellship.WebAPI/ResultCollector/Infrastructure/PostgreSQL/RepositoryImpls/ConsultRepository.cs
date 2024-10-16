@@ -21,13 +21,13 @@ public class ConsultRepository : IConsultRepository
     /// <summary>
     /// 受診が存在するか
     /// </summary>
-    /// <param name="reservationNo">予約No</param>
-    public bool ConsultExists(string reservationNo)
+    /// <param name="consultNumber">受診番号</param>
+    public bool ConsultExists(string consultNumber)
     {
         // TODO: データベースと接続したら実装する
 
-        // var sql = "select count(1) from consult where reservation_id = @ReservationNo";
-        // _connector.Execute(sql, new { ReservationNo = reservationNo });
+        // var sql = "select count(1) from consult where reservation_id = @ConsultNumber";
+        // _connector.Execute(sql, new { ConsultNumber = consultNumber });
         // var result = _connector.Query<int>(sql).SingleOrDefault();
         // return result == 1;
         return true;
