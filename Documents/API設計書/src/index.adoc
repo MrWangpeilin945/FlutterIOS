@@ -6,8 +6,6 @@ v0.1, 2024-09-24
 :toc: left
 :toc-levels: 3
 :toc-title: 目次
-:sectnums:
-:sectnum-levels: 3
 :icons: font
 :imagesdir: images
 :xrefstyle: short
