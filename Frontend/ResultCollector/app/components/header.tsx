@@ -1,14 +1,15 @@
 import { Box, Button, Center, Flex, Title } from '@mantine/core';
 import { useNavigate } from "react-router-dom";
+import styles from "~/styles/common.module.css";
 
 type HeaderProps = {
     title: string; // titleをpropsとして受け取る
 };
 
 export default function Header({title}:HeaderProps) {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     return (
-        <Box bg="#6F93C7" py="7" mb="xl">
+        <Box className={styles["basic-blue"]} py="7">
             <header>
                 <Flex
                     justify="space-between"
@@ -30,7 +31,8 @@ export default function Header({title}:HeaderProps) {
 
                     {/* ホームボタン */}
                     <Button
-                        size='md'
+                        w={80}
+                        h={40}
                         variant="fill"
                         bg="#396B9E"
                         onClick={() => navigate("/")}
