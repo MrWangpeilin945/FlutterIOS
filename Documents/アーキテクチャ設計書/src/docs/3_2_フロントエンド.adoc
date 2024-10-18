@@ -123,6 +123,18 @@ https://www.twilio.com/ja-jp/blog/react-choose-functional-components-jp[React:�
 https://qiita.com/aliceroot0678/items/e4eabcbe3f9f79cada55[React 子から親へ入力内容を渡す] +
 https://qiita.com/282Haniwa/items/46c01c9a8e2acc130d89[いいから黙ってpropsのコールバックは`on`から始めておけ]
 
+=== コールバック関数の定義について
+
+##callbackHogehoge##のように関数名の頭に##callback##をつける。以降はキャメルケースとする。 +
+
+[source,js,indent=4]
+----
+// 画面からコンポーネントを定義する例
+const callbackConfirm = () => {}
+<Hoge onConfirm={callbackConfirm} />
+----
+
+
 == メモ
 * TanStack QueryでAPIキャッシュを行う
 ** https://zenn.dev/eviry/articles/9bb81136a8cde0[TanStack Queryを用いたキャッシュハンドリング入門]
@@ -179,3 +191,26 @@ export default function Hoge() {
 
 上記のように、認証が必要な画面で認証チェックを行うコンポーネントを読み込む +
 認証が不要な画面(ログイン画面など)はこのコンポーネントを読み込まなければいい
+
+
+== フロントエンド開発におけるルール
+
+=== 設計時に留意すること
+* エラー処理
+** エラーメッセージは利用者がこの後どうすればいいのかがわかるよう設計する
+** APIのステータスコードによってエラー内容を切り分ける
+* 入力フォーム
+** 必須項目・任意項目がわかるように設計する
+** プレースホルダーを工夫する
+** テキストボックスに属性をつける
+** コンポーネントを使用する場合、バリデーションはコンポーネント内で行う(コンポーネント内でzodを使用する)
+** コンポーネントを使用しない場合、バリデーションはzodを使用する
+
+=== 実装時に留意すること
+* TypeScriptを使用する
+** 警告を放置しないこと
+* 日付の処理について
+** date-fnsを使用する
+* 各画面、コンポーネント内にCSSを直接記述しない
+* URL組み立て時、文字列結合を使用せずURLオブジェクトを使用する
+* 状態管理に格納するものは制限する(なんでもかんでも入れない)

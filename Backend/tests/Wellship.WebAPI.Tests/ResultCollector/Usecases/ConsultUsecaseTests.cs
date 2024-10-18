@@ -12,39 +12,39 @@ namespace Ryobi.Wellship.WebAPI.Tests.ResultCollector.Usecases;
 public class ConsultUsecaseTests
 {
     [Fact]
-    public void 予約Noが存在する場合に例外がスローされないこと()
+    public void 受診番号が存在する場合に例外がスローされないこと()
     {
         // Arrange
         var consultationRepositoryMock = new Mock<IConsultRepository>();
         consultationRepositoryMock.Setup(x => x.ConsultExists(It.IsAny<string>())).Returns(true);
 
         var usecase = new ConsultUsecase(consultationRepositoryMock.Object);
-        var request = new ReservationNoRequest
+        var request = new ConsultNumberRequest
         {
-            ReservationNo = "12345"
+            ConsultNumber = "12345"
         };
 
         // Act & Assert
-        usecase.Invoking(x => x.VerifyReservationNo(request))
-              .Should().NotThrow<ReservationNoNotFoundException>();
+        usecase.Invoking(x => x.VerifyConsultNumber(request))
+              .Should().NotThrow<ConsultNumberNotFoundException>();
     }
 
     [Fact]
-    public void 予約Noが存在しない場合に例外がスローされること()
+    public void 受診番号が存在しない場合に例外がスローされること()
     {
         // Arrange
         var consultationRepositoryMock = new Mock<IConsultRepository>();
         consultationRepositoryMock.Setup(x => x.ConsultExists(It.IsAny<string>())).Returns(false);
 
         var usecase = new ConsultUsecase(consultationRepositoryMock.Object);
-        var request = new ReservationNoRequest
+        var request = new ConsultNumberRequest
         {
-            ReservationNo = "54321"
+            ConsultNumber = "54321"
         };
 
         // Act & Assert
-        usecase.Invoking(x => x.VerifyReservationNo(request))
-              .Should().Throw<ReservationNoNotFoundException>()
-              .WithMessage("予約Noが存在しません。");
+        usecase.Invoking(x => x.VerifyConsultNumber(request))
+              .Should().Throw<ConsultNumberNotFoundException>()
+              .WithMessage("受診番号が存在しません。");
     }
 }

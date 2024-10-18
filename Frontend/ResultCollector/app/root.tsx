@@ -1,5 +1,5 @@
 import '@mantine/core/styles.css';
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Links,
   Meta,
@@ -9,15 +9,14 @@ import {
 } from '@remix-run/react';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 
+const queryClient = new QueryClient();
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <Meta />
         <Links />
         <ColorSchemeScript />
@@ -40,7 +39,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 },
             }}
         >
+        <QueryClientProvider client={queryClient}>
           {children}
+        </QueryClientProvider>
         </MantineProvider>
         <ScrollRestoration />
         <Scripts />
