@@ -12,7 +12,7 @@ public interface IConsultUsecase
     /// </summary>
     /// <param name="consultNumberRequest">受診番号リクエスト</param>
     /// <returns>受診が存在するか</returns>
-    public void VerifyConsultNumber(ReservationNoRequest reservationNoRequest);
+    public void VerifyConsultNumber(ConsultNumberRequest consultNumberRequest);
 
     /// <summary>
     /// 未受診の健診メニューを取得する
