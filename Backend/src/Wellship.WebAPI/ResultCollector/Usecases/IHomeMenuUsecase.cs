@@ -8,7 +8,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 public interface IHomeMenuUsecase
 {
     /// <summary>
-    /// ホームメニュー設定を取得する
+    /// ホームメニュー項目を取得する
     /// </summary>
-    public void GetHomeMenuSettings();
+    public void GetHomeMenus();
 }

@@ -9,7 +9,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// 基幹システム連携コントローラー
 /// </summary>
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 public class IntegrationController : ControllerBase
 {
     private readonly IIntegrationUsecase _integrationUsecase;
@@ -28,7 +28,7 @@ public class IntegrationController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [Route("api/v{version:apiVersion}/integrations/resuls/{placeScheduleId}")]
+    [Route("api/v{version:apiVersion}/integrations/results/{placeScheduleId}")]
     public IActionResult GetIntegrationResults()
     {
         _integrationUsecase.GetIntegrationResults();
@@ -40,7 +40,7 @@ public class IntegrationController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPost]
-    [Route("api/v{version:apiVersion}/integrations/resuls/{placeScheduleId}/export")]
+    [Route("api/v{version:apiVersion}/integrations/results/{placeScheduleId}/export")]
     public IActionResult ExportResults()
     {
         _integrationUsecase.ExportResults();
@@ -52,7 +52,7 @@ public class IntegrationController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [Route("api/v{version:apiVersion}/integrations/resuls/exportedHistory")]
+    [Route("api/v{version:apiVersion}/integrations/results/exportedHistory")]
     public IActionResult GetExportHistory()
     {
         _integrationUsecase.GetExportHistory();

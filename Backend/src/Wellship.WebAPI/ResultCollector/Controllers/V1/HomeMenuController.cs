@@ -9,7 +9,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// ホームメニューコントローラー
 /// </summary>
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 public class HomeMenuController : ControllerBase
 {
     private readonly IHomeMenuUsecase _homeMenuUsecase;
@@ -24,14 +24,14 @@ public class HomeMenuController : ControllerBase
     }
 
     /// <summary>
-    /// ホームメニュー設定を取得する
+    /// ホームメニュー項目を取得する
     /// </summary>
     /// <returns></returns>
     [HttpGet]
     [Route("api/v{version:apiVersion}/homeMenus")]
     public IActionResult GetHomeMenuSettings()
     {
-        _homeMenuUsecase.GetHomeMenuSettings();
+        _homeMenuUsecase.GetHomeMenus();
         return Ok();
     }
 }

@@ -9,7 +9,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// 検査結果コントローラー
 /// </summary>
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 public class ResultController : ControllerBase
 {
     private readonly IResultUsecase _resultUsecase;

@@ -9,7 +9,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// 機器コントローラー
 /// </summary>
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 public class EquipmentController : ControllerBase
 {
     private readonly IEquipmentUsecase _equipmentUsecase;

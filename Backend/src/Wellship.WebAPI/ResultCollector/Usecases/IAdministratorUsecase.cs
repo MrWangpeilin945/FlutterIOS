@@ -3,12 +3,12 @@ using Ryobi.Wellship.APIModels.Responses;
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 /// <summary>
-/// 管理者ユースケースのインターフェース
+/// 職員ユースケースのインターフェース
 /// </summary>
-public interface IAdministratorUsecase
+public interface IStaffUsecase
 {
     /// <summary>
-    /// 管理者の情報を取得する
+    /// 職員の情報を取得する
     /// </summary>
-    public void GetAdministrator();
+    public void GetStaff();
 }

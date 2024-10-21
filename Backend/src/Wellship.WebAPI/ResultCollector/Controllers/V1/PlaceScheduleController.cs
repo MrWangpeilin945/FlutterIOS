@@ -9,7 +9,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// 会場日程コントローラー
 /// </summary>
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 public class PlaceScheduleController : ControllerBase
 {
     private readonly IPlaceScheduleUsecase _placeScheduleUsecase;
@@ -59,10 +59,10 @@ public class PlaceScheduleController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [Route("api/v{version:apiVersion}/placeSchedules/placeCloseStatus")]
-    public IActionResult GetPlaceStatus()
+    [Route("api/v{version:apiVersion}/placeSchedules/placeScheduleClosingStatus")]
+    public IActionResult GetPlaceScheduleClosingStatus()
     {
-        _placeScheduleUsecase.GetPlaceStatus();
+        _placeScheduleUsecase.GetPlaceScheduleClosingStatus();
         return Ok();
     }
 
@@ -71,10 +71,10 @@ public class PlaceScheduleController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPut]
-    [Route("api/v{version:apiVersion}/placeSchedules/placeCloseStatus")]
-    public IActionResult UpdatePlaceStatus()
+    [Route("api/v{version:apiVersion}/placeSchedules/placeScheduleClosingStatus")]
+    public IActionResult UpdatePlaceScheduleClosingStatus()
     {
-        _placeScheduleUsecase.UpdatePlaceStatus();
+        _placeScheduleUsecase.UpdatePlaceScheduleClosingStatus();
         return Ok();
     }
 }

@@ -45,17 +45,17 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     }
 
     /// <summary>
-    /// 会場状況を取得する
+    /// 健診完了状態を取得する
     /// </summary>
-    public void GetPlaceStatus()
+    public void GetPlaceScheduleClosingStatus()
     {
 
     }
 
     /// <summary>
-    /// 会場状況を更新する
+    /// 健診完了状態を更新する
     /// </summary>
-    public void UpdatePlaceStatus()
+    public void UpdatePlaceScheduleClosingStatus()
     {
 
     }

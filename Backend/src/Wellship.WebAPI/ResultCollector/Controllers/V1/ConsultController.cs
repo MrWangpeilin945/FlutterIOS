@@ -12,7 +12,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// 受診コントローラー
 /// </summary>
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 public class ConsultController : ControllerBase
 {
     private readonly IConsultUsecase _consultUsecase;
@@ -53,18 +53,6 @@ public class ConsultController : ControllerBase
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/unexaminedMenus")]
     public IActionResult GetUnexaminedMenus([FromRoute][Required] string consultNumber)
     {
-        return Ok();
-    }
-
-    /// <summary>
-    /// 未受診の健診メニューを取得する
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet]
-    [Route("api/v{version:apiVersion}/consult/{consultId}/unexaminedMenus")]
-    public IActionResult GetUnexaminedMenus()
-    {
-        _consultUsecase.GetUnexaminedMenus();
         return Ok();
     }
 

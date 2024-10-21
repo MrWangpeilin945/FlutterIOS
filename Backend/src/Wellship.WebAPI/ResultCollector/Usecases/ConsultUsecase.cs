@@ -37,7 +37,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 未受診の健診メニューを取得する
+    /// 未受診の検査メニューを取得する
     /// </summary>
     public void GetUnexaminedMenus()
     {
@@ -65,7 +65,7 @@ public class ConsultUsecase : IConsultUsecase
     /// </summary>
     public void ChangeIntegrationStatus()
     {
-        
+
     }
 
 }

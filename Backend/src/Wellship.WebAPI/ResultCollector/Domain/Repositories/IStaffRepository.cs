@@ -1,8 +1,8 @@
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 /// <summary>
-/// 管理者リポジトリ
+/// 職員リポジトリ
 /// </summary>
-public interface IAdministratorRepository
+public interface IStaffRepository
 {
 }

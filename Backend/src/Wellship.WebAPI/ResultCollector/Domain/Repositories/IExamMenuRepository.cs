@@ -1,8 +1,8 @@
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 /// <summary>
-/// 健診メニューリポジトリ
+/// 検査メニューリポジトリ
 /// </summary>
-public interface ICheckupMenuRepository
+public interface IExamMenuRepository
 {
 }

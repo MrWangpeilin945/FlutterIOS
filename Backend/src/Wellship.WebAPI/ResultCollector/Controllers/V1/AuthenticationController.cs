@@ -9,7 +9,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// 認証コントローラー
 /// </summary>
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 public class AuthenticationController : ControllerBase
 {
     private readonly IAuthenticationUsecase _authenticationUsecase;
@@ -32,5 +32,5 @@ public class AuthenticationController : ControllerBase
     {
         _authenticationUsecase.Login();
         return Ok();
-    }    
+    }
 }
