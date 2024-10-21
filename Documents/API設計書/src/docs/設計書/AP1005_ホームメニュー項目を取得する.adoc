@@ -2,7 +2,9 @@
 
 === 概要
 
-* TODO
+* ホーム画面の表示に必要なホームメニューを取得する
+* ホームメニューの項目は設定したグループでグルーピングする
+* グループとグループ内の項目は表示順の昇順でソートする
 
 === URI
 
@@ -15,28 +17,46 @@
 
 === パスパラメータ
 
+なし
+
 === クエリパラメータ
 
-[cols="2,1,1,4,2" options="header"]
-|===
-|名称|必須|型|説明|具体例
-
-|
-
-|===
+なし
 
 === リクエストボディ
 
-[source,json]
-----
-
-----
+なし
 
 === レスポンスボディ
 
 [source,json]
 ----
-
+{
+  "homeMenuGroups": [
+    {
+      "groupName": "一般",
+      "menus": [
+        {
+          "menuName": "進捗",
+          "path": "progress"
+        }
+      ]
+    },
+    {
+      "groupName": "外部システム連携",
+      "menus": [
+        {
+          "menuName": "健診結果出力",
+          "path": "examResultsExport"
+        },
+        {
+          "menuName": "健診結果出力履歴",
+          "path": "examResultsExportHistory"
+        }
+      ]
+    }
+  ]
+}
 ----
 
 === ステータスコード

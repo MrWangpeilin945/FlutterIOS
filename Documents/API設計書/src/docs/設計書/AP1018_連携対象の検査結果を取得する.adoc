@@ -2,41 +2,56 @@
 
 === 概要
 
-* TODO
+* データ出力のために、会場日程単位で結果の連携状態や健診完了状態を一覧で確認する
 
 === URI
 
 [source]
 ----
-[GET] /integrations/examResults/{placeScheduleId}
+[GET] /integrations/examResults
 ----
 
 === リクエストヘッダー
 
 === パスパラメータ
 
+なし
+
 === クエリパラメータ
 
-[cols="2,1,1,4,2" options="header"]
-|===
-|名称|必須|型|説明|具体例
-
-|
-
-|===
+なし
 
 === リクエストボディ
 
-[source,json]
-----
-
-----
+なし
 
 === レスポンスボディ
 
 [source,json]
 ----
-
+{
+  "exportData": [
+    {
+      "placeScheduleId": 23,
+      "placeName": "会場B",
+      "placeScheduleClosingStatus": 1,
+      "examDate": "2024-10-21",
+      "dataCount": 187,
+      "details": [
+        {
+          "status": 2,
+          "statusName": "保留",
+          "count": 10
+        },
+        {
+          "status": 4,
+          "statusName": "連携済",
+          "count": 10
+        }
+      ]
+    }
+  ]
+}
 ----
 
 === ステータスコード

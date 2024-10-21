@@ -16,7 +16,7 @@ AP1014,検査結果を登録する,POST,/consult/{consultNumber}/results
 AP1015,進捗状況を取得する,GET,/progress/{placeScheduleId}
 AP1016,健診完了状態を取得する,GET,/placeSchedules/{placeScheduleId}/placeScheduleClosingStatus
 AP1017,健診完了状態を更新する,PUT,/placeSchedules/{placeScheduleId}/placeScheduleClosingStatus
-AP1018,連携対象の検査結果を取得する,GET,/integrations/examResults/{placeScheduleId}
+AP1018,連携対象の検査結果を取得する,GET,/integrations/examResults
 AP1019,連携用に検査結果を出力する,POST,/integrations/examResults/{placeScheduleId}/export
 AP1020,検査結果の出力履歴を取得する,GET,/integrations/examResults/exportHistory
 AP1021,検査結果の連携状態を変更する,PUT,/consult/{consultNumber}/integrationStatus

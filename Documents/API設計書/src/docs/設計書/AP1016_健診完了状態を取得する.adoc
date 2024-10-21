@@ -2,7 +2,7 @@
 
 === 概要
 
-* TODO
+* 会場日程IDを指定して健診完了の状態と更新情報を取得する
 
 === URI
 
@@ -15,31 +15,46 @@
 
 === パスパラメータ
 
-=== クエリパラメータ
-
 [cols="2,1,1,4,2" options="header"]
 |===
 |名称|必須|型|説明|具体例
 
-|
+|placeScheduleId
+|Yes
+|number
+|会場日程ID
+|54
 
 |===
 
+=== クエリパラメータ
+
+なし
+
 === リクエストボディ
 
-[source,json]
-----
-
-----
+なし
 
 === レスポンスボディ
 
 [source,json]
 ----
-
+{
+  "placeScheduleId": 15,
+  "placeId": 4,
+  "placeName": "会場D",
+  "date": "2024-10-21",
+  "placeScheduleClosingStatus": 1,
+  "updatedAt": "2024-10-21T11:35:20+09:00",
+  "updatedBy": "両備 太郎"
+}
 ----
 
 === ステータスコード
 
 * 200 OK
+* 400 BadRequest
+** 指定した会場日程IDの形式が不正
+* 404 NotFound
+** 指定した会場日程が存在しない
 
