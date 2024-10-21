@@ -2,13 +2,13 @@
 
 === 概要
 
-* 
+* TODO
 
 === URI
 
 [source]
 ----
-[POST] /consult/{consultId}/results
+[POST] /consult/{consultNumber}/results
 ----
 
 === リクエストヘッダー

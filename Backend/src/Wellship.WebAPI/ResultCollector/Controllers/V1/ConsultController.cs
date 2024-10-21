@@ -61,7 +61,7 @@ public class ConsultController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [Route("api/v{version:apiVersion}/consult/{consultId}/simple")]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/simple")]
     public IActionResult GetSimpleExaminee()
     {
         _consultUsecase.GetSimpleExaminee();
@@ -73,7 +73,7 @@ public class ConsultController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [Route("api/v{version:apiVersion}/consult/{consultId}/detail")]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/detail")]
     public IActionResult GetDetailedExaminee()
     {
         _consultUsecase.GetDetailedExaminee();
@@ -85,7 +85,7 @@ public class ConsultController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpPut]
-    [Route("api/v{version:apiVersion}/consult/{consultId}/integrationStatus")]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/integrationStatus")]
     public IActionResult ChangeIntegrationStatus()
     {
         _consultUsecase.ChangeIntegrationStatus();

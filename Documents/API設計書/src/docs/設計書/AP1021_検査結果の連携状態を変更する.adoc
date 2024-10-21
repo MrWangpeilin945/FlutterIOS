@@ -2,13 +2,13 @@
 
 === 概要
 
-* 
+* TODO
 
 === URI
 
 [source]
 ----
-[PUT] /consult/{consultId}/integrationStatus
+[PUT] /consult/{consultNumber}/integrationStatus
 ----
 
 === リクエストヘッダー
