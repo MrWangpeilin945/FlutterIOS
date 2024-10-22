@@ -60,9 +60,9 @@ public class PlaceScheduleController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("api/v{version:apiVersion}/placeSchedules/placeScheduleClosingStatus")]
-    public IActionResult GetPlaceScheduleClosingStatus()
+    public IActionResult GetPlaceScheduleLockingStatus()
     {
-        _placeScheduleUsecase.GetPlaceScheduleClosingStatus();
+        _placeScheduleUsecase.GetPlaceScheduleLockingStatus();
         return Ok();
     }
 
@@ -72,9 +72,9 @@ public class PlaceScheduleController : ControllerBase
     /// <returns></returns>
     [HttpPut]
     [Route("api/v{version:apiVersion}/placeSchedules/placeScheduleClosingStatus")]
-    public IActionResult UpdatePlaceScheduleClosingStatus()
+    public IActionResult UpdatePlaceScheduleLockingStatus()
     {
-        _placeScheduleUsecase.UpdatePlaceScheduleClosingStatus();
+        _placeScheduleUsecase.UpdatePlaceScheduleLockingStatus();
         return Ok();
     }
 }

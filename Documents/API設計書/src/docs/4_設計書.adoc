@@ -33,9 +33,9 @@ include::設計書/AP1014_検査結果を登録する.adoc[]
 
 include::設計書/AP1015_進捗状況を取得する.adoc[]
 
-include::設計書/AP1016_健診完了状態を取得する.adoc[]
+include::設計書/AP1016_会場ロック状態を取得する.adoc[]
 
-include::設計書/AP1017_健診完了状態を更新する.adoc[]
+include::設計書/AP1017_会場ロック状態を更新する.adoc[]
 
 include::設計書/AP1018_連携対象の検査結果を取得する.adoc[]
 
