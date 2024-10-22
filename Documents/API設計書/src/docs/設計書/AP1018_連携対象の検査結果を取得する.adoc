@@ -34,7 +34,7 @@
     {
       "placeScheduleId": 23,
       "placeName": "会場B",
-      "placeScheduleClosingStatus": 1,
+      "placeScheduleLockingStatus": 1,
       "examDate": "2024-10-21",
       "dataCount": 187,
       "details": [
