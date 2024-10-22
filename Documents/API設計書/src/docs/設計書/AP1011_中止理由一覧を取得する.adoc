@@ -2,7 +2,9 @@
 
 === 概要
 
-* TODO
+* 検査内容確認画面で入力する中止理由を取得する
+* 中止理由の表示順の昇順でソートする
+* 検査項目IDを渡すと絞り込みできる
 
 === URI
 
@@ -15,31 +17,49 @@
 
 === パスパラメータ
 
+なし
+
 === クエリパラメータ
 
 [cols="2,1,1,4,2" options="header"]
 |===
 |名称|必須|型|説明|具体例
 
-|
+|examItemId
+|No
+|number
+|検査項目ID
+|3
 
 |===
 
 === リクエストボディ
 
-[source,json]
-----
-
-----
+なし
 
 === レスポンスボディ
 
 [source,json]
 ----
-
+{
+  "cancelReasons": [
+    {
+      "cancelReasonId": 1,
+      "cancelReasonName": "中止理由A",
+      "examItemId": 23
+    },
+    {
+      "cancelReasonId": 2,
+      "cancelReasonName": "中止理由B",
+      "examItemId": 23
+    }
+  ]
+}
 ----
 
 === ステータスコード
 
 * 200 OK
+* 400 BadRequest
+** 検査項目IDの形式が不正
 
