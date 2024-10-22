@@ -18,9 +18,14 @@ v0.1, 2024-09-24
 :source-highlighter: highlightjs
 :stem: latexmath
 
+<<<
 include::docs/1_はじめに.adoc[leveloffset=+1]
+<<<
 include::docs/2_基本方針.adoc[leveloffset=+1]
+<<<
 include::docs/3_WebAPI一覧.adoc[leveloffset=+1]
+<<<
 include::docs/4_設計書.adoc[leveloffset=+1]
-include::docs/5_クラス図.adoc[leveloffset=+1]
+// include::docs/5_クラス図.adoc[leveloffset=+1]
+<<<
 include::docs/改版履歴.adoc[leveloffset=+1]
