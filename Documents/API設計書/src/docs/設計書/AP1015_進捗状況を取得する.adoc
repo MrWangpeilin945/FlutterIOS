@@ -46,6 +46,7 @@
   "examDate": "2024-10-21",
   "progress": [
     {
+      "examItemId": 3,
       "examItemName": "検査項目A",
       "details": [
         {
