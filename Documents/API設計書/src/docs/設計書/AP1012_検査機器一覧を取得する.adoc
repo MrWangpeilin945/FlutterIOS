@@ -2,7 +2,10 @@
 
 === 概要
 
-* TODO
+* 検査機器と連携するために設定を取得する
+* 検査メニューと検査機器は1対多で関連付く
+* 検査メニューIDを渡すと絞り込みできる
+* 機器連携ネイティブアプリに渡す設定項目が決まり次第追加する
 
 === URI
 
@@ -15,31 +18,49 @@
 
 === パスパラメータ
 
+なし
+
 === クエリパラメータ
 
 [cols="2,1,1,4,2" options="header"]
 |===
 |名称|必須|型|説明|具体例
 
-|
+|examMenuId
+|No
+|number
+|検査メニューID
+|3
 
 |===
 
 === リクエストボディ
 
-[source,json]
-----
-
-----
+なし
 
 === レスポンスボディ
 
 [source,json]
 ----
-
+{
+  "equipments": [
+    {
+      "equipmentId": 1,
+      "equipmentName": "ABC-1234-W",
+      "examMenuId": 23
+    },
+    {
+      "equipmentId": 7,
+      "equipmentName": "BR-003",
+      "examMenuId": 23
+    }
+  ]
+}
 ----
 
 === ステータスコード
 
 * 200 OK
+* 400 BadRequest
+** 検査メニューIDの形式が不正
 
