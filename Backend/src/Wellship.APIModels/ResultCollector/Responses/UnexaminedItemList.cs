@@ -3,19 +3,19 @@ using System.Text.Json.Serialization;
 namespace Ryobi.Wellship.APIModels.Responses;
 
 /// <summary>
-/// 未受診の検査メニューリスト
+/// 未受診の検査項目リスト
 /// </summary>
-public class UnexaminedMenuList
+public class UnexaminedItemList
 {
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public UnexaminedMenuList(int consultId, int examineeId, string examineeName, ICollection<ExamMenu> examMenus)
+    public UnexaminedItemList(int consultId, int examineeId, string examineeName, ICollection<ExamItem> examItems)
     {
         ConsultId = consultId;
         ExamineeId = examineeId;
         ExamineeName = examineeName;
-        UnexaminedMenus = examMenus.ToArray();
+        UnexaminedItems = examItems.ToArray();
     }
 
     /// <summary>
@@ -37,8 +37,8 @@ public class UnexaminedMenuList
     public string ExamineeName { get; }
 
     /// <summary>
-    /// 未受診の検査メニューリスト
+    /// 未受診の検査項目リスト
     /// </summary>
-    [JsonPropertyName("unexaminedMenus")]
-    public ExamMenu[] UnexaminedMenus { get; }
+    [JsonPropertyName("unexaminedItems")]
+    public ExamItem[] UnexaminedItems { get; }
 }
