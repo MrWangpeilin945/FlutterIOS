@@ -15,9 +15,9 @@ public interface IConsultUsecase
     public void VerifyConsultNumber(ConsultNumberRequest consultNumberRequest);
 
     /// <summary>
-    /// 未受診の検査メニューを取得する
+    /// 未受診の検査項目を取得する
     /// </summary>
-    public void GetUnexaminedMenus();
+    public void GetUnexaminedItems();
 
     /// <summary>
     /// 簡易な受診者情報を取得する

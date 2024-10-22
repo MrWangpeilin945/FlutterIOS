@@ -1,4 +1,0 @@
-= クラス図
-
-include::クラス図/Controllerクラス図.adoc[leveloffset=+1]
-include::クラス図/Usecaseクラス図.adoc[leveloffset=+1]

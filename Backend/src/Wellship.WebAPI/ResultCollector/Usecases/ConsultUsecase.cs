@@ -37,9 +37,9 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 未受診の検査メニューを取得する
+    /// 未受診の検査項目を取得する
     /// </summary>
-    public void GetUnexaminedMenus()
+    public void GetUnexaminedItems()
     {
 
     }
