@@ -1,4 +1,4 @@
-== AP1017_健診完了状態を更新する
+== AP1017_会場ロック状態を更新する
 
 === 概要
 
@@ -8,7 +8,7 @@
 
 [source]
 ----
-[PUT] /placeSchedules/{placeScheduleId}/placeScheduleClosingStatus
+[PUT] /placeSchedules/{placeScheduleId}/placeScheduleLockingStatus
 ----
 
 === リクエストヘッダー

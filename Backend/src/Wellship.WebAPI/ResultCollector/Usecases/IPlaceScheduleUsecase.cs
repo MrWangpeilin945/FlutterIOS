@@ -19,12 +19,12 @@ public interface IPlaceScheduleUsecase
     public void GetTeamPlaceSchedules();
 
     /// <summary>
-    /// 健診完了状態を取得する
+    /// 会場ロック状態を取得する
     /// </summary>
-    public void GetPlaceScheduleClosingStatus();
+    public void GetPlaceScheduleLockingStatus();
 
     /// <summary>
-    /// 健診完了状態を更新する
+    /// 会場ロック状態を更新する
     /// </summary>
-    public void UpdatePlaceScheduleClosingStatus();
+    public void UpdatePlaceScheduleLockingStatus();
 }
