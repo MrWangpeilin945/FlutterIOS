@@ -51,6 +51,8 @@
 ** 更新完了
 * 400 BadRequest
 ** 指定した会場日程IDの形式が不正
+* 401 Unauthorized
+** JWT認証に失敗
 * 404 NotFound
 ** 指定した会場日程が存在しない
 

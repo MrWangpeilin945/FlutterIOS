@@ -63,5 +63,7 @@
 * 200 OK
 * 400 BadRequest
 ** 入力した受診番号の形式が不正である
+* 401 Unauthorized
+** JWT認証に失敗
 * 404 NotFound
 ** 受診番号の受診データが存在しない

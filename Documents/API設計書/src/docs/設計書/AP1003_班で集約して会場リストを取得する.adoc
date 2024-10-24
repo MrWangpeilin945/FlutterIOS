@@ -74,3 +74,5 @@
 * 200 OK
 * 400 BadRequest
 ** 必須パラメータ不足
+* 401 Unauthorized
+** JWT認証に失敗

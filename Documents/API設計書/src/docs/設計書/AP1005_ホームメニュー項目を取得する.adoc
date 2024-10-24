@@ -40,7 +40,9 @@
         {
           "menuName": "進捗",
           "path": "progress",
-          "availableConditions": ["placeScheduleSelected"]
+          "availableConditions": [
+            "placeScheduleSelected"
+          ]
         }
       ]
     },
@@ -49,12 +51,12 @@
       "menus": [
         {
           "menuName": "健診結果出力",
-          "path": "examResultsExport"
+          "path": "examResultsExport",
           "availableConditions": []
         },
         {
           "menuName": "健診結果出力履歴",
-          "path": "examResultsExportHistory"
+          "path": "examResultsExportHistory",
           "availableConditions": []
         }
       ]
@@ -66,4 +68,5 @@
 === ステータスコード
 
 * 200 OK
-
+* 401 Unauthorized
+** JWT認証に失敗

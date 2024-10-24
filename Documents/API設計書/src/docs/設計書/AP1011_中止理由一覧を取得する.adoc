@@ -62,4 +62,5 @@
 * 200 OK
 * 400 BadRequest
 ** 検査項目IDの形式が不正
-
+* 401 Unauthorized
+** JWT認証に失敗
