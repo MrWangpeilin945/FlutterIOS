@@ -9,7 +9,7 @@
 
 [source]
 ----
-[POST] /login
+[POST] /staff/login
 ----
 
 === リクエストヘッダー
@@ -45,4 +45,6 @@
 === ステータスコード
 
 * 200 OK
+* 403 Forbidden
+** ログインが拒否された場合
 
