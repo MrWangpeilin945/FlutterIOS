@@ -38,7 +38,8 @@
       "menus": [
         {
           "menuName": "進捗",
-          "path": "progress"
+          "path": "progress",
+          "availableConditions": ["placeScheduleSelected"]
         }
       ]
     },
@@ -48,10 +49,12 @@
         {
           "menuName": "健診結果出力",
           "path": "examResultsExport"
+          "availableConditions": []
         },
         {
           "menuName": "健診結果出力履歴",
           "path": "examResultsExportHistory"
+          "availableConditions": []
         }
       ]
     }
