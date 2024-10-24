@@ -16,13 +16,16 @@ public class PostgresConnector
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public PostgresConnector(IConfiguration configuration)
+    public PostgresConnector()
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            throw new ArgumentException("接続文字列が設定されていません。");
-        }
+        // TODO: 接続文字列は環境変数から取得する
+
+        // var connectionString = configuration.GetConnectionString("DefaultConnection");
+        // if (string.IsNullOrEmpty(connectionString))
+        // {
+        //     throw new ArgumentException("接続文字列が設定されていません。");
+        // }
+        var connectionString = "";
         _connectionString = connectionString;
     }
 
