@@ -2,7 +2,10 @@
 
 === 概要
 
-* TODO
+* ホーム画面の表示に必要なホームメニューを取得する
+* ホームメニューの項目は設定したグループでグルーピングする
+* グループとグループ内の項目は表示順の昇順でソートする
+* 会場日程を選択済みのとき使用できる項目を判別するために、使用可能条件を使用する。現状は`placeScheduleSelected"`の1つだが、将来的な拡張の余白を残すためリスト型で定義する。
 
 === URI
 
@@ -15,31 +18,55 @@
 
 === パスパラメータ
 
+なし
+
 === クエリパラメータ
 
-[cols="2,1,1,4,2" options="header"]
-|===
-|名称|必須|型|説明|具体例
-
-|
-
-|===
+なし
 
 === リクエストボディ
 
-[source,json]
-----
-
-----
+なし
 
 === レスポンスボディ
 
 [source,json]
 ----
-
+{
+  "homeMenuGroups": [
+    {
+      "groupName": "一般",
+      "menus": [
+        {
+          "menuName": "進捗",
+          "path": "progress",
+          "availableConditions": [
+            "placeScheduleSelected"
+          ]
+        }
+      ]
+    },
+    {
+      "groupName": "外部システム連携",
+      "menus": [
+        {
+          "menuName": "健診結果出力",
+          "path": "examResultsExport",
+          "availableConditions": []
+        },
+        {
+          "menuName": "健診結果出力履歴",
+          "path": "examResultsExportHistory",
+          "availableConditions": []
+        }
+      ]
+    }
+  ]
+}
 ----
 
 === ステータスコード
 
 * 200 OK
-
+* 401 Unauthorized
+** JWT認証に失敗

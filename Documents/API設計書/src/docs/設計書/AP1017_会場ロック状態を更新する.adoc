@@ -2,7 +2,7 @@
 
 === 概要
 
-* TODO
+* 会場ロックの状態を更新して登録する
 
 === URI
 
@@ -15,31 +15,44 @@
 
 === パスパラメータ
 
-=== クエリパラメータ
-
 [cols="2,1,1,4,2" options="header"]
 |===
 |名称|必須|型|説明|具体例
 
-|
+|placeScheduleId
+|Yes
+|number
+|会場日程ID
+|54
 
 |===
+
+=== クエリパラメータ
+
+なし
 
 === リクエストボディ
 
 [source,json]
 ----
-
+{
+  "placeScheduleId": 15,
+  "placeScheduleLockingStatus": 2
+}
 ----
 
 === レスポンスボディ
 
-[source,json]
-----
-
-----
+なし
 
 === ステータスコード
 
 * 200 OK
+** 更新完了
+* 400 BadRequest
+** 指定した会場日程IDの形式が不正
+* 401 Unauthorized
+** JWT認証に失敗
+* 404 NotFound
+** 指定した会場日程が存在しない
 

@@ -56,15 +56,13 @@
       "placeScheduleId": 10,
       "placeId": 1,
       "placeName": "会場A",
-      "startTime": "09:00",
-      "endTime": "12:00"
+      "startTime": "09:00"
     },
     {
       "placeScheduleId": 15,
       "placeId": 4,
       "placeName": "会場D",
-      "startTime": "13:00",
-      "endTime": "17:30"
+      "startTime": "13:00"
     }
   ]
 }
@@ -75,3 +73,5 @@
 * 200 OK
 * 400 BadRequest
 ** 必須パラメータ不足
+* 401 Unauthorized
+** JWT認証に失敗

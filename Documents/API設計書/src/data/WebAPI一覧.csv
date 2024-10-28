@@ -1,6 +1,6 @@
 ID,名称,Method,URI
-AP1001,ログインする,POST,/login
-AP1002,職員の情報を取得する,GET,/staffs/{staffId}
+AP1001,ログインする,POST,/staff/login
+AP1002,職員の情報を取得する,GET,/staff/profile
 AP1003,班で集約して会場リストを取得する,GET,/placeSchedules/teams
 AP1004,班を指定して会場日程を取得する,GET,/placeSchedules/places
 AP1005,ホームメニュー項目を取得する,GET,/homeMenus
@@ -16,7 +16,7 @@ AP1014,検査結果を登録する,POST,/consult/{consultNumber}/results
 AP1015,進捗状況を取得する,GET,/progress/{placeScheduleId}
 AP1016,会場ロック状態を取得する,GET,/placeSchedules/{placeScheduleId}/placeScheduleLockingStatus
 AP1017,会場ロック状態を更新する,PUT,/placeSchedules/{placeScheduleId}/placeScheduleLockingStatus
-AP1018,連携対象の検査結果を取得する,GET,/integrations/examResults/{placeScheduleId}
+AP1018,連携対象の検査結果を取得する,GET,/integrations/examResults
 AP1019,連携用に検査結果を出力する,POST,/integrations/examResults/{placeScheduleId}/export
 AP1020,検査結果の出力履歴を取得する,GET,/integrations/examResults/exportHistory
 AP1021,検査結果の連携状態を変更する,PUT,/consult/{consultNumber}/integrationStatus

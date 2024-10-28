@@ -2,7 +2,8 @@
 
 === 概要
 
-* TODO
+* 検査結果を出力した履歴を取得する
+* 出力日時の降順でソートする
 
 === URI
 
@@ -15,31 +16,37 @@
 
 === パスパラメータ
 
+なし
+
 === クエリパラメータ
 
-[cols="2,1,1,4,2" options="header"]
-|===
-|名称|必須|型|説明|具体例
-
-|
-
-|===
+なし
 
 === リクエストボディ
 
-[source,json]
-----
-
-----
+なし
 
 === レスポンスボディ
 
 [source,json]
 ----
-
+{
+  "exportHistories": [
+    {
+      "placeScheduleId": 23,
+      "placeName": "会場B",
+      "placeScheduleLockingStatus" : 1,
+      "examDate": "2024-10-21",
+      "dataCount": 187,
+      "exportedAt": "2024-11-14T18:05:00+09:00",
+      "exportedBy": "両備 太郎"
+    }
+  ]
+}
 ----
 
 === ステータスコード
 
 * 200 OK
-
+* 401 Unauthorized
+** JWT認証に失敗
