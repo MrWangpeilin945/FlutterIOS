@@ -43,7 +43,7 @@
   "placeScheduleId": 15,
   "placeId": 4,
   "placeName": "会場D",
-  "date": "2024-10-21",
+  "examDate": "2024-10-21",
   "placeScheduleLockingStatus": 1,
   "updatedAt": "2024-10-21T11:35:20+09:00",
   "updatedBy": "両備 太郎"
