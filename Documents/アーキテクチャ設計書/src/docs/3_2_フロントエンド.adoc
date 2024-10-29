@@ -16,6 +16,7 @@ https://remix.run/[Remix] +
 |https://tanstack.com/query/latest[TanStack Query] |データフェッチ(キャッシュ機能あり)
 |https://date-fns.org/[date-fns] |日付操作
 |https://axios-http.com/[axios] |PromiseベースのHTTPクライアント
+|https://tabler.io/icons[Tabler icons]|アイコンライブラリ
 |===
 
 == ライブラリ等のバージョン
