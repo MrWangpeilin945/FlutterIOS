@@ -28,6 +28,7 @@ public class PlaceScheduleController : ControllerBase
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceScheduleTeams))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/placeSchedules/teams")]
     public ActionResult<IEnumerable<PlaceScheduleTeams>> GetTeams([FromQuery] string date)
@@ -45,10 +46,12 @@ public class PlaceScheduleController : ControllerBase
     /// <summary>
     /// 班を指定して会場日程を取得する
     /// </summary>
-    /// <returns></returns>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceSchedulePlaces))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/placeSchedules/places")]
-    public IActionResult GetTeamPlaceSchedules()
+    public IActionResult GetTeamPlaceSchedules([FromQuery] string date, [FromQuery] int teamId)
     {
         _placeScheduleUsecase.GetTeamPlaceSchedules();
         return Ok();
