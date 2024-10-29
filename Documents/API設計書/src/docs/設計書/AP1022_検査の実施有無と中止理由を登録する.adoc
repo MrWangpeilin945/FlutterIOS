@@ -1,0 +1,69 @@
+== AP1022_検査の実施有無と中止理由を登録する
+
+=== 概要
+
+* 受診の検査項目ごとに実施有無と中止理由を記録するため
+* 検査内容確認画面から利用する
+* 検査実施しない（`isPerforming:false`）の場合は中止理由ID（`cancelReasonId`）を合わせて送付する
+* リクエストに含まれる検査項目に対して上書き保存する
+
+=== URI
+
+[source]
+----
+[POST] /consult/{consultNumber}/executions
+----
+
+=== リクエストヘッダー
+
+=== パスパラメータ
+
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|consultNumber
+|Yes
+|string
+|受診番号
+|00123
+
+|===
+
+=== クエリパラメータ
+
+なし
+
+=== リクエストボディ
+
+[source,json]
+----
+{
+  "executions": [
+    {
+      "examItemId": 3,
+      "isPerforming" : ture,
+      "cancelReasonId": null
+    },
+    {
+      "examItemId": 3,
+      "isPerforming" : false,
+      "cancelReasonId": 3
+    }
+  ]
+}
+----
+
+=== レスポンスボディ
+
+なし
+
+=== ステータスコード
+
+* 200 OK
+* 400 BadRequest
+** 指定した受診番号の形式が不正
+* 401 Unauthorized
+** JWT認証に失敗
+* 404 NotFound
+** 指定した受診が存在しない
