@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Requests;
@@ -38,10 +40,13 @@ public class IntegrationController : ControllerBase
     /// <summary>
     /// 連携用に検査結果を出力する
     /// </summary>
-    /// <returns></returns>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/integrations/results/{placeScheduleId}/export")]
-    public IActionResult ExportResults()
+    public IActionResult ExportResults([FromRoute][Required] int placeScheduleId, [FromBody] ResultExportRequest request)
     {
         _integrationUsecase.ExportResults();
         return Ok();
@@ -58,5 +63,4 @@ public class IntegrationController : ControllerBase
         _integrationUsecase.GetExportHistory();
         return Ok();
     }
-
 }
