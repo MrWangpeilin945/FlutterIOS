@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
@@ -27,9 +27,12 @@ public class EquipmentController : ControllerBase
     /// 機器連携設定を取得する
     /// </summary>
     /// <returns></returns>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Equipment))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/equipments")]
-    public IActionResult GetEquipmentSettings()
+    public IActionResult GetEquipmentSettings([FromQuery] int examMenuId)
     {
         _equipmentUsecase.GetEquipmentSettings();
         return Ok();

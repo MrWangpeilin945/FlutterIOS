@@ -1,5 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
+using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -58,9 +60,13 @@ public class PlaceScheduleController : ControllerBase
     /// 会場状況を取得する
     /// </summary>
     /// <returns></returns>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceScheduleLocking))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
-    [Route("api/v{version:apiVersion}/placeSchedules/placeScheduleLockingStatus")]
-    public IActionResult GetPlaceScheduleLockingStatus()
+    [Route("api/v{version:apiVersion}/placeSchedules/{placeScheduleId}/placeScheduleLockingStatus")]
+    public IActionResult GetPlaceScheduleLockingStatus([FromRoute][Required] int placeScheduleId)
     {
         _placeScheduleUsecase.GetPlaceScheduleLockingStatus();
         return Ok();
@@ -70,9 +76,14 @@ public class PlaceScheduleController : ControllerBase
     /// 会場状況を更新する
     /// </summary>
     /// <returns></returns>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPut]
-    [Route("api/v{version:apiVersion}/placeSchedules/placeScheduleLockingStatus")]
-    public IActionResult UpdatePlaceScheduleLockingStatus()
+    [Route("api/v{version:apiVersion}/placeSchedules/{placeScheduleId}/placeScheduleLockingStatus")]
+    public IActionResult UpdatePlaceScheduleLockingStatus([FromRoute][Required] int placeScheduleId,
+                                                          [FromBody] PlaceScheduleLockingRequest placeScheduleLockingRequest)
     {
         _placeScheduleUsecase.UpdatePlaceScheduleLockingStatus();
         return Ok();

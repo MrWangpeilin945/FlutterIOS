@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
@@ -27,9 +27,12 @@ public class CancelReasonController : ControllerBase
     /// 中止理由を取得する
     /// </summary>
     /// <returns></returns>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CancelReason))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/cancelReasons")]
-    public IActionResult GetCancelReasons()
+    public IActionResult GetCancelReasons([FromQuery] int examItemId)
     {
         _cancelReasonUsecase.GetCancelReasons();
         return Ok();
