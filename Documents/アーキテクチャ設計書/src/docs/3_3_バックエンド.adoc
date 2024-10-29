@@ -93,7 +93,7 @@ https://learn.microsoft.com/ja-jp/dotnet/standard/design-guidelines/names-of-nam
 
 責務に応じてレイヤーを分離して、依存関係をコントロールする。
 
-image::../images/BackendLayer.drawio.svg[バックエンドレイヤー]
+image::../images/BackendLayer.drawio.png[バックエンドレイヤー]
 
 [cols="2,10" options="header"]
 |=== 
@@ -117,7 +117,7 @@ System.Exceptionをそのまま利用するのはNG。
 
 HTTPステータスコードを設定することで、Usecaseのメソッド内で例外送出した際、クライアント側に設定したHTTPステータスコードが伝わる。
 
-image::../images/BackendCustomException.drawio.svg[カスタム例外]
+image::../images/BackendCustomException.drawio.png[カスタム例外]
 
 == データベースアクセス
 
@@ -140,7 +140,7 @@ EFCoreの場合とは異なり、クエリビルダ機能はないため開発�
 
 === 全体の流れ
 
-image::../images/BackendDevFlow.drawio.svg[バックエンド開発フロー]
+image::../images/BackendDevFlow.drawio.png[バックエンド開発フロー]
 
 . API設計書を作成する
 . APIModelとControllerを実装する
@@ -207,7 +207,7 @@ ____
 
 ----
 
-＝== WebAPI一覧からC#のクラスを作成する
+=== WebAPI一覧からC#のクラスを作成する
 
 WebAPI一覧に以下の情報がある。
 

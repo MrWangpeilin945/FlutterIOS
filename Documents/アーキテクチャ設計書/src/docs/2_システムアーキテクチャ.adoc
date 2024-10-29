@@ -13,7 +13,7 @@
 
 === 概要図
 
-image::../images/SystemArch.drawio.svg[システム構成]
+image::../images/SystemArch.drawio.png[システム構成]
 
 === フロントエンド
 
