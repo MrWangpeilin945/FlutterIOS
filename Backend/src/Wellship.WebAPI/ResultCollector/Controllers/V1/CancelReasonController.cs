@@ -24,10 +24,10 @@ public class CancelReasonController : ControllerBase
     }
 
     /// <summary>
-    /// 中止理由を取得する
+    /// 中止理由一覧を取得する
     /// </summary>
     /// <returns></returns>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CancelReason))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CancelReasonList))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]

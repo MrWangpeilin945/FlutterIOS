@@ -24,10 +24,10 @@ public class EquipmentController : ControllerBase
     }
 
     /// <summary>
-    /// 機器連携設定を取得する
+    /// 検査機器一覧を取得する
     /// </summary>
     /// <returns></returns>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Equipment))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EquipmentList))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]

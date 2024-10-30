@@ -10,7 +10,7 @@ public class PlaceScheduleProgress
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public PlaceScheduleProgress(int placeScheduleId, string placeName, string examDate, Progress[] progress)
+    public PlaceScheduleProgress(int placeScheduleId, string placeName, DateOnly examDate, Progress[] progress)
     {
         PlaceScheduleId = placeScheduleId;
         PlaceName = placeName;
@@ -34,7 +34,7 @@ public class PlaceScheduleProgress
     /// 健診日
     /// </summary>
     [JsonPropertyName("examDate")]
-    public string ExamDate { get; }
+    public DateOnly ExamDate { get; }
 
     /// <summary>
     /// 進捗状況

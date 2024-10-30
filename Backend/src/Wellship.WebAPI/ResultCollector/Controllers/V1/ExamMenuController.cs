@@ -27,7 +27,7 @@ public class ExamMenuController : ControllerBase
     /// 検査メニュー一覧を取得する
     /// </summary>
     /// <returns></returns>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExamMenu))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExamMenuList))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/examMenus")]

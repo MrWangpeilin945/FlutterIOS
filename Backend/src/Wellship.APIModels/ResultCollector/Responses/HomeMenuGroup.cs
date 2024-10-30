@@ -10,7 +10,7 @@ public class HomeMenuGroup
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public HomeMenuGroup(string groupName, HomeMenu menus)
+    public HomeMenuGroup(string groupName, HomeMenu[] menus)
     {
         GroupName = groupName;
         Menus = menus;
@@ -26,5 +26,5 @@ public class HomeMenuGroup
     /// ホームメニュー
     /// </summary>
     [JsonPropertyName("menus")]
-    public HomeMenu Menus { get; }
+    public HomeMenu[] Menus { get; }
 }

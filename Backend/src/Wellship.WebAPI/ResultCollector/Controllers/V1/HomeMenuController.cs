@@ -27,7 +27,7 @@ public class HomeMenuController : ControllerBase
     /// ホームメニュー項目を取得する
     /// </summary>
     /// <returns></returns>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HomeMenuGroup))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HomeMenuGroupList))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/homeMenus")]

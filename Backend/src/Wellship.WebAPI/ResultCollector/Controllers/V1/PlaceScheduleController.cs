@@ -57,7 +57,7 @@ public class PlaceScheduleController : ControllerBase
     }
 
     /// <summary>
-    /// 会場状況を取得する
+    /// 会場ロック状態を取得する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceScheduleLocking))]
@@ -73,7 +73,7 @@ public class PlaceScheduleController : ControllerBase
     }
 
     /// <summary>
-    /// 会場状況を更新する
+    /// 会場ロック状態を更新する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK)]
