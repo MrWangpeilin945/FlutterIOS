@@ -26,9 +26,11 @@ public class AuthenticationController : ControllerBase
     /// <summary>
     /// ログインする
     /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StaffLoginResponse))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [HttpPost]
-    [Route("api/v{version:apiVersion}/login")]
-    public IActionResult Login()
+    [Route("api/v{version:apiVersion}/staff/login")]
+    public IActionResult Login([FromBody] StaffLoginRequest request)
     {
         _authenticationUsecase.Login();
         return Ok();

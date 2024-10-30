@@ -96,4 +96,18 @@ public class ConsultController : ControllerBase
         _consultUsecase.ChangeIntegrationStatus();
         return Ok();
     }
+
+    /// <summary>
+    /// 検査の実施有無と中止理由を登録する
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpPost]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/executions")]
+    public IActionResult RegisterExecutions([FromRoute] string consultNumber, [FromBody] ExecutionsRequest executions)
+    {
+        return Ok();
+    }
 }
