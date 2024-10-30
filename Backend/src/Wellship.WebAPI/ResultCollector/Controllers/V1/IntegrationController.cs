@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 using Microsoft.AspNetCore.Mvc;
 
-using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
@@ -29,8 +29,10 @@ public class IntegrationController : ControllerBase
     /// 連携対象の検査結果を取得する
     /// </summary>
     /// <returns></returns>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExportDataList))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
-    [Route("api/v{version:apiVersion}/integrations/results/{placeScheduleId}")]
+    [Route("api/v{version:apiVersion}/integrations/examResults")]
     public IActionResult GetIntegrationResults()
     {
         _integrationUsecase.GetIntegrationResults();
@@ -56,8 +58,10 @@ public class IntegrationController : ControllerBase
     /// 検査結果の出力履歴を取得する
     /// </summary>
     /// <returns></returns>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExportHistoryList))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
-    [Route("api/v{version:apiVersion}/integrations/results/exportedHistory")]
+    [Route("api/v{version:apiVersion}/integrations/examResults/exportHistory")]
     public IActionResult GetExportHistory()
     {
         _integrationUsecase.GetExportHistory();

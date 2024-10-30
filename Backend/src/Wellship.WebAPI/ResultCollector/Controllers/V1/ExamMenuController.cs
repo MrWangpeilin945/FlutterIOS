@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
@@ -27,6 +27,8 @@ public class ExamMenuController : ControllerBase
     /// 検査メニュー一覧を取得する
     /// </summary>
     /// <returns></returns>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExamMenuList))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/examMenus")]
     public IActionResult GetExamMenus()

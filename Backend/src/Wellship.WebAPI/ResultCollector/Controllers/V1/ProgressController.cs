@@ -1,6 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
-using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
@@ -27,9 +28,11 @@ public class ProgressController : ControllerBase
     /// 進捗状況を取得する
     /// </summary>
     /// <returns></returns>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceScheduleProgress))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/progress/{placeScheduleId}")]
-    public IActionResult GetProgress()
+    public IActionResult GetProgress([FromRoute][Required] int placeScheduleId)
     {
         _progressUsecase.GetProgress();
         return Ok();
