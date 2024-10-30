@@ -5,10 +5,8 @@
 :doctype: book
 :lang: ja
 :toc: left
-:toc-levels: 2
+:toc-levels: 3
 :toc-title: 目次
-:sectnums:
-:sectnum-levels: 3
 :icons: font
 :imagesdir: images
 :xrefstyle: short
@@ -21,7 +19,6 @@
 :source-highlighter: highlightjs
 :stem: latexmath
 
-ひとまずシーケンス図置き場として利用します。
-
-include::docs/SC000_班選択画面.adoc[leveloffset=+1]
+include::docs/画面/画面.adoc[leveloffset=+1]
+include::docs/コンポーネント/コンポーネント.adoc[leveloffset=+1]
 include::docs/改版履歴.adoc[leveloffset=+1]
