@@ -1,4 +1,4 @@
-# HTMLとして出力する
+﻿# HTMLとして出力する
 
 asciidoctor ./API設計書/src/index.adoc -a stylesheet=wellshipstyle.css --destination-dir ./API設計書/dist/ -r asciidoctor-diagram
 scp -r ./API設計書/dist/images aitel-ap:C:\inetpub\wwwroot\WELLSHIP\docs\webapi-design

@@ -1,4 +1,4 @@
-# PDFとして出力する
+﻿# PDFとして出力する
 
 $docnames = @('アーキテクチャ設計書', 'API設計書', 'UI設計書')
 $docnames | ForEach-Object {
