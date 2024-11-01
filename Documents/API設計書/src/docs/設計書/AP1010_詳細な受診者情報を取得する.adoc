@@ -36,7 +36,7 @@
 |名称|必須|型|説明|具体例
 
 |examMenuId
-|No
+|Yes
 |number
 |検査メニューID
 |3
