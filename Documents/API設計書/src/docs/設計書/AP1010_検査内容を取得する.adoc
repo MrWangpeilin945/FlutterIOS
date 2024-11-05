@@ -1,4 +1,4 @@
-== AP1010_詳細な受診者情報を取得する
+== AP1010_検査内容を取得する
 
 === 概要
 
@@ -56,7 +56,7 @@
     "examinees" : {
         "examineeId" : 10,
         "name" : "両備 太郎",
-        "kanaName" : "ﾘｮｳﾋﾞ ﾀﾛｳ",
+        "kanaName" : "リョウビ　タロウ",
         "birthdate" : "1975-10-30",
         "sex" : 1,
         "organizations" : [ "両備システムズ" ],

@@ -8,7 +8,7 @@ AP1006,検査メニュー一覧を取得する,GET,/examMenus
 AP1007,受診番号を検証する,POST,/consult/consultNumber/verify
 AP1008,未受診の検査項目を取得する,GET,/consult/{consultNumber}/unexaminedItems
 AP1009,簡易な受診者情報を取得する,GET,/consult/{consultNumber}/simple
-AP1010,詳細な受診者情報を取得する,GET,/consult/{consultNumber}/detail
+AP1010,検査内容を取得する,GET,/consult/{consultNumber}/detail
 AP1011,中止理由一覧を取得する,GET,/cancelReasons
 AP1012,検査機器一覧を取得する,GET,/equipments
 AP1013,検査結果を検証する,POST,/consult/{consultNumber}/results/verify
