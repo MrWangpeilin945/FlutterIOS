@@ -1,0 +1,105 @@
+== AP1010_検査内容を取得する
+
+=== 概要
+
+* 検査内容確認画面から利用する
+* 受診番号（consultNumber）から受診者に関する情報を取得する
+* 検査メニューID（examMenuId）から検査メニューに関する情報を取得する
+
+=== URI
+
+[source]
+----
+[GET] /consult/{consultNumber}/examItems
+----
+
+=== リクエストヘッダー
+
+=== パスパラメータ
+
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|consultNumber
+|Yes
+|string
+|受診番号
+|`012345678`
+
+|===
+
+=== クエリパラメータ
+
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|examMenuId
+|Yes
+|number
+|検査メニューID
+|3
+
+|===
+
+=== リクエストボディ
+
+なし
+
+=== レスポンスボディ
+
+[source,json]
+----
+{
+    "consultNumber": "012345678",
+    "examinee" : {
+        "examineeId" : 10,
+        "name" : "両備 太郎",
+        "kanaName" : "リョウビ　タロウ",
+        "birthdate" : "1975-10-30",
+        "sex" : 1,
+        "organizations" : [ "両備システムズ" ],
+        "sameNameAlert" : false,
+        "examDateAge" : 49
+    },
+    "isComplete" : false,
+    "relatedExamItems" : [
+        {
+            "examItemName" : "診察",
+            "examResult" : "所見なし"
+        }
+    ],
+    "examItems" :[
+        {
+            "examItemId" : 100,
+            "examItemName" : "身長",
+            "isPerforming" : true,
+            "cancelReasonId" : null
+        },
+        {
+            "examItemId" : 200,
+            "examItemName" : "体重",
+            "isPerforming" : false,
+            "cancelReasonId" : 10
+        }
+    ],
+    "examDecisionResult" : [ "血圧がまだ行われていません。" ],
+    "unexaminedItems" : [ 
+        {
+            "examMenuId": 3,
+            "examMenuName": "身体計測"
+        }
+    ]
+}
+----
+
+=== ステータスコード
+
+* 200 OK
+* 400 BadRequest
+** 指定した受診番号の形式が不正
+* 401 Unauthorized
+** JWT認証に失敗
+* 404 NotFound
+** 指定した受診が存在しない
