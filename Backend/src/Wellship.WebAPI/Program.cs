@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using NLog.Web;
 
+using Ryobi.Wellship.WebAPI.DapperSample.Infrastructure.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
@@ -97,6 +98,8 @@ public static class IServiceCollectionExtension
         services.AddScoped<IHealthCheckRepository, HealthCheckRepository>();
         services.AddScoped<IConsultRepository, ConsultRepository>();
         services.AddScoped<IPlaceScheduleRepository, PlaceScheduleRepository>();
+        // NOTE: ↓はサンプル
+        services.AddScoped<IPgUserRepository, PgUserRepository>();
         return services;
     }
     /// <summary>
