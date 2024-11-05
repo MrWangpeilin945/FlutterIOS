@@ -1,9 +1,16 @@
 ﻿# PDFとして出力する
 
-$docnames = @('アーキテクチャ設計書', 'API設計書', 'UI設計書')
+$docnames = @(
+    [PSCustomObject]@{Name = 'architecture'; JpName = 'アーキテクチャ設計書' },
+    [PSCustomObject]@{Name = 'webapi-design'; JpName = 'API設計書' },
+    [PSCustomObject]@{Name = 'ui-design'; JpName = 'UI設計書' }
+)
+
 $docnames | ForEach-Object {
-    $dirName = $_
+    $dirName = $_.JpName
     $content = Get-Content "./$($dirName)/src/index.adoc"
     $version = (($content | Where-Object { $_ -like "*:revnumber: *" }) -replace ':revnumber: ').Trim()
-    asciidoctor-pdf -a pdf-theme=./config/custom-theme.yml -r asciidoctor-diagram -r ./config/config.rb ./$dirName/src/index.adoc -o "$($dirName)_v$($version).pdf"
+    $outputName = "$($_.Name)_v$($version).pdf"
+    asciidoctor-pdf -a pdf-theme=./config/custom-theme.yml -r asciidoctor-diagram -r ./config/config.rb ./$dirName/src/index.adoc -o $outputName
+    scp $outputName aitel-ap:C:\inetpub\wwwroot\WELLSHIP\docs\pdf
 }
