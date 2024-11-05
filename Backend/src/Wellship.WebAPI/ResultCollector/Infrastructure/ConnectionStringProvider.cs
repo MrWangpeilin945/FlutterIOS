@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Wellship.WebAPI.ResultCollector.Infrastructure;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 
 /// <summary>
 /// 接続文字列を取得するためのプロバイダのインターフェースです。

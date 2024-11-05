@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 
-namespace Wellship.WebAPI.ResultCollector.Infrastructure;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 
 /// <summary>
 /// データベースのデータソースを管理するクラスのインターフェースです。

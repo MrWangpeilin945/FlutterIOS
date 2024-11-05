@@ -3,15 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using NLog.Web;
 
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ResultCollector.Middlewares;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 using Ryobi.Wellship.WebAPI.ResultCollector.Utilities;
-
-using Wellship.WebAPI.ResultCollector.Infrastructure;
-using Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 
 namespace Ryobi.Wellship.WebAPI;
 

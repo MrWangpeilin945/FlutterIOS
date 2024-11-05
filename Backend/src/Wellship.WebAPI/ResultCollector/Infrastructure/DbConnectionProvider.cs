@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.Common;
 
-namespace Wellship.WebAPI.ResultCollector.Infrastructure;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 
 /// <summary>
 /// DBConnectionを生成・管理するクラスのインターフェースです。
@@ -30,7 +30,7 @@ public class DbConnectionProvider(IDbDataSourceRegistry registory, IHttpContextA
     // NOTE: コネクションは1HTTPアクセスに対して最大1つを想定しています。平行で投げたい場合は別途実装が必要です。
     private DbConnection? _connection;
     // NOTE: サンプルのためHTTPヘッダからキーを取得しています。
-    private readonly string _key = (httpContextAccessor.HttpContext!.Request!.Headers!["key"]!.FirstOrDefault()) ?? "";
+    private readonly string _key = httpContextAccessor.HttpContext!.Request!.Headers!["key"]!.FirstOrDefault() ?? "";
 
     /// <summary>
     /// 現在使用しているコネクションを返します。まだオープンされていない・破棄されている場合はコネクションを開きます。

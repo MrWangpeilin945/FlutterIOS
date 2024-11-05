@@ -3,7 +3,9 @@ using System.Data.Common;
 
 using Npgsql;
 
-namespace Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
+
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 
 
 /// <summary>
