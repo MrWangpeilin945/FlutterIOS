@@ -1,11 +1,17 @@
 ﻿# HTMLとして出力する
 
-asciidoctor ./API設計書/src/index.adoc -a stylesheet=wellshipstyle.css --destination-dir ./API設計書/dist/ -r asciidoctor-diagram
-scp -r ./API設計書/dist/images aitel-ap:C:\inetpub\wwwroot\WELLSHIP\docs\webapi-design
-scp ./API設計書/dist/index.html aitel-ap:C:\inetpub\wwwroot\WELLSHIP\docs\webapi-design\index.html
-asciidoctor ./UI設計書/src/index.adoc -a stylesheet=wellshipstyle.css --destination-dir ./UI設計書/dist/ -r asciidoctor-diagram
-scp -r ./UI設計書/dist/images aitel-ap:C:\inetpub\wwwroot\WELLSHIP\docs\ui-design
-scp ./UI設計書/dist/index.html aitel-ap:C:\inetpub\wwwroot\WELLSHIP\docs\ui-design\index.html
-asciidoctor ./アーキテクチャ設計書/src/index.adoc -a stylesheet=wellshipstyle.css --destination-dir ./アーキテクチャ設計書/dist/ -r asciidoctor-diagram
-scp -r ./アーキテクチャ設計書/dist/images aitel-ap:C:\inetpub\wwwroot\WELLSHIP\docs\architecture
-scp ./アーキテクチャ設計書/dist/index.html aitel-ap:C:\inetpub\wwwroot\WELLSHIP\docs\architecture\index.html
+$docnames = @(
+    [PSCustomObject]@{Name = 'architecture'; JpName = 'アーキテクチャ設計書' },
+    [PSCustomObject]@{Name = 'webapi-design'; JpName = 'API設計書' },
+    [PSCustomObject]@{Name = 'ui-design'; JpName = 'UI設計書' }
+)
+
+$docnames | ForEach-Object {
+    $name = $_.Name
+    Set-Location $_.JpName
+    asciidoctor "./src/index.adoc" -a stylesheet=wellshipstyle.css --destination-dir "./dist/" -r asciidoctor-diagram
+    Copy-Item -Recurse -Force ./src/images -Destination ./dist/.
+    scp -r "./dist/images" "aitel-ap:C:\inetpub\wwwroot\WELLSHIP\docs\$($name)"
+    scp "./dist/index.html" "aitel-ap:C:\inetpub\wwwroot\WELLSHIP\docs\$($name)\index.html"
+    Set-Location ..
+}

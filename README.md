@@ -69,6 +69,7 @@ nvm use 22.4.1
 選択中のバージョンを確認する
 
 ```bash
+node -v
 ```
 
 ### .NET
@@ -84,6 +85,7 @@ winget install Microsoft.DotNet.SDK.8
 モノレポ構成とする。
 
 Excelで作成するUI設計書やマニュアルはこのGitリポジトリでは管理しない。
+ただしUI設計書で使うシーケンス図はMermaid.jsで記述してAsciidocでまとめて管理する。
 
 ```txt
 .

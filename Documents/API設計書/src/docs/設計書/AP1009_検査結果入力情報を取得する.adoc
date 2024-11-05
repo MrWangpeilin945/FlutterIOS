@@ -1,14 +1,14 @@
-== AP1009_簡易な受診者情報を取得する
+== AP1009_検査結果入力情報を取得する
 
 === 概要
 
-* TODO
+* 検査結果入力画面を構成するための情報を取得する
 
 === URI
 
 [source]
 ----
-[GET] /examinees/{examineeId}/simple
+[GET] /consult/{consultNumber}/inputExamItems
 ----
 
 === リクエストヘッダー
