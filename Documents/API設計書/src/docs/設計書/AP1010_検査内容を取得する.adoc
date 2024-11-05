@@ -10,7 +10,7 @@
 
 [source]
 ----
-[GET] /examinees/{consultNumber}/detail
+[GET] /consult/{consultNumber}/examItems
 ----
 
 === リクエストヘッダー
@@ -53,7 +53,7 @@
 ----
 {
     "consultNumber": "012345678",
-    "examinees" : {
+    "examinee" : {
         "examineeId" : 10,
         "name" : "両備 太郎",
         "kanaName" : "リョウビ　タロウ",
@@ -85,7 +85,12 @@
         }
     ],
     "examDecisionResult" : [ "血圧がまだ行われていません。" ],
-    "unexaminedItems" : [ "血圧", "心電図", "胸部" ]
+    "unexaminedItems" : [ 
+        {
+            "examMenuId": 3,
+            "examMenuName": "身体計測"
+        }
+    ]
 }
 ----
 
