@@ -8,9 +8,11 @@ $docnames = @(
 
 $docnames | ForEach-Object {
     $dirName = $_.JpName
-    $content = Get-Content "./$($dirName)/src/index.adoc"
+    Set-Location $dirName
+    $content = Get-Content "./src/index.adoc"
     $version = (($content | Where-Object { $_ -like "*:revnumber: *" }) -replace ':revnumber: ').Trim()
     $outputName = "$($_.Name)_v$($version).pdf"
-    asciidoctor-pdf -a pdf-theme=./config/custom-theme.yml -r asciidoctor-diagram -r ./config/config.rb ./$dirName/src/index.adoc -o $outputName
+    asciidoctor-pdf -a pdf-theme=../config/custom-theme.yml -r asciidoctor-diagram -r ../config/config.rb ./src/index.adoc -o $outputName
     scp $outputName aitel-ap:C:\inetpub\wwwroot\WELLSHIP\docs\pdf
+    Set-Location ..
 }
