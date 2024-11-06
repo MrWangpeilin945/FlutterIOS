@@ -69,14 +69,18 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 詳細な受診者情報を取得する
+    /// 検査内容を取得する
     /// </summary>
     /// <returns></returns>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExamContent))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
-    [Route("api/v{version:apiVersion}/consult/{consultNumber}/detail")]
-    public IActionResult GetDetailedExaminee()
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/examItems")]
+    public IActionResult GetExamItemsExaminee([FromQuery][Required] int examMenuId)
     {
-        _consultUsecase.GetDetailedExaminee();
+        _consultUsecase.GetExamItemsExaminee();
         return Ok();
     }
 

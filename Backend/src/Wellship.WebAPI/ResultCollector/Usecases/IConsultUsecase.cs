@@ -25,9 +25,9 @@ public interface IConsultUsecase
     public void GetSimpleExaminee();
 
     /// <summary>
-    /// 詳細な受診者情報を取得する
+    /// 検査内容を取得する
     /// </summary>
-    public void GetDetailedExaminee();
+    public void GetExamItemsExaminee();
 
     /// <summary>
     /// 検査結果の連携状態を変更する
