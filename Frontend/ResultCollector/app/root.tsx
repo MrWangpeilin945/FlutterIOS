@@ -6,12 +6,26 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useNavigate,
 } from '@remix-run/react';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { useEffect } from 'react';
+import { setupAxiosInterceptors } from '~/utils/axiosInstance';
 
 const queryClient = new QueryClient();
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
+
+  const redirectToLogin = () => {
+    navigate('/login');
+  };
+
+  useEffect(() => {
+    // API呼び出し時に401が返ってきたらログイン画面に遷移する処理をaxiosInstanceに引き渡す
+    setupAxiosInterceptors(redirectToLogin);
+  }, []);
+
   return (
     <html lang="en">
       <head>
