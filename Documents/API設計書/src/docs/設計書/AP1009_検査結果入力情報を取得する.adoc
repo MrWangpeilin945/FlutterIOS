@@ -2,6 +2,7 @@
 
 === 概要
 
+* 検査結果入力画面から利用する
 * 検査結果入力画面を構成するための情報を取得する
 
 === URI
@@ -15,36 +16,93 @@
 
 === パスパラメータ
 
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|consultNumber
+|Yes
+|string
+|受診番号
+|`012345678`
+
+|===
+
 === クエリパラメータ
 
 [cols="2,1,1,4,2" options="header"]
 |===
 |名称|必須|型|説明|具体例
 
-|
-|
-|
-|
-|
+|examMenuId
+|Yes
+|number
+|検査メニューID
+|3
 
 |===
 
 === リクエストボディ
 
-[source,json]
-----
-
-----
+なし
 
 === レスポンスボディ
 
 [source,json]
 ----
-
+{
+    "consultNumber": "012345678",
+    "examinee" : {
+        "examineeId" : 10,
+        "name" : "両備 太郎",
+        "kanaName" : "リョウビ　タロウ",
+        "birthdate" : "1975-10-30",
+        "sex" : 1,
+        "organizations" : [ "両備システムズ" ],
+        "sameNameAlert" : false,
+        "examDateAge" : 49
+    },
+    "examItems" :[
+        {
+            "examItemId" : 100,
+            "examItemName" : "身長",
+            "examItemGroupId" : 5,
+            "examItemDetails" : [
+                {
+                    "examItemDetailId": 1,
+                    "value" : "178.5",
+                    "prevValue" : "178.3",
+                    "cancelReasonId": null,
+                    "numericMin" : 50.0,
+                    "numericMax" : 250.0,
+                    "errorLevel" : 10,
+                    "colorCode" : 255
+                }
+            ],
+            "choices" : [
+                {
+                    "choiceId" : 100,
+                    "choiceName" : "やせ"
+                }
+            ],
+            "selectableCount" : 0,
+            "increment" : 0,
+            "equipmentId" : 10,
+            "unit" : "cm",
+            "initiSetting" :  false,
+            "examType" : 1,
+            "keyboardType" : 1
+        }
+    ]
+}
 ----
 
 === ステータスコード
 
 * 200 OK
+* 400 BadRequest
+** 指定した受診番号の形式が不正
 * 401 Unauthorized
 ** JWT認証に失敗
+* 404 NotFound
+** 指定した受診が存在しない
