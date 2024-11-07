@@ -8,11 +8,29 @@ import { RemixBrowser } from "@remix-run/react";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 
-startTransition(() => {
-  hydrateRoot(
-    document,
-    <StrictMode>
-      <RemixBrowser />
-    </StrictMode>
-  );
-});
+async function prepareApp() {
+  if (process.env.NODE_ENV === 'development') {
+    const { worker } = await import('./mocks/browser')
+    return worker.start({
+      serviceWorker: {
+        url: '/ResultCollector/mockServiceWorker.js',
+      },
+      onUnhandledRequest: (req) => {
+        console.warn('Unhandled request:', req);
+      },
+    });
+  }
+
+  return Promise.resolve()
+}
+
+prepareApp().then(() => {
+  startTransition(() => {
+    hydrateRoot(
+      document,
+      <StrictMode>
+        <RemixBrowser />
+      </StrictMode>,
+    )
+  })
+})

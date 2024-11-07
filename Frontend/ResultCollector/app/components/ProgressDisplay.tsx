@@ -61,13 +61,23 @@ export default function ProgressDisplay({ progress }: progressData) {
 						<tr>
 							<td>【予定】</td>
 							<td>
-								<Button className={styles["progress-yotei"]} size="xs" radius="md" px={5}>
-									<Text size="lg" >来場</Text>
+								<Button
+									className={styles["progress-yotei"]}
+									size="xs"
+									radius="md"
+									px={5}
+								>
+									<Text size="lg">来場</Text>
 								</Button>
 							</td>
 							<td className={styles["progress-td"]}>{data.raijyo}</td>
 							<td>
-								<Button className={styles["progress-raijyo"]}size="xs" radius="md" px={5}>
+								<Button
+									className={styles["progress-raijyo"]}
+									size="xs"
+									radius="md"
+									px={5}
+								>
 									<Text size="lg">予定</Text>
 								</Button>
 							</td>
@@ -76,7 +86,12 @@ export default function ProgressDisplay({ progress }: progressData) {
 						<tr>
 							<td>【受診】</td>
 							<td>
-								<Button className={styles["progress-completed"]} size="xs" radius="md" px={5}>
+								<Button
+									className={styles["progress-completed"]}
+									size="xs"
+									radius="md"
+									px={5}
+								>
 									<Text size="lg">済</Text>
 								</Button>
 							</td>
