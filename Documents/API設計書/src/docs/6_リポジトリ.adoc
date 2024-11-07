@@ -20,7 +20,9 @@ class StaffRepository {
 ----
 classDiagram
 class PlaceScheduleRepository {
-  + Get()
+  + GetPlaceSchedules()
+  + GetPlaceScheduleLockingStatus()
+  + SavePlaceScheduleLockingStatus()
 }
 ----
 
@@ -30,7 +32,7 @@ class PlaceScheduleRepository {
 ----
 classDiagram
 class HomeMenuRepository {
-  + Get()
+  + GetHomeMenus()
 }
 ----
 
@@ -40,7 +42,7 @@ class HomeMenuRepository {
 ----
 classDiagram
 class ExamMenuRepository {
-  + Get()
+  + GetExamMenus()
 }
 ----
 
@@ -60,7 +62,7 @@ class ConsultRepository {
 ----
 classDiagram
 class CancelReasonRepository {
-  + Get()
+  + GetCancelReasons()
 }
 ----
 
@@ -70,7 +72,7 @@ class CancelReasonRepository {
 ----
 classDiagram
 class EquipmentRepository {
-  + Get()
+  + GetEquipmentSettings()
 }
 ----
 
@@ -80,7 +82,7 @@ class EquipmentRepository {
 ----
 classDiagram
 class ResultRepository {
-  + Get()
+  + SaveResults()
 }
 ----
 
@@ -90,7 +92,7 @@ class ResultRepository {
 ----
 classDiagram
 class ProgressRepository {
-  + Get()
+  + GetProgress()
 }
 ----
 
@@ -100,6 +102,7 @@ class ProgressRepository {
 ----
 classDiagram
 class IntegrationRepository {
-  + Get()  
+  + ExportResults()
+  + GetExportHistory()
 }
 ----

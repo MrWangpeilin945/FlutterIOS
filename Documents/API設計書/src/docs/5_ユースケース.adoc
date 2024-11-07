@@ -180,10 +180,53 @@ sequenceDiagram
 ----
 classDiagram
 class ConsultUsecase {
+  + GetExamItems(consultNumber: string)
+  + GetInputExamItems(consultNumber: string)
+  + GetUnexaminedItems(consultNumber: string)
   + VerifyConsultNumber(request: ): void
-  + GetUnexaminedItems(consultId: int)
+  + RegisterExecutions(request: )
   + ChangeIntegrationStatus(request: ): void
 }
+----
+
+=== GetExamItems
+
+* 受診に紐づく検査項目を取得する
+* 検査内容確認画面を構成する項目をまとめて取得する
+
+[mermaid,GetExamItems-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== GetInputExamItems
+
+* 検査結果入力画面を構成する項目をまとめて取得する
+
+[mermaid,GetInputExamItems-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== GetUnexaminedItems
+
+* 未受診の検査項目リストを取得する
+
+[mermaid,GetUnexaminedItems-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
 ----
 
 === VerifyConsultNumber
@@ -199,11 +242,11 @@ sequenceDiagram
 
 ----
 
-=== GetUnexaminedItems
+=== RegisterExecutions
 
-* 未受診の検査項目リストを取得する
+* 検査項目ごとの実施有無と中止理由を記録する
 
-[mermaid,GetUnexaminedItems-u-seq,png]
+[mermaid,VerifyConsultNumber-u-seq,png]
 ----
 sequenceDiagram
   participant con as Controller
