@@ -6,6 +6,11 @@ font:
       bold: GEM_FONTS_DIR/notoserif-bold-subset.ttf
       italic: GEM_FONTS_DIR/notoserif-italic-subset.ttf
       bold_italic: GEM_FONTS_DIR/notoserif-bold_italic-subset.ttf
+    Noto Sans:
+      normal: GEM_FONTS_DIR/notosans-regular-subset.ttf
+      bold: GEM_FONTS_DIR/notosans-bold-subset.ttf
+      italic: GEM_FONTS_DIR/notosans-italic-subset.ttf
+      bold_italic: GEM_FONTS_DIR/notosans-bold_italic-subset.ttf
     # M+ 1mn supports ASCII and the circled numbers used for conums
     M+ 1mn:
       normal: GEM_FONTS_DIR/mplus1mn-regular-subset.ttf
@@ -30,7 +35,7 @@ page:
 base:
   text_align: justify
   font_color: 333333
-  font_family: Noto Serif
+  font_family: Noto Sans
   font_size: 10.5
   # line_height_length is really just a vertical spacing variable; it's not actually the height of a line
   line_height_length: 12
@@ -58,7 +63,6 @@ role:
   subtitle:
     font_color: 999999
     font_size: 0.8em
-    font_style: normal_italic
 vertical_rhythm: $base_line_height_length
 horizontal_rhythm: $base_line_height_length
 link:
@@ -87,7 +91,6 @@ menu:
 heading:
   text_align: left
   font_color: $base_font_color
-  font_style: bold
   # h1 is used for part titles (book doctype) or the doctitle (article doctype)
   h1_font_size: floor($base_font_size * 2.6)
   # h2 is used for chapter titles (book doctype only)
@@ -112,7 +115,6 @@ title_page:
     line_height: 0.9
   subtitle:
     font_size: $heading_h3_font_size
-    font_style: bold_italic
     line_height: 1
   authors:
     margin_top: $base_font_size * 1.25
@@ -139,7 +141,6 @@ abstract:
     text_align: center
     font_color: $heading_font_color
     font_size: $heading_h4_font_size
-    font_style: $heading_font_style
 admonition:
   column_rule_color: $base_border_color
   column_rule_width: $base_border_width
@@ -223,7 +224,6 @@ sidebar:
     text_align: center
     font_color: $heading_font_color
     font_size: $heading_h4_font_size
-    font_style: $heading_font_style
 thematic_break:
   border_color: $base_border_color
   border_style: solid
