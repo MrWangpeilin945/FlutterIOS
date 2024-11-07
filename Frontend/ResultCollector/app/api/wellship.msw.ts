@@ -16,7 +16,7 @@ import {
 import type {
   PlaceScheduleTeams,
   UnexaminedItemList
-} from './wellship.schemas'
+} from '../domain/wellship.schemas'
 
 export const getAuthenticationLoginResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
 

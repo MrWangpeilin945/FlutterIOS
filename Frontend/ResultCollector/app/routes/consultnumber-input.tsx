@@ -4,7 +4,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
 import { z } from "zod";
 import { useAtom } from "jotai";
-import { teamAtom } from "~/store/store";
+import { teamState } from "~/store/store";
 import { Group, Title, Box, Center } from "@mantine/core";
 import { useClickOutside, useDisclosure } from "@mantine/hooks";
 import { consultVerifyConsultNumber } from "~/api/wellship";
@@ -23,7 +23,7 @@ export const meta: MetaFunction = () => {
 
 export default function consultNumberInput() {
 	const [consultNo, setConsultNo] = useState("");
-	const [teamData, setTeamData] = useAtom(teamAtom);
+	const [teamData, setTeamData] = useAtom(teamState);
 	const [showKeyboard, setShowKeyboard] = useState(false);
 	const [opened, { open, close }] = useDisclosure(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -112,7 +112,7 @@ export default function consultNumberInput() {
 						<Group justify="space-between" m={10}>
 							<Title order={1}>受診番号</Title>
 							<Title order={2} fw={500}>
-								{teamData?.teamName}
+								{teamData?.name}
 							</Title>
 						</Group>
 						<input

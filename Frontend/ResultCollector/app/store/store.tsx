@@ -1,8 +1,9 @@
 import { atom } from 'jotai';
-import type { Place, PlaceScheduleTeam } from '~/api/wellship.schemas';
+import type { NamedEntity } from '~/interfaces/interfaces';
+import type { PlaceScheduleTeam } from '~/domain/wellship.schemas';
 
-export const placeState = atom<Place | null>(null);
-export const teamAtom = atom<{teamId:number,teamName:string} | null>(null);
+export const teamState = atom<NamedEntity | null>(null);
 export const placeScheduleState = atom<PlaceScheduleTeam | null>();
 export const examDateState = atom<Date | null>();
-export const staffState = atom<{staffId:number,stafName:string} | null >();
+export const staffState = atom<NamedEntity | null >();
+export const examMenuState = atom<NamedEntity[] | null>();
