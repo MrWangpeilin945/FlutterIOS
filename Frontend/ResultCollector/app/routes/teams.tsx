@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Container, Stack, Title } from "@mantine/core";
 import { useNavigate } from "@remix-run/react";
 import { useAtom } from "jotai";
-import { teamAtom } from "~/store/store";
+import { teamState } from "~/store/store";
 import { placeScheduleGetTeams } from "~/api/wellship";
 import type { PlaceScheduleTeams } from "~/domain/wellship.schemas";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
@@ -22,7 +22,7 @@ export default function teams() {
 	const [teamsData, setTeamsData] = useState<PlaceScheduleTeams>();
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const [teamState, setTeamState] = useAtom(teamAtom);
+	const [team, setTeam] = useAtom(teamState);
 
 
 	useEffect(() => {
@@ -48,7 +48,7 @@ export default function teams() {
 	const buttonClickEvent = (id?: number, name?: string) => {
 		if (id && name) {
 			const teamData = {id,name};
-			setTeamState(teamData);
+			setTeam(teamData);
 			console.log(teamState);
 		}
 		navigate("/consultnumber-input")
