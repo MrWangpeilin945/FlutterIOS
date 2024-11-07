@@ -5,7 +5,7 @@ import { useNavigate } from "@remix-run/react";
 import { useAtom } from "jotai";
 import { teamAtom } from "~/store/store";
 import { placeScheduleGetTeams } from "~/api/wellship";
-import type { PlaceScheduleTeams } from "~/api/wellship.schemas";
+import type { PlaceScheduleTeams } from "~/domain/wellship.schemas";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import Team from "~/components/Team";
 import CommonHeader from "~/components/CommonHeader";
@@ -45,9 +45,9 @@ export default function teams() {
 	if (error) return <div>{error}</div>;
 
 	//jotaiに班idと班名を保存して遷移
-	const buttonClickEvent = (teamId?: number, teamName?: string) => {
-		if (teamId && teamName) {
-			const teamData = {teamId,teamName};
+	const buttonClickEvent = (id?: number, name?: string) => {
+		if (id && name) {
+			const teamData = {id,name};
 			setTeamState(teamData);
 			console.log(teamState);
 		}

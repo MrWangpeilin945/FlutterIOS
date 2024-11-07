@@ -112,7 +112,7 @@ export default function consultNumberInput() {
 						<Group justify="space-between" m={10}>
 							<Title order={1}>受診番号</Title>
 							<Title order={2} fw={500}>
-								{teamData?.teamName}
+								{teamData?.name}
 							</Title>
 						</Group>
 						<input
