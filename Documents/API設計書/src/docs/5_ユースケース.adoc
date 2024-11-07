@@ -2,123 +2,339 @@
 
 ユースケースの設計を示します。
 
+ユースケースはコントローラーから利用されます。リクエストモデルを受け取り、レスポンスモデルを返却します。
+
+リポジトリを通してデータベースにアクセスします。ドメインモデルに定義されたロジックを利用しつつ、処理の流れを記載します。
+
 == 認証ユースケース
-[plantuml,Authentication-u-cd,svg]
+
+[mermaid,Authentication-u-cd,png]
 ----
-@startuml
+classDiagram
 class AuthenticationUsecase {
-  + Login(request: LoginRequest): JwtResponse
+  + Login(request)
 }
-@enduml
 ----
 
-== 管理者ユースケース
-[plantuml,Administrator-u-cd,svg]
+=== Login_ログインする
+
+[mermaid,Login-u-seq,png]
 ----
-@startuml
-class AdministratorUsecase {
-  + GetAdministrator(administratorId: int): AdministratorResponse
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: 職員ID、パスワード
+  uc->>repo: GetStaff()
+  repo-->>uc: Staff
+  alt 職員が存在しない
+    uc->>uc: カスタム例外を投げる
+  end
+  uc->>uc: パスワード検証
+  alt パスワードが一致する
+    uc->>con: アクセストークン
+  else パスワードが一致しない
+    uc->>uc: カスタム例外を投げる
+  end
+----
+
+
+== 職員ユースケース
+
+[mermaid,Staff-u-cd,png]
+----
+classDiagram
+class StaffUsecase {
+  + GetStaff(staffId: int)
 }
-@enduml
 ----
+
+=== GetStaff
+
+[mermaid,GetStaff-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
 
 == 会場日程ユースケース
-[plantuml,PlaceSchedule-u-cd,svg]
+
+[mermaid,PlaceSchedule-u-cd,png]
 ----
-@startuml
+classDiagram
 class PlaceScheduleUsecase {
-  + GetTeamPlaceSchedules(): List<PlaceScheduleResponse>
-  + GetTeams(teamId: int): List<PlaceScheduleResponse>
-  + GetPlaceStatus(placeScheduleId: int): 
-  + UpdatePlaceStatus(placeScheduleId: string, status: boolean): void
+  + GetTeams(examDate: DateOnly)
+  + GetTeamPlaceSchedules(teamId: int)
+  + GetPlaceScheduleLockingStatus(placeScheduleId: int)
+  + UpdatePlaceStatus(request: ): void
 }
-@enduml
+----
+
+=== GetTeams
+
+[mermaid,GetTeams-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== GetTeamPlaceSchedules
+
+[mermaid,GetTeamPlaceSchedules-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== GetPlaceScheduleLockingStatus
+
+[mermaid,GetPlaceScheduleLockingStatus-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== UpdatePlaceStatus
+
+[mermaid,UpdatePlaceStatus-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
 ----
 
 == ホームメニューユースケース
-[plantuml,HomeMenu-u-cd,svg]
+
+[mermaid,HomeMenu-u-cd,png]
 ----
-@startuml
+classDiagram
 class HomeMenuUsecase {
-  + GetHomeMenuSettings(): List<HomeMenuSetting>
+  + GetHomeMenus()
 }
-@enduml
 ----
+
+=== GetHomeMenus
 
 == 検査メニューユースケース
-[plantuml,CheckupMenu-u-cd,svg]
+
+[mermaid,ExamMenu-u-cd,png]
 ----
-@startuml
-class CheckupMenuUsecase {
-  + GetCheckupMenus(): List<CheckupMenu>
+classDiagram
+class ExamMenuUsecase {
+  + GetExamMenus()
 }
-@enduml
 ----
 
-== 受診ユースケース
-[plantuml,Consult-u-cd,svg]
+=== GetExamMenus
+
+[mermaid,GetExamMenus-u-seq,png]
 ----
-@startuml
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+
+== 受診ユースケース
+
+[mermaid,Consult-u-cd,png]
+----
+classDiagram
 class ConsultUsecase {
-  + VerifyReservationNo(request: VerifyReservationNoRequest): void
-  + GetUnexaminedMenus(consultId: int): List<UnexaminedMenu>
-  + GetSimpleExaminee(examineeId: int): ExamineeSimpleInfo
-  + GetDetailedExaminee(examineeId: int): ExamineeDetailedInfo
-  + ChangeIntegrationStatus(consultId: string, status: IntegrationStatus): void
+  + VerifyConsultNumber(request: ): void
+  + GetUnexaminedItems(consultId: int)
+  + ChangeIntegrationStatus(request: ): void
 }
-@enduml
+----
+
+=== VerifyConsultNumber
+
+[mermaid,VerifyConsultNumber-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== GetUnexaminedItems
+
+[mermaid,GetUnexaminedItems-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== ChangeIntegrationStatus
+
+[mermaid,ChangeIntegrationStatus-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
 ----
 
 == 中止理由ユースケース
-[plantuml,CancelReason-u-cd,svg]
+
+[mermaid,CancelReason-u-cd,png]
 ----
-@startuml
+classDiagram
 class CancelReasonUsecase {
-  + GetCancelReasons(): List<CancelReason>
+  + GetCancelReasons(examItemId :int)
 }
-@enduml
+----
+
+=== GetCancelReasons
+
+[mermaid,GetCancelReasons-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
 ----
 
 == 検査機器ユースケース
-[plantuml,Equipment-u-cd,svg]
+
+[mermaid,Equipment-u-cd,png]
 ----
-@startuml
+classDiagram
 class EquipmentUsecase {
-  + GetEquipmentSettings(): List<EquipmentSetting>
+  + GetEquipmentSettings()
 }
-@enduml
+----
+
+=== GetEquipmentSettings
+
+[mermaid,GetEquipmentSettings-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
 ----
 
 == 検査結果ユースケース
-[plantuml,Result-u-cd,svg]
+
+[mermaid,Result-u-cd,png]
 ----
-@startuml
+classDiagram
 class ResultUsecase {
-  + VerifyResults(consultId: string, results: List<Result>): VerificationResponse
-  + RegisterResults(consultId: string, results: List<Result>): void
+  + VerifyResults(request:)
+  + RegisterResults(request:)
 }
-@enduml
+----
+
+=== VerifyResults
+
+[mermaid,VerifyResults-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== RegisterResults
+
+[mermaid,RegisterResults-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
 ----
 
 == 進捗ユースケース
-[plantuml,Progress-u-cd,svg]
+
+[mermaid,Progress-u-cd,png]
 ----
-@startuml
+classDiagram
 class ProgressUsecase {
-  + GetProgress(placeScheduleId: int): Progress
+  + GetProgress(placeScheduleId: int)
 }
-@enduml
+----
+
+=== GetProgress
+
+[mermaid,GetProgress-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
 ----
 
 == 基幹システム連携ユースケース
-[plantuml,Integration-u-cd,svg]
+
+[mermaid,Integration-u-cd,png]
 ----
-@startuml
+classDiagram
 class IntegrationUsecase {
-  + GetIntegrationResults(placeScheduleId: int): List<IntegrateResult>
-  + ExportResults(placeScheduleId: string): void
-  + GetExportHistory(): List<ExportHistory>
+  + GetIntegrationResults(placeScheduleId: int)
+  + ExportResults(placeScheduleId: int)
+  + GetExportHistory()
 }
-@enduml
 ----
 
+=== GetIntegrationResults
+
+[mermaid,GetIntegrationResults-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== ExportResults
+
+[mermaid,ExportResults-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== GetExportHistory
+
+[mermaid,GetExportHistory-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
