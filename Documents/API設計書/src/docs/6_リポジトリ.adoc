@@ -3,3 +3,103 @@
 リポジトリの設計を示します。
 リポジトリはユースケース層から利用されます。データベースに接続して、データを読み書きします。
 原則として、リポジトリのメソッドはドメインモデルを返します。
+
+== 職員リポジトリ
+
+[mermaid,Staff-r-cd,png]
+----
+classDiagram
+class StaffRepository {
+  + GetStaff(staffId: int)
+}
+----
+
+== 会場日程リポジトリ
+
+[mermaid,PlaceSchedule-r-cd,png]
+----
+classDiagram
+class PlaceScheduleRepository {
+  + Get()
+}
+----
+
+== ホームメニューリポジトリ
+
+[mermaid,HomeMenu-r-cd,png]
+----
+classDiagram
+class HomeMenuRepository {
+  + Get()
+}
+----
+
+== 検査メニューリポジトリ
+
+[mermaid,ExamMenu-r-cd,png]
+----
+classDiagram
+class ExamMenuRepository {
+  + Get()
+}
+----
+
+== 受診リポジトリ
+
+[mermaid,Consult-r-cd,png]
+----
+classDiagram
+class ConsultRepository {
+  + Get()
+}
+----
+
+== 中止理由リポジトリ
+
+[mermaid,CancelReason-r-cd,png]
+----
+classDiagram
+class CancelReasonRepository {
+  + Get()
+}
+----
+
+== 検査機器リポジトリ
+
+[mermaid,Equipment-r-cd,png]
+----
+classDiagram
+class EquipmentRepository {
+  + Get()
+}
+----
+
+== 検査結果リポジトリ
+
+[mermaid,Result-r-cd,png]
+----
+classDiagram
+class ResultRepository {
+  + Get()
+}
+----
+
+== 進捗リポジトリ
+
+[mermaid,Progress-r-cd,png]
+----
+classDiagram
+class ProgressRepository {
+  + Get()
+}
+----
+
+== 基幹システム連携リポジトリ
+
+[mermaid,Integration-r-cd,png]
+----
+classDiagram
+class IntegrationRepository {
+  + Get()  
+}
+----

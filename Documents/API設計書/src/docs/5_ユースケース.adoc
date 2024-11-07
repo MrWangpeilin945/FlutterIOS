@@ -16,7 +16,10 @@ class AuthenticationUsecase {
 }
 ----
 
-=== Login_ログインする
+=== Login
+
+* 入力された認証情報とデータベースの値を比較する
+* ログイン可能場合はアクセストークンを返却する
 
 [mermaid,Login-u-seq,png]
 ----
@@ -39,7 +42,7 @@ sequenceDiagram
   end
 ----
 
-
+<<<
 == 職員ユースケース
 
 [mermaid,Staff-u-cd,png]
@@ -52,6 +55,8 @@ class StaffUsecase {
 
 === GetStaff
 
+* 職員IDを指定して職員情報を取得する
+
 [mermaid,GetStaff-u-seq,png]
 ----
 sequenceDiagram
@@ -61,7 +66,7 @@ sequenceDiagram
 
 ----
 
-
+<<<
 == 会場日程ユースケース
 
 [mermaid,PlaceSchedule-u-cd,png]
@@ -69,13 +74,16 @@ sequenceDiagram
 classDiagram
 class PlaceScheduleUsecase {
   + GetTeams(examDate: DateOnly)
-  + GetTeamPlaceSchedules(teamId: int)
+  + GetTeamPlaceSchedules(examDate: DateOnly, teamId: int)
   + GetPlaceScheduleLockingStatus(placeScheduleId: int)
   + UpdatePlaceStatus(request: ): void
 }
 ----
 
 === GetTeams
+
+* 班単位で集約して、班の情報と会場リストを取得する
+* 健診日を指定する
 
 [mermaid,GetTeams-u-seq,png]
 ----
@@ -88,6 +96,9 @@ sequenceDiagram
 
 === GetTeamPlaceSchedules
 
+* 班に紐づく会場リストを取得する
+* 班と健診日を指定する
+
 [mermaid,GetTeamPlaceSchedules-u-seq,png]
 ----
 sequenceDiagram
@@ -99,6 +110,8 @@ sequenceDiagram
 
 === GetPlaceScheduleLockingStatus
 
+* 会場日程IDを指定して会場ロックの状態と更新情報を取得する
+
 [mermaid,GetPlaceScheduleLockingStatus-u-seq,png]
 ----
 sequenceDiagram
@@ -108,9 +121,11 @@ sequenceDiagram
 
 ----
 
-=== UpdatePlaceStatus
+=== UpdatePlaceScheduleLockingStatus
 
-[mermaid,UpdatePlaceStatus-u-seq,png]
+* 会場ロックの状態を更新する
+
+[mermaid,UpdatePlaceScheduleLockingStatus-u-seq,png]
 ----
 sequenceDiagram
   participant con as Controller
@@ -119,6 +134,7 @@ sequenceDiagram
 
 ----
 
+<<<
 == ホームメニューユースケース
 
 [mermaid,HomeMenu-u-cd,png]
@@ -131,6 +147,9 @@ class HomeMenuUsecase {
 
 === GetHomeMenus
 
+* ホームメニュー一覧を取得する
+
+<<<
 == 検査メニューユースケース
 
 [mermaid,ExamMenu-u-cd,png]
@@ -143,6 +162,8 @@ class ExamMenuUsecase {
 
 === GetExamMenus
 
+* 検査メニュー一覧を取得する
+
 [mermaid,GetExamMenus-u-seq,png]
 ----
 sequenceDiagram
@@ -152,7 +173,7 @@ sequenceDiagram
 
 ----
 
-
+<<<
 == 受診ユースケース
 
 [mermaid,Consult-u-cd,png]
@@ -167,6 +188,8 @@ class ConsultUsecase {
 
 === VerifyConsultNumber
 
+* 受診番号の受診が存在するか確認する
+
 [mermaid,VerifyConsultNumber-u-seq,png]
 ----
 sequenceDiagram
@@ -177,6 +200,8 @@ sequenceDiagram
 ----
 
 === GetUnexaminedItems
+
+* 未受診の検査項目リストを取得する
 
 [mermaid,GetUnexaminedItems-u-seq,png]
 ----
@@ -189,6 +214,8 @@ sequenceDiagram
 
 === ChangeIntegrationStatus
 
+* 受診の連携状態を更新する
+
 [mermaid,ChangeIntegrationStatus-u-seq,png]
 ----
 sequenceDiagram
@@ -198,6 +225,7 @@ sequenceDiagram
 
 ----
 
+<<<
 == 中止理由ユースケース
 
 [mermaid,CancelReason-u-cd,png]
@@ -210,6 +238,8 @@ class CancelReasonUsecase {
 
 === GetCancelReasons
 
+* 検査項目IDを指定して中止理由一覧を取得する
+
 [mermaid,GetCancelReasons-u-seq,png]
 ----
 sequenceDiagram
@@ -219,6 +249,7 @@ sequenceDiagram
 
 ----
 
+<<<
 == 検査機器ユースケース
 
 [mermaid,Equipment-u-cd,png]
@@ -231,6 +262,8 @@ class EquipmentUsecase {
 
 === GetEquipmentSettings
 
+* 検査機器の設定を取得する
+
 [mermaid,GetEquipmentSettings-u-seq,png]
 ----
 sequenceDiagram
@@ -240,6 +273,7 @@ sequenceDiagram
 
 ----
 
+<<<
 == 検査結果ユースケース
 
 [mermaid,Result-u-cd,png]
@@ -253,6 +287,10 @@ class ResultUsecase {
 
 === VerifyResults
 
+* 入力された検査結果を設定されたルールで検証する
+* 検証結果を返却する
+* TODO: 業務ルールのところはで未確定で設計が必要
+
 [mermaid,VerifyResults-u-seq,png]
 ----
 sequenceDiagram
@@ -264,6 +302,8 @@ sequenceDiagram
 
 === RegisterResults
 
+* 入力された検査結果をデータベースに登録する
+
 [mermaid,RegisterResults-u-seq,png]
 ----
 sequenceDiagram
@@ -273,6 +313,7 @@ sequenceDiagram
 
 ----
 
+<<<
 == 進捗ユースケース
 
 [mermaid,Progress-u-cd,png]
@@ -285,6 +326,9 @@ class ProgressUsecase {
 
 === GetProgress
 
+* 検査項目ごとの進捗状況を計算して返却する
+* TODO: 進捗の算出はPostgreSQLでビューを作るかも
+
 [mermaid,GetProgress-u-seq,png]
 ----
 sequenceDiagram
@@ -294,6 +338,7 @@ sequenceDiagram
 
 ----
 
+<<<
 == 基幹システム連携ユースケース
 
 [mermaid,Integration-u-cd,png]
@@ -308,6 +353,8 @@ class IntegrationUsecase {
 
 === GetIntegrationResults
 
+* データ出力のために、会場日程単位で結果の連携状態や会場ロック状態を一覧で取得する
+
 [mermaid,GetIntegrationResults-u-seq,png]
 ----
 sequenceDiagram
@@ -319,6 +366,9 @@ sequenceDiagram
 
 === ExportResults
 
+* 検査結果をファイルに出力する
+* 「出力する」ボタンをトリガーに処理する
+
 [mermaid,ExportResults-u-seq,png]
 ----
 sequenceDiagram
@@ -329,6 +379,8 @@ sequenceDiagram
 ----
 
 === GetExportHistory
+
+* 検査結果を出力した履歴を取得する
 
 [mermaid,GetExportHistory-u-seq,png]
 ----
