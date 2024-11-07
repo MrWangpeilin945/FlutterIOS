@@ -53,9 +53,9 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 詳細な受診者情報を取得する
+    /// 検査内容を取得する
     /// </summary>
-    public void GetDetailedExaminee()
+    public void GetExamItemsExaminee()
     {
 
     }

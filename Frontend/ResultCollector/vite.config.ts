@@ -16,4 +16,7 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   base: "/ResultCollector/",
+  resolve: {
+    mainFields: ['browser', 'module', 'main'],
+  },
 });
