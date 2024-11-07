@@ -1,6 +1,7 @@
 import { Container } from "@mantine/core";
 import type { MetaFunction } from "@remix-run/node";
-import Header from "~/components/Header";
+import CommonFooter from "~/components/CommonFooter";
+import CommonHeader from "~/components/CommonHeader";
 import ProgressDisplay from "~/components/ProgressDisplay";
 
 export const meta: MetaFunction = () => {
@@ -11,6 +12,7 @@ export default function progress() {
 	const data = {
 		progressList: [
 			{
+				koumokuId:1,
 				koumoku: "身長",
 				examinee: [
 					{ id: 1, name: "丸々 盛盛", status: "raijyo" },
@@ -22,6 +24,7 @@ export default function progress() {
 				],
 			},
 			{
+				koumokuId:2,
 				koumoku: "体重",
 				examinee: [
 					{ id: 1, name: "丸々 盛盛", status: "completed"},
@@ -35,12 +38,13 @@ export default function progress() {
 	};
 	return (
 		<>
-			<Header title="進捗" />
+			<CommonHeader screenName="進捗" buttonType="1"/>
 			<Container fluid>
 				{data.progressList.map((data) => (
 					<ProgressDisplay key={data.koumoku} progress={data} />
 				))}
 			</Container>
+			<CommonFooter/>
 		</>
 	);
 }

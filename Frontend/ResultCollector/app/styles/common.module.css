@@ -22,16 +22,30 @@
 }
 
 .footer-button-text{
-    font-size: 20px;
+    font-size: 24px;
+}
+
+.footer-padding{
+    padding-bottom: 70px;
 }
 
 .large-input{
     width: 100%;
     height: 90px;
     border-radius: 5px;
-    padding-right: 10px;
+    padding-right: 20px;
     text-align: right;
     font-size: 48px;
+}
+
+.text-left{
+    text-align: left;
+}
+
+.button-text{
+    padding-left: 25px;
+    font-size: 24px;
+    text-align: left;
 }
 
 .text-wrap{
