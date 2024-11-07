@@ -27,7 +27,7 @@ import type {
   PlaceScheduleTeams,
   ProblemDetails,
   UnexaminedItemList
-} from './wellship.schemas'
+} from '../domain/wellship.schemas'
 import { customAxiosInstance } from './customInstance';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
