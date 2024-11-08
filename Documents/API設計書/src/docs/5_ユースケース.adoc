@@ -266,6 +266,13 @@ sequenceDiagram
   participant uc as Usecase
   participant repo as Repository
 
+  con->>uc: ChangeIntegrationStatus()
+  uc->>repo: ChangeIntegrationStatus()
+  alt 受診が存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+  repo-->>uc: 200 OK
+  uc-->>con: 200 OK
 ----
 
 <<<
@@ -379,6 +386,11 @@ sequenceDiagram
   participant uc as Usecase
   participant repo as Repository
 
+  con->>uc: GetProgress()
+  uc->>repo: GetProgress()
+  repo-->>uc: PlaceScheduleProgress
+  uc-->>con: PlaceScheduleProgress
+
 ----
 
 <<<
@@ -405,6 +417,10 @@ sequenceDiagram
   participant uc as Usecase
   participant repo as Repository
 
+  con->>uc: GetIntegrationResults()
+  uc->>repo: GetIntegrationResults()
+  repo-->>uc: ExportDataList
+  uc-->>con: ExportDataList
 ----
 
 === ExportResults
@@ -431,5 +447,10 @@ sequenceDiagram
   participant con as Controller
   participant uc as Usecase
   participant repo as Repository
+
+  con->>uc: GetExportHistory()
+  uc->>repo: GetExportHistory()
+  repo-->>uc: ExportHistoryList
+  uc-->>con: ExportHistoryList
 
 ----
