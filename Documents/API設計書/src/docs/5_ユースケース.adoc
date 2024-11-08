@@ -64,6 +64,14 @@ sequenceDiagram
   participant uc as Usecase
   participant repo as Repository
 
+  con->>uc: 職員ID、パスワード
+  uc->>repo: GetStaff()
+  repo-->>uc: Staff
+  alt 職員が存在しない
+    uc->>uc: カスタム例外を投げる
+  end
+  uc-->>con: Staff
+
 ----
 
 <<<
@@ -76,7 +84,7 @@ class PlaceScheduleUsecase {
   + GetTeams(examDate: DateOnly)
   + GetTeamPlaceSchedules(examDate: DateOnly, teamId: int)
   + GetPlaceScheduleLockingStatus(placeScheduleId: int)
-  + UpdatePlaceStatus(request: ): void
+  + UpdatePlaceScheduleLockingStatus(request: ): void
 }
 ----
 
@@ -92,6 +100,11 @@ sequenceDiagram
   participant uc as Usecase
   participant repo as Repository
 
+  con->>uc: GetTeams()
+  uc->>repo: GetTeams()
+  repo-->>uc: PlaceScheduleTeams
+  uc-->>con: PlaceScheduleTeams
+
 ----
 
 === GetTeamPlaceSchedules
@@ -106,6 +119,11 @@ sequenceDiagram
   participant uc as Usecase
   participant repo as Repository
 
+  con->>uc: GetTeamPlaceSchedules()
+  uc->>repo: GetTeamPlaceSchedules()
+  repo-->>uc: PlaceSchedulePlaces
+  uc-->>con: PlaceSchedulePlaces
+
 ----
 
 === GetPlaceScheduleLockingStatus
@@ -119,6 +137,14 @@ sequenceDiagram
   participant uc as Usecase
   participant repo as Repository
 
+  con->>uc: GetPlaceScheduleLockingStatus()
+  uc->>repo: GetPlaceScheduleLockingStatus()
+  repo-->>uc: PlaceScheduleLocking
+  alt 会場日程が存在しない
+    uc->>uc: カスタム例外を投げる
+  end
+  uc-->>con: PlaceScheduleLocking
+
 ----
 
 === UpdatePlaceScheduleLockingStatus
@@ -131,6 +157,14 @@ sequenceDiagram
   participant con as Controller
   participant uc as Usecase
   participant repo as Repository
+
+  con->>uc: UpdatePlaceScheduleLockingStatus()
+  uc->>repo: UpdatePlaceScheduleLockingStatus()
+  alt 会場日程が存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+  repo-->>uc: 200 OK
+  uc->>con: 200 OK
 
 ----
 
@@ -148,6 +182,20 @@ class HomeMenuUsecase {
 === GetHomeMenus
 
 * ホームメニュー一覧を取得する
+
+[mermaid,GetHomeMenus-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetHomeMenus()
+  uc->>repo: GetHomeMenus()
+  repo-->>uc: HomeMenuGroupList
+  uc-->>con: HomeMenuGroupList
+
+----
 
 <<<
 == 検査メニューユースケース
@@ -170,6 +218,11 @@ sequenceDiagram
   participant con as Controller
   participant uc as Usecase
   participant repo as Repository
+
+  con->>uc: GetExamMenus()
+  uc->>repo: GetExamMenus()
+  repo-->>uc: ExamMenuList
+  uc-->>con: ExamMenuList
 
 ----
 
@@ -227,6 +280,14 @@ sequenceDiagram
   participant uc as Usecase
   participant repo as Repository
 
+  con->>uc: GetUnexaminedItems()
+  uc->>repo: GetUnexaminedItems()
+  alt 受診データが存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+  repo-->>uc: UnexaminedItemList
+  uc-->>con: UnexaminedItemList
+
 ----
 
 === VerifyConsultNumber
@@ -240,6 +301,14 @@ sequenceDiagram
   participant uc as Usecase
   participant repo as Repository
 
+  con->>uc: VerifyConsultNumber()
+  uc->>repo: VerifyConsultNumber()
+  alt 受診データが存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+  repo-->>uc: 200 OK
+  uc-->>con: 200 OK
+
 ----
 
 === RegisterExecutions
@@ -252,6 +321,14 @@ sequenceDiagram
   participant con as Controller
   participant uc as Usecase
   participant repo as Repository
+
+  con->>uc: RegisterExecutions()
+  uc->>repo: RegisterExecutions()
+  alt 受診データが存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+  repo-->>uc: 200 OK
+  uc-->>con: 200 OK
 
 ----
 
@@ -290,6 +367,11 @@ sequenceDiagram
   participant uc as Usecase
   participant repo as Repository
 
+  con->>uc: GetCancelReasons()
+  uc->>repo: GetCancelReasons()
+  repo-->>uc: CancelReasonList
+  uc-->>con: CancelReasonList
+
 ----
 
 <<<
@@ -313,6 +395,11 @@ sequenceDiagram
   participant con as Controller
   participant uc as Usecase
   participant repo as Repository
+
+  con->>uc: GetEquipmentSettings()
+  uc->>repo: GetEquipmentSettings()
+  repo-->>uc: EquipmentList
+  uc-->>con: EquipmentList
 
 ----
 
