@@ -1,54 +1,75 @@
-import { Box, Button, Center, Flex, Title } from "@mantine/core";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Box, Button, Center, Flex, Title, Dialog } from "@mantine/core";
+import { useDisclosure, useClickOutside } from "@mantine/hooks";
+import { IconUserFilled, IconHomeFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
 
 type HeaderProps = {
-	screenName: string;
-	buttonType: string;
+  screenName: string;
+  staffName: string;
 };
 
-export default function CommonHeader({ screenName, buttonType }: HeaderProps) {
-	const navigate = useNavigate();
-	const getButtonConfig = () => {
-		switch (buttonType) {
-			case "1":
-				return {
-					label: "ホーム",
-					action: () => navigate("/"),
-				};
-			case "2":
-				return {
-					label: "戻る",
-					action: () => navigate("/login"),
-				};
-			default:
-				return {
-					label: "ホーム",
-					action: () => navigate("/home"),
-				};
-		}
-	};
+export default function CommonHeader({ screenName, staffName }: HeaderProps) {
+  const navigate = useNavigate();
+  const [opened, { toggle, close }] = useDisclosure(false);
 
-	const { label, action } = getButtonConfig();
-	return (
-		<Box className={styles["basic-blue"]} py="7">
-			<header>
-				<Flex justify="space-between" align="center" px="md">
-					<Box w={60} />
+  // ダイアログ以外の部分がクリックされると非表示に
+  const closeKeyBoard = useClickOutside(close);
 
-					{/* 班選択 */}
-					<Center>
-						<Title order={1} c="white" fw={500}>
-							{screenName}
-						</Title>
-					</Center>
+  return (
+    <Box className={styles["basic-green"]} py="15">
+      <Flex justify="space-between" align="center" px="md">
+        {/* ユーザアイコン */}
+        <Button
+          className={styles["reverse-green-button"]}
+          radius="xl"
+          onClick={toggle}
+        >
+          <IconUserFilled size={"2.3rem"} />
+        </Button>
 
-					{/* ホームボタン */}
-					<Button w={80} h={40} variant="fill" bg="#396B9E" onClick={action}>
-						{label}
-					</Button>
-				</Flex>
-			</header>
-		</Box>
-	);
+        {/* 画面名 */}
+        <Center>
+          <Title order={1} c="white" fw={550}>
+            {screenName}
+          </Title>
+        </Center>
+
+        {/* ホームボタン */}
+        <Button
+          className={styles["reverse-green-button"]}
+          leftSection={<IconHomeFilled size={"1.7rem"} />}
+          size={"1.5rem"}
+          w={150}
+          radius="xl"
+          onClick={() => navigate("/")}
+        >
+          ホーム
+        </Button>
+      </Flex>
+      <div ref={closeKeyBoard}>
+        <Dialog
+          opened={opened}
+          title="ダイアログ"
+          position={{ top: 50, left: 10 }}
+          onClose={close}
+          w={200}
+        >
+          {staffName}
+          {/* ログアウトボタン */}
+          {/* ToDo:ログアウト時の処理は未実装 */}
+          <Button
+            className={styles[""]}
+            color="grey"
+            variant="outline"
+            w={150}
+            onClick={() => navigate("/login")}
+          >
+            ログアウト
+          </Button>
+        </Dialog>
+      </div>
+    </Box>
+  );
 }

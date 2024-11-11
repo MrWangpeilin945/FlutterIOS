@@ -1,7 +1,22 @@
-.basic-blue{
-    background-color: #6F93C7;
+.basic-green{
+    background-color: #00ADA4;
     color: white;
 }
+.basic-grey{
+    background-color: #9A9A9A;
+    color: white;
+}
+.basic-grey2{
+    background-color: #f2f2f2;
+    
+}
+.reverse-green-button{
+  height: 40px;
+  color: #00ADA4;
+  background-color: white;
+  border: none;
+}
+
 .hr{
     width: 98%;
 }
@@ -18,7 +33,7 @@
     position: fixed;
     bottom: 0;
     width: 100%;
-    background-color: #396B9E;
+    background-color:#9A9A9A;
 }
 
 .footer-button-text{
@@ -31,11 +46,12 @@
 
 .large-input{
     width: 100%;
-    height: 90px;
-    border-radius: 5px;
+    height: 80px;
+    border-radius: 20px;
     padding-right: 20px;
     text-align: right;
     font-size: 48px;
+    border: 2.5px solid #9A9A9A;
 }
 
 .text-left{
