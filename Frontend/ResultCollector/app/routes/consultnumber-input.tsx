@@ -13,6 +13,7 @@ import {
   Paper,
   Textarea,
   Text,
+  TextInput,
 } from "@mantine/core";
 import { useClickOutside, useDisclosure } from "@mantine/hooks";
 import { consultVerifyConsultNumber } from "~/api/wellship";
@@ -59,7 +60,7 @@ export default function consultNumberInput() {
   };
 
   // バリデーションチェック
-  const validationCheck = async () => {
+  const validationCheck = () => {
     // バリデーションチェックスキーマ
     //ここも共通化できるかも？
     const validationSchema = z
@@ -74,8 +75,9 @@ export default function consultNumberInput() {
     if (!result.success) {
       setErrorMessage(result.error.errors[0].message);
       open();
-      throw new Error("入力された受診番号が正しくありません");
+      return false;
     }
+    return true;
   };
 
   //AP1007_受診番号を検証する
@@ -86,8 +88,15 @@ export default function consultNumberInput() {
         //TODO：【SC0007】検査内容確認画面のパスパラメータに設定する処理
       })
       .catch((error) => {
-        // エラー時の処理
-        setErrorMessage(error);
+        if (error.responce.status === 400) {
+          setErrorMessage(getErrorMessage(errorMessages.invalid, "受診番号"));
+        } else if (error.responce.status === 404) {
+          setErrorMessage(
+            getErrorMessage(errorMessages.noData, "該当の受診番号のデータ")
+          );
+        } else if (error.responce.status === 500) {
+          setErrorMessage(getErrorMessage(errorMessages.server));
+        }
         open();
         throw new Error(error);
       });
@@ -103,10 +112,12 @@ export default function consultNumberInput() {
   // 確定処理
   const handleConfirm = async () => {
     try {
-      await validationCheck();
-      await verifyConsultNo();
-      // 全てのチェックが通ったら次の画面に遷移
-      navigate("/examorder-confirm");
+      const validationPassed = validationCheck();
+      if (validationPassed) {
+        await verifyConsultNo();
+        // 全てのチェックが通ったら次の画面に遷移
+        navigate("/examorder-confirm");
+      }
     } catch (error) {
       console.error("受診番号の検証中にエラーが発生しました:", error);
     }
@@ -115,8 +126,8 @@ export default function consultNumberInput() {
   return (
     <>
       <AuthWrapper>
-        <Box h="100vh" className={styles["basic-grey2"]}>
-          <CommonHeader screenName="受診番号入力" staffName="検査 完璧男" />
+        <Box h="100vh" className={styles["background-grey"]}>
+          <CommonHeader screenName="受診番号入力" staffName="両備 太郎" />
           <Group mt={30} ml={50} gap="ms">
             <Box className={styles["basic-green"]} w={10} h={70} />
             <Title order={2} fw={550}>
@@ -125,7 +136,7 @@ export default function consultNumberInput() {
             </Title>
           </Group>
           <Center>
-            <Group mt={150}>
+            <Group mt={50}>
               <Paper
                 className={styles["basic-grey"]}
                 radius="lg"
@@ -137,8 +148,8 @@ export default function consultNumberInput() {
                 </Title>
               </Paper>
               <Box>
-                <input
-                  className={styles["large-input"]}
+                <TextInput
+                  size="xl"
                   value={consultNo}
                   onFocus={() => setShowKeyboard(true)}
                   onChange={(e) => handleInputChange(e)}

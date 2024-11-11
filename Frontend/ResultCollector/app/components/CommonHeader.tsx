@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Center, Flex, Title, Dialog } from "@mantine/core";
 import { useDisclosure, useClickOutside } from "@mantine/hooks";
@@ -12,10 +11,10 @@ type HeaderProps = {
 
 export default function CommonHeader({ screenName, staffName }: HeaderProps) {
   const navigate = useNavigate();
-  const [opened, { toggle, close }] = useDisclosure(false);
+  const [opened, { toggle, close: hide }] = useDisclosure(false);
 
   // ダイアログ以外の部分がクリックされると非表示に
-  const closeKeyBoard = useClickOutside(close);
+  const closeMenu = useClickOutside(hide);
 
   return (
     <Box className={styles["basic-green"]} py="15">
@@ -42,12 +41,12 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
           ホーム
         </Button>
       </Flex>
-      <div ref={closeKeyBoard}>
+      <div ref={closeMenu}>
         <Dialog
           opened={opened}
           title="ダイアログ"
           position={{ top: 50, left: 10 }}
-          onClose={close}
+          onClose={hide}
           w={200}
         >
           {staffName}
@@ -58,6 +57,7 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
             color="grey"
             variant="outline"
             w={150}
+            radius="ms"
             onClick={() => navigate("/login")}
           >
             ログアウト
