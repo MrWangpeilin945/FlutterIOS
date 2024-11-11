@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { type AxiosInstance } from "axios";
 
 export const axiosInstance: AxiosInstance = axios.create({
   // todo baseURLは実際には設定から取得する
