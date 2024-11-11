@@ -17,25 +17,34 @@ class HomePage extends ConsumerWidget {
         title: const Text('WELLSHIP Serial Client'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            WscMenuButton(
-              onPressed: () => {router.push(const WiredSerialSettingsRoute())},
-              text: '有線接続',
+      body: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: constraints.maxHeight),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    WscMenuButton(
+                      onPressed: () => {router.push(const WiredSerialSettingsRoute())},
+                      text: '有線接続',
+                    ),
+                    WscMenuButton(
+                      onPressed: () => {router.push(const WiredSerialSettingsRoute())},
+                      text: '無線接続（BR/EDR）',
+                    ),
+                    WscMenuButton(
+                      onPressed: () => {router.push(const WiredSerialSettingsRoute())},
+                      text: '無線接続 (BLE)',
+                    ),
+                  ],
+                ),
+              ),
             ),
-            WscMenuButton(
-              onPressed: () => {router.push(const WiredSerialSettingsRoute())},
-              text: '無線接続（BR/EDR）',
-            ),
-            WscMenuButton(
-              onPressed: () => {router.push(const WiredSerialSettingsRoute())},
-              text: '無線接続 (BLE)',
-            ),
-          ],
+          ),
         ),
       ),
     );

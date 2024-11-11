@@ -12,12 +12,12 @@ class WscMenuButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: ButtonStyle(
-          fixedSize: WidgetStateProperty.all(const Size.fromHeight(140)),
-          side: WidgetStateProperty.all(BorderSide(width: 8, color: Theme.of(context).colorScheme.primary)),
-        ),
+            side: WidgetStateProperty.all(BorderSide(width: 6, color: Theme.of(context).colorScheme.primary)),
+            minimumSize: WidgetStateProperty.all(const Size.fromHeight(100)),
+            padding: WidgetStateProperty.all(const EdgeInsets.only(left: 50, right: 50))),
         child: Text(
           text,
-          style: const TextStyle(fontSize: 80),
+          style: const TextStyle(fontSize: 40),
         ),
       ),
     );
