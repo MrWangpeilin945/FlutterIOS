@@ -1,5 +1,5 @@
 ﻿import 'package:auto_route/auto_route.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wellship_serial_client/ui/route/app_route.gr.dart';
 
 final routerProvider = Provider((ref) => AppRouter());
