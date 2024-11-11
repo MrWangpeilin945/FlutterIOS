@@ -30,10 +30,10 @@ sequenceDiagram
 
   con->>uc: 職員ID、パスワード
   uc->>repo: GetStaff()
-  repo-->>uc: Staff
   alt 職員が存在しない
-    uc->>uc: カスタム例外を投げる
+    repo ->>repo: カスタム例外を投げる
   end
+  repo-->>uc: Staff
   uc->>uc: パスワード検証
   alt パスワードが一致する
     uc->>con: アクセストークン
@@ -66,10 +66,10 @@ sequenceDiagram
 
   con->>uc: 職員ID、パスワード
   uc->>repo: GetStaff()
-  repo-->>uc: Staff
   alt 職員が存在しない
-    uc->>uc: カスタム例外を投げる
+    repo->>repo: カスタム例外を投げる
   end
+  repo-->>uc: Staff
   uc-->>con: Staff
 
 ----
@@ -139,10 +139,10 @@ sequenceDiagram
 
   con->>uc: GetPlaceScheduleLockingStatus()
   uc->>repo: GetPlaceScheduleLockingStatus()
-  repo-->>uc: PlaceScheduleLocking
   alt 会場日程が存在しない
-    uc->>uc: カスタム例外を投げる
+    repo->>repo: カスタム例外を投げる
   end
+  repo-->>uc: PlaceScheduleLocking
   uc-->>con: PlaceScheduleLocking
 
 ----
@@ -159,11 +159,10 @@ sequenceDiagram
   participant repo as Repository
 
   con->>uc: UpdatePlaceScheduleLockingStatus()
-  uc->>repo: UpdatePlaceScheduleLockingStatus()
+  uc->>repo: SavePlaceScheduleLockingStatus()
   alt 会場日程が存在しない
     repo->>repo: カスタム例外を投げる
   end
-  repo-->>uc: 200 OK
   uc->>con: 200 OK
 
 ----
@@ -238,7 +237,7 @@ class ConsultUsecase {
   + GetUnexaminedItems(consultNumber: string)
   + VerifyConsultNumber(request: ): void
   + RegisterExecutions(request: )
-  + ChangeIntegrationStatus(request: ): void
+  + UpdateIntegrationStatus(request: ): void
 }
 ----
 
@@ -306,7 +305,6 @@ sequenceDiagram
   alt 受診データが存在しない
     repo->>repo: カスタム例外を投げる
   end
-  repo-->>uc: 200 OK
   uc-->>con: 200 OK
 
 ----
@@ -315,7 +313,7 @@ sequenceDiagram
 
 * 検査項目ごとの実施有無と中止理由を記録する
 
-[mermaid,VerifyConsultNumber-u-seq,png]
+[mermaid,RegisterExecutions-u-seq,png]
 ----
 sequenceDiagram
   participant con as Controller
@@ -327,16 +325,15 @@ sequenceDiagram
   alt 受診データが存在しない
     repo->>repo: カスタム例外を投げる
   end
-  repo-->>uc: 200 OK
   uc-->>con: 200 OK
 
 ----
 
-=== ChangeIntegrationStatus
+=== UpdateIntegrationStatus
 
 * 受診の連携状態を更新する
 
-[mermaid,ChangeIntegrationStatus-u-seq,png]
+[mermaid,UpdateIntegrationStatus-u-seq,png]
 ----
 sequenceDiagram
   participant con as Controller
