@@ -21,11 +21,7 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
     <Box className={styles["basic-green"]} py="15">
       <Flex justify="space-between" align="center" px="md">
         {/* ユーザアイコン */}
-        <Button
-          className={styles["reverse-green-button"]}
-          radius="xl"
-          onClick={toggle}
-        >
+        <Button className={styles["reverse-green-button"]} onClick={toggle}>
           <IconUserFilled size={"2.3rem"} />
         </Button>
 
@@ -40,9 +36,7 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
         <Button
           className={styles["reverse-green-button"]}
           leftSection={<IconHomeFilled size={"1.7rem"} />}
-          size={"1.5rem"}
           w={150}
-          radius="xl"
           onClick={() => navigate("/")}
         >
           ホーム
