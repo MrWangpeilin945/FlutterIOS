@@ -123,57 +123,50 @@ export default function consultNumberInput() {
   return (
     <>
       <AuthWrapper>
-        <Box h="100vh" className={styles["background-grey"]}>
-          <CommonHeader screenName="受診番号入力" staffName="両備 太郎" />
-          <Group mt={30} ml={50} gap="ms">
-            <Box className={styles["basic-green"]} w={10} h={70} />
-            <Title order={2} fw={550}>
-              両備システムズ 豊成事業所
-              {/* {teamData?.name} */}
-            </Title>
+        <CommonHeader screenName="受診番号入力" staffName="両備 太郎" />
+        <Group mt={30} ml={50} gap="ms">
+          <Box className={styles["basic-green"]} w={10} h={70} />
+          <Title order={2} fw={550}>
+            両備システムズ 豊成事業所
+            {/* {teamData?.name} */}
+          </Title>
+        </Group>
+        <Center>
+          <Group mt={50}>
+            <Paper className={styles["basic-grey"]} radius="lg" px="xl" py="md">
+              <Title order={1} fw={500}>
+                受診番号
+              </Title>
+            </Paper>
+            <Box>
+              <TextInput
+                size="xl"
+                value={consultNo}
+                onFocus={() => setShowKeyboard(true)}
+                onChange={(e) => handleInputChange(e)}
+                onKeyDown={handleKeyDown}
+              />
+            </Box>
           </Group>
+        </Center>
+        {showKeyboard && (
           <Center>
-            <Group mt={50}>
-              <Paper
-                className={styles["basic-grey"]}
-                radius="lg"
-                px="xl"
-                py="md"
-              >
-                <Title order={1} fw={500}>
-                  受診番号
-                </Title>
-              </Paper>
-              <Box>
-                <TextInput
-                  size="xl"
-                  value={consultNo}
-                  onFocus={() => setShowKeyboard(true)}
-                  onChange={(e) => handleInputChange(e)}
-                  onKeyDown={handleKeyDown}
-                />
-              </Box>
-            </Group>
+            <div ref={closeKeyBoard}>
+              <Keyboard
+                size={150}
+                value={consultNo}
+                onChange={(e: string) => setConsultNo(e)}
+                onConfirm={handleConfirm}
+              />
+            </div>
           </Center>
-          {showKeyboard && (
-            <Center>
-              <div ref={closeKeyBoard}>
-                <Keyboard
-                  size={150}
-                  value={consultNo}
-                  onChange={(e: string) => setConsultNo(e)}
-                  onConfirm={handleConfirm}
-                />
-              </div>
-            </Center>
-          )}
-          <ErrorModal
-            isOpen={opened}
-            onClose={close}
-            errorMessage={errorMessage}
-          />
-          <CommonFooter items={fotterItems} />
-        </Box>
+        )}
+        <ErrorModal
+          isOpen={opened}
+          onClose={close}
+          errorMessage={errorMessage}
+        />
+        <CommonFooter items={fotterItems} />
       </AuthWrapper>
     </>
   );

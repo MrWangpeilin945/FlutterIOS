@@ -35,6 +35,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
         <ColorSchemeScript />
+        <style>
+          {`
+            /* ここにグローバルスタイルを記述します */
+            html body {
+              background-color: #f2f2f2 ;
+            }
+          `}
+        </style>
       </head>
       <body>
         <MantineProvider theme={customTheme}>

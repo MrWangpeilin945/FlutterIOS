@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@remix-run/react";
 import { Box, Button, Center, Flex, Title, Dialog } from "@mantine/core";
 import { useDisclosure, useClickOutside } from "@mantine/hooks";
 import { IconUserFilled, IconHomeFilled } from "@tabler/icons-react";
