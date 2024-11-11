@@ -12,6 +12,7 @@ class AppRouter extends RootStackRouter {
   @override
   List<AutoRoute> get routes => [
         AutoRoute(path: '/', page: HomeRoute.page),
+        AutoRoute(page: WiredSerialSettingsRoute.page),
         AutoRoute(path: '/deep-link-home', page: DeepLinkHomeRoute.page),
       ];
 }
