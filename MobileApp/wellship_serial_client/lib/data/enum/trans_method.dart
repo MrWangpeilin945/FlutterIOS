@@ -1,0 +1,19 @@
+﻿enum TransMethod {
+  none,
+  wired,
+  btClassic,
+  ble;
+
+  factory TransMethod.fromString(String value) {
+    switch (value) {
+      case 'wired':
+        return TransMethod.wired;
+      case 'btClassic':
+        return TransMethod.btClassic;
+      case 'ble':
+        return TransMethod.ble;
+      default:
+        return TransMethod.none;
+    }
+  }
+}
