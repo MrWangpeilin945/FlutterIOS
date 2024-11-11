@@ -112,8 +112,7 @@ export default function consultNumberInput() {
   // 確定処理
   const handleConfirm = async () => {
     try {
-      const validationPassed = validationCheck();
-      if (validationPassed) {
+      if (validationCheck()) {
         await verifyConsultNo();
         // 全てのチェックが通ったら次の画面に遷移
         navigate("/examorder-confirm");
