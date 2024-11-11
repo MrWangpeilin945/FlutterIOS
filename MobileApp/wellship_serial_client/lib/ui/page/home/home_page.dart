@@ -32,12 +32,12 @@ class HomePage extends ConsumerWidget {
                       onPressed: () => {router.push(const WiredSerialSettingsRoute())},
                       text: '有線接続',
                     ),
-                    WscMenuButton(
-                      onPressed: () => {router.push(const WiredSerialSettingsRoute())},
+                    const WscMenuButton(
+                      onPressed: null,
                       text: '無線接続（BR/EDR）',
                     ),
-                    WscMenuButton(
-                      onPressed: () => {router.push(const WiredSerialSettingsRoute())},
+                    const WscMenuButton(
+                      onPressed: null,
                       text: '無線接続 (BLE)',
                     ),
                   ],
