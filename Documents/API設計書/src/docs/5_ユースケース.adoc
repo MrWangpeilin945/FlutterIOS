@@ -340,12 +340,11 @@ sequenceDiagram
   participant uc as Usecase
   participant repo as Repository
 
-  con->>uc: ChangeIntegrationStatus()
-  uc->>repo: ChangeIntegrationStatus()
+  con->>uc: UpdateIntegrationStatus()
+  uc->>repo: UpdateIntegrationStatus()
   alt 受診が存在しない
     repo->>repo: カスタム例外を投げる
   end
-  repo-->>uc: 200 OK
   uc-->>con: 200 OK
 ----
 
