@@ -23,7 +23,6 @@ import CommonFooter from "~/components/CommonFooter";
 import Keyboard from "~/components/SoftwareKeyboard";
 import { ErrorModal } from "~/components/ErrorModal";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
-import { createNavigate } from "~/utils/screenMove";
 import styles from "~/styles/common.module.css";
 
 export const meta: MetaFunction = () => {
@@ -39,9 +38,8 @@ export default function consultNumberInput() {
 
   //【CP0002】共通フッター設定
   const navigate = useNavigate();
-  const SC = createNavigate(navigate);
   const fotterItems = [
-    { label: "進捗", action: SC.navigateProgress },
+    { label: "進捗", action: () => navigate("/progress") },
     { label: "", action: () => {} },
     { label: "", action: () => {} },
   ];

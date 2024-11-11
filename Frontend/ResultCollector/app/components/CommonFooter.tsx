@@ -1,6 +1,5 @@
 import { Box, Button, Grid, GridCol } from "@mantine/core";
 import { useNavigate } from "@remix-run/react";
-import { createNavigate } from "~/utils/screenMove";
 
 import styles from "~/styles/common.module.css";
 
@@ -13,8 +12,7 @@ type footerProps = {
 
 export default function CommonFooter({ items }: footerProps) {
   const navigate = useNavigate();
-  const SC = createNavigate(navigate);
-  let setItems = [{ label: "戻る", action: SC.navigateBack }];
+  let setItems = [{ label: "戻る", action: () => navigate(-1) }];
   if (items) {
     if (items.length <= 3) {
       setItems = setItems.concat(items);

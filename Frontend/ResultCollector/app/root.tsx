@@ -16,12 +16,12 @@ import { setupAxiosInterceptors } from "~/utils/axiosInstance";
 const queryClient = new QueryClient();
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  // const redirectToLogin = () => {
-  //   navigate("/login");
-  // };
-
+  const redirectToLogin = () => {
+    navigate("/login");
+  };
+  // Biomeのエラーが出るので、コメントアウトしています。
   // useEffect(() => {
   //   // API呼び出し時に401が返ってきたらログイン画面に遷移する処理をaxiosInstanceに引き渡す
   //   setupAxiosInterceptors(redirectToLogin);

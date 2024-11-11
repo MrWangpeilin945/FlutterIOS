@@ -1,5 +1,7 @@
 import { Button, createTheme } from "@mantine/core";
+
 const baseColor = "#00ADA4";
+
 export const customTheme = createTheme({
   colors: {
     // todo 色は取り急ぎ設定
@@ -28,7 +30,6 @@ export const customTheme = createTheme({
       },
       defaultProps: {
         radius: "50",
-        h: "40",
       },
     }),
   },
