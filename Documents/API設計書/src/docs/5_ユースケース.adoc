@@ -163,7 +163,6 @@ sequenceDiagram
   alt 会場日程が存在しない
     repo->>repo: カスタム例外を投げる
   end
-  uc->>con: 200 OK
 
 ----
 
@@ -305,7 +304,6 @@ sequenceDiagram
   alt 受診データが存在しない
     repo->>repo: カスタム例外を投げる
   end
-  uc-->>con: 200 OK
 
 ----
 
@@ -325,7 +323,6 @@ sequenceDiagram
   alt 受診データが存在しない
     repo->>repo: カスタム例外を投げる
   end
-  uc-->>con: 200 OK
 
 ----
 
@@ -345,7 +342,7 @@ sequenceDiagram
   alt 受診が存在しない
     repo->>repo: カスタム例外を投げる
   end
-  uc-->>con: 200 OK
+
 ----
 
 <<<
