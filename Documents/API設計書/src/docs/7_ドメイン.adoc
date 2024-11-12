@@ -11,3 +11,152 @@
 * 中止理由
 * 検査機器
 * ホームメニュー
+
+== 列挙型
+
+列挙型（Enum）で表現するものを一覧で整理します。
+
+=== 性別
+
+受診者の生物学的性別を表現するコード。国際規格であるISO 5218に則る。
+
+* https://ja.wikipedia.org/wiki/ISO_5218[ISO 5218 - Wikipedia]
+* https://qiita.com/aoshirobo/items/32deb45cb8c8b87d65a4[システムで「性別」の情報を扱う前に知っておくべきこと - Qiita]
+
+----
+enum Sex
+{
+    不明 = 0,
+    男 = 1,
+    女 = 2,
+    適用不能 = 9
+}
+----
+
+=== 対象性別
+
+[source,csharp]
+----
+enum TargetSex
+{
+    男 = 1,
+    女 = 2,
+    両方 = 3
+}
+----
+
+=== 受診進捗状況
+
+[source,csharp]
+----
+enum ConsultProgressStatus
+{
+    来場待ち = 11,
+    検査中 = 21,
+    キャンセル = 41
+}
+----
+
+=== 検査進捗状況
+
+[source,csharp]
+----
+enum ExamItemProgressStatus
+{
+    未実施 = 11,
+    検査済み = 41,
+    検査中止 = 51
+}
+----
+
+=== 集計検査進捗状況
+
+[source,csharp]
+----
+enum AggregatedProgressStatus
+{
+    予定 = 11,
+    来場 = 21,
+    済 = 41,
+    中止 = 51
+}
+----
+
+=== 会場日程状況
+
+[source,csharp]
+----
+enum PlaceScheduleLockingStatus
+{
+    検査中 = 21,
+    検査完了 = 31
+}
+----
+
+=== 会場日程データ出力状況
+
+[source,csharp]
+----
+enum PlaceScheduleResultExportStatus
+{
+    未出力 = 11,
+    出力済み = 31,
+    出力エラー = 41
+}
+----
+
+=== 受診データ出力状況
+
+[source,csharp]
+----
+enum ConsultResultExportStatus
+{
+    未出力 = 11,
+    出力保留 = 21,
+    出力済み = 31
+}
+----
+
+=== キーボード種別
+
+[source,csharp]
+----
+enum KeyboardType
+{
+    テンキー = 1
+}
+----
+
+=== 検査項目グループ種別
+
+[source,csharp]
+----
+enum ExamItemGroupType
+{
+    単一数値,
+    単一選択,
+    尿検査,
+    インクリメント,
+    左右数値,
+    左右選択,
+    身体計測,
+    血圧1,
+    血圧2,
+    血圧3,
+    視力,
+    聴力,
+    通過
+}
+----
+
+=== 入力エラーレベル
+
+[source,csharp]
+----
+enum InputErrorLevel
+{
+    正常 = 1,
+    警告 = 2,
+    異常 = 3
+}
+----

@@ -1,0 +1,22 @@
+= カスタム例外
+
+カスタム例外の設計を示します。
+
+すべてのカスタム例外は`WellshipException`を継承します。HTTPステータスコードをプロパティに設定することで、例外ハンドリングミドルウェアで補足してWebAPIのレスポンスとして返します。
+
+== 
+
+[options="header",cols="3,3,3,1"]
+|===
+
+|Class名
+|例外名
+|タイトル
+|StatusCode
+
+|`ConsultNumberNotFound`
+|受診番号が存在しない
+|ConsultNumberNotFound
+|`404`
+
+|===
