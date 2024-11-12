@@ -45,7 +45,7 @@ enum TargetSex
 }
 ----
 
-=== 受診進捗
+=== 受診進捗状況
 
 [source,csharp]
 ----
@@ -57,7 +57,7 @@ enum ConsultProgressStatus
 }
 ----
 
-=== 検査進捗
+=== 検査進捗状況
 
 [source,csharp]
 ----
@@ -69,7 +69,7 @@ enum ExamItemProgressStatus
 }
 ----
 
-=== 集計検査進捗
+=== 集計検査進捗状況
 
 [source,csharp]
 ----
@@ -114,5 +114,49 @@ enum ConsultResultExportStatus
     未出力 = 11,
     出力保留 = 21,
     出力済み = 31
+}
+----
+
+=== キーボード種別
+
+[source,csharp]
+----
+enum KeyboardType
+{
+    テンキー = 1
+}
+----
+
+=== 検査項目グループ種別
+
+[source,csharp]
+----
+enum ExamItemGroupType
+{
+    単一数値,
+    単一選択,
+    尿検査,
+    インクリメント,
+    左右数値,
+    左右選択,
+    身体計測,
+    血圧1,
+    血圧2,
+    血圧3,
+    視力,
+    聴力,
+    通過
+}
+----
+
+=== 入力エラーレベル
+
+[source,csharp]
+----
+enum InputErrorLevel
+{
+    正常 = 1,
+    警告 = 2,
+    異常 = 3
 }
 ----
