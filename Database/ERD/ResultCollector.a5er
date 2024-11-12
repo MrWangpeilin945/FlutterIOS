@@ -30,7 +30,9 @@ FooterRight=
 ShowPageoutRelation=1
 RDBMSType=7
 RDBMSTypeName=PostgreSQL
+GenerateComment=0
 BackupRestoreTempTable=0
+EnableTableOption=0
 CreateFk=1
 FkOnDeleteOption=restrict
 FkOnUpdateOption=cascade
@@ -42,6 +44,7 @@ DefaultIndexName=%0:s_IX%1:d
 DefaultFkName=%0:s_FK%1:d
 SqlSeparator=0
 UpperCaseKeyword=1
+CreateOrder=Dependent
 ShowTag=1
 ShowCommonAttributes=0
 BugFixEntityWidth=1
@@ -1121,11 +1124,12 @@ TableOption=
 Page=MAIN
 Left=2150
 Top=300
+Field="ID","id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241112153648
-Position="MAIN",2150,300,111,55
+ModifiedDateTime=20241112164813
+Position="MAIN",2150,300,313,55
 ZOrder=65
 
 [Entity]
@@ -1162,11 +1166,12 @@ TableOption=
 Page=MAIN
 Left=2150
 Top=400
+Field="ID","id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241111173223
-Position="MAIN",2150,400,137,50
+ModifiedDateTime=20241112164830
+Position="MAIN",2150,400,311,50
 ZOrder=67
 
 [Entity]
@@ -1175,7 +1180,7 @@ LName=過去検査結果
 Comment=
 TableInnerOption=
 TableOption=
-Page=Main
+Page=MAIN
 Left=100
 Top=2100
 Field="受診ID","consult_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
@@ -1186,7 +1191,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241112155106
-Position="Main",100,2100
+Position="MAIN",100,2100
 ZOrder=70
 
 [Relation]
