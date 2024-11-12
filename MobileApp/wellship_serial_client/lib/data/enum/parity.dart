@@ -22,4 +22,18 @@
         return Parity.none;
     }
   }
+  factory Parity.fromString(String value) {
+    switch (value.toLowerCase()) {
+      case 'odd':
+        return Parity.odd;
+      case 'even':
+        return Parity.even;
+      case 'mark':
+        return Parity.mark;
+      case 'space':
+        return Parity.space;
+      default:
+        return Parity.none;
+    }
+  }
 }

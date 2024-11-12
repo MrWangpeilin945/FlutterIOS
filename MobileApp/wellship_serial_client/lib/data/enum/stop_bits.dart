@@ -16,4 +16,15 @@
         return StopBits.stopBits_1;
     }
   }
+
+  factory StopBits.fromString(String value) {
+    switch (value) {
+      case '2':
+        return StopBits.stopBits_2;
+      case '1.5':
+        return StopBits.stopBits_1_5;
+      default:
+        return StopBits.stopBits_1;
+    }
+  }
 }
