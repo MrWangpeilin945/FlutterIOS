@@ -18,6 +18,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNameSpace>Ryobi.Wellship.WebAPI</RootNameSpace>
   </PropertyGroup>
 
 </Project>
