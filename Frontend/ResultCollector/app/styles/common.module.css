@@ -1,57 +1,84 @@
-.basic-blue{
-    background-color: #6F93C7;
-    color: white;
+.basic-green {
+	background-color: #00ada4;
+	color: white;
 }
-.hr{
-    width: 98%;
+.basic-grey {
+	background-color: #9a9a9a;
+	color: white;
 }
-
-.border{
-    border: 1px solid gray;
+.background-grey {
+	background-color: #f2f2f2;
 }
-
-.green-button{
-    background-color: rgba(143, 196, 96, 1);
-}
-
-.footer{
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background-color: #396B9E;
+.reverse-green-button {
+	color: #00ada4;
+	background-color: white;
 }
 
-.footer-button-text{
-    font-size: 20px;
+.hr {
+	width: 98%;
 }
 
-.large-input{
-    width: 100%;
-    height: 90px;
-    border-radius: 5px;
-    padding-right: 10px;
-    text-align: right;
-    font-size: 48px;
+.border {
+	border: 1px solid gray;
 }
 
-.text-wrap{
-    word-break : break-word;
-    white-space : normal;
+.green-button {
+	background-color: rgba(143, 196, 96, 1);
 }
 
-.progress-raijyo{
-    background-color: gray;
+.footer {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	background-color: #9a9a9a;
 }
 
-.progress-yotei{
-    background-color: black;
+.footer-button-text {
+	font-size: 24px;
 }
 
-.progress-completed{
-    background-color: rgba(143, 196, 96, 1);
+.footer-padding {
+	padding-bottom: 70px;
 }
 
-.progress-td{
-    width: 40px;
-    text-align: center;
+.large-input {
+	width: 100%;
+	height: 80px;
+	border-radius: 20px;
+	padding-right: 20px;
+	text-align: right;
+	font-size: 48px;
+	border: 2.5px solid #9a9a9a;
+}
+
+.text-left {
+	text-align: left;
+}
+
+.button-text {
+	padding-left: 25px;
+	font-size: 24px;
+	text-align: left;
+}
+
+.text-wrap {
+	word-break: break-word;
+	white-space: normal;
+}
+
+.progress-raijyo {
+	background-color: gray;
+}
+
+.progress-yotei {
+	background-color: black;
+}
+
+.progress-completed {
+	background-color: rgba(143, 196, 96, 1);
+}
+
+.progress-td {
+	width: 40px;
+	text-align: center;
 }

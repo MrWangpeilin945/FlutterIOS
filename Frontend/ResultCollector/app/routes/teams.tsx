@@ -1,116 +1,95 @@
 import type { MetaFunction } from "@remix-run/node";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import { Container, Stack, Title } from "@mantine/core";
-import type { PlaceScheduleTeams } from "~/api/models/teamItems";
-import config from "~/domain/config.json";
-import Header from "~/components/Header";
+import { useNavigate } from "@remix-run/react";
+import { useAtom } from "jotai";
+import { teamState } from "~/store/store";
+import { placeScheduleGetTeams } from "~/api/wellship";
+import type { PlaceScheduleTeams } from "~/domain/wellship.schemas";
+import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import Team from "~/components/Team";
-import { getErrorMessage } from "~/utils/getErrorMessage";
+import CommonHeader from "~/components/CommonHeader";
+import CommonFooter from "~/components/CommonFooter";
+
+import styles from "~/styles/common.module.css";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "班選択" }];
 };
 
 export default function teams() {
-	const baseURL = config.baseURL;
-	const date = config.date;
+	const navigate = useNavigate();
+	const [teamsData, setTeamsData] = useState<PlaceScheduleTeams>();
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+	const [team, setTeam] = useAtom(teamState);
 
-	// // APIから班データを取得する
-	// const fetchTeams = async (): Promise<PlaceScheduleTeams> => {
-	// 	const { data } = await axios.get(`${baseURL}/placeSchedules/teams?date=${date}`);
-	// 	return data;
-	// };
 
-	// // TanStack Queryを使用してAPIデータを取得
-	// // queryKey: キャッシュのキー（"teams"）
-	// // queryFn: データを取得する関数（fetchTeams）
-	// const { data, isLoading, error } = useQuery({
-	// 	queryKey: ["teams"],
-	// 	queryFn: fetchTeams,
-	// });
+	useEffect(() => {
+		const fetchTeams = async () => {
+			try {
+				const result = await placeScheduleGetTeams("1", { date: "2024-09-27" });
+				setTeamsData(result.data);
+			} catch (err) {
+				console.error(err);
+				setError("Failed to fetch teams data");
+			} finally {
+				setIsLoading(false);
+			}
+		};
+		fetchTeams();
+	},[]);
+	
+	//
+	if (isLoading) return <div>Loading...</div>;
+	if (error) return <div>{error}</div>;
 
-	// if(data === undefined){
-	//     return;
-	// }
-
-	// // ローディング中の表示
-	// if (isLoading) return <div>Loading...</div>;
-
-	// // エラーが発生した場合の処理
-	// let errorMessage = "";
-	// if (error) {
-	//     errorMessage = getErrorMessage(error);
-	// }
-	// if (!data || (data.teams && data.teams.length === 0)) {
-	//     errorMessage = "班情報データが０件でした。";
-	// }
-
-	const teamsData = {
-		teams: [
-			{
-				teamId: 1,
-				teamName: "1班",
-				places: [
-					{
-						placeId: 1,
-						placeName: "会場A",
-					},
-					{
-						placeId: 2,
-						placeName: "会場B",
-					},
-					{
-						placeId: 3,
-						placeName: "会場A",
-					},
-					{
-						placeId: 4,
-						placeName: "会場A",
-					},
-					{
-						placeId: 5,
-						placeName: "会場A",
-					},
-					{
-						placeId: 6,
-						placeName: "会場A",
-					},
-				],
-			},
-			{
-				teamId: 200,
-				teamName: "10班",
-				places: [
-					{
-						placeId: 4,
-						placeName: "会場F",
-					},
-				],
-			},
-		],
+	//jotaiに班idと班名を保存して遷移
+	const buttonClickEvent = (id?: number, name?: string) => {
+		if (id && name) {
+			const teamData = {id,name};
+			setTeam(teamData);
+			console.log(teamState);
+		}
+		navigate("/consultnumber-input")
+		//エラー処理
 	};
 
-	return (
-		<div>
-			<Header title="班選択" />
+	if(!teamsData?.teams){
+		return (
+			<>
+				<CommonHeader screenName="班選択" buttonType="1" />
+				<Container fluid mt={20}>
+					{/* エラーメッセージを表示 */}
+					<Title order={3}>{getErrorMessage(errorMessages.noData, "該当する班")}</Title>
+				</Container>
+				<CommonFooter />
+			</>
+		);
+	}
 
-			{/* 班データをリストにして表示*/}
-			<Container fluid mt={20}>
-				<Stack>
-					{teamsData.teams.map((teams) => (
-						// teamに班名と会場情報を渡す
-						<Team
-							key={teams.teamId}
-							teamName={teams.teamName}
-							places={teams.places}
-						/> 
-					))}
-				</Stack>
-			</Container>
+	if (teamsData?.teams) {
+		return (
+			<div>
+				<CommonHeader screenName="班選択" buttonType="1" />
 
-			{/* エラーメッセージを表示 */}
-			{/* <Title order={3}>{errorMessage}</Title> */}
-		</div>
-	);
+				{/* 班データをリストにして表示*/}
+				<Container className={styles["footer-padding"]}fluid mt={20}>
+					<Stack>
+						{teamsData.teams.map((teams) => (
+								// teamに班名と会場情報を渡す
+								<Team
+									key={teams.teamId}
+									teamId={teams.teamId}
+									teamName={teams.teamName}
+									places={teams.places}
+									onClick={() => buttonClickEvent(teams.teamId, teams.teamName)}
+								/>
+							))}
+					</Stack>
+				</Container>
+				<CommonFooter />
+			</div>
+		);
+	} 
 }

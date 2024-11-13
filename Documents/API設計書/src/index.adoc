@@ -1,7 +1,7 @@
 = WELLSHIP API設計書
 :author: 両備システムズ ヘルスケアソリューションカンパニー ウェルネスビジネス事業部
-:revdate: 2024-11-05
-:revnumber: 0.4
+:revdate: 2024-11-07
+:revnumber: 0.6
 :doctype: book
 :lang: ja
 :toc: left
@@ -26,6 +26,14 @@ include::docs/2_基本方針.adoc[leveloffset=+1]
 <<<
 include::docs/3_WebAPI一覧.adoc[leveloffset=+1]
 <<<
-include::docs/4_設計書.adoc[leveloffset=+1]
+include::docs/4_インターフェース.adoc[leveloffset=+1]
+<<<
+include::docs/5_ユースケース.adoc[leveloffset=+1]
+<<<
+include::docs/6_リポジトリ.adoc[leveloffset=+1]
+<<<
+include::docs/7_ドメイン.adoc[leveloffset=+1]
+<<<
+include::docs/8_カスタム例外.adoc[leveloffset=+1]
 <<<
 include::docs/改版履歴.adoc[leveloffset=+1]

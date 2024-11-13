@@ -1,0 +1,536 @@
+= ユースケース
+
+ユースケースの設計を示します。
+
+ユースケースはコントローラーから利用されます。リクエストモデルを受け取り、レスポンスモデルを返却します。
+
+リポジトリを通してデータベースにアクセスします。ドメインモデルに定義されたロジックを利用しつつ、処理の流れを記載します。
+
+== 認証ユースケース
+
+[mermaid,Authentication-u-cd,png]
+----
+classDiagram
+class AuthenticationUsecase {
+  + Login(request)
+}
+----
+
+=== Login
+
+* 入力された認証情報とデータベースの値を比較する
+* ログイン可能場合はアクセストークンを返却する
+
+[mermaid,Login-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: 職員ID、パスワード
+  uc->>repo: GetStaff()
+  alt 職員が存在しない
+    repo ->>repo: カスタム例外を投げる
+  end
+  repo-->>uc: Staff
+  uc->>uc: パスワード検証
+  alt パスワードが一致する
+    uc->>con: アクセストークン
+  else パスワードが一致しない
+    uc->>uc: カスタム例外を投げる
+  end
+----
+
+<<<
+== 職員ユースケース
+
+[mermaid,Staff-u-cd,png]
+----
+classDiagram
+class StaffUsecase {
+  + GetStaff(staffId: int)
+}
+----
+
+=== GetStaff
+
+* 職員IDを指定して職員情報を取得する
+
+[mermaid,GetStaff-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: 職員ID、パスワード
+  uc->>repo: GetStaff()
+  alt 職員が存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+  repo-->>uc: Staff
+  uc-->>con: Staff
+
+----
+
+<<<
+== 会場日程ユースケース
+
+[mermaid,PlaceSchedule-u-cd,png]
+----
+classDiagram
+class PlaceScheduleUsecase {
+  + GetTeams(examDate: DateOnly)
+  + GetTeamPlaceSchedules(examDate: DateOnly, teamId: int)
+  + GetPlaceScheduleLockingStatus(placeScheduleId: int)
+  + UpdatePlaceScheduleLockingStatus(request: ): void
+}
+----
+
+=== GetTeams
+
+* 班単位で集約して、班の情報と会場リストを取得する
+* 健診日を指定する
+
+[mermaid,GetTeams-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetTeams()
+  uc->>repo: GetTeams()
+  repo-->>uc: PlaceScheduleTeams
+  uc-->>con: PlaceScheduleTeams
+
+----
+
+=== GetTeamPlaceSchedules
+
+* 班に紐づく会場リストを取得する
+* 班と健診日を指定する
+
+[mermaid,GetTeamPlaceSchedules-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetTeamPlaceSchedules()
+  uc->>repo: GetTeamPlaceSchedules()
+  repo-->>uc: PlaceSchedulePlaces
+  uc-->>con: PlaceSchedulePlaces
+
+----
+
+=== GetPlaceScheduleLockingStatus
+
+* 会場日程IDを指定して会場ロックの状態と更新情報を取得する
+
+[mermaid,GetPlaceScheduleLockingStatus-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetPlaceScheduleLockingStatus()
+  uc->>repo: GetPlaceScheduleLockingStatus()
+  alt 会場日程が存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+  repo-->>uc: PlaceScheduleLocking
+  uc-->>con: PlaceScheduleLocking
+
+----
+
+=== UpdatePlaceScheduleLockingStatus
+
+* 会場ロックの状態を更新する
+
+[mermaid,UpdatePlaceScheduleLockingStatus-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: UpdatePlaceScheduleLockingStatus()
+  uc->>repo: SavePlaceScheduleLockingStatus()
+  alt 会場日程が存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+
+----
+
+<<<
+== ホームメニューユースケース
+
+[mermaid,HomeMenu-u-cd,png]
+----
+classDiagram
+class HomeMenuUsecase {
+  + GetHomeMenus()
+}
+----
+
+=== GetHomeMenus
+
+* ホームメニュー一覧を取得する
+
+[mermaid,GetHomeMenus-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetHomeMenus()
+  uc->>repo: GetHomeMenus()
+  repo-->>uc: HomeMenuGroupList
+  uc-->>con: HomeMenuGroupList
+
+----
+
+<<<
+== 検査メニューユースケース
+
+[mermaid,ExamMenu-u-cd,png]
+----
+classDiagram
+class ExamMenuUsecase {
+  + GetExamMenus()
+}
+----
+
+=== GetExamMenus
+
+* 検査メニュー一覧を取得する
+
+[mermaid,GetExamMenus-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetExamMenus()
+  uc->>repo: GetExamMenus()
+  repo-->>uc: ExamMenuList
+  uc-->>con: ExamMenuList
+
+----
+
+<<<
+== 受診ユースケース
+
+[mermaid,Consult-u-cd,png]
+----
+classDiagram
+class ConsultUsecase {
+  + GetExamItems(consultNumber: string)
+  + GetInputExamItems(consultNumber: string)
+  + GetUnexaminedItems(consultNumber: string)
+  + VerifyConsultNumber(request: ): void
+  + RegisterExecutions(request: )
+  + UpdateIntegrationStatus(request: ): void
+}
+----
+
+=== GetExamItems
+
+* 受診に紐づく検査項目を取得する
+* 検査内容確認画面を構成する項目をまとめて取得する
+
+[mermaid,GetExamItems-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== GetInputExamItems
+
+* 検査結果入力画面を構成する項目をまとめて取得する
+
+[mermaid,GetInputExamItems-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== GetUnexaminedItems
+
+* 未受診の検査項目リストを取得する
+
+[mermaid,GetUnexaminedItems-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetUnexaminedItems()
+  uc->>repo: GetUnexaminedItems()
+  alt 受診データが存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+  repo-->>uc: UnexaminedItemList
+  uc-->>con: UnexaminedItemList
+
+----
+
+=== VerifyConsultNumber
+
+* 受診番号の受診が存在するか確認する
+
+[mermaid,VerifyConsultNumber-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: VerifyConsultNumber()
+  uc->>repo: VerifyConsultNumber()
+  alt 受診データが存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+
+----
+
+=== RegisterExecutions
+
+* 検査項目ごとの実施有無と中止理由を記録する
+
+[mermaid,RegisterExecutions-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: RegisterExecutions()
+  uc->>repo: RegisterExecutions()
+  alt 受診データが存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+
+----
+
+=== UpdateIntegrationStatus
+
+* 受診の連携状態を更新する
+
+[mermaid,UpdateIntegrationStatus-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: UpdateIntegrationStatus()
+  uc->>repo: UpdateIntegrationStatus()
+  alt 受診が存在しない
+    repo->>repo: カスタム例外を投げる
+  end
+
+----
+
+<<<
+== 中止理由ユースケース
+
+[mermaid,CancelReason-u-cd,png]
+----
+classDiagram
+class CancelReasonUsecase {
+  + GetCancelReasons(examItemId :int)
+}
+----
+
+=== GetCancelReasons
+
+* 検査項目IDを指定して中止理由一覧を取得する
+
+[mermaid,GetCancelReasons-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetCancelReasons()
+  uc->>repo: GetCancelReasons()
+  repo-->>uc: CancelReasonList
+  uc-->>con: CancelReasonList
+
+----
+
+<<<
+== 検査機器ユースケース
+
+[mermaid,Equipment-u-cd,png]
+----
+classDiagram
+class EquipmentUsecase {
+  + GetEquipmentSettings()
+}
+----
+
+=== GetEquipmentSettings
+
+* 検査機器の設定を取得する
+
+[mermaid,GetEquipmentSettings-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetEquipmentSettings()
+  uc->>repo: GetEquipmentSettings()
+  repo-->>uc: EquipmentList
+  uc-->>con: EquipmentList
+
+----
+
+<<<
+== 検査結果ユースケース
+
+[mermaid,Result-u-cd,png]
+----
+classDiagram
+class ResultUsecase {
+  + VerifyResults(request:)
+  + RegisterResults(request:)
+}
+----
+
+=== VerifyResults
+
+* 入力された検査結果を設定されたルールで検証する
+* 検証結果を返却する
+* TODO: 業務ルールのところはで未確定で設計が必要
+
+[mermaid,VerifyResults-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== RegisterResults
+
+* 入力された検査結果をデータベースに登録する
+
+[mermaid,RegisterResults-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+<<<
+== 進捗ユースケース
+
+[mermaid,Progress-u-cd,png]
+----
+classDiagram
+class ProgressUsecase {
+  + GetProgress(placeScheduleId: int)
+}
+----
+
+=== GetProgress
+
+* 検査項目ごとの進捗状況を計算して返却する
+* TODO: 進捗の算出はPostgreSQLでビューを作るかも
+
+[mermaid,GetProgress-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetProgress()
+  uc->>repo: GetProgress()
+  repo-->>uc: PlaceScheduleProgress
+  uc-->>con: PlaceScheduleProgress
+
+----
+
+<<<
+== 基幹システム連携ユースケース
+
+[mermaid,Integration-u-cd,png]
+----
+classDiagram
+class IntegrationUsecase {
+  + GetIntegrationResults(placeScheduleId: int)
+  + ExportResults(placeScheduleId: int)
+  + GetExportHistory()
+}
+----
+
+=== GetIntegrationResults
+
+* データ出力のために、会場日程単位で結果の連携状態や会場ロック状態を一覧で取得する
+
+[mermaid,GetIntegrationResults-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetIntegrationResults()
+  uc->>repo: GetIntegrationResults()
+  repo-->>uc: ExportDataList
+  uc-->>con: ExportDataList
+----
+
+=== ExportResults
+
+* 検査結果をファイルに出力する
+* 「出力する」ボタンをトリガーに処理する
+
+[mermaid,ExportResults-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+----
+
+=== GetExportHistory
+
+* 検査結果を出力した履歴を取得する
+
+[mermaid,GetExportHistory-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: GetExportHistory()
+  uc->>repo: GetExportHistory()
+  repo-->>uc: ExportHistoryList
+  uc-->>con: ExportHistoryList
+
+----

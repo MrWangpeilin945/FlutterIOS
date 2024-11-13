@@ -1,40 +1,43 @@
 import { Button, Group, Text, Title } from "@mantine/core";
-
+import styles from "~/styles/common.module.css";
 
 type TeamProps = {
+	teamId?:number;
 	teamName?: string;
 	places?: {
 		placeId?: number;
 		placeName?: string;
 	}[];
+	onClick: () => void;
 };
 
-export default function team(team: TeamProps) {
-	const { teamName, places } = team;
-    if(places === undefined ) return;
+export default function Team({
+	teamName = "",
+	places = [],
+	onClick,
+}: TeamProps) {
+	if (places.length === 0) return null;
+
 	return (
-        //班名と会場名を表示したボタンを作成
-		<Group >
+		<Group>
 			<Button
 				fullWidth
 				variant="outline"
 				color="rgba(0, 0, 0, 1)"
 				radius="md"
 				justify="flex-start"
-				h={((places.length + 1) * 30) + 25}
+				h={(places.length + 1) * 30 + 50}
 				m={5}
-                py="xs"
+				py="xs"
+				onClick={onClick}
 			>
 				<div>
-					<Title order={2} >
-						【{teamName}】
-					</Title>
-                    {/* 会場を1つずつ取り出して配置 */}
-						{places.map((kaijyou) => (
-							<Text key={kaijyou.placeId} size="lg" fw={700}>
-								{kaijyou.placeName}
-							</Text>
-						))}
+					<Title className={styles["text-left"]} order={1} >【{teamName}】</Title>
+					{places.map((kaijyou) => (
+						<Text className={styles["button-text"]} key={kaijyou.placeId} w={1000} size="lg" fw={700}>
+							{kaijyou.placeName}
+						</Text>
+					))}
 				</div>
 			</Button>
 		</Group>

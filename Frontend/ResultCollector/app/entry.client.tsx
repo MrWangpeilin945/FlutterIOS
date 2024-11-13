@@ -8,11 +8,32 @@ import { RemixBrowser } from "@remix-run/react";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 
-startTransition(() => {
-  hydrateRoot(
-    document,
-    <StrictMode>
-      <RemixBrowser />
-    </StrictMode>
-  );
+//mock
+import { setupWorker } from "msw/browser";
+import { getWellshipMock } from "~/api/wellship.msw";
+
+async function prepareApp() {
+  if (process.env.NODE_ENV === "development") {
+    const worker = setupWorker(...getWellshipMock());
+    return worker.start({
+      serviceWorker: {
+        url: "/ResultCollector/mockServiceWorker.js",
+      },
+      onUnhandledRequest: (req) => {
+        console.warn("Unhandled request:", req);
+      },
+    });
+  }
+  return Promise.resolve();
+}
+
+prepareApp().then(() => {
+  startTransition(() => {
+    hydrateRoot(
+      document,
+      <StrictMode>
+        <RemixBrowser />
+      </StrictMode>
+    );
+  });
 });
