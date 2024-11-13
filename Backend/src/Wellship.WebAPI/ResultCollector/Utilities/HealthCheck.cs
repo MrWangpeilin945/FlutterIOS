@@ -23,18 +23,14 @@ public class HealthCheck : IHealthCheck
     /// <summary>
     /// ヘルスチェックします。
     /// </summary>
-    public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        var isHealthy = _healthCheckRepository.CheckDatabaseConnection();
-
+        var isHealthy = await _healthCheckRepository.CheckDatabaseConnectionAsync();
         if (isHealthy)
         {
-            return Task.FromResult(
-                HealthCheckResult.Healthy("A healthy result."));
+            return HealthCheckResult.Healthy("A healthy result.");
         }
 
-        return Task.FromResult(
-            new HealthCheckResult(
-                context.Registration.FailureStatus, "An unhealthy result."));
+        return new HealthCheckResult(context.Registration.FailureStatus, "An unhealthy result.");
     }
 }
