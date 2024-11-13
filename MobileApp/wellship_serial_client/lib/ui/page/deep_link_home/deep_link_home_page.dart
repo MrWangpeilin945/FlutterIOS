@@ -4,7 +4,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:wellship_serial_client/data/model/query_parameter.dart';
+import 'package:wellship_serial_client/data/enum/trans_method.dart';
+import 'package:wellship_serial_client/data/model/app_settings.dart';
+import 'package:wellship_serial_client/data/provider/wired_settings.dart';
+import 'package:wellship_serial_client/ui/route/app_route.gr.dart';
 
 @RoutePage()
 class DeepLinkHomePage extends ConsumerWidget {
@@ -14,7 +17,22 @@ class DeepLinkHomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = context.router;
     final params = router.current.queryParams;
-    final query = QueryParameter.fromMap(params.rawMap);
+    final settings = AppSettings.fromMap(params.rawMap);
+    switch (settings.transMethod) {
+      case TransMethod.wired:
+        ref.read(wiredSettingsProvider.notifier).state = WiredSettings(
+          baud: settings.baud,
+          dataBits: settings.dataBits,
+          parity: settings.parity,
+          stopBits: settings.stopBits,
+          useRts: settings.useRts,
+          useDtr: settings.useDtr,
+        );
+        router.replace(const WiredSerialCommunicationRoute());
+        return const Scaffold();
+      default:
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Deep Link'),
@@ -27,7 +45,7 @@ class DeepLinkHomePage extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text('Deep Link'),
-            Text(query.toString()),
+            Text(settings.toString()),
             OutlinedButton(
                 onPressed: () async {
                   final random = Random();

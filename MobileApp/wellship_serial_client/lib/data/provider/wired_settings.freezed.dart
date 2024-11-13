@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'query_parameter.dart';
+part of 'wired_settings.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,115 +15,102 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
-mixin _$QueryParameter {
-  TransMethod get transMethod => throw _privateConstructorUsedError;
-  String? get title => throw _privateConstructorUsedError;
-  String? get callback => throw _privateConstructorUsedError;
-  int? get baud => throw _privateConstructorUsedError;
-  int? get dataBits => throw _privateConstructorUsedError;
-  Parity? get parity => throw _privateConstructorUsedError;
-  StopBits? get stopBits => throw _privateConstructorUsedError;
+mixin _$WiredSettings {
+  int get baud => throw _privateConstructorUsedError;
+  int get dataBits => throw _privateConstructorUsedError;
+  Parity get parity => throw _privateConstructorUsedError;
+  StopBits get stopBits => throw _privateConstructorUsedError;
+  bool get useRts => throw _privateConstructorUsedError;
+  bool get useDtr => throw _privateConstructorUsedError;
   List<String>? get ackTriggerStrings => throw _privateConstructorUsedError;
   String? get ackString => throw _privateConstructorUsedError;
   String? get eotString => throw _privateConstructorUsedError;
   int? get dataLength => throw _privateConstructorUsedError;
-  bool? get useRts => throw _privateConstructorUsedError;
-  bool? get useDtr => throw _privateConstructorUsedError;
   String? get transmissionDataTriggerString =>
       throw _privateConstructorUsedError;
   String? get transmissionData => throw _privateConstructorUsedError;
 
-  /// Create a copy of QueryParameter
+  /// Create a copy of WiredSettings
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $QueryParameterCopyWith<QueryParameter> get copyWith =>
+  $WiredSettingsCopyWith<WiredSettings> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $QueryParameterCopyWith<$Res> {
-  factory $QueryParameterCopyWith(
-          QueryParameter value, $Res Function(QueryParameter) then) =
-      _$QueryParameterCopyWithImpl<$Res, QueryParameter>;
+abstract class $WiredSettingsCopyWith<$Res> {
+  factory $WiredSettingsCopyWith(
+          WiredSettings value, $Res Function(WiredSettings) then) =
+      _$WiredSettingsCopyWithImpl<$Res, WiredSettings>;
   @useResult
   $Res call(
-      {TransMethod transMethod,
-      String? title,
-      String? callback,
-      int? baud,
-      int? dataBits,
-      Parity? parity,
-      StopBits? stopBits,
+      {int baud,
+      int dataBits,
+      Parity parity,
+      StopBits stopBits,
+      bool useRts,
+      bool useDtr,
       List<String>? ackTriggerStrings,
       String? ackString,
       String? eotString,
       int? dataLength,
-      bool? useRts,
-      bool? useDtr,
       String? transmissionDataTriggerString,
       String? transmissionData});
 }
 
 /// @nodoc
-class _$QueryParameterCopyWithImpl<$Res, $Val extends QueryParameter>
-    implements $QueryParameterCopyWith<$Res> {
-  _$QueryParameterCopyWithImpl(this._value, this._then);
+class _$WiredSettingsCopyWithImpl<$Res, $Val extends WiredSettings>
+    implements $WiredSettingsCopyWith<$Res> {
+  _$WiredSettingsCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of QueryParameter
+  /// Create a copy of WiredSettings
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? transMethod = null,
-    Object? title = freezed,
-    Object? callback = freezed,
-    Object? baud = freezed,
-    Object? dataBits = freezed,
-    Object? parity = freezed,
-    Object? stopBits = freezed,
+    Object? baud = null,
+    Object? dataBits = null,
+    Object? parity = null,
+    Object? stopBits = null,
+    Object? useRts = null,
+    Object? useDtr = null,
     Object? ackTriggerStrings = freezed,
     Object? ackString = freezed,
     Object? eotString = freezed,
     Object? dataLength = freezed,
-    Object? useRts = freezed,
-    Object? useDtr = freezed,
     Object? transmissionDataTriggerString = freezed,
     Object? transmissionData = freezed,
   }) {
     return _then(_value.copyWith(
-      transMethod: null == transMethod
-          ? _value.transMethod
-          : transMethod // ignore: cast_nullable_to_non_nullable
-              as TransMethod,
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      callback: freezed == callback
-          ? _value.callback
-          : callback // ignore: cast_nullable_to_non_nullable
-              as String?,
-      baud: freezed == baud
+      baud: null == baud
           ? _value.baud
           : baud // ignore: cast_nullable_to_non_nullable
-              as int?,
-      dataBits: freezed == dataBits
+              as int,
+      dataBits: null == dataBits
           ? _value.dataBits
           : dataBits // ignore: cast_nullable_to_non_nullable
-              as int?,
-      parity: freezed == parity
+              as int,
+      parity: null == parity
           ? _value.parity
           : parity // ignore: cast_nullable_to_non_nullable
-              as Parity?,
-      stopBits: freezed == stopBits
+              as Parity,
+      stopBits: null == stopBits
           ? _value.stopBits
           : stopBits // ignore: cast_nullable_to_non_nullable
-              as StopBits?,
+              as StopBits,
+      useRts: null == useRts
+          ? _value.useRts
+          : useRts // ignore: cast_nullable_to_non_nullable
+              as bool,
+      useDtr: null == useDtr
+          ? _value.useDtr
+          : useDtr // ignore: cast_nullable_to_non_nullable
+              as bool,
       ackTriggerStrings: freezed == ackTriggerStrings
           ? _value.ackTriggerStrings
           : ackTriggerStrings // ignore: cast_nullable_to_non_nullable
@@ -140,14 +127,6 @@ class _$QueryParameterCopyWithImpl<$Res, $Val extends QueryParameter>
           ? _value.dataLength
           : dataLength // ignore: cast_nullable_to_non_nullable
               as int?,
-      useRts: freezed == useRts
-          ? _value.useRts
-          : useRts // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      useDtr: freezed == useDtr
-          ? _value.useDtr
-          : useDtr // ignore: cast_nullable_to_non_nullable
-              as bool?,
       transmissionDataTriggerString: freezed == transmissionDataTriggerString
           ? _value.transmissionDataTriggerString
           : transmissionDataTriggerString // ignore: cast_nullable_to_non_nullable
@@ -161,89 +140,79 @@ class _$QueryParameterCopyWithImpl<$Res, $Val extends QueryParameter>
 }
 
 /// @nodoc
-abstract class _$$QueryParameterImplCopyWith<$Res>
-    implements $QueryParameterCopyWith<$Res> {
-  factory _$$QueryParameterImplCopyWith(_$QueryParameterImpl value,
-          $Res Function(_$QueryParameterImpl) then) =
-      __$$QueryParameterImplCopyWithImpl<$Res>;
+abstract class _$$WiredSettingsImplCopyWith<$Res>
+    implements $WiredSettingsCopyWith<$Res> {
+  factory _$$WiredSettingsImplCopyWith(
+          _$WiredSettingsImpl value, $Res Function(_$WiredSettingsImpl) then) =
+      __$$WiredSettingsImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
-      {TransMethod transMethod,
-      String? title,
-      String? callback,
-      int? baud,
-      int? dataBits,
-      Parity? parity,
-      StopBits? stopBits,
+      {int baud,
+      int dataBits,
+      Parity parity,
+      StopBits stopBits,
+      bool useRts,
+      bool useDtr,
       List<String>? ackTriggerStrings,
       String? ackString,
       String? eotString,
       int? dataLength,
-      bool? useRts,
-      bool? useDtr,
       String? transmissionDataTriggerString,
       String? transmissionData});
 }
 
 /// @nodoc
-class __$$QueryParameterImplCopyWithImpl<$Res>
-    extends _$QueryParameterCopyWithImpl<$Res, _$QueryParameterImpl>
-    implements _$$QueryParameterImplCopyWith<$Res> {
-  __$$QueryParameterImplCopyWithImpl(
-      _$QueryParameterImpl _value, $Res Function(_$QueryParameterImpl) _then)
+class __$$WiredSettingsImplCopyWithImpl<$Res>
+    extends _$WiredSettingsCopyWithImpl<$Res, _$WiredSettingsImpl>
+    implements _$$WiredSettingsImplCopyWith<$Res> {
+  __$$WiredSettingsImplCopyWithImpl(
+      _$WiredSettingsImpl _value, $Res Function(_$WiredSettingsImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of QueryParameter
+  /// Create a copy of WiredSettings
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? transMethod = null,
-    Object? title = freezed,
-    Object? callback = freezed,
-    Object? baud = freezed,
-    Object? dataBits = freezed,
-    Object? parity = freezed,
-    Object? stopBits = freezed,
+    Object? baud = null,
+    Object? dataBits = null,
+    Object? parity = null,
+    Object? stopBits = null,
+    Object? useRts = null,
+    Object? useDtr = null,
     Object? ackTriggerStrings = freezed,
     Object? ackString = freezed,
     Object? eotString = freezed,
     Object? dataLength = freezed,
-    Object? useRts = freezed,
-    Object? useDtr = freezed,
     Object? transmissionDataTriggerString = freezed,
     Object? transmissionData = freezed,
   }) {
-    return _then(_$QueryParameterImpl(
-      transMethod: null == transMethod
-          ? _value.transMethod
-          : transMethod // ignore: cast_nullable_to_non_nullable
-              as TransMethod,
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      callback: freezed == callback
-          ? _value.callback
-          : callback // ignore: cast_nullable_to_non_nullable
-              as String?,
-      baud: freezed == baud
+    return _then(_$WiredSettingsImpl(
+      baud: null == baud
           ? _value.baud
           : baud // ignore: cast_nullable_to_non_nullable
-              as int?,
-      dataBits: freezed == dataBits
+              as int,
+      dataBits: null == dataBits
           ? _value.dataBits
           : dataBits // ignore: cast_nullable_to_non_nullable
-              as int?,
-      parity: freezed == parity
+              as int,
+      parity: null == parity
           ? _value.parity
           : parity // ignore: cast_nullable_to_non_nullable
-              as Parity?,
-      stopBits: freezed == stopBits
+              as Parity,
+      stopBits: null == stopBits
           ? _value.stopBits
           : stopBits // ignore: cast_nullable_to_non_nullable
-              as StopBits?,
+              as StopBits,
+      useRts: null == useRts
+          ? _value.useRts
+          : useRts // ignore: cast_nullable_to_non_nullable
+              as bool,
+      useDtr: null == useDtr
+          ? _value.useDtr
+          : useDtr // ignore: cast_nullable_to_non_nullable
+              as bool,
       ackTriggerStrings: freezed == ackTriggerStrings
           ? _value._ackTriggerStrings
           : ackTriggerStrings // ignore: cast_nullable_to_non_nullable
@@ -260,14 +229,6 @@ class __$$QueryParameterImplCopyWithImpl<$Res>
           ? _value.dataLength
           : dataLength // ignore: cast_nullable_to_non_nullable
               as int?,
-      useRts: freezed == useRts
-          ? _value.useRts
-          : useRts // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      useDtr: freezed == useDtr
-          ? _value.useDtr
-          : useDtr // ignore: cast_nullable_to_non_nullable
-              as bool?,
       transmissionDataTriggerString: freezed == transmissionDataTriggerString
           ? _value.transmissionDataTriggerString
           : transmissionDataTriggerString // ignore: cast_nullable_to_non_nullable
@@ -282,39 +243,34 @@ class __$$QueryParameterImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$QueryParameterImpl implements _QueryParameter {
-  const _$QueryParameterImpl(
-      {required this.transMethod,
-      this.title,
-      this.callback,
-      this.baud,
-      this.dataBits,
-      this.parity,
-      this.stopBits,
+class _$WiredSettingsImpl implements _WiredSettings {
+  const _$WiredSettingsImpl(
+      {required this.baud,
+      required this.dataBits,
+      required this.parity,
+      required this.stopBits,
+      required this.useRts,
+      required this.useDtr,
       final List<String>? ackTriggerStrings,
       this.ackString,
       this.eotString,
       this.dataLength,
-      this.useRts,
-      this.useDtr,
       this.transmissionDataTriggerString,
       this.transmissionData})
       : _ackTriggerStrings = ackTriggerStrings;
 
   @override
-  final TransMethod transMethod;
+  final int baud;
   @override
-  final String? title;
+  final int dataBits;
   @override
-  final String? callback;
+  final Parity parity;
   @override
-  final int? baud;
+  final StopBits stopBits;
   @override
-  final int? dataBits;
+  final bool useRts;
   @override
-  final Parity? parity;
-  @override
-  final StopBits? stopBits;
+  final bool useDtr;
   final List<String>? _ackTriggerStrings;
   @override
   List<String>? get ackTriggerStrings {
@@ -333,35 +289,28 @@ class _$QueryParameterImpl implements _QueryParameter {
   @override
   final int? dataLength;
   @override
-  final bool? useRts;
-  @override
-  final bool? useDtr;
-  @override
   final String? transmissionDataTriggerString;
   @override
   final String? transmissionData;
 
   @override
   String toString() {
-    return 'QueryParameter(transMethod: $transMethod, title: $title, callback: $callback, baud: $baud, dataBits: $dataBits, parity: $parity, stopBits: $stopBits, ackTriggerStrings: $ackTriggerStrings, ackString: $ackString, eotString: $eotString, dataLength: $dataLength, useRts: $useRts, useDtr: $useDtr, transmissionDataTriggerString: $transmissionDataTriggerString, transmissionData: $transmissionData)';
+    return 'WiredSettings(baud: $baud, dataBits: $dataBits, parity: $parity, stopBits: $stopBits, useRts: $useRts, useDtr: $useDtr, ackTriggerStrings: $ackTriggerStrings, ackString: $ackString, eotString: $eotString, dataLength: $dataLength, transmissionDataTriggerString: $transmissionDataTriggerString, transmissionData: $transmissionData)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$QueryParameterImpl &&
-            (identical(other.transMethod, transMethod) ||
-                other.transMethod == transMethod) &&
-            (identical(other.title, title) || other.title == title) &&
-            (identical(other.callback, callback) ||
-                other.callback == callback) &&
+            other is _$WiredSettingsImpl &&
             (identical(other.baud, baud) || other.baud == baud) &&
             (identical(other.dataBits, dataBits) ||
                 other.dataBits == dataBits) &&
             (identical(other.parity, parity) || other.parity == parity) &&
             (identical(other.stopBits, stopBits) ||
                 other.stopBits == stopBits) &&
+            (identical(other.useRts, useRts) || other.useRts == useRts) &&
+            (identical(other.useDtr, useDtr) || other.useDtr == useDtr) &&
             const DeepCollectionEquality()
                 .equals(other._ackTriggerStrings, _ackTriggerStrings) &&
             (identical(other.ackString, ackString) ||
@@ -370,8 +319,6 @@ class _$QueryParameterImpl implements _QueryParameter {
                 other.eotString == eotString) &&
             (identical(other.dataLength, dataLength) ||
                 other.dataLength == dataLength) &&
-            (identical(other.useRts, useRts) || other.useRts == useRts) &&
-            (identical(other.useDtr, useDtr) || other.useDtr == useDtr) &&
             (identical(other.transmissionDataTriggerString,
                     transmissionDataTriggerString) ||
                 other.transmissionDataTriggerString ==
@@ -383,64 +330,55 @@ class _$QueryParameterImpl implements _QueryParameter {
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      transMethod,
-      title,
-      callback,
       baud,
       dataBits,
       parity,
       stopBits,
+      useRts,
+      useDtr,
       const DeepCollectionEquality().hash(_ackTriggerStrings),
       ackString,
       eotString,
       dataLength,
-      useRts,
-      useDtr,
       transmissionDataTriggerString,
       transmissionData);
 
-  /// Create a copy of QueryParameter
+  /// Create a copy of WiredSettings
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$QueryParameterImplCopyWith<_$QueryParameterImpl> get copyWith =>
-      __$$QueryParameterImplCopyWithImpl<_$QueryParameterImpl>(
-          this, _$identity);
+  _$$WiredSettingsImplCopyWith<_$WiredSettingsImpl> get copyWith =>
+      __$$WiredSettingsImplCopyWithImpl<_$WiredSettingsImpl>(this, _$identity);
 }
 
-abstract class _QueryParameter implements QueryParameter {
-  const factory _QueryParameter(
-      {required final TransMethod transMethod,
-      final String? title,
-      final String? callback,
-      final int? baud,
-      final int? dataBits,
-      final Parity? parity,
-      final StopBits? stopBits,
+abstract class _WiredSettings implements WiredSettings {
+  const factory _WiredSettings(
+      {required final int baud,
+      required final int dataBits,
+      required final Parity parity,
+      required final StopBits stopBits,
+      required final bool useRts,
+      required final bool useDtr,
       final List<String>? ackTriggerStrings,
       final String? ackString,
       final String? eotString,
       final int? dataLength,
-      final bool? useRts,
-      final bool? useDtr,
       final String? transmissionDataTriggerString,
-      final String? transmissionData}) = _$QueryParameterImpl;
+      final String? transmissionData}) = _$WiredSettingsImpl;
 
   @override
-  TransMethod get transMethod;
+  int get baud;
   @override
-  String? get title;
+  int get dataBits;
   @override
-  String? get callback;
+  Parity get parity;
   @override
-  int? get baud;
+  StopBits get stopBits;
   @override
-  int? get dataBits;
+  bool get useRts;
   @override
-  Parity? get parity;
-  @override
-  StopBits? get stopBits;
+  bool get useDtr;
   @override
   List<String>? get ackTriggerStrings;
   @override
@@ -450,18 +388,14 @@ abstract class _QueryParameter implements QueryParameter {
   @override
   int? get dataLength;
   @override
-  bool? get useRts;
-  @override
-  bool? get useDtr;
-  @override
   String? get transmissionDataTriggerString;
   @override
   String? get transmissionData;
 
-  /// Create a copy of QueryParameter
+  /// Create a copy of WiredSettings
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$QueryParameterImplCopyWith<_$QueryParameterImpl> get copyWith =>
+  _$$WiredSettingsImplCopyWith<_$WiredSettingsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

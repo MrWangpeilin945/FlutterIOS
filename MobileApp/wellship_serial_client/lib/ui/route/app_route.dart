@@ -13,6 +13,7 @@ class AppRouter extends RootStackRouter {
   List<AutoRoute> get routes => [
         AutoRoute(path: '/', page: HomeRoute.page),
         AutoRoute(page: WiredSerialSettingsRoute.page),
+        AutoRoute(page: WiredSerialCommunicationRoute.page),
         AutoRoute(path: '/deep-link-home', page: DeepLinkHomeRoute.page),
       ];
 }

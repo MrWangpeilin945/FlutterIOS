@@ -18,9 +18,9 @@ class HomePage extends ConsumerWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: constraints.maxHeight),
+        builder: (context, constraints) => ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: constraints.maxHeight),
+          child: SingleChildScrollView(
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
