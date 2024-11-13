@@ -8,14 +8,14 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Reposi
 /// </summary>
 public class PlaceScheduleRepository : IPlaceScheduleRepository
 {
-    private readonly PostgresConnector _connector;
+    private readonly IDbConnectionProvider _dbConnectionProvider;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public PlaceScheduleRepository(PostgresConnector connector)
+    public PlaceScheduleRepository(IDbConnectionProvider dbConnectionProvider)
     {
-        _connector = connector;
+        _dbConnectionProvider = dbConnectionProvider;
     }
 
     /// <summary>

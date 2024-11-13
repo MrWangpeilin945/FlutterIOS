@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NLog.Web;
 
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
@@ -33,9 +34,16 @@ public class Program
 
         builder.Services.AddHealthChecks()
                         .AddCheck<HealthCheck>("database");
-        builder.Services.AddScoped<PostgresConnector>();
         builder.Services.AddRepositories();
         builder.Services.AddUseCases();
+
+        // 動作環境を確認してそれに合わせたサービスをDIします。
+        if (true)
+        {
+            builder.Services.AddLocalServices()
+                            .AddPostgreSqlServices();
+        }
+        builder.Services.AddScoped<IDbConnectionProvider, DbConnectionProvider>();
 
         builder.Services.AddOpenApiDocument(options =>
         {
@@ -97,6 +105,31 @@ public static class IServiceCollectionExtension
     {
         services.AddScoped<IPlaceScheduleUsecase, PlaceScheduleUsecase>();
         services.AddScoped<IConsultUsecase, ConsultUsecase>();
+        return services;
+    }
+    /// <summary>
+    /// ローカル環境で動作させる場合のみ使用するサービス群
+    /// </summary>
+    public static IServiceCollection AddLocalServices(this IServiceCollection services)
+    {
+        // 接続文字列はアプリケーション全体の寿命で管理したいためSingletonでDIする
+        services.AddSingleton<IConnectionStringProvider, AppSettingsConnectionStringProvider>();
+        return services;
+    }
+    /// <summary>
+    /// AWS環境で動作させる場合のみ使用するサービス群
+    /// </summary>
+    public static IServiceCollection AddAwsServices(this IServiceCollection services)
+    {
+        throw new NotImplementedException();
+    }
+    /// <summary>
+    /// PostgreSQLに接続する場合のみ使用するサービス群
+    /// </summary>
+    public static IServiceCollection AddPostgreSqlServices(this IServiceCollection services)
+    {
+        // データソースはアプリケーション全体の寿命で管理したいためSingletonでDIする
+        services.AddSingleton<IDbDataSourceRegistry, NpgsqlDbDataSourceRegistry>();
         return services;
     }
 }

@@ -7,15 +7,15 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Reposi
 /// </summary>
 public class ConsultRepository : IConsultRepository
 {
-    private readonly PostgresConnector _connector;
+    private readonly IDbConnectionProvider _dbConnectionProvider;
 
     /// <summary>
     /// 受診リポジトリを生成します。
     /// </summary>
-    /// <param name="connector">PostgreSQL用コネクター</param>
-    public ConsultRepository(PostgresConnector connector)
+    /// <param name="dbConnectionProvider">dbConnectionProvider</param>
+    public ConsultRepository(IDbConnectionProvider dbConnectionProvider)
     {
-        _connector = connector;
+        _dbConnectionProvider = dbConnectionProvider;
     }
 
     /// <summary>

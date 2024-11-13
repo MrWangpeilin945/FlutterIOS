@@ -1,3 +1,5 @@
+using Dapper;
+
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 
@@ -8,28 +10,26 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
 /// </summary>
 public class HealthCheckRepository : IHealthCheckRepository
 {
-    private readonly PostgresConnector _connector;
+    private readonly IDbConnectionProvider _dbConnectionProvider;
 
     /// <summary>
     /// ヘルスチェック用のリポジトリを生成します。
     /// </summary>
-    /// <param name="connector">PostgreSQL用コネクター</param>
-    public HealthCheckRepository(PostgresConnector connector)
+    /// <param name="dbConnectionProvider">dbConnectionProvider</param>
+    public HealthCheckRepository(IDbConnectionProvider dbConnectionProvider)
     {
-        _connector = connector;
+        _dbConnectionProvider = dbConnectionProvider;
     }
 
     /// <summary>
     /// SELECT 1を投げてDB接続を確認します。
     /// </summary>
     /// <returns>接続が正常か</returns>
-    public bool CheckDatabaseConnection()
+    public async Task<bool> CheckDatabaseConnectionAsync()
     {
-        // TODO: データベースと接続して正常性を確認する
-        return true;
-
-        // var sql = "SELECT 1;";
-        // var result = _connector.Query<int>(sql).SingleOrDefault();
-        // return result == 1;
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = "SELECT 1;";
+        var result = await connection.QueryAsync<int>(sql);
+        return result.SingleOrDefault() == 1;
     }
 }
