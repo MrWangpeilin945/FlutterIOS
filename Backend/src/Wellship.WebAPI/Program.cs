@@ -113,7 +113,7 @@ public static class IServiceCollectionExtension
     public static IServiceCollection AddLocalServices(this IServiceCollection services)
     {
         // 接続文字列はアプリケーション全体の寿命で管理したいためSingletonでDIする
-        services.AddSingleton<IConnectionStringProvider, AppSettingsConnectionStringProvider>();
+        services.AddSingleton<IConnectionStringProvider, EnvironmentVariableConnectionStringProvider>();
         return services;
     }
     /// <summary>
