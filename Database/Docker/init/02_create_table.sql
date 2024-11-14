@@ -113,10 +113,14 @@ CREATE TABLE home_menus (
   , name text NOT NULL
   , home_menu_group_id integer NOT NULL
   , order_number integer NOT NULL
+  , path text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT home_menus_PKC PRIMARY KEY (home_menu_id)
 );
+
+ALTER TABLE home_menus ADD CONSTRAINT home_menus_IX1
+  UNIQUE (path) ;
 
 CREATE TABLE keyboard_options (
   option_id integer NOT NULL
@@ -553,6 +557,7 @@ COMMENT ON COLUMN home_menus.home_menu_id IS 'ホームメニューID';
 COMMENT ON COLUMN home_menus.name IS 'ホームメニュー名';
 COMMENT ON COLUMN home_menus.home_menu_group_id IS 'ホームメニューグループID';
 COMMENT ON COLUMN home_menus.order_number IS 'グループ内表示順';
+COMMENT ON COLUMN home_menus.path IS 'パス';
 COMMENT ON COLUMN home_menus.created_at IS '作成日時';
 COMMENT ON COLUMN home_menus.created_by IS '作成者';
 
