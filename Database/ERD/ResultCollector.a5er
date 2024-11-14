@@ -638,10 +638,12 @@ Field="ホームメニューID","home_menu_id","integer","NOT NULL",0,"","",$FFF
 Field="ホームメニュー名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="ホームメニューグループID","home_menu_group_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="グループ内表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="パス","path","text","NOT NULL",,"","",$FFFFFFFF,""
+Index==2,path
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241015152028
+ModifiedDateTime=20241114185530
 Position="MAIN",3000,1250
 ZOrder=34
 
