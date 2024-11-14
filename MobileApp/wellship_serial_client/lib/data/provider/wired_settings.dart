@@ -6,7 +6,13 @@ import 'package:wellship_serial_client/data/enum/stop_bits.dart';
 part 'wired_settings.freezed.dart';
 
 final wiredSettingsProvider = StateProvider<WiredSettings>((ref) => const WiredSettings(
-    baud: 9600, dataBits: 8, parity: Parity.none, stopBits: StopBits.stopBits_1, useRts: false, useDtr: false));
+      baud: 9600,
+      dataBits: 8,
+      parity: Parity.none,
+      stopBits: StopBits.stopBits_1,
+      useRts: false,
+      useDtr: false,
+    ));
 
 @freezed
 class WiredSettings with _$WiredSettings {

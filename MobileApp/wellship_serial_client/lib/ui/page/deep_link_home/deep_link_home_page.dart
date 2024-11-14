@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wellship_serial_client/data/enum/trans_method.dart';
 import 'package:wellship_serial_client/data/model/app_settings.dart';
+import 'package:wellship_serial_client/data/provider/bt_classic_settings.dart';
 import 'package:wellship_serial_client/data/provider/wired_settings.dart';
 import 'package:wellship_serial_client/ui/route/app_route.gr.dart';
 
@@ -20,6 +21,7 @@ class DeepLinkHomePage extends ConsumerWidget {
     final settings = AppSettings.fromMap(params.rawMap);
     switch (settings.transMethod) {
       case TransMethod.wired:
+        // Buildメソッド内でStateProviderを更新してはならないため
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ref.read(wiredSettingsProvider.notifier).state = WiredSettings(
             baud: settings.baud,
@@ -31,6 +33,12 @@ class DeepLinkHomePage extends ConsumerWidget {
           );
         });
         router.replace(const WiredSerialCommunicationRoute());
+        return const Scaffold();
+      case TransMethod.btClassic:
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(btClassicSettingsProvider.notifier).state = const BtClassicSettings();
+        });
+        router.replace(const BtClassicSerialCommunicationRoute());
         return const Scaffold();
       default:
     }

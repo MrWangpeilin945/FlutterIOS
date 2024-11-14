@@ -14,6 +14,8 @@ class AppRouter extends RootStackRouter {
         AutoRoute(path: '/', page: HomeRoute.page),
         AutoRoute(page: WiredSerialSettingsRoute.page),
         AutoRoute(page: WiredSerialCommunicationRoute.page),
+        AutoRoute(page: BtClassicSerialSettingsRoute.page),
+        AutoRoute(page: BtClassicSerialCommunicationRoute.page),
         AutoRoute(path: '/deep-link-home', page: DeepLinkHomeRoute.page),
       ];
 }

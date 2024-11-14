@@ -32,8 +32,8 @@ class HomePage extends ConsumerWidget {
                       onPressed: () => {router.push(const WiredSerialSettingsRoute())},
                       text: '有線接続',
                     ),
-                    const WscMenuButton(
-                      onPressed: null,
+                    WscMenuButton(
+                      onPressed: () => {router.push(const BtClassicSerialSettingsRoute())},
                       text: '無線接続（BR/EDR）',
                     ),
                     const WscMenuButton(
