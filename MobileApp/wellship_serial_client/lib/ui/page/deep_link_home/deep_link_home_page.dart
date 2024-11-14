@@ -20,14 +20,16 @@ class DeepLinkHomePage extends ConsumerWidget {
     final settings = AppSettings.fromMap(params.rawMap);
     switch (settings.transMethod) {
       case TransMethod.wired:
-        ref.read(wiredSettingsProvider.notifier).state = WiredSettings(
-          baud: settings.baud,
-          dataBits: settings.dataBits,
-          parity: settings.parity,
-          stopBits: settings.stopBits,
-          useRts: settings.useRts,
-          useDtr: settings.useDtr,
-        );
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(wiredSettingsProvider.notifier).state = WiredSettings(
+            baud: settings.baud,
+            dataBits: settings.dataBits,
+            parity: settings.parity,
+            stopBits: settings.stopBits,
+            useRts: settings.useRts,
+            useDtr: settings.useDtr,
+          );
+        });
         router.replace(const WiredSerialCommunicationRoute());
         return const Scaffold();
       default:
