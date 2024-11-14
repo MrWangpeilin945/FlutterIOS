@@ -25,11 +25,11 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
 
     useEffect(() {
       if (firstDevice == null) {
+        usbPort.value = null;
         return;
       }
       firstDevice.create().then((port) async {
         text.value = "";
-        usbPort.value = port;
         if (port == null) {
           return;
         }
@@ -42,6 +42,7 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
           serialSettings.stopBits.value,
           serialSettings.parity.value,
         );
+        usbPort.value = port;
         final buffer = Uint8Buffer();
         // 多重に終了処理が行われないように
         bool aborting = false;
@@ -72,7 +73,7 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
       body: Center(
         child: Column(children: [
           Text("firstDevice:${firstDevice.toString()}"),
-          Text("UsbPort:$usbPort"),
+          Text("UsbPort:${usbPort.value}"),
           Text("text:${text.value}"),
         ]),
       ),
