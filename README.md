@@ -201,6 +201,16 @@ Backlog課題名が自動で入力されるので、課題名の後ろに変更�
 
 |名称|説明|必須|例|
 |-----|-----|-----|-----|
-|`RDS_USER_ID`|データベースのユーザID|Yes||
-|`RDS_USER_PASS`|データベースのパスワード|Yes||
-|`RDS_ENDPOINT`|データベースのエンドポイント|Yes||
+|`RDS_USER_ID`|データベースのユーザID|Yes|`postgres`|
+|`RDS_USER_PASS`|データベースのパスワード|Yes|`p@ssw0rd`|
+|`RDS_ENDPOINT`|データベースのエンドポイント|Yes|`Host=localhost;Port=15433;Database=dev01;`|
+
+ローカル開発端末のシステム環境変数に設定するにはPowerShellでコマンドを実行する。
+
+```powershell
+[Environment]::SetEnvironmentVariable("RDS_USER_ID", "postgres", [EnvironmentVariableTarget]::Machine)
+[Environment]::SetEnvironmentVariable("RDS_USER_PASS", "p@ssw0rd", [EnvironmentVariableTarget]::Machine)
+[Environment]::SetEnvironmentVariable("RDS_ENDPOINT", "Host=localhost;Port=15433;Database=dev01;", [EnvironmentVariableTarget]::Machine)
+```
+
+この例はDockerコンテナでローカルに立てたPostgreSQLを想定している。
