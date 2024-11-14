@@ -1,6 +1,3 @@
-
-using System.Text.Json;
-
 using Dapper;
 
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
