@@ -58,7 +58,7 @@ export default function teams() {
 	if(!teamsData?.teams){
 		return (
 			<>
-				<CommonHeader screenName="班選択" buttonType="1" />
+				<CommonHeader screenName="班選択" staffName="両備 太郎" />
 				<Container fluid mt={20}>
 					{/* エラーメッセージを表示 */}
 					<Title order={3}>{getErrorMessage(errorMessages.noData, "該当する班")}</Title>
@@ -71,7 +71,7 @@ export default function teams() {
 	if (teamsData?.teams) {
 		return (
 			<div>
-				<CommonHeader screenName="班選択" buttonType="1" />
+				<CommonHeader screenName="班選択" staffName="両備 太郎" />
 
 				{/* 班データをリストにして表示*/}
 				<Container className={styles["footer-padding"]}fluid mt={20}>

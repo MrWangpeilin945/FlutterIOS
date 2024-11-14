@@ -18,5 +18,9 @@ export default defineConfig({
   base: "/ResultCollector/",
   resolve: {
     mainFields: ['browser', 'module', 'main'],
+    alias: {
+      // 開発環境でも、アイコンを静的にエクスポートするように設定
+      '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
+    },
   },
 });
