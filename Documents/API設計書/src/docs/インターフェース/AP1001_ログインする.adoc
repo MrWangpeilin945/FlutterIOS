@@ -27,7 +27,7 @@
 [source,json]
 ----
 {
-  "staffId": 12345,
+  "loginId": "ABC12345",
   "password": "sKgj3c83JXJWXs"
 }
 ----
