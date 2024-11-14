@@ -8,14 +8,14 @@ namespace Ryobi.Wellship.APIModels.Requests;
 public class StaffLoginRequest
 {
     /// <summary>
-    /// 職員ID
+    /// 職員のログインID
     /// </summary>
-    [JsonPropertyName("staffId")]
-    public int StaffId { get; set; }
+    [JsonPropertyName("loginId")]
+    public string LoginId { get; set; } = null!;
 
     /// <summary>
     /// パスワード
     /// </summary>
     [JsonPropertyName("password")]
-    public string Password { get; set; } = "";
+    public string Password { get; set; } = null!;
 }
