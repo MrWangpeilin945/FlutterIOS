@@ -10,5 +10,5 @@ public interface IExamMenuUsecase
     /// <summary>
     /// 検査メニュー一覧を取得する
     /// </summary>
-    public void GetExamMenus();
+    public Task<ExamMenuList> GetExamMenusAsync();
 }
