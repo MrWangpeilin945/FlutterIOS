@@ -1,0 +1,41 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+  actor stf as 職員
+  participant fe as フロントエンド
+  participant cmp as コンポーネント
+  participant be as バックエンド
+  autonumber
+  stf ->> fe: 【SC0008】検査結果入力画面に遷移
+  Note right of stf: 引数チェック
+  fe ->> fe: パスパラメータ：検査メニューIDの正当性チェック
+  break 検査メニューIDが異常
+    fe ->> cmp: 共通ダイアログ呼び出し
+    Note over fe, cmp: 「検査メニューが選択されていません（OK only）」
+    fe ->> fe: ブラウザバック処理
+  end
+  fe ->> fe: パスパラメータ：受診番号の正当性チェック
+  break 受診番号が異常
+    fe ->> cmp: 共通ダイアログ呼び出し
+    Note over fe, cmp: 「受診者が選択されていません（OK only）」
+    fe ->> fe: ブラウザバック処理
+  end
+  fe ->> fe: jotaiから機器IDを取得（APIパラメータ用）
+  fe ->> be: AP1009_検査結果入力情報を取得する
+  Note right of be: 受診番号、検査メニューID、機器ID
+  be -->> fe: レスポンスを取得（受診者情報+ブース特記+検査情報）
+  break ステータスコードが200以外
+    fe ->> cmp: 【CP0015】共通ダイアログを呼び出す
+    Note over fe, cmp: 「検査項目の取得に失敗しました。（OK only）」
+    fe ->> fe: ブラウザバック処理
+  end
+  fe ->> fe: jotaiからログインしている職員名を取得（ヘッダーに渡す用）
+  fe ->> cmp: 【CP0002】共通フッターを呼び出す
+  fe ->> cmp: 【CP0003】受診者ヘッダーを呼び出す
+  alt ブース特記データがある場合
+    fe ->> cmp: 【CP0009】ブース特記を呼び出す
+  end
+  fe ->> cmp: 【CP1001~CP1011】検査項目グループ呼び出す
+  fe ->> stf: 【SC0008】検査結果入力画面の表示
