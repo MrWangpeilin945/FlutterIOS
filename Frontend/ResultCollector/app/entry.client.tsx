@@ -19,9 +19,7 @@ async function prepareApp() {
       serviceWorker: {
         url: "/ResultCollector/mockServiceWorker.js",
       },
-      onUnhandledRequest: (req) => {
-        console.warn("Unhandled request:", req);
-      },
+      onUnhandledRequest: "bypass"
     });
   }
   return Promise.resolve();

@@ -14,53 +14,62 @@ import {
   http
 } from 'msw'
 import type {
+  CancelReasonList,
+  EquipmentList,
+  ExamContent,
+  ExamMenuList,
+  Examinee,
+  ExportDataList,
+  ExportHistoryList,
+  HomeMenuGroupList,
+  PlaceScheduleLocking,
+  PlaceSchedulePlaces,
+  PlaceScheduleProgress,
   PlaceScheduleTeams,
+  Staff,
+  StaffLoginResponse,
   UnexaminedItemList
-} from '../domain/wellship.schemas'
+} from '~/domain/wellship.schemas'
 
-export const getAuthenticationLoginResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getAuthenticationLoginResponseMock = (overrideResponse: Partial< StaffLoginResponse > = {}): StaffLoginResponse => ({token: faker.helpers.arrayElement([faker.word.sample(), undefined]), ...overrideResponse})
 
-export const getCancelReasonGetCancelReasonsResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getCancelReasonGetCancelReasonsResponseMock = (overrideResponse: Partial< CancelReasonList > = {}): CancelReasonList => ({cancelReasons: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({cancelReasonId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), cancelReasonName: faker.helpers.arrayElement([faker.word.sample(), undefined]), examItemId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), ...overrideResponse})
 
 export const getConsultGetUnexaminedItemsResponseMock = (overrideResponse: Partial< UnexaminedItemList > = {}): UnexaminedItemList => ({consultId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examineeId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examineeName: faker.helpers.arrayElement([faker.word.sample(), undefined]), unexaminedItems: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examItemId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examItemName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
 
 export const getConsultGetSimpleExamineeResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
 
-export const getConsultGetDetailedExamineeResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getConsultGetExamItemsExamineeResponseExamineeMock = (overrideResponse: Partial<Examinee> = {}): Examinee => ({...{birthdate: faker.helpers.arrayElement([faker.date.past().toISOString().split('T')[0], undefined]), examDateAge: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examineeId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), kanaName: faker.helpers.arrayElement([faker.word.sample(), undefined]), name: faker.helpers.arrayElement([faker.word.sample(), undefined]), organizations: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.word.sample())), undefined]), sameNameAlert: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]), sex: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])}, ...overrideResponse});
 
-export const getConsultChangeIntegrationStatusResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getConsultGetExamItemsExamineeResponseMock = (overrideResponse: Partial< ExamContent > = {}): ExamContent => ({consultNumber: faker.helpers.arrayElement([faker.word.sample(), undefined]), examDecisionResult: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.word.sample())), undefined]), examinee: faker.helpers.arrayElement([faker.helpers.arrayElement([{...getConsultGetExamItemsExamineeResponseExamineeMock()}]), undefined]), examItems: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({cancelReasonId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examItemId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examItemName: faker.helpers.arrayElement([faker.word.sample(), undefined]), isPerforming: faker.helpers.arrayElement([faker.datatype.boolean(), undefined])})), undefined]), isComplete: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]), relatedExamItems: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examItemName: faker.helpers.arrayElement([faker.word.sample(), undefined]), examResult: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), unexaminedItems: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examMenuId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examMenuName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
 
-export const getEquipmentGetEquipmentSettingsResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getEquipmentGetEquipmentSettingsResponseMock = (overrideResponse: Partial< EquipmentList > = {}): EquipmentList => ({equipments: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({equipmentId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), equipmentName: faker.helpers.arrayElement([faker.word.sample(), undefined]), examMenuId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), ...overrideResponse})
 
-export const getExamMenuGetExamMenusResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getExamMenuGetExamMenusResponseMock = (overrideResponse: Partial< ExamMenuList > = {}): ExamMenuList => ({examMenus: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examMenuId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examMenuName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
 
-export const getHomeMenuGetHomeMenuSettingsResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getHomeMenuGetHomeMenuSettingsResponseMock = (overrideResponse: Partial< HomeMenuGroupList > = {}): HomeMenuGroupList => ({homeMenuGroups: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({groupName: faker.helpers.arrayElement([faker.word.sample(), undefined]), menus: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({availableConditions: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.word.sample())), undefined]), menuName: faker.helpers.arrayElement([faker.word.sample(), undefined]), path: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined])})), undefined]), ...overrideResponse})
 
-export const getIntegrationGetIntegrationResultsResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getIntegrationGetIntegrationResultsResponseMock = (overrideResponse: Partial< ExportDataList > = {}): ExportDataList => ({exportData: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({dataCount: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), details: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({count: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), status: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), statusName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), examDate: faker.helpers.arrayElement([faker.date.past().toISOString().split('T')[0], undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeScheduleId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), placeScheduleLockingStatus: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), ...overrideResponse})
 
-export const getIntegrationExportResultsResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
-
-export const getIntegrationGetExportHistoryResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getIntegrationGetExportHistoryResponseMock = (overrideResponse: Partial< ExportHistoryList > = {}): ExportHistoryList => ({exportHistories: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({dataCount: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examDate: faker.helpers.arrayElement([faker.date.past().toISOString().split('T')[0], undefined]), exportedAt: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), exportedBy: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeScheduleId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), placeScheduleLockingStatus: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), ...overrideResponse})
 
 export const getPlaceScheduleGetTeamsResponseMock = (overrideResponse: Partial< PlaceScheduleTeams > = {}): PlaceScheduleTeams => ({teams: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({places: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({placeId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), teamId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), teamName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
 
-export const getPlaceScheduleGetTeamPlaceSchedulesResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getPlaceScheduleGetTeamPlaceSchedulesResponseMock = (overrideResponse: Partial< PlaceSchedulePlaces > = {}): PlaceSchedulePlaces => ({examDate: faker.helpers.arrayElement([faker.date.past().toISOString().split('T')[0], undefined]), placeSchedules: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({placeId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeScheduleId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), startTime: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), teamId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), teamName: faker.helpers.arrayElement([faker.word.sample(), undefined]), ...overrideResponse})
 
-export const getPlaceScheduleGetPlaceScheduleLockingStatusResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getPlaceScheduleGetPlaceScheduleLockingStatusResponseMock = (overrideResponse: Partial< PlaceScheduleLocking > = {}): PlaceScheduleLocking => ({examDate: faker.helpers.arrayElement([faker.date.past().toISOString().split('T')[0], undefined]), placeId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeScheduleId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), placeScheduleLockingStatus: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), updatedAt: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), updatedBy: faker.helpers.arrayElement([faker.word.sample(), undefined]), ...overrideResponse})
 
-export const getPlaceScheduleUpdatePlaceScheduleLockingStatusResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
-
-export const getProgressGetProgressResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getProgressGetProgressResponseMock = (overrideResponse: Partial< PlaceScheduleProgress > = {}): PlaceScheduleProgress => ({examDate: faker.helpers.arrayElement([faker.date.past().toISOString().split('T')[0], undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeScheduleId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), progress: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({details: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({count: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), status: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), statusName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), examItemId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examItemName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
 
 export const getResultVerifyResultsResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
 
 export const getResultRegisterResultsResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
 
-export const getStaffGetStaffResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getStaffGetStaffResponseMock = (overrideResponse: Partial< Staff > = {}): Staff => ({staffId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), staffName: faker.helpers.arrayElement([faker.word.sample(), undefined]), ...overrideResponse})
 
 
-export const getAuthenticationLoginMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Blob> | Blob)) => {
-  return http.post('*/api/v:version/login', async (info) => {await delay(1000);
+export const getAuthenticationLoginMockHandler = (overrideResponse?: StaffLoginResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<StaffLoginResponse> | StaffLoginResponse)) => {
+  return http.post('*/api/v:version/staff/login', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
@@ -71,7 +80,7 @@ export const getAuthenticationLoginMockHandler = (overrideResponse?: Blob | ((in
   })
 }
 
-export const getCancelReasonGetCancelReasonsMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob)) => {
+export const getCancelReasonGetCancelReasonsMockHandler = (overrideResponse?: CancelReasonList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<CancelReasonList> | CancelReasonList)) => {
   return http.get('*/api/v:version/cancelReasons', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
@@ -83,33 +92,15 @@ export const getCancelReasonGetCancelReasonsMockHandler = (overrideResponse?: Bl
   })
 }
 
-/**
- * @summary return "error"をすると400を返すように設定。
- */
-export const getConsultVerifyConsultNumberMockHandler = (
-  overrideResponse?: (info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<'error' | 'success'>
-) => {
-  return http.post('*/api/v:version/consult/consultNumber/verify', async (info) => {
-    await delay(1000);
-
-    // overrideResponseが提供されている場合に実行し、結果に応じて400または200を返す
-    if (typeof overrideResponse === 'function') {
-      const result = await overrideResponse(info);
-      if (result === 'error') {
-        return new HttpResponse(null, {
-          status: 400,
-          statusText: 'Bad Request',
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
-    }
-
-    // デフォルトまたは 'success' は200を返す
-    return new HttpResponse(null, {
-      status: 200,
-    });
-  });
-};
+export const getConsultVerifyConsultNumberMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)) => {
+  return http.post('*/api/v:version/consult/consultNumber/verify', async (info) => {await delay(1000);
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+    return new HttpResponse(null,
+      { status: 200,
+        
+      })
+  })
+}
 
 export const getConsultGetUnexaminedItemsMockHandler = (overrideResponse?: UnexaminedItemList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UnexaminedItemList> | UnexaminedItemList)) => {
   return http.get('*/api/v:version/consult/:consultNumber/unexaminedItems', async (info) => {await delay(1000);
@@ -135,31 +126,39 @@ export const getConsultGetSimpleExamineeMockHandler = (overrideResponse?: Blob |
   })
 }
 
-export const getConsultGetDetailedExamineeMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob)) => {
-  return http.get('*/api/v:version/consult/:consultNumber/detail', async (info) => {await delay(1000);
+export const getConsultGetExamItemsExamineeMockHandler = (overrideResponse?: ExamContent | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ExamContent> | ExamContent)) => {
+  return http.get('*/api/v:version/consult/:consultNumber/examItems', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getConsultGetDetailedExamineeResponseMock()),
+            : getConsultGetExamItemsExamineeResponseMock()),
       { status: 200,
         headers: { 'Content-Type': 'application/json' }
       })
   })
 }
 
-export const getConsultChangeIntegrationStatusMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<Blob> | Blob)) => {
+export const getConsultChangeIntegrationStatusMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<void> | void)) => {
   return http.put('*/api/v:version/consult/:consultNumber/integrationStatus', async (info) => {await delay(1000);
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
-            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getConsultChangeIntegrationStatusResponseMock()),
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+    return new HttpResponse(null,
       { status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        
       })
   })
 }
 
-export const getEquipmentGetEquipmentSettingsMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob)) => {
+export const getConsultRegisterExecutionsMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)) => {
+  return http.post('*/api/v:version/consult/:consultNumber/executions', async (info) => {await delay(1000);
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+    return new HttpResponse(null,
+      { status: 200,
+        
+      })
+  })
+}
+
+export const getEquipmentGetEquipmentSettingsMockHandler = (overrideResponse?: EquipmentList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<EquipmentList> | EquipmentList)) => {
   return http.get('*/api/v:version/equipments', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
@@ -171,7 +170,7 @@ export const getEquipmentGetEquipmentSettingsMockHandler = (overrideResponse?: B
   })
 }
 
-export const getExamMenuGetExamMenusMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob)) => {
+export const getExamMenuGetExamMenusMockHandler = (overrideResponse?: ExamMenuList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ExamMenuList> | ExamMenuList)) => {
   return http.get('*/api/v:version/examMenus', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
@@ -183,7 +182,7 @@ export const getExamMenuGetExamMenusMockHandler = (overrideResponse?: Blob | ((i
   })
 }
 
-export const getHomeMenuGetHomeMenuSettingsMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob)) => {
+export const getHomeMenuGetHomeMenuSettingsMockHandler = (overrideResponse?: HomeMenuGroupList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<HomeMenuGroupList> | HomeMenuGroupList)) => {
   return http.get('*/api/v:version/homeMenus', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
@@ -195,8 +194,8 @@ export const getHomeMenuGetHomeMenuSettingsMockHandler = (overrideResponse?: Blo
   })
 }
 
-export const getIntegrationGetIntegrationResultsMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob)) => {
-  return http.get('*/api/v:version/integrations/results/:placeScheduleId', async (info) => {await delay(1000);
+export const getIntegrationGetIntegrationResultsMockHandler = (overrideResponse?: ExportDataList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ExportDataList> | ExportDataList)) => {
+  return http.get('*/api/v:version/integrations/examResults', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
@@ -207,20 +206,18 @@ export const getIntegrationGetIntegrationResultsMockHandler = (overrideResponse?
   })
 }
 
-export const getIntegrationExportResultsMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Blob> | Blob)) => {
-  return http.post('*/api/v:version/integrations/results/:placeScheduleId/export', async (info) => {await delay(1000);
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
-            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getIntegrationExportResultsResponseMock()),
+export const getIntegrationExportResultsMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)) => {
+  return http.post('*/api/v:version/integrations/examResults/:placeScheduleId/export', async (info) => {await delay(1000);
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+    return new HttpResponse(null,
       { status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        
       })
   })
 }
 
-export const getIntegrationGetExportHistoryMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob)) => {
-  return http.get('*/api/v:version/integrations/results/exportedHistory', async (info) => {await delay(1000);
+export const getIntegrationGetExportHistoryMockHandler = (overrideResponse?: ExportHistoryList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ExportHistoryList> | ExportHistoryList)) => {
+  return http.get('*/api/v:version/integrations/examResults/exportHistory', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
@@ -234,12 +231,9 @@ export const getIntegrationGetExportHistoryMockHandler = (overrideResponse?: Blo
 /**
  * @summary 固定値を返すように変更しています。
  */
-export const getPlaceScheduleGetTeamsMockHandler = (
-  overrideResponse?: PlaceScheduleTeams | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PlaceScheduleTeams> | PlaceScheduleTeams)
-) => {
-  return http.get('*/api/v:version/placeSchedules/teams', async (info) => {
-    await delay(1000);
-
+export const getPlaceScheduleGetTeamsMockHandler = (overrideResponse?: PlaceScheduleTeams | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PlaceScheduleTeams> | PlaceScheduleTeams)) => {
+  return http.get('*/api/v:version/placeSchedules/teams', async (info) => {await delay(1000);
+  
     // overrideResponseが未定義の場合に返すモックデータを設定
     const defaultMockResponse: PlaceScheduleTeams = {
       teams: [
@@ -262,22 +256,16 @@ export const getPlaceScheduleGetTeamsMockHandler = (
       ]
     };
 
-    // レスポンスとしてoverrideResponseまたはdefaultMockResponseを返す
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? (typeof overrideResponse === 'function' ? await overrideResponse(info) : overrideResponse)
-          : defaultMockResponse
-      ),
-      {
-        status: 200,
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : defaultMockResponse),
+      { status: 200,
         headers: { 'Content-Type': 'application/json' }
-      }
-    );
-  });
-};
+      })
+  })
+}
 
-export const getPlaceScheduleGetTeamPlaceSchedulesMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob)) => {
+export const getPlaceScheduleGetTeamPlaceSchedulesMockHandler = (overrideResponse?: PlaceSchedulePlaces | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PlaceSchedulePlaces> | PlaceSchedulePlaces)) => {
   return http.get('*/api/v:version/placeSchedules/places', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
@@ -289,8 +277,8 @@ export const getPlaceScheduleGetTeamPlaceSchedulesMockHandler = (overrideRespons
   })
 }
 
-export const getPlaceScheduleGetPlaceScheduleLockingStatusMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob)) => {
-  return http.get('*/api/v:version/placeSchedules/placeScheduleLockingStatus', async (info) => {await delay(1000);
+export const getPlaceScheduleGetPlaceScheduleLockingStatusMockHandler = (overrideResponse?: PlaceScheduleLocking | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PlaceScheduleLocking> | PlaceScheduleLocking)) => {
+  return http.get('*/api/v:version/placeSchedules/:placeScheduleId/placeScheduleLockingStatus', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
@@ -301,19 +289,17 @@ export const getPlaceScheduleGetPlaceScheduleLockingStatusMockHandler = (overrid
   })
 }
 
-export const getPlaceScheduleUpdatePlaceScheduleLockingStatusMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<Blob> | Blob)) => {
-  return http.put('*/api/v:version/placeSchedules/placeScheduleLockingStatus', async (info) => {await delay(1000);
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
-            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getPlaceScheduleUpdatePlaceScheduleLockingStatusResponseMock()),
+export const getPlaceScheduleUpdatePlaceScheduleLockingStatusMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<void> | void)) => {
+  return http.put('*/api/v:version/placeSchedules/:placeScheduleId/placeScheduleLockingStatus', async (info) => {await delay(1000);
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+    return new HttpResponse(null,
       { status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        
       })
   })
 }
 
-export const getProgressGetProgressMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob)) => {
+export const getProgressGetProgressMockHandler = (overrideResponse?: PlaceScheduleProgress | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PlaceScheduleProgress> | PlaceScheduleProgress)) => {
   return http.get('*/api/v:version/progress/:placeScheduleId', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
@@ -349,8 +335,8 @@ export const getResultRegisterResultsMockHandler = (overrideResponse?: Blob | ((
   })
 }
 
-export const getStaffGetStaffMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Blob> | Blob)) => {
-  return http.get('*/api/v:version/staffs/:staffId', async (info) => {await delay(1000);
+export const getStaffGetStaffMockHandler = (overrideResponse?: Staff | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Staff> | Staff)) => {
+  return http.get('*/api/v:version/staff/profile', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
@@ -366,8 +352,9 @@ export const getWellshipMock = () => [
   getConsultVerifyConsultNumberMockHandler(),
   getConsultGetUnexaminedItemsMockHandler(),
   getConsultGetSimpleExamineeMockHandler(),
-  getConsultGetDetailedExamineeMockHandler(),
+  getConsultGetExamItemsExamineeMockHandler(),
   getConsultChangeIntegrationStatusMockHandler(),
+  getConsultRegisterExecutionsMockHandler(),
   getEquipmentGetEquipmentSettingsMockHandler(),
   getExamMenuGetExamMenusMockHandler(),
   getHomeMenuGetHomeMenuSettingsMockHandler(),
