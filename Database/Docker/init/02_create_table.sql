@@ -187,7 +187,7 @@ CREATE TABLE staffs (
   , login_id text NOT NULL
   , name text NOT NULL
   , password_hash bytea NOT NULL
-  , "password_salt " bytea NOT NULL
+  , password_salt bytea NOT NULL
   , enabled boolean DEFAULT true NOT NULL
   , role_id integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -611,7 +611,7 @@ COMMENT ON COLUMN staffs.staff_code IS '職員コード';
 COMMENT ON COLUMN staffs.login_id IS 'ログインID';
 COMMENT ON COLUMN staffs.name IS '職員名';
 COMMENT ON COLUMN staffs.password_hash IS 'パスワードハッシュ';
-COMMENT ON COLUMN staffs."password_salt " IS 'パスワードソルト';
+COMMENT ON COLUMN staffs.password_salt IS 'パスワードソルト';
 COMMENT ON COLUMN staffs.enabled IS '有効';
 COMMENT ON COLUMN staffs.role_id IS 'ロールID';
 COMMENT ON COLUMN staffs.created_at IS '作成日時';

@@ -97,6 +97,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IConsultRepository, ConsultRepository>();
         services.AddScoped<IPlaceScheduleRepository, PlaceScheduleRepository>();
         services.AddScoped<IHomeMenuRepository, HomeMenuRepository>();
+        services.AddScoped<IStaffRepository, StaffRepository>();
         return services;
     }
     /// <summary>
@@ -107,6 +108,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IPlaceScheduleUsecase, PlaceScheduleUsecase>();
         services.AddScoped<IConsultUsecase, ConsultUsecase>();
         services.AddScoped<IHomeMenuUsecase, HomeMenuUsecase>();
+        services.AddScoped<IStaffUsecase, StaffUsecase>();
         return services;
     }
     /// <summary>

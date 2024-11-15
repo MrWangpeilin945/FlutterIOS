@@ -1,5 +1,3 @@
-using Ryobi.Wellship.APIModels.Requests;
-using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -23,8 +21,13 @@ public class StaffUsecase : IStaffUsecase
     /// <summary>
     /// 職員の情報を取得する
     /// </summary>
-    public void GetStaff()
+    public async Task<APIModels.Responses.Staff> GetStaffAsync(int staffId)
     {
-
+        var staff = await _staffRepository.GetStaffByStaffIdAsync(staffId);
+        return new APIModels.Responses.Staff()
+        {
+            StaffId = staff.StaffId,
+            StaffName = staff.Name
+        };
     }
 }
