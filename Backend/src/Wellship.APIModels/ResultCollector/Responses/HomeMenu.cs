@@ -8,31 +8,21 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class HomeMenu
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public HomeMenu(string menuName, string path, string[] availableConditions)
-    {
-        MenuName = menuName;
-        Path = path;
-        AvailableConditions = availableConditions;
-    }
-
-    /// <summary>
     /// ホームメニュー名
     /// </summary>
     [JsonPropertyName("menuName")]
-    public string MenuName { get; }
+    public required string MenuName { get; init; }
 
     /// <summary>
     /// 遷移パス
     /// </summary>
     [JsonPropertyName("path")]
-    public string Path { get; }
+    public required string Path { get; init; }
 
     /// <summary>
     /// 使用可能条件
     /// </summary>
     [JsonPropertyName("availableConditions")]
-    public string[] AvailableConditions { get; }
+    public required string[] AvailableConditions { get; init; }
 
 }
