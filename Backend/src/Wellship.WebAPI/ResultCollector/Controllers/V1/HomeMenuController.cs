@@ -31,9 +31,9 @@ public class HomeMenuController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/homeMenus")]
-    public IActionResult GetHomeMenuSettings()
+    public async Task<IActionResult> GetHomeMenuSettingsAsync()
     {
-        _homeMenuUsecase.GetHomeMenus();
-        return Ok();
+        var results = await _homeMenuUsecase.GetHomeMenusAsync();
+        return Ok(results);
     }
 }

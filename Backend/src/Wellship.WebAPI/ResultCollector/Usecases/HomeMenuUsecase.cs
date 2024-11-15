@@ -1,5 +1,4 @@
-using Ryobi.Wellship.APIModels.Requests;
-using Ryobi.Wellship.Core.Exceptions;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -23,8 +22,23 @@ public class HomeMenuUsecase : IHomeMenuUsecase
     /// <summary>
     /// ホームメニュー項目を取得する
     /// </summary>
-    public void GetHomeMenus()
+    public async Task<HomeMenuGroupList> GetHomeMenusAsync()
     {
-
+        // ドメインモデルをWebAPIのレスポンスモデルに変換する
+        var repoResults = await _homeMenuRepository.GetHomeMenuGroupsAsync();
+        var result = new HomeMenuGroupList()
+        {
+            HomeMenuGroups = repoResults.Select(x => new HomeMenuGroup()
+            {
+                GroupName = x.GroupName,
+                Menus = x.HomeMenus.Select(m => new HomeMenu()
+                {
+                    MenuName = m.MenuName,
+                    Path = m.Path,
+                    AvailableConditions = []
+                }).ToArray()
+            }).ToArray()
+        };
+        return result;
     }
 }
