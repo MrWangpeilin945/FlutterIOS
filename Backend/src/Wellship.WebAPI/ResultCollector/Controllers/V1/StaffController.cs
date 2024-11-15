@@ -32,9 +32,12 @@ public class StaffController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/staff/profile")]
-    public IActionResult GetStaff()
+    public async Task<IActionResult> GetStaffAsync()
     {
-        _administratorUsecase.GetStaff();
-        return Ok();
+        // TODO: 認証認可の部品が出来次第、JWTから自身の職員IDを取得する
+
+        var staffId = 1; // TODO: ダミーのIDです。
+        var result = await _administratorUsecase.GetStaffAsync(staffId);
+        return Ok(result);
     }
 }
