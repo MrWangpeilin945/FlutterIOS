@@ -12,7 +12,8 @@ type HeaderProps = {
 export default function ExamineeHeader({ id, name, gender, age }: HeaderProps) {
   const navigate = useNavigate();
   return (
-    <Box className={styles["basic-blue"]} py="7">
+    //TODO：genderによってスタイルを変更
+    <Box className={styles["man-blue"]} py="7">
       <header>
         <Grid justify="space-between" align="center" px="md" gutter={0}>
           {/* 管理番号 */}

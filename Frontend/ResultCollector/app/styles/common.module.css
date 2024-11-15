@@ -6,12 +6,34 @@
   background-color: #9a9a9a;
   color: white;
 }
+
+.man-blue{
+  background-color: #A0DDEA;
+  color:black;
+}
+
+.woman-pink{
+  background-color: #FFBEB7;
+  color:black;
+}
+
 .background-grey {
   background-color: #f2f2f2;
 }
+
+.alert-orange{
+  color: #FF9100;
+}
+
 .reverse-green-button {
+	background-color: white;
   color: #00ada4;
-  background-color: white;
+}
+
+.selected-button{
+  background-color: #D5F0DF;
+  color: #00ada4;
+  border: 1px solid #00ada4;
 }
 
 .hr {
@@ -21,6 +43,7 @@
 .border {
   border: 1px solid gray;
 }
+
 
 .green-button {
   background-color: rgba(143, 196, 96, 1);
