@@ -1,5 +1,6 @@
 using Dapper;
 
+using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
@@ -49,8 +50,7 @@ public class StaffRepository : IStaffRepository
 
         if (staff is null)
         {
-            // TODO: 職員が存在しない例外 → 404
-            throw new Exception();
+            throw new StaffNotFoundException();
         }
 
         return new Domain.Models.Staff(staff);
@@ -83,8 +83,7 @@ public class StaffRepository : IStaffRepository
 
         if (staff is null)
         {
-            // TODO: 職員が存在しない例外 → 404
-            throw new Exception();
+            throw new StaffNotFoundException();
         }
 
         return new Domain.Models.Staff(staff);
