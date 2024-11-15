@@ -1,10 +1,10 @@
-import axios from 'axios';
+import axios from "axios";
 
-const baseURL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000'; // Vite の場合
+const baseURL = import.meta.env.VITE_BASE_URL || "http://localhost:3000"; // Vite の場合
 
 export const customAxiosInstance = axios.create({
-    baseURL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+  baseURL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
