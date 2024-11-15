@@ -93,6 +93,10 @@ INSERT INTO roles(role_id,name,created_at,created_by) VALUES
     (10,'一般',CURRENT_TIMESTAMP,'init')
   , (20,'管理者',CURRENT_TIMESTAMP,'init');
 
+-- 職員
+INSERT INTO resultcollector.staffs(staff_id,staff_code,login_id,name,password_hash,password_salt,enabled,role_id,created_at,created_by) VALUES 
+    (1,'S001','S001','職員A',DECODE('cndlYnJ0MzU2Nzh0ZXNuZXNydHNlbXRhM3c0YW0zNGF3NG1hdzM0bWE0cWEzNG1yNzg=', 'base64'),DECODE('d3JhT1VZSVJUVDRFNXJld3J0', 'base64'),True,10,CURRENT_TIMESTAMP,'init')
+  , (2,'S002','S002','職員B',DECODE('bWh0anV1ZHI1dXlzZXJ5', 'base64'),DECODE('ZXdiNWFxMzRyYmdlbnN5cmVtc2VyeQ==', 'base64'),True,20,CURRENT_TIMESTAMP,'init');
 
 -- 団体
 INSERT INTO organizations(organization_id,organization_code,name,order_number,created_at,created_by) VALUES 
