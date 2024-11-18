@@ -183,3 +183,16 @@ enum InputErrorLevel
     異常 = 3
 }
 ----
+
+=== ロール
+
+職員に対して付与する役割です。権限グループとして使います。
+
+[source,csharp]
+----
+enum InputErrorLevel
+{
+    一般 = 10,
+    管理者 = 20
+}
+----

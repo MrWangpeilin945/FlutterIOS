@@ -215,3 +215,19 @@ export default function Hoge() {
 * 各画面、コンポーネント内にCSSを直接記述しない
 * URL組み立て時、文字列結合を使用せずURLオブジェクトを使用する
 * 状態管理に格納するものは制限する(なんでもかんでも入れない)
+
+== Mantineのテーマカラー
+[options="header"]
+|===
+|[green]#色#| [green]#テーマ名# | [green]#説明#
+|pass:[<span style="color:#FFFFFF;font-size:30pt">■</span>]| - | 標準的な背景色
+|pass:[<span style="color:#3F3A39;font-size:30pt">■</span>]| - | 標準的な文字色
+|pass:[<span style="color:#00ADA4;font-size:30pt">■</span>]| primary | プライマリカラー
+|pass:[<span style="color:#FF9100;font-size:30pt">■</span>]| warning | 警告色
+|pass:[<span style="color:#E26264;font-size:30pt">■</span>]| error | エラー色
+|pass:[<span style="color:#A0DDEA;font-size:30pt">■</span>]| malePrimary | 男性のプライマリカラー
+|pass:[<span style="color:#6DB5D1;font-size:30pt">■</span>]| maleSecondary | 男性のセカンダリカラー
+|pass:[<span style="color:#FFBEB7;font-size:30pt">■</span>]| femalePrimary | 女性のプライマリカラー
+|pass:[<span style="color:#F3948E;font-size:30pt">■</span>]| femaleSecondary | 女性のセカンダリカラー
+
+|===
