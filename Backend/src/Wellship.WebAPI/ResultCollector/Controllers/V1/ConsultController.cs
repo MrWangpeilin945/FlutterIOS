@@ -36,9 +36,10 @@ public class ConsultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/consult/consultNumber/verify")]
-    public IActionResult VerifyConsultNumberAsync([FromBody] ConsultNumberRequest consultNumberRequest)
+    public async Task<IActionResult> VerifyConsultNumberAsync([FromBody] ConsultNumberRequest consultNumberRequest)
     {
-        _consultUsecase.VerifyConsultNumber(consultNumberRequest);
+        // NOTE: 受診番号が存在しない場合はUsecaseで例外発生
+        await _consultUsecase.VerifyConsultNumberAsync(consultNumberRequest);
         return Ok();
     }
 

@@ -28,5 +28,5 @@ public class ConsultNumberNotFoundException : WellshipException
     /// <summary>
     /// エラーのタイトル
     /// </summary>
-    public override string ErrorTitle => "ReserveNo NotFound";
+    public override string ErrorTitle => "ConsultNumber NotFound";
 }

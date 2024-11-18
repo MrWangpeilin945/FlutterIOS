@@ -1,3 +1,5 @@
+using Dapper;
+
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
@@ -22,14 +24,21 @@ public class ConsultRepository : IConsultRepository
     /// 受診が存在するか
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
-    public bool ConsultExists(string consultNumber)
+    public async Task<bool> ConsultExistsAsync(string consultNumber)
     {
-        // TODO: データベースと接続したら実装する
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            count(1) 
+        from
+            resultcollector.consult 
+        where
+            consult_number = @ConsultNumber;";
 
-        // var sql = "select count(1) from consult where reservation_id = @ConsultNumber";
-        // _connector.Execute(sql, new { ConsultNumber = consultNumber });
-        // var result = _connector.Query<int>(sql).SingleOrDefault();
-        // return result == 1;
-        return true;
+        var results = await connection.QueryAsync<int>(sql, new { ConsultNumber = consultNumber });
+
+        // 受診番号が一致するレコードが1件あればOK
+        var consultExists = results.SingleOrDefault() == 1;
+        return consultExists;
     }
 }

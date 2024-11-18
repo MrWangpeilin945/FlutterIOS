@@ -12,7 +12,7 @@ public interface IConsultUsecase
     /// </summary>
     /// <param name="consultNumberRequest">受診番号リクエスト</param>
     /// <returns>受診が存在するか</returns>
-    public void VerifyConsultNumber(ConsultNumberRequest consultNumberRequest);
+    public Task VerifyConsultNumberAsync(ConsultNumberRequest consultNumberRequest);
 
     /// <summary>
     /// 未受診の検査項目を取得する
