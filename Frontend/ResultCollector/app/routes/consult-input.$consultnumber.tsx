@@ -34,6 +34,14 @@ export default function consultInput(){
               {
                 selectorId: "10032",
                 selectorName: "コンタクト",
+              },
+              {
+                selectorId: "10033", 
+                selectorName: "テスト1",
+              },
+              {
+                selectorId: "10034",
+                selectorName: "テスト2",
               }
             ], //選択系
             ranges: [

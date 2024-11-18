@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Group, Text, Box, Flex, rem } from "@mantine/core";
+import { Button, Group, Text, Flex, Center } from "@mantine/core";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
 
@@ -40,7 +40,7 @@ type selectProps = {
 
 export default function ExamSelect({ examItems, onClick }: selectProps) {
   const [selected, setSelected] = useState(examItems.examItemDetails[0].value);
-  const [errorMessage, setErrorMessage] = useState(`${examItems.examItemName}は必須項目です`);
+  const errorMessage = `${examItems.examItemName}は必須項目です`;
 
   const onSelect = (selector: { selectorId: string; selectorName: string }) => {
     if (selected === selector.selectorId) {
@@ -59,8 +59,10 @@ export default function ExamSelect({ examItems, onClick }: selectProps) {
   return (
     <>
       <Flex mb="xs">
-        <Text size="xl" w={200}>
+        <Text className={`${styles["basic-grey"]} ${styles["label-radius"]}`}  size="xl" w={200}  >
+          <Center>
           {examItems.examItemName}
+          </Center>
         </Text>
         <Text mt="xs">（前回：{examItems.examItemDetails[0].prevValue}）</Text>
       </Flex>
@@ -83,7 +85,7 @@ export default function ExamSelect({ examItems, onClick }: selectProps) {
       </Group>
       {/* selectedが空文字列の場合のみエラーメッセージを表示 */}
       {selected === "" && (
-        <Group className={styles["alert-orange"]}>
+        <Group c="warning">
           <IconExclamationCircleFilled size={"1.7rem"} />
           <Text>{errorMessage}</Text>
         </Group>

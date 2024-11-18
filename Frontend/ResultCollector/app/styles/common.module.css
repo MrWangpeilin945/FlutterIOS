@@ -36,6 +36,10 @@
   border: 1px solid #00ada4;
 }
 
+.label-radius{
+  border-radius: 3%/10%;
+}
+
 .hr {
   width: 98%;
 }
