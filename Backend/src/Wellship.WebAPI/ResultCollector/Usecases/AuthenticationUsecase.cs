@@ -25,6 +25,6 @@ public class AuthenticationUsecase : IAuthenticationUsecase
     /// </summary>
     public void Login()
     {
-        
+
     }
 }

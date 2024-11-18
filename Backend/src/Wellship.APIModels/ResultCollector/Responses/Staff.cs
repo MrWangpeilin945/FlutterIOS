@@ -8,23 +8,14 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class Staff
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public Staff(int staffId, string staffName)
-    {
-        StaffId = staffId;
-        StaffName = staffName;
-    }
-
-    /// <summary>
     /// 職員ID
     /// </summary>
     [JsonPropertyName("staffId")]
-    public int StaffId { get; }
+    public required int StaffId { get; init; }
 
     /// <summary>
     /// 職員名
     /// </summary>
     [JsonPropertyName("staffName")]
-    public string StaffName { get; }
+    public required string StaffName { get; init; }
 }

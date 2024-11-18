@@ -22,12 +22,33 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query'
 import type {
+  CancelReasonGetCancelReasonsParams,
+  CancelReasonList,
+  ConsultGetExamItemsExamineeParams,
   ConsultNumberRequest,
+  EquipmentGetEquipmentSettingsParams,
+  EquipmentList,
+  ExamContent,
+  ExamMenuList,
+  ExecutionsRequest,
+  ExportDataList,
+  ExportHistoryList,
+  HomeMenuGroupList,
+  IntegrationStatusRequest,
+  PlaceScheduleGetTeamPlaceSchedulesParams,
   PlaceScheduleGetTeamsParams,
+  PlaceScheduleLocking,
+  PlaceScheduleLockingRequest,
+  PlaceSchedulePlaces,
+  PlaceScheduleProgress,
   PlaceScheduleTeams,
   ProblemDetails,
+  ResultExportRequest,
+  Staff,
+  StaffLoginRequest,
+  StaffLoginResponse,
   UnexaminedItemList
-} from '../domain/wellship.schemas'
+} from '~/domain/wellship.schemas'
 import { customAxiosInstance } from './customInstance';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
@@ -41,30 +62,32 @@ type AwaitedInput<T> = PromiseLike<T> | T;
  */
 export const authenticationLogin = (
     version: string,
+    staffLoginRequest: StaffLoginRequest,
  ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/login`, method: 'POST',
-        responseType: 'blob'
+      return customAxiosInstance<StaffLoginResponse>(
+      {url: `/api/v${version}/staff/login`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: staffLoginRequest
     },
       );
     }
   
 
 
-export const getAuthenticationLoginMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authenticationLogin>>, TError,{version: string}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof authenticationLogin>>, TError,{version: string}, TContext> => {
+export const getAuthenticationLoginMutationOptions = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authenticationLogin>>, TError,{version: string;data: StaffLoginRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof authenticationLogin>>, TError,{version: string;data: StaffLoginRequest}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authenticationLogin>>, {version: string}> = (props) => {
-          const {version} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authenticationLogin>>, {version: string;data: StaffLoginRequest}> = (props) => {
+          const {version,data} = props ?? {};
 
-          return  authenticationLogin(version,)
+          return  authenticationLogin(version,data,)
         }
 
         
@@ -73,18 +96,18 @@ const {mutation: mutationOptions} = options ?? {};
   return  { mutationFn, ...mutationOptions }}
 
     export type AuthenticationLoginMutationResult = NonNullable<Awaited<ReturnType<typeof authenticationLogin>>>
-    
-    export type AuthenticationLoginMutationError = unknown
+    export type AuthenticationLoginMutationBody = StaffLoginRequest
+    export type AuthenticationLoginMutationError = ProblemDetails
 
     /**
  * @summary ログインする
  */
-export const useAuthenticationLogin = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authenticationLogin>>, TError,{version: string}, TContext>, }
+export const useAuthenticationLogin = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authenticationLogin>>, TError,{version: string;data: StaffLoginRequest}, TContext>, }
 ): UseMutationResult<
         Awaited<ReturnType<typeof authenticationLogin>>,
         TError,
-        {version: string},
+        {version: string;data: StaffLoginRequest},
         TContext
       > => {
 
@@ -94,37 +117,40 @@ export const useAuthenticationLogin = <TError = unknown,
     }
     
 /**
- * @summary 中止理由を取得する
+ * @summary 中止理由一覧を取得する
  */
 export const cancelReasonGetCancelReasons = (
     version: string,
+    params?: CancelReasonGetCancelReasonsParams,
  signal?: AbortSignal
 ) => {
       
       
-      return customAxiosInstance<Blob>(
+      return customAxiosInstance<CancelReasonList>(
       {url: `/api/v${version}/cancelReasons`, method: 'GET',
-        responseType: 'blob', signal
+        params, signal
     },
       );
     }
   
 
-export const getCancelReasonGetCancelReasonsQueryKey = (version: string,) => {
-    return [`/api/v${version}/cancelReasons`] as const;
+export const getCancelReasonGetCancelReasonsQueryKey = (version: string,
+    params?: CancelReasonGetCancelReasonsParams,) => {
+    return [`/api/v${version}/cancelReasons`, ...(params ? [params]: [])] as const;
     }
 
     
-export const getCancelReasonGetCancelReasonsQueryOptions = <TData = Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError = unknown>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError, TData>>, }
+export const getCancelReasonGetCancelReasonsQueryOptions = <TData = Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError = ProblemDetails>(version: string,
+    params?: CancelReasonGetCancelReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getCancelReasonGetCancelReasonsQueryKey(version);
+  const queryKey =  queryOptions?.queryKey ?? getCancelReasonGetCancelReasonsQueryKey(version,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>> = ({ signal }) => cancelReasonGetCancelReasons(version, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>> = ({ signal }) => cancelReasonGetCancelReasons(version,params, signal);
 
       
 
@@ -134,11 +160,12 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type CancelReasonGetCancelReasonsQueryResult = NonNullable<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>>
-export type CancelReasonGetCancelReasonsQueryError = unknown
+export type CancelReasonGetCancelReasonsQueryError = ProblemDetails
 
 
-export function useCancelReasonGetCancelReasons<TData = Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError = unknown>(
- version: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError, TData>> & Pick<
+export function useCancelReasonGetCancelReasons<TData = Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError = ProblemDetails>(
+ version: string,
+    params: undefined |  CancelReasonGetCancelReasonsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>,
           TError,
@@ -147,8 +174,9 @@ export function useCancelReasonGetCancelReasons<TData = Awaited<ReturnType<typeo
       >, }
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useCancelReasonGetCancelReasons<TData = Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError, TData>> & Pick<
+export function useCancelReasonGetCancelReasons<TData = Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError = ProblemDetails>(
+ version: string,
+    params?: CancelReasonGetCancelReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>,
           TError,
@@ -157,20 +185,22 @@ export function useCancelReasonGetCancelReasons<TData = Awaited<ReturnType<typeo
       >, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useCancelReasonGetCancelReasons<TData = Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError, TData>>, }
+export function useCancelReasonGetCancelReasons<TData = Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError = ProblemDetails>(
+ version: string,
+    params?: CancelReasonGetCancelReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
 /**
- * @summary 中止理由を取得する
+ * @summary 中止理由一覧を取得する
  */
 
-export function useCancelReasonGetCancelReasons<TData = Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError, TData>>, }
+export function useCancelReasonGetCancelReasons<TData = Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError = ProblemDetails>(
+ version: string,
+    params?: CancelReasonGetCancelReasonsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof cancelReasonGetCancelReasons>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getCancelReasonGetCancelReasonsQueryOptions(version,options)
+  const queryOptions = getCancelReasonGetCancelReasonsQueryOptions(version,params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -433,90 +463,97 @@ export function useConsultGetSimpleExaminee<TData = Awaited<ReturnType<typeof co
 
 
 /**
- * @summary 詳細な受診者情報を取得する
+ * @summary 検査内容を取得する
  */
-export const consultGetDetailedExaminee = (
+export const consultGetExamItemsExaminee = (
     version: string,
     consultNumber: string,
+    params?: ConsultGetExamItemsExamineeParams,
  signal?: AbortSignal
 ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/consult/${consultNumber}/detail`, method: 'GET',
-        responseType: 'blob', signal
+      return customAxiosInstance<ExamContent>(
+      {url: `/api/v${version}/consult/${consultNumber}/examItems`, method: 'GET',
+        params, signal
     },
       );
     }
   
 
-export const getConsultGetDetailedExamineeQueryKey = (version: string,
-    consultNumber: string,) => {
-    return [`/api/v${version}/consult/${consultNumber}/detail`] as const;
+export const getConsultGetExamItemsExamineeQueryKey = (version: string,
+    consultNumber: string,
+    params?: ConsultGetExamItemsExamineeParams,) => {
+    return [`/api/v${version}/consult/${consultNumber}/examItems`, ...(params ? [params]: [])] as const;
     }
 
     
-export const getConsultGetDetailedExamineeQueryOptions = <TData = Awaited<ReturnType<typeof consultGetDetailedExaminee>>, TError = unknown>(version: string,
-    consultNumber: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetDetailedExaminee>>, TError, TData>>, }
+export const getConsultGetExamItemsExamineeQueryOptions = <TData = Awaited<ReturnType<typeof consultGetExamItemsExaminee>>, TError = ProblemDetails>(version: string,
+    consultNumber: string,
+    params?: ConsultGetExamItemsExamineeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetExamItemsExaminee>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getConsultGetDetailedExamineeQueryKey(version,consultNumber);
+  const queryKey =  queryOptions?.queryKey ?? getConsultGetExamItemsExamineeQueryKey(version,consultNumber,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof consultGetDetailedExaminee>>> = ({ signal }) => consultGetDetailedExaminee(version,consultNumber, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof consultGetExamItemsExaminee>>> = ({ signal }) => consultGetExamItemsExaminee(version,consultNumber,params, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(version && consultNumber), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof consultGetDetailedExaminee>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: !!(version && consultNumber), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof consultGetExamItemsExaminee>>, TError, TData> & { queryKey: QueryKey }
 }
 
-export type ConsultGetDetailedExamineeQueryResult = NonNullable<Awaited<ReturnType<typeof consultGetDetailedExaminee>>>
-export type ConsultGetDetailedExamineeQueryError = unknown
+export type ConsultGetExamItemsExamineeQueryResult = NonNullable<Awaited<ReturnType<typeof consultGetExamItemsExaminee>>>
+export type ConsultGetExamItemsExamineeQueryError = ProblemDetails
 
 
-export function useConsultGetDetailedExaminee<TData = Awaited<ReturnType<typeof consultGetDetailedExaminee>>, TError = unknown>(
+export function useConsultGetExamItemsExaminee<TData = Awaited<ReturnType<typeof consultGetExamItemsExaminee>>, TError = ProblemDetails>(
  version: string,
-    consultNumber: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetDetailedExaminee>>, TError, TData>> & Pick<
+    consultNumber: string,
+    params: undefined |  ConsultGetExamItemsExamineeParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetExamItemsExaminee>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof consultGetDetailedExaminee>>,
+          Awaited<ReturnType<typeof consultGetExamItemsExaminee>>,
           TError,
           TData
         > , 'initialData'
       >, }
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useConsultGetDetailedExaminee<TData = Awaited<ReturnType<typeof consultGetDetailedExaminee>>, TError = unknown>(
+export function useConsultGetExamItemsExaminee<TData = Awaited<ReturnType<typeof consultGetExamItemsExaminee>>, TError = ProblemDetails>(
  version: string,
-    consultNumber: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetDetailedExaminee>>, TError, TData>> & Pick<
+    consultNumber: string,
+    params?: ConsultGetExamItemsExamineeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetExamItemsExaminee>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof consultGetDetailedExaminee>>,
+          Awaited<ReturnType<typeof consultGetExamItemsExaminee>>,
           TError,
           TData
         > , 'initialData'
       >, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useConsultGetDetailedExaminee<TData = Awaited<ReturnType<typeof consultGetDetailedExaminee>>, TError = unknown>(
+export function useConsultGetExamItemsExaminee<TData = Awaited<ReturnType<typeof consultGetExamItemsExaminee>>, TError = ProblemDetails>(
  version: string,
-    consultNumber: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetDetailedExaminee>>, TError, TData>>, }
+    consultNumber: string,
+    params?: ConsultGetExamItemsExamineeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetExamItemsExaminee>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
 /**
- * @summary 詳細な受診者情報を取得する
+ * @summary 検査内容を取得する
  */
 
-export function useConsultGetDetailedExaminee<TData = Awaited<ReturnType<typeof consultGetDetailedExaminee>>, TError = unknown>(
+export function useConsultGetExamItemsExaminee<TData = Awaited<ReturnType<typeof consultGetExamItemsExaminee>>, TError = ProblemDetails>(
  version: string,
-    consultNumber: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetDetailedExaminee>>, TError, TData>>, }
+    consultNumber: string,
+    params?: ConsultGetExamItemsExamineeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetExamItemsExaminee>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getConsultGetDetailedExamineeQueryOptions(version,consultNumber,options)
+  const queryOptions = getConsultGetExamItemsExamineeQueryOptions(version,consultNumber,params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -534,30 +571,32 @@ export function useConsultGetDetailedExaminee<TData = Awaited<ReturnType<typeof 
 export const consultChangeIntegrationStatus = (
     version: string,
     consultNumber: string,
+    integrationStatusRequest: IntegrationStatusRequest,
  ) => {
       
       
-      return customAxiosInstance<Blob>(
+      return customAxiosInstance<void>(
       {url: `/api/v${version}/consult/${consultNumber}/integrationStatus`, method: 'PUT',
-        responseType: 'blob'
+      headers: {'Content-Type': 'application/json', },
+      data: integrationStatusRequest
     },
       );
     }
   
 
 
-export const getConsultChangeIntegrationStatusMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, TError,{version: string;consultNumber: string}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, TError,{version: string;consultNumber: string}, TContext> => {
+export const getConsultChangeIntegrationStatusMutationOptions = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, TError,{version: string;consultNumber: string;data: IntegrationStatusRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, TError,{version: string;consultNumber: string;data: IntegrationStatusRequest}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, {version: string;consultNumber: string}> = (props) => {
-          const {version,consultNumber} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, {version: string;consultNumber: string;data: IntegrationStatusRequest}> = (props) => {
+          const {version,consultNumber,data} = props ?? {};
 
-          return  consultChangeIntegrationStatus(version,consultNumber,)
+          return  consultChangeIntegrationStatus(version,consultNumber,data,)
         }
 
         
@@ -566,18 +605,18 @@ const {mutation: mutationOptions} = options ?? {};
   return  { mutationFn, ...mutationOptions }}
 
     export type ConsultChangeIntegrationStatusMutationResult = NonNullable<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>>
-    
-    export type ConsultChangeIntegrationStatusMutationError = unknown
+    export type ConsultChangeIntegrationStatusMutationBody = IntegrationStatusRequest
+    export type ConsultChangeIntegrationStatusMutationError = ProblemDetails
 
     /**
  * @summary 検査結果の連携状態を変更する
  */
-export const useConsultChangeIntegrationStatus = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, TError,{version: string;consultNumber: string}, TContext>, }
+export const useConsultChangeIntegrationStatus = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, TError,{version: string;consultNumber: string;data: IntegrationStatusRequest}, TContext>, }
 ): UseMutationResult<
         Awaited<ReturnType<typeof consultChangeIntegrationStatus>>,
         TError,
-        {version: string;consultNumber: string},
+        {version: string;consultNumber: string;data: IntegrationStatusRequest},
         TContext
       > => {
 
@@ -587,37 +626,100 @@ export const useConsultChangeIntegrationStatus = <TError = unknown,
     }
     
 /**
- * @summary 機器連携設定を取得する
+ * @summary 検査の実施有無と中止理由を登録する
  */
-export const equipmentGetEquipmentSettings = (
+export const consultRegisterExecutions = (
     version: string,
- signal?: AbortSignal
-) => {
+    consultNumber: string,
+    executionsRequest: ExecutionsRequest,
+ ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/equipments`, method: 'GET',
-        responseType: 'blob', signal
+      return customAxiosInstance<void>(
+      {url: `/api/v${version}/consult/${consultNumber}/executions`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: executionsRequest
     },
       );
     }
   
 
-export const getEquipmentGetEquipmentSettingsQueryKey = (version: string,) => {
-    return [`/api/v${version}/equipments`] as const;
+
+export const getConsultRegisterExecutionsMutationOptions = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof consultRegisterExecutions>>, TError,{version: string;consultNumber: string;data: ExecutionsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof consultRegisterExecutions>>, TError,{version: string;consultNumber: string;data: ExecutionsRequest}, TContext> => {
+const {mutation: mutationOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof consultRegisterExecutions>>, {version: string;consultNumber: string;data: ExecutionsRequest}> = (props) => {
+          const {version,consultNumber,data} = props ?? {};
+
+          return  consultRegisterExecutions(version,consultNumber,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConsultRegisterExecutionsMutationResult = NonNullable<Awaited<ReturnType<typeof consultRegisterExecutions>>>
+    export type ConsultRegisterExecutionsMutationBody = ExecutionsRequest
+    export type ConsultRegisterExecutionsMutationError = ProblemDetails
+
+    /**
+ * @summary 検査の実施有無と中止理由を登録する
+ */
+export const useConsultRegisterExecutions = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof consultRegisterExecutions>>, TError,{version: string;consultNumber: string;data: ExecutionsRequest}, TContext>, }
+): UseMutationResult<
+        Awaited<ReturnType<typeof consultRegisterExecutions>>,
+        TError,
+        {version: string;consultNumber: string;data: ExecutionsRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getConsultRegisterExecutionsMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
+ * @summary 検査機器一覧を取得する
+ */
+export const equipmentGetEquipmentSettings = (
+    version: string,
+    params?: EquipmentGetEquipmentSettingsParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customAxiosInstance<EquipmentList>(
+      {url: `/api/v${version}/equipments`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getEquipmentGetEquipmentSettingsQueryKey = (version: string,
+    params?: EquipmentGetEquipmentSettingsParams,) => {
+    return [`/api/v${version}/equipments`, ...(params ? [params]: [])] as const;
     }
 
     
-export const getEquipmentGetEquipmentSettingsQueryOptions = <TData = Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError = unknown>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError, TData>>, }
+export const getEquipmentGetEquipmentSettingsQueryOptions = <TData = Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError = ProblemDetails>(version: string,
+    params?: EquipmentGetEquipmentSettingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getEquipmentGetEquipmentSettingsQueryKey(version);
+  const queryKey =  queryOptions?.queryKey ?? getEquipmentGetEquipmentSettingsQueryKey(version,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>> = ({ signal }) => equipmentGetEquipmentSettings(version, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>> = ({ signal }) => equipmentGetEquipmentSettings(version,params, signal);
 
       
 
@@ -627,11 +729,12 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type EquipmentGetEquipmentSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>>
-export type EquipmentGetEquipmentSettingsQueryError = unknown
+export type EquipmentGetEquipmentSettingsQueryError = ProblemDetails
 
 
-export function useEquipmentGetEquipmentSettings<TData = Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError = unknown>(
- version: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError, TData>> & Pick<
+export function useEquipmentGetEquipmentSettings<TData = Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError = ProblemDetails>(
+ version: string,
+    params: undefined |  EquipmentGetEquipmentSettingsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>,
           TError,
@@ -640,8 +743,9 @@ export function useEquipmentGetEquipmentSettings<TData = Awaited<ReturnType<type
       >, }
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useEquipmentGetEquipmentSettings<TData = Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError, TData>> & Pick<
+export function useEquipmentGetEquipmentSettings<TData = Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError = ProblemDetails>(
+ version: string,
+    params?: EquipmentGetEquipmentSettingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>,
           TError,
@@ -650,20 +754,22 @@ export function useEquipmentGetEquipmentSettings<TData = Awaited<ReturnType<type
       >, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useEquipmentGetEquipmentSettings<TData = Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError, TData>>, }
+export function useEquipmentGetEquipmentSettings<TData = Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError = ProblemDetails>(
+ version: string,
+    params?: EquipmentGetEquipmentSettingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
 /**
- * @summary 機器連携設定を取得する
+ * @summary 検査機器一覧を取得する
  */
 
-export function useEquipmentGetEquipmentSettings<TData = Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError, TData>>, }
+export function useEquipmentGetEquipmentSettings<TData = Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError = ProblemDetails>(
+ version: string,
+    params?: EquipmentGetEquipmentSettingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof equipmentGetEquipmentSettings>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getEquipmentGetEquipmentSettingsQueryOptions(version,options)
+  const queryOptions = getEquipmentGetEquipmentSettingsQueryOptions(version,params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -684,9 +790,8 @@ export const examMenuGetExamMenus = (
 ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/examMenus`, method: 'GET',
-        responseType: 'blob', signal
+      return customAxiosInstance<ExamMenuList>(
+      {url: `/api/v${version}/examMenus`, method: 'GET', signal
     },
       );
     }
@@ -697,7 +802,7 @@ export const getExamMenuGetExamMenusQueryKey = (version: string,) => {
     }
 
     
-export const getExamMenuGetExamMenusQueryOptions = <TData = Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError = unknown>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError, TData>>, }
+export const getExamMenuGetExamMenusQueryOptions = <TData = Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError = ProblemDetails>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
@@ -716,10 +821,10 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type ExamMenuGetExamMenusQueryResult = NonNullable<Awaited<ReturnType<typeof examMenuGetExamMenus>>>
-export type ExamMenuGetExamMenusQueryError = unknown
+export type ExamMenuGetExamMenusQueryError = ProblemDetails
 
 
-export function useExamMenuGetExamMenus<TData = Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError = unknown>(
+export function useExamMenuGetExamMenus<TData = Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError = ProblemDetails>(
  version: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof examMenuGetExamMenus>>,
@@ -729,7 +834,7 @@ export function useExamMenuGetExamMenus<TData = Awaited<ReturnType<typeof examMe
       >, }
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useExamMenuGetExamMenus<TData = Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError = unknown>(
+export function useExamMenuGetExamMenus<TData = Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError = ProblemDetails>(
  version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof examMenuGetExamMenus>>,
@@ -739,7 +844,7 @@ export function useExamMenuGetExamMenus<TData = Awaited<ReturnType<typeof examMe
       >, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useExamMenuGetExamMenus<TData = Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError = unknown>(
+export function useExamMenuGetExamMenus<TData = Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError = ProblemDetails>(
  version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
@@ -747,7 +852,7 @@ export function useExamMenuGetExamMenus<TData = Awaited<ReturnType<typeof examMe
  * @summary 検査メニュー一覧を取得する
  */
 
-export function useExamMenuGetExamMenus<TData = Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError = unknown>(
+export function useExamMenuGetExamMenus<TData = Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError = ProblemDetails>(
  version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examMenuGetExamMenus>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
@@ -773,9 +878,8 @@ export const homeMenuGetHomeMenuSettings = (
 ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/homeMenus`, method: 'GET',
-        responseType: 'blob', signal
+      return customAxiosInstance<HomeMenuGroupList>(
+      {url: `/api/v${version}/homeMenus`, method: 'GET', signal
     },
       );
     }
@@ -786,7 +890,7 @@ export const getHomeMenuGetHomeMenuSettingsQueryKey = (version: string,) => {
     }
 
     
-export const getHomeMenuGetHomeMenuSettingsQueryOptions = <TData = Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError = unknown>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError, TData>>, }
+export const getHomeMenuGetHomeMenuSettingsQueryOptions = <TData = Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError = ProblemDetails>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
@@ -805,10 +909,10 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type HomeMenuGetHomeMenuSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>>
-export type HomeMenuGetHomeMenuSettingsQueryError = unknown
+export type HomeMenuGetHomeMenuSettingsQueryError = ProblemDetails
 
 
-export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError = unknown>(
+export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError = ProblemDetails>(
  version: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>,
@@ -818,7 +922,7 @@ export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof
       >, }
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError = unknown>(
+export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError = ProblemDetails>(
  version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>,
@@ -828,7 +932,7 @@ export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof
       >, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError = unknown>(
+export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError = ProblemDetails>(
  version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
@@ -836,7 +940,7 @@ export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof
  * @summary ホームメニュー項目を取得する
  */
 
-export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError = unknown>(
+export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError = ProblemDetails>(
  version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof homeMenuGetHomeMenuSettings>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
@@ -858,51 +962,46 @@ export function useHomeMenuGetHomeMenuSettings<TData = Awaited<ReturnType<typeof
  */
 export const integrationGetIntegrationResults = (
     version: string,
-    placeScheduleId: string,
  signal?: AbortSignal
 ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/integrations/results/${placeScheduleId}`, method: 'GET',
-        responseType: 'blob', signal
+      return customAxiosInstance<ExportDataList>(
+      {url: `/api/v${version}/integrations/examResults`, method: 'GET', signal
     },
       );
     }
   
 
-export const getIntegrationGetIntegrationResultsQueryKey = (version: string,
-    placeScheduleId: string,) => {
-    return [`/api/v${version}/integrations/results/${placeScheduleId}`] as const;
+export const getIntegrationGetIntegrationResultsQueryKey = (version: string,) => {
+    return [`/api/v${version}/integrations/examResults`] as const;
     }
 
     
-export const getIntegrationGetIntegrationResultsQueryOptions = <TData = Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError = unknown>(version: string,
-    placeScheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData>>, }
+export const getIntegrationGetIntegrationResultsQueryOptions = <TData = Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError = ProblemDetails>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getIntegrationGetIntegrationResultsQueryKey(version,placeScheduleId);
+  const queryKey =  queryOptions?.queryKey ?? getIntegrationGetIntegrationResultsQueryKey(version);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof integrationGetIntegrationResults>>> = ({ signal }) => integrationGetIntegrationResults(version,placeScheduleId, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof integrationGetIntegrationResults>>> = ({ signal }) => integrationGetIntegrationResults(version, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(version && placeScheduleId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: !!(version), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData> & { queryKey: QueryKey }
 }
 
 export type IntegrationGetIntegrationResultsQueryResult = NonNullable<Awaited<ReturnType<typeof integrationGetIntegrationResults>>>
-export type IntegrationGetIntegrationResultsQueryError = unknown
+export type IntegrationGetIntegrationResultsQueryError = ProblemDetails
 
 
-export function useIntegrationGetIntegrationResults<TData = Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError = unknown>(
- version: string,
-    placeScheduleId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData>> & Pick<
+export function useIntegrationGetIntegrationResults<TData = Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError = ProblemDetails>(
+ version: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof integrationGetIntegrationResults>>,
           TError,
@@ -911,9 +1010,8 @@ export function useIntegrationGetIntegrationResults<TData = Awaited<ReturnType<t
       >, }
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useIntegrationGetIntegrationResults<TData = Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError = unknown>(
- version: string,
-    placeScheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData>> & Pick<
+export function useIntegrationGetIntegrationResults<TData = Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError = ProblemDetails>(
+ version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof integrationGetIntegrationResults>>,
           TError,
@@ -922,22 +1020,20 @@ export function useIntegrationGetIntegrationResults<TData = Awaited<ReturnType<t
       >, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useIntegrationGetIntegrationResults<TData = Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError = unknown>(
- version: string,
-    placeScheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData>>, }
+export function useIntegrationGetIntegrationResults<TData = Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError = ProblemDetails>(
+ version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
 /**
  * @summary 連携対象の検査結果を取得する
  */
 
-export function useIntegrationGetIntegrationResults<TData = Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError = unknown>(
- version: string,
-    placeScheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData>>, }
+export function useIntegrationGetIntegrationResults<TData = Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError = ProblemDetails>(
+ version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetIntegrationResults>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getIntegrationGetIntegrationResultsQueryOptions(version,placeScheduleId,options)
+  const queryOptions = getIntegrationGetIntegrationResultsQueryOptions(version,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -954,31 +1050,33 @@ export function useIntegrationGetIntegrationResults<TData = Awaited<ReturnType<t
  */
 export const integrationExportResults = (
     version: string,
-    placeScheduleId: string,
+    placeScheduleId: number,
+    resultExportRequest: ResultExportRequest,
  ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/integrations/results/${placeScheduleId}/export`, method: 'POST',
-        responseType: 'blob'
+      return customAxiosInstance<void>(
+      {url: `/api/v${version}/integrations/examResults/${placeScheduleId}/export`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: resultExportRequest
     },
       );
     }
   
 
 
-export const getIntegrationExportResultsMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof integrationExportResults>>, TError,{version: string;placeScheduleId: string}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof integrationExportResults>>, TError,{version: string;placeScheduleId: string}, TContext> => {
+export const getIntegrationExportResultsMutationOptions = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof integrationExportResults>>, TError,{version: string;placeScheduleId: number;data: ResultExportRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof integrationExportResults>>, TError,{version: string;placeScheduleId: number;data: ResultExportRequest}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof integrationExportResults>>, {version: string;placeScheduleId: string}> = (props) => {
-          const {version,placeScheduleId} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof integrationExportResults>>, {version: string;placeScheduleId: number;data: ResultExportRequest}> = (props) => {
+          const {version,placeScheduleId,data} = props ?? {};
 
-          return  integrationExportResults(version,placeScheduleId,)
+          return  integrationExportResults(version,placeScheduleId,data,)
         }
 
         
@@ -987,18 +1085,18 @@ const {mutation: mutationOptions} = options ?? {};
   return  { mutationFn, ...mutationOptions }}
 
     export type IntegrationExportResultsMutationResult = NonNullable<Awaited<ReturnType<typeof integrationExportResults>>>
-    
-    export type IntegrationExportResultsMutationError = unknown
+    export type IntegrationExportResultsMutationBody = ResultExportRequest
+    export type IntegrationExportResultsMutationError = ProblemDetails
 
     /**
  * @summary 連携用に検査結果を出力する
  */
-export const useIntegrationExportResults = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof integrationExportResults>>, TError,{version: string;placeScheduleId: string}, TContext>, }
+export const useIntegrationExportResults = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof integrationExportResults>>, TError,{version: string;placeScheduleId: number;data: ResultExportRequest}, TContext>, }
 ): UseMutationResult<
         Awaited<ReturnType<typeof integrationExportResults>>,
         TError,
-        {version: string;placeScheduleId: string},
+        {version: string;placeScheduleId: number;data: ResultExportRequest},
         TContext
       > => {
 
@@ -1016,20 +1114,19 @@ export const integrationGetExportHistory = (
 ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/integrations/results/exportedHistory`, method: 'GET',
-        responseType: 'blob', signal
+      return customAxiosInstance<ExportHistoryList>(
+      {url: `/api/v${version}/integrations/examResults/exportHistory`, method: 'GET', signal
     },
       );
     }
   
 
 export const getIntegrationGetExportHistoryQueryKey = (version: string,) => {
-    return [`/api/v${version}/integrations/results/exportedHistory`] as const;
+    return [`/api/v${version}/integrations/examResults/exportHistory`] as const;
     }
 
     
-export const getIntegrationGetExportHistoryQueryOptions = <TData = Awaited<ReturnType<typeof integrationGetExportHistory>>, TError = unknown>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetExportHistory>>, TError, TData>>, }
+export const getIntegrationGetExportHistoryQueryOptions = <TData = Awaited<ReturnType<typeof integrationGetExportHistory>>, TError = ProblemDetails>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetExportHistory>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
@@ -1048,10 +1145,10 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type IntegrationGetExportHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof integrationGetExportHistory>>>
-export type IntegrationGetExportHistoryQueryError = unknown
+export type IntegrationGetExportHistoryQueryError = ProblemDetails
 
 
-export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof integrationGetExportHistory>>, TError = unknown>(
+export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof integrationGetExportHistory>>, TError = ProblemDetails>(
  version: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetExportHistory>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof integrationGetExportHistory>>,
@@ -1061,7 +1158,7 @@ export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof
       >, }
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof integrationGetExportHistory>>, TError = unknown>(
+export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof integrationGetExportHistory>>, TError = ProblemDetails>(
  version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetExportHistory>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof integrationGetExportHistory>>,
@@ -1071,7 +1168,7 @@ export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof
       >, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof integrationGetExportHistory>>, TError = unknown>(
+export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof integrationGetExportHistory>>, TError = ProblemDetails>(
  version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetExportHistory>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
@@ -1079,7 +1176,7 @@ export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof
  * @summary 検査結果の出力履歴を取得する
  */
 
-export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof integrationGetExportHistory>>, TError = unknown>(
+export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof integrationGetExportHistory>>, TError = ProblemDetails>(
  version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof integrationGetExportHistory>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
@@ -1197,33 +1294,36 @@ export function usePlaceScheduleGetTeams<TData = Awaited<ReturnType<typeof place
  */
 export const placeScheduleGetTeamPlaceSchedules = (
     version: string,
+    params?: PlaceScheduleGetTeamPlaceSchedulesParams,
  signal?: AbortSignal
 ) => {
       
       
-      return customAxiosInstance<Blob>(
+      return customAxiosInstance<PlaceSchedulePlaces>(
       {url: `/api/v${version}/placeSchedules/places`, method: 'GET',
-        responseType: 'blob', signal
+        params, signal
     },
       );
     }
   
 
-export const getPlaceScheduleGetTeamPlaceSchedulesQueryKey = (version: string,) => {
-    return [`/api/v${version}/placeSchedules/places`] as const;
+export const getPlaceScheduleGetTeamPlaceSchedulesQueryKey = (version: string,
+    params?: PlaceScheduleGetTeamPlaceSchedulesParams,) => {
+    return [`/api/v${version}/placeSchedules/places`, ...(params ? [params]: [])] as const;
     }
 
     
-export const getPlaceScheduleGetTeamPlaceSchedulesQueryOptions = <TData = Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError = unknown>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError, TData>>, }
+export const getPlaceScheduleGetTeamPlaceSchedulesQueryOptions = <TData = Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError = ProblemDetails>(version: string,
+    params?: PlaceScheduleGetTeamPlaceSchedulesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getPlaceScheduleGetTeamPlaceSchedulesQueryKey(version);
+  const queryKey =  queryOptions?.queryKey ?? getPlaceScheduleGetTeamPlaceSchedulesQueryKey(version,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>> = ({ signal }) => placeScheduleGetTeamPlaceSchedules(version, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>> = ({ signal }) => placeScheduleGetTeamPlaceSchedules(version,params, signal);
 
       
 
@@ -1233,11 +1333,12 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type PlaceScheduleGetTeamPlaceSchedulesQueryResult = NonNullable<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>>
-export type PlaceScheduleGetTeamPlaceSchedulesQueryError = unknown
+export type PlaceScheduleGetTeamPlaceSchedulesQueryError = ProblemDetails
 
 
-export function usePlaceScheduleGetTeamPlaceSchedules<TData = Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError = unknown>(
- version: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError, TData>> & Pick<
+export function usePlaceScheduleGetTeamPlaceSchedules<TData = Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError = ProblemDetails>(
+ version: string,
+    params: undefined |  PlaceScheduleGetTeamPlaceSchedulesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>,
           TError,
@@ -1246,8 +1347,9 @@ export function usePlaceScheduleGetTeamPlaceSchedules<TData = Awaited<ReturnType
       >, }
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function usePlaceScheduleGetTeamPlaceSchedules<TData = Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError, TData>> & Pick<
+export function usePlaceScheduleGetTeamPlaceSchedules<TData = Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError = ProblemDetails>(
+ version: string,
+    params?: PlaceScheduleGetTeamPlaceSchedulesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>,
           TError,
@@ -1256,20 +1358,22 @@ export function usePlaceScheduleGetTeamPlaceSchedules<TData = Awaited<ReturnType
       >, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function usePlaceScheduleGetTeamPlaceSchedules<TData = Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError, TData>>, }
+export function usePlaceScheduleGetTeamPlaceSchedules<TData = Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError = ProblemDetails>(
+ version: string,
+    params?: PlaceScheduleGetTeamPlaceSchedulesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
 /**
  * @summary 班を指定して会場日程を取得する
  */
 
-export function usePlaceScheduleGetTeamPlaceSchedules<TData = Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError, TData>>, }
+export function usePlaceScheduleGetTeamPlaceSchedules<TData = Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError = ProblemDetails>(
+ version: string,
+    params?: PlaceScheduleGetTeamPlaceSchedulesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetTeamPlaceSchedules>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getPlaceScheduleGetTeamPlaceSchedulesQueryOptions(version,options)
+  const queryOptions = getPlaceScheduleGetTeamPlaceSchedulesQueryOptions(version,params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -1282,51 +1386,54 @@ export function usePlaceScheduleGetTeamPlaceSchedules<TData = Awaited<ReturnType
 
 
 /**
- * @summary 会場状況を取得する
+ * @summary 会場ロック状態を取得する
  */
 export const placeScheduleGetPlaceScheduleLockingStatus = (
     version: string,
+    placeScheduleId: number,
  signal?: AbortSignal
 ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/placeSchedules/placeScheduleLockingStatus`, method: 'GET',
-        responseType: 'blob', signal
+      return customAxiosInstance<PlaceScheduleLocking>(
+      {url: `/api/v${version}/placeSchedules/${placeScheduleId}/placeScheduleLockingStatus`, method: 'GET', signal
     },
       );
     }
   
 
-export const getPlaceScheduleGetPlaceScheduleLockingStatusQueryKey = (version: string,) => {
-    return [`/api/v${version}/placeSchedules/placeScheduleLockingStatus`] as const;
+export const getPlaceScheduleGetPlaceScheduleLockingStatusQueryKey = (version: string,
+    placeScheduleId: number,) => {
+    return [`/api/v${version}/placeSchedules/${placeScheduleId}/placeScheduleLockingStatus`] as const;
     }
 
     
-export const getPlaceScheduleGetPlaceScheduleLockingStatusQueryOptions = <TData = Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError = unknown>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData>>, }
+export const getPlaceScheduleGetPlaceScheduleLockingStatusQueryOptions = <TData = Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError = ProblemDetails>(version: string,
+    placeScheduleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getPlaceScheduleGetPlaceScheduleLockingStatusQueryKey(version);
+  const queryKey =  queryOptions?.queryKey ?? getPlaceScheduleGetPlaceScheduleLockingStatusQueryKey(version,placeScheduleId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>> = ({ signal }) => placeScheduleGetPlaceScheduleLockingStatus(version, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>> = ({ signal }) => placeScheduleGetPlaceScheduleLockingStatus(version,placeScheduleId, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(version), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: !!(version && placeScheduleId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData> & { queryKey: QueryKey }
 }
 
 export type PlaceScheduleGetPlaceScheduleLockingStatusQueryResult = NonNullable<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>>
-export type PlaceScheduleGetPlaceScheduleLockingStatusQueryError = unknown
+export type PlaceScheduleGetPlaceScheduleLockingStatusQueryError = ProblemDetails
 
 
-export function usePlaceScheduleGetPlaceScheduleLockingStatus<TData = Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError = unknown>(
- version: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData>> & Pick<
+export function usePlaceScheduleGetPlaceScheduleLockingStatus<TData = Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError = ProblemDetails>(
+ version: string,
+    placeScheduleId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>,
           TError,
@@ -1335,8 +1442,9 @@ export function usePlaceScheduleGetPlaceScheduleLockingStatus<TData = Awaited<Re
       >, }
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function usePlaceScheduleGetPlaceScheduleLockingStatus<TData = Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData>> & Pick<
+export function usePlaceScheduleGetPlaceScheduleLockingStatus<TData = Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError = ProblemDetails>(
+ version: string,
+    placeScheduleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>,
           TError,
@@ -1345,20 +1453,22 @@ export function usePlaceScheduleGetPlaceScheduleLockingStatus<TData = Awaited<Re
       >, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function usePlaceScheduleGetPlaceScheduleLockingStatus<TData = Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData>>, }
+export function usePlaceScheduleGetPlaceScheduleLockingStatus<TData = Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError = ProblemDetails>(
+ version: string,
+    placeScheduleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
 /**
- * @summary 会場状況を取得する
+ * @summary 会場ロック状態を取得する
  */
 
-export function usePlaceScheduleGetPlaceScheduleLockingStatus<TData = Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError = unknown>(
- version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData>>, }
+export function usePlaceScheduleGetPlaceScheduleLockingStatus<TData = Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError = ProblemDetails>(
+ version: string,
+    placeScheduleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof placeScheduleGetPlaceScheduleLockingStatus>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getPlaceScheduleGetPlaceScheduleLockingStatusQueryOptions(version,options)
+  const queryOptions = getPlaceScheduleGetPlaceScheduleLockingStatusQueryOptions(version,placeScheduleId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -1371,34 +1481,37 @@ export function usePlaceScheduleGetPlaceScheduleLockingStatus<TData = Awaited<Re
 
 
 /**
- * @summary 会場状況を更新する
+ * @summary 会場ロック状態を更新する
  */
 export const placeScheduleUpdatePlaceScheduleLockingStatus = (
     version: string,
+    placeScheduleId: number,
+    placeScheduleLockingRequest: PlaceScheduleLockingRequest,
  ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/placeSchedules/placeScheduleLockingStatus`, method: 'PUT',
-        responseType: 'blob'
+      return customAxiosInstance<void>(
+      {url: `/api/v${version}/placeSchedules/${placeScheduleId}/placeScheduleLockingStatus`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: placeScheduleLockingRequest
     },
       );
     }
   
 
 
-export const getPlaceScheduleUpdatePlaceScheduleLockingStatusMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleLockingStatus>>, TError,{version: string}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleLockingStatus>>, TError,{version: string}, TContext> => {
+export const getPlaceScheduleUpdatePlaceScheduleLockingStatusMutationOptions = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleLockingStatus>>, TError,{version: string;placeScheduleId: number;data: PlaceScheduleLockingRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleLockingStatus>>, TError,{version: string;placeScheduleId: number;data: PlaceScheduleLockingRequest}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleLockingStatus>>, {version: string}> = (props) => {
-          const {version} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleLockingStatus>>, {version: string;placeScheduleId: number;data: PlaceScheduleLockingRequest}> = (props) => {
+          const {version,placeScheduleId,data} = props ?? {};
 
-          return  placeScheduleUpdatePlaceScheduleLockingStatus(version,)
+          return  placeScheduleUpdatePlaceScheduleLockingStatus(version,placeScheduleId,data,)
         }
 
         
@@ -1407,18 +1520,18 @@ const {mutation: mutationOptions} = options ?? {};
   return  { mutationFn, ...mutationOptions }}
 
     export type PlaceScheduleUpdatePlaceScheduleLockingStatusMutationResult = NonNullable<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleLockingStatus>>>
-    
-    export type PlaceScheduleUpdatePlaceScheduleLockingStatusMutationError = unknown
+    export type PlaceScheduleUpdatePlaceScheduleLockingStatusMutationBody = PlaceScheduleLockingRequest
+    export type PlaceScheduleUpdatePlaceScheduleLockingStatusMutationError = ProblemDetails
 
     /**
- * @summary 会場状況を更新する
+ * @summary 会場ロック状態を更新する
  */
-export const usePlaceScheduleUpdatePlaceScheduleLockingStatus = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleLockingStatus>>, TError,{version: string}, TContext>, }
+export const usePlaceScheduleUpdatePlaceScheduleLockingStatus = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleLockingStatus>>, TError,{version: string;placeScheduleId: number;data: PlaceScheduleLockingRequest}, TContext>, }
 ): UseMutationResult<
         Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleLockingStatus>>,
         TError,
-        {version: string},
+        {version: string;placeScheduleId: number;data: PlaceScheduleLockingRequest},
         TContext
       > => {
 
@@ -1432,27 +1545,26 @@ export const usePlaceScheduleUpdatePlaceScheduleLockingStatus = <TError = unknow
  */
 export const progressGetProgress = (
     version: string,
-    placeScheduleId: string,
+    placeScheduleId: number,
  signal?: AbortSignal
 ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/progress/${placeScheduleId}`, method: 'GET',
-        responseType: 'blob', signal
+      return customAxiosInstance<PlaceScheduleProgress>(
+      {url: `/api/v${version}/progress/${placeScheduleId}`, method: 'GET', signal
     },
       );
     }
   
 
 export const getProgressGetProgressQueryKey = (version: string,
-    placeScheduleId: string,) => {
+    placeScheduleId: number,) => {
     return [`/api/v${version}/progress/${placeScheduleId}`] as const;
     }
 
     
-export const getProgressGetProgressQueryOptions = <TData = Awaited<ReturnType<typeof progressGetProgress>>, TError = unknown>(version: string,
-    placeScheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof progressGetProgress>>, TError, TData>>, }
+export const getProgressGetProgressQueryOptions = <TData = Awaited<ReturnType<typeof progressGetProgress>>, TError = ProblemDetails>(version: string,
+    placeScheduleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof progressGetProgress>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
@@ -1471,12 +1583,12 @@ const {query: queryOptions} = options ?? {};
 }
 
 export type ProgressGetProgressQueryResult = NonNullable<Awaited<ReturnType<typeof progressGetProgress>>>
-export type ProgressGetProgressQueryError = unknown
+export type ProgressGetProgressQueryError = ProblemDetails
 
 
-export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progressGetProgress>>, TError = unknown>(
+export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progressGetProgress>>, TError = ProblemDetails>(
  version: string,
-    placeScheduleId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof progressGetProgress>>, TError, TData>> & Pick<
+    placeScheduleId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof progressGetProgress>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof progressGetProgress>>,
           TError,
@@ -1485,9 +1597,9 @@ export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progres
       >, }
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progressGetProgress>>, TError = unknown>(
+export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progressGetProgress>>, TError = ProblemDetails>(
  version: string,
-    placeScheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof progressGetProgress>>, TError, TData>> & Pick<
+    placeScheduleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof progressGetProgress>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof progressGetProgress>>,
           TError,
@@ -1496,18 +1608,18 @@ export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progres
       >, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progressGetProgress>>, TError = unknown>(
+export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progressGetProgress>>, TError = ProblemDetails>(
  version: string,
-    placeScheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof progressGetProgress>>, TError, TData>>, }
+    placeScheduleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof progressGetProgress>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
 /**
  * @summary 進捗状況を取得する
  */
 
-export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progressGetProgress>>, TError = unknown>(
+export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progressGetProgress>>, TError = ProblemDetails>(
  version: string,
-    placeScheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof progressGetProgress>>, TError, TData>>, }
+    placeScheduleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof progressGetProgress>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
@@ -1644,51 +1756,46 @@ export const useResultRegisterResults = <TError = unknown,
  */
 export const staffGetStaff = (
     version: string,
-    staffId: string,
  signal?: AbortSignal
 ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/staffs/${staffId}`, method: 'GET',
-        responseType: 'blob', signal
+      return customAxiosInstance<Staff>(
+      {url: `/api/v${version}/staff/profile`, method: 'GET', signal
     },
       );
     }
   
 
-export const getStaffGetStaffQueryKey = (version: string,
-    staffId: string,) => {
-    return [`/api/v${version}/staffs/${staffId}`] as const;
+export const getStaffGetStaffQueryKey = (version: string,) => {
+    return [`/api/v${version}/staff/profile`] as const;
     }
 
     
-export const getStaffGetStaffQueryOptions = <TData = Awaited<ReturnType<typeof staffGetStaff>>, TError = unknown>(version: string,
-    staffId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData>>, }
+export const getStaffGetStaffQueryOptions = <TData = Awaited<ReturnType<typeof staffGetStaff>>, TError = ProblemDetails>(version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getStaffGetStaffQueryKey(version,staffId);
+  const queryKey =  queryOptions?.queryKey ?? getStaffGetStaffQueryKey(version);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof staffGetStaff>>> = ({ signal }) => staffGetStaff(version,staffId, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof staffGetStaff>>> = ({ signal }) => staffGetStaff(version, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(version && staffId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: !!(version), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData> & { queryKey: QueryKey }
 }
 
 export type StaffGetStaffQueryResult = NonNullable<Awaited<ReturnType<typeof staffGetStaff>>>
-export type StaffGetStaffQueryError = unknown
+export type StaffGetStaffQueryError = ProblemDetails
 
 
-export function useStaffGetStaff<TData = Awaited<ReturnType<typeof staffGetStaff>>, TError = unknown>(
- version: string,
-    staffId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData>> & Pick<
+export function useStaffGetStaff<TData = Awaited<ReturnType<typeof staffGetStaff>>, TError = ProblemDetails>(
+ version: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof staffGetStaff>>,
           TError,
@@ -1697,9 +1804,8 @@ export function useStaffGetStaff<TData = Awaited<ReturnType<typeof staffGetStaff
       >, }
 
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useStaffGetStaff<TData = Awaited<ReturnType<typeof staffGetStaff>>, TError = unknown>(
- version: string,
-    staffId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData>> & Pick<
+export function useStaffGetStaff<TData = Awaited<ReturnType<typeof staffGetStaff>>, TError = ProblemDetails>(
+ version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof staffGetStaff>>,
           TError,
@@ -1708,22 +1814,20 @@ export function useStaffGetStaff<TData = Awaited<ReturnType<typeof staffGetStaff
       >, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
-export function useStaffGetStaff<TData = Awaited<ReturnType<typeof staffGetStaff>>, TError = unknown>(
- version: string,
-    staffId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData>>, }
+export function useStaffGetStaff<TData = Awaited<ReturnType<typeof staffGetStaff>>, TError = ProblemDetails>(
+ version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
 /**
  * @summary 職員の情報を取得する
  */
 
-export function useStaffGetStaff<TData = Awaited<ReturnType<typeof staffGetStaff>>, TError = unknown>(
- version: string,
-    staffId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData>>, }
+export function useStaffGetStaff<TData = Awaited<ReturnType<typeof staffGetStaff>>, TError = ProblemDetails>(
+ version: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof staffGetStaff>>, TError, TData>>, }
 
   ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getStaffGetStaffQueryOptions(version,staffId,options)
+  const queryOptions = getStaffGetStaffQueryOptions(version,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

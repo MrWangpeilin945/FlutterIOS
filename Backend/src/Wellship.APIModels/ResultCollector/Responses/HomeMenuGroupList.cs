@@ -8,17 +8,9 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class HomeMenuGroupList
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public HomeMenuGroupList(HomeMenuGroup[] homeMenuGroups)
-    {
-        HomeMenuGroups = homeMenuGroups;
-    }
-
-    /// <summary>
     /// ホームメニューグループリスト
     /// </summary>
     [JsonPropertyName("homeMenuGroups")]
-    public HomeMenuGroup[] HomeMenuGroups { get; }
+    public required HomeMenuGroup[] HomeMenuGroups { get; init; }
 
 }

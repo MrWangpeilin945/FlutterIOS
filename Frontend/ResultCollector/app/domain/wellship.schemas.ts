@@ -5,9 +5,132 @@
  * WELLSHIPのバックエンドです。
  * OpenAPI spec version: v1
  */
+export type PlaceScheduleGetTeamPlaceSchedulesParams = {
+date?: string;
+teamId?: number;
+};
+
 export type PlaceScheduleGetTeamsParams = {
 date?: string;
 };
+
+export type EquipmentGetEquipmentSettingsParams = {
+examMenuId?: number;
+};
+
+export type ConsultGetExamItemsExamineeParams = {
+examMenuId?: number;
+};
+
+export type CancelReasonGetCancelReasonsParams = {
+examItemId?: number;
+};
+
+/**
+ * 職員
+ */
+export interface Staff {
+  /** 職員ID */
+  staffId?: number;
+  /** 職員名 */
+  staffName?: string;
+}
+
+/**
+ * 進捗明細
+ */
+export interface ProgressDetail {
+  /** 対象者数 */
+  count?: number;
+  /** 状態値 */
+  status?: number;
+  /** 状態名 */
+  statusName?: string;
+}
+
+/**
+ * 進捗状況
+ */
+export interface Progress {
+  /** 進捗明細 */
+  details?: ProgressDetail[];
+  /** 検査項目ID */
+  examItemId?: number;
+  /** 検査項目名 */
+  examItemName?: string;
+}
+
+/**
+ * 会場日程の進捗状況
+ */
+export interface PlaceScheduleProgress {
+  /** 健診日 */
+  examDate?: string;
+  /** 会場名 */
+  placeName?: string;
+  /** 会場日程ID */
+  placeScheduleId?: number;
+  /** 進捗状況 */
+  progress?: Progress[];
+}
+
+/**
+ * 会場ロック状態リクエストモデル
+ */
+export interface PlaceScheduleLockingRequest {
+  /** 会場日程ID */
+  placeScheduleId?: number;
+  /** ロック状態 */
+  placeScheduleLockingStatus?: number;
+}
+
+/**
+ * 会場ロック状態
+ */
+export interface PlaceScheduleLocking {
+  /** 健診日 */
+  examDate?: string;
+  /** 会場ID */
+  placeId?: number;
+  /** 会場名 */
+  placeName?: string;
+  /** 会場日程ID */
+  placeScheduleId?: number;
+  /** ロック状態 */
+  placeScheduleLockingStatus?: number;
+  /** 最終更新日時 */
+  updatedAt?: string;
+  /** 最終更新者 */
+  updatedBy?: string;
+}
+
+/**
+ * 会場日程の班リスト
+ */
+export interface PlaceSchedule {
+  /** 会場ID */
+  placeId?: number;
+  /** 会場名 */
+  placeName?: string;
+  /** 会場日程ID */
+  placeScheduleId?: number;
+  /** 開始時刻 */
+  startTime?: string;
+}
+
+/**
+ * 班ごとの会場日程リスト
+ */
+export interface PlaceSchedulePlaces {
+  /** 健診日 */
+  examDate?: string;
+  /** 会場日程リスト */
+  placeSchedules?: PlaceSchedule[];
+  /** 班ID */
+  teamId?: number;
+  /** 班名 */
+  teamName?: string;
+}
 
 /**
  * 会場
@@ -37,6 +160,247 @@ export interface PlaceScheduleTeam {
 export interface PlaceScheduleTeams {
   /** 班リスト */
   teams?: PlaceScheduleTeam[];
+}
+
+/**
+ * 検査結果出力履歴
+ */
+export interface ExportHistory {
+  /** 項目数 */
+  dataCount?: number;
+  /** 健診日 */
+  examDate?: string;
+  /** 出力日時 */
+  exportedAt?: string;
+  /** 出力者 */
+  exportedBy?: string;
+  /** 会場名 */
+  placeName?: string;
+  /** 会場日程ID */
+  placeScheduleId?: number;
+  /** ロック状態 */
+  placeScheduleLockingStatus?: number;
+}
+
+/**
+ * 検査結果出力履歴リスト
+ */
+export interface ExportHistoryList {
+  /** 検査結果出力履歴リスト */
+  exportHistories?: ExportHistory[];
+}
+
+/**
+ * 検査結果出力のリクエスト
+ */
+export interface ResultExportRequest {
+  /** 会場日程ID */
+  placeScheduleId?: number;
+}
+
+/**
+ * 連携対象検査結果明細
+ */
+export interface ExportDataDetail {
+  /** 項目数 */
+  count?: number;
+  /** 状態値 */
+  status?: number;
+  /** 状態名 */
+  statusName?: string;
+}
+
+/**
+ * 連携対象検査結果
+ */
+export interface ExportData {
+  /** 項目数 */
+  dataCount?: number;
+  /** 連携対象検査結果明細 */
+  details?: ExportDataDetail[];
+  /** 健診日 */
+  examDate?: string;
+  /** 会場名 */
+  placeName?: string;
+  /** 会場日程ID */
+  placeScheduleId?: number;
+  /** ロック状態 */
+  placeScheduleLockingStatus?: number;
+}
+
+/**
+ * 連携対象検査結果リスト
+ */
+export interface ExportDataList {
+  /** 連携対象検査結果リスト */
+  exportData?: ExportData[];
+}
+
+/**
+ * ホームメニュー
+ */
+export interface HomeMenu {
+  /** 使用可能条件 */
+  availableConditions?: string[];
+  /** ホームメニュー名 */
+  menuName?: string;
+  /** 遷移パス */
+  path?: string;
+}
+
+/**
+ * ホームメニューグループ
+ */
+export interface HomeMenuGroup {
+  /** ホームメニューグループ名 */
+  groupName?: string;
+  /** ホームメニュー */
+  menus?: HomeMenu[];
+}
+
+/**
+ * ホームメニューグループリスト
+ */
+export interface HomeMenuGroupList {
+  /** ホームメニューグループリスト */
+  homeMenuGroups?: HomeMenuGroup[];
+}
+
+/**
+ * 検査メニューリスト
+ */
+export interface ExamMenuList {
+  /** 検査メニューリスト */
+  examMenus?: ExamMenu[];
+}
+
+/**
+ * 検査機器
+ */
+export interface Equipment {
+  /** 検査機器ID */
+  equipmentId?: number;
+  /** 検査機器名 */
+  equipmentName?: string;
+  /** 検査メニューID */
+  examMenuId?: number;
+}
+
+/**
+ * 検査機器リスト
+ */
+export interface EquipmentList {
+  /** 検査機器リスト */
+  equipments?: Equipment[];
+}
+
+/**
+ * 実施有無と中止理由のリクエストモデル
+ */
+export interface ExecutionRequest {
+  /**
+   * 中止理由ID
+   * @nullable
+   */
+  cancelReasonId?: number | null;
+  /** 検査項目ID */
+  examItemId?: number;
+  /** 検査実施するか */
+  isPerforming?: boolean;
+}
+
+/**
+ * 実施有無と中止理由を束ねたリクエストモデル
+ */
+export interface ExecutionsRequest {
+  /** 検査項目ごとの実施有無と中止理由 */
+  executions?: ExecutionRequest[];
+}
+
+/**
+ * 検査結果連携状態リクエストモデル
+ */
+export interface IntegrationStatusRequest {
+  /** 受診番号 */
+  consultNumber?: string;
+  /** 連携状態 */
+  integrationStatus?: number;
+}
+
+/**
+ * 検査メニュー
+ */
+export interface ExamMenu {
+  /** 検査メニューID */
+  examMenuId?: number;
+  /** 検査メニュー名 */
+  examMenuName?: string;
+}
+
+/**
+ * 実施検査状況
+ */
+export interface ExamDetail {
+  /** 中止理由ID */
+  cancelReasonId?: number;
+  /** 検査項目ID */
+  examItemId?: number;
+  /** 検査項目名 */
+  examItemName?: string;
+  /** 検査実施するか */
+  isPerforming?: boolean;
+}
+
+/**
+ * 関連検査項目
+ */
+export interface RelatedExamItem {
+  /** 検査項目名 */
+  examItemName?: string;
+  /** 検査結果 */
+  examResult?: string;
+}
+
+/**
+ * 受診者情報
+ */
+export interface Examinee {
+  /** 生年月日 */
+  birthdate?: string;
+  /** 受診日年齢 */
+  examDateAge?: number;
+  /** 受診者ID */
+  examineeId?: number;
+  /** カナ氏名 */
+  kanaName?: string;
+  /** 氏名 */
+  name?: string;
+  /** 事業所名 */
+  organizations?: string[];
+  /** 同姓同名アラート */
+  sameNameAlert?: boolean;
+  /** 性別 */
+  sex?: number;
+}
+
+/**
+ * 検査内容
+ */
+export interface ExamContent {
+  /** 受診番号 */
+  consultNumber?: string;
+  /** 検査実施判断結果 */
+  examDecisionResult?: string[];
+  /** 受診者情報 */
+  examinee?: Examinee;
+  /** 実施検査項目 */
+  examItems?: ExamDetail[];
+  /** 検査実施判断 */
+  isComplete?: boolean;
+  /** 関連検査項目 */
+  relatedExamItems?: RelatedExamItem[];
+  /** 未実施検査項目 */
+  unexaminedItems?: ExamMenu[];
 }
 
 /**
@@ -71,6 +435,36 @@ export interface ConsultNumberRequest {
   consultNumber?: string;
 }
 
+/**
+ * 中止理由
+ */
+export interface CancelReason {
+  /** 中止理由ID */
+  cancelReasonId?: number;
+  /** 中止理由名 */
+  cancelReasonName?: string;
+  /** 検査項目ID */
+  examItemId?: number;
+}
+
+/**
+ * 中止理由リスト
+ */
+export interface CancelReasonList {
+  /** 中止理由リスト */
+  cancelReasons?: CancelReason[];
+}
+
+/**
+ * 職員ログインのリクエストモデル
+ */
+export interface StaffLoginRequest {
+  /** 職員のログインID */
+  loginId?: string;
+  /** パスワード */
+  password?: string;
+}
+
 export interface ProblemDetails {
   /** @nullable */
   detail?: string | null;
@@ -83,5 +477,13 @@ export interface ProblemDetails {
   /** @nullable */
   type?: string | null;
   [key: string]: unknown | null;
+}
+
+/**
+ * 職員ログインのレスポンスモデル
+ */
+export interface StaffLoginResponse {
+  /** トークン */
+  token?: string;
 }
 

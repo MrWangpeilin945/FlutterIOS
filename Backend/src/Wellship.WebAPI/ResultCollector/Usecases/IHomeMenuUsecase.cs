@@ -10,5 +10,5 @@ public interface IHomeMenuUsecase
     /// <summary>
     /// ホームメニュー項目を取得する
     /// </summary>
-    public void GetHomeMenus();
+    public Task<HomeMenuGroupList> GetHomeMenusAsync();
 }

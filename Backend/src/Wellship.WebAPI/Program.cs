@@ -96,6 +96,8 @@ public static class IServiceCollectionExtension
         services.AddScoped<IHealthCheckRepository, HealthCheckRepository>();
         services.AddScoped<IConsultRepository, ConsultRepository>();
         services.AddScoped<IPlaceScheduleRepository, PlaceScheduleRepository>();
+        services.AddScoped<IHomeMenuRepository, HomeMenuRepository>();
+        services.AddScoped<IStaffRepository, StaffRepository>();
         return services;
     }
     /// <summary>
@@ -105,6 +107,8 @@ public static class IServiceCollectionExtension
     {
         services.AddScoped<IPlaceScheduleUsecase, PlaceScheduleUsecase>();
         services.AddScoped<IConsultUsecase, ConsultUsecase>();
+        services.AddScoped<IHomeMenuUsecase, HomeMenuUsecase>();
+        services.AddScoped<IStaffUsecase, StaffUsecase>();
         return services;
     }
     /// <summary>
@@ -113,7 +117,7 @@ public static class IServiceCollectionExtension
     public static IServiceCollection AddLocalServices(this IServiceCollection services)
     {
         // 接続文字列はアプリケーション全体の寿命で管理したいためSingletonでDIする
-        services.AddSingleton<IConnectionStringProvider, AppSettingsConnectionStringProvider>();
+        services.AddSingleton<IConnectionStringProvider, EnvironmentVariableConnectionStringProvider>();
         return services;
     }
     /// <summary>

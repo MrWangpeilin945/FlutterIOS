@@ -38,6 +38,8 @@ enum Sex
 
 === 対象性別
 
+基準値などの設定に使用します。
+
 [source,csharp]
 ----
 enum TargetSex
@@ -49,6 +51,8 @@ enum TargetSex
 ----
 
 === 受診進捗状況
+
+受診単位の進捗ステータスです。
 
 [source,csharp]
 ----
@@ -62,6 +66,8 @@ enum ConsultProgressStatus
 
 === 検査進捗状況
 
+検査項目単位の進捗ステータスです。
+
 [source,csharp]
 ----
 enum ExamItemProgressStatus
@@ -73,6 +79,8 @@ enum ExamItemProgressStatus
 ----
 
 === 集計検査進捗状況
+
+進捗画面で取り扱うステータスです。
 
 [source,csharp]
 ----
@@ -87,6 +95,8 @@ enum AggregatedProgressStatus
 
 === 会場日程状況
 
+会場ロックのステータスです。 
+
 [source,csharp]
 ----
 enum PlaceScheduleLockingStatus
@@ -97,6 +107,8 @@ enum PlaceScheduleLockingStatus
 ----
 
 === 会場日程データ出力状況
+
+会場日程単位のデータ出力ステータスです。 
 
 [source,csharp]
 ----
@@ -110,6 +122,8 @@ enum PlaceScheduleResultExportStatus
 
 === 受診データ出力状況
 
+受診単位のデータ出力ステータスです。
+
 [source,csharp]
 ----
 enum ConsultResultExportStatus
@@ -122,6 +136,8 @@ enum ConsultResultExportStatus
 
 === キーボード種別
 
+ソフトウェアキーボードのタイプです。
+
 [source,csharp]
 ----
 enum KeyboardType
@@ -131,6 +147,8 @@ enum KeyboardType
 ----
 
 === 検査項目グループ種別
+
+コンポーネントを出し分けるためのタイプです。
 
 [source,csharp]
 ----
@@ -154,6 +172,8 @@ enum ExamItemGroupType
 
 === 入力エラーレベル
 
+入力した結果値に対するエラーを表示するときのレベルです。
+
 [source,csharp]
 ----
 enum InputErrorLevel
@@ -161,5 +181,18 @@ enum InputErrorLevel
     正常 = 1,
     警告 = 2,
     異常 = 3
+}
+----
+
+=== ロール
+
+職員に対して付与する役割です。権限グループとして使います。
+
+[source,csharp]
+----
+enum InputErrorLevel
+{
+    一般 = 10,
+    管理者 = 20
 }
 ----

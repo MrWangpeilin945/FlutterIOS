@@ -10,5 +10,5 @@ public interface IStaffUsecase
     /// <summary>
     /// 職員の情報を取得する
     /// </summary>
-    public void GetStaff();
+    public Task<Staff> GetStaffAsync(int staffId);
 }

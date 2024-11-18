@@ -4,17 +4,8 @@ import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
 import { z } from "zod";
 import { useAtom } from "jotai";
-import { teamState } from "~/store/store";
-import {
-  Group,
-  Title,
-  Box,
-  Center,
-  Paper,
-  Textarea,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { placeScheduleState } from "~/store/store";
+import { Group, Title, Box, Center, Paper, TextInput } from "@mantine/core";
 import { useClickOutside, useDisclosure } from "@mantine/hooks";
 import { consultVerifyConsultNumber } from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
@@ -31,7 +22,7 @@ export const meta: MetaFunction = () => {
 
 export default function consultNumberInput() {
   const [consultNo, setConsultNo] = useState("");
-  const [teamData, setTeamData] = useAtom(teamState);
+  const [placeSchedule, setPlaceSchedule] = useAtom(placeScheduleState);
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -67,7 +58,7 @@ export default function consultNumberInput() {
       .max(20, getErrorMessage(errorMessages.maxLength, "受診番号は", 20))
       .regex(
         /^[a-zA-Z0-9]+$/,
-        getErrorMessage(errorMessages.alphaNumericString, "受診番号は")
+        getErrorMessage(errorMessages.alphaNumericString, "受診番号は"),
       );
     const result = validationSchema.safeParse(consultNo);
     if (!result.success) {
@@ -90,13 +81,12 @@ export default function consultNumberInput() {
           setErrorMessage(getErrorMessage(errorMessages.invalid, "受診番号"));
         } else if (error.responce.status === 404) {
           setErrorMessage(
-            getErrorMessage(errorMessages.noData, "該当の受診番号のデータ")
+            getErrorMessage(errorMessages.noData, "該当の受診番号のデータ"),
           );
         } else if (error.responce.status === 500) {
           setErrorMessage(getErrorMessage(errorMessages.server));
         }
         open();
-        throw new Error(error);
       });
   };
 
@@ -109,14 +99,10 @@ export default function consultNumberInput() {
 
   // 確定処理
   const handleConfirm = async () => {
-    try {
-      if (validationCheck()) {
-        await verifyConsultNo();
-        // 全てのチェックが通ったら次の画面に遷移
-        navigate("/examorder-confirm");
-      }
-    } catch (error) {
-      console.error("受診番号の検証中にエラーが発生しました:", error);
+    if (validationCheck()) {
+      await verifyConsultNo();
+      // 全てのチェックが通ったら次の画面に遷移
+      navigate("/examorder-confirm");
     }
   };
 
@@ -128,7 +114,7 @@ export default function consultNumberInput() {
           <Box className={styles["basic-green"]} w={10} h={70} />
           <Title order={2} fw={550}>
             両備システムズ 豊成事業所
-            {/* {teamData?.name} */}
+            {/* {placeSchedule?.placeName} */}
           </Title>
         </Group>
         <Center>

@@ -63,7 +63,7 @@ Field="職員コード","staff_code","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="ログインID","login_id","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="職員名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="パスワードハッシュ","password_hash","bytea","NOT NULL",,"","",$FFFFFFFF,""
-Field="パスワードソルト","password_salt ","bytea","NOT NULL",,"","",$FFFFFFFF,""
+Field="パスワードソルト","password_salt","bytea","NOT NULL",,"","",$FFFFFFFF,""
 Field="有効","enabled","boolean","NOT NULL",,"true","",$FFFFFFFF,""
 Field="ロールID","role_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Index==2,staff_code
@@ -71,7 +71,7 @@ Index==2,login_id
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241112160208
+ModifiedDateTime=20241115112751
 Position="MAIN",100,600
 ZOrder=1
 
@@ -638,10 +638,12 @@ Field="ホームメニューID","home_menu_id","integer","NOT NULL",0,"","",$FFF
 Field="ホームメニュー名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="ホームメニューグループID","home_menu_group_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="グループ内表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="パス","path","text","NOT NULL",,"","",$FFFFFFFF,""
+Index==2,path
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241015152028
+ModifiedDateTime=20241114185530
 Position="MAIN",3000,1250
 ZOrder=34
 

@@ -1,7 +1,6 @@
 using Dapper;
 
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
-using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
 

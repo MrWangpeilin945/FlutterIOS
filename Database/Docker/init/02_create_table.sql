@@ -113,10 +113,14 @@ CREATE TABLE home_menus (
   , name text NOT NULL
   , home_menu_group_id integer NOT NULL
   , order_number integer NOT NULL
+  , path text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT home_menus_PKC PRIMARY KEY (home_menu_id)
 );
+
+ALTER TABLE home_menus ADD CONSTRAINT home_menus_IX1
+  UNIQUE (path) ;
 
 CREATE TABLE keyboard_options (
   option_id integer NOT NULL
@@ -183,7 +187,7 @@ CREATE TABLE staffs (
   , login_id text NOT NULL
   , name text NOT NULL
   , password_hash bytea NOT NULL
-  , "password_salt " bytea NOT NULL
+  , password_salt bytea NOT NULL
   , enabled boolean DEFAULT true NOT NULL
   , role_id integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -553,6 +557,7 @@ COMMENT ON COLUMN home_menus.home_menu_id IS 'ホームメニューID';
 COMMENT ON COLUMN home_menus.name IS 'ホームメニュー名';
 COMMENT ON COLUMN home_menus.home_menu_group_id IS 'ホームメニューグループID';
 COMMENT ON COLUMN home_menus.order_number IS 'グループ内表示順';
+COMMENT ON COLUMN home_menus.path IS 'パス';
 COMMENT ON COLUMN home_menus.created_at IS '作成日時';
 COMMENT ON COLUMN home_menus.created_by IS '作成者';
 
@@ -606,7 +611,7 @@ COMMENT ON COLUMN staffs.staff_code IS '職員コード';
 COMMENT ON COLUMN staffs.login_id IS 'ログインID';
 COMMENT ON COLUMN staffs.name IS '職員名';
 COMMENT ON COLUMN staffs.password_hash IS 'パスワードハッシュ';
-COMMENT ON COLUMN staffs."password_salt " IS 'パスワードソルト';
+COMMENT ON COLUMN staffs.password_salt IS 'パスワードソルト';
 COMMENT ON COLUMN staffs.enabled IS '有効';
 COMMENT ON COLUMN staffs.role_id IS 'ロールID';
 COMMENT ON COLUMN staffs.created_at IS '作成日時';

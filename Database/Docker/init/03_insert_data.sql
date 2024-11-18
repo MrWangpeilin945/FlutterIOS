@@ -79,12 +79,12 @@ INSERT INTO home_menu_groups(home_menu_group_id,name,order_number,created_at,cre
   , (2,'管理',2,CURRENT_TIMESTAMP,'init');
 
 -- ホームメニュー
-INSERT INTO home_menus(home_menu_id,name,home_menu_group_id,order_number,created_at,created_by) VALUES 
-    (1,'検査メニュー選択',1,1,CURRENT_TIMESTAMP,'init')
-  , (2,'進捗',1,2,CURRENT_TIMESTAMP,'init')
-  , (3,'会場ロック',2,1,CURRENT_TIMESTAMP,'init')
-  , (4,'検査結果出力',2,2,CURRENT_TIMESTAMP,'init')
-  , (5,'検査結果出力履歴',2,3,CURRENT_TIMESTAMP,'init');
+INSERT INTO home_menus(home_menu_id,name,home_menu_group_id,order_number,path,created_at,created_by) VALUES 
+    (1,'検査メニュー選択',1,1,'exammenu-select',CURRENT_TIMESTAMP,'init')
+  , (2,'進捗',1,2,'progress',CURRENT_TIMESTAMP,'init')
+  , (3,'会場ロック',2,1,'placeschedule-lock',CURRENT_TIMESTAMP,'init')
+  , (4,'検査結果出力',2,2,'examresult-export',CURRENT_TIMESTAMP,'init')
+  , (5,'検査結果出力履歴',2,3,'examresult-export-history',CURRENT_TIMESTAMP,'init');
 
 -- 受診
 
@@ -93,6 +93,10 @@ INSERT INTO roles(role_id,name,created_at,created_by) VALUES
     (10,'一般',CURRENT_TIMESTAMP,'init')
   , (20,'管理者',CURRENT_TIMESTAMP,'init');
 
+-- 職員
+INSERT INTO resultcollector.staffs(staff_id,staff_code,login_id,name,password_hash,password_salt,enabled,role_id,created_at,created_by) VALUES 
+    (1,'S001','S001','職員A',DECODE('cndlYnJ0MzU2Nzh0ZXNuZXNydHNlbXRhM3c0YW0zNGF3NG1hdzM0bWE0cWEzNG1yNzg=', 'base64'),DECODE('d3JhT1VZSVJUVDRFNXJld3J0', 'base64'),True,10,CURRENT_TIMESTAMP,'init')
+  , (2,'S002','S002','職員B',DECODE('bWh0anV1ZHI1dXlzZXJ5', 'base64'),DECODE('ZXdiNWFxMzRyYmdlbnN5cmVtc2VyeQ==', 'base64'),True,20,CURRENT_TIMESTAMP,'init');
 
 -- 団体
 INSERT INTO organizations(organization_id,organization_code,name,order_number,created_at,created_by) VALUES 
