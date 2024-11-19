@@ -7,10 +7,18 @@ import {
   colorsTuple,
 } from "@mantine/core";
 
+import styles from "./styles/theme.module.css";
+
 export const customTheme = createTheme({
   colors: {
     // プライマリカラー
     primary: colorsTuple("#00ADA4"),
+    // システムの背景色
+    background: colorsTuple("#F2F2F2"),
+    // 標準の背景色
+    white01: colorsTuple("#FFFFFF"),
+    // 標準の文字色
+    black01: colorsTuple("#3F3A39"),
     // 警告色
     warning: colorsTuple("#FF9100"),
     // エラー色
@@ -23,6 +31,20 @@ export const customTheme = createTheme({
     femalePrimary: colorsTuple("#FFBEB7"),
     // 女性のセカンダリカラー
     femaleSecondary: colorsTuple("#F3948E"),
+    // 緑系の色
+    green01: colorsTuple("#70CBA9"),
+    green02: colorsTuple("#98DBBA"),
+    green03: colorsTuple("#D5F0DF"),
+    // 青系の色
+    blue01: colorsTuple("#1C208D"),
+    blue02: colorsTuple("#0D5DB9"),
+    blue03: colorsTuple("#5694E6"),
+    blue04: colorsTuple("#40B7EE"),
+    // 灰系の色
+    gray01: colorsTuple("#6A6A6A"),
+    gray02: colorsTuple("#9A9A9A"),
+    gray03: colorsTuple("#CECECE"),
+    gray04: colorsTuple("#EAEAEA"),
   },
   // プライマリカラーの設定
   primaryColor: "primary",
@@ -41,14 +63,17 @@ export const customTheme = createTheme({
       defaultProps: {
         radius: "50",
       },
+      classNames: (theme, props, ctx) => ({
+        // Buttonコンポーネントが使用不可の時に適用するスタイルを設定
+        root: props.disabled ? styles["button-disabled"] : "",
+      }),
     }),
     Divider: Divider.extend({
-      vars: () => {
-        return { root: {} };
+      vars: (theme) => {
+        return { root: { "--divider-color": theme.colors.gray03[1] } };
       },
       defaultProps: {
-        // todo テーマから取得する
-        color: "#CECECE",
+        color: "var(--divider-color)",
       },
     }),
     Switch: Switch.extend({
@@ -62,13 +87,16 @@ export const customTheme = createTheme({
               "--switch-thumb-size": rem(35),
               "--switch-track-label-padding": rem(1),
               "--switch-width": rem(120),
-              // todo テーマから取得する
-              "--switch-color": "#70CBA9",
+              "--switch-color": theme.colors.green01[1],
             },
           };
         }
         return { root: {} };
       },
+      classNames: (theme, props, ctx) => ({
+        // Switchコンポーネントがオフの時に適用するスタイルを設定
+        root: !props.checked ? styles["switch-off"] : "",
+      }),
     }),
   },
 });

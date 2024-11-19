@@ -220,14 +220,53 @@ export default function Hoge() {
 [options="header"]
 |===
 |[green]#色#| [green]#テーマ名# | [green]#説明#
-|pass:[<span style="color:#FFFFFF;font-size:30pt">■</span>]| - | 標準的な背景色
-|pass:[<span style="color:#3F3A39;font-size:30pt">■</span>]| - | 標準的な文字色
-|pass:[<span style="color:#00ADA4;font-size:30pt">■</span>]| primary | プライマリカラー
-|pass:[<span style="color:#FF9100;font-size:30pt">■</span>]| warning | 警告色
-|pass:[<span style="color:#E26264;font-size:30pt">■</span>]| error | エラー色
-|pass:[<span style="color:#A0DDEA;font-size:30pt">■</span>]| malePrimary | 男性のプライマリカラー
-|pass:[<span style="color:#6DB5D1;font-size:30pt">■</span>]| maleSecondary | 男性のセカンダリカラー
-|pass:[<span style="color:#FFBEB7;font-size:30pt">■</span>]| femalePrimary | 女性のプライマリカラー
-|pass:[<span style="color:#F3948E;font-size:30pt">■</span>]| femaleSecondary | 女性のセカンダリカラー
-
+|pass:[<span style="color:#00ADA4;font-size:30pt">■</span>] +
+#00ADA4| primary | プライマリカラー
+|pass:[<span style="color:#F2F2F2;font-size:30pt">■</span>] +
+#F2F2F2| background | システムの背景色
+|pass:[<span style="color:#FFFFFF;font-size:30pt">■</span>] +
+#FFFFFF| white01 | 標準的な背景色 +
+特に設定しなくても適用される
+|pass:[<span style="color:#3F3A39;font-size:30pt">■</span>] +
+#3F3A39| black01 | 標準的な文字色 +
+特に設定しなくても適用される
+|pass:[<span style="color:#FF9100;font-size:30pt">■</span>] +
+#FF9100| warning | 警告色
+|pass:[<span style="color:#E26264;font-size:30pt">■</span>] +
+#E26264| error | エラー色
+|pass:[<span style="color:#A0DDEA;font-size:30pt">■</span>] +
+#A0DDEA| malePrimary | 男性のプライマリカラー +
+受診者ヘッダー（男性）の背景色
+|pass:[<span style="color:#6DB5D1;font-size:30pt">■</span>] +
+#6DB5D1| maleSecondary | 男性のセカンダリカラー +
+受診者ヘッダー（男性用）上のボタンのラベル
+|pass:[<span style="color:#FFBEB7;font-size:30pt">■</span>] +
+#FFBEB7| femalePrimary | 女性のプライマリカラー +
+受診者ヘッダー（女性）の背景色
+|pass:[<span style="color:#F3948E;font-size:30pt">■</span>] +
+#F3948E| femaleSecondary | 女性のセカンダリカラー +
+受診者ヘッダー（女性用）上のボタンのラベル
+|pass:[<span style="color:#70CBA9;font-size:30pt">■</span>] +
+#70CBA9| green01 | トグルスイッチ、ツールチップ
+|pass:[<span style="color:#98DBBA;font-size:30pt">■</span>] +
+#98DBBA| green02 | 未受診項目用
+|pass:[<span style="color:#D5F0DF;font-size:30pt">■</span>] +
+#D5F0DF| green03 | ボタン選択時の背景色、表の背景色
+|pass:[<span style="color:#1C208D;font-size:30pt">■</span>] +
+#1C208D| blue01 | 進捗「済」の色
+|pass:[<span style="color:#0D5DB9;font-size:30pt">■</span>] +
+#0D5DB9| blue02 | 進捗「来場」の色
+|pass:[<span style="color:#5694E6;font-size:30pt">■</span>] +
+#5694E6| blue03 | 進捗「予定」の色
+|pass:[<span style="color:#40B7EE;font-size:30pt">■</span>] +
+#40B7EE| blue04 | 進捗「中止」の色
+|pass:[<span style="color:#6A6A6A;font-size:30pt">■</span>] +
+#6A6A6A| gray01 | ソフトウェアキーボードの「AC」「確定」の背景色
+|pass:[<span style="color:#9A9A9A;font-size:30pt">■</span>] +
+#9A9A9A| gray02 | フッターの背景色、検査項目名の背景色
+|pass:[<span style="color:#CECECE;font-size:30pt">■</span>] +
+#CECECE| gray03 | コンポーネントの枠線 +
+※色が異なっている場合はMantine標準の色を使う
+|pass:[<span style="color:#EAEAEA;font-size:30pt">■</span>] +
+#EAEAEA| gray04 | 個人属性情報のタイトルの背景色
 |===
