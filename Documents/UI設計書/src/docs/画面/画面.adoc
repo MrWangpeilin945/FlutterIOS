@@ -28,6 +28,8 @@ include::./SC0001_ログイン画面/SC0001-初期表示.mmd[]
 <<<
 == SC0008_検査結果入力画面
 
+=== 初期表示
+
 [mermaid,SC0008-初期表示,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0008_検査結果入力画面/SC0008-初期表示.mmd[]

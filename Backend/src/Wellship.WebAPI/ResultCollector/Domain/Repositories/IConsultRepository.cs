@@ -9,5 +9,5 @@ public interface IConsultRepository
     /// 受診が存在するか
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
-    public bool ConsultExists(string consultNumber);
+    public Task<bool> ConsultExistsAsync(string consultNumber);
 }

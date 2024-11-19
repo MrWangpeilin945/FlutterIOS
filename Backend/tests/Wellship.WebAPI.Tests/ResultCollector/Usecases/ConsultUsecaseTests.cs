@@ -12,11 +12,11 @@ namespace Ryobi.Wellship.WebAPI.Tests.ResultCollector.Usecases;
 public class ConsultUsecaseTests
 {
     [Fact]
-    public void 受診番号が存在する場合に例外がスローされないこと()
+    public async Task 受診番号が存在する場合に例外がスローされない()
     {
         // Arrange
         var consultationRepositoryMock = new Mock<IConsultRepository>();
-        consultationRepositoryMock.Setup(x => x.ConsultExists(It.IsAny<string>())).Returns(true);
+        consultationRepositoryMock.Setup(x => x.ConsultExistsAsync(It.IsAny<string>())).ReturnsAsync(true);
 
         var usecase = new ConsultUsecase(consultationRepositoryMock.Object);
         var request = new ConsultNumberRequest
@@ -25,16 +25,17 @@ public class ConsultUsecaseTests
         };
 
         // Act & Assert
-        usecase.Invoking(x => x.VerifyConsultNumber(request))
-              .Should().NotThrow<ConsultNumberNotFoundException>();
+        await usecase.VerifyConsultNumberAsync(request);
+        await usecase.Invoking(x => x.VerifyConsultNumberAsync(request))
+                      .Should().NotThrowAsync<ConsultNumberNotFoundException>();
     }
 
     [Fact]
-    public void 受診番号が存在しない場合に例外がスローされること()
+    public async Task 受診番号が存在しない場合に例外がスローされる()
     {
         // Arrange
         var consultationRepositoryMock = new Mock<IConsultRepository>();
-        consultationRepositoryMock.Setup(x => x.ConsultExists(It.IsAny<string>())).Returns(false);
+        consultationRepositoryMock.Setup(x => x.ConsultExistsAsync(It.IsAny<string>())).ReturnsAsync(false);
 
         var usecase = new ConsultUsecase(consultationRepositoryMock.Object);
         var request = new ConsultNumberRequest
@@ -43,8 +44,8 @@ public class ConsultUsecaseTests
         };
 
         // Act & Assert
-        usecase.Invoking(x => x.VerifyConsultNumber(request))
-              .Should().Throw<ConsultNumberNotFoundException>()
-              .WithMessage("受診番号が存在しません。");
+        await usecase.Invoking(x => x.VerifyConsultNumberAsync(request))
+                     .Should().ThrowAsync<ConsultNumberNotFoundException>()
+                     .WithMessage("受診番号が存在しません。");
     }
 }

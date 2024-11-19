@@ -31,9 +31,9 @@ public class ExamMenuController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/examMenus")]
-    public IActionResult GetExamMenus()
+    public async Task<IActionResult> GetExamMenusAsync()
     {
-        _examMenuUsecase.GetExamMenus();
-        return Ok();
+        var results = await _examMenuUsecase.GetExamMenusAsync();
+        return Ok(results);
     }
 }

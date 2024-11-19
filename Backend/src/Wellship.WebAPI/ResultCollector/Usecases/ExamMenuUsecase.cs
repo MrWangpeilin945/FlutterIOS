@@ -1,5 +1,3 @@
-using Ryobi.Wellship.APIModels.Requests;
-using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -23,8 +21,16 @@ public class ExamMenuUsecase : IExamMenuUsecase
     /// <summary>
     /// 検査メニュー一覧を取得する
     /// </summary>
-    public void GetExamMenus()
+    public async Task<APIModels.Responses.ExamMenuList> GetExamMenusAsync()
     {
-
+        var menus = await _examMenuRepository.GetExamMenusAsync();
+        return new APIModels.Responses.ExamMenuList()
+        {
+            ExamMenus = menus.Select(x => new APIModels.Responses.ExamMenu()
+            {
+                ExamMenuId = x.MenuId,
+                ExamMenuName = x.MenuName
+            }).ToArray()
+        };
     }
 }
