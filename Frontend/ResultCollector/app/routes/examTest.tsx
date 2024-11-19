@@ -15,7 +15,7 @@ export default function consultInput() {
             positionNumber: 1, //血圧の上なのか下なのかのテキストボックス位置を指定する
             examItemDetailId: 1001,
             examItemDetailName: "スピッツ",
-            value: "10031", //前回値初期値化設定があれば、ここに入れておいてほしい   インクリメントの場合登録済みなら、登録済みの値、未登録なら次のインクリメント値をもらう
+            value: "", //前回値初期値化設定があれば、ここに入れておいてほしい   インクリメントの場合登録済みなら、登録済みの値、未登録なら次のインクリメント値をもらう
             prevValue: "150",
             unit: "cm",
             examItemDetailType: "1", //1:入力、2:選択、3：演算値など ※ここのテーブル設定を知らないのでとりあえずの例
