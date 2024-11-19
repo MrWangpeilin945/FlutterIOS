@@ -74,7 +74,7 @@ export default function consultInput(){
 
   return(
     <>
-    <ExamineeHeader id={100001} name="リョウビ タロウ" gender="man" age={35} />
+    <ExamineeHeader staffName="両備 花子" managerId={100001} name="リョウビ タロウ" gender={1} age={35} />
     <ExamSelect examItems={data.examItems[0]} onClick={handleConfirm} />
     <CommonFooter/>
     </>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Group, Text, Flex, Center } from "@mantine/core";
+import { Button, Group, Text, Flex, Paper, Title } from "@mantine/core";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
 
@@ -59,11 +59,11 @@ export default function ExamSelect({ examItems, onClick }: selectProps) {
   return (
     <>
       <Flex mb="xs">
-        <Text className={`${styles["basic-grey"]} ${styles["label-radius"]}`}  size="xl" w={200}  >
-          <Center>
-          {examItems.examItemName}
-          </Center>
-        </Text>
+        <Paper bg="gray02" c="white" radius="lg" px="md" py="10">
+          <Title order={1} fw={500}>
+            {examItems.examItemName}
+          </Title>
+        </Paper>
         <Text mt="xs">（前回：{examItems.examItemDetails[0].prevValue}）</Text>
       </Flex>
 

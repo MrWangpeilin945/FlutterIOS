@@ -17,7 +17,7 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
   const closeMenu = useClickOutside(hide);
 
   return (
-    <Box className={styles["basic-green"]} py="15">
+    <Box className={styles["basic-green"]} py="10">
       <Flex justify="space-between" align="center" px="md">
         {/* ユーザアイコン */}
         <Button className={styles["reverse-green-button"]} onClick={toggle}>
