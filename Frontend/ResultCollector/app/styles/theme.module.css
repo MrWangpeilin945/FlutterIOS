@@ -1,0 +1,14 @@
+/* Mantineのテーマ用のCSS */
+/* テーマファイルでcommon.module.cssをimportすると画面上でCSSの適用順が変わって画面が崩れるため切り出し */
+
+/* SwitchをOFFにした時に適用するCSS */
+.switch-off > label > div:first-of-type {
+  background-color: #9a9a9a;
+  color: #ffffff;
+}
+
+/* Buttonがdisableの時に適用するCSS */
+.button-disabled {
+  background-color: #cecece !important;
+  color: #9a9a9a !important;
+}
