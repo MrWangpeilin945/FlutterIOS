@@ -51,70 +51,70 @@
 [source,json]
 ----
 {
-    "consultNumber": "012345678",
-    "examinee" : {
-        "receptionNumber" : 10,
-        "kanaName" : "リョウビ　タロウ",
-        "sex" : 1,
-        "examDateAge" : 49
-    },
-    "relatedExamItems" : [
+  "consultNumber": "012345678",
+  "examinee" : {
+    "receptionNumber" : 10,
+    "kanaName" : "リョウビ　タロウ",
+    "sex" : 1,
+    "examDateAge" : 49
+  },
+  "relatedExamItems" : [
+    {
+        "examItemName" : "診察",
+        "examResult" : "所見なし"
+    }
+  ],
+  "examItemGroups" :[
+    {
+      "type" : 1,
+      "examItems" : [
         {
-            "examItemName" : "診察",
-            "examResult" : "所見なし"
-        }
-    ],
-    "examItemGroups" :[
-        {
-            "type" : 1,
-            "examItems" : [
+          "positionNumber" : 1,
+          "examItemId" : 101,
+          "name" : "身長",
+          "examItemDetails" : [
+            {
+              "positionNumber" : 1,
+              "examItemDetailId" : 1001,
+              "equipmentLabel" : "Height",
+              "name" : "身長",
+              "value" : "157.0",
+              "prevValue" : "155.5",
+              "unit" : "cm",
+              "type" : 1, 
+              "cancelReasonId" : null,
+              "integerLength" : 3,
+              "decimalLength" : 1,
+              "keyboard" : {
+                  "keyboardType" : 1,
+                  "values" : ["0.1" ,"0.2" ,"0.3"]
+              },
+              "examItemDetailOptions" : [
                 {
-                    "positionNumber" : 1,
-                    "examItemId" : 101,
-                    "name" : "身長",
-                    "examItemDetails" : [
-                        {
-                            "positionNumber" : 1,
-                            "examItemDetailId" : 1001,
-                            "equipmentLabel" : "Height",
-                            "name" : "身長",
-                            "value" : "157.0",
-                            "prevValue" : "155.5",
-                            "unit" : "cm",
-                            "type" : 1, 
-                            "cancelReasonId" : null,
-                            "integerLength" : 3,
-                            "decimalLength" : 1,
-                            "keyboard" : {
-                                "keyboardType" : 1,
-                                "values" : ["0.1" ,"0.2" ,"0.3"]
-                            },
-                            "examItemDetailOptions" : [
-                                {
-                                    "orderNumber" : 1,
-                                    "code" : "100",
-                                    "name" : "メガネ"
-                                }
-                            ],
-                            "examNormalValueRanges" : [
-                                {
-                                    "errorLevel" : 4,
-                                    "maxValue" : 999.9,
-                                    "minValue" : 10.0
-                                }
-                            ]
-                        }
-                    ],
-                    "examRegstResults" : 
-                    [ 
-                        { "errorLevel" : 2, 
-                          "description" : "正常値範囲外です。"
-                        } 
-                    ],
+                  "orderNumber" : 1,
+                  "code" : "100",
+                  "name" : "メガネ"
                 }
-            ]
+              ],
+              "examNormalValueRanges" : [
+                {
+                  "errorLevel" : 4,
+                  "maxValue" : 999.9,
+                  "minValue" : 10.0
+                }
+              ]
+            }
+          ],
+          "examRegstResults" : 
+          [ 
+            { "errorLevel" : 2, 
+              "description" : "正常値範囲外です。"
+            } 
+          ]
         }
-    ]
+      ]
+    }
+  ]
 }
 ----
 
