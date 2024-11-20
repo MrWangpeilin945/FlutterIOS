@@ -22,8 +22,8 @@ export default function BoothNote({ relatedExamItems }: BoothNoteProps) {
                 className={styles["basic-grey"]}
                 radius="md"
                 px="xs"
-                w={160}
-                miw={160}
+                w={190}
+                miw={190}
               >
                 <Text size="xs" fw={700} ta="center">
                   {examItem.examItemName}
