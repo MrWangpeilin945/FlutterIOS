@@ -1,5 +1,6 @@
 import { customTheme } from "~/customTheme";
 import "@mantine/core/styles.css";
+import "./styles/global.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Links,
@@ -35,14 +36,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
         <ColorSchemeScript />
-        <style>
-          {`
-            /* ここにグローバルスタイルを記述します */
-            html body {
-              background-color: #f2f2f2 ;
-            }
-          `}
-        </style>
       </head>
       <body>
         <MantineProvider theme={customTheme}>
