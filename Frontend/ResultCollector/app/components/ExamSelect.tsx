@@ -80,7 +80,7 @@ export default function ExamSelect({
         prevErrors.filter((message) => message !== errorMessage),
       );
     }
-  }, [examItems, onRegisterPressed, selected]);
+  }, [examItems.examItemName, onRegisterPressed, selected]);
 
   //選択/未選択の切替
   const onSelect = (selector: { selectorId: string; selectorName: string }) => {
