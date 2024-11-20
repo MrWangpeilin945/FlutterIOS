@@ -119,8 +119,8 @@ export default function ExamSelect({
               onClick={() => onSelect(selector)}
               variant="outline"
               //グレーアウト、選択済/未選択によって色を変更
-              bg={isCancelled ? "#e0e0e0" : isSelected ? "green03" : "white"} 
-              color={isCancelled ? "#9e9e9e" : isSelected ? "primary" : "gray02"} 
+              bg={isCancelled ? "grey03" : isSelected ? "green03" : "white"} 
+              color={isCancelled ? "grey02" : isSelected ? "primary" : "gray02"} 
               disabled={isCancelled}  // isCancelledがtrueの場合、ボタンを無効化
             >
               {selector.selectorName}
