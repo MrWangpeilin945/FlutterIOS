@@ -86,8 +86,8 @@
               "integerLength" : 3,
               "decimalLength" : 1,
               "keyboard" : {
-                  "keyboardType" : 1,
-                  "values" : ["0.1" ,"0.2" ,"0.3"]
+                "keyboardType" : 1,
+                "values" : ["0.1" ,"0.2" ,"0.3"]
               },
               "examItemDetailOptions" : [
                 {
@@ -105,8 +105,7 @@
               ]
             }
           ],
-          "examRegstResults" : 
-          [ 
+          "examRegstResults" : [
             { "errorLevel" : 2, 
               "description" : "正常値範囲外です。"
             } 
