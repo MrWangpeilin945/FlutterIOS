@@ -4,5 +4,12 @@
 	},
 	"formatter": {
 		"indentStyle": "space"
-	}
+	},
+    "linter":{
+        "rules":{
+            "suspicious":{
+                "noArrayIndexKey": "off"
+            }
+        }
+    }
 }

@@ -5,6 +5,7 @@ import {
   Divider,
   Switch,
   colorsTuple,
+  LoadingOverlay,
 } from "@mantine/core";
 
 import styles from "./styles/theme.module.css";
@@ -53,7 +54,13 @@ export const customTheme = createTheme({
   // 標準の文字色
   black: "#3F3A39",
   // ベースとなるフォントサイズの設定
-  fontSizes: { xs: "22px", sm: "24px", md: "28px", lg: "30px", xl: "46px" },
+  fontSizes: {
+    xs: "24px",
+    sm: "26px",
+    md: "28px",
+    lg: "30px",
+    xl: "32px",
+  },
   // 各コンポーネントのカスタマイズ
   components: {
     Button: Button.extend({
@@ -96,6 +103,14 @@ export const customTheme = createTheme({
       classNames: (theme, props, ctx) => ({
         // Switchコンポーネントがオフの時に適用するスタイルを設定
         root: !props.checked ? styles["switch-off"] : "",
+      }),
+    }),
+    LoadingOverlay: LoadingOverlay.extend({
+      defaultProps: {
+        loaderProps: { size: "xxl" },
+      },
+      classNames: (theme, props, ctx) => ({
+        root: props.loaderProps?.size === "xxl" ? styles["loading-large"] : "",
       }),
     }),
   },
