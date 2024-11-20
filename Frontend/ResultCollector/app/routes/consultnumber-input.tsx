@@ -169,6 +169,7 @@ export default function consultNumberInput() {
           </Center>
         )}
         <Box mt="50">
+          {/* TODO 確認用のため、後で変更 */}
           <IncompliedExam
             name="あいうえおかきくけこさしすせそたちつてとなにぬねの"
             incompliesExam={incompliedExams}
