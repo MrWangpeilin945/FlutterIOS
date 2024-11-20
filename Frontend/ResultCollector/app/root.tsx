@@ -8,6 +8,7 @@ import {
 } from "@remix-run/react";
 import { useEffect } from "react";
 import "@mantine/core/styles.css";
+import "./styles/global.css";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { customTheme } from "~/customTheme";
@@ -35,14 +36,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
         <ColorSchemeScript />
-        <style>
-          {`
-            /* ここにグローバルスタイルを記述します */
-            html body {
-              background-color: #f2f2f2 ;
-            }
-          `}
-        </style>
       </head>
       <body>
         <MantineProvider theme={customTheme}>
