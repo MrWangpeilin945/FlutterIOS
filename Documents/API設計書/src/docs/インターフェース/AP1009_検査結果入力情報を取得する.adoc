@@ -40,12 +40,6 @@
 |検査メニューID
 |3
 
-|equipmentId
-|Yes
-|number
-|検査機器ID
-|10
-
 |===
 
 === リクエストボディ
@@ -78,19 +72,19 @@
                     "positionNumber" : 1,
                     "examItemId" : 101,
                     "name" : "身長",
-                    "equipmentLabel" : "DC-250",
                     "examItemDetails" : [
                         {
                             "positionNumber" : 1,
                             "examItemDetailId" : 1001,
+                            "equipmentLabel" : "Height",
                             "name" : "身長",
                             "value" : "157.0",
                             "prevValue" : "155.5",
                             "unit" : "cm",
                             "type" : 1, 
                             "cancelReasonId" : null,
-                            "integerMaximumDigit" : 3,
-                            "afterDecimalPointDigit" : 1,
+                            "integerLength" : 3,
+                            "decimalLength" : 1,
                             "keyboard" : {
                                 "keyboardType" : 1,
                                 "values" : ["0.1" ,"0.2" ,"0.3"]
