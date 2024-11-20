@@ -49,7 +49,7 @@
           }.
           {
             "examItemDetailId": 2,
-            "value" : null
+            "value" : ""
           }
         ]
       }
@@ -69,5 +69,7 @@
 ** 指定した受診番号の形式が不正
 * 401 Unauthorized
 ** JWT認証に失敗
+* 403 Forbidden
+** 会場がロック中の更新権限がない
 * 404 NotFound
 ** 指定した受診が存在しない
