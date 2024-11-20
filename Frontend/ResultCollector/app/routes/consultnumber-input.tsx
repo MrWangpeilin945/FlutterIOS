@@ -12,6 +12,7 @@ import AuthWrapper from "~/components/AuthWrapper";
 import CommonHeader from "~/components/CommonHeader";
 import CommonFooter from "~/components/CommonFooter";
 import Keyboard from "~/components/SoftwareKeyboard";
+import IncompliedExam from "~/components/IncompliedExam";
 import { ErrorModal } from "~/components/ErrorModal";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import styles from "~/styles/common.module.css";
@@ -33,6 +34,26 @@ export default function consultNumberInput() {
     { label: "進捗", action: () => navigate("/progress") },
     { label: "", action: () => {} },
     { label: "", action: () => {} },
+  ];
+
+  // 【CP0011】未受診検査項目の引数設定
+  const incompliedExams = [
+    "胸囲",
+    "検尿",
+    "視力",
+    "診察",
+    "胸部X線",
+    "心電図",
+    "マーゲン",
+    "肺活量",
+    "MRI",
+    "CT",
+    "身長体重",
+    "診察",
+    "問診",
+    "健康指導",
+    "胃カメラ",
+    "エコー",
   ];
 
   // キーボード以外の部分がクリックされると非表示に
@@ -58,7 +79,7 @@ export default function consultNumberInput() {
       .max(20, getErrorMessage(errorMessages.maxLength, "受診番号は", 20))
       .regex(
         /^[a-zA-Z0-9]+$/,
-        getErrorMessage(errorMessages.alphaNumericString, "受診番号は"),
+        getErrorMessage(errorMessages.alphaNumericString, "受診番号は")
       );
     const result = validationSchema.safeParse(consultNo);
     if (!result.success) {
@@ -81,7 +102,7 @@ export default function consultNumberInput() {
           setErrorMessage(getErrorMessage(errorMessages.invalid, "受診番号"));
         } else if (error.responce.status === 404) {
           setErrorMessage(
-            getErrorMessage(errorMessages.noData, "該当の受診番号のデータ"),
+            getErrorMessage(errorMessages.noData, "該当の受診番号のデータ")
           );
         } else if (error.responce.status === 500) {
           setErrorMessage(getErrorMessage(errorMessages.server));
@@ -147,6 +168,12 @@ export default function consultNumberInput() {
             </div>
           </Center>
         )}
+        <Box mt="50">
+          <IncompliedExam
+            name="あいうえおかきくけこさしすせそたちつてとなにぬねの"
+            incompliesExam={incompliedExams}
+          />
+        </Box>
         <ErrorModal
           isOpen={opened}
           onClose={close}

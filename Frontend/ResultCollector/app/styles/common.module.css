@@ -65,7 +65,15 @@
   word-break: break-word;
   white-space: normal;
 }
+.white-wrap {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
 
+.custome-box {
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
 .progress-raijyo {
   background-color: gray;
 }
