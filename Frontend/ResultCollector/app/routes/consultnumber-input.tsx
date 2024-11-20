@@ -36,7 +36,7 @@ export default function consultNumberInput() {
     { label: "", action: () => {} },
   ];
 
-  // 【CP0011】未受診検査項目の引数設定
+  // Todo 後に消す【CP0011】未受診検査項目の確認用の設定
   const incompliedExams = [
     "胸囲",
     "検尿",

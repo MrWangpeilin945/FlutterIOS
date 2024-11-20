@@ -21,7 +21,7 @@ export default function IncompliedExam({
         // 6要素ごとに改行文字を追加
         resultArray.push("、\n");
       } else if (i !== items.length - 1) {
-        // 最後以外で句読点追加
+        // 要素の間で句読点追加
         resultArray.push("、");
       }
     }
@@ -30,7 +30,7 @@ export default function IncompliedExam({
   }
 
   return (
-    <Box p="md" w={970}>
+    <Box p="md" w={800}>
       <Paper radius="lg" bg={"white"}>
         <Box
           className={styles["custome-box"]}
@@ -40,12 +40,12 @@ export default function IncompliedExam({
           // Todo CSS増やして良いか確認
         >
           <Text size="sm" c="black" fw="550">
-            {name.length > 20
-              ? `${name.slice(0, 20)}...さんの未受診検査項目はこちらです。`
+            {name.length > 10
+              ? `${name.slice(0, 10)}...さんの未受診検査項目はこちらです。`
               : `${name}さんの未受診検査項目です。`}
           </Text>
         </Box>
-        <Box ml="sm" p="md">
+        <Box pl="sm" p="md">
           <Text className={styles["white-wrap"]} size="sm" c="black" fw="500">
             {concatItems(incompliesExam)}
           </Text>
