@@ -1,6 +1,7 @@
 import CommonFooter from "~/components/CommonFooter";
 import ExamineeHeader from "~/components/ExamineeHeader";
 import ExamSelect from "~/components/ExamSelect";
+import { errorMessages } from "~/utils/getErrorMessage";
 
 export default function consultInput(){
 
@@ -10,6 +11,11 @@ export default function consultInput(){
         positionNumber: 1,
         examItemId: 101,
         examItemName: "スピッツ",
+        //どのような形式かは未確定
+        errorMessages:[
+          {value:"エラー1"},
+          {value:"エラー2"}
+        ],
         examItemDetails: [
           {
             positionNumber: 1, //血圧の上なのか下なのかのテキストボックス位置を指定する
@@ -19,7 +25,7 @@ export default function consultInput(){
             prevValue: "111112222333",
             unit: "cm",
             examItemDetailType: "1", //1:入力、2:選択、3：演算値など ※ここのテーブル設定を知らないのでとりあえずの例
-            isCanceld: true,
+            isCancelled: true,
             kikiDetail: "★value1", //検討中連携している機器のどのパラメータに該当するかのプロパティ的なもの
             afterDecimalPointDigit: 1, //小数点以下の入力 ※必要か？
             keyboard: {
@@ -75,7 +81,7 @@ export default function consultInput(){
   return(
     <>
     <ExamineeHeader staffName="両備 花子" managerId={100001} name="リョウビ タロウ" gender={1} age={35} />
-    <ExamSelect examItems={data.examItems[0]} onClick={handleConfirm} />
+    <ExamSelect examItems={data.examItems[0]} onRegisterPressed={1} onClick={handleConfirm} />
     <CommonFooter/>
     </>
   )
