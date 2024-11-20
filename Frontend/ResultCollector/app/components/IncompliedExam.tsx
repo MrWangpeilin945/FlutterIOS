@@ -39,7 +39,7 @@ export default function IncompliedExam({
           bg={"green02"}
           // Todo CSS増やして良いか確認
         >
-          <Text size="sm" c="black" fw="550">
+          <Text size="sm" c="black" fw="500">
             {name.length > 10
               ? `${name.slice(0, 10)}...さんの未受診検査項目はこちらです。`
               : `${name}さんの未受診検査項目です。`}
