@@ -54,19 +54,18 @@ export default function ExamSelect({
     }
     return "";
   });
-  const [errorMessages, setErrorMessages] = useState([""]);
-
-
   //TODO：エラーメッセージの形式が未確定のため決定次第、修正予定
   // errorMessagesをexamItemsに基づいて設定
-  useEffect(() => {
+  const [errorMessages, setErrorMessages] = useState<string[]>(() =>{
     if (examItems.errorMessages) {
       const extractedValues = examItems.errorMessages.map(
         (error: { value: string }) => error.value,
       );
-      setErrorMessages(extractedValues);
+      return extractedValues;
     }
-  }, [examItems.errorMessages]);
+    return [""];
+  });
+
 
   // selectedが空の時にエラーメッセージを追加
   useEffect(() => {
