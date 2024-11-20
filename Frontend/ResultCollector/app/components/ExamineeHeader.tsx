@@ -1,8 +1,7 @@
-import { Box, Button, Center, Dialog, Flex, Grid, GridCol, Title } from "@mantine/core";
+import { Box, Button, Dialog, Flex, Title } from "@mantine/core";
 import { useClickOutside, useDisclosure } from "@mantine/hooks";
 import { useNavigate } from "@remix-run/react";
 import { IconHomeFilled, IconUserFilled } from "@tabler/icons-react";
-import styles from "~/styles/common.module.css";
 
 type HeaderProps = {
   staffName: string;
@@ -10,10 +9,15 @@ type HeaderProps = {
   name: string;
   age: number;
   gender: number;
-  
 };
 
-export default function ExamineeHeader({ staffName, managerId, name, age, gender }: HeaderProps) {
+export default function ExamineeHeader({
+  staffName,
+  managerId,
+  name,
+  age,
+  gender,
+}: HeaderProps) {
   const navigate = useNavigate();
   const [opened, { toggle, close: hide }] = useDisclosure(false);
 
@@ -24,24 +28,27 @@ export default function ExamineeHeader({ staffName, managerId, name, age, gender
     <Box bg={gender === 1 ? "malePrimary" : "femalePrimary"} py="10">
       <Flex justify="space-between" align="center" px="md">
         {/* ユーザアイコン */}
-        <Button  bg="white" c={gender === 1 ? "maleSecondary" : "femaleSecondary"} onClick={toggle}>
+        <Button
+          bg="white"
+          c={gender === 1 ? "maleSecondary" : "femaleSecondary"}
+          onClick={toggle}
+        >
           <IconUserFilled size={"2.3rem"} />
         </Button>
         {/* 受診番号、受診者名、年齢 */}
-          <Title fw={500}>
+        <Title fw={500}>
           {managerId} {name}({age})
-
-          </Title>
+        </Title>
         {/* ホームボタン */}
-          <Button
-            bg="white" 
-            c={gender === 1 ? "maleSecondary" : "femaleSecondary"}
-            leftSection={<IconHomeFilled size={"1.7rem"} />}
-            w={150}
-            onClick={() => navigate("/")}
-          >
-            ホーム
-          </Button>
+        <Button
+          bg="white"
+          c={gender === 1 ? "maleSecondary" : "femaleSecondary"}
+          leftSection={<IconHomeFilled size={"1.7rem"} />}
+          w={150}
+          onClick={() => navigate("/")}
+        >
+          ホーム
+        </Button>
       </Flex>
       <div ref={closeMenu}>
         <Dialog
