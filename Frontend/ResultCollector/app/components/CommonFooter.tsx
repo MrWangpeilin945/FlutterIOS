@@ -26,8 +26,8 @@ export default function CommonFooter({ items }: FooterProps) {
       {/*横並びにボタンを4つ配置*/}
       <Box h={60} className={styles.footer}>
         <Grid className={styles.footer}>
-          {setItems?.map((item) => (
-            <GridCol key={crypto.randomUUID()} span={3} p={0}>
+          {setItems?.map((item, index) => (
+            <GridCol key={index} span={3} p={0}>
               <Button
                 className={styles["footer-button-text"]}
                 fullWidth
