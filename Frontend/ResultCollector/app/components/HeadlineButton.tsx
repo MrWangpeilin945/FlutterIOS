@@ -28,8 +28,8 @@ export default function HeadlineButton({
       >
         <div>
           <Title order={1}>【{title}】</Title>
-          {elements?.map((elem) => (
-            <Text key={crypto.randomUUID()} size="lg" fw={700}>
+          {elements?.map((elem, index) => (
+            <Text key={index} size="lg" fw={700}>
               {elem}
             </Text>
           ))}
