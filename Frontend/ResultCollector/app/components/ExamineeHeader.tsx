@@ -1,49 +1,80 @@
-import { Box, Button, Center, Flex, Grid, GridCol, Title } from "@mantine/core";
+import { Box, Button, Dialog, Flex, Title,Text } from "@mantine/core";
+import { useClickOutside, useDisclosure } from "@mantine/hooks";
 import { useNavigate } from "@remix-run/react";
-import styles from "~/styles/common.module.css";
+import { IconHomeFilled, IconUserFilled } from "@tabler/icons-react";
 
 type HeaderProps = {
-  id: number;
+  staffName: string;
+  managerId: number;
   name: string;
-  gender: string;
   age: number;
+  gender: number;
 };
 
-export default function ExamineeHeader({ id, name, gender, age }: HeaderProps) {
+export default function ExamineeHeader({
+  staffName,
+  managerId,
+  name,
+  age,
+  gender,
+}: HeaderProps) {
   const navigate = useNavigate();
+  const [opened, { toggle, close: hide }] = useDisclosure(false);
+
+  // ダイアログ以外の部分がクリックされると非表示に
+  const closeMenu = useClickOutside(hide);
+
   return (
-    <Box className={styles["basic-blue"]} py="7">
-      <header>
-        <Grid justify="space-between" align="center" px="md" gutter={0}>
-          {/* 管理番号 */}
-          <GridCol span="content" offset={2}>
-            <Title h={40} order={2} fw={500} bg="rgba(29, 163, 132, 1)" px={10}>
-              {id}
-            </Title>
-          </GridCol>
-          {/* 受診者名 */}
-          <GridCol span={4}>
-            <Title fw={500}>
-              <Center>
-                {name}({age})
-              </Center>
-            </Title>
-          </GridCol>
-          {/* ホームボタン */}
-          <GridCol span="content" offset={2}>
-            {/* ホームボタン */}
-            <Button
-              w={80}
-              h={40}
-              variant="fill"
-              bg="#396B9E"
-              onClick={() => navigate("/")}
-            >
-              ホーム
-            </Button>
-          </GridCol>
-        </Grid>
-      </header>
+    <Box bg={gender === 1 ? "malePrimary" : "femalePrimary"} py="10">
+      <Flex justify="space-between" align="center" px="md">
+        {/* ユーザアイコン */}
+        <Button
+          bg="white"
+          c={gender === 1 ? "maleSecondary" : "femaleSecondary"}
+          onClick={toggle}
+        >
+          <IconUserFilled size={"2.3rem"} />
+        </Button>
+        {/* 受付番号、受診者名、年齢 */}
+        <Title fw={500}>
+          {managerId} {name}({age})
+        </Title>
+        {/* ホームボタン */}
+        <Button
+          bg="white"
+          c={gender === 1 ? "maleSecondary" : "femaleSecondary"}
+          leftSection={<IconHomeFilled size={"1.7rem"} />}
+          w={150}
+          onClick={() => navigate("/home")}
+        >
+          ホーム
+        </Button>
+      </Flex>
+      <div ref={closeMenu}>
+        <Dialog
+          opened={opened}
+          title="ダイアログ"
+          position={{ top: 50, left: 10 }}
+          onClose={hide}
+          w="auto"
+          radius="md"
+        >
+        <Flex align="center" direction="column" gap="md">
+          <Text>管理者　{staffName}</Text>
+          {/* ログアウトボタン */}
+          {/* ToDo:ログアウト時の処理は未実装 */}
+          <Button
+            color="primary"
+            variant="outline"
+            w={200}
+            radius="xl"
+            onClick={() => navigate("/login")}
+          >
+            ログアウト
+          </Button>
+          </Flex>
+        </Dialog>
+      </div>
     </Box>
   );
 }
