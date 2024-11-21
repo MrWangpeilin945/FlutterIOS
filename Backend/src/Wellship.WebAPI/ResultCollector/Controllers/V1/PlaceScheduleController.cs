@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Requests;
@@ -89,6 +90,22 @@ public class PlaceScheduleController : ControllerBase
                                                           [FromBody] PlaceScheduleLockingRequest placeScheduleLockingRequest)
     {
         _placeScheduleUsecase.UpdatePlaceScheduleLockingStatus();
+        return Ok();
+    }
+
+    /// <summary>
+    /// 会場日程のデータ出力状況を更新する
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpPut]
+    [Route("api/v{version:apiVersion}/placeSchedules/{placeScheduleId}/placeScheduleResultExportStatus")]
+    public IActionResult UpdatePlaceScheduleResultExportStatus([FromRoute][Required] int placeScheduleId,
+                                                          [FromBody] PlaceScheduleLockingRequest placeScheduleLockingRequest)
+    {
+        _placeScheduleUsecase.UpdatePlaceScheduleResultExportStatus();
         return Ok();
     }
 }

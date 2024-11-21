@@ -27,4 +27,9 @@ public interface IPlaceScheduleUsecase
     /// 会場ロック状態を更新する
     /// </summary>
     public void UpdatePlaceScheduleLockingStatus();
+
+    /// <summary>
+    /// 会場日程の出力状況を変更する
+    /// </summary>
+    public void UpdatePlaceScheduleResultExportStatus();
 }

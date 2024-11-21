@@ -86,23 +86,6 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 検査結果の連携状態を変更する
-    /// </summary>
-    /// <returns></returns>
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpPut]
-    [Route("api/v{version:apiVersion}/consult/{consultNumber}/integrationStatus")]
-    public IActionResult ChangeIntegrationStatus([FromRoute][Required] string consultNumber,
-                                                 [FromBody] IntegrationStatusRequest integrationStatusRequest)
-    {
-        _consultUsecase.ChangeIntegrationStatus();
-        return Ok();
-    }
-
-    /// <summary>
     /// 検査の実施有無と中止理由を登録する
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK)]
