@@ -38,24 +38,22 @@
 [source,json]
 ----
 {
-  "results": {
-    "examMenuId" : 10,
-    "examResults" : [
-      {
-        "examItemId": 12,
-        "examItemDetails" : [
-          {
-            "examItemDetailId": 1,
-            "value" : "120"
-          }.
-          {
-            "examItemDetailId": 2,
-            "value" : ""
-          }
-        ]
-      }
-    ]
-  }  
+  "examMenuId" : 10,
+  "examResults" : [
+    {
+      "examItemId": 12,
+      "examItemDetails" : [
+        {
+          "examItemDetailId": 1,
+          "value" : "120"
+        }.
+        {
+          "examItemDetailId": 2,
+          "value" : ""
+        }
+      ]
+    }
+  ]
 }
 ----
 
