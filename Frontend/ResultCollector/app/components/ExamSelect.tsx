@@ -44,6 +44,11 @@ export default function ExamSelect({
   onRegisterPressed,
   onClick,
 }: SelectProps) {
+  // 配列の要素がない時は空を返す
+  if (examItems.examItemDetails?.length === 0) {
+    return null;
+  }
+
   const [selected, setSelected] = useState(() => {
     const examItemDetail = examItems.examItemDetails[0];
     if (examItemDetail.value && examItemDetail.value !== "") {
