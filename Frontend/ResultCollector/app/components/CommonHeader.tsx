@@ -1,7 +1,7 @@
+import { Box, Button, Center, Dialog, Flex, Title } from "@mantine/core";
+import { useClickOutside, useDisclosure } from "@mantine/hooks";
 import { useNavigate } from "@remix-run/react";
-import { Box, Button, Center, Flex, Title, Dialog } from "@mantine/core";
-import { useDisclosure, useClickOutside } from "@mantine/hooks";
-import { IconUserFilled, IconHomeFilled } from "@tabler/icons-react";
+import { IconHomeFilled, IconUserFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
 
 type HeaderProps = {
@@ -36,7 +36,7 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
           className={styles["reverse-green-button"]}
           leftSection={<IconHomeFilled size={"1.7rem"} />}
           w={150}
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/home")}
         >
           ホーム
         </Button>
@@ -44,14 +44,13 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
       <div ref={closeMenu}>
         <Dialog
           opened={opened}
-          title="ダイアログ"
+          title=""
           position={{ top: 50, left: 10 }}
           onClose={hide}
           w={200}
         >
           {staffName}
           {/* ログアウトボタン */}
-          {/* ToDo:ログアウト時の処理は未実装 */}
           <Button
             className={styles[""]}
             color="grey"
