@@ -2,26 +2,23 @@ import { Box, Button, Grid, GridCol } from "@mantine/core";
 import { useNavigate } from "@remix-run/react";
 import styles from "~/styles/common.module.css";
 
-type footerProps = {
+type FooterProps = {
   items?: {
     label: string;
     action: () => void;
   }[];
 };
 
-export default function CommonFooter({ items }: footerProps) {
+export default function CommonFooter({ items }: FooterProps) {
   const navigate = useNavigate();
   let setItems = [{ label: "戻る", action: () => navigate(-1) }];
-  if (items) {
-    if (items.length <= 3) {
-      setItems = setItems.concat(items);
-    }
-  } else {
-    setItems = setItems.concat(
-      { label: "", action: () => {} },
-      { label: "", action: () => {} },
-      { label: "", action: () => {} },
-    );
+  const dummyItem = [{ label: "", action: () => {} }];
+
+  if (items && items.length <= 3) {
+    setItems = setItems.concat(items);
+  }
+  for (let i = setItems.length; i <= 3; i++) {
+    setItems = setItems.concat(dummyItem);
   }
 
   return (
