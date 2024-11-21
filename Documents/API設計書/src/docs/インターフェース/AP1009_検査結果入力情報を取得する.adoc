@@ -2,6 +2,7 @@
 
 === 概要
 
+* 検査結果入力画面から利用する
 * 検査結果入力画面を構成するための情報を取得する
 
 === URI
@@ -15,36 +16,113 @@
 
 === パスパラメータ
 
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|consultNumber
+|Yes
+|string
+|受診番号
+|`012345678`
+
+|===
+
 === クエリパラメータ
 
 [cols="2,1,1,4,2" options="header"]
 |===
 |名称|必須|型|説明|具体例
 
-|
-|
-|
-|
-|
+|examMenuId
+|Yes
+|number
+|検査メニューID
+|3
 
 |===
 
 === リクエストボディ
 
-[source,json]
-----
-
-----
+なし
 
 === レスポンスボディ
 
 [source,json]
 ----
-
+{
+  "consultNumber": "012345678",
+  "examinee" : {
+    "receptionNumber" : 10,
+    "kanaName" : "リョウビ　タロウ",
+    "sex" : 1,
+    "examDateAge" : 49
+  },
+  "relatedExamItems" : [
+    {
+        "examItemName" : "診察",
+        "examResult" : "所見なし"
+    }
+  ],
+  "examItemGroups" :[
+    {
+      "type" : 1,
+      "examItems" : [
+        {
+          "positionNumber" : 1,
+          "examItemId" : 101,
+          "name" : "身長",
+          "examItemDetails" : [
+            {
+              "positionNumber" : 1,
+              "examItemDetailId" : 1001,
+              "equipmentLabel" : "Height",
+              "name" : "身長",
+              "value" : "157.0",
+              "prevValue" : "155.5",
+              "unit" : "cm",
+              "type" : 1, 
+              "cancelReasonId" : null,
+              "integerLength" : 3,
+              "decimalLength" : 1,
+              "keyboard" : {
+                "keyboardType" : 1,
+                "values" : ["0.1" ,"0.2" ,"0.3"]
+              },
+              "examItemDetailOptions" : [
+                {
+                  "orderNumber" : 1,
+                  "code" : "100",
+                  "name" : "メガネ"
+                }
+              ],
+              "examNormalValueRanges" : [
+                {
+                  "errorLevel" : 4,
+                  "maxValue" : 999.9,
+                  "minValue" : 10.0
+                }
+              ]
+            }
+          ],
+          "examRegstResults" : [
+            { "errorLevel" : 2, 
+              "description" : "正常値範囲外です。"
+            } 
+          ]
+        }
+      ]
+    }
+  ]
+}
 ----
 
 === ステータスコード
 
 * 200 OK
+* 400 BadRequest
+** 指定した受診番号の形式が不正
 * 401 Unauthorized
 ** JWT認証に失敗
+* 404 NotFound
+** 指定した受診が存在しない
