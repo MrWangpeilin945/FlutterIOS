@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, Flex, Title } from "@mantine/core";
+import { Box, Button, Dialog, Flex, Title,Text } from "@mantine/core";
 import { useClickOutside, useDisclosure } from "@mantine/hooks";
 import { useNavigate } from "@remix-run/react";
 import { IconHomeFilled, IconUserFilled } from "@tabler/icons-react";
@@ -35,7 +35,7 @@ export default function ExamineeHeader({
         >
           <IconUserFilled size={"2.3rem"} />
         </Button>
-        {/* 受診番号、受診者名、年齢 */}
+        {/* 受付番号、受診者名、年齢 */}
         <Title fw={500}>
           {managerId} {name}({age})
         </Title>
@@ -45,7 +45,7 @@ export default function ExamineeHeader({
           c={gender === 1 ? "maleSecondary" : "femaleSecondary"}
           leftSection={<IconHomeFilled size={"1.7rem"} />}
           w={150}
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/home")}
         >
           ホーム
         </Button>
@@ -56,20 +56,23 @@ export default function ExamineeHeader({
           title="ダイアログ"
           position={{ top: 50, left: 10 }}
           onClose={hide}
-          w={200}
+          w="auto"
+          radius="md"
         >
-          {staffName}
+        <Flex align="center" direction="column" gap="md">
+          <Text>管理者　{staffName}</Text>
           {/* ログアウトボタン */}
           {/* ToDo:ログアウト時の処理は未実装 */}
           <Button
-            color="grey"
+            color="primary"
             variant="outline"
-            w={150}
-            radius="ms"
+            w={200}
+            radius="xl"
             onClick={() => navigate("/login")}
           >
             ログアウト
           </Button>
+          </Flex>
         </Dialog>
       </div>
     </Box>
