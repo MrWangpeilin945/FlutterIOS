@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Group, Text, Flex, Paper, Title } from "@mantine/core";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
+import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 
 type SelectProps = {
   //Orvalで生成したschemaを参照予定
@@ -61,7 +62,7 @@ export default function ExamSelect({
   });
   //TODO：エラーメッセージの形式が未確定のため決定次第、修正予定
   // errorMessagesをexamItemsに基づいて設定
-  const [errorMessages, setErrorMessages] = useState<string[]>(() =>{
+  const [errMessages, setErrMessages] = useState<string[]>(() =>{
     if (examItems.errorMessages) {
       const extractedValues = examItems.errorMessages.map(
         (error: { value: string }) => error.value,
@@ -74,13 +75,13 @@ export default function ExamSelect({
 
   // selectedが空の時にエラーメッセージを追加
   useEffect(() => {
-    const errorMessage = `${examItems.examItemName}は必須項目です`;
+    const errorMessage = getErrorMessage(errorMessages.required, `${examItems.examItemName}は`);
 
     if (onRegisterPressed === 1 && selected === "") {
-      setErrorMessages((items) => [...items, errorMessage]);
+      setErrMessages((items) => [...items, errorMessage]);
     } else {
       // selectedが空でなくなった場合、エラーメッセージを削除
-      setErrorMessages((prevErrors) =>
+      setErrMessages((prevErrors) =>
         prevErrors.filter((message) => message !== errorMessage),
       );
     }
@@ -135,7 +136,7 @@ export default function ExamSelect({
       </Group>
       
       {/* エラーメッセージを表示 */}
-      {errorMessages.map((error,index) => (
+      {errMessages.map((error,index) => (
         <Group key={index} c="warning">
           <IconExclamationCircleFilled size={"1.7rem"} />
           <Text>{error}</Text>
