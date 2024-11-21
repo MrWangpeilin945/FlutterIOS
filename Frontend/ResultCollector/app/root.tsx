@@ -1,7 +1,3 @@
-import { customTheme } from "~/customTheme";
-import "@mantine/core/styles.css";
-import "./styles/global.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Links,
   Meta,
@@ -10,8 +6,12 @@ import {
   ScrollRestoration,
   useNavigate,
 } from "@remix-run/react";
-import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { useEffect } from "react";
+import "@mantine/core/styles.css";
+import "./styles/global.css";
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { customTheme } from "~/customTheme";
 import { setupAxiosInterceptors } from "~/utils/axiosInstance";
 
 const queryClient = new QueryClient();
