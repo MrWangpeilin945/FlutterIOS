@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Group, Text, Flex, Paper, Title } from "@mantine/core";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 
-type selectProps = {
+type SelectProps = {
   //Orvalで生成したschemaを参照予定
   examItems: {
     positionNumber: number;
@@ -43,7 +43,7 @@ export default function ExamSelect({
   examItems,
   onRegisterPressed,
   onClick,
-}: selectProps) {
+}: SelectProps) {
   const [selected, setSelected] = useState(() => {
     const examItemDetail = examItems.examItemDetails[0];
     if (examItemDetail.value && examItemDetail.value !== "") {
@@ -63,7 +63,7 @@ export default function ExamSelect({
       );
       return extractedValues;
     }
-    return [""];
+    return [];
   });
 
 
