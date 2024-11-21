@@ -59,13 +59,4 @@ public class ConsultUsecase : IConsultUsecase
     {
 
     }
-
-    /// <summary>
-    /// 検査結果の連携状態を変更する
-    /// </summary>
-    public void ChangeIntegrationStatus()
-    {
-
-    }
-
 }

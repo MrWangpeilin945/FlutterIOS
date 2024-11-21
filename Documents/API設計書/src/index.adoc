@@ -1,7 +1,7 @@
 = WELLSHIP API設計書
 :author: 両備システムズ ヘルスケアソリューションカンパニー ウェルネスビジネス事業部
-:revdate: 2024-11-14
-:revnumber: 0.7
+:revdate: 2024-11-21
+:revnumber: 0.8
 :doctype: book
 :lang: ja
 :toc: left

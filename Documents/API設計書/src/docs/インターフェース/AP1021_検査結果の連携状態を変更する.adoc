@@ -2,14 +2,16 @@
 
 === 概要
 
-* 受診単位の連携状態を変更する
+* 会場日程単位の連携状態を変更する
 * 結果出力後に連携状態を引き戻して再処理したいときなどに使用する
+* 未出力にする場合、`placeScheduleResultExportStatus : 11`を送信する
+* バックエンドでは、受診ごとに持っているステータス（`consultResultExportStatus`）を更新する
 
 === URI
 
 [source]
 ----
-[PUT] /consult/{consultNumber}/integrationStatus
+[PUT] /placeSchedules/{placeScheduleId}/placeScheduleResultExportStatus
 ----
 
 === リクエストヘッダー
@@ -20,11 +22,11 @@
 |===
 |名称|必須|型|説明|具体例
 
-|consultNumber
+|placeScheduleId
 |Yes
-|string
-|受診番号
-|00123
+|int
+|会場日程ID
+|23
 
 |===
 
@@ -37,8 +39,8 @@
 [source,json]
 ----
 {
-  "consultNumber": "15",
-  "integrationStatus": 1
+  "placeScheduleId": 15,
+  "placeScheduleResultExportStatus": 1
 }
 ----
 

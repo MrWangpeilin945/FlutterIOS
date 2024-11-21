@@ -59,4 +59,12 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     {
 
     }
+
+    /// <summary>
+    /// 会場日程の出力状況を変更する
+    /// </summary>
+    public void UpdatePlaceScheduleResultExportStatus()
+    {
+
+    }
 }
