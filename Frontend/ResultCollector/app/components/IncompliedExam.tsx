@@ -1,8 +1,8 @@
 import React from "react";
-import { Box, Paper, Title, Text, Flex, Group } from "@mantine/core";
+import { Box, Paper, Text } from "@mantine/core";
 import styles from "~/styles/common.module.css";
 
-type incompliedExamProps = {
+type IncompliedExamProps = {
   name: string;
   incompliesExam: string[];
 };
@@ -10,43 +10,49 @@ type incompliedExamProps = {
 export default function IncompliedExam({
   name,
   incompliesExam,
-}: incompliedExamProps) {
+}: IncompliedExamProps) {
   function concatItems(items: string[]): string {
-    const resultArray = [];
-
+    let resultSt = "";
+    let count = 0;
     for (let i = 0; i < items.length; i++) {
-      resultArray.push(items[i]);
-
-      if ((i + 1) % 6 === 0 && i !== items.length - 1) {
-        // 6要素ごとに改行文字を追加
-        resultArray.push("、\n");
-      } else if (i !== items.length - 1) {
-        // 要素の間で句読点追加
-        resultArray.push("、");
+      count += items[i].length + 1;
+      // 足した後の文章が38文字を超えていた場合、改行
+      if (count > 38) {
+        resultSt += `\n${items[i]}、`;
+        count = items[i].length + 1;
+      } else {
+        resultSt += `${items[i]}、`;
       }
     }
-
-    return resultArray.join("");
+    return resultSt;
   }
 
   return (
-    <Box p="md" w={800}>
+    <Box p="md" w={924}>
       <Paper radius="lg" bg={"white"}>
         <Box
-          className={styles["custome-box"]}
+          style={{
+            // Todo styleを指定して良いか確認
+            borderTopLeftRadius: "inherit",
+            borderTopRightRadius: "inherit",
+          }}
           pl="sm"
           p="md"
           bg={"green02"}
-          // Todo CSS増やして良いか確認
         >
-          <Text size="sm" c="black" fw="500">
-            {name.length > 10
-              ? `${name.slice(0, 10)}...さんの未受診検査項目はこちらです。`
-              : `${name}さんの未受診検査項目です。`}
+          <Text size="xs" c="black" fw="500">
+            {name.length > 18
+              ? `${name.slice(0, 18)}...さんの未受診検査項目はこちらです。`
+              : `${name}さんの未受診検査項目はこちらです。`}
           </Text>
         </Box>
         <Box pl="sm" p="md">
-          <Text className={styles["white-wrap"]} size="sm" c="black" fw="500">
+          <Text
+            className={styles["text-multiline"]}
+            size="xs"
+            c="black"
+            fw="500"
+          >
             {concatItems(incompliesExam)}
           </Text>
         </Box>
