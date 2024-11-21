@@ -1,15 +1,18 @@
 {
-	"files": {
-		"ignore": ["./public/mockServiceWorker.js"]
-	},
-	"formatter": {
-		"indentStyle": "space"
-	},
-    "linter":{
-        "rules":{
-            "suspicious":{
-                "noArrayIndexKey": "off"
-            }
-        }
+  "files": {
+    "ignore": ["./public/mockServiceWorker.js"]
+  },
+  "formatter": {
+    "indentStyle": "space"
+  },
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noArrayIndexKey": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off"
+      }
     }
+  }
 }
