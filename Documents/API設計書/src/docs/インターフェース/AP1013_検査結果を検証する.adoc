@@ -46,13 +46,11 @@
         "examItemDetails" : [
           {
             "examItemDetailId": 1,
-            "value" : "120",
-            "cancelReasonId": null,
+            "value" : "120"
           }.
           {
             "examItemDetailId": 2,
-            "value" : null,
-            "cancelReasonId": 3
+            "value" : ""
           }
         ]
       }
