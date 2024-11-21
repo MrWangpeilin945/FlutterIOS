@@ -12,19 +12,22 @@ export default function IncompliedExam({
   incompliesExam,
 }: IncompliedExamProps) {
   function concatItems(items: string[]): string {
-    let resultSt = "";
+    let result = "";
     let count = 0;
-    for (let i = 0; i < items.length; i++) {
-      count += items[i].length + 1;
-      // 足した後の文章が38文字を超えていた場合、改行
-      if (count > 38) {
-        resultSt += `\n${items[i]}、`;
-        count = items[i].length + 1;
-      } else {
-        resultSt += `${items[i]}、`;
+    for (const item of items) {
+      const newCount = count + item.length + 1;
+      if (newCount > 38) {
+        result += "\n";
+        count = 0;
       }
+      count += item.length + 1;
+      result += `${item}、`;
     }
-    return resultSt;
+    // 最後の"、"を削除
+    if (result.length > 0) {
+      result = result.slice(0, -1);
+    }
+    return result;
   }
 
   return (
@@ -32,7 +35,6 @@ export default function IncompliedExam({
       <Paper radius="lg" bg={"white"}>
         <Box
           style={{
-            // Todo styleを指定して良いか確認
             borderTopLeftRadius: "inherit",
             borderTopRightRadius: "inherit",
           }}
@@ -41,9 +43,8 @@ export default function IncompliedExam({
           bg={"green02"}
         >
           <Text size="xs" c="black" fw="500">
-            {name.length > 18
-              ? `${name.slice(0, 18)}...さんの未受診検査項目はこちらです。`
-              : `${name}さんの未受診検査項目はこちらです。`}
+            {name?.length > 18 ? `${name.slice(0, 18)}...` : name}
+            さんの未受診検査項目はこちらです。
           </Text>
         </Box>
         <Box pl="sm" p="md">
