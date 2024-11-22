@@ -103,7 +103,7 @@ export default function ExamSelect({
   const selectors = examItems.examItemDetails[0].selectors;
 
   return (
-    <>
+    <Flex justify="flex-start" align="flex-start" direction="column">
       <Flex mb="xs">
         <Paper bg="gray02" c="white" radius="lg" px="md" py="10">
           <Title order={1} fw={500}>
@@ -134,14 +134,14 @@ export default function ExamSelect({
           );
         })}
       </Group>
-      
+
       {/* エラーメッセージを表示 */}
-      {errMessages.map((error,index) => (
+      {errMessages.map((error, index) => (
         <Group key={index} c="warning">
           <IconExclamationCircleFilled size={"1.7rem"} />
           <Text>{error}</Text>
         </Group>
       ))}
-    </>
+    </Flex>
   );
 }
