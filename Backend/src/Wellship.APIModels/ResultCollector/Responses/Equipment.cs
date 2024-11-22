@@ -8,31 +8,32 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class Equipment
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public Equipment(int equipmentId, string equipmentName, int examMenuId)
-    {
-        EquipmentId = equipmentId;
-        EquipmentName = equipmentName;
-        ExamMenuId = examMenuId;
-    }
-
-    /// <summary>
     /// 検査機器ID
     /// </summary>
     [JsonPropertyName("equipmentId")]
-    public int EquipmentId { get; }
+    public required int EquipmentId { get; init; }
 
     /// <summary>
     /// 検査機器名
     /// </summary>
     [JsonPropertyName("equipmentName")]
-    public string EquipmentName { get; }
+    public required string EquipmentName { get; init; }
 
     /// <summary>
     /// 検査メニューID
     /// </summary>
     [JsonPropertyName("examMenuId")]
-    public int ExamMenuId { get; }
+    public required int ExamMenuId { get; init; }
 
+    /// <summary>
+    /// アプリ起動URL
+    /// </summary>
+    [JsonPropertyName("appLaunchUrl")]
+    public required int AppLaunchUrl { get; init; }
+
+    /// <summary>
+    /// 処理スクリプトURL
+    /// </summary>
+    [JsonPropertyName("processingScriptUrl")]
+    public required string ProcessingScriptUrl { get; init; }
 }

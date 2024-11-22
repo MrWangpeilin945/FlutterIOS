@@ -110,3 +110,11 @@ INSERT INTO organizations(organization_id,organization_code,name,order_number,cr
   , (4,'21','テストD株式会社',4,CURRENT_TIMESTAMP,'init')
   , (5,'22','テストE株式会社',5,CURRENT_TIMESTAMP,'init')
   , (6,'23','一般社団法人テストF',6,CURRENT_TIMESTAMP,'init');
+
+-- 検査機器
+INSERT INTO equipments(equipment_id,name,exam_menu_id,app_launch_url,processing_script_url,created_at,created_by) VALUES 
+    (1,'EQ001',1,'wsc://abcde','https://example.com/sctipts/eq001.js',CURRENT_TIMESTAMP,'init')
+  , (2,'EQ002',1,'wsc://abcde','https://example.com/sctipts/eq002.js',CURRENT_TIMESTAMP,'init')
+  , (3,'EQ003',2,'wsc://abcde','https://example.com/sctipts/eq003.js',CURRENT_TIMESTAMP,'init')
+  , (4,'EQ004',3,'wsc://abcde','https://example.com/sctipts/eq004.js',CURRENT_TIMESTAMP,'init')
+  , (5,'EQ005',5,'wsc://abcde','https://example.com/sctipts/eq005.js',CURRENT_TIMESTAMP,'init');

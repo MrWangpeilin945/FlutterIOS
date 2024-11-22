@@ -533,15 +533,17 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=2150
-Top=700
+Top=650
 Field="検査機器ID","equipment_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査機器名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査メニューID","exam_menu_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="アプリ起動URL","app_launch_url","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="処理スクリプトURL","processing_script_url","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241030111219
-Position="MAIN",2150,700
+ModifiedDateTime=20241122211733
+Position="MAIN",2150,650
 ZOrder=29
 
 [Entity]
