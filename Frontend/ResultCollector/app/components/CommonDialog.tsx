@@ -26,6 +26,7 @@ export default function CommonDialog({
     >
       <Title
         className={styles["text-wrap"]}
+        size="lg"
         maw={400} // 最大幅の制限
         mx="md"
         my="xl"
