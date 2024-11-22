@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Paper, Text } from "@mantine/core";
+import { Flex, Box, Paper, Text } from "@mantine/core";
 import styles from "~/styles/common.module.css";
 
 type IncompliedExamProps = {
@@ -31,33 +31,35 @@ export default function IncompliedExam({
   }
 
   return (
-    <Box p="md" w={924}>
-      <Paper radius="lg" bg={"white"}>
-        <Box
-          style={{
-            borderTopLeftRadius: "inherit",
-            borderTopRightRadius: "inherit",
-          }}
-          pl="sm"
-          p="md"
-          bg={"green02"}
-        >
-          <Text size="xs" c="black" fw="500">
-            {name?.length > 18 ? `${name.slice(0, 18)}...` : name}
-            さんの未受診検査項目はこちらです。
-          </Text>
-        </Box>
-        <Box pl="sm" p="md">
-          <Text
-            className={styles["text-multiline"]}
-            size="xs"
-            c="black"
-            fw="500"
+    <Flex align="flex-start" direction="column">
+      <Box p="md" w={924}>
+        <Paper radius="lg" bg={"white"}>
+          <Box
+            style={{
+              borderTopLeftRadius: "inherit",
+              borderTopRightRadius: "inherit",
+            }}
+            pl="sm"
+            p="md"
+            bg={"green02"}
           >
-            {concatItems(incompliesExam)}
-          </Text>
-        </Box>
-      </Paper>
-    </Box>
+            <Text size="xs" c="black" fw="500">
+              {name?.length > 18 ? `${name.slice(0, 18)}...` : name}
+              さんの未受診検査項目はこちらです。
+            </Text>
+          </Box>
+          <Box pl="sm" p="md">
+            <Text
+              className={styles["text-multiline"]}
+              size="xs"
+              c="black"
+              fw="500"
+            >
+              {concatItems(incompliesExam)}
+            </Text>
+          </Box>
+        </Paper>
+      </Box>
+    </Flex>
   );
 }
