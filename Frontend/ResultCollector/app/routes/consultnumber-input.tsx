@@ -11,7 +11,7 @@ import { consultVerifyConsultNumber } from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
 import CommonHeader from "~/components/CommonHeader";
 import CommonFooter from "~/components/CommonFooter";
-import Keyboard from "~/components/SoftwareKeyboard";
+import Keyboard from "~/components/NumericKeyboard";
 import { ErrorModal } from "~/components/ErrorModal";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import styles from "~/styles/common.module.css";
@@ -139,7 +139,6 @@ export default function consultNumberInput() {
           <Center>
             <div ref={closeKeyBoard}>
               <Keyboard
-                size={150}
                 value={consultNo}
                 onChange={(e: string) => setConsultNo(e)}
                 onConfirm={handleConfirm}
