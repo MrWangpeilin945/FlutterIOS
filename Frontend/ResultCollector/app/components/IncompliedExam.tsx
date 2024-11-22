@@ -4,12 +4,12 @@ import styles from "~/styles/common.module.css";
 
 type IncompliedExamProps = {
   name: string;
-  incompliesExam: string[];
+  incompliedExams: string[];
 };
 
 export default function IncompliedExam({
   name,
-  incompliesExam,
+  incompliedExams,
 }: IncompliedExamProps) {
   function concatItems(items: string[]): string {
     let result = "";
@@ -55,7 +55,7 @@ export default function IncompliedExam({
               c="black"
               fw="500"
             >
-              {concatItems(incompliesExam)}
+              {concatItems(incompliedExams)}
             </Text>
           </Box>
         </Paper>

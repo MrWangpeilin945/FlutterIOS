@@ -173,7 +173,7 @@ export default function consultNumberInput() {
           {/* TODO 確認用のため、後で変更 */}
           <IncompliedExam
             name="あいうえおかきくけこさしすせそたちつてとなにぬねの"
-            incompliesExam={incompliedExams}
+            incompliedExams={incompliedExams}
           />
         </Box>
         <ErrorModal
