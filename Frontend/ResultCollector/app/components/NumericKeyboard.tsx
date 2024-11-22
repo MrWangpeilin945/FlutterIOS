@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import "@mantine/core/styles.css";
 import {
   GridCol,
   Button,
   Grid,
   Box,
-  Text,
 } from "@mantine/core";
 
 type KeyboardProps = {
@@ -80,13 +78,14 @@ export default function NumericKeyboard(props: KeyboardProps) {
                 <Button
                   w={144}
                   h={80}
+                  size="keyboard"
                   radius="md"
                   variant={keyValue === "AC" || keyValue === "確定" ? "filled" : "white"}
                   color={keyValue === "AC" || keyValue === "確定" ? "gray01" : "black"}
                   value={keyValue}
                   onClick={(e) => handlerKeyboardClick(e.currentTarget.value)}
                 >
-                  <Text size="48" >{keyValue}</Text>
+                  {keyValue}
                 </Button>
               </GridCol>
             ))}

@@ -60,6 +60,7 @@ export const customTheme = createTheme({
     md: "28px",
     lg: "30px",
     xl: "32px",
+    keyboard: "48px",
   },
   // 各コンポーネントのカスタマイズ
   components: {
