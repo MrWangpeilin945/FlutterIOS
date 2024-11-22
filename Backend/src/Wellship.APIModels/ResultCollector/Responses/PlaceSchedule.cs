@@ -8,37 +8,26 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class PlaceSchedule
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public PlaceSchedule(int placeScheduleId, int placeId, string placeName, string startTime)
-    {
-        PlaceScheduleId = placeScheduleId;
-        PlaceId = placeId;
-        PlaceName = placeName;
-        StartTime = startTime;
-    }
-
-    /// <summary>
     /// 会場日程ID
     /// </summary>
     [JsonPropertyName("placeScheduleId")]
-    public int PlaceScheduleId { get; set; }
+    public required int PlaceScheduleId { get; init; }
 
     /// <summary>
     /// 会場ID
     /// </summary>
     [JsonPropertyName("placeId")]
-    public int PlaceId { get; set; }
+    public required int PlaceId { get; init; }
 
     /// <summary>
     /// 会場名
     /// </summary>
     [JsonPropertyName("placeName")]
-    public string PlaceName { get; set; } = "";
+    public required string PlaceName { get; init; }
 
     /// <summary>
-    /// 開始時刻
+    /// 開始時刻（HH:mm形式）
     /// </summary>
     [JsonPropertyName("startTime")]
-    public string StartTime { get; set; } = "";
+    public required string StartTime { get; init; }
 }

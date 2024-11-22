@@ -1,5 +1,6 @@
 
 using Ryobi.Wellship.APIModels.Responses;
+using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -54,9 +55,33 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// <summary>
     /// 班を指定して会場日程を取得する
     /// </summary>
-    public Task GetTeamPlaceSchedulesAsync()
+    public async Task<PlaceSchedulePlaces> GetTeamPlaceSchedulesAsync(DateOnly examDate, int teamId)
     {
-        throw new NotImplementedException();
+        var placeSchedules = await _placeScheduleRepository.GetPlaceSchedulesAsync(examDate);
+        var team = placeSchedules.Where(x => x.ExamDate == examDate)
+                                 .Where(x => x.Team.Id == teamId)
+                                 .ToList();
+
+        if (team.Count == 0)
+        {
+            throw new ResourceNotFoundException("会場日程が存在しません。");
+        }
+
+        return new PlaceSchedulePlaces()
+        {
+            TeamId = team.First().Team.Id,
+            TeamName = team.First().Team.Name,
+            ExamDate = team.First().ExamDate,
+            PlaceSchedules = team.OrderBy(x => x.Place.OrderNumber)
+                                 .ThenBy(x => x.StartTime)
+                                 .Select(t => new PlaceSchedule()
+                                 {
+                                     PlaceScheduleId = t.Id,
+                                     PlaceId = t.Place.Id,
+                                     PlaceName = t.Place.Name,
+                                     StartTime = FormatStartTimeString(t.StartTime),
+                                 }).ToArray()
+        };
     }
 
     /// <summary>
@@ -81,5 +106,13 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     public Task UpdatePlaceScheduleResultExportStatusAsync()
     {
         throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// 会場日程の開始時刻文字列（HHmm）を（HH:mm）に変換します。
+    /// </summary>
+    private static string FormatStartTimeString(string startTimeString)
+    {
+        return $"{startTimeString.Substring(0, 2)}:{startTimeString.Substring(2, 2)}";
     }
 }

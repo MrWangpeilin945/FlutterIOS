@@ -56,8 +56,13 @@ public class PlaceScheduleController : ControllerBase
     [Route("api/v{version:apiVersion}/placeSchedules/places")]
     public async Task<IActionResult> GetTeamPlaceSchedulesAsync([FromQuery] string date, [FromQuery] int teamId)
     {
-        await _placeScheduleUsecase.GetTeamPlaceSchedulesAsync();
-        return Ok();
+        if (!DateOnly.TryParse(date, out var dateOnlyDate))
+        {
+            return BadRequest("日付の形式が無効です。yyyy-MM-ddの形式で日付を指定してください。");
+        }
+
+        var results = await _placeScheduleUsecase.GetTeamPlaceSchedulesAsync(dateOnlyDate, teamId);
+        return Ok(results);
     }
 
     /// <summary>
