@@ -10,5 +10,5 @@ public interface IEquipmentUsecase
     /// <summary>
     /// 機器連携設定を取得する
     /// </summary>
-    public Task<EquipmentList> GetEquipmentSettingsAsync(int examMenuId);
+    public Task<EquipmentList> GetEquipmentsAsync(int examMenuId);
 }

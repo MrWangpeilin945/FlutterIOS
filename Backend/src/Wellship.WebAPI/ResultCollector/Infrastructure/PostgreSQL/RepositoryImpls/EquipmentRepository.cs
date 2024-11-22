@@ -35,7 +35,10 @@ public class EquipmentRepository : IEquipmentRepository
             , processing_script_url as ProcessingScriptUrl
         from
             resultcollector.equipments
-        where exam_menu_id = @ExamMenuId;";
+        where
+            exam_menu_id = @ExamMenuId
+        order by
+            EquipmentId;";
 
         var equipments = await connection.QueryAsync<Equipment>(sql, new { ExamMenuId = examMenuId });
         return equipments;

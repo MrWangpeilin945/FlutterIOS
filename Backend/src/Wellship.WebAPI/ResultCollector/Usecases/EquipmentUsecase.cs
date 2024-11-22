@@ -25,7 +25,7 @@ public class EquipmentUsecase : IEquipmentUsecase
     /// <summary>
     /// 機器連携設定を取得する
     /// </summary>
-    public async Task<EquipmentList> GetEquipmentSettingsAsync(int examMenuId)
+    public async Task<EquipmentList> GetEquipmentsAsync(int examMenuId)
     {
         var equipments = await _equipmentRepository.GetEquipmentAsync(examMenuId);
         return new EquipmentList()

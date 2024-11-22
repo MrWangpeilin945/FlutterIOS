@@ -36,7 +36,7 @@ public class EquipmentController : ControllerBase
     [Route("api/v{version:apiVersion}/equipments")]
     public async Task<IActionResult> GetEquipmentSettingsAsync([FromQuery][Required] int examMenuId)
     {
-        var results = await _equipmentUsecase.GetEquipmentSettingsAsync(examMenuId);
+        var results = await _equipmentUsecase.GetEquipmentsAsync(examMenuId);
         return Ok(results);
     }
 }
