@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Responses;
@@ -32,9 +34,9 @@ public class EquipmentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/equipments")]
-    public IActionResult GetEquipmentSettings([FromQuery] int examMenuId)
+    public async Task<IActionResult> GetEquipmentSettingsAsync([FromQuery][Required] int examMenuId)
     {
-        _equipmentUsecase.GetEquipmentSettings();
-        return Ok();
+        var results = await _equipmentUsecase.GetEquipmentSettingsAsync(examMenuId);
+        return Ok(results);
     }
 }
