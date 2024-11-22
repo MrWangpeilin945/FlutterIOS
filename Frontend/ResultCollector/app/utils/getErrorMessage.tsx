@@ -18,9 +18,9 @@ export const errorMessages = {
   maxLength: "{0}文字以下で入力してください。",
   email: "eメールアドレスの形式で入力してください。",
   prohibited: '入力禁止文字 "{0}" が含まれています。',
-  invalid: "の入力形式が間違っています。",
+  invalid: "{0}の入力形式が間違っています。",
   noData: "{0}データが0件でした。",
-  notFound: "が存在しません。",
+  notFound: "{0}存在しません。",
   server: "システム管理者にお問い合わせください。",
 };
 
