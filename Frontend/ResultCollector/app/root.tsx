@@ -22,11 +22,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const redirectToLogin = () => {
     navigate("/login");
   };
-  // Biomeのエラーが出るので、コメントアウトしています。
-  // useEffect(() => {
-  //   // API呼び出し時に401が返ってきたらログイン画面に遷移する処理をaxiosInstanceに引き渡す
-  //   setupAxiosInterceptors(redirectToLogin);
-  // }, []);
+  useEffect(() => {
+    // API呼び出し時に401が返ってきたらログイン画面に遷移する処理をaxiosInstanceに引き渡す
+    setupAxiosInterceptors(redirectToLogin);
+  }, []);
 
   return (
     <html lang="ja">
