@@ -5,7 +5,7 @@ import { useNavigate } from "@remix-run/react";
 import { format } from "date-fns";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { placeScheduleGetTeamPlaceSchedules } from "~/api/wellship";
+import { usePlaceScheduleGetTeamPlaceSchedules } from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
 import CommonDialog from "~/components/CommonDialog";
 import CommonFooter from "~/components/CommonFooter";
@@ -19,41 +19,37 @@ export const meta: MetaFunction = () => {
   return [{ title: "会場選択" }];
 };
 
-export default function placeSelect() {
+export default function PlaceSelect() {
   const navigate = useNavigate();
   const [placesData, setPlacesData] = useState<PlaceSchedulePlaces>();
-  const [isLoading, setIsLoading] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [placeSchedule, setPlaceSchedule] = useAtom(placeScheduleState);
   const [team] = useAtom(teamState);
   const [staff] = useAtom(staffState);
+  const [targetDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const { isFetching, refetch } = usePlaceScheduleGetTeamPlaceSchedules(
+    "1",
+    { date: targetDate, teamId: team?.id },
+    { query: { enabled: false } },
+  );
 
   // AP1004_班を指定して会場日程を取得する
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    setIsLoading(true);
     const fetchPlaceSchedules = async () => {
-      await placeScheduleGetTeamPlaceSchedules("1", {
-        date: format(new Date(), "yyyy-MM-dd"),
-        teamId: team?.id,
-      })
-        .then((result) => {
-          setPlacesData(result.data);
-        })
-        .catch((error) => {
-          if (error.response.status === 400) {
-            setErrorMessage(
-              getErrorMessage(errorMessages.invalid, "必要なパラメータ"),
-            );
-          } else if (error.response.status === 500) {
-            setErrorMessage(getErrorMessage(errorMessages.server));
-          }
-          open();
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      const result = await refetch();
+      if (result.data) {
+        setPlacesData(result.data.data);
+      } else if (result.error) {
+        if (result.error.status === 400) {
+          setErrorMessage(
+            getErrorMessage(errorMessages.invalid, "必要なパラメータ"),
+          );
+        } else if (result.error.status === 500) {
+          setErrorMessage(getErrorMessage(errorMessages.serverError));
+        }
+        open();
+      }
     };
     fetchPlaceSchedules();
   }, []);
@@ -65,7 +61,7 @@ export default function placeSelect() {
     placeScheduleId?: number,
     startTime?: string,
   ) => {
-    if (placeId && placeName && placeScheduleId) {
+    if (placeId !== undefined && placeName && placeScheduleId !== undefined) {
       const placeScheduleData = {
         placeId,
         placeName,
@@ -80,10 +76,10 @@ export default function placeSelect() {
   return (
     <>
       <AuthWrapper>
-        <LoadingOverlay visible={isLoading} />
+        <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="会場選択" staffName={staff?.name || ""} />
         <Container fluid mt={20}>
-          {!isLoading && (
+          {!isFetching && (
             <>
               {placesData?.placeSchedules ? (
                 <Stack>
