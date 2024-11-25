@@ -237,12 +237,37 @@ export const getIntegrationGetExportHistoryMockHandler = (overrideResponse?: Exp
   })
 }
 
+/**
+ * @summary 固定値を返すように変更しています。
+ */
 export const getPlaceScheduleGetTeamsMockHandler = (overrideResponse?: PlaceScheduleTeams | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PlaceScheduleTeams> | PlaceScheduleTeams)) => {
   return http.get('*/api/v:version/placeSchedules/teams', async (info) => {await delay(1000);
   
+    // overrideResponseが未定義の場合に返すモックデータを設定
+    const defaultMockResponse: PlaceScheduleTeams = {
+      teams: [
+        {
+          teamId: 1,
+          teamName: 'Team A',
+          places: [
+            { placeId: 101, placeName: 'Room 101' },
+            { placeId: 102, placeName: 'Room 102' }
+          ]
+        },
+        {
+          teamId: 2,
+          teamName: 'Team B',
+          places: [
+            { placeId: 201, placeName: 'Room 201' },
+            { placeId: 202, placeName: 'Room 202' }
+          ]
+        }
+      ]
+    };
+
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getPlaceScheduleGetTeamsResponseMock()),
+            : defaultMockResponse),
       { status: 200,
         headers: { 'Content-Type': 'application/json' }
       })
