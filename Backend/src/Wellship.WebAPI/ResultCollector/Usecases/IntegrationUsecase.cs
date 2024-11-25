@@ -1,7 +1,4 @@
-
-using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.APIModels.Responses;
-using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -64,7 +61,7 @@ public class IntegrationUsecase : IIntegrationUsecase
                 ExportedAt = x.ExportedAt,
                 ExportedBy = x.ExportedBy
             };
-        }).ToArray();
+        }).OrderByDescending(x => x.ExportedAt).ToArray();
 
         return new ExportHistoryList
         {
