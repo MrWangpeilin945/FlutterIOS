@@ -111,9 +111,9 @@ CREATE TABLE exam_results (
 CREATE TABLE export_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , place_schedule_id integer NOT NULL
-  , dataCount integer NOT NULL
-  , exportedAt timestamp with time zone NOT NULL
-  , exportedBy text NOT NULL
+  , data_count integer NOT NULL
+  , exported_at timestamp with time zone NOT NULL
+  , exported_by text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT export_histories_PKC PRIMARY KEY (id)
@@ -571,9 +571,9 @@ COMMENT ON COLUMN exam_results.created_by IS '作成者';
 COMMENT ON TABLE export_histories IS '検査結果出力履歴';
 COMMENT ON COLUMN export_histories.id IS 'ID';
 COMMENT ON COLUMN export_histories.place_schedule_id IS '会場日程ID';
-COMMENT ON COLUMN export_histories.dataCount IS '出力件数';
-COMMENT ON COLUMN export_histories.exportedAt IS '出力日時';
-COMMENT ON COLUMN export_histories.exportedBy IS '出力者';
+COMMENT ON COLUMN export_histories.data_count IS '出力件数';
+COMMENT ON COLUMN export_histories.exported_at IS '出力日時';
+COMMENT ON COLUMN export_histories.exported_by IS '出力者';
 COMMENT ON COLUMN export_histories.created_at IS '作成日時';
 COMMENT ON COLUMN export_histories.created_by IS '作成者';
 

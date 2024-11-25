@@ -1285,13 +1285,13 @@ Left=2450
 Top=2700
 Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="会場日程ID","place_schedule_id","integer","NOT NULL",,"","",$FFFFFFFF,""
-Field="出力件数","dataCount","integer","NOT NULL",,"","",$FFFFFFFF,""
-Field="出力日時","exportedAt","timestamp with time zone","NOT NULL",,"","",$FFFFFFFF,""
-Field="出力者","exportedBy","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="出力件数","data_count","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="出力日時","exported_at","timestamp with time zone","NOT NULL",,"","",$FFFFFFFF,""
+Field="出力者","exported_by","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241125124733
+ModifiedDateTime=20241125125345
 Position="Main",2450,2700
 ZOrder=76
 
