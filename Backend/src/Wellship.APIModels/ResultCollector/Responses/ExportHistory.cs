@@ -8,59 +8,45 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class ExportHistory
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public ExportHistory(int placeScheduleId, string placeName, int placeScheduleLockingStatus, 
-                           DateOnly examDate, int dataCount, DateTime exportedAt, string exportedBy)
-    {
-        PlaceScheduleId = placeScheduleId;
-        PlaceName = placeName;
-        PlaceScheduleLockingStatus = placeScheduleLockingStatus;
-        ExamDate = examDate;
-        DataCount = dataCount;
-        ExportedAt = exportedAt;
-        ExportedBy = exportedBy;
-    }
-    /// <summary>
     /// 会場日程ID
     /// </summary>
     [JsonPropertyName("placeScheduleId")]
-    public int PlaceScheduleId { get; }
+    public required int PlaceScheduleId { get; init; }
 
     /// <summary>
     /// 会場名
     /// </summary>
     [JsonPropertyName("placeName")]
-    public string PlaceName { get; }
+    public required string PlaceName { get; init; }
 
     /// <summary>
     /// ロック状態
     /// </summary>
     [JsonPropertyName("placeScheduleLockingStatus")]
-    public int PlaceScheduleLockingStatus { get; }
+    public required int PlaceScheduleLockingStatus { get; init; }
 
     /// <summary>
     /// 健診日
     /// </summary>
     [JsonPropertyName("examDate")]
-    public DateOnly ExamDate { get; }
+    public required DateOnly ExamDate { get; init; }
 
     /// <summary>
     /// 項目数
     /// </summary>
     [JsonPropertyName("dataCount")]
-    public int DataCount { get; }
+    public required int DataCount { get; init; }
 
     /// <summary>
     /// 出力日時
     /// </summary>
     [JsonPropertyName("exportedAt")]
-    public DateTime ExportedAt { get; }
+    public required DateTime ExportedAt { get; init; }
 
     /// <summary>
     /// 出力者
     /// </summary>
     [JsonPropertyName("exportedBy")]
-    public string ExportedBy { get; }
+    public required string ExportedBy { get; init; }
 
 }
