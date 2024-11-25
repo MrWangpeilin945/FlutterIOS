@@ -226,6 +226,7 @@ CREATE TABLE consult (
   consult_id integer NOT NULL
   , consult_number text NOT NULL
   , progress_status integer NOT NULL
+  , export_status integer NOT NULL
   , place_schedule_id integer NOT NULL
   , examinee_id integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -654,6 +655,7 @@ COMMENT ON TABLE consult IS '受診';
 COMMENT ON COLUMN consult.consult_id IS '受診ID';
 COMMENT ON COLUMN consult.consult_number IS '受診番号';
 COMMENT ON COLUMN consult.progress_status IS '進捗状況';
+COMMENT ON COLUMN consult.export_status IS '結果出力状況';
 COMMENT ON COLUMN consult.place_schedule_id IS '会場日程ID';
 COMMENT ON COLUMN consult.examinee_id IS '受診者ID';
 COMMENT ON COLUMN consult.created_at IS '作成日時';

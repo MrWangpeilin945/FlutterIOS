@@ -308,13 +308,14 @@ Top=2100
 Field="受診ID","consult_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="受診番号","consult_number","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="進捗状況","progress_status","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="結果出力状況","export_status","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="会場日程ID","place_schedule_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="受診者ID","examinee_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Index==2,consult_number
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241112160323
+ModifiedDateTime=20241125184734
 Position="MAIN",950,2100
 ZOrder=17
 
@@ -1280,7 +1281,7 @@ LName=検査結果出力履歴
 Comment=
 TableInnerOption=
 TableOption=
-Page=Main
+Page=MAIN
 Left=2450
 Top=2700
 Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
@@ -1292,7 +1293,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241125125345
-Position="Main",2450,2700
+Position="MAIN",2450,2700
 ZOrder=76
 
 [Relation]
