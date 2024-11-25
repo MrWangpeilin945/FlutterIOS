@@ -8,31 +8,21 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class ExportDataDetail
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public ExportDataDetail(int status, string statusName, int count)
-    {
-        Status = status;
-        StatusName = statusName;
-        Count = count;
-    }
-
-    /// <summary>
     /// 状態値
     /// </summary>
     [JsonPropertyName("status")]
-    public int Status { get; }
+    public required int Status { get; init; }
 
     /// <summary>
     /// 状態名
     /// </summary>
     [JsonPropertyName("statusName")]
-    public string StatusName { get; }
+    public required string StatusName { get; init; }
 
     /// <summary>
     /// 項目数
     /// </summary>
     [JsonPropertyName("count")]
-    public int Count { get; }
+    public required int Count { get; init; }
 
 }
