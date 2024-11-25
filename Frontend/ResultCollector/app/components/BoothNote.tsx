@@ -21,12 +21,12 @@ export default function BoothNote({ relatedExamItems }: BoothNoteProps) {
               <Paper
                 className={styles["basic-grey"]}
                 radius="md"
-                px="xs"
-                w={190}
-                miw={190}
+                px={3}
+                w={210}
+                miw={210}
               >
                 <Text size="xs" fw={700} ta="center">
-                  {examItem.examItemName}
+                  {examItem.examItemName?.slice(0, 8)}
                 </Text>
               </Paper>
               <Text size="xs" truncate="end" className={styles["text-wrap"]}>

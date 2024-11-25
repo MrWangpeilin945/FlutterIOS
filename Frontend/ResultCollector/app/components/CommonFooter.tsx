@@ -1,22 +1,24 @@
 import { Box, Button, Grid, GridCol } from "@mantine/core";
 import { useNavigate } from "@remix-run/react";
-
 import styles from "~/styles/common.module.css";
 
-type footerProps = {
+type FooterProps = {
   items?: {
     label: string;
     action: () => void;
   }[];
 };
 
-export default function CommonFooter({ items }: footerProps) {
+export default function CommonFooter({ items }: FooterProps) {
   const navigate = useNavigate();
   let setItems = [{ label: "戻る", action: () => navigate(-1) }];
-  if (items) {
-    if (items.length <= 3) {
-      setItems = setItems.concat(items);
-    }
+  const dummyItem = [{ label: "", action: () => {} }];
+
+  if (items && items.length <= 3) {
+    setItems = setItems.concat(items);
+  }
+  for (let i = setItems.length; i <= 3; i++) {
+    setItems = setItems.concat(dummyItem);
   }
 
   return (
@@ -24,8 +26,8 @@ export default function CommonFooter({ items }: footerProps) {
       {/*横並びにボタンを4つ配置*/}
       <Box h={60} className={styles.footer}>
         <Grid className={styles.footer}>
-          {setItems?.map((item) => (
-            <GridCol key={item.label} span={3} p={0}>
+          {setItems?.map((item, index) => (
+            <GridCol key={index} span={3} p={0}>
               <Button
                 className={styles["footer-button-text"]}
                 fullWidth

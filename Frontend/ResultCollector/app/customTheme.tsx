@@ -46,6 +46,8 @@ export const customTheme = createTheme({
     gray02: colorsTuple("#9A9A9A"),
     gray03: colorsTuple("#CECECE"),
     gray04: colorsTuple("#EAEAEA"),
+    // オレンジ系の色
+    orange01: colorsTuple("#FF6A00"),
   },
   // プライマリカラーの設定
   primaryColor: "primary",
@@ -60,6 +62,8 @@ export const customTheme = createTheme({
     md: "28px",
     lg: "30px",
     xl: "32px",
+    keyboard: "48px",
+    inputComponent: "64px",
   },
   // 各コンポーネントのカスタマイズ
   components: {
