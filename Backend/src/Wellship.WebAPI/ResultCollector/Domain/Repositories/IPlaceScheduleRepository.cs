@@ -10,5 +10,10 @@ public interface IPlaceScheduleRepository
     /// <summary>
     /// 健診日を指定して会場日程を取得する
     /// </summary>
-    public IEnumerable<PlaceSchedule> GetPlaceSchedules(DateOnly date);
+    public Task<IEnumerable<PlaceSchedule>> GetPlaceSchedulesAsync(DateOnly date);
+
+    /// <summary>
+    /// 会場日程IDを指定して会場日程を取得する
+    /// </summary>
+    public Task<IEnumerable<PlaceSchedule>> GetPlaceSchedulesAsync(int[] placeScheduleIds);
 }

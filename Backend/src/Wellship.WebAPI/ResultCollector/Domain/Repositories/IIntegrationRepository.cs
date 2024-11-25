@@ -1,3 +1,5 @@
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 /// <summary>
@@ -5,4 +7,8 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 /// </summary>
 public interface IIntegrationRepository
 {
+    /// <summary>
+    /// 検査結果出力履歴を取得する
+    /// </summary>
+    public Task<IEnumerable<ExportHistory>> GetExportHistoryAsync();
 }
