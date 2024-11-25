@@ -5,23 +5,23 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 /// </summary>
 public class Place
 {
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public Place(int id, string name)
-    {
-        Id = id;
-        Name = name;
-    }
-
     /// <summary>
     /// 会場ID
     /// </summary>
-    public int Id { get; }
+    public required int Id { get; init; }
+
+    /// <summary>
+    /// 会場コード
+    /// </summary>
+    public required string Code { get; init; }
 
     /// <summary>
     /// 会場名
     /// </summary>
-    public string Name { get; }
+    public required string Name { get; init; }
+
+    /// <summary>
+    /// 表示順
+    /// </summary>
+    public required int OrderNumber { get; init; }
 }
