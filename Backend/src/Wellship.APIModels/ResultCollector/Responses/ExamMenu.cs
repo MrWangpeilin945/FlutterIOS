@@ -8,23 +8,14 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class ExamMenu
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public ExamMenu(int examMenuId, string examMenuName)
-    {
-        ExamMenuId = examMenuId;
-        ExamMenuName = examMenuName;
-    }
-
-    /// <summary>
     /// 検査メニューID
     /// </summary>
     [JsonPropertyName("examMenuId")]
-    public int ExamMenuId { get; }
+    public required int ExamMenuId { get; init; }
 
     /// <summary>
     /// 検査メニュー名
     /// </summary>
     [JsonPropertyName("examMenuName")]
-    public string ExamMenuName { get; }
+    public required string ExamMenuName { get; init; }
 }

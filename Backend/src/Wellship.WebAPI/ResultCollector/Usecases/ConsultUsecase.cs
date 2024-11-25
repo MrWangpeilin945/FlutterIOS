@@ -25,10 +25,10 @@ public class ConsultUsecase : IConsultUsecase
     /// </summary>
     /// <param name="consultNumberRequest">受診番号リクエスト</param>
     /// <returns>受診が存在するか</returns>
-    public void VerifyConsultNumber(ConsultNumberRequest consultNumberRequest)
+    public async Task VerifyConsultNumberAsync(ConsultNumberRequest consultNumberRequest)
     {
         var consultNumber = consultNumberRequest.ConsultNumber;
-        var consultExists = _consultRepository.ConsultExists(consultNumber);
+        var consultExists = await _consultRepository.ConsultExistsAsync(consultNumber);
 
         if (!consultExists)
         {
@@ -59,13 +59,4 @@ public class ConsultUsecase : IConsultUsecase
     {
 
     }
-
-    /// <summary>
-    /// 検査結果の連携状態を変更する
-    /// </summary>
-    public void ChangeIntegrationStatus()
-    {
-
-    }
-
 }

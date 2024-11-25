@@ -1,6 +1,3 @@
-import { customTheme } from "~/customTheme";
-import "@mantine/core/styles.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Links,
   Meta,
@@ -9,8 +6,12 @@ import {
   ScrollRestoration,
   useNavigate,
 } from "@remix-run/react";
-import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { useEffect } from "react";
+import "@mantine/core/styles.css";
+import "./styles/global.css";
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { customTheme } from "~/customTheme";
 import { setupAxiosInterceptors } from "~/utils/axiosInstance";
 
 const queryClient = new QueryClient();
@@ -21,11 +22,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const redirectToLogin = () => {
     navigate("/login");
   };
-  // Biomeのエラーが出るので、コメントアウトしています。
-  // useEffect(() => {
-  //   // API呼び出し時に401が返ってきたらログイン画面に遷移する処理をaxiosInstanceに引き渡す
-  //   setupAxiosInterceptors(redirectToLogin);
-  // }, []);
+  useEffect(() => {
+    // API呼び出し時に401が返ってきたらログイン画面に遷移する処理をaxiosInstanceに引き渡す
+    setupAxiosInterceptors(redirectToLogin);
+  }, []);
 
   return (
     <html lang="ja">
@@ -35,14 +35,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
         <ColorSchemeScript />
-        <style>
-          {`
-            /* ここにグローバルスタイルを記述します */
-            html body {
-              background-color: #f2f2f2 ;
-            }
-          `}
-        </style>
       </head>
       <body>
         <MantineProvider theme={customTheme}>

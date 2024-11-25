@@ -38,10 +38,15 @@ public class ResultController : ControllerBase
     /// <summary>
     /// 検査結果を登録する
     /// </summary>
-    /// <returns></returns>
+    /// <param name="consultNumber">受診番号</param>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPost]
-    [Route("api/v{version:apiVersion}/consult/{consultId}/results")]
-    public IActionResult RegisterResults()
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/results")]
+    public IActionResult RegisterResults([FromRoute] string consultNumber, [FromBody] ResultsRequest results)
     {
         _resultUsecase.RegisterResults();
         return Ok();

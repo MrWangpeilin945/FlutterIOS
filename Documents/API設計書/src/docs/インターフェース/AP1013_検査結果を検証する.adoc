@@ -2,7 +2,9 @@
 
 === 概要
 
-* TODO
+* 検査結果入力画面から利用する
+* 検査結果入力画面の入力値のバリデーションチェックをする
+* バリデーションエラーメッセージを返却する
 
 === URI
 
@@ -15,36 +17,113 @@
 
 === パスパラメータ
 
-=== クエリパラメータ
-
 [cols="2,1,1,4,2" options="header"]
 |===
 |名称|必須|型|説明|具体例
 
-|
-|
-|
-|
-|
+|consultNumber
+|Yes
+|string
+|受診番号
+|00123
 
 |===
+
+=== クエリパラメータ
+
+なし
 
 === リクエストボディ
 
 [source,json]
 ----
-
+{
+  "examMenuId" : 10,
+  "examResults" : [
+    {
+      "examItemId": 12,
+      "examItemDetails" : [
+        {
+          "examItemDetailId": 1,
+          "value" : "120"
+        }.
+        {
+          "examItemDetailId": 2,
+          "value" : ""
+        }
+      ]
+    }
+  ]
+}
 ----
 
 === レスポンスボディ
 
 [source,json]
 ----
-
+{
+  "errorLevel" : 3,
+  "examItemGroups" :[
+    {
+      "type" : 1,
+      "examItems" : [
+        {
+          "positionNumber" : 1,
+          "examItemId" : 101,
+          "name" : "身長",
+          "examItemDetails" : [
+            {
+              "positionNumber" : 1,
+              "examItemDetailId" : 1001,
+              "equipmentLabel" : "Height",
+              "name" : "身長",
+              "value" : "157.0",
+              "prevValue" : "155.5",
+              "unit" : "cm",
+              "type" : 1, 
+              "cancelReasonId" : null,
+              "integerLength" : 3,
+              "decimalLength" : 1,
+              "keyboard" : {
+                "keyboardType" : 1,
+                "values" : ["0.1" ,"0.2" ,"0.3"]
+              },
+              "examItemDetailOptions" : [
+                  {
+                    "orderNumber" : 1,
+                    "code" : "100",
+                    "name" : "メガネ"
+                  }
+              ],
+              "examNormalValueRanges" : [
+                  {
+                    "errorLevel" : 4,
+                    "maxValue" : 999.9,
+                    "minValue" : 10.0
+                  }
+              ]
+            }
+          ],
+          "examRegstResults" : [ 
+              { "errorLevel" : 2, 
+                "description" : "正常値範囲外です。"
+              } 
+          ],
+        }
+      ]
+    }
+  ]
+}
 ----
 
 === ステータスコード
 
 * 200 OK
+* 400 BadRequest
+** 指定した受診番号の形式が不正
 * 401 Unauthorized
 ** JWT認証に失敗
+* 404 NotFound
+** 指定した受診が存在しない
+* 422 Unprocessable
+** バリデーションエラー

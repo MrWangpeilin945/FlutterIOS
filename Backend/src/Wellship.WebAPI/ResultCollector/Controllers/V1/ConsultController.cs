@@ -36,9 +36,10 @@ public class ConsultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/consult/consultNumber/verify")]
-    public IActionResult VerifyConsultNumberAsync([FromBody] ConsultNumberRequest consultNumberRequest)
+    public async Task<IActionResult> VerifyConsultNumberAsync([FromBody] ConsultNumberRequest consultNumberRequest)
     {
-        _consultUsecase.VerifyConsultNumber(consultNumberRequest);
+        // NOTE: 受診番号が存在しない場合はUsecaseで例外発生
+        await _consultUsecase.VerifyConsultNumberAsync(consultNumberRequest);
         return Ok();
     }
 
@@ -85,23 +86,6 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 検査結果の連携状態を変更する
-    /// </summary>
-    /// <returns></returns>
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpPut]
-    [Route("api/v{version:apiVersion}/consult/{consultNumber}/integrationStatus")]
-    public IActionResult ChangeIntegrationStatus([FromRoute][Required] string consultNumber,
-                                                 [FromBody] IntegrationStatusRequest integrationStatusRequest)
-    {
-        _consultUsecase.ChangeIntegrationStatus();
-        return Ok();
-    }
-
-    /// <summary>
     /// 検査の実施有無と中止理由を登録する
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -112,6 +96,23 @@ public class ConsultController : ControllerBase
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/executions")]
     public IActionResult RegisterExecutions([FromRoute] string consultNumber, [FromBody] ExecutionsRequest executions)
     {
+        return Ok();
+    }
+
+    /// <summary>
+    /// 検査結果入力情報を取得する
+    /// </summary>
+    /// <param name="consultNumber">受診番号</param>
+    /// <param name="examMenuId">検査メニューID</param>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(InputExamItems))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpGet]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/inputExamItems")]
+    public IActionResult GetInputExamItemsExamineeAsync([FromRoute][Required] int consultNumber, [FromQuery][Required] int examMenuId)
+    {
+        _consultUsecase.GetExamItemsExaminee();
         return Ok();
     }
 }

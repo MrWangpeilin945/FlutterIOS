@@ -6,12 +6,14 @@
   background-color: #9a9a9a;
   color: white;
 }
+
 .background-grey {
   background-color: #f2f2f2;
 }
+
 .reverse-green-button {
-  color: #00ada4;
   background-color: white;
+  color: #00ada4;
 }
 
 .hr {
@@ -64,6 +66,10 @@
 .text-wrap {
   word-break: break-word;
   white-space: normal;
+}
+.text-multiline {
+  white-space: pre-wrap;
+  line-height: 1.5;
 }
 
 .progress-raijyo {

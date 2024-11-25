@@ -87,6 +87,10 @@ INSERT INTO home_menus(home_menu_id,name,home_menu_group_id,order_number,path,cr
   , (5,'検査結果出力履歴',2,3,'examresult-export-history',CURRENT_TIMESTAMP,'init');
 
 -- 受診
+INSERT INTO resultcollector.consult(consult_id,consult_number,progress_status,place_schedule_id,examinee_id,created_at,created_by) VALUES 
+    (1,'0001',11,2,2,CURRENT_TIMESTAMP,'init')
+  , (2,'0002',41,2,12,CURRENT_TIMESTAMP,'init')
+  , (3,'0003',51,3,18,CURRENT_TIMESTAMP,'init');
 
 -- ロール
 INSERT INTO roles(role_id,name,created_at,created_by) VALUES 
