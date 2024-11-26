@@ -1,3 +1,4 @@
+using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
@@ -94,6 +95,7 @@ public class IntegrationUsecase : IIntegrationUsecase
 
             return new ExportHistory
             {
+                ExportId = x.ExportId,
                 PlaceScheduleId = x.PlaceScheduleId,
                 PlaceName = placeSchedule.Place.Name,
                 PlaceScheduleLockingStatus = (int)placeSchedule.PlaceScheduleLockingStatus,
@@ -109,5 +111,13 @@ public class IntegrationUsecase : IIntegrationUsecase
         {
             ExportHistories = exportHistories
         };
+    }
+
+    /// <summary>
+    /// 出力した検査結果を未出力にする
+    /// </summary>
+    public async Task UndoAsync(UndoIntegrationExportStatusRequest request)
+    {
+        throw new NotImplementedException();
     }
 }

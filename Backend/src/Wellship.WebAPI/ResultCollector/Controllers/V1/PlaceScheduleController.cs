@@ -98,20 +98,4 @@ public class PlaceScheduleController : ControllerBase
         await _placeScheduleUsecase.UpdatePlaceScheduleLockingStatusAsync();
         return Ok();
     }
-
-    /// <summary>
-    /// 会場日程のデータ出力状況を更新する
-    /// </summary>
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [HttpPut]
-    [Route("api/v{version:apiVersion}/placeSchedules/{placeScheduleId}/placeScheduleResultExportStatus")]
-    public async Task<IActionResult> UpdatePlaceScheduleResultExportStatusAsync([FromRoute][Required] int placeScheduleId,
-                                                                                [FromBody] PlaceScheduleLockingRequest placeScheduleLockingRequest)
-    {
-        await _placeScheduleUsecase.UpdatePlaceScheduleResultExportStatusAsync();
-        return Ok();
-    }
 }

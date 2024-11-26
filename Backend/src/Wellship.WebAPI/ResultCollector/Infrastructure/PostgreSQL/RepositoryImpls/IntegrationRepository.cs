@@ -30,7 +30,8 @@ public class IntegrationRepository : IIntegrationRepository
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
         select
-            place_schedule_id as PlaceScheduleId
+            id as ExportId
+            , place_schedule_id as PlaceScheduleId
             , data_count as DataCount
             , exported_at as ExportedAt
             , exported_by as ExportedBy
