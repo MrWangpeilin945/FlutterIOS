@@ -1,4 +1,5 @@
 using Ryobi.Wellship.APIModels.Responses;
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -23,9 +24,49 @@ public class IntegrationUsecase : IIntegrationUsecase
     /// <summary>
     /// 連携対象の検査結果を取得する
     /// </summary>
-    public void GetIntegrationResults()
+    public async Task<ExportDataList> GetExportTargetResultsAsync()
     {
+        var results = await _integrationRepository.GetExportPlaceSchedulesAsync();
 
+        // 会場名や会場ロック状況を表示するため、会場日程を取得する
+        var placeScheduleIds = results.Select(x => x.PlaceScheduleId).Distinct().ToArray();
+        var placeSchedules = await _placeScheduleRepository.GetPlaceSchedulesAsync(placeScheduleIds);
+
+        // 健診日の降順で会場日程を返却する
+        return new ExportDataList()
+        {
+            ExportData = results.Select(r =>
+            {
+                var placeSchedule = placeSchedules.Single(p => p.Id == r.PlaceScheduleId);
+                return new ExportData()
+                {
+                    PlaceScheduleId = r.PlaceScheduleId,
+                    PlaceName = placeSchedule.Place.Name,
+                    PlaceScheduleLockingStatus = (int)placeSchedule.PlaceScheduleLockingStatus,
+                    ExamDate = placeSchedule.ExamDate,
+                    StartTime = placeSchedule.FormatStartTimeString,
+                    Details = [
+                        new(){
+                            Status = (int)ConsultResultExportStatus.未出力,
+                            StatusName = ConsultResultExportStatus.未出力.ToString(),
+                            Count = r.ExportStatusCount11
+                        },
+                        new(){
+                            Status = (int)ConsultResultExportStatus.出力保留,
+                            StatusName = ConsultResultExportStatus.出力保留.ToString(),
+                            Count = r.ExportStatusCount21
+                        },
+                        new(){
+                            Status = (int)ConsultResultExportStatus.出力済み,
+                            StatusName = ConsultResultExportStatus.出力済み.ToString(),
+                            Count = r.ExportStatusCount31
+                        }
+                    ]
+                };
+            }).OrderByDescending(x => x.ExamDate)
+              .ThenByDescending(x => x.StartTime)
+              .ToArray()
+        };
     }
 
     /// <summary>
@@ -61,7 +102,8 @@ public class IntegrationUsecase : IIntegrationUsecase
                 ExportedAt = x.ExportedAt,
                 ExportedBy = x.ExportedBy
             };
-        }).OrderByDescending(x => x.ExportedAt).ToArray();
+        }).OrderByDescending(x => x.ExportedAt)
+          .ToArray();
 
         return new ExportHistoryList
         {
