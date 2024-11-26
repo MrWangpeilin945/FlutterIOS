@@ -1,4 +1,11 @@
-import { Button, Center, Container, Flex } from "@mantine/core";
+import {
+  Button,
+  Center,
+  Flex,
+  Grid,
+  GridCol,
+  LoadingOverlay,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
 import { useAtom } from "jotai";
@@ -8,37 +15,94 @@ import CommonFooter from "~/components/CommonFooter";
 import { ErrorModal } from "~/components/ErrorModal";
 import ExamineeHeader from "~/components/ExamineeHeader";
 import ExamSelect from "~/components/ExamSelect";
-import { examMenuState, staffState } from "~/store/store";
+import {
+  connectionEquipmentState,
+  examMenuState,
+  staffState,
+} from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
-import { resultRegisterResults } from "~/api/wellship";
-import { NamedEntity } from "~/interfaces/interfaces";
+import {
+  resultRegisterResults,
+  resultVerifyResults,
+  useConsultGetInputExamItemsExaminee,
+  useResultVerifyResults,
+} from "~/api/wellship";
+import AuthWrapper from "~/components/AuthWrapper";
+import type {
+  ExamItemDetailOption,
+  ExamItemGroup,
+  InputExamItem,
+  InputExamItems,
+  ResultRequest,
+  ResultsRequest,
+  VerifyExamItems,
+} from "~/domain/wellship.schemas";
+import { type AxiosResponse, isAxiosError } from "axios";
 
 export default function consultInput() {
   const navigate = useNavigate();
+  const [examData, setExamData] = useState<InputExamItems>();
   // パスパラメータの取得
   const { consultnumber } = useParams();
+  const [consultNumber] = useState(Number(consultnumber));
   // クエリパラメータの取得
   const [searchParams] = useSearchParams();
-  const examMenuId = searchParams.get("exammenuid");
-  //TODO:機器情報をJotaiから取得
+  const examMenuId = Number(searchParams.get("exammenuid"));
   const [staffData] = useAtom(staffState);
   const [examMenus] = useAtom(examMenuState);
+  const [ConnectionEquipment] = useAtom(connectionEquipmentState);
+  const [isLoading, setIsLoading] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showRemeasurement, setShowRemeasurement] = useState<boolean>(false);
+  //機器連携用
+  const [value, setValue] = useState<string>(
+    localStorage.getItem("value") || "",
+  ); //jsonにvalueセット方法どうするか
+  const [isWatching, setIsWatching] = useState(false); // 監視状態を管理するフラグ
 
   useEffect(() => {
+    setIsLoading(true);
+    //受診番号の受け取り確認
     if (!consultnumber) {
       setErrorMessage("必要な受診番号がありません");
       open();
       return;
     }
+    //検査メニューIDの受け取り確認
     if (!examMenuId) {
       setErrorMessage("必要な検査メニューIDがありません");
       open();
       return;
     }
-    //TODO：API呼び出し、通過の判断処理
-  }, [consultnumber, examMenuId, open]);
+    //AP1009_検査結果入力情報を取得する
+    const inputExamItems = async () => {
+      const { refetch } = useConsultGetInputExamItemsExaminee(
+        "1",
+        consultNumber, //stringになるかも
+        { examMenuId: examMenuId },
+        { query: { enabled: false } },
+      );
+
+      const result = await refetch();
+      if (result.data) {
+        setExamData(result.data.data);
+      } else if (result.error) {
+        if (result.error.status === 400) {
+          setErrorMessage(
+            getErrorMessage(errorMessages.invalid, "受診番号と検査項目"),
+          );
+        } else if (result.error.status === 404) {
+          setErrorMessage(getErrorMessage(errorMessages.notFound, "検査項目"));
+        } else if (result.error.status === 500) {
+          setErrorMessage(getErrorMessage(errorMessages.serverError));
+        }
+        open();
+      }
+    };
+    inputExamItems();
+    setIsLoading(false);
+  }, [consultnumber, examMenuId]);
 
   const callbackCloseModal = () => {
     close();
@@ -47,44 +111,179 @@ export default function consultInput() {
     }
   };
 
-  const callbackChangeValue = () => {
-    //valueを更新
-    //再計測ボタンのDisabledチェック処理
-  }
+  //機器連携：監視用
+  useEffect(() => {
+    const initialValue = localStorage.getItem("value") || "";
+    setValue(initialValue);
+    // StorageEventの変更を監視する関数
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === "value") {
+        setValue(event.newValue || "");
+        //TODO:valueにsetする処理　どこのvalueを更新するかの判定をどうするか
+        console.log(event);
+
+        // 初回の変更後に監視を解除
+        if (isWatching) {
+          setIsWatching(false);
+        }
+      }
+    };
+
+    // isWatchingがtrueのときに監視を開始
+    if (isWatching) {
+      window.addEventListener("storage", handleStorageChange);
+    }
+
+    // クリーンアップ処理
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [isWatching]); // isWatchingが変わるたびに監視の開始/停止
+
+  //値変更用
+  const callbackChangeValue = (
+    examItem: InputExamItem | undefined,
+    index: number,
+    groupIndex: number,
+  ) => {
+    if (examItem) {
+      setExamData((prevData) => {
+        if (!prevData) {
+          return {
+            examItemGroups: [],
+          };
+        }
+
+        // 初期値を設定しつつ安全に処理
+        const updatedExamItemGroups = (prevData.examItemGroups || []).map(
+          (group, gIndex) => {
+            if (gIndex !== groupIndex) {
+              return group;
+            }
+            return {
+              ...group,
+              examItems: (group.examItems || []).map((item, itemIndex) => {
+                // 指定された index のみ更新
+                return itemIndex === index ? examItem : item;
+              }),
+            };
+          },
+        );
+
+        return {
+          ...prevData,
+          examItemGroups: updatedExamItemGroups,
+        };
+      });
+    }
+    // 再計測ボタンのDisabledチェック処理
+    if (!connectionEquipmentState /* && TODO:equipmentNameの仕様を確認*/) {
+      setShowRemeasurement(true);
+    } else {
+      setIsWatching(true);
+      if (!showRemeasurement) {
+        // TODO:機器連携アプリへ遷移
+      }
+    }
+  };
 
   //TODO：機器連携
+  //再計測ボタン押下時
+  const handleRemeasurement = () => {
+    setIsWatching(true);
+    //TODO:機器連携アプリへ遷移
+    //TODO:js呼び出し処理以降
+  };
+
+  //リクエストボディ作成
+  const makeBody = ():ResultsRequest => {
+    if (examData) {
+      const converted = {
+        examMenuId: examMenuId,
+        examResults: examData.examItemGroups
+          ? examData.examItemGroups.flatMap(
+              (group) =>
+                group.examItems?.map((examItem) => ({
+                  examItemId: examItem.examItemId,
+                  examItemDetails: examItem.examItemDetails
+                    ? examItem.examItemDetails.map((itemDetail) => ({
+                        examItemDetailId: itemDetail.examItemDetailId,
+                        value: itemDetail.value || "",
+                      }))
+                    : [],
+                })) ?? [],
+            )
+          : [],
+      };
+      return converted;
+    }
+    return {};
+  };
+
+  //エラーレベルによる分岐処理
+  const errorBranch = (errorLevel?:number) => {
+    if(errorLevel === 3){
+      setErrorMessage("エラーがあります。内容を確認してください"); //改行文字入れるかも
+      open();
+    }else if(errorLevel === 2){
+      //TODO:確認ダイアログ呼び出し　OKの時に検査結果確認画面　キャンセルでclose
+    }else{
+      return;
+    }
+  };
 
   //AP1013_検査結果を検証する
   const verifyResults = async () => {
-
-  }
-
-  //AP1014_検査結果を登録する
-  //TODO:ボディ作成
-  const registerResults = async () => {
-    if(!consultnumber) return;
-    await resultRegisterResults("1", consultnumber)
-      .then(() => {
-        // 成功時の処理
-        
-      })
-      .catch((error) => {
-        if (error.responce.status === 400) {
-          setErrorMessage(getErrorMessage(errorMessages.invalid, "指定した受診番号"));
-        } else if (error.responce.status === 404) {
-          setErrorMessage(
-            getErrorMessage(errorMessages.noData, "指定した受診情報が"),
-          );
-        } else if (error.responce.status === 500) {
-          setErrorMessage(getErrorMessage(errorMessages.server));
+    let result:AxiosResponse<VerifyExamItems>;
+    const resultsRequest = makeBody();
+    if (!consultnumber) return;
+    const { mutateAsync } = useResultVerifyResults();
+    const postMutateAsync = async () => {
+      try {
+        result = await mutateAsync({
+          version: "1",
+          consultNumber: consultnumber,
+          data: resultsRequest,
+        });
+        if (result.status === 200) {
+          // 正常時の処理
+          //TODO:検査結果確認画面へ遷移
         }
+      } catch (error) {
+        let errorMessage = "";
+        // AxiosErrorかどうかを確認
+        if (isAxiosError(error) && error.response) {
+          const status = error.response.status;
+          // エラー処理
+          if (status === 400) {
+            errorMessage =  getErrorMessage(errorMessages.invalid, "受診番号と検査項目");
+          } else if (status === 404) {
+            errorMessage = getErrorMessage(errorMessages.notFound, "検査項目");
+          } else if (status === 422) {
+            setExamData(result.data);
+            errorBranch(result.data.errorLevel);
+          } else if (status === 500) {
+            errorMessage = getErrorMessage(errorMessages.serverError);
+          }
+        }
+        // 共通ダイアログにエラーメッセージを表示
+        setErrorMessage(errorMessage);
         open();
-      });
+      } 
+    };
+    postMutateAsync();
+  };
+
+  //検証処理
+  const handleVerify = () => {
+    setIsLoading(true);
+    verifyResults();
+    setIsLoading(false);
   };
 
   //検査継続処理
   const continuingExam = () => {
-    if(!examMenus) return;
+    if (!examMenus) return;
     const currentIndex = examMenus.findIndex((menu) => menu === examMenuId);
     if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
       const nextExam = examMenus[currentIndex + 1];
@@ -92,121 +291,145 @@ export default function consultInput() {
     } else {
       navigate(`/consultnumber-input?consultnumber=${consultnumber}`);
     }
-  }
+  };
 
+  //AP1014_検査結果を登録する
+  const registerResults = async () => {
+    const resultsRequest = makeBody();
+    if (!consultnumber) return;
+    await resultRegisterResults("1", consultnumber, resultsRequest)
+      .then(() => {
+        // 成功時の処理
+        continuingExam();
+      })
+      .catch((error) => {
+        if (error.responce.status === 400) {
+          setErrorMessage(
+            getErrorMessage(errorMessages.invalid, "指定した受診番号"),
+          );
+        } else if (error.responce.status === 403) {
+          setErrorMessage("会場ロック中です。管理者のみ更新可能です。");
+        } else if (error.responce.status === 404) {
+          setErrorMessage(
+            getErrorMessage(errorMessages.notFound, "指定した受診情報が"),
+          );
+        } else if (error.responce.status === 500) {
+          setErrorMessage(getErrorMessage(errorMessages.serverError));
+        }
+        open();
+      });
+  };
+
+  //登録処理
   const handleRegister = () => {
+    setIsLoading(true);
     registerResults();
-    continuingExam();
-  
+    setIsLoading(false);
   };
 
-  const data = {
-    examItems: [
-      {
-        positionNumber: 1,
-        examItemId: 101,
-        examItemName: "スピッツ",
-        //どのような形式かは未確定
-        errorMessages: [{ value: "エラー1" }, { value: "エラー2" }],
-        examItemDetails: [
-          {
-            positionNumber: 1, //血圧の上なのか下なのかのテキストボックス位置を指定する
-            examItemDetailId: 1001,
-            examItemDetailName: "スピッツ",
-            value: "10031", //前回値初期値化設定があれば、ここに入れておいてほしい   インクリメントの場合登録済みなら、登録済みの値、未登録なら次のインクリメント値をもらう
-            prevValue: "111112222333",
-            unit: "cm",
-            examItemDetailType: "1", //1:入力、2:選択、3：演算値など ※ここのテーブル設定を知らないのでとりあえずの例
-            isCancelled: false,
-            kikiDetail: "★value1", //検討中連携している機器のどのパラメータに該当するかのプロパティ的なもの
-            afterDecimalPointDigit: 1, //小数点以下の入力 ※必要か？
-            keyboard: {
-              Type: 1, //0～9タイプか、カスタムか
-              keys: ["0.1", "0.2", "0.3"], //0～9タイプの時は不要
-            },
-            selectors: [
-              {
-                selectorId: "10031", //表示順にソートしてもらう
-                selectorName: "メガネ",
-              },
-              {
-                selectorId: "10032",
-                selectorName: "コンタクト",
-              },
-              {
-                selectorId: "10033",
-                selectorName: "テスト1",
-              },
-              {
-                selectorId: "10034",
-                selectorName: "テスト2",
-              },
-            ], //選択系
-            ranges: [
-              //エラーレベルの高い順でソートして渡してもらう
-              {
-                errorLevel: 4,
-                numericMin: 0.0,
-                numericMax: 50.5,
-              },
-              {
-                errorLevel: 4,
-                numericMin: 250.0,
-                numericMax: 999.9,
-              },
-              {
-                errorLevel: 3,
-                numericMin: 50.0,
-                numericMax: 100.0,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
+  const ExamItemRender = ({
+    groupIndex,
+    examItemGroup,
+  }: {
+    groupIndex: number;
+    examItemGroup: ExamItemGroup;
+  }) => {
+    const { type, examItems } = examItemGroup;
 
-  const BoothData = [
-    {
-      examItemName: "視力",
-      examResult: "1.0",
-    },
-    {
-      examItemName: "テストテストテス",
-      examResult: "150.7",
-    },
-  ];
-  
+    // 検査項目が存在しない場合のチェック
+    if (!examItems || examItems.length === 0) {
+      return <div>検査項目がありません</div>;
+    }
+
+    // `examItems` をループして表示
+    const renderedItems: JSX.Element[] = [];
+
+    for (let index = 0; index < examItems.length; index++) {
+      const item = examItems[index];
+
+      // 単一選択の場合
+      if (type === 2) {
+        renderedItems.push(
+          <ExamSelect
+            key={index} // key を設定
+            examItems={item}
+            onRegisterPressed={1}
+            onClick={(updatedExamItem) =>
+              callbackChangeValue(updatedExamItem, index, groupIndex)
+            }
+          />,
+        );
+      }
+
+      // 通過（typeが13の場合）: 処理を中断する
+      else if (type === 13) {
+        //TODO:検査結果確認画面へ遷移
+        break;
+      }
+
+      // 他のtypeに対する処理
+      else {
+        renderedItems.push(
+          <div key={index}>
+            未対応のタイプ: {type}（項目ID: {index}）
+          </div>,
+        );
+      }
+    }
+
+    return <div>{renderedItems}</div>;
+  };
 
   return (
     <>
-      <ExamineeHeader
-        staffName={staffData?.name}
-        managerId={100001}
-        name="リョウビ タロウ"
-        gender={1}
-        age={35}
-      />
-      <BoothNote relatedExamItems={BoothData} />
-      <Flex align="center" direction="column" my={10}>
-        <ExamSelect
-          examItems={data.examItems[0]}
-          onRegisterPressed={1}
-          onClick={callbackChangeValue}
+      <AuthWrapper>
+        <LoadingOverlay visible={isLoading} />
+        <ExamineeHeader
+          staffName={staffData?.name ? staffData.name : ""}
+          managerId={100001}
+          name="リョウビ タロウ"
+          gender={1}
+          age={35}
         />
-        <Center>
-          <Button w={500} h={50} my={30} onClick={handleRegister}>
-            登録する
-          </Button>
-        </Center>
-      </Flex>
-
-      <ErrorModal
-        isOpen={opened}
-        onClose={callbackCloseModal}
-        errorMessage={errorMessage}
-      />
-      <CommonFooter />
+        <BoothNote relatedExamItems={examData?.relatedExamItems ?? []} />
+        <Grid>
+          <GridCol span="auto" />
+          <GridCol span="content">
+            <Flex align="center" direction="column" my={10}>
+              {examData?.examItemGroups?.map(
+                (examItemGroup: ExamItemGroup, index: number) => (
+                  <ExamItemRender
+                    key={index}
+                    groupIndex={index}
+                    examItemGroup={examItemGroup}
+                  />
+                ),
+              )}
+              <Center>
+                <Button w={860} h={75} my={30} onClick={handleVerify}>
+                  登録する
+                </Button>
+              </Center>
+            </Flex>
+          </GridCol>
+          <GridCol span="auto">
+            <Button
+              disabled={showRemeasurement}
+              w={100}
+              onClick={handleRemeasurement}
+            >
+              再計測
+            </Button>
+          </GridCol>
+        </Grid>
+        {/* TODO:確認ダイアログの実装、onclickで登録処理呼び出し */}
+        <ErrorModal
+          isOpen={opened}
+          onClose={callbackCloseModal}
+          errorMessage={errorMessage}
+        />
+        <CommonFooter />
+      </AuthWrapper>
     </>
   );
 }
