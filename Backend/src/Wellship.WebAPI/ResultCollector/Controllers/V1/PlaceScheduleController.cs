@@ -34,7 +34,7 @@ public class PlaceScheduleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/placeSchedules/teams")]
-    public ActionResult<IEnumerable<PlaceScheduleTeams>> GetTeams([FromQuery] string date)
+    public async Task<IActionResult> GetTeamsAsync([FromQuery] string date)
     {
 
         if (!DateOnly.TryParse(date, out var dateOnlyDate))
@@ -42,7 +42,7 @@ public class PlaceScheduleController : ControllerBase
             return BadRequest("日付の形式が無効です。yyyy-MM-ddの形式で日付を指定してください。");
         }
 
-        var results = _placeScheduleUsecase.GetTeams(dateOnlyDate);
+        var results = await _placeScheduleUsecase.GetTeamsAsync(dateOnlyDate);
         return Ok(results);
     }
 
@@ -54,9 +54,9 @@ public class PlaceScheduleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/placeSchedules/places")]
-    public IActionResult GetTeamPlaceSchedules([FromQuery] string date, [FromQuery] int teamId)
+    public async Task<IActionResult> GetTeamPlaceSchedulesAsync([FromQuery] string date, [FromQuery] int teamId)
     {
-        _placeScheduleUsecase.GetTeamPlaceSchedules();
+        await _placeScheduleUsecase.GetTeamPlaceSchedulesAsync();
         return Ok();
     }
 
@@ -70,9 +70,9 @@ public class PlaceScheduleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/placeSchedules/{placeScheduleId}/placeScheduleLockingStatus")]
-    public IActionResult GetPlaceScheduleLockingStatus([FromRoute][Required] int placeScheduleId)
+    public async Task<IActionResult> GetPlaceScheduleLockingStatusAsync([FromRoute][Required] int placeScheduleId)
     {
-        _placeScheduleUsecase.GetPlaceScheduleLockingStatus();
+        await _placeScheduleUsecase.GetPlaceScheduleLockingStatusAsync();
         return Ok();
     }
 
@@ -86,10 +86,10 @@ public class PlaceScheduleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPut]
     [Route("api/v{version:apiVersion}/placeSchedules/{placeScheduleId}/placeScheduleLockingStatus")]
-    public IActionResult UpdatePlaceScheduleLockingStatus([FromRoute][Required] int placeScheduleId,
+    public async Task<IActionResult> UpdatePlaceScheduleLockingStatusAsync([FromRoute][Required] int placeScheduleId,
                                                           [FromBody] PlaceScheduleLockingRequest placeScheduleLockingRequest)
     {
-        _placeScheduleUsecase.UpdatePlaceScheduleLockingStatus();
+        await _placeScheduleUsecase.UpdatePlaceScheduleLockingStatusAsync();
         return Ok();
     }
 
@@ -102,10 +102,10 @@ public class PlaceScheduleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPut]
     [Route("api/v{version:apiVersion}/placeSchedules/{placeScheduleId}/placeScheduleResultExportStatus")]
-    public IActionResult UpdatePlaceScheduleResultExportStatus([FromRoute][Required] int placeScheduleId,
-                                                          [FromBody] PlaceScheduleLockingRequest placeScheduleLockingRequest)
+    public async Task<IActionResult> UpdatePlaceScheduleResultExportStatusAsync([FromRoute][Required] int placeScheduleId,
+                                                                                [FromBody] PlaceScheduleLockingRequest placeScheduleLockingRequest)
     {
-        _placeScheduleUsecase.UpdatePlaceScheduleResultExportStatus();
+        await _placeScheduleUsecase.UpdatePlaceScheduleResultExportStatusAsync();
         return Ok();
     }
 }

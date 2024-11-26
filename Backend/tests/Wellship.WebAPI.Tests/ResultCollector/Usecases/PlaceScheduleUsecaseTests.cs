@@ -2,8 +2,7 @@ using FluentAssertions;
 
 using Moq;
 
-using Ryobi.Wellship.APIModels.Responses;
-using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -11,39 +10,125 @@ namespace Ryobi.Wellship.WebAPI.Tests.ResultCollector.Usecases;
 
 public class PlaceScheduleUsecaseTests
 {
+    private readonly Mock<IPlaceScheduleRepository> _placeScheduleRepositoryMock;
+    private readonly PlaceScheduleUsecase _placeScheduleUsecase;
+    private readonly List<WebAPI.ResultCollector.Domain.Models.PlaceSchedule> _placeSchedules;
+
+    public PlaceScheduleUsecaseTests()
+    {
+        _placeScheduleRepositoryMock = new Mock<IPlaceScheduleRepository>();
+        _placeScheduleUsecase = new PlaceScheduleUsecase(_placeScheduleRepositoryMock.Object);
+        _placeSchedules =
+        [
+            new(){
+                Id = 6,
+                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = 2,Code = "P002",Name = "会場B",OrderNumber = 2},
+                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = 3,Code = "T003",Name = "C班",OrderNumber = 3},
+                ExamDate = new DateOnly(2024,11,20),
+                StartTime = "10:00",
+                PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査中
+            },
+            new(){
+                Id = 5,
+                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = 2,Code = "P002",Name = "会場B",OrderNumber = 2},
+                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = 3,Code = "T003",Name = "C班",OrderNumber = 3},
+                ExamDate = new DateOnly(2024,11,30),
+                StartTime = "10:00",
+                PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査中
+            },
+            new(){
+                Id = 3,
+                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = 1,Code = "P001",Name = "会場A",OrderNumber = 1},
+                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = 2,Code = "T002",Name = "B班",OrderNumber = 2},
+                ExamDate = new DateOnly(2024,11,30),
+                StartTime = "10:00",
+                PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査中
+            },
+            new(){
+                Id = 4,
+                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = 2,Code = "P002",Name = "会場B",OrderNumber = 2},
+                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = 2,Code = "T002",Name = "B班",OrderNumber = 2},
+                ExamDate = new DateOnly(2024,11,30),
+                StartTime = "10:00",
+                PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査中
+            },
+            new(){
+                Id = 2,
+                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = 1,Code = "P001",Name = "会場A",OrderNumber = 1},
+                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = 1,Code = "T001",Name = "A班",OrderNumber = 1},
+                ExamDate = new DateOnly(2024,11,30),
+                StartTime = "13:00",
+                PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査中
+            },
+            new(){
+                Id = 1,
+                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = 1,Code = "P001",Name = "会場A",OrderNumber = 1},
+                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = 1,Code = "T001",Name = "A班",OrderNumber = 1},
+                ExamDate = new DateOnly(2024,11,30),
+                StartTime = "10:00",
+                PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査中
+            },
+        ];
+    }
+
     [Fact]
-    public void 班でグループ化して会場日程を取得できる()
+    public async Task 班で集約して会場日程を取得できる_空の場合()
     {
         // Arrange
-        var placeScheduleRepositoryMock = new Mock<IPlaceScheduleRepository>();
-        var usecase = new PlaceScheduleUsecase(placeScheduleRepositoryMock.Object);
-
-        var date = new DateOnly(2024, 09, 27);
-        var placeSchedules = new[]
-        {
-            new WebAPI.ResultCollector.Domain.Models.PlaceSchedule(1, new WebAPI.ResultCollector.Domain.Models.Place(10, "豊成オフィス"), new Team(2, "2班"), new DateOnly(2024, 09, 27), "09:00", "12:00"),
-            new WebAPI.ResultCollector.Domain.Models.PlaceSchedule(3, new WebAPI.ResultCollector.Domain.Models.Place(10, "豊成オフィス"), new Team(3, "3班"), new DateOnly(2024, 09, 27), "09:00", "12:00"),
-            new WebAPI.ResultCollector.Domain.Models.PlaceSchedule(4, new WebAPI.ResultCollector.Domain.Models.Place(20, "藤崎オフィス"), new Team(2, "2班"), new DateOnly(2024, 09, 27), "13:00", "17:00")
-        };
-
-        placeScheduleRepositoryMock.Setup(x => x.GetPlaceSchedules(date)).Returns(placeSchedules);
+        var examDate = new DateOnly(2024, 11, 1);
+        var emptyList = new List<WebAPI.ResultCollector.Domain.Models.PlaceSchedule>();
+        var placeSchedules = _placeScheduleRepositoryMock.Setup(x => x.GetPlaceSchedulesAsync(examDate))
+                                                         .ReturnsAsync(emptyList);
 
         // Act
-        var result = usecase.GetTeams(date);
+        var results = await _placeScheduleUsecase.GetTeamsAsync(examDate);
 
         // Assert
-        var expectedTeams = new[]
+        results.Teams.Length.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task 班で集約して会場日程を取得できる_複数件の場合()
+    {
+        // Arrange
+        var examDate = new DateOnly(2024, 11, 30);
+
+        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceSchedulesAsync(examDate))
+                                    .ReturnsAsync(_placeSchedules);
+
+        var expected = new APIModels.Responses.PlaceScheduleTeams()
         {
-                new PlaceScheduleTeam(2, "2班",
-                [
-                    new APIModels.Responses.Place(10, "豊成オフィス"),
-                    new APIModels.Responses.Place(20, "藤崎オフィス")
-                ]),
-                new PlaceScheduleTeam(3, "3班",
-                [
-                    new APIModels.Responses.Place(10, "豊成オフィス")
-                ])
-            };
-        result.Teams.Should().BeEquivalentTo(expectedTeams);
+            Teams =
+            [
+                new(){
+                    TeamId = 1,
+                    TeamName = "A班",
+                    Places = [
+                        new APIModels.Responses.Place(){PlaceId = 1, PlaceName = "会場A"},
+                    ]
+                },
+                new(){
+                    TeamId = 2,
+                    TeamName = "B班",
+                    Places = [
+                        new APIModels.Responses.Place(){PlaceId = 1, PlaceName = "会場A"},
+                        new APIModels.Responses.Place(){PlaceId = 2, PlaceName = "会場B"}
+                    ]
+                },
+                new(){
+                    TeamId = 3,
+                    TeamName = "C班",
+                    Places = [
+                        new APIModels.Responses.Place(){PlaceId = 2, PlaceName = "会場B"}
+                    ]
+                }
+            ]
+        };
+
+        // Act
+        var results = await _placeScheduleUsecase.GetTeamsAsync(examDate);
+
+        // Assert
+        results.Should().BeEquivalentTo(expected);
     }
 }
