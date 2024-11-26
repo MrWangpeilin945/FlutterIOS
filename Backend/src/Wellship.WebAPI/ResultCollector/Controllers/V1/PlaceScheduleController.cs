@@ -51,6 +51,7 @@ public class PlaceScheduleController : ControllerBase
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceSchedulePlaces))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/placeSchedules/places")]
