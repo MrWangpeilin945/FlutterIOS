@@ -9,10 +9,18 @@ type KeyboardProps = {
 
 export default function CollectionKeyboard(props: KeyboardProps) {
   const [value, setValue] = useState(props.value);
+  const [buttons,setButtons] = useState(props.keyboardValues);
 
   useEffect(() => {
     setValue(props.value);
   }, [props.value]);
+
+  //ACを配列の最後に結合
+  useEffect(() => {
+    const newKeyboardValues = [...props.keyboardValues, "AC"] 
+    setButtons(newKeyboardValues);
+  }, [props.keyboardValues]);
+
 
   //押下時処理
   const handlerKeyboardClick = (keyboardValue: string) => {
@@ -32,19 +40,17 @@ export default function CollectionKeyboard(props: KeyboardProps) {
       {/* キーボード(選択) */}
       <Box
         w={632}
-        h={88 * Math.ceil(props.keyboardValues.length / 4) + 24}
+        h={88 * Math.ceil(buttons.length / 4) + 24}
         bg="gray03"
         p={16}
         style={{ borderRadius: 8 }}
       >
         <Grid gutter={8}>
-          {props.keyboardValues.map((keyValue, index) => {
-            const isLastButton = index === props.keyboardValues.length - 1;
-
+          {buttons.map((keyValue, index) => {
             return (
               <GridCol
-                span={isLastButton ? "auto" : 3}
-                style={isLastButton ? { textAlign: "right" } : {}} // 最後のボタンを右端に配置
+                span={keyValue === "AC" ? "auto" : 3}
+                style={keyValue === "AC" ? { textAlign: "right" } : {}} // 最後のボタンを右端に配置
                 key={index}
               >
                 <Button
