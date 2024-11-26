@@ -74,6 +74,16 @@ export interface ResultsRequest {
 }
 
 /**
+ * 検査結果検証結果情報
+ */
+export interface VerifyExamItems {
+  /** エラーレベル */
+  errorLevel?: number;
+  /** 検査結果入力項目グループ */
+  examItemGroups?: ExamItemGroup[];
+}
+
+/**
  * 進捗明細
  */
 export interface ProgressDetail {
