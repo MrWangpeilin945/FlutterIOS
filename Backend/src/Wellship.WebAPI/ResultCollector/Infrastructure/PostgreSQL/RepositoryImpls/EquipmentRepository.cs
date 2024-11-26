@@ -30,7 +30,7 @@ public class EquipmentRepository : IEquipmentRepository
         const string sql = @"
         select
             equipment_id as EquipmentId
-            , name as Name
+            , name as EquipmentName
             , app_launch_url as AppLaunchUrl
             , processing_script_url as ProcessingScriptUrl
         from
