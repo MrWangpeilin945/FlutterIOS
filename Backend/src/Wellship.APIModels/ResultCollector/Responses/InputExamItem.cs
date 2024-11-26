@@ -34,7 +34,7 @@ public class InputExamItem
     /// <summary>
     /// 検査結果登録エラー
     /// </summary>
-    [JsonPropertyName("examRegstResults")]
-    public required ExamRegstResult[] ExamRegstResults { get; init;}
+    [JsonPropertyName("examRegistResults")]
+    public required ExamRegistResult[] ExamRegistResults { get; init;}
 
 }
