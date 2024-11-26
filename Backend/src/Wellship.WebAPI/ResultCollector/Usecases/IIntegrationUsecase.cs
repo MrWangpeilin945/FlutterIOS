@@ -20,5 +20,5 @@ public interface IIntegrationUsecase
     /// <summary>
     /// 検査結果の出力履歴を取得する
     /// </summary>
-    public void GetExportHistory();
+    public Task<ExportHistoryList> GetExportHistoryAsync();
 }

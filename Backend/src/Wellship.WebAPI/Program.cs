@@ -99,6 +99,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IHomeMenuRepository, HomeMenuRepository>();
         services.AddScoped<IStaffRepository, StaffRepository>();
         services.AddScoped<IExamMenuRepository, ExamMenuRepository>();
+        services.AddScoped<IIntegrationRepository, IntegrationRepository>();
         return services;
     }
     /// <summary>
@@ -111,6 +112,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IHomeMenuUsecase, HomeMenuUsecase>();
         services.AddScoped<IStaffUsecase, StaffUsecase>();
         services.AddScoped<IExamMenuUsecase, ExamMenuUsecase>();
+        services.AddScoped<IIntegrationUsecase, IntegrationUsecase>();
         return services;
     }
     /// <summary>

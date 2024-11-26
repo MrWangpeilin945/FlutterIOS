@@ -77,4 +77,59 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
             },
         }).ToArray();
     }
+
+    /// <summary>
+    /// 会場日程IDを指定して会場日程を取得する
+    /// </summary>
+    public async Task<IEnumerable<Domain.Models.PlaceSchedule>> GetPlaceSchedulesAsync(int[] placeScheduleIds)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            ps.place_schedule_id as PlaceScheduleId
+            , ps.status as Status
+            , ps.exam_date as ExamDate
+            , ps.start_time as StartTime
+            , p.place_id as PlaceId
+            , p.place_code as PlaceCode
+            , p.name as PlaceName
+            , p.order_number as PlaceOrderNumber
+            , t.team_id as TeamId
+            , t.team_code as TeamCode
+            , t.name as TeamName
+            , t.order_number as TeamOrderNumber 
+        from
+            resultcollector.place_schedule ps 
+            left join resultcollector.places p 
+                on ps.place_id = p.place_id 
+            left join resultcollector.teams t 
+                on ps.team_id = t.team_id
+        where
+            ps.place_schedule_id = any(@PlaceScheduleIds)
+        order by StartTime asc;";
+
+        var response = await connection.QueryAsync<PlaceSchedulePlaceTeam>(sql, new { PlaceScheduleIds = placeScheduleIds });
+
+        return response.Select(x => new Domain.Models.PlaceSchedule()
+        {
+            Id = x.PlaceScheduleId,
+            ExamDate = DateOnly.FromDateTime(x.ExamDate),
+            StartTime = x.StartTime,
+            PlaceScheduleLockingStatus = (PlaceScheduleLockingStatus)x.Status,
+            Place = new Domain.Models.Place()
+            {
+                Id = x.PlaceId,
+                Code = x.PlaceCode,
+                Name = x.PlaceName,
+                OrderNumber = x.PlaceOrderNumber
+            },
+            Team = new Domain.Models.Team()
+            {
+                Id = x.TeamId,
+                Code = x.TeamCode,
+                Name = x.TeamName,
+                OrderNumber = x.TeamOrderNumber
+            },
+        }).ToArray();
+    }
 }
