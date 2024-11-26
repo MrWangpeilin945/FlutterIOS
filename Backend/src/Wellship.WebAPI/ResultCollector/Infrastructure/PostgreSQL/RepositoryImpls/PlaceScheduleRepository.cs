@@ -58,7 +58,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
         return response.Select(x => new Domain.Models.PlaceSchedule()
         {
             Id = x.PlaceScheduleId,
-            ExamDate = new DateOnly(),
+            ExamDate = DateOnly.FromDateTime(x.ExamDate),
             StartTime = x.StartTime,
             PlaceScheduleLockingStatus = (PlaceScheduleLockingStatus)x.Status,
             Place = new Domain.Models.Place()

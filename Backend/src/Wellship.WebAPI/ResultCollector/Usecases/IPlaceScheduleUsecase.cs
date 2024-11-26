@@ -16,7 +16,7 @@ public interface IPlaceScheduleUsecase
     /// <summary>
     /// 班を指定して会場日程を取得する
     /// </summary>
-    public Task GetTeamPlaceSchedulesAsync();
+    public Task<PlaceSchedulePlaces> GetTeamPlaceSchedulesAsync(DateOnly examDate, int teamId);
 
     /// <summary>
     /// 会場ロック状態を取得する
