@@ -36,10 +36,11 @@
       "placeName": "会場B",
       "placeScheduleLockingStatus": 1,
       "examDate": "2024-10-21",
+      "startTime": "13:00",
       "details": [
         {
           "status": 11,
-          "statusName": "保留",
+          "statusName": "未出力",
           "count": 9
         },
         {
