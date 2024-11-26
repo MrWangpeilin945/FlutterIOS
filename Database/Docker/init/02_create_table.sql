@@ -16,6 +16,8 @@ CREATE TABLE equipments (
   equipment_id integer NOT NULL
   , name text NOT NULL
   , exam_menu_id integer NOT NULL
+  , app_launch_url text NOT NULL
+  , processing_script_url text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT equipments_PKC PRIMARY KEY (equipment_id)
@@ -88,7 +90,7 @@ CREATE TABLE exam_result_correlation_rules (
 );
 
 CREATE TABLE exam_result_histories (
-  id uuid NOT NULL
+  id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_id integer NOT NULL
   , exam_item_id integer NOT NULL
   , consult_item_detail_id integer NOT NULL
@@ -106,6 +108,17 @@ CREATE TABLE exam_results (
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_results_PKC PRIMARY KEY (consult_id,exam_item_id,exam_item_detail_id)
+);
+
+CREATE TABLE export_histories (
+  id uuid DEFAULT gen_random_uuid () NOT NULL
+  , place_schedule_id integer NOT NULL
+  , data_count integer NOT NULL
+  , exported_at timestamp with time zone NOT NULL
+  , exported_by text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT export_histories_PKC PRIMARY KEY (id)
 );
 
 CREATE TABLE home_menus (
@@ -145,7 +158,7 @@ ALTER TABLE organizations ADD CONSTRAINT organizations_IX1
   UNIQUE (organization_code) ;
 
 CREATE TABLE place_schedule_lock_histoies (
-  id uuid NOT NULL
+  id uuid DEFAULT gen_random_uuid () NOT NULL
   , place_schedule_id integer NOT NULL
   , status integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -172,7 +185,7 @@ CREATE TABLE role_permissions (
 );
 
 CREATE TABLE staff_login_histories (
-  id uuid NOT NULL
+  id uuid DEFAULT gen_random_uuid () NOT NULL
   , staff_id integer NOT NULL
   , login_timestamp timestamp with time zone NOT NULL
   , login_success boolean NOT NULL
@@ -419,6 +432,11 @@ ALTER TABLE exam_results
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE export_histories
+  ADD CONSTRAINT export_histories_FK1 FOREIGN KEY (place_schedule_id) REFERENCES place_schedule(place_schedule_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE home_menus
   ADD CONSTRAINT home_menus_FK1 FOREIGN KEY (home_menu_group_id) REFERENCES home_menu_groups(home_menu_group_id)
   ON DELETE RESTRICT
@@ -480,6 +498,8 @@ COMMENT ON TABLE equipments IS '検査機器';
 COMMENT ON COLUMN equipments.equipment_id IS '検査機器ID';
 COMMENT ON COLUMN equipments.name IS '検査機器名';
 COMMENT ON COLUMN equipments.exam_menu_id IS '検査メニューID';
+COMMENT ON COLUMN equipments.app_launch_url IS 'アプリ起動URL';
+COMMENT ON COLUMN equipments.processing_script_url IS '処理スクリプトURL';
 COMMENT ON COLUMN equipments.created_at IS '作成日時';
 COMMENT ON COLUMN equipments.created_by IS '作成者';
 
@@ -551,6 +571,15 @@ COMMENT ON COLUMN exam_results.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_results.value IS '値';
 COMMENT ON COLUMN exam_results.created_at IS '作成日時';
 COMMENT ON COLUMN exam_results.created_by IS '作成者';
+
+COMMENT ON TABLE export_histories IS '検査結果出力履歴';
+COMMENT ON COLUMN export_histories.id IS 'ID';
+COMMENT ON COLUMN export_histories.place_schedule_id IS '会場日程ID';
+COMMENT ON COLUMN export_histories.data_count IS '出力件数';
+COMMENT ON COLUMN export_histories.exported_at IS '出力日時';
+COMMENT ON COLUMN export_histories.exported_by IS '出力者';
+COMMENT ON COLUMN export_histories.created_at IS '作成日時';
+COMMENT ON COLUMN export_histories.created_by IS '作成者';
 
 COMMENT ON TABLE home_menus IS 'ホームメニュー';
 COMMENT ON COLUMN home_menus.home_menu_id IS 'ホームメニューID';

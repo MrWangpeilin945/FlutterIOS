@@ -49,13 +49,10 @@ import type {
   Staff,
   StaffLoginRequest,
   StaffLoginResponse,
-  UnexaminedItemList
-} from '~/domain/wellship.schemas'
-import { customAxiosInstance } from './customInstance';
-
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
+  UnexaminedItemList,
+  VerifyExamItems
+} from '../domain/wellship.schemas'
+import { axiosInstance } from '../utils/axiosInstance';
 
 
 
@@ -68,7 +65,7 @@ export const authenticationLogin = (
  ) => {
       
       
-      return customAxiosInstance<StaffLoginResponse>(
+      return axiosInstance<StaffLoginResponse>(
       {url: `/api/v${version}/staff/login`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: staffLoginRequest
@@ -128,7 +125,7 @@ export const cancelReasonGetCancelReasons = (
 ) => {
       
       
-      return customAxiosInstance<CancelReasonList>(
+      return axiosInstance<CancelReasonList>(
       {url: `/api/v${version}/cancelReasons`, method: 'GET',
         params, signal
     },
@@ -223,7 +220,7 @@ export const consultVerifyConsultNumber = (
  ) => {
       
       
-      return customAxiosInstance<void>(
+      return axiosInstance<void>(
       {url: `/api/v${version}/consult/consultNumber/verify`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: consultNumberRequest
@@ -283,7 +280,7 @@ export const consultGetUnexaminedItems = (
 ) => {
       
       
-      return customAxiosInstance<UnexaminedItemList>(
+      return axiosInstance<UnexaminedItemList>(
       {url: `/api/v${version}/consult/${consultNumber}/unexaminedItems`, method: 'GET', signal
     },
       );
@@ -378,7 +375,7 @@ export const consultGetSimpleExaminee = (
 ) => {
       
       
-      return customAxiosInstance<Blob>(
+      return axiosInstance<Blob>(
       {url: `/api/v${version}/consult/${consultNumber}/simple`, method: 'GET',
         responseType: 'blob', signal
     },
@@ -475,7 +472,7 @@ export const consultGetExamItemsExaminee = (
 ) => {
       
       
-      return customAxiosInstance<ExamContent>(
+      return axiosInstance<ExamContent>(
       {url: `/api/v${version}/consult/${consultNumber}/examItems`, method: 'GET',
         params, signal
     },
@@ -577,7 +574,7 @@ export const consultRegisterExecutions = (
  ) => {
       
       
-      return customAxiosInstance<void>(
+      return axiosInstance<void>(
       {url: `/api/v${version}/consult/${consultNumber}/executions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: executionsRequest
@@ -638,7 +635,7 @@ export const consultGetInputExamItemsExaminee = (
 ) => {
       
       
-      return customAxiosInstance<InputExamItems>(
+      return axiosInstance<InputExamItems>(
       {url: `/api/v${version}/consult/${consultNumber}/inputExamItems`, method: 'GET',
         params, signal
     },
@@ -740,7 +737,7 @@ export const equipmentGetEquipmentSettings = (
 ) => {
       
       
-      return customAxiosInstance<EquipmentList>(
+      return axiosInstance<EquipmentList>(
       {url: `/api/v${version}/equipments`, method: 'GET',
         params, signal
     },
@@ -835,7 +832,7 @@ export const examMenuGetExamMenus = (
 ) => {
       
       
-      return customAxiosInstance<ExamMenuList>(
+      return axiosInstance<ExamMenuList>(
       {url: `/api/v${version}/examMenus`, method: 'GET', signal
     },
       );
@@ -923,7 +920,7 @@ export const homeMenuGetHomeMenuSettings = (
 ) => {
       
       
-      return customAxiosInstance<HomeMenuGroupList>(
+      return axiosInstance<HomeMenuGroupList>(
       {url: `/api/v${version}/homeMenus`, method: 'GET', signal
     },
       );
@@ -1011,7 +1008,7 @@ export const integrationGetIntegrationResults = (
 ) => {
       
       
-      return customAxiosInstance<ExportDataList>(
+      return axiosInstance<ExportDataList>(
       {url: `/api/v${version}/integrations/examResults`, method: 'GET', signal
     },
       );
@@ -1100,7 +1097,7 @@ export const integrationExportResults = (
  ) => {
       
       
-      return customAxiosInstance<void>(
+      return axiosInstance<void>(
       {url: `/api/v${version}/integrations/examResults/${placeScheduleId}/export`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: resultExportRequest
@@ -1159,7 +1156,7 @@ export const integrationGetExportHistory = (
 ) => {
       
       
-      return customAxiosInstance<ExportHistoryList>(
+      return axiosInstance<ExportHistoryList>(
       {url: `/api/v${version}/integrations/examResults/exportHistory`, method: 'GET', signal
     },
       );
@@ -1248,7 +1245,7 @@ export const placeScheduleGetTeams = (
 ) => {
       
       
-      return customAxiosInstance<PlaceScheduleTeams>(
+      return axiosInstance<PlaceScheduleTeams>(
       {url: `/api/v${version}/placeSchedules/teams`, method: 'GET',
         params, signal
     },
@@ -1344,7 +1341,7 @@ export const placeScheduleGetTeamPlaceSchedules = (
 ) => {
       
       
-      return customAxiosInstance<PlaceSchedulePlaces>(
+      return axiosInstance<PlaceSchedulePlaces>(
       {url: `/api/v${version}/placeSchedules/places`, method: 'GET',
         params, signal
     },
@@ -1440,7 +1437,7 @@ export const placeScheduleGetPlaceScheduleLockingStatus = (
 ) => {
       
       
-      return customAxiosInstance<PlaceScheduleLocking>(
+      return axiosInstance<PlaceScheduleLocking>(
       {url: `/api/v${version}/placeSchedules/${placeScheduleId}/placeScheduleLockingStatus`, method: 'GET', signal
     },
       );
@@ -1535,7 +1532,7 @@ export const placeScheduleUpdatePlaceScheduleLockingStatus = (
  ) => {
       
       
-      return customAxiosInstance<void>(
+      return axiosInstance<void>(
       {url: `/api/v${version}/placeSchedules/${placeScheduleId}/placeScheduleLockingStatus`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: placeScheduleLockingRequest
@@ -1595,7 +1592,7 @@ export const placeScheduleUpdatePlaceScheduleResultExportStatus = (
  ) => {
       
       
-      return customAxiosInstance<void>(
+      return axiosInstance<void>(
       {url: `/api/v${version}/placeSchedules/${placeScheduleId}/placeScheduleResultExportStatus`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: placeScheduleLockingRequest
@@ -1655,7 +1652,7 @@ export const progressGetProgress = (
 ) => {
       
       
-      return customAxiosInstance<PlaceScheduleProgress>(
+      return axiosInstance<PlaceScheduleProgress>(
       {url: `/api/v${version}/progress/${placeScheduleId}`, method: 'GET', signal
     },
       );
@@ -1745,31 +1742,33 @@ export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progres
  */
 export const resultVerifyResults = (
     version: string,
-    consultId: string,
+    consultNumber: string,
+    resultsRequest: ResultsRequest,
  ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/consult/${consultId}/results/verify`, method: 'POST',
-        responseType: 'blob'
+      return axiosInstance<VerifyExamItems>(
+      {url: `/api/v${version}/consult/${consultNumber}/results/verify`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: resultsRequest
     },
       );
     }
   
 
 
-export const getResultVerifyResultsMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultId: string}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultId: string}, TContext> => {
+export const getResultVerifyResultsMutationOptions = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultNumber: string;data: ResultsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultNumber: string;data: ResultsRequest}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resultVerifyResults>>, {version: string;consultId: string}> = (props) => {
-          const {version,consultId} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resultVerifyResults>>, {version: string;consultNumber: string;data: ResultsRequest}> = (props) => {
+          const {version,consultNumber,data} = props ?? {};
 
-          return  resultVerifyResults(version,consultId,)
+          return  resultVerifyResults(version,consultNumber,data,)
         }
 
         
@@ -1778,18 +1777,18 @@ const {mutation: mutationOptions} = options ?? {};
   return  { mutationFn, ...mutationOptions }}
 
     export type ResultVerifyResultsMutationResult = NonNullable<Awaited<ReturnType<typeof resultVerifyResults>>>
-    
-    export type ResultVerifyResultsMutationError = unknown
+    export type ResultVerifyResultsMutationBody = ResultsRequest
+    export type ResultVerifyResultsMutationError = ProblemDetails
 
     /**
  * @summary 検査結果を検証する
  */
-export const useResultVerifyResults = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultId: string}, TContext>, }
+export const useResultVerifyResults = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultNumber: string;data: ResultsRequest}, TContext>, }
 ): UseMutationResult<
         Awaited<ReturnType<typeof resultVerifyResults>>,
         TError,
-        {version: string;consultId: string},
+        {version: string;consultNumber: string;data: ResultsRequest},
         TContext
       > => {
 
@@ -1808,7 +1807,7 @@ export const resultRegisterResults = (
  ) => {
       
       
-      return customAxiosInstance<void>(
+      return axiosInstance<void>(
       {url: `/api/v${version}/consult/${consultNumber}/results`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: resultsRequest
@@ -1867,7 +1866,7 @@ export const staffGetStaff = (
 ) => {
       
       
-      return customAxiosInstance<Staff>(
+      return axiosInstance<Staff>(
       {url: `/api/v${version}/staff/profile`, method: 'GET', signal
     },
       );

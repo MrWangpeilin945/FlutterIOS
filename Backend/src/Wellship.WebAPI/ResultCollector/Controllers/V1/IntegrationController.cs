@@ -64,9 +64,9 @@ public class IntegrationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/integrations/examResults/exportHistory")]
-    public IActionResult GetExportHistory()
+    public async Task<IActionResult> GetExportHistory()
     {
-        _integrationUsecase.GetExportHistory();
-        return Ok();
+        var result = await _integrationUsecase.GetExportHistoryAsync();
+        return Ok(result);
     }
 }

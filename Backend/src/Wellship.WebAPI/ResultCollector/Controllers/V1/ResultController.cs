@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
@@ -26,10 +28,16 @@ public class ResultController : ControllerBase
     /// <summary>
     /// 検査結果を検証する
     /// </summary>
-    /// <returns></returns>
+    /// <param name="consultNumber">受診番号</param>
+    /// <param name="results">検査結果検証項目</param>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(VerifyExamItems))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [HttpPost]
-    [Route("api/v{version:apiVersion}/consult/{consultId}/results/verify")]
-    public IActionResult VerifyResults()
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/results/verify")]
+    public IActionResult VerifyResults([FromRoute][Required] string consultNumber, [FromBody] ResultsRequest results)
     {
         _resultUsecase.VerifyResults();
         return Ok();
@@ -39,6 +47,7 @@ public class ResultController : ControllerBase
     /// 検査結果を登録する
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
+    /// <param name="results">検査結果登録項目</param>
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -46,7 +55,7 @@ public class ResultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/results")]
-    public IActionResult RegisterResults([FromRoute] string consultNumber, [FromBody] ResultsRequest results)
+    public IActionResult RegisterResults([FromRoute][Required] string consultNumber, [FromBody] ResultsRequest results)
     {
         _resultUsecase.RegisterResults();
         return Ok();
