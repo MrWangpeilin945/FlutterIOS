@@ -10,7 +10,7 @@ public interface IIntegrationUsecase
     /// <summary>
     /// 連携対象の検査結果を取得する
     /// </summary>
-    public void GetIntegrationResults();
+    public Task<ExportDataList> GetExportTargetResultsAsync();
 
     /// <summary>
     /// 連携用に検査結果を出力する

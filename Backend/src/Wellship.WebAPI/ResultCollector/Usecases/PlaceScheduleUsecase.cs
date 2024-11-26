@@ -79,7 +79,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
                                      PlaceScheduleId = t.Id,
                                      PlaceId = t.Place.Id,
                                      PlaceName = t.Place.Name,
-                                     StartTime = FormatStartTimeString(t.StartTime),
+                                     StartTime = t.FormatStartTimeString,
                                  }).ToArray()
         };
     }

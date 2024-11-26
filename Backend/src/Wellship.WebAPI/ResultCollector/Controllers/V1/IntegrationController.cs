@@ -35,10 +35,10 @@ public class IntegrationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/integrations/examResults")]
-    public IActionResult GetIntegrationResults()
+    public async Task<IActionResult> GetIntegrationResults()
     {
-        _integrationUsecase.GetIntegrationResults();
-        return Ok();
+        var result = await _integrationUsecase.GetExportTargetResultsAsync();
+        return Ok(result);
     }
 
     /// <summary>

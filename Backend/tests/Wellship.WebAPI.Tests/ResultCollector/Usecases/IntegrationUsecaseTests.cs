@@ -15,6 +15,7 @@ public class IntegrationUsecaseTests
     private readonly Mock<IIntegrationRepository> _integrationRepositoryMock;
     private readonly List<WebAPI.ResultCollector.Domain.Models.PlaceSchedule> _placeSchedules;
     private readonly List<WebAPI.ResultCollector.Domain.Models.ExportHistory> _exportHistories;
+    private readonly List<WebAPI.ResultCollector.Domain.Models.ExportPlaceSchedule> _exportPlaceSchedules;
 
     public IntegrationUsecaseTests()
     {
@@ -61,6 +62,11 @@ public class IntegrationUsecaseTests
             new(){PlaceScheduleId = 1,DataCount = 13,ExportedAt = DateTime.Parse("2024-11-30 17:00"),ExportedBy = "職員A"},
             new(){PlaceScheduleId = 1,DataCount = 45,ExportedAt = DateTime.Parse("2024-11-30 13:00"),ExportedBy = "職員B"},
             new(){PlaceScheduleId = 2,DataCount = 2,ExportedAt = DateTime.Parse("2024-10-21 17:30"),ExportedBy = "職員B"}
+        ];
+
+        _exportPlaceSchedules = [
+            new(){PlaceScheduleId = 1, ExportStatusCount11 = 103, ExportStatusCount21 = 4, ExportStatusCount31 = 97},
+            new(){PlaceScheduleId = 2, ExportStatusCount11 = 0, ExportStatusCount21 = 0, ExportStatusCount31 = 3}
         ];
     }
 
@@ -134,6 +140,97 @@ public class IntegrationUsecaseTests
 
         // Act
         var result = await integrationUsecase.GetExportHistoryAsync();
+
+        // Assert
+        result.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task 出力対象を会場日程ごとに取得できる_複数件()
+    {
+        // Arrange
+        _integrationRepositoryMock.Setup(r => r.GetExportPlaceSchedulesAsync()).ReturnsAsync(_exportPlaceSchedules);
+        _placeScheduleRepositoryMock.Setup(r => r.GetPlaceSchedulesAsync(new int[] { 1, 2 })).ReturnsAsync(_placeSchedules);
+
+        var integrationUsecase = new IntegrationUsecase(_integrationRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
+
+        var expected = new APIModels.Responses.ExportDataList()
+        {
+            ExportData = [
+               new APIModels.Responses.ExportData(){
+                PlaceScheduleId = 1,
+                ExamDate = new DateOnly(2024,11,30),
+                PlaceName = "会場A",
+                StartTime = "10:00",
+                PlaceScheduleLockingStatus = (int)PlaceScheduleLockingStatus.検査完了,
+                Details = [
+                    new APIModels.Responses.ExportDataDetail(){
+                        Status = (int)ConsultResultExportStatus.未出力,
+                        StatusName = "未出力",
+                        Count = 103
+                    },
+                    new APIModels.Responses.ExportDataDetail(){
+                        Status = (int)ConsultResultExportStatus.出力保留,
+                        StatusName = "出力保留",
+                        Count = 4
+                    },
+                    new APIModels.Responses.ExportDataDetail(){
+                        Status = (int)ConsultResultExportStatus.出力済み,
+                        StatusName = "出力済み",
+                        Count = 97
+                    }
+                ]
+               },
+               new APIModels.Responses.ExportData(){
+                PlaceScheduleId = 2,
+                ExamDate = new DateOnly(2024,10,21),
+                PlaceName = "会場A",
+                StartTime = "13:00",
+                PlaceScheduleLockingStatus = (int)PlaceScheduleLockingStatus.検査完了,
+                Details = [
+                    new APIModels.Responses.ExportDataDetail(){
+                        Status = (int)ConsultResultExportStatus.未出力,
+                        StatusName = "未出力",
+                        Count = 0
+                    },
+                    new APIModels.Responses.ExportDataDetail(){
+                        Status = (int)ConsultResultExportStatus.出力保留,
+                        StatusName = "出力保留",
+                        Count = 0
+                    },
+                    new APIModels.Responses.ExportDataDetail(){
+                        Status = (int)ConsultResultExportStatus.出力済み,
+                        StatusName = "出力済み",
+                        Count = 3
+                    }
+                ]
+               }
+            ]
+        };
+
+        // Act
+        var result = await integrationUsecase.GetExportTargetResultsAsync();
+
+        // Assert
+        result.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task 出力対象を会場日程ごとに取得できる_0件()
+    {
+        // Arrange
+        _integrationRepositoryMock.Setup(r => r.GetExportPlaceSchedulesAsync()).ReturnsAsync([]);
+        _placeScheduleRepositoryMock.Setup(r => r.GetPlaceSchedulesAsync(new int[] { })).ReturnsAsync([]);
+
+        var integrationUsecase = new IntegrationUsecase(_integrationRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
+
+        var expected = new APIModels.Responses.ExportDataList()
+        {
+            ExportData = []
+        };
+
+        // Act
+        var result = await integrationUsecase.GetExportTargetResultsAsync();
 
         // Assert
         result.Should().BeEquivalentTo(expected);

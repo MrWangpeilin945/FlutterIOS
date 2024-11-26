@@ -28,7 +28,7 @@ public class PlaceSchedule
     public required DateOnly ExamDate { get; init; }
 
     /// <summary>
-    /// 開始時刻（HH:mm形式）
+    /// 開始時刻（HHmm形式）
     /// </summary>
     public required string StartTime { get; init; }
 
@@ -36,4 +36,12 @@ public class PlaceSchedule
     /// 会場ロック状況
     /// </summary>
     public required PlaceScheduleLockingStatus PlaceScheduleLockingStatus { get; init; }
+
+    /// <summary>
+    /// 開始時刻をHH:mm形式で取得します。
+    /// </summary>
+    public string FormatStartTimeString
+    {
+        get => $"{StartTime.Substring(0, 2)}:{StartTime.Substring(2, 2)}";
+    }
 }

@@ -42,4 +42,25 @@ public class IntegrationRepository : IIntegrationRepository
         var response = await connection.QueryAsync<ExportHistory>(sql);
         return response;
     }
+
+    /// <summary>
+    /// 検査結果出力のために会場日程ごとの受診を取得する
+    /// </summary>
+    public async Task<IEnumerable<ExportPlaceSchedule>> GetExportPlaceSchedulesAsync()
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            place_schedule_id as PlaceScheduleId
+            , SUM(case when export_status = 11 then 1 else 0 end) as ExportStatusCount11
+            , SUM(case when export_status = 21 then 1 else 0 end) as ExportStatusCount21
+            , SUM(case when export_status = 31 then 1 else 0 end) as ExportStatusCount31 
+        from
+            resultcollector.consult 
+        group by
+            place_schedule_id;";
+
+        var response = await connection.QueryAsync<ExportPlaceSchedule>(sql);
+        return response;
+    }
 }
