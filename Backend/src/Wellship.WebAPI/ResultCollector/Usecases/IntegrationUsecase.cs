@@ -1,5 +1,4 @@
-using Ryobi.Wellship.APIModels.Requests;
-using Ryobi.Wellship.Core.Exceptions;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -10,14 +9,15 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 public class IntegrationUsecase : IIntegrationUsecase
 {
     private readonly IIntegrationRepository _integrationRepository;
+    private readonly IPlaceScheduleRepository _placeScheduleRepository;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="integrationRepository">基幹システム連携リポジトリ</param>
-    public IntegrationUsecase(IIntegrationRepository integrationRepository)
+    public IntegrationUsecase(IIntegrationRepository integrationRepository, IPlaceScheduleRepository placeScheduleRepository)
     {
         _integrationRepository = integrationRepository;
+        _placeScheduleRepository = placeScheduleRepository;
     }
 
     /// <summary>
@@ -39,8 +39,33 @@ public class IntegrationUsecase : IIntegrationUsecase
     /// <summary>
     /// 検査結果の出力履歴を取得する
     /// </summary>
-    public void GetExportHistory()
+    public async Task<ExportHistoryList> GetExportHistoryAsync()
     {
+        var histories = await _integrationRepository.GetExportHistoryAsync();
 
+        // 会場名や会場ロック状況を表示するため、会場日程を取得する
+        var placeScheduleIds = histories.Select(x => x.PlaceScheduleId).Distinct().ToArray();
+        var placeSchedules = await _placeScheduleRepository.GetPlaceSchedulesAsync(placeScheduleIds);
+
+        var exportHistories = histories.Select(x =>
+        {
+            var placeSchedule = placeSchedules.Single(p => p.Id == x.PlaceScheduleId);
+
+            return new ExportHistory
+            {
+                PlaceScheduleId = x.PlaceScheduleId,
+                PlaceName = placeSchedule.Place.Name,
+                PlaceScheduleLockingStatus = (int)placeSchedule.PlaceScheduleLockingStatus,
+                ExamDate = placeSchedule.ExamDate,
+                DataCount = x.DataCount,
+                ExportedAt = x.ExportedAt,
+                ExportedBy = x.ExportedBy
+            };
+        }).OrderByDescending(x => x.ExportedAt).ToArray();
+
+        return new ExportHistoryList
+        {
+            ExportHistories = exportHistories
+        };
     }
 }

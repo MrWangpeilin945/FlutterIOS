@@ -100,6 +100,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IStaffRepository, StaffRepository>();
         services.AddScoped<IExamMenuRepository, ExamMenuRepository>();
         services.AddScoped<IEquipmentRepository, EquipmentRepository>();
+        services.AddScoped<IIntegrationRepository, IntegrationRepository>();
         return services;
     }
     /// <summary>
@@ -113,6 +114,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IStaffUsecase, StaffUsecase>();
         services.AddScoped<IExamMenuUsecase, ExamMenuUsecase>();
         services.AddScoped<IEquipmentUsecase, EquipmentUsecase>();
+        services.AddScoped<IIntegrationUsecase, IntegrationUsecase>();
         return services;
     }
     /// <summary>
