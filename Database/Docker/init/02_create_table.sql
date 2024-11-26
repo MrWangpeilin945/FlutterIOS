@@ -16,6 +16,8 @@ CREATE TABLE equipments (
   equipment_id integer NOT NULL
   , name text NOT NULL
   , exam_menu_id integer NOT NULL
+  , app_launch_url text NOT NULL
+  , processing_script_url text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT equipments_PKC PRIMARY KEY (equipment_id)
@@ -496,6 +498,8 @@ COMMENT ON TABLE equipments IS '検査機器';
 COMMENT ON COLUMN equipments.equipment_id IS '検査機器ID';
 COMMENT ON COLUMN equipments.name IS '検査機器名';
 COMMENT ON COLUMN equipments.exam_menu_id IS '検査メニューID';
+COMMENT ON COLUMN equipments.app_launch_url IS 'アプリ起動URL';
+COMMENT ON COLUMN equipments.processing_script_url IS '処理スクリプトURL';
 COMMENT ON COLUMN equipments.created_at IS '作成日時';
 COMMENT ON COLUMN equipments.created_by IS '作成者';
 
