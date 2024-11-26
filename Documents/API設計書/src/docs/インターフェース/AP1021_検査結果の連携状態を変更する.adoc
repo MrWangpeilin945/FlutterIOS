@@ -1,17 +1,15 @@
-== AP1021_検査結果の連携状態を変更する
+== AP1021_検査結果の連携状態を未出力にする
 
 === 概要
 
-* 会場日程単位の連携状態を変更する
-* 結果出力後に連携状態を引き戻して再処理したいときなどに使用する
-* 未出力にする場合、`placeScheduleResultExportStatus : 11`を送信する
-* バックエンドでは、受診ごとに持っているステータス（`consultResultExportStatus`）を更新する
+* 出力結果履歴に対して、受診データ出力状況「出力済み」を「未出力」に変更する
+* 検査結果出力履歴画面から利用する
 
 === URI
 
 [source]
 ----
-[PUT] /placeSchedules/{placeScheduleId}/placeScheduleResultExportStatus
+[PUT] /integrations/examResults/{placeScheduleId}/undo
 ----
 
 === リクエストヘッダー
@@ -39,8 +37,7 @@
 [source,json]
 ----
 {
-  "placeScheduleId": 15,
-  "placeScheduleResultExportStatus": 1
+  "exportId": "c0873b41-ac80-403e-ae35-336065b0411f",
 }
 ----
 
@@ -52,8 +49,8 @@
 
 * 200 OK
 * 400 BadRequest
-** 指定した受診番号の形式が不正
+** 指定した会場日程IDの形式が不正
 * 401 Unauthorized
 ** JWT認証に失敗
 * 404 NotFound
-** 指定した受診が存在しない
+** 指定した会場日程が存在しない
