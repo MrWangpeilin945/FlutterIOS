@@ -77,6 +77,7 @@ public class IntegrationRepository : IIntegrationRepository
     public async Task UndoExportStatusAsync(Guid exportId)
     {
         var status = ConsultResultExportStatus.未出力;
+
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
         update resultcollector.consult 

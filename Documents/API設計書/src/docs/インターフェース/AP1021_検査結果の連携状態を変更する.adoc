@@ -4,29 +4,18 @@
 
 * 出力結果履歴に対して、受診データ出力状況「出力済み」を「未出力」に変更する
 * 検査結果出力履歴画面から利用する
+* 指定した出力IDが存在しない場合は、何も更新せずエラーも出さない
 
 === URI
 
 [source]
 ----
-[PUT] /integrations/examResults/{placeScheduleId}/undo
+[PUT] /integrations/examResults/undoExport
 ----
 
 === リクエストヘッダー
 
 === パスパラメータ
-
-[cols="2,1,1,4,2" options="header"]
-|===
-|名称|必須|型|説明|具体例
-
-|placeScheduleId
-|Yes
-|int
-|会場日程ID
-|23
-
-|===
 
 === クエリパラメータ
 
@@ -49,8 +38,6 @@
 
 * 200 OK
 * 400 BadRequest
-** 指定した会場日程IDの形式が不正
+** 指定した出力IDがUUIDの形式ではない
 * 401 Unauthorized
 ** JWT認証に失敗
-* 404 NotFound
-** 指定した会場日程が存在しない
