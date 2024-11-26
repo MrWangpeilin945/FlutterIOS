@@ -24,7 +24,7 @@ export default function ExamineeInfo({
         <Title order={2} className={styles["text-wrap"]}>
           {name}
         </Title>
-        {namesake && <Text>同性同名の受診者がいます</Text>}
+        {namesake && <Text>同姓同名の受診者がいます</Text>}
       </Group>
       <Group>
         <Paper
