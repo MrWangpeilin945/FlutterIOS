@@ -5,7 +5,7 @@ namespace Ryobi.Wellship.APIModels.Responses;
 /// <summary>
 /// 検査結果登録エラー
 /// </summary>
-public class ExamRegstResult
+public class ExamRegistResult
 {
     /// <summary>
     /// エラーレベル
