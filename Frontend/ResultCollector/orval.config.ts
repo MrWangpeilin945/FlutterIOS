@@ -4,7 +4,7 @@ export default {
     output: {
       mode: 'split',
       target: './app/api', // 生成するAPIクライアントの出力先
-      client: 'react-query', // Axiosを使用
+      client: 'react-query', 
       import: {
         axios: 'axios', // Axiosをインポート
       },
