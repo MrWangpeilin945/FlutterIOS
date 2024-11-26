@@ -114,10 +114,10 @@ public class IntegrationUsecase : IIntegrationUsecase
     }
 
     /// <summary>
-    /// 出力した検査結果を未出力にする
+    /// 出力した結果を未出力に戻す
     /// </summary>
-    public async Task UndoAsync(UndoIntegrationExportStatusRequest request)
+    public async Task UndoExportStatusAsync(Guid exportId)
     {
-        throw new NotImplementedException();
+        await _integrationRepository.UndoExportStatusAsync(exportId);
     }
 }

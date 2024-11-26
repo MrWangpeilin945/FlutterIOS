@@ -1,6 +1,8 @@
 
+
 using Dapper;
 
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
@@ -30,15 +32,19 @@ public class IntegrationRepository : IIntegrationRepository
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
         select
-            id as ExportId
+            h.id as ExportId
             , place_schedule_id as PlaceScheduleId
-            , data_count as DataCount
+            , COUNT(d.consult_id) as DataCount
             , exported_at as ExportedAt
-            , exported_by as ExportedBy
+            , exported_by as ExportedBy 
         from
-            resultcollector.export_histories 
+            resultcollector.export_histories as h 
+            left join resultcollector.export_history_details as d 
+                on h.id = d.id 
+        group by
+            h.id 
         order by
-            exported_at desc;";
+            h.exported_at desc;";
 
         var response = await connection.QueryAsync<ExportHistory>(sql);
         return response;
@@ -63,5 +69,28 @@ public class IntegrationRepository : IIntegrationRepository
 
         var response = await connection.QueryAsync<ExportPlaceSchedule>(sql);
         return response;
+    }
+
+    /// <summary>
+    /// 出力履歴IDを指定して受診の出力状況を未出力に戻す
+    /// </summary>
+    public async Task UndoExportStatusAsync(Guid exportId)
+    {
+        var status = ConsultResultExportStatus.未出力;
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        update resultcollector.consult 
+        set
+            export_status = @Status
+        where
+            consult_id in ( 
+                select
+                    consult_id 
+                from
+                    resultcollector.export_history_details 
+                where
+                    id = @ExportId
+            );";
+        await connection.QueryAsync(sql, new { Status = status, ExportId = exportId });
     }
 }
