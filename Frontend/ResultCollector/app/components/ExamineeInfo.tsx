@@ -1,10 +1,10 @@
-import { Box, Group, Paper, Text, Title } from "@mantine/core";
+import { Box, Group, Paper, Text, Title, Tooltip } from "@mantine/core";
+import { useState } from "react";
 import styles from "~/styles/common.module.css";
 
 type ExamineeInfoProps = {
   name: string;
   birthday: string;
-  age: number;
   office: string[];
   note?: string;
   namesake: boolean;
@@ -13,11 +13,25 @@ type ExamineeInfoProps = {
 export default function ExamineeInfo({
   name,
   birthday,
-  age,
   office,
   note,
   namesake,
 }: ExamineeInfoProps) {
+  const [showOfficeTooltip, setShowOfficeTooltip] = useState(false);
+  const [showNoteTooltip, setShowNoteTooltip] = useState(false);
+
+  function concatOffices(offices: string[]): string {
+    let result = "";
+    for (const office of offices) {
+      result += `${office}、`;
+    }
+    // 最後の"、"を削除
+    if (result.length > 0) {
+      result = result.slice(0, -1);
+    }
+    return result;
+  }
+
   return (
     <Box>
       <Group>
@@ -50,11 +64,26 @@ export default function ExamineeInfo({
             団体
           </Text>
         </Paper>
-        <Text className={styles["text-wrap"]}>
-          {office.map((office) => {
-            return office.concat("　");
-          })}
-        </Text>
+        <Tooltip
+          label={concatOffices(office)}
+          w={600}
+          opened={showOfficeTooltip}
+          multiline
+          withArrow
+          position="top"
+        >
+          <Text
+            w={400}
+            onClick={() => setShowOfficeTooltip(!showOfficeTooltip)}
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {concatOffices(office)}
+          </Text>
+        </Tooltip>
       </Group>
       <Group>
         <Paper
@@ -68,7 +97,26 @@ export default function ExamineeInfo({
             備考
           </Text>
         </Paper>
-        <Text className={styles["text-wrap"]}>{note}</Text>
+        <Tooltip
+          label={note}
+          w={800}
+          opened={showNoteTooltip}
+          multiline
+          withArrow
+          position="bottom"
+        >
+          <Text
+            w={600}
+            onClick={() => setShowNoteTooltip(!showNoteTooltip)}
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {note}
+          </Text>
+        </Tooltip>
       </Group>
     </Box>
   );
