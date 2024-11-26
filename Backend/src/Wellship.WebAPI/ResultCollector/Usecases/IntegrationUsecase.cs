@@ -24,7 +24,7 @@ public class IntegrationUsecase : IIntegrationUsecase
     /// <summary>
     /// 連携対象の検査結果を取得する
     /// </summary>
-    public async Task<ExportDataList> GetIntegrationResultsAsync()
+    public async Task<ExportDataList> GetExportTargetResultsAsync()
     {
         var results = await _integrationRepository.GetExportPlaceSchedulesAsync();
 
@@ -66,7 +66,6 @@ public class IntegrationUsecase : IIntegrationUsecase
             }).OrderByDescending(x => x.ExamDate)
               .ThenByDescending(x => x.StartTime)
               .ToArray()
-
         };
     }
 

@@ -37,7 +37,7 @@ public class IntegrationController : ControllerBase
     [Route("api/v{version:apiVersion}/integrations/examResults")]
     public async Task<IActionResult> GetIntegrationResults()
     {
-        var result = await _integrationUsecase.GetIntegrationResultsAsync();
+        var result = await _integrationUsecase.GetExportTargetResultsAsync();
         return Ok(result);
     }
 
