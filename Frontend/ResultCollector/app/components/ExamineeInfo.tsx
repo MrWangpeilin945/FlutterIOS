@@ -21,15 +21,7 @@ export default function ExamineeInfo({
   const [showNoteTooltip, setShowNoteTooltip] = useState(false);
 
   function concatOffices(offices: string[]): string {
-    let result = "";
-    for (const office of offices) {
-      result += `${office}、`;
-    }
-    // 最後の"、"を削除
-    if (result.length > 0) {
-      result = result.slice(0, -1);
-    }
-    return result;
+    return offices.join("、");
   }
 
   return (
