@@ -101,6 +101,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IExamMenuRepository, ExamMenuRepository>();
         services.AddScoped<IEquipmentRepository, EquipmentRepository>();
         services.AddScoped<IIntegrationRepository, IntegrationRepository>();
+        services.AddScoped<IExamineeRepository, ExamineeRepository>();
         return services;
     }
     /// <summary>

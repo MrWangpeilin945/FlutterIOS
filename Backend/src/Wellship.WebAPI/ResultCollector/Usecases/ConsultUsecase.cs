@@ -1,4 +1,5 @@
 using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
@@ -10,14 +11,17 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 public class ConsultUsecase : IConsultUsecase
 {
     private readonly IConsultRepository _consultRepository;
+    private readonly IExamineeRepository _examineeRepository;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="consultRepository">受診リポジトリ</param>
-    public ConsultUsecase(IConsultRepository consultRepository)
+    /// <param name="examineeRepository">受診者リポジトリ</param>
+    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository)
     {
         _consultRepository = consultRepository;
+        _examineeRepository = examineeRepository;
     }
 
     /// <summary>
@@ -39,9 +43,23 @@ public class ConsultUsecase : IConsultUsecase
     /// <summary>
     /// 未受診の検査項目を取得する
     /// </summary>
-    public void GetUnexaminedItems()
+    public async Task<UnexaminedItemList> GetUnexaminedItemsAsync(string consultNumber)
     {
+        // 受診リポジトリから受診を取得する
+        // 受診.受診者IDをもとに氏名などを取る
+        var dummyId = 3;
 
+        var examinee = await _examineeRepository.GetExamineeAsync(dummyId);
+
+        return new UnexaminedItemList()
+        {
+            ConsultId = 1,
+            ExamineeId = examinee.ExamineeId,
+            ExamineeName = examinee.Name,
+            UnexaminedItems = [
+                new(){ExamItemId = 1,ExamItemName = ""}
+            ]
+        };
     }
 
     /// <summary>

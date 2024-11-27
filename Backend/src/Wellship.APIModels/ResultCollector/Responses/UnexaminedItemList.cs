@@ -8,37 +8,26 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class UnexaminedItemList
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public UnexaminedItemList(int consultId, int examineeId, string examineeName, ICollection<ExamItem> examItems)
-    {
-        ConsultId = consultId;
-        ExamineeId = examineeId;
-        ExamineeName = examineeName;
-        UnexaminedItems = examItems.ToArray();
-    }
-
-    /// <summary>
     /// 受診ID
     /// </summary>
     [JsonPropertyName("consultId")]
-    public int ConsultId { get; }
+    public required int ConsultId { get; init; }
 
     /// <summary>
     /// 受診者ID
     /// </summary>
     [JsonPropertyName("examineeId")]
-    public int ExamineeId { get; }
+    public required int ExamineeId { get; init; }
 
     /// <summary>
     /// 受診者名
     /// </summary>
     [JsonPropertyName("examineeName")]
-    public string ExamineeName { get; }
+    public required string ExamineeName { get; init; }
 
     /// <summary>
     /// 未受診の検査項目リスト
     /// </summary>
     [JsonPropertyName("unexaminedItems")]
-    public ExamItem[] UnexaminedItems { get; }
+    public required ExamItem[] UnexaminedItems { get; init; }
 }

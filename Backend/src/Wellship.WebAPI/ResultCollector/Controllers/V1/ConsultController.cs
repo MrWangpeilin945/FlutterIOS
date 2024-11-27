@@ -52,9 +52,10 @@ public class ConsultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/unexaminedItems")]
-    public IActionResult GetUnexaminedItems([FromRoute][Required] string consultNumber)
+    public async Task<IActionResult> GetUnexaminedItems([FromRoute][Required] string consultNumber)
     {
-        return Ok();
+        var results = await _consultUsecase.GetUnexaminedItemsAsync(consultNumber);
+        return Ok(results);
     }
 
     /// <summary>

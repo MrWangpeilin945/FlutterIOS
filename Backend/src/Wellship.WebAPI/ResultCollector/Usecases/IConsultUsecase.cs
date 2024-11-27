@@ -1,4 +1,5 @@
 using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -17,7 +18,7 @@ public interface IConsultUsecase
     /// <summary>
     /// 未受診の検査項目を取得する
     /// </summary>
-    public void GetUnexaminedItems();
+    public Task<UnexaminedItemList> GetUnexaminedItemsAsync(string consultNumber);
 
     /// <summary>
     /// 簡易な受診者情報を取得する
