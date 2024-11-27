@@ -161,7 +161,7 @@ export interface PlaceSchedule {
   placeName?: string;
   /** 会場日程ID */
   placeScheduleId?: number;
-  /** 開始時刻 */
+  /** 開始時刻（HH:mm形式） */
   startTime?: string;
 }
 
@@ -210,6 +210,14 @@ export interface PlaceScheduleTeams {
 }
 
 /**
+ * 検査結果出力状況を未出力に戻すリクエストモデル
+ */
+export interface UndoIntegrationExportStatusRequest {
+  /** 出力履歴ID */
+  exportId?: string;
+}
+
+/**
  * 検査結果出力履歴
  */
 export interface ExportHistory {
@@ -221,6 +229,8 @@ export interface ExportHistory {
   exportedAt?: string;
   /** 出力者 */
   exportedBy?: string;
+  /** 出力履歴ID */
+  exportId?: string;
   /** 会場名 */
   placeName?: string;
   /** 会場日程ID */
@@ -261,8 +271,6 @@ export interface ExportDataDetail {
  * 連携対象検査結果
  */
 export interface ExportData {
-  /** 項目数 */
-  dataCount?: number;
   /** 連携対象検査結果明細 */
   details?: ExportDataDetail[];
   /** 健診日 */
@@ -273,6 +281,8 @@ export interface ExportData {
   placeScheduleId?: number;
   /** ロック状態 */
   placeScheduleLockingStatus?: number;
+  /** 開始時刻 */
+  startTime?: string;
 }
 
 /**
@@ -325,12 +335,14 @@ export interface ExamMenuList {
  * 検査機器
  */
 export interface Equipment {
+  /** アプリ起動URL */
+  appLaunchUrl?: string;
   /** 検査機器ID */
   equipmentId?: number;
   /** 検査機器名 */
   equipmentName?: string;
-  /** 検査メニューID */
-  examMenuId?: number;
+  /** 処理スクリプトURL */
+  processingScriptUrl?: string;
 }
 
 /**
@@ -344,7 +356,7 @@ export interface EquipmentList {
 /**
  * 検査結果登録エラー
  */
-export interface ExamRegstResult {
+export interface ExamRegistResult {
   /** エラー内容 */
   description?: string;
   /** エラーレベル */
@@ -428,7 +440,7 @@ export interface InputExamItem {
   /** 検査項目ID */
   examItemId?: number;
   /** 検査結果登録エラー */
-  examRegstResults?: ExamRegstResult[];
+  examRegistResults?: ExamRegistResult[];
   /** 検査項目名 */
   name?: string;
   /** 配置番号 */
