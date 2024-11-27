@@ -10,7 +10,7 @@
 
 [source]
 ----
-[PUT] /integrations/examResults/undoExport
+[POST] /integrations/examResults/undoExport
 ----
 
 === リクエストヘッダー

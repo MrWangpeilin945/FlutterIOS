@@ -74,6 +74,7 @@ public class IntegrationController : ControllerBase
     /// 出力した結果を未出力に戻す
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/integrations/examResults/undoExport")]
