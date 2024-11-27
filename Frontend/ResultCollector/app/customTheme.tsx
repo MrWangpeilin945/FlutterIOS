@@ -67,11 +67,11 @@ export const customTheme = createTheme({
   },
   // ベースとなる境界半径サイズの設定
   radius: {
-    xs: '0.25rem',
-    sm: '0.5rem',
-    md: '1rem',
-    lg: '2rem',
-    xl: '3rem',
+    xs: '2px',
+    sm: '4px',
+    md: '8px',
+    lg: '16px',
+    xl: '32px',
     itemName: '10px'
   },
   // 各コンポーネントのカスタマイズ
