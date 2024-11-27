@@ -238,4 +238,18 @@ public class IntegrationUsecaseTests
         // Assert
         result.Should().BeEquivalentTo(expected);
     }
+
+    [Fact]
+    public async Task 出力履歴をもとに受診の出力状況を未出力に戻す()
+    {
+        // Arrange
+        var exportId = new Guid("10728b06-9246-45e4-9032-5b75c51f1c06");
+        _integrationRepositoryMock.Setup(r => r.UndoExportStatusAsync(exportId));
+
+        var integrationUsecase = new IntegrationUsecase(_integrationRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
+
+        // Act & Assert
+        await integrationUsecase.Invoking(x => x.UndoExportStatusAsync(exportId))
+                                .Should().NotThrowAsync();
+    }
 }
