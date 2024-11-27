@@ -8,60 +8,45 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class PlaceScheduleLocking
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public PlaceScheduleLocking(int placeScheduleId, int placeId, string placeName, DateOnly examDate, 
-                                int placeScheduleLockingStatus, DateTime updatedAt, string updatedBy)
-    {
-        PlaceScheduleId = placeScheduleId;
-        PlaceId = placeId;
-        PlaceName = placeName;
-        ExamDate = examDate;
-        PlaceScheduleLockingStatus = placeScheduleLockingStatus;
-        UpdatedAt = updatedAt;
-        UpdatedBy = updatedBy;
-    }
-
-    /// <summary>
     /// 会場日程ID
     /// </summary>
     [JsonPropertyName("placeScheduleId")]
-    public int PlaceScheduleId { get; }
+    public int PlaceScheduleId { get; init;}
 
     /// <summary>
     /// 会場ID
     /// </summary>
     [JsonPropertyName("placeId")]
-    public int PlaceId { get; }
+    public int PlaceId { get; init;}
 
     /// <summary>
     /// 会場名
     /// </summary>
     [JsonPropertyName("placeName")]
-    public string PlaceName { get; }
+    public string PlaceName { get; init;} = "";
 
     /// <summary>
     /// 健診日
     /// </summary>
     [JsonPropertyName("examDate")]
-    public DateOnly ExamDate { get; }
+    public DateOnly ExamDate { get; init;}
 
     /// <summary>
     /// ロック状態
     /// </summary>
     [JsonPropertyName("placeScheduleLockingStatus")]
-    public int PlaceScheduleLockingStatus { get; }
+    public int PlaceScheduleLockingStatus { get; init;}
 
     /// <summary>
     /// 最終更新日時
     /// </summary>
     [JsonPropertyName("updatedAt")]
-    public DateTime UpdatedAt { get; }
+    public DateTime UpdatedAt { get; init;}
 
     /// <summary>
     /// 最終更新者
     /// </summary>
     [JsonPropertyName("updatedBy")]
-    public string UpdatedBy { get; }
+    public string UpdatedBy { get; init;} = "";
 
 }

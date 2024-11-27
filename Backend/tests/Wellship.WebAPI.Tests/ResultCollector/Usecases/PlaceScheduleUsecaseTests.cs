@@ -6,6 +6,7 @@ using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 namespace Ryobi.Wellship.WebAPI.Tests.ResultCollector.Usecases;
 
@@ -186,5 +187,42 @@ public class PlaceScheduleUsecaseTests
 
         // Assert
         results.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task 会場ロック状態を取得する()
+    {
+        // Arrange
+        var placeScheduleId = 1;
+
+        var placeScheduleStatus = new PlaceScheduleStatus() {
+            PlaceScheduleId = 1,
+            PlaceId = 1, 
+            PlaceName = "会場A",
+            ExamDate = DateTime.Parse("2024-10-01"),
+            Status = 21,
+            CreatedAt = DateTime.Parse("2024-11-27 14:42:50"),
+            CreatedBy = "tester"
+        };
+        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(placeScheduleId))
+                                    .ReturnsAsync(placeScheduleStatus);
+
+        var expected = new APIModels.Responses.PlaceScheduleLocking()
+        {
+            PlaceScheduleId = 1,
+            PlaceId = 1,
+            PlaceName = "会場A",
+            ExamDate = DateOnly.Parse("2024-10-01"),
+            PlaceScheduleLockingStatus = 21,
+            UpdatedAt = DateTime.Parse("2024-11-27 14:42:50"),
+            UpdatedBy = "tester"
+        };
+
+        // Act
+        var result = await _placeScheduleUsecase.GetPlaceScheduleLockingStatusAsync(placeScheduleId);
+
+        // Assert
+        result.Should().BeEquivalentTo(expected);
+
     }
 }
