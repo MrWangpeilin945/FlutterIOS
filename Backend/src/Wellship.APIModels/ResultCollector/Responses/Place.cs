@@ -8,23 +8,14 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class Place
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public Place(int placeId, string placeName)
-    {
-        PlaceId = placeId;
-        PlaceName = placeName;
-    }
-
-    /// <summary>
     /// 会場ID
     /// </summary>
     [JsonPropertyName("placeId")]
-    public int PlaceId { get; }
+    public required int PlaceId { get; init; }
 
     /// <summary>
     /// 会場名
     /// </summary>
     [JsonPropertyName("placeName")]
-    public string PlaceName { get; }
+    public required string PlaceName { get; init; }
 }

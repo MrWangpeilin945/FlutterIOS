@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 namespace Ryobi.Wellship.APIModels.Responses;
 
 /// <summary>
-/// 検査結果登録エラー
+/// 検査結果検証結果情報
 /// </summary>
-public class ExamRegstResult
+public class VerifyExamItems
 {
     /// <summary>
     /// エラーレベル
@@ -14,8 +14,9 @@ public class ExamRegstResult
     public required int ErrorLevel { get; init; }
 
     /// <summary>
-    /// エラー内容
+    /// 検査結果入力項目グループ
     /// </summary>
-    [JsonPropertyName("description")]
-    public required string Description { get; init; }
+    [JsonPropertyName("examItemGroups")]
+    public required ExamItemGroup[] ExamItemGroups { get; init; }
+
 }

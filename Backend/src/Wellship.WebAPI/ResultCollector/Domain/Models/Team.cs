@@ -6,21 +6,22 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 public class Team
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public Team(int id, string name)
-    {
-        Id = id;
-        Name = name;
-    }
-
-    /// <summary>
     /// 班ID
     /// </summary>
-    public int Id { get; }
+    public int Id { get; init; }
+
+    /// <summary>
+    /// 班コード
+    /// </summary>
+    public required string Code { get; init; }
 
     /// <summary>
     /// 班名
     /// </summary>
-    public string Name { get; }
+    public required string Name { get; init; }
+
+    /// <summary>
+    /// 表示順
+    /// </summary>
+    public required int OrderNumber { get; init; }
 }

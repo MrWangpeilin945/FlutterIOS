@@ -18,6 +18,13 @@ export type EquipmentGetEquipmentSettingsParams = {
 examMenuId?: number;
 };
 
+export type ConsultGetInputExamItemsExamineeParams = {
+/**
+ * 検査メニューID
+ */
+examMenuId?: number;
+};
+
 export type ConsultGetExamItemsExamineeParams = {
 examMenuId?: number;
 };
@@ -34,6 +41,46 @@ export interface Staff {
   staffId?: number;
   /** 職員名 */
   staffName?: string;
+}
+
+/**
+ * 検査結果の登録の検査項目明細リクエストモデル
+ */
+export interface ExamItemDetailRequest {
+  /** 検査項目明細ID */
+  examItemDetailId?: number;
+  /** 値 */
+  value?: string;
+}
+
+/**
+ * 検査結果の登録の検査項目リクエストモデル
+ */
+export interface ResultRequest {
+  /** 検査項目明細 */
+  examItemDetails?: ExamItemDetailRequest[];
+  /** 検査項目ID */
+  examItemId?: number;
+}
+
+/**
+ * 検査結果の登録のリクエストモデル
+ */
+export interface ResultsRequest {
+  /** 検査メニューID */
+  examMenuId?: number;
+  /** 検査項目 */
+  examResults?: ResultRequest[];
+}
+
+/**
+ * 検査結果検証結果情報
+ */
+export interface VerifyExamItems {
+  /** エラーレベル */
+  errorLevel?: number;
+  /** 検査結果入力項目グループ */
+  examItemGroups?: ExamItemGroup[];
 }
 
 /**
@@ -295,6 +342,138 @@ export interface EquipmentList {
 }
 
 /**
+ * 検査結果登録エラー
+ */
+export interface ExamRegstResult {
+  /** エラー内容 */
+  description?: string;
+  /** エラーレベル */
+  errorLevel?: number;
+}
+
+/**
+ * 検査正常値範囲
+ */
+export interface ExamNormalValueRange {
+  /** エラーレベル */
+  errorLevel?: number;
+  /** 最大値 */
+  maxValue?: number;
+  /** 最小値 */
+  minValue?: number;
+}
+
+/**
+ * 検査項目明細選択肢
+ */
+export interface ExamItemDetailOption {
+  /** 選択肢コード */
+  code?: string;
+  /** 選択肢名称 */
+  name?: string;
+  /** 表示順 */
+  orderNumber?: number;
+}
+
+/**
+ * キーボード
+ */
+export interface Keyboard {
+  /** キーボード種別 */
+  keyboardType?: number;
+  /** キーボード入力値 */
+  values?: string[];
+}
+
+/**
+ * 検査項目明細
+ */
+export interface ExamItemDetail {
+  /** 中止理由ID */
+  cancelReasonId?: number;
+  /** 小数部有効桁数 */
+  decimalLength?: number;
+  /** 機器ラベル */
+  equipmentLabel?: string;
+  /** 検査項目明細ID */
+  examItemDetailId?: number;
+  /** 選択肢 */
+  examItemDetailOptions?: ExamItemDetailOption[];
+  /** 検査正常値範囲 */
+  examNormalValueRanges?: ExamNormalValueRange[];
+  /** 整数部最大桁数 */
+  integerLength?: number;
+  /** キーボード */
+  keyboard?: Keyboard;
+  /** 検査項目明細名 */
+  name?: string;
+  /** 配置番号 */
+  positionNumber?: number;
+  /** 前回値 */
+  prevValue?: string;
+  /** 検査項目明細種別 */
+  type?: number;
+  /** 単位 */
+  unit?: string;
+  /** 今回値 */
+  value?: string;
+}
+
+/**
+ * 検査結果入力項目
+ */
+export interface InputExamItem {
+  /** 検査項目明細 */
+  examItemDetails?: ExamItemDetail[];
+  /** 検査項目ID */
+  examItemId?: number;
+  /** 検査結果登録エラー */
+  examRegstResults?: ExamRegstResult[];
+  /** 検査項目名 */
+  name?: string;
+  /** 配置番号 */
+  positionNumber?: number;
+}
+
+/**
+ * 検査項目グループ
+ */
+export interface ExamItemGroup {
+  /** 検査結果入力項目 */
+  examItems?: InputExamItem[];
+  /** 検査項目グループ種別 */
+  type?: number;
+}
+
+/**
+ * 検査結果入力画面 受診者情報
+ */
+export interface InputExamExaminee {
+  /** 受診日年齢 */
+  examDateAge?: number;
+  /** カナ氏名 */
+  kanaName?: string;
+  /** 受付番号 */
+  receptionNumber?: number;
+  /** 性別 */
+  sex?: number;
+}
+
+/**
+ * 検査結果入力情報
+ */
+export interface InputExamItems {
+  /** 受診番号 */
+  consultNumber?: string;
+  /** 受診者情報 */
+  examinee?: InputExamExaminee;
+  /** 検査結果入力項目グループ */
+  examItemGroups?: ExamItemGroup[];
+  /** 関連検査項目 */
+  relatedExamItems?: RelatedExamItem[];
+}
+
+/**
  * 実施有無と中止理由のリクエストモデル
  */
 export interface ExecutionRequest {
@@ -315,16 +494,6 @@ export interface ExecutionRequest {
 export interface ExecutionsRequest {
   /** 検査項目ごとの実施有無と中止理由 */
   executions?: ExecutionRequest[];
-}
-
-/**
- * 検査結果連携状態リクエストモデル
- */
-export interface IntegrationStatusRequest {
-  /** 受診番号 */
-  consultNumber?: string;
-  /** 連携状態 */
-  integrationStatus?: number;
 }
 
 /**

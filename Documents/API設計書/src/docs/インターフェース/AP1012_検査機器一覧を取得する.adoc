@@ -4,8 +4,7 @@
 
 * 検査機器と連携するために設定を取得する
 * 検査メニューと検査機器は1対多で関連付く
-* 検査メニューIDを渡すと絞り込みできる
-* 機器連携ネイティブアプリに渡す設定項目が決まり次第追加する
+* 検査メニューIDを指定して取得する
 
 === URI
 
@@ -27,7 +26,7 @@
 |名称|必須|型|説明|具体例
 
 |examMenuId
-|No
+|Yes
 |number
 |検査メニューID
 |3
@@ -47,12 +46,14 @@
     {
       "equipmentId": 1,
       "equipmentName": "ABC-1234-W",
-      "examMenuId": 23
+      "appLaunchUrl": "wsc://...",
+      "processingScriptUrl": "https://example.com/scripts/abc-1234.js"
     },
     {
       "equipmentId": 7,
       "equipmentName": "BR-003",
-      "examMenuId": 23
+      "appLaunchUrl": "wsc://...",
+      "processingScriptUrl": "https://example.com/scripts/br-003.js"
     }
   ]
 }

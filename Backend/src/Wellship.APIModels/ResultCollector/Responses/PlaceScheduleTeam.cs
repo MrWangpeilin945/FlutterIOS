@@ -7,32 +7,21 @@ namespace Ryobi.Wellship.APIModels.Responses;
 /// </summary>
 public class PlaceScheduleTeam
 {
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public PlaceScheduleTeam(int teamId, string teamName, ICollection<Place> places)
-    {
-        TeamId = teamId;
-        TeamName = teamName;
-        Places = places.ToArray();
-    }
-
     /// <summary>
     /// 班ID
     /// </summary>
     [JsonPropertyName("teamId")]
-    public int TeamId { get; }
+    public required int TeamId { get; init; }
 
     /// <summary>
     /// 班名
     /// </summary>
     [JsonPropertyName("teamName")]
-    public string TeamName { get; }
+    public required string TeamName { get; init; }
 
     /// <summary>
     /// 会場リスト
     /// </summary>
     [JsonPropertyName("places")]
-    public Place[] Places { get; }
+    public required Place[] Places { get; init; }
 }

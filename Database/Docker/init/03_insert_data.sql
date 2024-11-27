@@ -87,10 +87,12 @@ INSERT INTO home_menus(home_menu_id,name,home_menu_group_id,order_number,path,cr
   , (5,'検査結果出力履歴',2,3,'examresult-export-history',CURRENT_TIMESTAMP,'init');
 
 -- 受診
-INSERT INTO resultcollector.consult(consult_id,consult_number,progress_status,place_schedule_id,examinee_id,created_at,created_by) VALUES 
-    (1,'0001',11,2,2,CURRENT_TIMESTAMP,'init')
-  , (2,'0002',41,2,12,CURRENT_TIMESTAMP,'init')
-  , (3,'0003',51,3,18,CURRENT_TIMESTAMP,'init');
+INSERT INTO resultcollector.consult(consult_id,consult_number,progress_status,export_status,place_schedule_id,examinee_id,created_at,created_by) VALUES 
+    (1,'0001',11,11,2,2,CURRENT_TIMESTAMP,'init')
+  , (2,'0002',41,11,2,12,CURRENT_TIMESTAMP,'init')
+  , (3,'0003',51,11,1,18,CURRENT_TIMESTAMP,'init')
+  , (4,'0004',41,21,2,13,CURRENT_TIMESTAMP,'init')
+  , (5,'0005',41,31,1,14,CURRENT_TIMESTAMP,'init');
 
 -- ロール
 INSERT INTO roles(role_id,name,created_at,created_by) VALUES 
@@ -110,3 +112,26 @@ INSERT INTO organizations(organization_id,organization_code,name,order_number,cr
   , (4,'21','テストD株式会社',4,CURRENT_TIMESTAMP,'init')
   , (5,'22','テストE株式会社',5,CURRENT_TIMESTAMP,'init')
   , (6,'23','一般社団法人テストF',6,CURRENT_TIMESTAMP,'init');
+
+-- 検査機器
+INSERT INTO equipments(equipment_id,name,exam_menu_id,app_launch_url,processing_script_url,created_at,created_by) VALUES 
+    (1,'EQ001',1,'wsc://abcde','https://example.com/sctipts/eq001.js',CURRENT_TIMESTAMP,'init')
+  , (2,'EQ002',1,'wsc://abcde','https://example.com/sctipts/eq002.js',CURRENT_TIMESTAMP,'init')
+  , (3,'EQ003',2,'wsc://abcde','https://example.com/sctipts/eq003.js',CURRENT_TIMESTAMP,'init')
+  , (4,'EQ004',3,'wsc://abcde','https://example.com/sctipts/eq004.js',CURRENT_TIMESTAMP,'init')
+  , (5,'EQ005',5,'wsc://abcde','https://example.com/sctipts/eq005.js',CURRENT_TIMESTAMP,'init');
+
+-- 検査結果出力履歴
+INSERT INTO resultcollector.export_histories(id, place_schedule_id,exported_at,exported_by,created_at,created_by) VALUES 
+    ('af0971a0-186f-4b14-86a1-0c648d77c9af',2,TIMESTAMP '2024-11-25 12:57:15.506','職員B',CURRENT_TIMESTAMP,'init')
+  , ('41293e22-4290-4f85-9179-9affda055cdd',3,TIMESTAMP '2024-10-22 20:00:00.000','職員A',CURRENT_TIMESTAMP,'init')
+  , ('b53cc211-1b6a-4d20-8bb0-3c2a007661c6',1,TIMESTAMP '2024-10-03 13:20:00.000','職員B',CURRENT_TIMESTAMP,'init')
+  , ('8f2edd5a-9ad3-4445-96a8-1b2129f60929',1,TIMESTAMP '2023-02-25 09:24:000.000','職員A',CURRENT_TIMESTAMP,'init');
+
+-- 検査結果出力履歴明細
+INSERT INTO resultcollector.export_history_details(id,consult_id,created_at,created_by) VALUES 
+    ('af0971a0-186f-4b14-86a1-0c648d77c9af',1,CURRENT_TIMESTAMP,'init')
+  , ('af0971a0-186f-4b14-86a1-0c648d77c9af',2,CURRENT_TIMESTAMP,'init')
+  , ('af0971a0-186f-4b14-86a1-0c648d77c9af',4,CURRENT_TIMESTAMP,'init')
+  , ('b53cc211-1b6a-4d20-8bb0-3c2a007661c6',3,CURRENT_TIMESTAMP,'init')
+  , ('8f2edd5a-9ad3-4445-96a8-1b2129f60929',5,CURRENT_TIMESTAMP,'init');

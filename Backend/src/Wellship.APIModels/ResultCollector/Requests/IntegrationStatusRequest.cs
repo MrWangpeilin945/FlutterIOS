@@ -3,19 +3,13 @@ using System.Text.Json.Serialization;
 namespace Ryobi.Wellship.APIModels.Requests;
 
 /// <summary>
-/// 検査結果連携状態リクエストモデル
+/// 検査結果出力状況を未出力に戻すリクエストモデル
 /// </summary>
-public class IntegrationStatusRequest
+public class UndoIntegrationExportStatusRequest
 {
     /// <summary>
-    /// 受診番号
+    /// 出力履歴ID
     /// </summary>
-    [JsonPropertyName("consultNumber")]
-    public string ConsultNumber { get; set; } = "";
-
-    /// <summary>
-    /// 連携状態
-    /// </summary>
-    [JsonPropertyName("integrationStatus")]
-    public int IntegrationStatus{ get; set; }
+    [JsonPropertyName("exportId")]
+    public Guid ExportId { get; set; }
 }

@@ -35,10 +35,10 @@ public class IntegrationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/integrations/examResults")]
-    public IActionResult GetIntegrationResults()
+    public async Task<IActionResult> GetIntegrationResults()
     {
-        _integrationUsecase.GetIntegrationResults();
-        return Ok();
+        var result = await _integrationUsecase.GetExportTargetResultsAsync();
+        return Ok(result);
     }
 
     /// <summary>
@@ -64,9 +64,23 @@ public class IntegrationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/integrations/examResults/exportHistory")]
-    public IActionResult GetExportHistory()
+    public async Task<IActionResult> GetExportHistory()
     {
-        _integrationUsecase.GetExportHistory();
+        var result = await _integrationUsecase.GetExportHistoryAsync();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// 出力した結果を未出力に戻す
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [HttpPost]
+    [Route("api/v{version:apiVersion}/integrations/examResults/undoExport")]
+    public async Task<IActionResult> UndoExportStatusAsync([FromBody] UndoIntegrationExportStatusRequest request)
+    {
+        await _integrationUsecase.UndoExportStatusAsync(request.ExportId);
         return Ok();
     }
 }
