@@ -65,6 +65,15 @@ export const customTheme = createTheme({
     keyboard: "48px",
     inputComponent: "64px",
   },
+  // ベースとなる境界半径サイズの設定
+  radius: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '2rem',
+    xl: '3rem',
+    itemName: '10px'
+  },
   // 各コンポーネントのカスタマイズ
   components: {
     Button: Button.extend({
