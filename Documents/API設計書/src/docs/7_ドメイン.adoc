@@ -190,7 +190,7 @@ enum InputErrorLevel
 
 [source,csharp]
 ----
-enum InputErrorLevel
+enum Role
 {
     一般 = 10,
     管理者 = 20
