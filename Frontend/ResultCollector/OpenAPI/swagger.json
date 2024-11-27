@@ -834,6 +834,63 @@
         }
       }
     },
+    "/api/v{version}/integrations/examResults/undoExport": {
+      "post": {
+        "tags": [
+          "Integration"
+        ],
+        "summary": "出力した結果を未出力に戻す",
+        "operationId": "Integration_UndoExportStatus",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UndoIntegrationExportStatusRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v{version}/placeSchedules/teams": {
       "get": {
         "tags": [
@@ -950,6 +1007,16 @@
               }
             }
           },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "",
             "content": {
@@ -1040,83 +1107,6 @@
         ],
         "summary": "会場ロック状態を更新する",
         "operationId": "PlaceSchedule_UpdatePlaceScheduleLockingStatus",
-        "parameters": [
-          {
-            "name": "placeScheduleId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 3
-          }
-        ],
-        "requestBody": {
-          "x-name": "placeScheduleLockingRequest",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PlaceScheduleLockingRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v{version}/placeSchedules/{placeScheduleId}/placeScheduleResultExportStatus": {
-      "put": {
-        "tags": [
-          "PlaceSchedule"
-        ],
-        "summary": "会場日程のデータ出力状況を更新する",
-        "operationId": "PlaceSchedule_UpdatePlaceScheduleResultExportStatus",
         "parameters": [
           {
             "name": "placeScheduleId",
@@ -1915,11 +1905,11 @@
               "$ref": "#/components/schemas/ExamItemDetail"
             }
           },
-          "examRegstResults": {
+          "examRegistResults": {
             "type": "array",
             "description": "検査結果登録エラー",
             "items": {
-              "$ref": "#/components/schemas/ExamRegstResult"
+              "$ref": "#/components/schemas/ExamRegistResult"
             }
           }
         }
@@ -2064,7 +2054,7 @@
           }
         }
       },
-      "ExamRegstResult": {
+      "ExamRegistResult": {
         "type": "object",
         "description": "検査結果登録エラー",
         "additionalProperties": false,
@@ -2108,10 +2098,13 @@
             "type": "string",
             "description": "検査機器名"
           },
-          "examMenuId": {
-            "type": "integer",
-            "description": "検査メニューID",
-            "format": "int32"
+          "appLaunchUrl": {
+            "type": "string",
+            "description": "アプリ起動URL"
+          },
+          "processingScriptUrl": {
+            "type": "string",
+            "description": "処理スクリプトURL"
           }
         }
       },
@@ -2221,10 +2214,9 @@
             "description": "健診日",
             "format": "date"
           },
-          "dataCount": {
-            "type": "integer",
-            "description": "項目数",
-            "format": "int32"
+          "startTime": {
+            "type": "string",
+            "description": "開始時刻"
           },
           "details": {
             "type": "array",
@@ -2287,6 +2279,11 @@
         "description": "検査結果出力履歴",
         "additionalProperties": false,
         "properties": {
+          "exportId": {
+            "type": "string",
+            "description": "出力履歴ID",
+            "format": "guid"
+          },
           "placeScheduleId": {
             "type": "integer",
             "description": "会場日程ID",
@@ -2319,6 +2316,18 @@
           "exportedBy": {
             "type": "string",
             "description": "出力者"
+          }
+        }
+      },
+      "UndoIntegrationExportStatusRequest": {
+        "type": "object",
+        "description": "検査結果出力状況を未出力に戻すリクエストモデル",
+        "additionalProperties": false,
+        "properties": {
+          "exportId": {
+            "type": "string",
+            "description": "出力履歴ID",
+            "format": "guid"
           }
         }
       },
@@ -2424,7 +2433,7 @@
           },
           "startTime": {
             "type": "string",
-            "description": "開始時刻"
+            "description": "開始時刻（HH:mm形式）"
           }
         }
       },
