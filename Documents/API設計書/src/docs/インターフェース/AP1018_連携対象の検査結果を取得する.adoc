@@ -36,17 +36,22 @@
       "placeName": "会場B",
       "placeScheduleLockingStatus": 1,
       "examDate": "2024-10-21",
-      "dataCount": 187,
+      "startTime": "13:00",
       "details": [
         {
-          "status": 2,
-          "statusName": "保留",
-          "count": 10
+          "status": 11,
+          "statusName": "未出力",
+          "count": 9
         },
         {
-          "status": 4,
-          "statusName": "連携済",
-          "count": 10
+          "status": 21,
+          "statusName": "出力保留",
+          "count": 2
+        },
+        {
+          "status": 31,
+          "statusName": "出力済み",
+          "count": 30
         }
       ]
     }

@@ -8,53 +8,37 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class ExportData
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public ExportData(int placeScheduleId, string placeName, int placeScheduleLockingStatus, DateOnly examDate,
-                      int dataCount, ExportDataDetail[] details)
-    {
-        PlaceScheduleId = placeScheduleId;
-        PlaceName = placeName;
-        PlaceScheduleLockingStatus = placeScheduleLockingStatus;
-        ExamDate = examDate;
-        DataCount = dataCount;
-        Details = details;
-    }
-
-    /// <summary>
     /// 会場日程ID
     /// </summary>
     [JsonPropertyName("placeScheduleId")]
-    public int PlaceScheduleId { get; }
+    public required int PlaceScheduleId { get; init; }
 
     /// <summary>
     /// 会場名
     /// </summary>
     [JsonPropertyName("placeName")]
-    public string PlaceName { get; }
+    public required string PlaceName { get; init; }
 
     /// <summary>
     /// ロック状態
     /// </summary>
     [JsonPropertyName("placeScheduleLockingStatus")]
-    public int PlaceScheduleLockingStatus { get; }
+    public required int PlaceScheduleLockingStatus { get; init; }
 
     /// <summary>
     /// 健診日
     /// </summary>
     [JsonPropertyName("examDate")]
-    public DateOnly ExamDate { get; }
+    public required DateOnly ExamDate { get; init; }
 
     /// <summary>
-    /// 項目数
+    /// 開始時刻
     /// </summary>
-    [JsonPropertyName("dataCount")]
-    public int DataCount { get; }
+    public required string StartTime { get; init; }
 
     /// <summary>
     /// 連携対象検査結果明細
     /// </summary>
     [JsonPropertyName("details")]
-    public ExportDataDetail[] Details { get; }
-
+    public required ExportDataDetail[] Details { get; init; }
 }

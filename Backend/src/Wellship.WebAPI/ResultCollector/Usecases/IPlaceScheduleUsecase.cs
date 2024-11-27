@@ -11,25 +11,20 @@ public interface IPlaceScheduleUsecase
     /// 班リストを取得する
     /// </summary>
     /// <param name="date">健診日</param>
-    public PlaceScheduleTeams GetTeams(DateOnly date);
+    public Task<PlaceScheduleTeams> GetTeamsAsync(DateOnly date);
 
     /// <summary>
     /// 班を指定して会場日程を取得する
     /// </summary>
-    public void GetTeamPlaceSchedules();
+    public Task<PlaceSchedulePlaces> GetTeamPlaceSchedulesAsync(DateOnly examDate, int teamId);
 
     /// <summary>
     /// 会場ロック状態を取得する
     /// </summary>
-    public void GetPlaceScheduleLockingStatus();
+    public Task<PlaceScheduleLocking> GetPlaceScheduleLockingStatusAsync(int placeScheduleId);
 
     /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
-    public void UpdatePlaceScheduleLockingStatus();
-
-    /// <summary>
-    /// 会場日程の出力状況を変更する
-    /// </summary>
-    public void UpdatePlaceScheduleResultExportStatus();
+    public Task UpdatePlaceScheduleLockingStatusAsync();
 }

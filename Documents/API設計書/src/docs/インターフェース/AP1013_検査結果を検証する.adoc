@@ -104,7 +104,7 @@
               ]
             }
           ],
-          "examRegstResults" : [ 
+          "examRegistResults" : [ 
               { "errorLevel" : 2, 
                 "description" : "正常値範囲外です。"
               } 

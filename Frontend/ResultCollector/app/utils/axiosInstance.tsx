@@ -1,4 +1,5 @@
-import axios, { type AxiosInstance } from "axios";
+// biome-ignore lint/style/useImportType: typeをつけるとaxiosInstanceが関数として認識されなくなるため
+import axios, { AxiosInstance } from "axios";
 
 export const axiosInstance: AxiosInstance = axios.create({
   // todo baseURLは実際には設定から取得する
@@ -13,18 +14,18 @@ export const setupAxiosInterceptors = (redirectToLogin: () => void) => {
     console.log("-----------interceptors.request start-----------");
 
     // todo 認証処理
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      // 未認証時はログイン画面に遷移(redirectToLoginはroot.tsxで定義)
-      // axiosInstance内ではuseNavigate()が使用できないため
-      redirectToLogin();
-      return Promise.reject(
-        new Error("No authentication token, redirecting to login")
-      );
-    }
+    // const token = localStorage.getItem("authToken");
+    // if (!token) {
+    //   // 未認証時はログイン画面に遷移(redirectToLoginはroot.tsxで定義)
+    //   // axiosInstance内ではuseNavigate()が使用できないため
+    //   redirectToLogin();
+    //   return Promise.reject(
+    //     new Error("No authentication token, redirecting to login"),
+    //   );
+    // }
 
-    // 認証トークンを付与
-    config.headers.Authorization = `Bearer ${token}`;
+    // // 認証トークンを付与
+    // config.headers.Authorization = `Bearer ${token}`;
 
     console.log(`method:${config.method}`);
     console.log(`url:${config.url}`);
@@ -51,7 +52,7 @@ export const setupAxiosInterceptors = (redirectToLogin: () => void) => {
         // ネットワークエラーの時
         console.log("network error");
         return Promise.reject(
-          new Error("Network error: Unable to reach the server")
+          new Error("Network error: Unable to reach the server"),
         );
       }
 
@@ -68,6 +69,6 @@ export const setupAxiosInterceptors = (redirectToLogin: () => void) => {
       }
 
       return Promise.reject(error);
-    }
+    },
   );
 };

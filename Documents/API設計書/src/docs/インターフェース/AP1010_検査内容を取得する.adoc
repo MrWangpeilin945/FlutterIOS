@@ -53,8 +53,9 @@
 ----
 {
     "consultNumber": "012345678",
+    "consultName" : "定期健康健診",
     "examinee" : {
-        "examineeId" : 10,
+        "receptionNumber" : 10,
         "name" : "両備 太郎",
         "kanaName" : "リョウビ　タロウ",
         "birthdate" : "1975-10-30",
@@ -84,7 +85,12 @@
             "cancelReasonId" : 10
         }
     ],
-    "examDecisionResult" : [ "血圧がまだ行われていません。" ],
+    "examDecisionResults" : [
+        {
+            "errorLevel" : 2,
+            "description" : "血圧がまだ行われていません。" 
+        }
+    ],
     "unexaminedItems" : [ 
         {
             "examMenuId": 3,

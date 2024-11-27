@@ -25,6 +25,7 @@ import type {
   CancelReasonGetCancelReasonsParams,
   CancelReasonList,
   ConsultGetExamItemsExamineeParams,
+  ConsultGetInputExamItemsExamineeParams,
   ConsultNumberRequest,
   EquipmentGetEquipmentSettingsParams,
   EquipmentList,
@@ -34,7 +35,7 @@ import type {
   ExportDataList,
   ExportHistoryList,
   HomeMenuGroupList,
-  IntegrationStatusRequest,
+  InputExamItems,
   PlaceScheduleGetTeamPlaceSchedulesParams,
   PlaceScheduleGetTeamsParams,
   PlaceScheduleLocking,
@@ -44,16 +45,15 @@ import type {
   PlaceScheduleTeams,
   ProblemDetails,
   ResultExportRequest,
+  ResultsRequest,
   Staff,
   StaffLoginRequest,
   StaffLoginResponse,
-  UnexaminedItemList
-} from '~/domain/wellship.schemas'
-import { customAxiosInstance } from './customInstance';
-
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
+  UndoIntegrationExportStatusRequest,
+  UnexaminedItemList,
+  VerifyExamItems
+} from '../domain/wellship.schemas'
+import { axiosInstance } from '../utils/axiosInstance';
 
 
 
@@ -66,7 +66,7 @@ export const authenticationLogin = (
  ) => {
       
       
-      return customAxiosInstance<StaffLoginResponse>(
+      return axiosInstance<StaffLoginResponse>(
       {url: `/api/v${version}/staff/login`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: staffLoginRequest
@@ -126,7 +126,7 @@ export const cancelReasonGetCancelReasons = (
 ) => {
       
       
-      return customAxiosInstance<CancelReasonList>(
+      return axiosInstance<CancelReasonList>(
       {url: `/api/v${version}/cancelReasons`, method: 'GET',
         params, signal
     },
@@ -221,7 +221,7 @@ export const consultVerifyConsultNumber = (
  ) => {
       
       
-      return customAxiosInstance<void>(
+      return axiosInstance<void>(
       {url: `/api/v${version}/consult/consultNumber/verify`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: consultNumberRequest
@@ -281,7 +281,7 @@ export const consultGetUnexaminedItems = (
 ) => {
       
       
-      return customAxiosInstance<UnexaminedItemList>(
+      return axiosInstance<UnexaminedItemList>(
       {url: `/api/v${version}/consult/${consultNumber}/unexaminedItems`, method: 'GET', signal
     },
       );
@@ -376,7 +376,7 @@ export const consultGetSimpleExaminee = (
 ) => {
       
       
-      return customAxiosInstance<Blob>(
+      return axiosInstance<Blob>(
       {url: `/api/v${version}/consult/${consultNumber}/simple`, method: 'GET',
         responseType: 'blob', signal
     },
@@ -473,7 +473,7 @@ export const consultGetExamItemsExaminee = (
 ) => {
       
       
-      return customAxiosInstance<ExamContent>(
+      return axiosInstance<ExamContent>(
       {url: `/api/v${version}/consult/${consultNumber}/examItems`, method: 'GET',
         params, signal
     },
@@ -566,66 +566,6 @@ export function useConsultGetExamItemsExaminee<TData = Awaited<ReturnType<typeof
 
 
 /**
- * @summary 検査結果の連携状態を変更する
- */
-export const consultChangeIntegrationStatus = (
-    version: string,
-    consultNumber: string,
-    integrationStatusRequest: IntegrationStatusRequest,
- ) => {
-      
-      
-      return customAxiosInstance<void>(
-      {url: `/api/v${version}/consult/${consultNumber}/integrationStatus`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: integrationStatusRequest
-    },
-      );
-    }
-  
-
-
-export const getConsultChangeIntegrationStatusMutationOptions = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, TError,{version: string;consultNumber: string;data: IntegrationStatusRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, TError,{version: string;consultNumber: string;data: IntegrationStatusRequest}, TContext> => {
-const {mutation: mutationOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, {version: string;consultNumber: string;data: IntegrationStatusRequest}> = (props) => {
-          const {version,consultNumber,data} = props ?? {};
-
-          return  consultChangeIntegrationStatus(version,consultNumber,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ConsultChangeIntegrationStatusMutationResult = NonNullable<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>>
-    export type ConsultChangeIntegrationStatusMutationBody = IntegrationStatusRequest
-    export type ConsultChangeIntegrationStatusMutationError = ProblemDetails
-
-    /**
- * @summary 検査結果の連携状態を変更する
- */
-export const useConsultChangeIntegrationStatus = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof consultChangeIntegrationStatus>>, TError,{version: string;consultNumber: string;data: IntegrationStatusRequest}, TContext>, }
-): UseMutationResult<
-        Awaited<ReturnType<typeof consultChangeIntegrationStatus>>,
-        TError,
-        {version: string;consultNumber: string;data: IntegrationStatusRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getConsultChangeIntegrationStatusMutationOptions(options);
-
-      return useMutation(mutationOptions);
-    }
-    
-/**
  * @summary 検査の実施有無と中止理由を登録する
  */
 export const consultRegisterExecutions = (
@@ -635,7 +575,7 @@ export const consultRegisterExecutions = (
  ) => {
       
       
-      return customAxiosInstance<void>(
+      return axiosInstance<void>(
       {url: `/api/v${version}/consult/${consultNumber}/executions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: executionsRequest
@@ -686,6 +626,109 @@ export const useConsultRegisterExecutions = <TError = ProblemDetails,
     }
     
 /**
+ * @summary 検査結果入力情報を取得する
+ */
+export const consultGetInputExamItemsExaminee = (
+    version: string,
+    consultNumber: number,
+    params?: ConsultGetInputExamItemsExamineeParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<InputExamItems>(
+      {url: `/api/v${version}/consult/${consultNumber}/inputExamItems`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+  
+
+export const getConsultGetInputExamItemsExamineeQueryKey = (version: string,
+    consultNumber: number,
+    params?: ConsultGetInputExamItemsExamineeParams,) => {
+    return [`/api/v${version}/consult/${consultNumber}/inputExamItems`, ...(params ? [params]: [])] as const;
+    }
+
+    
+export const getConsultGetInputExamItemsExamineeQueryOptions = <TData = Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>, TError = ProblemDetails>(version: string,
+    consultNumber: number,
+    params?: ConsultGetInputExamItemsExamineeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getConsultGetInputExamItemsExamineeQueryKey(version,consultNumber,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>> = ({ signal }) => consultGetInputExamItemsExaminee(version,consultNumber,params, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(version && consultNumber), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ConsultGetInputExamItemsExamineeQueryResult = NonNullable<Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>>
+export type ConsultGetInputExamItemsExamineeQueryError = ProblemDetails
+
+
+export function useConsultGetInputExamItemsExaminee<TData = Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>, TError = ProblemDetails>(
+ version: string,
+    consultNumber: number,
+    params: undefined |  ConsultGetInputExamItemsExamineeParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>,
+          TError,
+          TData
+        > , 'initialData'
+      >, }
+
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey }
+export function useConsultGetInputExamItemsExaminee<TData = Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>, TError = ProblemDetails>(
+ version: string,
+    consultNumber: number,
+    params?: ConsultGetInputExamItemsExamineeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>,
+          TError,
+          TData
+        > , 'initialData'
+      >, }
+
+  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
+export function useConsultGetInputExamItemsExaminee<TData = Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>, TError = ProblemDetails>(
+ version: string,
+    consultNumber: number,
+    params?: ConsultGetInputExamItemsExamineeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>, TError, TData>>, }
+
+  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey }
+/**
+ * @summary 検査結果入力情報を取得する
+ */
+
+export function useConsultGetInputExamItemsExaminee<TData = Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>, TError = ProblemDetails>(
+ version: string,
+    consultNumber: number,
+    params?: ConsultGetInputExamItemsExamineeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof consultGetInputExamItemsExaminee>>, TError, TData>>, }
+
+  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getConsultGetInputExamItemsExamineeQueryOptions(version,consultNumber,params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
  * @summary 検査機器一覧を取得する
  */
 export const equipmentGetEquipmentSettings = (
@@ -695,7 +738,7 @@ export const equipmentGetEquipmentSettings = (
 ) => {
       
       
-      return customAxiosInstance<EquipmentList>(
+      return axiosInstance<EquipmentList>(
       {url: `/api/v${version}/equipments`, method: 'GET',
         params, signal
     },
@@ -790,7 +833,7 @@ export const examMenuGetExamMenus = (
 ) => {
       
       
-      return customAxiosInstance<ExamMenuList>(
+      return axiosInstance<ExamMenuList>(
       {url: `/api/v${version}/examMenus`, method: 'GET', signal
     },
       );
@@ -878,7 +921,7 @@ export const homeMenuGetHomeMenuSettings = (
 ) => {
       
       
-      return customAxiosInstance<HomeMenuGroupList>(
+      return axiosInstance<HomeMenuGroupList>(
       {url: `/api/v${version}/homeMenus`, method: 'GET', signal
     },
       );
@@ -966,7 +1009,7 @@ export const integrationGetIntegrationResults = (
 ) => {
       
       
-      return customAxiosInstance<ExportDataList>(
+      return axiosInstance<ExportDataList>(
       {url: `/api/v${version}/integrations/examResults`, method: 'GET', signal
     },
       );
@@ -1055,7 +1098,7 @@ export const integrationExportResults = (
  ) => {
       
       
-      return customAxiosInstance<void>(
+      return axiosInstance<void>(
       {url: `/api/v${version}/integrations/examResults/${placeScheduleId}/export`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: resultExportRequest
@@ -1114,7 +1157,7 @@ export const integrationGetExportHistory = (
 ) => {
       
       
-      return customAxiosInstance<ExportHistoryList>(
+      return axiosInstance<ExportHistoryList>(
       {url: `/api/v${version}/integrations/examResults/exportHistory`, method: 'GET', signal
     },
       );
@@ -1194,6 +1237,65 @@ export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof
 
 
 /**
+ * @summary 出力した結果を未出力に戻す
+ */
+export const integrationUndoExportStatus = (
+    version: string,
+    undoIntegrationExportStatusRequest: UndoIntegrationExportStatusRequest,
+ ) => {
+      
+      
+      return axiosInstance<void>(
+      {url: `/api/v${version}/integrations/examResults/undoExport`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: undoIntegrationExportStatusRequest
+    },
+      );
+    }
+  
+
+
+export const getIntegrationUndoExportStatusMutationOptions = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof integrationUndoExportStatus>>, TError,{version: string;data: UndoIntegrationExportStatusRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof integrationUndoExportStatus>>, TError,{version: string;data: UndoIntegrationExportStatusRequest}, TContext> => {
+const {mutation: mutationOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof integrationUndoExportStatus>>, {version: string;data: UndoIntegrationExportStatusRequest}> = (props) => {
+          const {version,data} = props ?? {};
+
+          return  integrationUndoExportStatus(version,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type IntegrationUndoExportStatusMutationResult = NonNullable<Awaited<ReturnType<typeof integrationUndoExportStatus>>>
+    export type IntegrationUndoExportStatusMutationBody = UndoIntegrationExportStatusRequest
+    export type IntegrationUndoExportStatusMutationError = ProblemDetails
+
+    /**
+ * @summary 出力した結果を未出力に戻す
+ */
+export const useIntegrationUndoExportStatus = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof integrationUndoExportStatus>>, TError,{version: string;data: UndoIntegrationExportStatusRequest}, TContext>, }
+): UseMutationResult<
+        Awaited<ReturnType<typeof integrationUndoExportStatus>>,
+        TError,
+        {version: string;data: UndoIntegrationExportStatusRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getIntegrationUndoExportStatusMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
  * @summary 日付を指定して班と会場のリストを取得する
  */
 export const placeScheduleGetTeams = (
@@ -1203,7 +1305,7 @@ export const placeScheduleGetTeams = (
 ) => {
       
       
-      return customAxiosInstance<PlaceScheduleTeams>(
+      return axiosInstance<PlaceScheduleTeams>(
       {url: `/api/v${version}/placeSchedules/teams`, method: 'GET',
         params, signal
     },
@@ -1299,7 +1401,7 @@ export const placeScheduleGetTeamPlaceSchedules = (
 ) => {
       
       
-      return customAxiosInstance<PlaceSchedulePlaces>(
+      return axiosInstance<PlaceSchedulePlaces>(
       {url: `/api/v${version}/placeSchedules/places`, method: 'GET',
         params, signal
     },
@@ -1395,7 +1497,7 @@ export const placeScheduleGetPlaceScheduleLockingStatus = (
 ) => {
       
       
-      return customAxiosInstance<PlaceScheduleLocking>(
+      return axiosInstance<PlaceScheduleLocking>(
       {url: `/api/v${version}/placeSchedules/${placeScheduleId}/placeScheduleLockingStatus`, method: 'GET', signal
     },
       );
@@ -1490,7 +1592,7 @@ export const placeScheduleUpdatePlaceScheduleLockingStatus = (
  ) => {
       
       
-      return customAxiosInstance<void>(
+      return axiosInstance<void>(
       {url: `/api/v${version}/placeSchedules/${placeScheduleId}/placeScheduleLockingStatus`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: placeScheduleLockingRequest
@@ -1550,7 +1652,7 @@ export const progressGetProgress = (
 ) => {
       
       
-      return customAxiosInstance<PlaceScheduleProgress>(
+      return axiosInstance<PlaceScheduleProgress>(
       {url: `/api/v${version}/progress/${placeScheduleId}`, method: 'GET', signal
     },
       );
@@ -1640,31 +1742,33 @@ export function useProgressGetProgress<TData = Awaited<ReturnType<typeof progres
  */
 export const resultVerifyResults = (
     version: string,
-    consultId: string,
+    consultNumber: string,
+    resultsRequest: ResultsRequest,
  ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/consult/${consultId}/results/verify`, method: 'POST',
-        responseType: 'blob'
+      return axiosInstance<VerifyExamItems>(
+      {url: `/api/v${version}/consult/${consultNumber}/results/verify`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: resultsRequest
     },
       );
     }
   
 
 
-export const getResultVerifyResultsMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultId: string}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultId: string}, TContext> => {
+export const getResultVerifyResultsMutationOptions = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultNumber: string;data: ResultsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultNumber: string;data: ResultsRequest}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resultVerifyResults>>, {version: string;consultId: string}> = (props) => {
-          const {version,consultId} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resultVerifyResults>>, {version: string;consultNumber: string;data: ResultsRequest}> = (props) => {
+          const {version,consultNumber,data} = props ?? {};
 
-          return  resultVerifyResults(version,consultId,)
+          return  resultVerifyResults(version,consultNumber,data,)
         }
 
         
@@ -1673,18 +1777,18 @@ const {mutation: mutationOptions} = options ?? {};
   return  { mutationFn, ...mutationOptions }}
 
     export type ResultVerifyResultsMutationResult = NonNullable<Awaited<ReturnType<typeof resultVerifyResults>>>
-    
-    export type ResultVerifyResultsMutationError = unknown
+    export type ResultVerifyResultsMutationBody = ResultsRequest
+    export type ResultVerifyResultsMutationError = ProblemDetails
 
     /**
  * @summary 検査結果を検証する
  */
-export const useResultVerifyResults = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultId: string}, TContext>, }
+export const useResultVerifyResults = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultVerifyResults>>, TError,{version: string;consultNumber: string;data: ResultsRequest}, TContext>, }
 ): UseMutationResult<
         Awaited<ReturnType<typeof resultVerifyResults>>,
         TError,
-        {version: string;consultId: string},
+        {version: string;consultNumber: string;data: ResultsRequest},
         TContext
       > => {
 
@@ -1698,31 +1802,33 @@ export const useResultVerifyResults = <TError = unknown,
  */
 export const resultRegisterResults = (
     version: string,
-    consultId: string,
+    consultNumber: string,
+    resultsRequest: ResultsRequest,
  ) => {
       
       
-      return customAxiosInstance<Blob>(
-      {url: `/api/v${version}/consult/${consultId}/results`, method: 'POST',
-        responseType: 'blob'
+      return axiosInstance<void>(
+      {url: `/api/v${version}/consult/${consultNumber}/results`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: resultsRequest
     },
       );
     }
   
 
 
-export const getResultRegisterResultsMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultRegisterResults>>, TError,{version: string;consultId: string}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof resultRegisterResults>>, TError,{version: string;consultId: string}, TContext> => {
+export const getResultRegisterResultsMutationOptions = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultRegisterResults>>, TError,{version: string;consultNumber: string;data: ResultsRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof resultRegisterResults>>, TError,{version: string;consultNumber: string;data: ResultsRequest}, TContext> => {
 const {mutation: mutationOptions} = options ?? {};
 
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resultRegisterResults>>, {version: string;consultId: string}> = (props) => {
-          const {version,consultId} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resultRegisterResults>>, {version: string;consultNumber: string;data: ResultsRequest}> = (props) => {
+          const {version,consultNumber,data} = props ?? {};
 
-          return  resultRegisterResults(version,consultId,)
+          return  resultRegisterResults(version,consultNumber,data,)
         }
 
         
@@ -1731,18 +1837,18 @@ const {mutation: mutationOptions} = options ?? {};
   return  { mutationFn, ...mutationOptions }}
 
     export type ResultRegisterResultsMutationResult = NonNullable<Awaited<ReturnType<typeof resultRegisterResults>>>
-    
-    export type ResultRegisterResultsMutationError = unknown
+    export type ResultRegisterResultsMutationBody = ResultsRequest
+    export type ResultRegisterResultsMutationError = ProblemDetails
 
     /**
  * @summary 検査結果を登録する
  */
-export const useResultRegisterResults = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultRegisterResults>>, TError,{version: string;consultId: string}, TContext>, }
+export const useResultRegisterResults = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resultRegisterResults>>, TError,{version: string;consultNumber: string;data: ResultsRequest}, TContext>, }
 ): UseMutationResult<
         Awaited<ReturnType<typeof resultRegisterResults>>,
         TError,
-        {version: string;consultId: string},
+        {version: string;consultNumber: string;data: ResultsRequest},
         TContext
       > => {
 
@@ -1760,7 +1866,7 @@ export const staffGetStaff = (
 ) => {
       
       
-      return customAxiosInstance<Staff>(
+      return axiosInstance<Staff>(
       {url: `/api/v${version}/staff/profile`, method: 'GET', signal
     },
       );

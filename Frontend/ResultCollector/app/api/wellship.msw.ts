@@ -22,14 +22,18 @@ import type {
   ExportDataList,
   ExportHistoryList,
   HomeMenuGroupList,
+  InputExamExaminee,
+  InputExamItems,
+  Keyboard,
   PlaceScheduleLocking,
   PlaceSchedulePlaces,
   PlaceScheduleProgress,
   PlaceScheduleTeams,
   Staff,
   StaffLoginResponse,
-  UnexaminedItemList
-} from '~/domain/wellship.schemas'
+  UnexaminedItemList,
+  VerifyExamItems
+} from '../domain/wellship.schemas'
 
 export const getAuthenticationLoginResponseMock = (overrideResponse: Partial< StaffLoginResponse > = {}): StaffLoginResponse => ({token: faker.helpers.arrayElement([faker.word.sample(), undefined]), ...overrideResponse})
 
@@ -43,15 +47,21 @@ export const getConsultGetExamItemsExamineeResponseExamineeMock = (overrideRespo
 
 export const getConsultGetExamItemsExamineeResponseMock = (overrideResponse: Partial< ExamContent > = {}): ExamContent => ({consultNumber: faker.helpers.arrayElement([faker.word.sample(), undefined]), examDecisionResult: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.word.sample())), undefined]), examinee: faker.helpers.arrayElement([faker.helpers.arrayElement([{...getConsultGetExamItemsExamineeResponseExamineeMock()}]), undefined]), examItems: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({cancelReasonId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examItemId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examItemName: faker.helpers.arrayElement([faker.word.sample(), undefined]), isPerforming: faker.helpers.arrayElement([faker.datatype.boolean(), undefined])})), undefined]), isComplete: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]), relatedExamItems: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examItemName: faker.helpers.arrayElement([faker.word.sample(), undefined]), examResult: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), unexaminedItems: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examMenuId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examMenuName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
 
-export const getEquipmentGetEquipmentSettingsResponseMock = (overrideResponse: Partial< EquipmentList > = {}): EquipmentList => ({equipments: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({equipmentId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), equipmentName: faker.helpers.arrayElement([faker.word.sample(), undefined]), examMenuId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), ...overrideResponse})
+export const getConsultGetInputExamItemsExamineeResponseInputExamExamineeMock = (overrideResponse: Partial<InputExamExaminee> = {}): InputExamExaminee => ({...{examDateAge: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), kanaName: faker.helpers.arrayElement([faker.word.sample(), undefined]), receptionNumber: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), sex: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])}, ...overrideResponse});
+
+export const getConsultGetInputExamItemsExamineeResponseKeyboardMock = (overrideResponse: Partial<Keyboard> = {}): Keyboard => ({...{keyboardType: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), values: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.word.sample())), undefined])}, ...overrideResponse});
+
+export const getConsultGetInputExamItemsExamineeResponseMock = (overrideResponse: Partial< InputExamItems > = {}): InputExamItems => ({consultNumber: faker.helpers.arrayElement([faker.word.sample(), undefined]), examinee: faker.helpers.arrayElement([faker.helpers.arrayElement([{...getConsultGetInputExamItemsExamineeResponseInputExamExamineeMock()}]), undefined]), examItemGroups: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examItems: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examItemDetails: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({cancelReasonId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), decimalLength: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), equipmentLabel: faker.helpers.arrayElement([faker.word.sample(), undefined]), examItemDetailId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examItemDetailOptions: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement([faker.word.sample(), undefined]), name: faker.helpers.arrayElement([faker.word.sample(), undefined]), orderNumber: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), examNormalValueRanges: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({errorLevel: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), maxValue: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), minValue: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), integerLength: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), keyboard: faker.helpers.arrayElement([faker.helpers.arrayElement([{...getConsultGetInputExamItemsExamineeResponseKeyboardMock()}]), undefined]), name: faker.helpers.arrayElement([faker.word.sample(), undefined]), positionNumber: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), prevValue: faker.helpers.arrayElement([faker.word.sample(), undefined]), type: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), unit: faker.helpers.arrayElement([faker.word.sample(), undefined]), value: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), examItemId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examRegistResults: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({description: faker.helpers.arrayElement([faker.word.sample(), undefined]), errorLevel: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), name: faker.helpers.arrayElement([faker.word.sample(), undefined]), positionNumber: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), type: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), relatedExamItems: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examItemName: faker.helpers.arrayElement([faker.word.sample(), undefined]), examResult: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
+
+export const getEquipmentGetEquipmentSettingsResponseMock = (overrideResponse: Partial< EquipmentList > = {}): EquipmentList => ({equipments: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({appLaunchUrl: faker.helpers.arrayElement([faker.word.sample(), undefined]), equipmentId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), equipmentName: faker.helpers.arrayElement([faker.word.sample(), undefined]), processingScriptUrl: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
 
 export const getExamMenuGetExamMenusResponseMock = (overrideResponse: Partial< ExamMenuList > = {}): ExamMenuList => ({examMenus: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examMenuId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examMenuName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
 
 export const getHomeMenuGetHomeMenuSettingsResponseMock = (overrideResponse: Partial< HomeMenuGroupList > = {}): HomeMenuGroupList => ({homeMenuGroups: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({groupName: faker.helpers.arrayElement([faker.word.sample(), undefined]), menus: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({availableConditions: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.word.sample())), undefined]), menuName: faker.helpers.arrayElement([faker.word.sample(), undefined]), path: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined])})), undefined]), ...overrideResponse})
 
-export const getIntegrationGetIntegrationResultsResponseMock = (overrideResponse: Partial< ExportDataList > = {}): ExportDataList => ({exportData: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({dataCount: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), details: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({count: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), status: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), statusName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), examDate: faker.helpers.arrayElement([faker.date.past().toISOString().split('T')[0], undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeScheduleId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), placeScheduleLockingStatus: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), ...overrideResponse})
+export const getIntegrationGetIntegrationResultsResponseMock = (overrideResponse: Partial< ExportDataList > = {}): ExportDataList => ({exportData: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({details: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({count: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), status: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), statusName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), examDate: faker.helpers.arrayElement([faker.date.past().toISOString().split('T')[0], undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeScheduleId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), placeScheduleLockingStatus: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), startTime: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
 
-export const getIntegrationGetExportHistoryResponseMock = (overrideResponse: Partial< ExportHistoryList > = {}): ExportHistoryList => ({exportHistories: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({dataCount: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examDate: faker.helpers.arrayElement([faker.date.past().toISOString().split('T')[0], undefined]), exportedAt: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), exportedBy: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeScheduleId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), placeScheduleLockingStatus: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), ...overrideResponse})
+export const getIntegrationGetExportHistoryResponseMock = (overrideResponse: Partial< ExportHistoryList > = {}): ExportHistoryList => ({exportHistories: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({dataCount: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examDate: faker.helpers.arrayElement([faker.date.past().toISOString().split('T')[0], undefined]), exportedAt: faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, undefined]), exportedBy: faker.helpers.arrayElement([faker.word.sample(), undefined]), exportId: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeScheduleId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), placeScheduleLockingStatus: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), ...overrideResponse})
 
 export const getPlaceScheduleGetTeamsResponseMock = (overrideResponse: Partial< PlaceScheduleTeams > = {}): PlaceScheduleTeams => ({teams: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({places: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({placeId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), teamId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), teamName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
 
@@ -61,9 +71,9 @@ export const getPlaceScheduleGetPlaceScheduleLockingStatusResponseMock = (overri
 
 export const getProgressGetProgressResponseMock = (overrideResponse: Partial< PlaceScheduleProgress > = {}): PlaceScheduleProgress => ({examDate: faker.helpers.arrayElement([faker.date.past().toISOString().split('T')[0], undefined]), placeName: faker.helpers.arrayElement([faker.word.sample(), undefined]), placeScheduleId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), progress: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({details: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({count: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), status: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), statusName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), examItemId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examItemName: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), ...overrideResponse})
 
-export const getResultVerifyResultsResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getResultVerifyResultsResponseKeyboardMock = (overrideResponse: Partial<Keyboard> = {}): Keyboard => ({...{keyboardType: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), values: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => (faker.word.sample())), undefined])}, ...overrideResponse});
 
-export const getResultRegisterResultsResponseMock = (): Blob => (new Blob(faker.helpers.arrayElements(faker.word.words(10).split(' '))))
+export const getResultVerifyResultsResponseMock = (overrideResponse: Partial< VerifyExamItems > = {}): VerifyExamItems => ({errorLevel: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examItemGroups: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examItems: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({examItemDetails: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({cancelReasonId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), decimalLength: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), equipmentLabel: faker.helpers.arrayElement([faker.word.sample(), undefined]), examItemDetailId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examItemDetailOptions: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement([faker.word.sample(), undefined]), name: faker.helpers.arrayElement([faker.word.sample(), undefined]), orderNumber: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), examNormalValueRanges: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({errorLevel: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), maxValue: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), minValue: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), integerLength: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), keyboard: faker.helpers.arrayElement([faker.helpers.arrayElement([{...getResultVerifyResultsResponseKeyboardMock()}]), undefined]), name: faker.helpers.arrayElement([faker.word.sample(), undefined]), positionNumber: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), prevValue: faker.helpers.arrayElement([faker.word.sample(), undefined]), type: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), unit: faker.helpers.arrayElement([faker.word.sample(), undefined]), value: faker.helpers.arrayElement([faker.word.sample(), undefined])})), undefined]), examItemId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), examRegistResults: faker.helpers.arrayElement([Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({description: faker.helpers.arrayElement([faker.word.sample(), undefined]), errorLevel: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), name: faker.helpers.arrayElement([faker.word.sample(), undefined]), positionNumber: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), type: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined])})), undefined]), ...overrideResponse})
 
 export const getStaffGetStaffResponseMock = (overrideResponse: Partial< Staff > = {}): Staff => ({staffId: faker.helpers.arrayElement([faker.number.int({min: undefined, max: undefined}), undefined]), staffName: faker.helpers.arrayElement([faker.word.sample(), undefined]), ...overrideResponse})
 
@@ -138,8 +148,8 @@ export const getConsultGetExamItemsExamineeMockHandler = (overrideResponse?: Exa
   })
 }
 
-export const getConsultChangeIntegrationStatusMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<void> | void)) => {
-  return http.put('*/api/v:version/consult/:consultNumber/integrationStatus', async (info) => {await delay(1000);
+export const getConsultRegisterExecutionsMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)) => {
+  return http.post('*/api/v:version/consult/:consultNumber/executions', async (info) => {await delay(1000);
   if (typeof overrideResponse === 'function') {await overrideResponse(info); }
     return new HttpResponse(null,
       { status: 200,
@@ -148,12 +158,14 @@ export const getConsultChangeIntegrationStatusMockHandler = (overrideResponse?: 
   })
 }
 
-export const getConsultRegisterExecutionsMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)) => {
-  return http.post('*/api/v:version/consult/:consultNumber/executions', async (info) => {await delay(1000);
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-    return new HttpResponse(null,
+export const getConsultGetInputExamItemsExamineeMockHandler = (overrideResponse?: InputExamItems | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<InputExamItems> | InputExamItems)) => {
+  return http.get('*/api/v:version/consult/:consultNumber/inputExamItems', async (info) => {await delay(1000);
+  
+    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
+            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
+            : getConsultGetInputExamItemsExamineeResponseMock()),
       { status: 200,
-        
+        headers: { 'Content-Type': 'application/json' }
       })
   })
 }
@@ -228,37 +240,22 @@ export const getIntegrationGetExportHistoryMockHandler = (overrideResponse?: Exp
   })
 }
 
-/**
- * @summary 固定値を返すように変更しています。
- */
+export const getIntegrationUndoExportStatusMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)) => {
+  return http.post('*/api/v:version/integrations/examResults/undoExport', async (info) => {await delay(1000);
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+    return new HttpResponse(null,
+      { status: 200,
+        
+      })
+  })
+}
+
 export const getPlaceScheduleGetTeamsMockHandler = (overrideResponse?: PlaceScheduleTeams | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<PlaceScheduleTeams> | PlaceScheduleTeams)) => {
   return http.get('*/api/v:version/placeSchedules/teams', async (info) => {await delay(1000);
   
-    // overrideResponseが未定義の場合に返すモックデータを設定
-    const defaultMockResponse: PlaceScheduleTeams = {
-      teams: [
-        {
-          teamId: 1,
-          teamName: 'Team A',
-          places: [
-            { placeId: 101, placeName: 'Room 101' },
-            { placeId: 102, placeName: 'Room 102' }
-          ]
-        },
-        {
-          teamId: 2,
-          teamName: 'Team B',
-          places: [
-            { placeId: 201, placeName: 'Room 201' },
-            { placeId: 202, placeName: 'Room 202' }
-          ]
-        }
-      ]
-    };
-
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : defaultMockResponse),
+            : getPlaceScheduleGetTeamsResponseMock()),
       { status: 200,
         headers: { 'Content-Type': 'application/json' }
       })
@@ -311,8 +308,8 @@ export const getProgressGetProgressMockHandler = (overrideResponse?: PlaceSchedu
   })
 }
 
-export const getResultVerifyResultsMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Blob> | Blob)) => {
-  return http.post('*/api/v:version/consult/:consultId/results/verify', async (info) => {await delay(1000);
+export const getResultVerifyResultsMockHandler = (overrideResponse?: VerifyExamItems | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<VerifyExamItems> | VerifyExamItems)) => {
+  return http.post('*/api/v:version/consult/:consultNumber/results/verify', async (info) => {await delay(1000);
   
     return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
             ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
@@ -323,14 +320,12 @@ export const getResultVerifyResultsMockHandler = (overrideResponse?: Blob | ((in
   })
 }
 
-export const getResultRegisterResultsMockHandler = (overrideResponse?: Blob | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Blob> | Blob)) => {
-  return http.post('*/api/v:version/consult/:consultId/results', async (info) => {await delay(1000);
-  
-    return new HttpResponse(JSON.stringify(overrideResponse !== undefined 
-            ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse) 
-            : getResultRegisterResultsResponseMock()),
+export const getResultRegisterResultsMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)) => {
+  return http.post('*/api/v:version/consult/:consultNumber/results', async (info) => {await delay(1000);
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+    return new HttpResponse(null,
       { status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        
       })
   })
 }
@@ -353,14 +348,15 @@ export const getWellshipMock = () => [
   getConsultGetUnexaminedItemsMockHandler(),
   getConsultGetSimpleExamineeMockHandler(),
   getConsultGetExamItemsExamineeMockHandler(),
-  getConsultChangeIntegrationStatusMockHandler(),
   getConsultRegisterExecutionsMockHandler(),
+  getConsultGetInputExamItemsExamineeMockHandler(),
   getEquipmentGetEquipmentSettingsMockHandler(),
   getExamMenuGetExamMenusMockHandler(),
   getHomeMenuGetHomeMenuSettingsMockHandler(),
   getIntegrationGetIntegrationResultsMockHandler(),
   getIntegrationExportResultsMockHandler(),
   getIntegrationGetExportHistoryMockHandler(),
+  getIntegrationUndoExportStatusMockHandler(),
   getPlaceScheduleGetTeamsMockHandler(),
   getPlaceScheduleGetTeamPlaceSchedulesMockHandler(),
   getPlaceScheduleGetPlaceScheduleLockingStatusMockHandler(),

@@ -8,16 +8,8 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class ExportHistoryList
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public ExportHistoryList(ExportHistory[] exportHistories)
-    {
-        ExportHistories = exportHistories;
-    }
-    /// <summary>
     /// 検査結果出力履歴リスト
     /// </summary>
     [JsonPropertyName("exportHistories")]
-    public ExportHistory[] ExportHistories { get; }
-
+    public required ExportHistory[] ExportHistories { get; init; }
 }

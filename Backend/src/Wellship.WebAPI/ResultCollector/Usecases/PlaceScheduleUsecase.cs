@@ -1,5 +1,5 @@
-
 using Ryobi.Wellship.APIModels.Responses;
+using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -23,48 +23,89 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// 班リストを取得する
     /// </summary>
     /// <param name="date">健診日</param>
-    public PlaceScheduleTeams GetTeams(DateOnly date)
+    public async Task<PlaceScheduleTeams> GetTeamsAsync(DateOnly date)
     {
-        var placeSchedules = _placeScheduleRepository.GetPlaceSchedules(date);
+        var placeSchedules = await _placeScheduleRepository.GetPlaceSchedulesAsync(date);
 
-        // 班でグループ化する
+        // 班でグループ化する。1日に同じ会場が複数設定できるので、会場でグループ化して1つだけ返す。
+        // 班リストは班.表示順の昇順
+        // 会場リストは会場.表示順の昇順
         var results = placeSchedules.GroupBy(x => x.Team.Id)
-                                    .Select(x => new PlaceScheduleTeam(x.Key,
-                                                                       x.First().Team.Name,
-                                                                       x.Select(p => new Place(p.Place.Id,
-                                                                                               p.Place.Name)).ToList())).ToArray();
-        return new PlaceScheduleTeams(results);
+                               .OrderBy(x => x.First().Team.OrderNumber)
+                               .Select(x => new PlaceScheduleTeam()
+                               {
+                                   TeamId = x.First().Team.Id,
+                                   TeamName = x.First().Team.Name,
+                                   Places = x.GroupBy(p => p.Place.Id) // PlaceIdでグループ化する
+                                             .OrderBy(x => x.First().Place.OrderNumber)
+                                             .Select(g => new Place()
+                                             {
+                                                 PlaceId = g.Key,
+                                                 PlaceName = g.First().Place.Name
+                                             }).ToArray()
+                               }).ToArray();
+
+        return new PlaceScheduleTeams()
+        {
+            Teams = results
+        };
     }
 
     /// <summary>
     /// 班を指定して会場日程を取得する
     /// </summary>
-    public void GetTeamPlaceSchedules()
+    public async Task<PlaceSchedulePlaces> GetTeamPlaceSchedulesAsync(DateOnly examDate, int teamId)
     {
+        var placeSchedules = await _placeScheduleRepository.GetPlaceSchedulesAsync(examDate);
+        var team = placeSchedules.Where(x => x.ExamDate == examDate)
+                                 .Where(x => x.Team.Id == teamId)
+                                 .ToList();
 
+        if (team.Count == 0)
+        {
+            throw new ResourceNotFoundException("会場日程が存在しません。");
+        }
+
+        return new PlaceSchedulePlaces()
+        {
+            TeamId = team.First().Team.Id,
+            TeamName = team.First().Team.Name,
+            ExamDate = team.First().ExamDate,
+            PlaceSchedules = team.OrderBy(x => x.Place.OrderNumber)
+                                 .ThenBy(x => x.StartTime)
+                                 .Select(t => new PlaceSchedule()
+                                 {
+                                     PlaceScheduleId = t.Id,
+                                     PlaceId = t.Place.Id,
+                                     PlaceName = t.Place.Name,
+                                     StartTime = t.FormatStartTimeString,
+                                 }).ToArray()
+        };
     }
 
     /// <summary>
     /// 会場ロック状態を取得する
     /// </summary>
-    public void GetPlaceScheduleLockingStatus()
+    public async Task<PlaceScheduleLocking> GetPlaceScheduleLockingStatusAsync(int placeScheduleId)
     {
-
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync(placeScheduleId);
+        return new APIModels.Responses.PlaceScheduleLocking()
+        {
+            PlaceScheduleId = placeSchedule.PlaceScheduleId,
+            PlaceId = placeSchedule.PlaceId,
+            PlaceName = placeSchedule.PlaceName,
+            ExamDate =  DateOnly.FromDateTime(placeSchedule.ExamDate),
+            PlaceScheduleLockingStatus = placeSchedule.Status,
+            UpdatedAt = placeSchedule.CreatedAt,
+            UpdatedBy = placeSchedule.CreatedBy
+        };
     }
 
     /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
-    public void UpdatePlaceScheduleLockingStatus()
+    public Task UpdatePlaceScheduleLockingStatusAsync()
     {
-
-    }
-
-    /// <summary>
-    /// 会場日程の出力状況を変更する
-    /// </summary>
-    public void UpdatePlaceScheduleResultExportStatus()
-    {
-
+        throw new NotImplementedException();
     }
 }

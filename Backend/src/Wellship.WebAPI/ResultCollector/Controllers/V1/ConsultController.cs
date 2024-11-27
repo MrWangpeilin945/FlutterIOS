@@ -98,4 +98,21 @@ public class ConsultController : ControllerBase
     {
         return Ok();
     }
+
+    /// <summary>
+    /// 検査結果入力情報を取得する
+    /// </summary>
+    /// <param name="consultNumber">受診番号</param>
+    /// <param name="examMenuId">検査メニューID</param>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(InputExamItems))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpGet]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/inputExamItems")]
+    public IActionResult GetInputExamItemsExamineeAsync([FromRoute][Required] int consultNumber, [FromQuery][Required] int examMenuId)
+    {
+        _consultUsecase.GetExamItemsExaminee();
+        return Ok();
+    }
 }

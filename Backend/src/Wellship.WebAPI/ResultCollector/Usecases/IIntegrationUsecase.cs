@@ -10,7 +10,7 @@ public interface IIntegrationUsecase
     /// <summary>
     /// 連携対象の検査結果を取得する
     /// </summary>
-    public void GetIntegrationResults();
+    public Task<ExportDataList> GetExportTargetResultsAsync();
 
     /// <summary>
     /// 連携用に検査結果を出力する
@@ -20,5 +20,10 @@ public interface IIntegrationUsecase
     /// <summary>
     /// 検査結果の出力履歴を取得する
     /// </summary>
-    public void GetExportHistory();
+    public Task<ExportHistoryList> GetExportHistoryAsync();
+
+    /// <summary>
+    /// 出力した結果を未出力に戻す
+    /// </summary>
+    public Task UndoExportStatusAsync(Guid exportId);
 }

@@ -8,17 +8,9 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class EquipmentList
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public EquipmentList(Equipment[] equipments)
-    {
-        Equipments = equipments;
-    }
-
-    /// <summary>
     /// 検査機器リスト
     /// </summary>
     [JsonPropertyName("equipments")]
-    public Equipment[] Equipments { get; }
+    public required Equipment[] Equipments { get; init; }
 
 }

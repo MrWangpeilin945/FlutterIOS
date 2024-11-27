@@ -1,3 +1,5 @@
+using Ryobi.Wellship.Core.Enums;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 /// <summary>
@@ -5,47 +7,41 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 /// </summary>
 public class PlaceSchedule
 {
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public PlaceSchedule(int id, Place place, Team team, DateOnly date, string startTime, string endTime)
-    {
-        Id = id;
-        Place = place;
-        Team = team;
-        Date = date;
-        StartTime = startTime;
-        EndTime = endTime;
-    }
-
     /// <summary>
     /// 会場日程ID
     /// </summary>
-    public int Id { get; }
+    public required int Id { get; init; }
 
     /// <summary>
     /// 会場
     /// </summary>
-    public Place Place { get; }
+    public required Place Place { get; init; }
 
     /// <summary>
     /// 班
     /// </summary>
-    public Team Team { get; }
+    public required Team Team { get; init; }
 
     /// <summary>
     /// 健診日
     /// </summary>
-    public DateOnly Date { get; }
+    public required DateOnly ExamDate { get; init; }
 
     /// <summary>
-    /// 開始時刻
+    /// 開始時刻（HHmm形式）
     /// </summary>
-    public string StartTime { get; }
+    public required string StartTime { get; init; }
 
     /// <summary>
-    /// 終了時刻
+    /// 会場ロック状況
     /// </summary>
-    public string EndTime { get; }
+    public required PlaceScheduleLockingStatus PlaceScheduleLockingStatus { get; init; }
+
+    /// <summary>
+    /// 開始時刻をHH:mm形式で取得します。
+    /// </summary>
+    public string FormatStartTimeString
+    {
+        get => $"{StartTime.Substring(0, 2)}:{StartTime.Substring(2, 2)}";
+    }
 }
