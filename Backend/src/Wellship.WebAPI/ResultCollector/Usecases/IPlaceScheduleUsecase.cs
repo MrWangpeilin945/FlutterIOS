@@ -21,7 +21,7 @@ public interface IPlaceScheduleUsecase
     /// <summary>
     /// 会場ロック状態を取得する
     /// </summary>
-    public Task GetPlaceScheduleLockingStatusAsync();
+    public Task<PlaceScheduleLocking> GetPlaceScheduleLockingStatusAsync(int placeScheduleId);
 
     /// <summary>
     /// 会場ロック状態を更新する

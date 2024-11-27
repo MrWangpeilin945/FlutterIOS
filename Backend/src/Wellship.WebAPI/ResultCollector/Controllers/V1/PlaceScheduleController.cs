@@ -78,8 +78,8 @@ public class PlaceScheduleController : ControllerBase
     [Route("api/v{version:apiVersion}/placeSchedules/{placeScheduleId}/placeScheduleLockingStatus")]
     public async Task<IActionResult> GetPlaceScheduleLockingStatusAsync([FromRoute][Required] int placeScheduleId)
     {
-        await _placeScheduleUsecase.GetPlaceScheduleLockingStatusAsync();
-        return Ok();
+        var results = await _placeScheduleUsecase.GetPlaceScheduleLockingStatusAsync(placeScheduleId);
+        return Ok(results);
     }
 
     /// <summary>

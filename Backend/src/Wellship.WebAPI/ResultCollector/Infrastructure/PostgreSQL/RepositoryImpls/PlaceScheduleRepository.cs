@@ -1,6 +1,7 @@
 using Dapper;
 
 using Ryobi.Wellship.Core.Enums;
+using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
@@ -131,5 +132,38 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
                 OrderNumber = x.TeamOrderNumber
             },
         }).ToArray();
+    }
+
+    /// <summary>
+    /// 会場ロック状態を取得する
+    /// </summary>
+    public async Task<Domain.Models.PlaceScheduleStatus> GetPlaceScheduleLockingStatusAsync(int placeScheduleId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            ps.place_schedule_id as PlaceScheduleId
+            , ps.place_id as PlaceId
+            , p.name as PlaceName
+            , ps.exam_date as ExamDate
+            , ps.status as Status
+            , ps.created_at as CreatedAt
+            , ps.created_by as CreatedBy
+        from
+            resultcollector.place_schedule as ps
+            left join resultcollector.places as p 
+                on ps.place_id = p.place_id 
+        where
+            ps.place_schedule_id = @PlaceScheduleId;";
+
+        var results = await connection.QueryAsync<Domain.Models.PlaceScheduleStatus>(sql, new { PlaceScheduleId = placeScheduleId });
+
+        var placeSchedule = results.SingleOrDefault();
+
+        if (placeSchedule is null)
+        {
+            throw new PlaceScheduleNotFoundException();
+        }
+        return placeSchedule;
     }
 }
