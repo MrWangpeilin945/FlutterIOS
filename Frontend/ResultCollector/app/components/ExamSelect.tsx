@@ -28,15 +28,13 @@ export default function ExamSelect({
     return null; // examItemDetailがundefinedの場合は何も表示しない
   }
 
-  const [errMessages, setErrMessages] = useState<ExamRegstResult[] | undefined>(
-    examItems.examRegstResults,
-  );
+  const [errMessages, setErrMessages] = useState<ExamRegstResult[] | undefined>(examItems.examRegistResults);
   const [selected, setSelected] = useState(
     examItemDetail.value || examItemDetail.prevValue || undefined,
   );
 
   const handleErrorMessage = () => {
-    const initialMessages = examItems.examRegstResults || [];
+    const initialMessages = examItems.examRegistResults || [];
     let updatedMessages = [...initialMessages];
 
     //必須チェック
@@ -64,7 +62,7 @@ export default function ExamSelect({
   };
 
   useEffect(handleErrorMessage, [
-    examItems.examRegstResults,
+    examItems.examRegistResults,
     examItems.name,
     onRegisterPressed,
     selected,
@@ -93,7 +91,15 @@ export default function ExamSelect({
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Flex mb={16}>
-        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" px={32} py={16}>
+        <Paper
+          w={274}
+          h={80}
+          bg="gray02"
+          c="white"
+          radius="itemName"
+          px={32}
+          py={16}
+        >
           <Center>
             <Text size="lg" fw={700}>
               {examItems.name}
