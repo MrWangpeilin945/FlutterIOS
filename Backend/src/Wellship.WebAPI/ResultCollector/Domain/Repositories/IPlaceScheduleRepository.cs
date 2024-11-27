@@ -16,4 +16,9 @@ public interface IPlaceScheduleRepository
     /// 会場日程IDを指定して会場日程を取得する
     /// </summary>
     public Task<IEnumerable<PlaceSchedule>> GetPlaceSchedulesAsync(int[] placeScheduleIds);
+
+    /// <summary>
+    /// 会場ロック状態を取得する
+    /// </summary>
+    public Task<PlaceScheduleStatus> GetPlaceScheduleLockingStatusAsync(int placeScheduleId);
 }

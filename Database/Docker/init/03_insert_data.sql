@@ -120,9 +120,18 @@ INSERT INTO equipments(equipment_id,name,exam_menu_id,app_launch_url,processing_
   , (3,'EQ003',2,'wsc://abcde','https://example.com/sctipts/eq003.js',CURRENT_TIMESTAMP,'init')
   , (4,'EQ004',3,'wsc://abcde','https://example.com/sctipts/eq004.js',CURRENT_TIMESTAMP,'init')
   , (5,'EQ005',5,'wsc://abcde','https://example.com/sctipts/eq005.js',CURRENT_TIMESTAMP,'init');
+
 -- 検査結果出力履歴
-INSERT INTO resultcollector.export_histories(place_schedule_id,data_count,exported_at,exported_by,created_at,created_by) VALUES 
-    (2,2,TIMESTAMP '2024-11-25 12:57:15.506','職員B',CURRENT_TIMESTAMP,'init')
-  , (3,65,TIMESTAMP '2024-10-22 20:00:00.000','職員A',CURRENT_TIMESTAMP,'init')
-  , (1,142,TIMESTAMP '2024-10-03 13:20:00.000','職員B',CURRENT_TIMESTAMP,'init')
-  , (1,34,TIMESTAMP '2023-02-25 09:24:000.000','職員A',CURRENT_TIMESTAMP,'init');
+INSERT INTO resultcollector.export_histories(id, place_schedule_id,exported_at,exported_by,created_at,created_by) VALUES 
+    ('af0971a0-186f-4b14-86a1-0c648d77c9af',2,TIMESTAMP '2024-11-25 12:57:15.506','職員B',CURRENT_TIMESTAMP,'init')
+  , ('41293e22-4290-4f85-9179-9affda055cdd',3,TIMESTAMP '2024-10-22 20:00:00.000','職員A',CURRENT_TIMESTAMP,'init')
+  , ('b53cc211-1b6a-4d20-8bb0-3c2a007661c6',1,TIMESTAMP '2024-10-03 13:20:00.000','職員B',CURRENT_TIMESTAMP,'init')
+  , ('8f2edd5a-9ad3-4445-96a8-1b2129f60929',1,TIMESTAMP '2023-02-25 09:24:000.000','職員A',CURRENT_TIMESTAMP,'init');
+
+-- 検査結果出力履歴明細
+INSERT INTO resultcollector.export_history_details(id,consult_id,created_at,created_by) VALUES 
+    ('af0971a0-186f-4b14-86a1-0c648d77c9af',1,CURRENT_TIMESTAMP,'init')
+  , ('af0971a0-186f-4b14-86a1-0c648d77c9af',2,CURRENT_TIMESTAMP,'init')
+  , ('af0971a0-186f-4b14-86a1-0c648d77c9af',4,CURRENT_TIMESTAMP,'init')
+  , ('b53cc211-1b6a-4d20-8bb0-3c2a007661c6',3,CURRENT_TIMESTAMP,'init')
+  , ('8f2edd5a-9ad3-4445-96a8-1b2129f60929',5,CURRENT_TIMESTAMP,'init');

@@ -1,4 +1,3 @@
-
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
@@ -87,9 +86,19 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// <summary>
     /// 会場ロック状態を取得する
     /// </summary>
-    public Task GetPlaceScheduleLockingStatusAsync()
+    public async Task<PlaceScheduleLocking> GetPlaceScheduleLockingStatusAsync(int placeScheduleId)
     {
-        throw new NotImplementedException();
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync(placeScheduleId);
+        return new APIModels.Responses.PlaceScheduleLocking()
+        {
+            PlaceScheduleId = placeSchedule.PlaceScheduleId,
+            PlaceId = placeSchedule.PlaceId,
+            PlaceName = placeSchedule.PlaceName,
+            ExamDate =  DateOnly.FromDateTime(placeSchedule.ExamDate),
+            PlaceScheduleLockingStatus = placeSchedule.Status,
+            UpdatedAt = placeSchedule.CreatedAt,
+            UpdatedBy = placeSchedule.CreatedBy
+        };
     }
 
     /// <summary>
@@ -98,21 +107,5 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     public Task UpdatePlaceScheduleLockingStatusAsync()
     {
         throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// 会場日程の出力状況を変更する
-    /// </summary>
-    public Task UpdatePlaceScheduleResultExportStatusAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// 会場日程の開始時刻文字列（HHmm）を（HH:mm）に変換します。
-    /// </summary>
-    private static string FormatStartTimeString(string startTimeString)
-    {
-        return $"{startTimeString.Substring(0, 2)}:{startTimeString.Substring(2, 2)}";
     }
 }

@@ -6,6 +6,11 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 public class ExportHistory
 {
     /// <summary>
+    /// 出力履歴ID
+    /// </summary>
+    public required Guid ExportId { get; init; }
+
+    /// <summary>
     /// 会場日程ID
     /// </summary>
     public required int PlaceScheduleId { get; init; }
