@@ -1,10 +1,10 @@
 import CommonFooter from "~/components/CommonFooter";
 import ExamineeHeader from "~/components/ExamineeHeader";
+import ExamNumeric from "~/components/ExamNumeric";
 import ExamSelect from "~/components/ExamSelect";
 import { errorMessages } from "~/utils/getErrorMessage";
 
-export default function consultInput(){
-
+export default function consultInput() {
   const data = {
     examItems: [
       {
@@ -12,10 +12,7 @@ export default function consultInput(){
         examItemId: 101,
         examItemName: "スピッツ",
         //どのような形式かは未確定
-        errorMessages:[
-          {value:"エラー1"},
-          {value:"エラー2"}
-        ],
+        errorMessages: [{ value: "エラー1" }, { value: "エラー2" }],
         examItemDetails: [
           {
             positionNumber: 1, //血圧の上なのか下なのかのテキストボックス位置を指定する
@@ -42,13 +39,13 @@ export default function consultInput(){
                 selectorName: "コンタクト",
               },
               {
-                selectorId: "10033", 
+                selectorId: "10033",
                 selectorName: "テスト1",
               },
               {
                 selectorId: "10034",
                 selectorName: "テスト2",
-              }
+              },
             ], //選択系
             ranges: [
               //エラーレベルの高い順でソートして渡してもらう
@@ -66,23 +63,32 @@ export default function consultInput(){
                 errorLevel: 3,
                 numericMin: 50.0,
                 numericMax: 100.0,
-              }
+              },
             ],
-          }
+          },
         ],
-      }
-    ]
+      },
+    ],
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = () => {};
 
-  }
-
-  return(
+  return (
     <>
-    <ExamineeHeader staffName="両備 花子" managerId={100001} name="リョウビ タロウ" gender={1} age={35} />
-    <ExamSelect examItems={data.examItems[0]} onRegisterPressed={1} onClick={handleConfirm} />
-    <CommonFooter/>
+      <ExamineeHeader
+        staffName="両備 花子"
+        managerId={100001}
+        name="リョウビ タロウ"
+        gender={1}
+        age={35}
+      />
+      <ExamSelect
+        examItems={data.examItems[0]}
+        onRegisterPressed={1}
+        onClick={handleConfirm}
+      />
+      <ExamNumeric examItems={data.examItems[0]} onChange={handleConfirm} />
+      <CommonFooter />
     </>
-  )
+  );
 }
