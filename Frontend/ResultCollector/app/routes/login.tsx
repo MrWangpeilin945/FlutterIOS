@@ -1,13 +1,13 @@
-import { Button } from "@mantine/core";
+import { Button, LoadingOverlay } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
+import { isAxiosError } from "axios";
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { z } from "zod";
-import { authenticationLogin, staffGetStaff } from "~/api/wellship";
+import { useAuthenticationLogin, useStaffGetStaff } from "~/api/wellship";
 import CommonDialog from "~/components/CommonDialog";
-import type { StaffLoginRequest } from "~/domain/wellship.schemas";
 import type { NamedEntity } from "~/interfaces/interfaces";
 import { staffState } from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
@@ -18,11 +18,20 @@ export const meta: MetaFunction = () => {
 
 export default function Login() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [loginId, setLoginId] = useState("");
   const [opened, { open, close }] = useDisclosure(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [, setStaff] = useAtom(staffState);
+
+  //AP1001呼び出し用(POST系APIの定義)
+  const { mutateAsync } = useAuthenticationLogin();
+
+  //AP1002呼び出し用(GET系APIの定義)
+  const { isFetching, refetch } = useStaffGetStaff("1", {
+    query: { enabled: false },
+  });
 
   // バリデーションチェック
   const validationCheck = () => {
@@ -61,46 +70,65 @@ export default function Login() {
 
   //AP1001_ログインする( 認証情報を渡してJWTを取得する)
   const fetchlogin = async () => {
-    const loginData: StaffLoginRequest = { loginId, password };
+    // POST時のリクエストボディを生成する
+    const body = {
+      loginId: loginId,
+      password: password,
+    };
 
-    await authenticationLogin("1", loginData)
-      .then(() => {
-        // 成功時の処理
-      })
-      .catch((error) => {
-        if (error.response.status === 403) {
-          setErrorMessage(getErrorMessage(errorMessages.accesDenied));
-        } else if (error.response.status === 500) {
-          setErrorMessage(getErrorMessage(errorMessages.server));
+    const postMutateAsync = async () => {
+      setIsLoading(true);
+      try {
+        const result = await mutateAsync({
+          version: "1",
+          data: body,
+        });
+        if (result.status === 200) {
+          // 成功時の処理
+          await fetchStaff();
         }
-        open();
-        throw new Error(error);
-      });
+      } catch (error) {
+        if (isAxiosError(error) && error.response) {
+          if (error.response.status === 403) {
+            setErrorMessage(getErrorMessage(errorMessages.accessDenied));
+          } else if (error.response.status === 500) {
+            setErrorMessage(getErrorMessage(errorMessages.serverError));
+          }
+          open();
+          throw new Error();
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    postMutateAsync();
   };
 
   //AP1002_職員の情報を取得する(ログイン中の職員の名前などを取得する)
   const fetchStaff = async () => {
-    await staffGetStaff("1")
-      .then((result) => {
-        // 成功時の処理
-        // サーバから取得した情報.staffId、staffNameを設定する
-        const jotaiData: NamedEntity = {
-          id: result.data.staffId,
-          name: result.data.staffName,
-        };
-        setStaff(jotaiData);
-      })
-      .catch((error) => {
-        if (error.response.status === 404) {
-          setErrorMessage(
-            getErrorMessage(errorMessages.noData, "該当IDの職員情報"),
-          );
-        } else if (error.response.status === 500) {
-          setErrorMessage(getErrorMessage(errorMessages.server));
-        }
-        open();
-        throw new Error(error);
-      });
+    const result = await refetch();
+    if (result.data) {
+      // 成功時
+      // サーバから取得した情報.staffId、staffNameを設定する
+      const jotaiData: NamedEntity = {
+        id: result.data.data.staffId,
+        name: result.data.data.staffName,
+      };
+      setStaff(jotaiData);
+
+      // 次の画面に遷移
+      navigate("/team-select");
+    } else if (result.error) {
+      if (result.error.status === 404) {
+        setErrorMessage(
+          getErrorMessage(errorMessages.noData, "該当IDの職員情報"),
+        );
+      } else if (result.error.status === 500) {
+        setErrorMessage(getErrorMessage(errorMessages.serverError));
+      }
+      open();
+      throw new Error();
+    }
   };
 
   // ログイン実行処理
@@ -108,10 +136,6 @@ export default function Login() {
     try {
       if (validationCheck()) {
         await fetchlogin();
-        await fetchStaff();
-
-        // 次の画面に遷移
-        navigate("/team-select");
       }
     } catch (error) {
       // console.error("ログイン実行中にエラーが発生しました:", error);
@@ -121,36 +145,39 @@ export default function Login() {
   return (
     <div>
       <div>
-        <h1>ログイン画面</h1>
-        <label>
-          利用者ID&nbsp;
-          <input
-            type="text"
-            value={loginId}
-            onChange={(e) => setLoginId(e.target.value)}
-            maxLength={20}
+        <LoadingOverlay visible={isFetching || isLoading} />
+        <>
+          <h1>ログイン画面</h1>
+          <label>
+            利用者ID&nbsp;
+            <input
+              type="text"
+              value={loginId}
+              onChange={(e) => setLoginId(e.target.value)}
+              maxLength={20}
+            />
+            &nbsp;&nbsp;
+          </label>
+          <br />
+          <label>
+            パスワード&nbsp;
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+          <br />
+          <Button variant="primary" onClick={() => handleConfirm()}>
+            ログイン
+          </Button>
+          <CommonDialog
+            message={errorMessage || ""}
+            buttonMessage="閉じる"
+            isOpen={opened}
+            onClose={close}
           />
-          &nbsp;&nbsp;
-        </label>
-        <br />
-        <label>
-          パスワード&nbsp;
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
-        <br />
-        <Button variant="primary" onClick={() => handleConfirm()}>
-          ログイン
-        </Button>
-        <CommonDialog
-          message={errorMessage || ""}
-          buttonMessage="閉じる"
-          isOpen={opened}
-          onClose={close}
-        />
+        </>
       </div>
     </div>
   );
