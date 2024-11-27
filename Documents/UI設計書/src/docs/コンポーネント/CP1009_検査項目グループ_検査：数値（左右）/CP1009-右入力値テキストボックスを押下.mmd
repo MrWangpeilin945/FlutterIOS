@@ -1,0 +1,18 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+  participant KB as 【CP0012】キーボード(整数)
+
+  User->>KN:右入力値テキストボックスを押下
+  KN->>KB:【CP0012】キーボード(整数)を呼び出す
+  KB->>KN:【CP0012】キーボード(整数)の値変更 <br> 数字ボタン押下 or AC押下
+  KN->>KN:渡された値を保存してテキストボックスに表示
+  KN-->>FE:引数.右変更イベントを呼び出す
+  KB->>KN:【CP0012】キーボード(整数)の確定ボタンを押下
+  KN->>KN:【CP0012】キーボード(整数)を非表示

@@ -1,0 +1,13 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  User->>KN:戻るボタンを押下
+  
+  KN-->>FE:1つ前の画面に遷移

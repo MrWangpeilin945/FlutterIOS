@@ -6,8 +6,7 @@ sequenceDiagram
 autonumber
   actor User as 職員
   participant FE as フロントエンド
-  participant KN as コンポーネント
+  participant KN as コンポーネント 
   participant BE as バックエンド   
-  User->>FE:【SC0001】ログイン画面に遷移
- 
-  FE-->>User:【SC0001】ログイン画面表示
+  User->>FE:班名ボタンを押下
+  FE-->>User:【SC0002】班選択画面に遷移

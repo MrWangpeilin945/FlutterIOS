@@ -1,0 +1,29 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント 
+  participant BE as バックエンド   
+  User->>FE:【SC0006】受診番号入力画面に遷移
+  FE->>FE:jotaiから職員名、会場名を取得
+  FE->>KN:【CP0001】共通ヘッダーを呼び出す
+  FE->>KN:【CP0002】共通フッターを呼び出す
+  alt 前回個人のクエリパラメータが存在する
+  FE->>BE:AP1008_未受診の健診メニュー取得<br>[GET] /consult/{consultNumber}/unexaminedItems
+  BE-->>FE:レスポンスを取得  
+  alt httpステータスコードが200
+  FE->>KN:【CP0011】未実施検査項目を呼び出す
+  else 400エラー or 500エラー
+   FE->>KN:【CP0015】共通ダイアログを呼び出す
+  end
+  end
+  FE-->>User:【SC0006】受診番号入力画面の表示
+  note over User,FE:取得した情報を表示  
+  
+
+
+ 
