@@ -35,6 +35,27 @@ include::./SC0001_ログイン画面/SC0001-初期表示.mmd[]
 include::./SC0008_検査結果入力画面/SC0008-初期表示.mmd[]
 ....
 
+=== 機器測定する
+
+[mermaid,SC0008-機器測定する,png,scale=3,pdfwidth=100%]
+....
+include::./SC0008_検査結果入力画面/SC0008-機器測定する.mmd[]
+....
+
+=== 検証する
+
+[mermaid,SC0008-検証する,png,scale=3,pdfwidth=100%]
+....
+include::./SC0008_検査結果入力画面/SC0008-検証する.mmd[]
+....
+
+=== 登録する
+
+[mermaid,SC0008-登録する,png,scale=3,pdfwidth=100%]
+....
+include::./SC0008_検査結果入力画面/SC0008-登録する.mmd[]
+....
+
 <<<
 == SC0009_検査結果確認画面
 
