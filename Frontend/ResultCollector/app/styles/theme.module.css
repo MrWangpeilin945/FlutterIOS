@@ -3,8 +3,13 @@
 
 /* SwitchをOFFにした時に適用するCSS */
 .switch-off > label > div:first-of-type {
-  background-color: #9a9a9a;
-  color: #ffffff;
+  background-color: #cecece;
+  color: #6a6a6a;
+}
+
+/* Switchの文字位置を調整するCSS */
+.switch-padding > label > div:first-of-type > span {
+  padding-top: 3px;
 }
 
 /* Buttonがdisableの時に適用するCSS */
