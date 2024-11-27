@@ -4,7 +4,7 @@ import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import type {
   ExamItemDetailOption,
-  ExamRegstResult,
+  ExamRegistResult,
   InputExamItem,
 } from "~/domain/wellship.schemas";
 
@@ -28,7 +28,9 @@ export default function ExamSelect({
     return null; // examItemDetailがundefinedの場合は何も表示しない
   }
 
-  const [errMessages, setErrMessages] = useState<ExamRegstResult[] | undefined>(examItems.examRegistResults);
+  const [errMessages, setErrMessages] = useState<
+    ExamRegistResult[] | undefined
+  >(examItems.examRegistResults);
   const [selected, setSelected] = useState(
     examItemDetail.value || examItemDetail.prevValue || undefined,
   );
@@ -38,7 +40,7 @@ export default function ExamSelect({
     let updatedMessages = [...initialMessages];
 
     //必須チェック
-    const errorMessage: ExamRegstResult = {
+    const errorMessage: ExamRegistResult = {
       description: getErrorMessage(
         errorMessages.required,
         `${examItems.name}は`,
@@ -118,6 +120,8 @@ export default function ExamSelect({
             <Button
               w={320}
               h={78}
+              size="xl"
+              fw={700}
               key={selector.orderNumber}
               onClick={() => onSelect(selector)}
               variant="outline"
@@ -125,16 +129,14 @@ export default function ExamSelect({
               color={isCancelled ? "gray02" : isSelected ? "primary" : "gray02"}
               disabled={!!isCancelled}
             >
-              <Text size="xl" fw={700}>
-                {selector.name}
-              </Text>
+              {selector.name}
             </Button>
           );
         })}
       </Group>
 
       {(errMessages || []).map((error, index) => (
-        <Group key={index} c={error.errorLevel === 2 ? "warning" : "error"}>
+        <Group key={index} c={error.errorLevel === 2 ? "warning" : "error"} >
           <IconExclamationCircleFilled size={"32px"} />
           <Text size="sm" fw={700}>
             {error.description}
