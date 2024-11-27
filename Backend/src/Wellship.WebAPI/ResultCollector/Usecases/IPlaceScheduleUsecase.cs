@@ -26,5 +26,5 @@ public interface IPlaceScheduleUsecase
     /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
-    public Task UpdatePlaceScheduleLockingStatusAsync();
+    public Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, int status);
 }

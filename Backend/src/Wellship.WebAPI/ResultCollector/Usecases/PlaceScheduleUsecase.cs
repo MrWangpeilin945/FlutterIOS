@@ -104,8 +104,8 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
-    public Task UpdatePlaceScheduleLockingStatusAsync()
+    public async Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, int status)
     {
-        throw new NotImplementedException();
+        await _placeScheduleRepository.UpdatePlaceScheduleLockingStatusAsync(placeScheduleId, status);
     }
 }

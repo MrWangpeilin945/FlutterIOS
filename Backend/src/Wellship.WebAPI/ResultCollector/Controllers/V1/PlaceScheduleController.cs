@@ -95,7 +95,11 @@ public class PlaceScheduleController : ControllerBase
     public async Task<IActionResult> UpdatePlaceScheduleLockingStatusAsync([FromRoute][Required] int placeScheduleId,
                                                           [FromBody] PlaceScheduleLockingRequest placeScheduleLockingRequest)
     {
-        await _placeScheduleUsecase.UpdatePlaceScheduleLockingStatusAsync();
+        if(placeScheduleId != placeScheduleLockingRequest.PlaceScheduleId)
+        {
+            return BadRequest("パスパラメータとリクエストパラメータが一致しません。");
+        }
+        await _placeScheduleUsecase.UpdatePlaceScheduleLockingStatusAsync(placeScheduleId, placeScheduleLockingRequest.PlaceScheduleLockingStatus);
         return Ok();
     }
 }

@@ -21,4 +21,9 @@ public interface IPlaceScheduleRepository
     /// 会場ロック状態を取得する
     /// </summary>
     public Task<PlaceScheduleStatus> GetPlaceScheduleLockingStatusAsync(int placeScheduleId);
+
+    /// <summary>
+    /// 会場ロック状態を更新する
+    /// </summary>
+    public Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, int status);
 }

@@ -223,6 +223,18 @@ public class PlaceScheduleUsecaseTests
 
         // Assert
         result.Should().BeEquivalentTo(expected);
+    }
 
+    [Fact]
+    public async Task 会場ロック状態を更新する()
+    {
+        // Arrange
+        var placeScheduleId = 1;
+        var status = 11;
+        _placeScheduleRepositoryMock.Setup(r => r.UpdatePlaceScheduleLockingStatusAsync(placeScheduleId, status));
+
+        // Act & Assert
+        await _placeScheduleUsecase.Invoking(x => x.UpdatePlaceScheduleLockingStatusAsync(placeScheduleId, status))
+                                .Should().NotThrowAsync();
     }
 }
