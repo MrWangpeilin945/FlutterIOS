@@ -59,9 +59,9 @@ public class IntegrationUsecaseTests
         ];
 
         _exportHistories = [
-            new(){PlaceScheduleId = 1,DataCount = 13,ExportedAt = DateTime.Parse("2024-11-30 17:00"),ExportedBy = "職員A"},
-            new(){PlaceScheduleId = 1,DataCount = 45,ExportedAt = DateTime.Parse("2024-11-30 13:00"),ExportedBy = "職員B"},
-            new(){PlaceScheduleId = 2,DataCount = 2,ExportedAt = DateTime.Parse("2024-10-21 17:30"),ExportedBy = "職員B"}
+            new(){ExportId = new Guid("5d0628e7-1051-4475-8a00-34abacd828ee"),PlaceScheduleId = 1,DataCount = 13,ExportedAt = DateTime.Parse("2024-11-30 17:00"),ExportedBy = "職員A"},
+            new(){ExportId = new Guid("846c3347-14ff-4e4e-9ee3-bcb1452ae953"),PlaceScheduleId = 1,DataCount = 45,ExportedAt = DateTime.Parse("2024-11-30 13:00"),ExportedBy = "職員B"},
+            new(){ExportId = new Guid("4c0f1413-aa13-4886-94b4-851e42200f79"),PlaceScheduleId = 2,DataCount = 2,ExportedAt = DateTime.Parse("2024-10-21 17:30"),ExportedBy = "職員B"}
         ];
 
         _exportPlaceSchedules = [
@@ -86,6 +86,7 @@ public class IntegrationUsecaseTests
         {
             ExportHistories = [
                 new(){
+                    ExportId = new Guid("5d0628e7-1051-4475-8a00-34abacd828ee"),
                     PlaceScheduleId = 1,
                     PlaceName = "会場A",
                     PlaceScheduleLockingStatus = (int)PlaceScheduleLockingStatus.検査完了,
@@ -95,6 +96,7 @@ public class IntegrationUsecaseTests
                     ExportedBy = "職員A"
                 },
                 new(){
+                    ExportId = new Guid("846c3347-14ff-4e4e-9ee3-bcb1452ae953"),
                     PlaceScheduleId = 1,
                     PlaceName = "会場A",
                     PlaceScheduleLockingStatus = (int)PlaceScheduleLockingStatus.検査完了,
@@ -104,6 +106,7 @@ public class IntegrationUsecaseTests
                     ExportedBy = "職員B"
                 },
                 new(){
+                    ExportId = new Guid("4c0f1413-aa13-4886-94b4-851e42200f79"),
                     PlaceScheduleId = 2,
                     PlaceName = "会場A",
                     PlaceScheduleLockingStatus = (int)PlaceScheduleLockingStatus.検査完了,
@@ -234,5 +237,19 @@ public class IntegrationUsecaseTests
 
         // Assert
         result.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task 出力履歴をもとに受診の出力状況を未出力に戻す()
+    {
+        // Arrange
+        var exportId = new Guid("10728b06-9246-45e4-9032-5b75c51f1c06");
+        _integrationRepositoryMock.Setup(r => r.UndoExportStatusAsync(exportId));
+
+        var integrationUsecase = new IntegrationUsecase(_integrationRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
+
+        // Act & Assert
+        await integrationUsecase.Invoking(x => x.UndoExportStatusAsync(exportId))
+                                .Should().NotThrowAsync();
     }
 }

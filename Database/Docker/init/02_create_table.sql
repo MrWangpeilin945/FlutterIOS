@@ -110,15 +110,12 @@ CREATE TABLE exam_results (
   , CONSTRAINT exam_results_PKC PRIMARY KEY (consult_id,exam_item_id,exam_item_detail_id)
 );
 
-CREATE TABLE export_histories (
-  id uuid DEFAULT gen_random_uuid () NOT NULL
-  , place_schedule_id integer NOT NULL
-  , data_count integer NOT NULL
-  , exported_at timestamp with time zone NOT NULL
-  , exported_by text NOT NULL
+CREATE TABLE export_history_details (
+  id uuid NOT NULL
+  , consult_id integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
-  , CONSTRAINT export_histories_PKC PRIMARY KEY (id)
+  , CONSTRAINT export_history_details_PKC PRIMARY KEY (id,consult_id)
 );
 
 CREATE TABLE home_menus (
@@ -275,6 +272,16 @@ CREATE TABLE examinees (
 
 ALTER TABLE examinees ADD CONSTRAINT examinees_IX1
   UNIQUE (examinee_code) ;
+
+CREATE TABLE export_histories (
+  id uuid DEFAULT gen_random_uuid () NOT NULL
+  , place_schedule_id integer NOT NULL
+  , exported_at timestamp with time zone NOT NULL
+  , exported_by text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT export_histories_PKC PRIMARY KEY (id)
+);
 
 CREATE TABLE functionalities (
   functionality_id integer NOT NULL
@@ -438,6 +445,11 @@ ALTER TABLE export_histories
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE export_history_details
+  ADD CONSTRAINT export_history_details_FK1 FOREIGN KEY (id) REFERENCES export_histories(id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE home_menus
   ADD CONSTRAINT home_menus_FK1 FOREIGN KEY (home_menu_group_id) REFERENCES home_menu_groups(home_menu_group_id)
   ON DELETE RESTRICT
@@ -573,14 +585,11 @@ COMMENT ON COLUMN exam_results.value IS '値';
 COMMENT ON COLUMN exam_results.created_at IS '作成日時';
 COMMENT ON COLUMN exam_results.created_by IS '作成者';
 
-COMMENT ON TABLE export_histories IS '検査結果出力履歴';
-COMMENT ON COLUMN export_histories.id IS 'ID';
-COMMENT ON COLUMN export_histories.place_schedule_id IS '会場日程ID';
-COMMENT ON COLUMN export_histories.data_count IS '出力件数';
-COMMENT ON COLUMN export_histories.exported_at IS '出力日時';
-COMMENT ON COLUMN export_histories.exported_by IS '出力者';
-COMMENT ON COLUMN export_histories.created_at IS '作成日時';
-COMMENT ON COLUMN export_histories.created_by IS '作成者';
+COMMENT ON TABLE export_history_details IS '検査結果出力履歴明細';
+COMMENT ON COLUMN export_history_details.id IS 'ID';
+COMMENT ON COLUMN export_history_details.consult_id IS '受診ID';
+COMMENT ON COLUMN export_history_details.created_at IS '作成日時';
+COMMENT ON COLUMN export_history_details.created_by IS '作成者';
 
 COMMENT ON TABLE home_menus IS 'ホームメニュー';
 COMMENT ON COLUMN home_menus.home_menu_id IS 'ホームメニューID';
@@ -692,6 +701,14 @@ COMMENT ON COLUMN examinees.sex IS '性別';
 COMMENT ON COLUMN examinees.birthdate IS '生年月日';
 COMMENT ON COLUMN examinees.created_at IS '作成日時';
 COMMENT ON COLUMN examinees.created_by IS '作成者';
+
+COMMENT ON TABLE export_histories IS '検査結果出力履歴';
+COMMENT ON COLUMN export_histories.id IS 'ID';
+COMMENT ON COLUMN export_histories.place_schedule_id IS '会場日程ID';
+COMMENT ON COLUMN export_histories.exported_at IS '出力日時';
+COMMENT ON COLUMN export_histories.exported_by IS '出力者';
+COMMENT ON COLUMN export_histories.created_at IS '作成日時';
+COMMENT ON COLUMN export_histories.created_by IS '作成者';
 
 COMMENT ON TABLE functionalities IS '機能';
 COMMENT ON COLUMN functionalities.functionality_id IS '機能ID';

@@ -1,4 +1,3 @@
-
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
@@ -98,21 +97,5 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     public Task UpdatePlaceScheduleLockingStatusAsync()
     {
         throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// 会場日程の出力状況を変更する
-    /// </summary>
-    public Task UpdatePlaceScheduleResultExportStatusAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// 会場日程の開始時刻文字列（HHmm）を（HH:mm）に変換します。
-    /// </summary>
-    private static string FormatStartTimeString(string startTimeString)
-    {
-        return $"{startTimeString.Substring(0, 2)}:{startTimeString.Substring(2, 2)}";
     }
 }

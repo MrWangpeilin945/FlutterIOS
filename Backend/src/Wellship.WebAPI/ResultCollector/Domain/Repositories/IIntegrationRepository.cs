@@ -16,4 +16,9 @@ public interface IIntegrationRepository
     /// 検査結果出力のために会場日程ごとの受診を取得する
     /// </summary>
     public Task<IEnumerable<ExportPlaceSchedule>> GetExportPlaceSchedulesAsync();
+
+    /// <summary>
+    /// 出力履歴IDを指定して受診の出力状況を未出力に戻す
+    /// </summary>
+    public Task UndoExportStatusAsync(Guid exportId);
 }
