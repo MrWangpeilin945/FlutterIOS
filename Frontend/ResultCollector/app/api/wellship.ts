@@ -49,6 +49,7 @@ import type {
   Staff,
   StaffLoginRequest,
   StaffLoginResponse,
+  UndoIntegrationExportStatusRequest,
   UnexaminedItemList,
   VerifyExamItems
 } from '../domain/wellship.schemas'
@@ -1236,6 +1237,65 @@ export function useIntegrationGetExportHistory<TData = Awaited<ReturnType<typeof
 
 
 /**
+ * @summary 出力した結果を未出力に戻す
+ */
+export const integrationUndoExportStatus = (
+    version: string,
+    undoIntegrationExportStatusRequest: UndoIntegrationExportStatusRequest,
+ ) => {
+      
+      
+      return axiosInstance<void>(
+      {url: `/api/v${version}/integrations/examResults/undoExport`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: undoIntegrationExportStatusRequest
+    },
+      );
+    }
+  
+
+
+export const getIntegrationUndoExportStatusMutationOptions = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof integrationUndoExportStatus>>, TError,{version: string;data: UndoIntegrationExportStatusRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof integrationUndoExportStatus>>, TError,{version: string;data: UndoIntegrationExportStatusRequest}, TContext> => {
+const {mutation: mutationOptions} = options ?? {};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof integrationUndoExportStatus>>, {version: string;data: UndoIntegrationExportStatusRequest}> = (props) => {
+          const {version,data} = props ?? {};
+
+          return  integrationUndoExportStatus(version,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type IntegrationUndoExportStatusMutationResult = NonNullable<Awaited<ReturnType<typeof integrationUndoExportStatus>>>
+    export type IntegrationUndoExportStatusMutationBody = UndoIntegrationExportStatusRequest
+    export type IntegrationUndoExportStatusMutationError = ProblemDetails
+
+    /**
+ * @summary 出力した結果を未出力に戻す
+ */
+export const useIntegrationUndoExportStatus = <TError = ProblemDetails,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof integrationUndoExportStatus>>, TError,{version: string;data: UndoIntegrationExportStatusRequest}, TContext>, }
+): UseMutationResult<
+        Awaited<ReturnType<typeof integrationUndoExportStatus>>,
+        TError,
+        {version: string;data: UndoIntegrationExportStatusRequest},
+        TContext
+      > => {
+
+      const mutationOptions = getIntegrationUndoExportStatusMutationOptions(options);
+
+      return useMutation(mutationOptions);
+    }
+    
+/**
  * @summary 日付を指定して班と会場のリストを取得する
  */
 export const placeScheduleGetTeams = (
@@ -1578,66 +1638,6 @@ export const usePlaceScheduleUpdatePlaceScheduleLockingStatus = <TError = Proble
       > => {
 
       const mutationOptions = getPlaceScheduleUpdatePlaceScheduleLockingStatusMutationOptions(options);
-
-      return useMutation(mutationOptions);
-    }
-    
-/**
- * @summary 会場日程のデータ出力状況を更新する
- */
-export const placeScheduleUpdatePlaceScheduleResultExportStatus = (
-    version: string,
-    placeScheduleId: number,
-    placeScheduleLockingRequest: PlaceScheduleLockingRequest,
- ) => {
-      
-      
-      return axiosInstance<void>(
-      {url: `/api/v${version}/placeSchedules/${placeScheduleId}/placeScheduleResultExportStatus`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: placeScheduleLockingRequest
-    },
-      );
-    }
-  
-
-
-export const getPlaceScheduleUpdatePlaceScheduleResultExportStatusMutationOptions = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleResultExportStatus>>, TError,{version: string;placeScheduleId: number;data: PlaceScheduleLockingRequest}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleResultExportStatus>>, TError,{version: string;placeScheduleId: number;data: PlaceScheduleLockingRequest}, TContext> => {
-const {mutation: mutationOptions} = options ?? {};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleResultExportStatus>>, {version: string;placeScheduleId: number;data: PlaceScheduleLockingRequest}> = (props) => {
-          const {version,placeScheduleId,data} = props ?? {};
-
-          return  placeScheduleUpdatePlaceScheduleResultExportStatus(version,placeScheduleId,data,)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PlaceScheduleUpdatePlaceScheduleResultExportStatusMutationResult = NonNullable<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleResultExportStatus>>>
-    export type PlaceScheduleUpdatePlaceScheduleResultExportStatusMutationBody = PlaceScheduleLockingRequest
-    export type PlaceScheduleUpdatePlaceScheduleResultExportStatusMutationError = ProblemDetails
-
-    /**
- * @summary 会場日程のデータ出力状況を更新する
- */
-export const usePlaceScheduleUpdatePlaceScheduleResultExportStatus = <TError = ProblemDetails,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleResultExportStatus>>, TError,{version: string;placeScheduleId: number;data: PlaceScheduleLockingRequest}, TContext>, }
-): UseMutationResult<
-        Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleResultExportStatus>>,
-        TError,
-        {version: string;placeScheduleId: number;data: PlaceScheduleLockingRequest},
-        TContext
-      > => {
-
-      const mutationOptions = getPlaceScheduleUpdatePlaceScheduleResultExportStatusMutationOptions(options);
 
       return useMutation(mutationOptions);
     }
