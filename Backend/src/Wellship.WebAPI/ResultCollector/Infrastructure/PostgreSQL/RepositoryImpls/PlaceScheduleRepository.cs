@@ -170,7 +170,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
         /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
-    public async Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, int status)
+    public async Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, PlaceScheduleLockingStatus status)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string selectSql = @"
@@ -196,6 +196,6 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
             status = @Status
         where
             place_schedule_id = @PlaceScheduleId;";
-        await connection.QueryAsync(updateSql, new { Status = status, PlaceScheduleId = placeScheduleId });
+        await connection.QueryAsync(updateSql, new { Status = (int)status, PlaceScheduleId = placeScheduleId });
     }
 }

@@ -1,6 +1,7 @@
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.Core.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -104,7 +105,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
-    public async Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, int status)
+    public async Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, PlaceScheduleLockingStatus status)
     {
         await _placeScheduleRepository.UpdatePlaceScheduleLockingStatusAsync(placeScheduleId, status);
     }

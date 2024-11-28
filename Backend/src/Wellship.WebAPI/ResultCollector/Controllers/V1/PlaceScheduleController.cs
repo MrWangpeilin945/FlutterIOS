@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
+using Ryobi.Wellship.Core.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 
@@ -99,7 +100,9 @@ public class PlaceScheduleController : ControllerBase
         {
             return BadRequest("パスパラメータとリクエストパラメータが一致しません。");
         }
-        await _placeScheduleUsecase.UpdatePlaceScheduleLockingStatusAsync(placeScheduleId, placeScheduleLockingRequest.PlaceScheduleLockingStatus);
+        PlaceScheduleLockingStatus placeScheduleLockingStatus = 
+            (PlaceScheduleLockingStatus)Enum.ToObject(typeof(PlaceScheduleLockingStatus), placeScheduleLockingRequest.PlaceScheduleLockingStatus);
+        await _placeScheduleUsecase.UpdatePlaceScheduleLockingStatusAsync(placeScheduleId, placeScheduleLockingStatus);
         return Ok();
     }
 }

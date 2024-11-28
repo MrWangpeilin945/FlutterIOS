@@ -1,4 +1,5 @@
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+using Ryobi.Wellship.Core.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
@@ -25,5 +26,5 @@ public interface IPlaceScheduleRepository
     /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
-    public Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, int status);
+    public Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, PlaceScheduleLockingStatus status);
 }

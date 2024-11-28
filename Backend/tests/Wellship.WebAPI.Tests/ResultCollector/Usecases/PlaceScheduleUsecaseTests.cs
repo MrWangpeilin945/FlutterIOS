@@ -230,7 +230,7 @@ public class PlaceScheduleUsecaseTests
     {
         // Arrange
         var placeScheduleId = 1;
-        var status = 11;
+        PlaceScheduleLockingStatus status = PlaceScheduleLockingStatus.検査中;
         _placeScheduleRepositoryMock.Setup(r => r.UpdatePlaceScheduleLockingStatusAsync(placeScheduleId, status));
 
         // Act & Assert
