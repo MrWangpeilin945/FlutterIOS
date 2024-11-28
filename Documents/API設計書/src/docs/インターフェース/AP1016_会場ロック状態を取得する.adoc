@@ -3,6 +3,7 @@
 === 概要
 
 * 会場日程IDを指定して会場ロックの状態と更新情報を取得する
+* `placeScheduleLockingStatus` は会場日程状況 （ `PlaceScheduleLockingStatus` ）を使用する
 
 === URI
 
@@ -44,7 +45,7 @@
   "placeId": 4,
   "placeName": "会場D",
   "examDate": "2024-10-21",
-  "placeScheduleLockingStatus": 1,
+  "placeScheduleLockingStatus": 21,
   "updatedAt": "2024-10-21T11:35:20+09:00",
   "updatedBy": "両備 太郎"
 }
