@@ -2,25 +2,132 @@
 
 == SC0001_ログイン画面
 
+=== 検査項目進捗ボタン押下時
+
 [mermaid,SC0001-初期表示,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0001_ログイン画面/SC0001-初期表示.mmd[]
 ....
 
+=== ログインボタン押下
+
+[mermaid,SC0001-ログインボタン押下,png,scale=3,pdfwidth=100%]
+....
+include::./SC0001_ログイン画面/SC0001-ログインボタン押下.mmd[]
+....
+
 <<<
 == SC0002_班選択画面
+
+== 初期表示
+
+[mermaid,SC0002-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0002_班選択画面/SC0002-初期表示.mmd[]
+....
+
+=== 見出しボタン押下
+
+[mermaid,SC0002-見出しボタン押下,png,scale=3,pdfwidth=100%]
+....
+include::./SC0002_班選択画面/SC0002-見出しボタン押下.mmd[]
+....
 
 <<<
 == SC0003_会場選択画面
 
+== 初期表示
+
+[mermaid,SC0003-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0003_会場選択画面/SC0003-初期表示.mmd[]
+....
+
+=== 見出しボタン押下
+
+[mermaid,SC0003-見出しボタン押下,png,scale=3,pdfwidth=100%]
+....
+include::./SC0003_会場選択画面/SC0003-見出しボタン押下.mmd[]
+....
+
 <<<
 == SC0004_ホーム画面
+
+== 初期表示
+
+[mermaid,SC0004-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0004_ホーム画面/SC0004-初期表示.mmd[]
+....
+
+== 班名ボタン押下
+
+[mermaid,SC0004-班名ボタン押下,png,scale=3,pdfwidth=100%]
+....
+include::./SC0004_ホーム画面/SC0004-班名ボタン押下.mmd[]
+....
+
+== 会場名ボタン押下
+
+[mermaid,SC0004-会場名ボタン押下,png,scale=3,pdfwidth=100%]
+....
+include::./SC0004_ホーム画面/SC0004-会場名ボタン押下.mmd[]
+....
+
+== ホームメニューボタン押下
+
+[mermaid,SC0004-ホームメニューボタン押下,png,scale=3,pdfwidth=100%]
+....
+include::./SC0004_ホーム画面/SC0004-ホームメニューボタン押下.mmd[]
+....
 
 <<<
 == SC0005_検査メニュー選択画面
 
+== 初期表示
+
+[mermaid,SC0005-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0005_検査メニュー選択画面/SC0005-初期表示.mmd[]
+....
+
+== 検査メニュー項目ボタン押下
+
+[mermaid,SC0005-検査メニュー項目ボタン押下,png,scale=3,pdfwidth=100%]
+....
+include::./SC0005_検査メニュー選択画面/SC0005-検査メニュー項目ボタン押下.mmd[]
+....
+
+== 開始ボタン押下
+
+[mermaid,SC0005-開始ボタン押下,png,scale=3,pdfwidth=100%]
+....
+include::./SC0005_検査メニュー選択画面/SC0005-開始ボタン押下.mmd[]
+....
+
 <<<
 == SC0006_受診番号入力画面
+
+== 初期表示
+
+[mermaid,SC0006-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0006_受診番号入力画面/SC0006-初期表示.mmd[]
+....
+
+== 受診番号テキストボックス押下
+
+[mermaid,SC0006-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0006_受診番号入力画面/SC0006-受診番号テキストボックス押下.mmd[]
+....
+
+== バーコードリーダー読み込み
+
+[mermaid,SC0006-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0006_受診番号入力画面/SC0006-バーコードリーダー読み込み.mmd[]
+....
 
 <<<
 == SC0007_検査内容確認画面
@@ -62,13 +169,83 @@ include::./SC0008_検査結果入力画面/SC0008-登録する.mmd[]
 <<<
 == SC0010_進捗画面
 
+== 初期表示
+
+[mermaid,SC00010-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0010_進捗画面/SC0010-初期表示.mmd[]
+....
+
+== 検査項目進捗ボタン押下時
+
+[mermaid,SC00010-検査項目進捗ボタン押下時,png,scale=3,pdfwidth=100%]
+....
+include::./SC0010_進捗画面/SC0010-検査項目進捗ボタン押下時.mmd[]
+....
+
 <<<
 == SC0013_会場ロック画面
+
+== 初期表示
+
+[mermaid,SC00013-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0013_会場ロック画面/SC0013-初期表示.mmd[]
+....
+
+== 会場ロックボタン押下時
+
+[mermaid,SC00013-会場ロックボタン押下時,png,scale=3,pdfwidth=100%]
+....
+include::./SC0013_会場ロック画面/SC0013-会場ロックボタン押下時.mmd[]
+....
+
+== ロック解除ボタン押下時
+
+[mermaid,SC00013-ロック解除ボタン押下時,png,scale=3,pdfwidth=100%]
+....
+include::./SC0013_会場ロック画面/SC0013-ロック解除ボタン押下時.mmd[]
+....
 
 <<<
 == SC0019_検査結果出力画面
 
+== 初期表示
+
+[mermaid,SC00019-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0019_検査結果出力画面/SC0019-初期表示.mmd[]
+....
+
+== 出力ボタン押下時
+
+[mermaid,SC00019-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0019_検査結果出力画面/SC0019-出力ボタン押下時.mmd[]
+....
+
+== 会場ロックボタン押下時
+
+[mermaid,SC00019-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0019_検査結果出力画面/SC0019-会場ロックボタン押下時.mmd[]
+....
+
 <<<
 == SC0020_検査結果出力履歴画面
+
+== 初期表示
+
+[mermaid,SC00020-初期表示,png,scale=3,pdfwidth=100%]
+....
+include::./SC0020_検査結果出力履歴画面/SC0020-初期表示.mmd[]
+....
+
+== 未出力ボタン押下時
+
+[mermaid,SC00020-未出力ボタン押下時,png,scale=3,pdfwidth=100%]
+....
+include::./SC0020_検査結果出力履歴画面/SC0020-未出力ボタン押下時.mmd[]
+....
 
 <<<

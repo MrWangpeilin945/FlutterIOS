@@ -1,0 +1,30 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント
+  participant Key as CP0012 キーボード(整数)
+
+  User->>KN:入力値テキストボックスを押下
+  KN->>Key:【CP0012】キーボード(整数)を呼び出す
+  Key->>KN:【CP0012】キーボード(整数)の値変更<br>数字ボタン押下 or AC押下
+  KN-->>KN:渡された値を保存してテキストボックスに表示
+  KN-->>KN:バリデーションチェック
+   alt バリデーションチェックでエラーなし
+  KN-->>FE:引数.変更イベントを呼び出す
+  else バリデーションチェックでエラー
+  KN-->>KN:エラーメッセージを表示 
+  end
+  Key->>KN:【CP0012】キーボード(整数)の確定ボタン押下
+  KN-->>KN:【CP0012】キーボード(整数)を非表示
+
+
+
+  
+ 
+  
+
