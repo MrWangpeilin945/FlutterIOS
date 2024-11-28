@@ -17,8 +17,9 @@ public class ConsultUsecaseTests
         // Arrange
         var consultationRepositoryMock = new Mock<IConsultRepository>();
         consultationRepositoryMock.Setup(x => x.ConsultExistsAsync(It.IsAny<string>())).ReturnsAsync(true);
+        var examineeRepositoryMock = new Mock<IExamineeRepository>();
 
-        var usecase = new ConsultUsecase(consultationRepositoryMock.Object);
+        var usecase = new ConsultUsecase(consultationRepositoryMock.Object, examineeRepositoryMock.Object);
         var request = new ConsultNumberRequest
         {
             ConsultNumber = "12345"
@@ -36,8 +37,9 @@ public class ConsultUsecaseTests
         // Arrange
         var consultationRepositoryMock = new Mock<IConsultRepository>();
         consultationRepositoryMock.Setup(x => x.ConsultExistsAsync(It.IsAny<string>())).ReturnsAsync(false);
+        var examineeRepositoryMock = new Mock<IExamineeRepository>();
 
-        var usecase = new ConsultUsecase(consultationRepositoryMock.Object);
+        var usecase = new ConsultUsecase(consultationRepositoryMock.Object, examineeRepositoryMock.Object);
         var request = new ConsultNumberRequest
         {
             ConsultNumber = "54321"
