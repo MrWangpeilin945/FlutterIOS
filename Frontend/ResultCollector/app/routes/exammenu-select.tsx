@@ -96,17 +96,6 @@ export default function ExamMenuSelect() {
     );
   };
 
-  //検査項目名の表示文字数を最大8文字とし、9文字目以降は表示しない処理
-  const getDispExamMenuName = (name: string) => {
-    let res = "";
-    if (name.length > 8) {
-      res = name.substring(0, 8);
-    } else {
-      res = name;
-    }
-    return res;
-  };
-
   // 開始ボタン押下時処理：選択された検査項目ID、検査項目名のリストをjotaiに保存して次画面へ遷移
   const callbackConfirm = () => {
     if (selectExamMenuList.length > 0) {
@@ -162,7 +151,7 @@ export default function ExamMenuSelect() {
                             return index >= 0 ? <>{index + 1}</> : null;
                           })()}
                         </Text>
-                        {getDispExamMenuName(examMenu?.examMenuName || "")}
+                        {examMenu.examMenuName?.slice(0, 8)}
                         <Space w={30} />
                       </Flex>
                     </Button>
