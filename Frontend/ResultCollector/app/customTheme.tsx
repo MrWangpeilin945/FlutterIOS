@@ -70,12 +70,7 @@ export const customTheme = createTheme({
     " -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji",
   // ベースとなる境界半径サイズの設定
   radius: {
-    xs: '2px',
-    sm: '4px',
-    md: '8px',
-    lg: '16px',
-    xl: '32px',
-    itemName: '10px'
+    itemName: "10px",
   },
   // 各コンポーネントのカスタマイズ
   components: {

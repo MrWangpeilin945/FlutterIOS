@@ -7,6 +7,7 @@ import type {
   ExamRegistResult,
   InputExamItem,
 } from "~/domain/wellship.schemas";
+import { InputErrorLevel } from "~/domain/enums";
 
 type SelectProps = {
   examItems: InputExamItem;
@@ -45,7 +46,7 @@ export default function ExamSelect({
         errorMessages.required,
         `${examItems.name}は`,
       ),
-      errorLevel: 2,
+      errorLevel: InputErrorLevel.異常,
     };
 
     if (onRegisterPressed === 1 && selected === "") {
