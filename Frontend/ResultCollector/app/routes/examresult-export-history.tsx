@@ -1,10 +1,13 @@
 import {
+  Box,
   Button,
   Center,
   Container,
+  Group,
   LoadingOverlay,
   Modal,
   Table,
+  Text,
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -25,7 +28,7 @@ import {
 } from "react";
 import {
   useIntegrationGetExportHistory,
-  usePlaceScheduleUpdatePlaceScheduleResultExportStatus,
+  useIntegrationUndoExportStatus,
 } from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
 import CommonDialog from "~/components/CommonDialog";
@@ -39,24 +42,24 @@ export const meta: MetaFunction = () => {
   return [{ title: "検査結果出力履歴" }];
 };
 
-// 確認ダイアログ用の状態型定義
+// 結果出力確認ダイアログ用の状態型定義
 type State = {
   isOpen: boolean; // 表示・非表示用
   resolve: (isOk: boolean) => void; // resolve格納用
 };
 
-// 確認ダイアログ用の状態初期値
+// 結果出力確認ダイアログ用の状態初期値
 const initialState: State = {
   isOpen: false,
   resolve: () => {},
 };
 
-// 確認ダイアログの開閉状態を管理するカスタムフック
-const useConfirmState = () => {
+// 結果出力確認ダイアログの開閉状態を管理するカスタムフック
+const useResultsOutputConfirmState = () => {
   const [{ isOpen, resolve }, setState] = useState<State>(initialState);
 
-  // 確認ダイアログを起動するための関数
-  const confirm = useCallback(
+  // 結果出力確認ダイアログを起動するための関数
+  const resultsOutputConfirm = useCallback(
     () =>
       new Promise<boolean>((resolve) => {
         setState({ isOpen: true, resolve });
@@ -78,22 +81,25 @@ const useConfirmState = () => {
 
   return {
     isOpen,
-    confirm,
+    resultsOutputConfirm,
     handleOk,
     handleCancel,
   };
 };
 
 // 親コンポーネントに公開する関数
-type Handle = { confirm: () => Promise<boolean> };
+type Handle = { resultsOutputConfirm: () => Promise<boolean> };
 
 type Props = Omit<ComponentProps<typeof Modal>, "opened" | "onClose">;
 
-// 確認ダイアログコンポーネント
-const ConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
-  const { isOpen, confirm, handleOk, handleCancel } = useConfirmState();
+// 結果出力確認ダイアログコンポーネント
+const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
+  const { isOpen, resultsOutputConfirm, handleOk, handleCancel } =
+    useResultsOutputConfirmState();
   const { children, title } = props;
-  useImperativeHandle(ref, () => ({ confirm }), [confirm]);
+  useImperativeHandle(ref, () => ({ resultsOutputConfirm }), [
+    resultsOutputConfirm,
+  ]);
 
   return (
     <Modal
@@ -108,22 +114,18 @@ const ConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
     >
       {children}
       <Center>
-        <div>
-          <Button w={400} h={80} variant="filled" onClick={handleOk} mt="xl">
-            <Title order={2}>未出力確定</Title>
-          </Button>
-        </div>
-      </Center>
-      <Center>
-        <Button w={400} h={40} variant="outline" onClick={handleCancel} mt="xl">
+        <Button w={200} h={80} variant="outline" onClick={handleCancel} mt="xl">
           <Title order={2}>戻る</Title>
+        </Button>
+        <Button w={200} h={80} variant="filled" onClick={handleOk} mt="xl">
+          <Title order={2}>未出力確定</Title>
         </Button>
       </Center>
     </Modal>
   );
 });
 
-interface ConfirmResult {
+interface ResultsOutputConfirmDialogState {
   examDate?: string;
   placeName?: string;
   dataCount?: number;
@@ -133,17 +135,15 @@ export default function ExamresultExportHistory() {
   const [exportHistory, setExportHistory] = useState<ExportHistoryList>();
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [confirmResult, setConfirmResult] = useState<ConfirmResult | null>(
-    null,
-  );
+  const [resultsOutputConfirmDialog, setResultsOutputConfirmDialog] =
+    useState<ResultsOutputConfirmDialogState | null>(null);
   const [staff] = useAtom(staffState);
   const [opened, { open, close }] = useDisclosure(false);
-  const { mutateAsync } =
-    usePlaceScheduleUpdatePlaceScheduleResultExportStatus();
+  const { mutateAsync } = useIntegrationUndoExportStatus();
   const { isFetching, refetch } = useIntegrationGetExportHistory("1", {
     query: { enabled: false },
   });
-  const ref = useRef<ComponentRef<typeof ConfirmDialog>>(null);
+  const ref = useRef<ComponentRef<typeof ResultsOutputConfirmDialog>>(null);
 
   //【CP0002】共通フッター設定
   const navigate = useNavigate();
@@ -171,62 +171,65 @@ export default function ExamresultExportHistory() {
     fetchExportHistory();
   }, []);
 
-  // 確認ダイアログを表示する
-  const showConfirmDialog = useCallback(async (placeScheduleId: number) => {
-    // 確認ダイアログの結果を取得する
-    const confirmResult = await ref.current?.confirm();
-    if (confirmResult) {
-      setIsLoading(true);
-      // PUT時のリクエストボディを生成する
-      const body = {
-        placeScheduleId: placeScheduleId,
-        placeScheduleResultExportStatus: 11,
-      };
-      // 「未出力確定」ボタン押下時はAP1021_検査結果の連携状態を変更する
-      const putMutateAsync = async () => {
-        try {
-          const result = await mutateAsync({
-            version: "1",
-            placeScheduleId: placeScheduleId,
-            data: body,
-          });
-          if (result.status === 200) {
-            setMessage("未出力状態に変更しました。");
-            open();
-          }
-        } catch (error) {
-          if (isAxiosError(error) && error.response) {
-            if (error.response.status === 400) {
-              setMessage(getErrorMessage(errorMessages.invalid, "パラメータ"));
-            } else if (error.response.status === 404) {
-              setMessage(getErrorMessage(errorMessages.notFound, "変更情報"));
-            } else if (error.response.status === 500) {
-              setMessage(getErrorMessage(errorMessages.serverError));
+  // 結果出力確認ダイアログを表示する
+  const showResultsOutputConfirmDialog = useCallback(
+    async (exportId: string) => {
+      // 結果出力確認ダイアログの結果を取得する
+      const confirmResult = await ref.current?.resultsOutputConfirm();
+      if (confirmResult) {
+        setIsLoading(true);
+        // POST時のリクエストボディを生成する
+        const body = {
+          exportId: exportId,
+        };
+        // 「未出力確定」ボタン押下時はAP1021_出力した結果を未出力に戻す
+        const postMutateAsync = async () => {
+          try {
+            const result = await mutateAsync({
+              version: "1",
+              data: body,
+            });
+            if (result.status === 200) {
+              setMessage("未出力状態に変更しました。");
+              open();
             }
-            open();
+          } catch (error) {
+            if (isAxiosError(error) && error.response) {
+              if (error.response.status === 400) {
+                setMessage(
+                  getErrorMessage(errorMessages.invalid, "パラメータ"),
+                );
+              } else if (error.response.status === 404) {
+                setMessage(getErrorMessage(errorMessages.notFound, "変更情報"));
+              } else if (error.response.status === 500) {
+                setMessage(getErrorMessage(errorMessages.serverError));
+              }
+              open();
+            }
+          } finally {
+            setIsLoading(false);
           }
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      putMutateAsync();
-    }
-  }, []);
+        };
+        postMutateAsync();
+      }
+    },
+    [],
+  );
 
   const handleClick = (
-    placeScheduleId?: number,
+    exportId?: string,
     examDate?: string,
     placeName?: string,
     dataCount?: number,
   ) => {
-    const confirmResultData = {
+    const resultsOutputConfirmDialogData = {
       examDate,
       placeName,
       dataCount,
     };
-    setConfirmResult(confirmResultData);
-    // 確認ダイアログを表示する
-    showConfirmDialog(placeScheduleId || 0);
+    setResultsOutputConfirmDialog(resultsOutputConfirmDialogData);
+    // 結果出力確認ダイアログを表示する
+    showResultsOutputConfirmDialog(exportId || "");
   };
 
   return (
@@ -268,7 +271,7 @@ export default function ExamresultExportHistory() {
                             variant="outline"
                             onClick={() =>
                               handleClick(
-                                eh.placeScheduleId,
+                                eh.exportId,
                                 eh.examDate,
                                 eh.placeName,
                                 eh.dataCount,
@@ -287,7 +290,10 @@ export default function ExamresultExportHistory() {
                 <>
                   {/* エラーメッセージを表示 */}
                   <Title order={3}>
-                    {getErrorMessage(errorMessages.notFound, "出力済みのデータ")}
+                    {getErrorMessage(
+                      errorMessages.notFound,
+                      "出力済みのデータ",
+                    )}
                   </Title>
                 </>
               )}
@@ -297,18 +303,44 @@ export default function ExamresultExportHistory() {
                 message={message || ""}
                 buttonMessage="閉じる"
               />
-              <ConfirmDialog ref={ref} title="検査結果出力履歴">
-                <div>
-                  健診日：
-                  {confirmResult?.examDate &&
-                    format(
-                      parse(confirmResult?.examDate, "yyyy-MM-dd", new Date()),
-                      "yyyy/MM/dd",
-                    )}
-                </div>
-                <div>会場：{confirmResult?.placeName}</div>
-                <div>件数：{confirmResult?.dataCount}</div>
-              </ConfirmDialog>
+              <ResultsOutputConfirmDialog ref={ref} title="検査結果出力履歴">
+                <Box>
+                  <Group wrap="nowrap">
+                    <Text size="xs">健診日：</Text>
+                    <Text size="xs">
+                      {resultsOutputConfirmDialog?.examDate &&
+                        format(
+                          parse(
+                            resultsOutputConfirmDialog?.examDate,
+                            "yyyy-MM-dd",
+                            new Date(),
+                          ),
+                          "yyyy/MM/dd",
+                        )}
+                    </Text>
+                  </Group>
+                </Box>
+                <Box>
+                  <Group wrap="nowrap">
+                    <Text size="xs" style={{ whiteSpace: "nowrap" }}>
+                      会場：
+                    </Text>
+                    <Text size="xs">
+                      {resultsOutputConfirmDialog?.placeName}
+                    </Text>
+                  </Group>
+                </Box>
+                <Box>
+                  <Group wrap="nowrap">
+                    <Text size="xs" style={{ whiteSpace: "nowrap" }}>
+                      件数：
+                    </Text>
+                    <Text size="xs">
+                      {resultsOutputConfirmDialog?.dataCount}
+                    </Text>
+                  </Group>
+                </Box>
+              </ResultsOutputConfirmDialog>
             </>
           )}
         </Container>
