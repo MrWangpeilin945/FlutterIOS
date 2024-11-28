@@ -166,4 +166,36 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
         }
         return placeSchedule;
     }
+
+        /// <summary>
+    /// 会場ロック状態を更新する
+    /// </summary>
+    public async Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, PlaceScheduleLockingStatus status)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string selectSql = @"
+        select
+            ps.place_schedule_id as PlaceScheduleId
+            , ps.status as Status
+        from
+            resultcollector.place_schedule as ps
+        where
+            ps.place_schedule_id = @PlaceScheduleId;";
+
+        var results = await connection.QueryAsync<Domain.Models.PlaceScheduleStatus>(selectSql, new { PlaceScheduleId = placeScheduleId });
+
+        var placeSchedule = results.SingleOrDefault();
+
+        if (placeSchedule is null)
+        {
+            throw new PlaceScheduleNotFoundException();
+        }
+        const string updateSql = @"
+        update resultcollector.place_schedule 
+        set
+            status = @Status
+        where
+            place_schedule_id = @PlaceScheduleId;";
+        await connection.QueryAsync(updateSql, new { Status = (int)status, PlaceScheduleId = placeScheduleId });
+    }
 }
