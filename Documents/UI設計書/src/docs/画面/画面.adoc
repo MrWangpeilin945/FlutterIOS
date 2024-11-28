@@ -117,14 +117,14 @@ include::./SC0006_受診番号入力画面/SC0006-初期表示.mmd[]
 
 == 受診番号テキストボックス押下
 
-[mermaid,SC0006-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,SC0006-受診番号テキストボックス押下,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0006_受診番号入力画面/SC0006-受診番号テキストボックス押下.mmd[]
 ....
 
 == バーコードリーダー読み込み
 
-[mermaid,SC0006-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,SC0006-バーコードリーダー読み込み,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0006_受診番号入力画面/SC0006-バーコードリーダー読み込み.mmd[]
 ....
