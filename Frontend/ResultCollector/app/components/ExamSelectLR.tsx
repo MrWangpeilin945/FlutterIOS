@@ -59,7 +59,7 @@ export default function ExamSelectLR({
     // 空の選択肢があるかどうかチェック
     const hasEmptyValue = selectedValues.some((value) => value === "");
 
-    if (onRegisterPressed === 1 && hasEmptyValue) {
+    if (onRegisterPressed === true && hasEmptyValue) {
       // 空の値がある場合、エラーメッセージを追加
       if (
         !updatedMessages.some(
