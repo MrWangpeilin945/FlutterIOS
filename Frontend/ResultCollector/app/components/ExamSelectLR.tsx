@@ -20,7 +20,7 @@ import { InputErrorLevel } from "~/domain/enums";
 
 type SelectProps = {
   examItems: InputExamItem;
-  onRegisterPressed: number;
+  onRegisterPressed: boolean;
   onClick: (updatedExamItem: InputExamItem | undefined) => void;
 };
 
