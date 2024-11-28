@@ -260,7 +260,7 @@ CREATE TABLE exam_items (
   , name text NOT NULL
   , exam_item_group_id integer NOT NULL
   , position_number integer NOT NULL
-  , unit text NOT NULL
+  , unit text
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_items_PKC PRIMARY KEY (exam_item_id)
