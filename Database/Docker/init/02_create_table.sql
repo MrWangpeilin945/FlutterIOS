@@ -23,21 +23,30 @@ CREATE TABLE equipments (
   , CONSTRAINT equipments_PKC PRIMARY KEY (equipment_id)
 );
 
+CREATE TABLE exam_cancel_histories (
+  id uuid DEFAULT gen_random_uuid () NOT NULL
+  , consult_id integer NOT NULL
+  , consult_item_detail_id integer NOT NULL
+  , value text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_cancel_histories_PKC PRIMARY KEY (id)
+);
+
+CREATE TABLE exam_cancels (
+  consult_id integer NOT NULL
+  , exam_item_detail_id integer NOT NULL
+  , cancel_reason_id integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_cancels_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
+);
+
 CREATE TABLE exam_decision_rule (
   id integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_decision_rule_PKC PRIMARY KEY (id)
-);
-
-CREATE TABLE exam_item_cancels (
-  consult_id integer NOT NULL
-  , exam_item_id integer NOT NULL
-  , cancel_reason_id integer NOT NULL
-  , cancel_timestamp timestamp with time zone NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT exam_item_cancels_PKC PRIMARY KEY (consult_id,exam_item_id)
 );
 
 CREATE TABLE exam_item_detail_options (
@@ -59,12 +68,13 @@ CREATE TABLE exam_item_detail_orders (
   , CONSTRAINT exam_item_detail_orders_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
 );
 
-CREATE TABLE exam_item_orders (
-  exam_item_id integer NOT NULL
-  , consult_id integer NOT NULL
+CREATE TABLE exam_item_notes (
+  consult_id integer NOT NULL
+  , exam_item_id integer NOT NULL
+  , note text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
-  , CONSTRAINT exam_item_orders_PKC PRIMARY KEY (consult_id,exam_item_id)
+  , CONSTRAINT exam_item_notes_PKC PRIMARY KEY (consult_id,exam_item_id)
 );
 
 CREATE TABLE exam_normal_value_range (
@@ -92,7 +102,6 @@ CREATE TABLE exam_result_correlation_rules (
 CREATE TABLE exam_result_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_id integer NOT NULL
-  , exam_item_id integer NOT NULL
   , consult_item_detail_id integer NOT NULL
   , value text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -102,12 +111,11 @@ CREATE TABLE exam_result_histories (
 
 CREATE TABLE exam_results (
   consult_id integer NOT NULL
-  , exam_item_id integer NOT NULL
   , exam_item_detail_id integer NOT NULL
   , value text
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
-  , CONSTRAINT exam_results_PKC PRIMARY KEY (consult_id,exam_item_id,exam_item_detail_id)
+  , CONSTRAINT exam_results_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
 );
 
 CREATE TABLE export_history_details (
@@ -395,13 +403,13 @@ ALTER TABLE equipments
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
-ALTER TABLE exam_item_cancels
-  ADD CONSTRAINT exam_item_cancels_FK1 FOREIGN KEY (cancel_reason_id) REFERENCES cancel_reasons(cancel_reason_id)
+ALTER TABLE exam_cancels
+  ADD CONSTRAINT exam_cancels_FK1 FOREIGN KEY (cancel_reason_id) REFERENCES cancel_reasons(cancel_reason_id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
-ALTER TABLE exam_item_cancels
-  ADD CONSTRAINT exam_item_cancels_FK2 FOREIGN KEY (consult_id) REFERENCES consult(consult_id)
+ALTER TABLE exam_cancels
+  ADD CONSTRAINT exam_cancels_FK2 FOREIGN KEY (consult_id) REFERENCES consult(consult_id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -425,8 +433,8 @@ ALTER TABLE exam_item_groups
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
-ALTER TABLE exam_item_orders
-  ADD CONSTRAINT exam_item_orders_FK1 FOREIGN KEY (consult_id) REFERENCES consult(consult_id)
+ALTER TABLE exam_item_notes
+  ADD CONSTRAINT exam_item_notes_FK1 FOREIGN KEY (consult_id) REFERENCES consult(consult_id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -516,18 +524,25 @@ COMMENT ON COLUMN equipments.processing_script_url IS '処理スクリプトURL'
 COMMENT ON COLUMN equipments.created_at IS '作成日時';
 COMMENT ON COLUMN equipments.created_by IS '作成者';
 
+COMMENT ON TABLE exam_cancel_histories IS '検査中止履歴';
+COMMENT ON COLUMN exam_cancel_histories.id IS 'ID';
+COMMENT ON COLUMN exam_cancel_histories.consult_id IS '受診ID';
+COMMENT ON COLUMN exam_cancel_histories.consult_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_cancel_histories.value IS '値';
+COMMENT ON COLUMN exam_cancel_histories.created_at IS '作成日時';
+COMMENT ON COLUMN exam_cancel_histories.created_by IS '作成者';
+
+COMMENT ON TABLE exam_cancels IS '検査中止';
+COMMENT ON COLUMN exam_cancels.consult_id IS '受診ID';
+COMMENT ON COLUMN exam_cancels.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_cancels.cancel_reason_id IS '中止理由';
+COMMENT ON COLUMN exam_cancels.created_at IS '作成日時';
+COMMENT ON COLUMN exam_cancels.created_by IS '作成者';
+
 COMMENT ON TABLE exam_decision_rule IS '検査実施判断ルール';
 COMMENT ON COLUMN exam_decision_rule.id IS 'ID';
 COMMENT ON COLUMN exam_decision_rule.created_at IS '作成日時';
 COMMENT ON COLUMN exam_decision_rule.created_by IS '作成者';
-
-COMMENT ON TABLE exam_item_cancels IS '検査項目中止';
-COMMENT ON COLUMN exam_item_cancels.consult_id IS '受診ID';
-COMMENT ON COLUMN exam_item_cancels.exam_item_id IS '検査項目ID';
-COMMENT ON COLUMN exam_item_cancels.cancel_reason_id IS '中止理由';
-COMMENT ON COLUMN exam_item_cancels.cancel_timestamp IS '中止日時';
-COMMENT ON COLUMN exam_item_cancels.created_at IS '作成日時';
-COMMENT ON COLUMN exam_item_cancels.created_by IS '作成者';
 
 COMMENT ON TABLE exam_item_detail_options IS '検査項目明細_選択肢';
 COMMENT ON COLUMN exam_item_detail_options.option_id IS '選択肢ID';
@@ -544,11 +559,12 @@ COMMENT ON COLUMN exam_item_detail_orders.exam_item_detail_id IS '検査項目�
 COMMENT ON COLUMN exam_item_detail_orders.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_detail_orders.created_by IS '作成者';
 
-COMMENT ON TABLE exam_item_orders IS '検査項目依頼';
-COMMENT ON COLUMN exam_item_orders.exam_item_id IS '検査項目ID';
-COMMENT ON COLUMN exam_item_orders.consult_id IS '受診ID';
-COMMENT ON COLUMN exam_item_orders.created_at IS '作成日時';
-COMMENT ON COLUMN exam_item_orders.created_by IS '作成者';
+COMMENT ON TABLE exam_item_notes IS '検査項目特記';
+COMMENT ON COLUMN exam_item_notes.consult_id IS '受診ID';
+COMMENT ON COLUMN exam_item_notes.exam_item_id IS '検査項目ID';
+COMMENT ON COLUMN exam_item_notes.note IS '特記事項';
+COMMENT ON COLUMN exam_item_notes.created_at IS '作成日時';
+COMMENT ON COLUMN exam_item_notes.created_by IS '作成者';
 
 COMMENT ON TABLE exam_normal_value_range IS '検査正常値範囲';
 COMMENT ON COLUMN exam_normal_value_range.range_id IS '範囲ID';
@@ -571,7 +587,6 @@ COMMENT ON COLUMN exam_result_correlation_rules.created_by IS '作成者';
 COMMENT ON TABLE exam_result_histories IS '検査結果履歴';
 COMMENT ON COLUMN exam_result_histories.id IS 'ID';
 COMMENT ON COLUMN exam_result_histories.consult_id IS '受診ID';
-COMMENT ON COLUMN exam_result_histories.exam_item_id IS '検査項目ID';
 COMMENT ON COLUMN exam_result_histories.consult_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_result_histories.value IS '値';
 COMMENT ON COLUMN exam_result_histories.created_at IS '作成日時';
@@ -579,7 +594,6 @@ COMMENT ON COLUMN exam_result_histories.created_by IS '作成者';
 
 COMMENT ON TABLE exam_results IS '検査結果';
 COMMENT ON COLUMN exam_results.consult_id IS '受診ID';
-COMMENT ON COLUMN exam_results.exam_item_id IS '検査項目ID';
 COMMENT ON COLUMN exam_results.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_results.value IS '値';
 COMMENT ON COLUMN exam_results.created_at IS '作成日時';
