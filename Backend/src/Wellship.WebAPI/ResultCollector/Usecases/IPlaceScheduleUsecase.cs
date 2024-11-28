@@ -1,4 +1,5 @@
 using Ryobi.Wellship.APIModels.Responses;
+using Ryobi.Wellship.Core.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -21,10 +22,10 @@ public interface IPlaceScheduleUsecase
     /// <summary>
     /// 会場ロック状態を取得する
     /// </summary>
-    public Task GetPlaceScheduleLockingStatusAsync();
+    public Task<PlaceScheduleLocking> GetPlaceScheduleLockingStatusAsync(int placeScheduleId);
 
     /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
-    public Task UpdatePlaceScheduleLockingStatusAsync();
+    public Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, PlaceScheduleLockingStatus status);
 }

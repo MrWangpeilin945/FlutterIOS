@@ -1,0 +1,13 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  #actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  FE->>KN:【CP1008】検査項目グループ_検査：測定時刻を呼び出す
+  KN->>KN:各パラメータの表示
+  KN-->>FE:【CP1008】検査項目グループ_検査：測定時刻を返す
