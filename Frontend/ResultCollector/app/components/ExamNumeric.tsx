@@ -1,6 +1,5 @@
 import type React from "react";
 import { useEffect, useState } from "react";
-import { z } from "zod";
 import {
   Group,
   Stack,
@@ -14,45 +13,17 @@ import {
 } from "@mantine/core";
 import { useClickOutside, useDisclosure } from "@mantine/hooks";
 import Keyboard from "~/components/NumericKeyboard";
-import AuthWrapper from "~/components/AuthWrapper";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
-import { replace } from "@remix-run/react";
-
+import type {
+  ExamNormalValueRange,
+  ExamRegistResult,
+  InputExamItem,
+} from "~/domain/wellship.schemas";
+import { InputErrorLevel } from "~/domain/enums";
 type ExamNumericProps = {
-  //Orvalで生成したschemaを参照予定
-  examItems: {
-    positionNumber: number;
-    examItemId: number;
-    examItemName: string;
-    errorMessages: { value: string }[];
-    examItemDetails: {
-      positionNumber: number;
-      examItemDetailId: number;
-      examItemDetailName: string;
-      value: string;
-      prevValue: string;
-      unit: string;
-      examItemDetailType: string;
-      isCancelled: boolean;
-      kikiDetail: string;
-      afterDecimalPointDigit: number;
-      keyboard: {
-        Type: number;
-        keys: string[];
-      };
-      selectors: {
-        selectorId: string;
-        selectorName: string;
-      }[];
-      ranges: {
-        errorLevel: number;
-        numericMin: number;
-        numericMax: number;
-      }[];
-    }[];
-  };
+  examItems: InputExamItem;
   onChange: (newValue: string) => void;
 };
 
@@ -74,15 +45,16 @@ export default function ExamNumeric({ examItems, onChange }: ExamNumericProps) {
     return [];
   }
   // TODO:エラーメッセージに関するAPI仕様確定後に修正
-  const [errorMessage, setErrorMessage] = useState<string[]>(() =>
-    getApiErrorMessages(examItems.errorMessages)
-  );
+  const [errMessages, setErrMessages] = useState<
+    ExamRegistResult[] | undefined
+  >(examItems.examRegistResults);
 
   // examItemsのrangesから、エラーレベルを取得して
   // エラーメッセージを追加する。
   const getErrorLevelFromRanges = () => {
     const numericValue = Number.parseFloat(formatDecimalValue(examValue));
-    const ranges = examItems.examItemDetails[0].ranges;
+    const ranges = ExamRegistResult[] | undefined
+    >(examItems.examRegistResults);
 
     const errorLevel = ranges.find((range) => {
       return (
@@ -92,13 +64,13 @@ export default function ExamNumeric({ examItems, onChange }: ExamNumericProps) {
     if (errorLevel === 4) {
       setErrorMessage((prevErrorMessages) => [
         ...prevErrorMessages,
-        getErrorMessage(errorMessages[4]),
+        getErrorMessage(errorMessages.accessDenied),
       ]);
     }
     if (errorLevel === 3) {
       setErrorMessage((prevErrorMessages) => [
         ...prevErrorMessages,
-        getErrorMessage(errorMessages[3]),
+        getErrorMessage(errorMessages.invalid),
       ]);
     }
   };
@@ -149,17 +121,27 @@ export default function ExamNumeric({ examItems, onChange }: ExamNumericProps) {
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Group mb={"xs"}>
-        <Paper className={styles["basic-grey"]} radius="lg" px="md" py="10">
+        <Paper
+          w={274}
+          h={80}
+          className={styles["basic-grey"]}
+          radius="lg"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Title size="lg" fw={700}>
             {examItems.examItemName}
           </Title>
         </Paper>
         <TextInput
-          size="xl"
+          w={"340"}
+          size="inputComponent"
           value={formatDecimalValue(examValue)}
           maxLength={5}
           onClick={() => setShowKeyboard(true)}
-          w={"340"}
           onChange={(e) => {
             handleTextChange;
           }}
@@ -172,7 +154,14 @@ export default function ExamNumeric({ examItems, onChange }: ExamNumericProps) {
             {examItems.examItemDetails[0].unit}
           </Text>
         </Stack>
-        <Button bg={"white"} variant="outline" onClick={() => setExamValue("")}>
+        <Button
+          w={154}
+          h={64}
+          size="lg"
+          bg={"white"}
+          variant="outline"
+          onClick={() => setExamValue("")}
+        >
           クリア
         </Button>
       </Group>
@@ -183,7 +172,7 @@ export default function ExamNumeric({ examItems, onChange }: ExamNumericProps) {
           <Text>{error}</Text>
         </Group>
       ))}
-      <Box ml={80}>
+      <Box ml={274}>
         {showKeyboard && (
           <div ref={closeKeyBoard}>
             <Keyboard
