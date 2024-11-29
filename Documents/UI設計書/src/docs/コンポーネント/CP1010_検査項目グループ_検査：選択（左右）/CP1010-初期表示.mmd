@@ -1,0 +1,25 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  #actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  FE->>KN:【CP1010】検査項目グループ_検査：選択（左右）を呼び出す
+  alt isCancelledがtrueの場合
+  KN->>KN:グレーアウト（選択不可）して表示
+  end
+  alt 引数.検査項目情報にerrorMessageが存在する場合
+  KN->>KN:エラーメッセージを表示
+  end
+  alt 引数.登録ボタンフラグがtrueの場合
+  KN->>KN:バリデーションチェック
+  alt バリデーションチェックでエラーあり
+  KN->>KN:エラーメッセージを表示
+  end
+  end
+  KN->>KN:各パラメータの表示
+  KN-->>FE:【【CP1010】検査項目グループ_検査：選択（左右）を返す

@@ -13,7 +13,7 @@ import styles from "./styles/theme.module.css";
 export const customTheme = createTheme({
   colors: {
     // プライマリカラー
-    primary: colorsTuple("#00ADA4"),
+    primary: colorsTuple("#009485"),
     // システムの背景色
     background: colorsTuple("#F2F2F2"),
     // 標準の背景色
@@ -21,33 +21,33 @@ export const customTheme = createTheme({
     // 標準の文字色
     black01: colorsTuple("#3F3A39"),
     // 警告色
-    warning: colorsTuple("#FF9100"),
+    warning: colorsTuple("#EE6A00"),
     // エラー色
     error: colorsTuple("#E26264"),
     // 男性のプライマリカラー
     malePrimary: colorsTuple("#A0DDEA"),
     // 男性のセカンダリカラー
-    maleSecondary: colorsTuple("#6DB5D1"),
+    maleSecondary: colorsTuple("#219FD1"),
     // 女性のプライマリカラー
     femalePrimary: colorsTuple("#FFBEB7"),
     // 女性のセカンダリカラー
-    femaleSecondary: colorsTuple("#F3948E"),
+    femaleSecondary: colorsTuple("#F56358"),
     // 緑系の色
-    green01: colorsTuple("#70CBA9"),
+    green01: colorsTuple("#38A676"),
     green02: colorsTuple("#98DBBA"),
-    green03: colorsTuple("#D5F0DF"),
+    green03: colorsTuple("#CDFADB"),
     // 青系の色
     blue01: colorsTuple("#1C208D"),
     blue02: colorsTuple("#0D5DB9"),
     blue03: colorsTuple("#5694E6"),
-    blue04: colorsTuple("#40B7EE"),
+    blue04: colorsTuple("#009DE6"),
     // 灰系の色
     gray01: colorsTuple("#6A6A6A"),
     gray02: colorsTuple("#9A9A9A"),
     gray03: colorsTuple("#CECECE"),
     gray04: colorsTuple("#EAEAEA"),
     // オレンジ系の色
-    orange01: colorsTuple("#FF6A00"),
+    orange01: colorsTuple("#EB6200"),
   },
   // プライマリカラーの設定
   primaryColor: "primary",
@@ -64,6 +64,13 @@ export const customTheme = createTheme({
     xl: "32px",
     keyboard: "48px",
     inputComponent: "64px",
+  },
+  // フォントファミリー
+  fontFamily:
+    " -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji",
+  // ベースとなる境界半径サイズの設定
+  radius: {
+    itemName: "10px",
   },
   // 各コンポーネントのカスタマイズ
   components: {
@@ -106,7 +113,9 @@ export const customTheme = createTheme({
       },
       classNames: (theme, props, ctx) => ({
         // Switchコンポーネントがオフの時に適用するスタイルを設定
-        root: !props.checked ? styles["switch-off"] : "",
+        root: !props.checked
+          ? `${styles["switch-off"]} ${styles["switch-padding"]}`
+          : `${styles["switch-padding"]}`,
       }),
     }),
     LoadingOverlay: LoadingOverlay.extend({

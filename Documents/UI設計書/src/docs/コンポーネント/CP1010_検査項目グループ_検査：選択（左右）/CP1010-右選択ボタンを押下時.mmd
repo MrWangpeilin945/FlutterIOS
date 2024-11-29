@@ -1,0 +1,13 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  User->>KN:右選択ボタンを押下
+  KN->>KN:押下された右選択ボタンをもとに値を更新
+  KN->>FE:引数.右変更イベントを呼び出す

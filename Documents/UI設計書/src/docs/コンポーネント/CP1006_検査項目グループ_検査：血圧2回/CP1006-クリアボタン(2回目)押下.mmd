@@ -1,0 +1,13 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  User->>KN:クリアボタン(2回目)の押下
+  KN->>KN:入力値を更新
+  KN-->>FE:引数.変更イベントを呼び出す

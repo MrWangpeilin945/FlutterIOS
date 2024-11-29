@@ -19,7 +19,8 @@ export default function BoothNote({ relatedExamItems }: BoothNoteProps) {
           <Group key={index} mt={5} style={{ width: "calc(50% - 8px)" }}>
             <Flex gap="xs" align="flex-start" wrap="nowrap">
               <Paper
-                className={styles["basic-grey"]}
+                bg="gray03"
+                c="gray01"
                 radius="md"
                 px={3}
                 w={210}

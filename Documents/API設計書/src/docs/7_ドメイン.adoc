@@ -67,6 +67,7 @@ enum ConsultProgressStatus
 === 検査進捗状況
 
 検査項目単位の進捗ステータスです。
+データベースには持ちません。
 
 [source,csharp]
 ----
@@ -138,6 +139,8 @@ enum ConsultResultExportStatus
 
 ソフトウェアキーボードのタイプです。
 
+フロントエンドの実装単位が決まり次第、値を振ります。
+
 [source,csharp]
 ----
 enum KeyboardType
@@ -149,6 +152,7 @@ enum KeyboardType
 === 検査項目グループ種別
 
 コンポーネントを出し分けるためのタイプです。
+ファーストユーザーで使用するものが決まり次第、値を振ります。
 
 [source,csharp]
 ----
