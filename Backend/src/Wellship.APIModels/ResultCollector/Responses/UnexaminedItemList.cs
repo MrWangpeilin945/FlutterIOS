@@ -5,7 +5,7 @@ namespace Ryobi.Wellship.APIModels.Responses;
 /// <summary>
 /// 未受診の検査項目リスト
 /// </summary>
-public class UnexaminedItemList
+public class UnexaminedMenuList
 {
     /// <summary>
     /// 受診ID
@@ -26,8 +26,8 @@ public class UnexaminedItemList
     public required string ExamineeName { get; init; }
 
     /// <summary>
-    /// 未受診の検査項目リスト
+    /// 未受診の検査メニューリスト
     /// </summary>
-    [JsonPropertyName("unexaminedItems")]
-    public required ExamItem[] UnexaminedItems { get; init; }
+    [JsonPropertyName("unexaminedMenus")]
+    public required ExamMenu[] UnexaminedMenus { get; init; }
 }

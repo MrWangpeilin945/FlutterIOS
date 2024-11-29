@@ -16,9 +16,9 @@ public interface IConsultUsecase
     public Task VerifyConsultNumberAsync(ConsultNumberRequest consultNumberRequest);
 
     /// <summary>
-    /// 未受診の検査項目を取得する
+    /// 未受診の検査メニューを取得する
     /// </summary>
-    public Task<UnexaminedItemList> GetUnexaminedItemsAsync(string consultNumber);
+    public Task<UnexaminedMenuList> GetUnexaminedMenusAsync(string consultNumber);
 
     /// <summary>
     /// 簡易な受診者情報を取得する

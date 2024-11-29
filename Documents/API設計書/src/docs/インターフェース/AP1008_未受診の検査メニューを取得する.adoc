@@ -1,4 +1,4 @@
-== AP1008_未受診の検査項目を取得する
+== AP1008_未受診の検査メニューを取得する
 
 === 概要
 
@@ -10,7 +10,7 @@
 
 [source]
 ----
-[GET] /consult/{consultNumber}/unexaminedItems
+[GET] /consult/{consultNumber}/unexaminedMenus
 ----
 
 === リクエストヘッダー
@@ -45,7 +45,7 @@
   "consultId": 1234,
   "examineeId" : 1,
   "examineeName":"青空 太郎",
-  "unexaminedItems": [
+  "unexaminedMenus": [
     {
       "examMenuId": 3,
       "examMenuName": "身体計測"

@@ -24,5 +24,5 @@ public class UnexaminedConsult
     /// <summary>
     /// 未受診の検査項目リスト
     /// </summary>
-    public required IEnumerable<UnexaminedExamItem> UnexaminedExamItems { get; init; }
+    public required IEnumerable<UnexaminedExamMenu> UnexaminedExamMenus { get; init; }
 }

@@ -122,9 +122,8 @@ public class ConsultRepository : IConsultRepository
             c.consult_id as ConsultId
             , c.consult_number as ConsultNumber
             , c.examinee_id as ExamineeId
-            , d.exam_item_id as ExamItemId
-            , o.exam_item_detail_id as ExamItemDetailId
-            , i.name as ExamItemName
+            , m.exam_menu_id as ExamMenuId
+            , m.name as ExamMenuName 
         from
             resultcollector.consult c 
             inner join resultcollector.exam_item_detail_orders o 
@@ -136,19 +135,22 @@ public class ConsultRepository : IConsultRepository
                 on c.consult_id = ca.consult_id 
                 and o.exam_item_detail_id = ca.exam_item_detail_id 
             left join resultcollector.exam_item_details d 
-                on o.exam_item_detail_id = d.exam_item_detail_id
-            left join resultcollector.exam_items i
-                on d.exam_item_id = i.exam_item_id
+                on o.exam_item_detail_id = d.exam_item_detail_id 
+            left join resultcollector.exam_items i 
+                on d.exam_item_id = i.exam_item_id 
+            left join resultcollector.exam_item_groups g 
+                on i.exam_item_group_id = g.exam_item_group_id 
+            left join resultcollector.exam_menus m 
+                on g.exam_menu_id = m.exam_menu_id 
         where
             c.consult_number = any (@ConsultNumbers)
             and r.consult_id is null 
             and ca.consult_id is null 
         order by
             o.consult_id
-            , d.exam_item_id
-            , o.exam_item_detail_id;";
+            , m.order_number;";
 
-        var unexaminedDetails = await connection.QueryAsync<UnexaminedDetailEntity>(sql, new { ConsultNumbers = consultNumbers });
+        var unexaminedDetails = await connection.QueryAsync<UnexaminedMenuEntity>(sql, new { ConsultNumbers = consultNumbers });
 
         var unexaminedConsults = unexaminedDetails
                                  .GroupBy(d => d.ConsultId)
@@ -157,12 +159,11 @@ public class ConsultRepository : IConsultRepository
                                      ConsultId = g.Key,
                                      ExamineeId = g.First().ExamineeId,
                                      ConsultNumber = g.First().ConsultNumber,
-                                     UnexaminedExamItems = g.GroupBy(d => d.ExamItemId)
-                                                            .Select(gi => new UnexaminedExamItem
+                                     UnexaminedExamMenus = g.GroupBy(d => d.ExamMenuId)
+                                                            .Select(gi => new UnexaminedExamMenu
                                                             {
-                                                                ExamItemId = gi.Key,
-                                                                ExamItemName = gi.First().ExamItemName,
-                                                                ExamItemDetailIds = gi.Select(d => d.ExamItemDetailId)
+                                                                ExamMenuId = gi.Key,
+                                                                ExamMenuName = gi.First().ExamMenuName,
                                                             })
                                  });
         return unexaminedConsults;

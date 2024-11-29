@@ -41,43 +41,43 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 未受診の検査項目を取得する
+    /// 未受診の検査メニューを取得する
     /// </summary>
-    public async Task<UnexaminedItemList> GetUnexaminedItemsAsync(string consultNumber)
+    public async Task<UnexaminedMenuList> GetUnexaminedMenusAsync(string consultNumber)
     {
         // 受診単位に紐づく未受診の検査項目を取得する
         // 検査項目明細単位の依頼に対して、検査結果あるいは検査中止のレコードが存在すれば受診済みとする
-        // 未受診の検査項目明細が1つ以上存在する検査項目を「未受診の検査項目」として返す
+        // 未受診の検査項目明細が1つ以上存在する検査メニューを「未受診の検査メニュー」として返す
 
         var consult = await _consultRepository.GetConsultAsync(consultNumber);
         var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
 
-        // 未受診項目を取得する
+        // 未受診の検査メニューを取得する
         var unexaminedConsults = await _consultRepository.GetUnexaminedConsultsAsync([consult.ConsultNumber]);
 
-        // 未受診項目がない受診の場合は、空リストを返す
+        // 未受診の検査メニューがない受診の場合は、空リストを返す
         if (!unexaminedConsults.Any())
         {
-            return new UnexaminedItemList()
+            return new UnexaminedMenuList()
             {
                 ConsultId = consult.ConsultId,
                 ExamineeId = examinee.ExamineeId,
                 ExamineeName = examinee.Name,
-                UnexaminedItems = []
+                UnexaminedMenus = []
             };
         }
 
-        // 未受診項目がある受診の場合は、検査項目単位の未受診リストを返す
+        // 未受診項目がある受診の場合は、検査メニュー単位の未受診リストを返す
         var unexaminedConsult = unexaminedConsults.Single();
-        return new UnexaminedItemList()
+        return new UnexaminedMenuList()
         {
             ConsultId = unexaminedConsult.ConsultId,
             ExamineeId = examinee.ExamineeId,
             ExamineeName = examinee.Name,
-            UnexaminedItems = unexaminedConsult.UnexaminedExamItems.Select(x => new ExamItem()
+            UnexaminedMenus = unexaminedConsult.UnexaminedExamMenus.Select(x => new ExamMenu()
             {
-                ExamItemId = x.ExamItemId,
-                ExamItemName = x.ExamItemName
+                ExamMenuId = x.ExamMenuId,
+                ExamMenuName = x.ExamMenuName
             }).ToArray()
         };
     }
