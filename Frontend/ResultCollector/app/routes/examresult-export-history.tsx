@@ -147,7 +147,7 @@ export default function ExamresultExportHistory() {
 
   //【CP0002】共通フッター設定
   const navigate = useNavigate();
-  const fotterItems = [
+  const footerItems = [
     { label: "", action: () => {} },
     { label: "", action: () => {} },
     { label: "出力", action: () => navigate("/examresult-export") },
@@ -344,7 +344,7 @@ export default function ExamresultExportHistory() {
             </>
           )}
         </Container>
-        <CommonFooter items={fotterItems} />
+        <CommonFooter items={footerItems} />
       </AuthWrapper>
     </>
   );
