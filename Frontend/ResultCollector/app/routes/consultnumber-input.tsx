@@ -30,7 +30,7 @@ export default function consultNumberInput() {
 
   //【CP0002】共通フッター設定
   const navigate = useNavigate();
-  const fotterItems = [
+  const footerItems = [
     { label: "進捗", action: () => navigate("/progress") },
     { label: "", action: () => {} },
     { label: "", action: () => {} },
@@ -180,7 +180,7 @@ export default function consultNumberInput() {
           onClose={close}
           errorMessage={errorMessage}
         />
-        <CommonFooter items={fotterItems} />
+        <CommonFooter items={footerItems} />
       </AuthWrapper>
     </>
   );
