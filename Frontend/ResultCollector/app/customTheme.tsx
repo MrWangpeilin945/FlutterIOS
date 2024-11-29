@@ -68,6 +68,10 @@ export const customTheme = createTheme({
   // フォントファミリー
   fontFamily:
     " -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji",
+  // ベースとなる境界半径サイズの設定
+  radius: {
+    itemName: "10px",
+  },
   // 各コンポーネントのカスタマイズ
   components: {
     Button: Button.extend({

@@ -3,6 +3,8 @@
 === 概要
 
 * データ出力のために、会場日程単位で結果の連携状態や会場ロック状態を一覧で確認する
+* `placeScheduleLockingStatus` は会場日程状況 （ `PlaceScheduleLockingStatus` ）を使用する
+* `status` は受診データ出力状況（ `ConsultResultExportStatus` ）を使用する
 
 === URI
 
@@ -34,7 +36,7 @@
     {
       "placeScheduleId": 23,
       "placeName": "会場B",
-      "placeScheduleLockingStatus": 1,
+      "placeScheduleLockingStatus": 21,
       "examDate": "2024-10-21",
       "startTime": "13:00",
       "details": [

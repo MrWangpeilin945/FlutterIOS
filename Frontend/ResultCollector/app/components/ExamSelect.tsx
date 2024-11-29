@@ -1,43 +1,18 @@
 import { useEffect, useState } from "react";
-import { Button, Group, Text, Flex, Paper, Title } from "@mantine/core";
+import { Button, Group, Text, Flex, Paper, Center } from "@mantine/core";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
+import type {
+  ExamItemDetailOption,
+  ExamRegistResult,
+  InputExamItem,
+} from "~/domain/wellship.schemas";
+import { InputErrorLevel } from "~/domain/enums";
 
 type SelectProps = {
-  //Orvalで生成したschemaを参照予定
-  examItems: {
-    positionNumber: number;
-    examItemId: number;
-    examItemName: string;
-    errorMessages: { value: string }[];
-    examItemDetails: {
-      positionNumber: number;
-      examItemDetailId: number;
-      examItemDetailName: string;
-      value: string;
-      prevValue: string;
-      unit: string;
-      examItemDetailType: string;
-      isCancelled: boolean;
-      kikiDetail: string;
-      afterDecimalPointDigit: number;
-      keyboard: {
-        Type: number;
-        keys: string[];
-      };
-      selectors: {
-        selectorId: string;
-        selectorName: string;
-      }[];
-      ranges: {
-        errorLevel: number;
-        numericMin: number;
-        numericMax: number;
-      }[];
-    }[];
-  };
+  examItems: InputExamItem;
   onRegisterPressed: number;
-  onClick: (option: string) => void;
+  onClick: (updatedExamItem: InputExamItem | undefined) => void;
 };
 
 export default function ExamSelect({
@@ -45,101 +20,128 @@ export default function ExamSelect({
   onRegisterPressed,
   onClick,
 }: SelectProps) {
-  // 配列の要素がない時は空を返す
-  if (examItems.examItemDetails?.length === 0) {
-    return null;
+  if (!examItems.examItemDetails?.length) {
+    return null; // examItemDetailsが空の場合は何も表示しない
   }
 
-  const [selected, setSelected] = useState(() => {
-    const examItemDetail = examItems.examItemDetails[0];
-    if (examItemDetail.value && examItemDetail.value !== "") {
-      return examItemDetail.value;
-    }
-    if (examItemDetail.prevValue && examItemDetail.prevValue !== "") {
-      return examItemDetail.prevValue;
-    }
-    return "";
-  });
-  //TODO：エラーメッセージの形式が未確定のため決定次第、修正予定
-  // errorMessagesをexamItemsに基づいて設定
-  const [errMessages, setErrMessages] = useState<string[]>(() =>{
-    if (examItems.errorMessages) {
-      const extractedValues = examItems.errorMessages.map(
-        (error: { value: string }) => error.value,
-      );
-      return extractedValues;
-    }
-    return [];
-  });
+  const examItemDetail = examItems.examItemDetails[0];
+  if (!examItemDetail) {
+    return null; // examItemDetailがundefinedの場合は何も表示しない
+  }
 
+  const [errMessages, setErrMessages] = useState<
+    ExamRegistResult[] | undefined
+  >(examItems.examRegistResults);
+  const [selected, setSelected] = useState(
+    examItemDetail.value || examItemDetail.prevValue || undefined,
+  );
 
-  // selectedが空の時にエラーメッセージを追加
-  useEffect(() => {
-    const errorMessage = getErrorMessage(errorMessages.required, `${examItems.examItemName}は`);
+  const handleErrorMessage = () => {
+    const initialMessages = examItems.examRegistResults || [];
+    let updatedMessages = [...initialMessages];
+
+    //必須チェック
+    const errorMessage: ExamRegistResult = {
+      description: getErrorMessage(
+        errorMessages.required,
+        `${examItems.name}は`,
+      ),
+      errorLevel: InputErrorLevel.異常,
+    };
 
     if (onRegisterPressed === 1 && selected === "") {
-      setErrMessages((items) => [...items, errorMessage]);
+      //メッセージを追加
+      updatedMessages.push(errorMessage);
     } else {
-      // selectedが空でなくなった場合、エラーメッセージを削除
-      setErrMessages((prevErrors) =>
-        prevErrors.filter((message) => message !== errorMessage),
+      //重複メッセージを削除
+      updatedMessages = updatedMessages.filter(
+        (message) => message.description !== errorMessage.description,
       );
     }
-  }, [examItems.examItemName, onRegisterPressed, selected]);
 
-  //選択/未選択の切替
-  const onSelect = (selector: { selectorId: string; selectorName: string }) => {
-    if (selected === selector.selectorId) {
-      // すでに選択されている場合、選択を解除する
-      setSelected("");
-      onClick("");
-    } else {
-      // 新しく選択する
-      setSelected(selector.selectorId);
-      onClick(selector.selectorId);
-    }
+    //メッセージをソート
+    updatedMessages.sort((a, b) => (b.errorLevel ?? 0) - (a.errorLevel ?? 0));
+    setErrMessages(updatedMessages);
   };
 
-  const selectors = examItems.examItemDetails[0].selectors;
+  useEffect(handleErrorMessage, [
+    examItems.examRegistResults,
+    examItems.name,
+    onRegisterPressed,
+    selected,
+  ]);
+
+  const onSelect = (selector: ExamItemDetailOption) => {
+    const newSelected = selected === selector.code ? "" : selector.code;
+
+    setSelected(newSelected);
+
+    //examItemsのvalueを更新
+    const updatedExamItems: InputExamItem = {
+      ...examItems,
+      examItemDetails: (examItems.examItemDetails || []).map((detail) =>
+        detail.examItemDetailId === examItemDetail.examItemDetailId
+          ? { ...detail, value: newSelected }
+          : detail,
+      ),
+    };
+
+    onClick(updatedExamItems);
+  };
+
+  const selectors = examItemDetail.examItemDetailOptions || [];
 
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
-      <Flex mb="xs">
-        <Paper bg="gray02" c="white" radius="lg" px="md" py="10">
-          <Title order={1} fw={500}>
-            {examItems.examItemName}
-          </Title>
+      <Flex mb={16}>
+        <Paper
+          w={274}
+          h={80}
+          bg="gray02"
+          c="white"
+          radius="itemName"
+          px={32}
+          py={16}
+        >
+          <Center>
+            <Text size="lg" fw={700}>
+              {examItems.name}
+            </Text>
+          </Center>
         </Paper>
-        <Text mt="xs">（前回：{examItems.examItemDetails[0].prevValue}）</Text>
+        <Text>（前回：{examItemDetail.prevValue}）</Text>
       </Flex>
 
-      <Group mb="xs">
+      <Group>
         {selectors.map((selector) => {
-          const isCancelled = examItems.examItemDetails[0].isCancelled;
-          const isSelected = selected === selector.selectorId;
+          const isCancelled = examItemDetail.cancelReasonId !== undefined;
+          const isSelected = selected === selector.code;
 
           return (
             <Button
+              w={320}
+              h={78}
               size="xl"
-              key={selector.selectorId}
+              fw={700}
+              key={selector.orderNumber}
               onClick={() => onSelect(selector)}
               variant="outline"
-              //グレーアウト、選択済/未選択によって色を変更
-              bg={isCancelled ? "gray03" : isSelected ? "green03" : "white"} 
-              color={isCancelled ? "gray02" : isSelected ? "primary" : "gray02"} 
-              disabled={isCancelled}  // isCancelledがtrueの場合、ボタンを無効化
+              bg={isCancelled ? "gray03" : isSelected ? "green03" : "white"}
+              color={isCancelled ? "gray02" : isSelected ? "primary" : "gray02"}
+              disabled={!!isCancelled}
             >
-              {selector.selectorName}
+              {selector.name}
             </Button>
           );
         })}
       </Group>
 
-      {/* エラーメッセージを表示 */}
-      {errMessages.map((error, index) => (
-        <Group key={index} c="warning">
-          <IconExclamationCircleFilled size={"1.7rem"} />
-          <Text>{error}</Text>
+      {(errMessages || []).map((error, index) => (
+        <Group key={index} c={error.errorLevel === 2 ? "warning" : "error"} >
+          <IconExclamationCircleFilled size={"32px"} />
+          <Text size="sm" fw={700}>
+            {error.description}
+          </Text>
         </Group>
       ))}
     </Flex>
