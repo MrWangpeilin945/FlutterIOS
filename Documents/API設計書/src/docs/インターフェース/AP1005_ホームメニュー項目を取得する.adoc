@@ -64,7 +64,7 @@
       ]
     }
   ],
-  "placeScheduleLokingStatus" : 1
+  "placeScheduleLockingStatus" : 1
 }
 ----
 
