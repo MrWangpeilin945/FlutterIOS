@@ -45,20 +45,40 @@ public class ConsultUsecase : IConsultUsecase
     /// </summary>
     public async Task<UnexaminedItemList> GetUnexaminedItemsAsync(string consultNumber)
     {
-        // 受診リポジトリから受診を取得する
-        // 受診.受診者IDをもとに氏名などを取る
-        var dummyId = 3;
+        // 受診単位に紐づく未受診の検査項目を取得する
+        // 検査項目明細単位の依頼に対して、検査結果あるいは検査中止のレコードが存在すれば受診済みとする
+        // 未受診の検査項目明細が1つ以上存在する検査項目を「未受診の検査項目」として返す
 
-        var examinee = await _examineeRepository.GetExamineeAsync(dummyId);
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
 
+        // 未受診項目を取得する
+        var unexaminedConsults = await _consultRepository.GetUnexaminedConsultsAsync([consult.ConsultNumber]);
+
+        // 未受診項目がない受診の場合は、空リストを返す
+        if (!unexaminedConsults.Any())
+        {
+            return new UnexaminedItemList()
+            {
+                ConsultId = consult.ConsultId,
+                ExamineeId = examinee.ExamineeId,
+                ExamineeName = examinee.Name,
+                UnexaminedItems = []
+            };
+        }
+
+        // 未受診項目がある受診の場合は、検査項目単位の未受診リストを返す
+        var unexaminedConsult = unexaminedConsults.Single();
         return new UnexaminedItemList()
         {
-            ConsultId = 1,
+            ConsultId = unexaminedConsult.ConsultId,
             ExamineeId = examinee.ExamineeId,
             ExamineeName = examinee.Name,
-            UnexaminedItems = [
-                new(){ExamItemId = 1,ExamItemName = ""}
-            ]
+            UnexaminedItems = unexaminedConsult.UnexaminedExamItems.Select(x => new ExamItem()
+            {
+                ExamItemId = x.ExamItemId,
+                ExamItemName = x.ExamItemName
+            }).ToArray()
         };
     }
 

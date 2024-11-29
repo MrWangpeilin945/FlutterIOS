@@ -1,6 +1,4 @@
-using Ryobi.Wellship.Core.Enums;
-
-namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 /// <summary>
 /// 受診者のエンティティ

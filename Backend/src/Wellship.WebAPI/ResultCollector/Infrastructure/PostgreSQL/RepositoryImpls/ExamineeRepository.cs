@@ -5,6 +5,7 @@ using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
 
@@ -44,7 +45,7 @@ public class ExamineeRepository : IExamineeRepository
         where
             examinee_id = @ExamineeId;";
 
-        var examinee = await connection.QuerySingleAsync<ExamineeEntity>(sql, new { ExamineeId = examineeId });
+        var examinee = await connection.QuerySingleOrDefaultAsync<ExamineeEntity>(sql, new { ExamineeId = examineeId });
 
         if (examinee is null)
         {

@@ -1,12 +1,14 @@
+using Ryobi.Wellship.Core.Enums;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 /// <summary>
-/// 未受診検査項目明細のエンティティ
+/// 受診
 /// </summary>
-public class UnexaminedDetailEntity
+public class Consult
 {
     /// <summary>
-    /// 受診ID
+    /// 受診者ID
     /// </summary>
     public required int ConsultId { get; init; }
 
@@ -16,22 +18,22 @@ public class UnexaminedDetailEntity
     public required string ConsultNumber { get; init; }
 
     /// <summary>
+    /// 受診進捗状況
+    /// </summary>
+    public required ConsultProgressStatus ProgressStatus { get; init; }
+
+    /// <summary>
+    /// 受診データ出力状況
+    /// </summary>
+    public required ConsultResultExportStatus ExportStatus { get; init; }
+
+    /// <summary>
+    /// 会場日程ID
+    /// </summary>
+    public required int PlaceScheduleId { get; init; }
+
+    /// <summary>
     /// 受診者ID
     /// </summary>
     public required int ExamineeId { get; init; }
-
-    /// <summary>
-    /// 検査項目ID
-    /// </summary>
-    public required int ExamItemId { get; init; }
-
-    /// <summary>
-    /// 検査項目名
-    /// </summary>
-    public required string ExamItemName { get; init; }
-
-    /// <summary>
-    /// 検査項目明細ID
-    /// </summary>
-    public required int ExamItemDetailId { get; init; }
 }

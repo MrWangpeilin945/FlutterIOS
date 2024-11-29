@@ -1,9 +1,10 @@
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 /// <summary>
-/// 未受診検査項目明細のエンティティ
+/// 未受診の検査項目（受診単位）
+/// 検査依頼（明細単位）に対して、検査結果または検査中止のレコードが存在すれば済とする。
 /// </summary>
-public class UnexaminedDetailEntity
+public class UnexaminedConsult
 {
     /// <summary>
     /// 受診ID
@@ -21,17 +22,7 @@ public class UnexaminedDetailEntity
     public required int ExamineeId { get; init; }
 
     /// <summary>
-    /// 検査項目ID
+    /// 未受診の検査項目リスト
     /// </summary>
-    public required int ExamItemId { get; init; }
-
-    /// <summary>
-    /// 検査項目名
-    /// </summary>
-    public required string ExamItemName { get; init; }
-
-    /// <summary>
-    /// 検査項目明細ID
-    /// </summary>
-    public required int ExamItemDetailId { get; init; }
+    public required IEnumerable<UnexaminedExamItem> UnexaminedExamItems { get; init; }
 }
