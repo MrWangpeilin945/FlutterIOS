@@ -21,4 +21,9 @@ public interface IIntegrationUsecase
     /// 検査結果の出力履歴を取得する
     /// </summary>
     public Task<ExportHistoryList> GetExportHistoryAsync();
+
+    /// <summary>
+    /// 出力した結果を未出力に戻す
+    /// </summary>
+    public Task UndoExportStatusAsync(Guid exportId);
 }

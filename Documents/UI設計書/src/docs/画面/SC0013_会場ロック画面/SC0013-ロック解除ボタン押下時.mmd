@@ -1,0 +1,19 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント
+  participant BE as バックエンド 
+  User->>FE:ロック解除ボタンを押下
+  FE->>FE:ロック解除ボタンの背景色を変更
+  FE->>BE:AP1017_会場ロック状態を更新する<br>[PUT] /placeSchedules/{placeScheduleId}/placeScheduleClosingStatus
+  BE-->>FE:レスポンスを取得
+  alt httpステータスコードが200
+  FE->>KN:【CP0015】共通ダイアログを呼び出す
+  else 400エラー or 500エラー
+  FE->>KN:【CP0015】共通ダイアログを呼び出す
+  end

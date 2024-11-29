@@ -1,0 +1,11 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  participant FE as フロントエンド
+  participant KN as コンポーネント
+  KN->>FE:【CP0006】検査項目進捗のボタンを押下
+  FE->>FE:押されたボタンの内容を保持して、<br>【SC0011】受診者一覧画面に遷移
+  

@@ -1,0 +1,13 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  #actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  FE->>KN:【CP1003】検査項目グループ_検査:尿検査を呼び出す
+  KN->>KN:各パラメータの表示
+  KN-->>FE:【CP1003】検査項目グループ_検査:尿検査を返す

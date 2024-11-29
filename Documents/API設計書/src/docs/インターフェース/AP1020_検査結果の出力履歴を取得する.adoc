@@ -33,6 +33,7 @@
 {
   "exportHistories": [
     {
+      "exportId" : "c0873b41-ac80-403e-ae35-336065b0411f"
       "placeScheduleId": 23,
       "placeName": "会場B",
       "placeScheduleLockingStatus" : 1,

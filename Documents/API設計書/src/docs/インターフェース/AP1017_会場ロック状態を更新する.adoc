@@ -3,6 +3,7 @@
 === 概要
 
 * 会場ロックの状態を更新して登録する
+* `placeScheduleLockingStatus` は会場日程状況 （ `PlaceScheduleLockingStatus` ）を使用する
 
 === URI
 
@@ -37,7 +38,7 @@
 ----
 {
   "placeScheduleId": 15,
-  "placeScheduleLockingStatus": 2
+  "placeScheduleLockingStatus": 31
 }
 ----
 

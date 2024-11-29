@@ -8,6 +8,12 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class ExportHistory
 {
     /// <summary>
+    /// 出力履歴ID
+    /// </summary>
+    [JsonPropertyName("exportId")]
+    public required Guid ExportId { get; init; }
+
+    /// <summary>
     /// 会場日程ID
     /// </summary>
     [JsonPropertyName("placeScheduleId")]

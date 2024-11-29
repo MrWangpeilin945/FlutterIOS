@@ -1,0 +1,11 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+  User->>KN:ホームボタンを押下
+  KN-->>FE:【SC0004】ホーム画面に遷移

@@ -4,6 +4,7 @@
 
 * 会場日程を指定して、検査項目ごとの進捗状況を取得する
 * 検査項目の表示順の昇順でソートする。
+* `status` は集計検査進捗状況（ `AggregatedProgressStatus` ）を使用する。
 
 === URI
 
@@ -50,14 +51,24 @@
       "examItemName": "検査項目A",
       "details": [
         {
-          "status": 1,
+          "status": 11,
           "statusName": "予定",
-          "count": 0
+          "count": 32
         },
         {
-          "status": 2,
-          "name": "受診済み",
+          "status": 21,
+          "name": "来場",
           "count": 8
+        },
+        {
+          "status": 41,
+          "name": "済",
+          "count": 20
+        },
+        {
+          "status": 51,
+          "name": "中止",
+          "count": 1
         }
       ]
     }

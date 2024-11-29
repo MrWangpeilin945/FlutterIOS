@@ -1,0 +1,13 @@
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  User->>KN:状態名称ボタンを押下
+  KN-->>FE:引数.押下イベントを呼び出す
+  
