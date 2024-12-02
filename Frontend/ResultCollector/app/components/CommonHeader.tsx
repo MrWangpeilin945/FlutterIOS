@@ -27,7 +27,6 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
           pb={8}
           pl={32}
           pr={32}
-          radius={48}
           onClick={toggle}
         >
           <IconUserFilled size={"24"} />
@@ -49,7 +48,6 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
           pb={8}
           pl={32}
           pr={32}
-          radius={48}
           onClick={() => navigate("/home")}
         >
           <IconHomeFilled size={"24"} />
@@ -63,14 +61,14 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
           opened={opened}
           position={{ top: 67, left: 0 }}
           onClose={hide}
-          w="auto"
+          w={253}
           h={174}
           p={32}
           style={{ borderBottomLeftRadius: 8, borderBottomRightRadius: 8 }}
           bg="white01"
         >
           <Box>
-            <Text size="xs" c="black01" pb={24}>
+            <Text size="xs" c="black01" pb={24} truncate="end">
               {staffName}
             </Text>
             {/* ログアウトボタン */}
@@ -84,7 +82,6 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
               pb={8}
               pl={32}
               pr={32}
-              radius={48}
               onClick={() => navigate("/login")}
             >
               <Text size="xs" fw={700} c="primary">
