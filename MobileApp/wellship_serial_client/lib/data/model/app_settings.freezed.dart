@@ -22,15 +22,14 @@ mixin _$AppSettings {
   int get baud => throw _privateConstructorUsedError;
   int get dataBits => throw _privateConstructorUsedError;
   Parity get parity => throw _privateConstructorUsedError;
-  dynamic get stopBits => throw _privateConstructorUsedError;
-  List<String>? get ackTriggerStrings => throw _privateConstructorUsedError;
+  StopBits get stopBits => throw _privateConstructorUsedError;
+  List<String>? get ackTriggers => throw _privateConstructorUsedError;
   String? get ackString => throw _privateConstructorUsedError;
   String? get eotString => throw _privateConstructorUsedError;
   int? get dataLength => throw _privateConstructorUsedError;
   bool get useRts => throw _privateConstructorUsedError;
   bool get useDtr => throw _privateConstructorUsedError;
-  String? get transmissionDataTriggerString =>
-      throw _privateConstructorUsedError;
+  String? get transmissionDataTrigger => throw _privateConstructorUsedError;
   String? get transmissionData => throw _privateConstructorUsedError;
   bool get debugMode => throw _privateConstructorUsedError;
 
@@ -54,14 +53,14 @@ abstract class $AppSettingsCopyWith<$Res> {
       int baud,
       int dataBits,
       Parity parity,
-      dynamic stopBits,
-      List<String>? ackTriggerStrings,
+      StopBits stopBits,
+      List<String>? ackTriggers,
       String? ackString,
       String? eotString,
       int? dataLength,
       bool useRts,
       bool useDtr,
-      String? transmissionDataTriggerString,
+      String? transmissionDataTrigger,
       String? transmissionData,
       bool debugMode});
 }
@@ -87,14 +86,14 @@ class _$AppSettingsCopyWithImpl<$Res, $Val extends AppSettings>
     Object? baud = null,
     Object? dataBits = null,
     Object? parity = null,
-    Object? stopBits = freezed,
-    Object? ackTriggerStrings = freezed,
+    Object? stopBits = null,
+    Object? ackTriggers = freezed,
     Object? ackString = freezed,
     Object? eotString = freezed,
     Object? dataLength = freezed,
     Object? useRts = null,
     Object? useDtr = null,
-    Object? transmissionDataTriggerString = freezed,
+    Object? transmissionDataTrigger = freezed,
     Object? transmissionData = freezed,
     Object? debugMode = null,
   }) {
@@ -123,13 +122,13 @@ class _$AppSettingsCopyWithImpl<$Res, $Val extends AppSettings>
           ? _value.parity
           : parity // ignore: cast_nullable_to_non_nullable
               as Parity,
-      stopBits: freezed == stopBits
+      stopBits: null == stopBits
           ? _value.stopBits
           : stopBits // ignore: cast_nullable_to_non_nullable
-              as dynamic,
-      ackTriggerStrings: freezed == ackTriggerStrings
-          ? _value.ackTriggerStrings
-          : ackTriggerStrings // ignore: cast_nullable_to_non_nullable
+              as StopBits,
+      ackTriggers: freezed == ackTriggers
+          ? _value.ackTriggers
+          : ackTriggers // ignore: cast_nullable_to_non_nullable
               as List<String>?,
       ackString: freezed == ackString
           ? _value.ackString
@@ -151,9 +150,9 @@ class _$AppSettingsCopyWithImpl<$Res, $Val extends AppSettings>
           ? _value.useDtr
           : useDtr // ignore: cast_nullable_to_non_nullable
               as bool,
-      transmissionDataTriggerString: freezed == transmissionDataTriggerString
-          ? _value.transmissionDataTriggerString
-          : transmissionDataTriggerString // ignore: cast_nullable_to_non_nullable
+      transmissionDataTrigger: freezed == transmissionDataTrigger
+          ? _value.transmissionDataTrigger
+          : transmissionDataTrigger // ignore: cast_nullable_to_non_nullable
               as String?,
       transmissionData: freezed == transmissionData
           ? _value.transmissionData
@@ -182,14 +181,14 @@ abstract class _$$AppSettingsImplCopyWith<$Res>
       int baud,
       int dataBits,
       Parity parity,
-      dynamic stopBits,
-      List<String>? ackTriggerStrings,
+      StopBits stopBits,
+      List<String>? ackTriggers,
       String? ackString,
       String? eotString,
       int? dataLength,
       bool useRts,
       bool useDtr,
-      String? transmissionDataTriggerString,
+      String? transmissionDataTrigger,
       String? transmissionData,
       bool debugMode});
 }
@@ -213,14 +212,14 @@ class __$$AppSettingsImplCopyWithImpl<$Res>
     Object? baud = null,
     Object? dataBits = null,
     Object? parity = null,
-    Object? stopBits = freezed,
-    Object? ackTriggerStrings = freezed,
+    Object? stopBits = null,
+    Object? ackTriggers = freezed,
     Object? ackString = freezed,
     Object? eotString = freezed,
     Object? dataLength = freezed,
     Object? useRts = null,
     Object? useDtr = null,
-    Object? transmissionDataTriggerString = freezed,
+    Object? transmissionDataTrigger = freezed,
     Object? transmissionData = freezed,
     Object? debugMode = null,
   }) {
@@ -249,10 +248,13 @@ class __$$AppSettingsImplCopyWithImpl<$Res>
           ? _value.parity
           : parity // ignore: cast_nullable_to_non_nullable
               as Parity,
-      stopBits: freezed == stopBits ? _value.stopBits! : stopBits,
-      ackTriggerStrings: freezed == ackTriggerStrings
-          ? _value._ackTriggerStrings
-          : ackTriggerStrings // ignore: cast_nullable_to_non_nullable
+      stopBits: null == stopBits
+          ? _value.stopBits
+          : stopBits // ignore: cast_nullable_to_non_nullable
+              as StopBits,
+      ackTriggers: freezed == ackTriggers
+          ? _value._ackTriggers
+          : ackTriggers // ignore: cast_nullable_to_non_nullable
               as List<String>?,
       ackString: freezed == ackString
           ? _value.ackString
@@ -274,9 +276,9 @@ class __$$AppSettingsImplCopyWithImpl<$Res>
           ? _value.useDtr
           : useDtr // ignore: cast_nullable_to_non_nullable
               as bool,
-      transmissionDataTriggerString: freezed == transmissionDataTriggerString
-          ? _value.transmissionDataTriggerString
-          : transmissionDataTriggerString // ignore: cast_nullable_to_non_nullable
+      transmissionDataTrigger: freezed == transmissionDataTrigger
+          ? _value.transmissionDataTrigger
+          : transmissionDataTrigger // ignore: cast_nullable_to_non_nullable
               as String?,
       transmissionData: freezed == transmissionData
           ? _value.transmissionData
@@ -292,7 +294,7 @@ class __$$AppSettingsImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$AppSettingsImpl implements _AppSettings {
+class _$AppSettingsImpl extends _AppSettings {
   const _$AppSettingsImpl(
       {required this.transMethod,
       this.title,
@@ -301,16 +303,17 @@ class _$AppSettingsImpl implements _AppSettings {
       this.dataBits = 8,
       this.parity = Parity.none,
       this.stopBits = StopBits.stopBits_1,
-      final List<String>? ackTriggerStrings,
+      final List<String>? ackTriggers,
       this.ackString,
       this.eotString,
       this.dataLength,
       this.useRts = false,
       this.useDtr = false,
-      this.transmissionDataTriggerString,
+      this.transmissionDataTrigger,
       this.transmissionData,
       this.debugMode = false})
-      : _ackTriggerStrings = ackTriggerStrings;
+      : _ackTriggers = ackTriggers,
+        super._();
 
   @override
   final TransMethod transMethod;
@@ -329,14 +332,13 @@ class _$AppSettingsImpl implements _AppSettings {
   final Parity parity;
   @override
   @JsonKey()
-  final dynamic stopBits;
-  final List<String>? _ackTriggerStrings;
+  final StopBits stopBits;
+  final List<String>? _ackTriggers;
   @override
-  List<String>? get ackTriggerStrings {
-    final value = _ackTriggerStrings;
+  List<String>? get ackTriggers {
+    final value = _ackTriggers;
     if (value == null) return null;
-    if (_ackTriggerStrings is EqualUnmodifiableListView)
-      return _ackTriggerStrings;
+    if (_ackTriggers is EqualUnmodifiableListView) return _ackTriggers;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(value);
   }
@@ -354,7 +356,7 @@ class _$AppSettingsImpl implements _AppSettings {
   @JsonKey()
   final bool useDtr;
   @override
-  final String? transmissionDataTriggerString;
+  final String? transmissionDataTrigger;
   @override
   final String? transmissionData;
   @override
@@ -363,7 +365,7 @@ class _$AppSettingsImpl implements _AppSettings {
 
   @override
   String toString() {
-    return 'AppSettings(transMethod: $transMethod, title: $title, callback: $callback, baud: $baud, dataBits: $dataBits, parity: $parity, stopBits: $stopBits, ackTriggerStrings: $ackTriggerStrings, ackString: $ackString, eotString: $eotString, dataLength: $dataLength, useRts: $useRts, useDtr: $useDtr, transmissionDataTriggerString: $transmissionDataTriggerString, transmissionData: $transmissionData, debugMode: $debugMode)';
+    return 'AppSettings(transMethod: $transMethod, title: $title, callback: $callback, baud: $baud, dataBits: $dataBits, parity: $parity, stopBits: $stopBits, ackTriggers: $ackTriggers, ackString: $ackString, eotString: $eotString, dataLength: $dataLength, useRts: $useRts, useDtr: $useDtr, transmissionDataTrigger: $transmissionDataTrigger, transmissionData: $transmissionData, debugMode: $debugMode)';
   }
 
   @override
@@ -380,9 +382,10 @@ class _$AppSettingsImpl implements _AppSettings {
             (identical(other.dataBits, dataBits) ||
                 other.dataBits == dataBits) &&
             (identical(other.parity, parity) || other.parity == parity) &&
-            const DeepCollectionEquality().equals(other.stopBits, stopBits) &&
+            (identical(other.stopBits, stopBits) ||
+                other.stopBits == stopBits) &&
             const DeepCollectionEquality()
-                .equals(other._ackTriggerStrings, _ackTriggerStrings) &&
+                .equals(other._ackTriggers, _ackTriggers) &&
             (identical(other.ackString, ackString) ||
                 other.ackString == ackString) &&
             (identical(other.eotString, eotString) ||
@@ -391,10 +394,9 @@ class _$AppSettingsImpl implements _AppSettings {
                 other.dataLength == dataLength) &&
             (identical(other.useRts, useRts) || other.useRts == useRts) &&
             (identical(other.useDtr, useDtr) || other.useDtr == useDtr) &&
-            (identical(other.transmissionDataTriggerString,
-                    transmissionDataTriggerString) ||
-                other.transmissionDataTriggerString ==
-                    transmissionDataTriggerString) &&
+            (identical(
+                    other.transmissionDataTrigger, transmissionDataTrigger) ||
+                other.transmissionDataTrigger == transmissionDataTrigger) &&
             (identical(other.transmissionData, transmissionData) ||
                 other.transmissionData == transmissionData) &&
             (identical(other.debugMode, debugMode) ||
@@ -410,14 +412,14 @@ class _$AppSettingsImpl implements _AppSettings {
       baud,
       dataBits,
       parity,
-      const DeepCollectionEquality().hash(stopBits),
-      const DeepCollectionEquality().hash(_ackTriggerStrings),
+      stopBits,
+      const DeepCollectionEquality().hash(_ackTriggers),
       ackString,
       eotString,
       dataLength,
       useRts,
       useDtr,
-      transmissionDataTriggerString,
+      transmissionDataTrigger,
       transmissionData,
       debugMode);
 
@@ -430,7 +432,7 @@ class _$AppSettingsImpl implements _AppSettings {
       __$$AppSettingsImplCopyWithImpl<_$AppSettingsImpl>(this, _$identity);
 }
 
-abstract class _AppSettings implements AppSettings {
+abstract class _AppSettings extends AppSettings {
   const factory _AppSettings(
       {required final TransMethod transMethod,
       final String? title,
@@ -438,16 +440,17 @@ abstract class _AppSettings implements AppSettings {
       final int baud,
       final int dataBits,
       final Parity parity,
-      final dynamic stopBits,
-      final List<String>? ackTriggerStrings,
+      final StopBits stopBits,
+      final List<String>? ackTriggers,
       final String? ackString,
       final String? eotString,
       final int? dataLength,
       final bool useRts,
       final bool useDtr,
-      final String? transmissionDataTriggerString,
+      final String? transmissionDataTrigger,
       final String? transmissionData,
       final bool debugMode}) = _$AppSettingsImpl;
+  const _AppSettings._() : super._();
 
   @override
   TransMethod get transMethod;
@@ -462,9 +465,9 @@ abstract class _AppSettings implements AppSettings {
   @override
   Parity get parity;
   @override
-  dynamic get stopBits;
+  StopBits get stopBits;
   @override
-  List<String>? get ackTriggerStrings;
+  List<String>? get ackTriggers;
   @override
   String? get ackString;
   @override
@@ -476,7 +479,7 @@ abstract class _AppSettings implements AppSettings {
   @override
   bool get useDtr;
   @override
-  String? get transmissionDataTriggerString;
+  String? get transmissionDataTrigger;
   @override
   String? get transmissionData;
   @override

@@ -15,18 +15,16 @@ final wiredSettingsProvider = StateProvider<WiredSettings>((ref) => const WiredS
     ));
 
 @freezed
-class WiredSettings with _$WiredSettings {
+abstract class WiredSettings implements _$WiredSettings {
   const factory WiredSettings(
       {required int baud,
       required int dataBits,
       required Parity parity,
       required StopBits stopBits,
       required bool useRts,
-      required bool useDtr,
-      List<String>? ackTriggerStrings,
-      String? ackString,
-      String? eotString,
-      int? dataLength,
-      String? transmissionDataTriggerString,
-      String? transmissionData}) = _WiredSettings;
+      required bool useDtr}) = _WiredSettings;
+
+  // Uri? callbackUri{
+  //   final callbackUri = Uri.tryParse(callback);
+  // }
 }

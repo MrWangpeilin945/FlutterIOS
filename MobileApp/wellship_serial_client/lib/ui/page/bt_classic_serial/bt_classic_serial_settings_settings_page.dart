@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wellship_serial_client/data/handler/bluetooth_permission_handler.dart';
 import 'package:wellship_serial_client/data/handler/location_permission_handler.dart';
-import 'package:wellship_serial_client/data/provider/bt_classic_settings.dart';
+import 'package:wellship_serial_client/data/model/bt_classic_settings.dart';
 import 'package:wellship_serial_client/ui/route/app_route.dart';
 import 'package:wellship_serial_client/ui/route/app_route.gr.dart';
 
@@ -34,9 +34,8 @@ class BtClassicSerialSettingsPage extends ConsumerWidget {
                     OutlinedButton(
                         onPressed: () async {
                           var result = await _requestPermission();
-                          if (!result) {
+                          if (!result && context.mounted) {
                             showDialog(
-                                // TODO fix!
                                 context: context,
                                 builder: (context) => const AlertDialog(
                                       content: Text('必要な権限が与えられていないため実行できません。\r\n設定画面から位置情報・付近のデバイスを検出する権限を付与してください。'),

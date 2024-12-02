@@ -10,8 +10,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:typed_data/typed_buffers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:usb_serial/usb_serial.dart';
+import 'package:wellship_serial_client/data/model/behavior_settings.dart';
 import 'package:wellship_serial_client/data/provider/bt_classic_devices_provider.dart';
-import 'package:wellship_serial_client/data/provider/bt_classic_settings.dart';
+import 'package:wellship_serial_client/data/model/bt_classic_settings.dart';
 
 @RoutePage()
 class BtClassicSerialCommunicationPage extends HookConsumerWidget {
@@ -25,9 +26,14 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
     const deviceName = 'D1-N273';
     final device = deviceStream.value?.where((x) => x.device.name == deviceName).firstOrNull?.device;
     final serialSettings = ref.read(btClassicSettingsProvider);
+    final behaviorSettings = ref.read(behaviorSettingsProvider);
 
     final connection = useState<BluetoothConnection?>(null);
     final text = useState<String>("");
+    useEffect(() {
+      printSomething('s', 1);
+      return null;
+    }, []);
 
     useEffect(() {
       if (device == null) {
@@ -44,9 +50,13 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
         conn.input!.listen((data) async {
           buffer.addAll(data);
           text.value = utf8.decode(buffer);
-          // TODO ACK判定（ackTriggerStrings, ackString）
-          // TODO 停止判定（dataLength）
-          // TODO 停止判定（eotString）
+          // ACK判定（ackTriggers, ackString）
+          if (behaviorSettings.ackString != null && behaviorSettings.ackTriggers?.isNotEmpty == true) {
+            final ackString = behaviorSettings.ackString ?? "";
+          }
+          // 停止判定（dataLength）
+
+          // 停止判定（eotString）
           if (buffer.length > 40) {
             if (!aborting) {
               aborting = true;
@@ -65,7 +75,7 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
     }, [device]);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('BluetoothClassic接続通信画面'),
+        title: Text(behaviorSettings.title ?? 'BluetoothClassic接続通信画面'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Center(
@@ -81,4 +91,6 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
       ),
     );
   }
+
+  void printSomething(String s, int i) {}
 }

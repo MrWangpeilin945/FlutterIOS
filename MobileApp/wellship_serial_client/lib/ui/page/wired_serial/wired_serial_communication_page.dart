@@ -8,7 +8,7 @@ import 'package:typed_data/typed_buffers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:usb_serial/usb_serial.dart';
 import 'package:wellship_serial_client/data/provider/wired_devices_provider.dart';
-import 'package:wellship_serial_client/data/provider/wired_settings.dart';
+import 'package:wellship_serial_client/data/model/wired_settings.dart';
 
 @RoutePage()
 class WiredSerialCommunicationPage extends HookConsumerWidget {
@@ -20,6 +20,7 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
     final firstDevice = deviceStream.value?.firstOrNull;
     final serialSettings = ref.read(wiredSettingsProvider);
 
+    final error = useState<String>("");
     final usbPort = useState<UsbPort?>(null);
     final text = useState<String>("");
 
@@ -49,7 +50,7 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
         port.inputStream!.listen((data) async {
           buffer.addAll(data);
           text.value = utf8.decode(buffer);
-          // TODO ACK判定（ackTriggerStrings, ackString）
+          // TODO ACK判定（ackTriggers, ackString）
           // TODO 停止判定（dataLength）
           // TODO 停止判定（eotString）
           if (buffer.length > 40) {
@@ -62,6 +63,8 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
             }
           }
         });
+      }).onError((x, s) async {
+        error.value = x.toString();
       });
       return null;
     }, [firstDevice]);
@@ -75,6 +78,7 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
           Text("firstDevice:${firstDevice.toString()}"),
           Text("UsbPort:${usbPort.value}"),
           Text("text:${text.value}"),
+          Text("error:${error.value}"),
         ]),
       ),
     );

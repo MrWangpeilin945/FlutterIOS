@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'bt_classic_settings.dart';
+part of 'behavior_settings.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,63 +15,76 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
-mixin _$BtClassicSettings {
-  List<String>? get ackTriggerStrings => throw _privateConstructorUsedError;
+mixin _$BehaviorSettings {
+  String? get title => throw _privateConstructorUsedError;
+  Uri? get callback => throw _privateConstructorUsedError;
+  List<String>? get ackTriggers => throw _privateConstructorUsedError;
   String? get ackString => throw _privateConstructorUsedError;
   String? get eotString => throw _privateConstructorUsedError;
   int? get dataLength => throw _privateConstructorUsedError;
-  String? get transmissionDataTriggerString =>
-      throw _privateConstructorUsedError;
+  String? get transmissionDataTrigger => throw _privateConstructorUsedError;
   String? get transmissionData => throw _privateConstructorUsedError;
 
-  /// Create a copy of BtClassicSettings
+  /// Create a copy of BehaviorSettings
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $BtClassicSettingsCopyWith<BtClassicSettings> get copyWith =>
+  $BehaviorSettingsCopyWith<BehaviorSettings> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $BtClassicSettingsCopyWith<$Res> {
-  factory $BtClassicSettingsCopyWith(
-          BtClassicSettings value, $Res Function(BtClassicSettings) then) =
-      _$BtClassicSettingsCopyWithImpl<$Res, BtClassicSettings>;
+abstract class $BehaviorSettingsCopyWith<$Res> {
+  factory $BehaviorSettingsCopyWith(
+          BehaviorSettings value, $Res Function(BehaviorSettings) then) =
+      _$BehaviorSettingsCopyWithImpl<$Res, BehaviorSettings>;
   @useResult
   $Res call(
-      {List<String>? ackTriggerStrings,
+      {String? title,
+      Uri? callback,
+      List<String>? ackTriggers,
       String? ackString,
       String? eotString,
       int? dataLength,
-      String? transmissionDataTriggerString,
+      String? transmissionDataTrigger,
       String? transmissionData});
 }
 
 /// @nodoc
-class _$BtClassicSettingsCopyWithImpl<$Res, $Val extends BtClassicSettings>
-    implements $BtClassicSettingsCopyWith<$Res> {
-  _$BtClassicSettingsCopyWithImpl(this._value, this._then);
+class _$BehaviorSettingsCopyWithImpl<$Res, $Val extends BehaviorSettings>
+    implements $BehaviorSettingsCopyWith<$Res> {
+  _$BehaviorSettingsCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BtClassicSettings
+  /// Create a copy of BehaviorSettings
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? ackTriggerStrings = freezed,
+    Object? title = freezed,
+    Object? callback = freezed,
+    Object? ackTriggers = freezed,
     Object? ackString = freezed,
     Object? eotString = freezed,
     Object? dataLength = freezed,
-    Object? transmissionDataTriggerString = freezed,
+    Object? transmissionDataTrigger = freezed,
     Object? transmissionData = freezed,
   }) {
     return _then(_value.copyWith(
-      ackTriggerStrings: freezed == ackTriggerStrings
-          ? _value.ackTriggerStrings
-          : ackTriggerStrings // ignore: cast_nullable_to_non_nullable
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      callback: freezed == callback
+          ? _value.callback
+          : callback // ignore: cast_nullable_to_non_nullable
+              as Uri?,
+      ackTriggers: freezed == ackTriggers
+          ? _value.ackTriggers
+          : ackTriggers // ignore: cast_nullable_to_non_nullable
               as List<String>?,
       ackString: freezed == ackString
           ? _value.ackString
@@ -85,9 +98,9 @@ class _$BtClassicSettingsCopyWithImpl<$Res, $Val extends BtClassicSettings>
           ? _value.dataLength
           : dataLength // ignore: cast_nullable_to_non_nullable
               as int?,
-      transmissionDataTriggerString: freezed == transmissionDataTriggerString
-          ? _value.transmissionDataTriggerString
-          : transmissionDataTriggerString // ignore: cast_nullable_to_non_nullable
+      transmissionDataTrigger: freezed == transmissionDataTrigger
+          ? _value.transmissionDataTrigger
+          : transmissionDataTrigger // ignore: cast_nullable_to_non_nullable
               as String?,
       transmissionData: freezed == transmissionData
           ? _value.transmissionData
@@ -98,46 +111,58 @@ class _$BtClassicSettingsCopyWithImpl<$Res, $Val extends BtClassicSettings>
 }
 
 /// @nodoc
-abstract class _$$BtClassicSettingsImplCopyWith<$Res>
-    implements $BtClassicSettingsCopyWith<$Res> {
-  factory _$$BtClassicSettingsImplCopyWith(_$BtClassicSettingsImpl value,
-          $Res Function(_$BtClassicSettingsImpl) then) =
-      __$$BtClassicSettingsImplCopyWithImpl<$Res>;
+abstract class _$$BehaviorSettingsImplCopyWith<$Res>
+    implements $BehaviorSettingsCopyWith<$Res> {
+  factory _$$BehaviorSettingsImplCopyWith(_$BehaviorSettingsImpl value,
+          $Res Function(_$BehaviorSettingsImpl) then) =
+      __$$BehaviorSettingsImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
-      {List<String>? ackTriggerStrings,
+      {String? title,
+      Uri? callback,
+      List<String>? ackTriggers,
       String? ackString,
       String? eotString,
       int? dataLength,
-      String? transmissionDataTriggerString,
+      String? transmissionDataTrigger,
       String? transmissionData});
 }
 
 /// @nodoc
-class __$$BtClassicSettingsImplCopyWithImpl<$Res>
-    extends _$BtClassicSettingsCopyWithImpl<$Res, _$BtClassicSettingsImpl>
-    implements _$$BtClassicSettingsImplCopyWith<$Res> {
-  __$$BtClassicSettingsImplCopyWithImpl(_$BtClassicSettingsImpl _value,
-      $Res Function(_$BtClassicSettingsImpl) _then)
+class __$$BehaviorSettingsImplCopyWithImpl<$Res>
+    extends _$BehaviorSettingsCopyWithImpl<$Res, _$BehaviorSettingsImpl>
+    implements _$$BehaviorSettingsImplCopyWith<$Res> {
+  __$$BehaviorSettingsImplCopyWithImpl(_$BehaviorSettingsImpl _value,
+      $Res Function(_$BehaviorSettingsImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of BtClassicSettings
+  /// Create a copy of BehaviorSettings
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? ackTriggerStrings = freezed,
+    Object? title = freezed,
+    Object? callback = freezed,
+    Object? ackTriggers = freezed,
     Object? ackString = freezed,
     Object? eotString = freezed,
     Object? dataLength = freezed,
-    Object? transmissionDataTriggerString = freezed,
+    Object? transmissionDataTrigger = freezed,
     Object? transmissionData = freezed,
   }) {
-    return _then(_$BtClassicSettingsImpl(
-      ackTriggerStrings: freezed == ackTriggerStrings
-          ? _value._ackTriggerStrings
-          : ackTriggerStrings // ignore: cast_nullable_to_non_nullable
+    return _then(_$BehaviorSettingsImpl(
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
+      callback: freezed == callback
+          ? _value.callback
+          : callback // ignore: cast_nullable_to_non_nullable
+              as Uri?,
+      ackTriggers: freezed == ackTriggers
+          ? _value._ackTriggers
+          : ackTriggers // ignore: cast_nullable_to_non_nullable
               as List<String>?,
       ackString: freezed == ackString
           ? _value.ackString
@@ -151,9 +176,9 @@ class __$$BtClassicSettingsImplCopyWithImpl<$Res>
           ? _value.dataLength
           : dataLength // ignore: cast_nullable_to_non_nullable
               as int?,
-      transmissionDataTriggerString: freezed == transmissionDataTriggerString
-          ? _value.transmissionDataTriggerString
-          : transmissionDataTriggerString // ignore: cast_nullable_to_non_nullable
+      transmissionDataTrigger: freezed == transmissionDataTrigger
+          ? _value.transmissionDataTrigger
+          : transmissionDataTrigger // ignore: cast_nullable_to_non_nullable
               as String?,
       transmissionData: freezed == transmissionData
           ? _value.transmissionData
@@ -165,23 +190,28 @@ class __$$BtClassicSettingsImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$BtClassicSettingsImpl implements _BtClassicSettings {
-  const _$BtClassicSettingsImpl(
-      {final List<String>? ackTriggerStrings,
+class _$BehaviorSettingsImpl implements _BehaviorSettings {
+  const _$BehaviorSettingsImpl(
+      {this.title,
+      this.callback,
+      final List<String>? ackTriggers,
       this.ackString,
       this.eotString,
       this.dataLength,
-      this.transmissionDataTriggerString,
+      this.transmissionDataTrigger,
       this.transmissionData})
-      : _ackTriggerStrings = ackTriggerStrings;
+      : _ackTriggers = ackTriggers;
 
-  final List<String>? _ackTriggerStrings;
   @override
-  List<String>? get ackTriggerStrings {
-    final value = _ackTriggerStrings;
+  final String? title;
+  @override
+  final Uri? callback;
+  final List<String>? _ackTriggers;
+  @override
+  List<String>? get ackTriggers {
+    final value = _ackTriggers;
     if (value == null) return null;
-    if (_ackTriggerStrings is EqualUnmodifiableListView)
-      return _ackTriggerStrings;
+    if (_ackTriggers is EqualUnmodifiableListView) return _ackTriggers;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(value);
   }
@@ -193,32 +223,34 @@ class _$BtClassicSettingsImpl implements _BtClassicSettings {
   @override
   final int? dataLength;
   @override
-  final String? transmissionDataTriggerString;
+  final String? transmissionDataTrigger;
   @override
   final String? transmissionData;
 
   @override
   String toString() {
-    return 'BtClassicSettings(ackTriggerStrings: $ackTriggerStrings, ackString: $ackString, eotString: $eotString, dataLength: $dataLength, transmissionDataTriggerString: $transmissionDataTriggerString, transmissionData: $transmissionData)';
+    return 'BehaviorSettings(title: $title, callback: $callback, ackTriggers: $ackTriggers, ackString: $ackString, eotString: $eotString, dataLength: $dataLength, transmissionDataTrigger: $transmissionDataTrigger, transmissionData: $transmissionData)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BtClassicSettingsImpl &&
+            other is _$BehaviorSettingsImpl &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.callback, callback) ||
+                other.callback == callback) &&
             const DeepCollectionEquality()
-                .equals(other._ackTriggerStrings, _ackTriggerStrings) &&
+                .equals(other._ackTriggers, _ackTriggers) &&
             (identical(other.ackString, ackString) ||
                 other.ackString == ackString) &&
             (identical(other.eotString, eotString) ||
                 other.eotString == eotString) &&
             (identical(other.dataLength, dataLength) ||
                 other.dataLength == dataLength) &&
-            (identical(other.transmissionDataTriggerString,
-                    transmissionDataTriggerString) ||
-                other.transmissionDataTriggerString ==
-                    transmissionDataTriggerString) &&
+            (identical(
+                    other.transmissionDataTrigger, transmissionDataTrigger) ||
+                other.transmissionDataTrigger == transmissionDataTrigger) &&
             (identical(other.transmissionData, transmissionData) ||
                 other.transmissionData == transmissionData));
   }
@@ -226,34 +258,42 @@ class _$BtClassicSettingsImpl implements _BtClassicSettings {
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      const DeepCollectionEquality().hash(_ackTriggerStrings),
+      title,
+      callback,
+      const DeepCollectionEquality().hash(_ackTriggers),
       ackString,
       eotString,
       dataLength,
-      transmissionDataTriggerString,
+      transmissionDataTrigger,
       transmissionData);
 
-  /// Create a copy of BtClassicSettings
+  /// Create a copy of BehaviorSettings
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$BtClassicSettingsImplCopyWith<_$BtClassicSettingsImpl> get copyWith =>
-      __$$BtClassicSettingsImplCopyWithImpl<_$BtClassicSettingsImpl>(
+  _$$BehaviorSettingsImplCopyWith<_$BehaviorSettingsImpl> get copyWith =>
+      __$$BehaviorSettingsImplCopyWithImpl<_$BehaviorSettingsImpl>(
           this, _$identity);
 }
 
-abstract class _BtClassicSettings implements BtClassicSettings {
-  const factory _BtClassicSettings(
-      {final List<String>? ackTriggerStrings,
+abstract class _BehaviorSettings implements BehaviorSettings {
+  const factory _BehaviorSettings(
+      {final String? title,
+      final Uri? callback,
+      final List<String>? ackTriggers,
       final String? ackString,
       final String? eotString,
       final int? dataLength,
-      final String? transmissionDataTriggerString,
-      final String? transmissionData}) = _$BtClassicSettingsImpl;
+      final String? transmissionDataTrigger,
+      final String? transmissionData}) = _$BehaviorSettingsImpl;
 
   @override
-  List<String>? get ackTriggerStrings;
+  String? get title;
+  @override
+  Uri? get callback;
+  @override
+  List<String>? get ackTriggers;
   @override
   String? get ackString;
   @override
@@ -261,14 +301,14 @@ abstract class _BtClassicSettings implements BtClassicSettings {
   @override
   int? get dataLength;
   @override
-  String? get transmissionDataTriggerString;
+  String? get transmissionDataTrigger;
   @override
   String? get transmissionData;
 
-  /// Create a copy of BtClassicSettings
+  /// Create a copy of BehaviorSettings
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BtClassicSettingsImplCopyWith<_$BtClassicSettingsImpl> get copyWith =>
+  _$$BehaviorSettingsImplCopyWith<_$BehaviorSettingsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

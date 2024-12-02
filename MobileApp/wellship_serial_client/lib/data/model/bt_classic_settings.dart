@@ -7,11 +7,8 @@ final btClassicSettingsProvider = StateProvider<BtClassicSettings>((ref) => cons
 
 @freezed
 class BtClassicSettings with _$BtClassicSettings {
-  const factory BtClassicSettings(
-      {List<String>? ackTriggerStrings,
-      String? ackString,
-      String? eotString,
-      int? dataLength,
-      String? transmissionDataTriggerString,
-      String? transmissionData}) = _BtClassicSettings;
+  const factory BtClassicSettings({
+    String? deviceName,
+    String? address,
+  }) = _BtClassicSettings;
 }

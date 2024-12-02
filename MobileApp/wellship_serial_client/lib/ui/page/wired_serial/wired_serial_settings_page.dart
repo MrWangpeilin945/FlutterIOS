@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wellship_serial_client/data/enum/parity.dart';
 import 'package:wellship_serial_client/data/enum/stop_bits.dart';
-import 'package:wellship_serial_client/data/provider/wired_settings.dart';
+import 'package:wellship_serial_client/data/model/wired_settings.dart';
 import 'package:wellship_serial_client/ui/route/app_route.dart';
 import 'package:wellship_serial_client/ui/route/app_route.gr.dart';
 
