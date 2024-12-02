@@ -1,6 +1,4 @@
 ﻿import 'dart:convert';
-import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +7,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:typed_data/typed_buffers.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:usb_serial/usb_serial.dart';
 import 'package:wellship_serial_client/data/model/behavior_settings.dart';
 import 'package:wellship_serial_client/data/provider/bt_classic_devices_provider.dart';
 import 'package:wellship_serial_client/data/model/bt_classic_settings.dart';
@@ -31,7 +28,6 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
     final connection = useState<BluetoothConnection?>(null);
     final text = useState<String>("");
     useEffect(() {
-      printSomething('s', 1);
       return null;
     }, []);
 
@@ -50,21 +46,20 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
         conn.input!.listen((data) async {
           buffer.addAll(data);
           text.value = utf8.decode(buffer);
-          // ACK判定（ackTriggers, ackString）
+          // TODO ACK判定（ackTriggers, ackString）
           if (behaviorSettings.ackString != null && behaviorSettings.ackTriggers?.isNotEmpty == true) {
             final ackString = behaviorSettings.ackString ?? "";
           }
-          // 停止判定（dataLength）
-
-          // 停止判定（eotString）
-          if (buffer.length > 40) {
-            if (!aborting) {
-              aborting = true;
-              final b = base64UrlEncode(buffer);
-              // TODO queryParameter.callbackを確認
-              connection.value?.dispose();
-              await launchUrl(Uri.parse('http://10.167.2.216/query-receiver.html?value=$b'),
-                  mode: LaunchMode.externalApplication);
+          // 停止判定
+          if (!aborting && shouldAbort(buffer, behaviorSettings)) {
+            aborting = true;
+            connection.value?.dispose();
+            final b = base64UrlEncode(buffer);
+            final callback = behaviorSettings.callback;
+            if (callback != null) {
+              final result = {"value": b};
+              final uri = callback.replace(queryParameters: result..addAll(callback.queryParameters));
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
             }
           }
         });
@@ -92,5 +87,15 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
     );
   }
 
-  void printSomething(String s, int i) {}
+  bool shouldAbort(Uint8Buffer buffer, BehaviorSettings behaviorSettings) {
+    final dataLength = behaviorSettings.dataLength;
+    if (dataLength != null && buffer.length >= dataLength) {
+      return true;
+    }
+    final eotString = behaviorSettings.eotString;
+    if (eotString != null && utf8.decode(buffer).contains(eotString)) {
+      return true;
+    }
+    return false;
+  }
 }

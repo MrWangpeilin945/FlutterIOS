@@ -7,6 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:typed_data/typed_buffers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:usb_serial/usb_serial.dart';
+import 'package:wellship_serial_client/data/model/behavior_settings.dart';
 import 'package:wellship_serial_client/data/provider/wired_devices_provider.dart';
 import 'package:wellship_serial_client/data/model/wired_settings.dart';
 
@@ -19,6 +20,7 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
     final deviceStream = ref.watch(wiredDevicesProvider);
     final firstDevice = deviceStream.value?.firstOrNull;
     final serialSettings = ref.read(wiredSettingsProvider);
+    final behaviorSettings = ref.read(behaviorSettingsProvider);
 
     final error = useState<String>("");
     final usbPort = useState<UsbPort?>(null);
@@ -53,13 +55,15 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
           // TODO ACK判定（ackTriggers, ackString）
           // TODO 停止判定（dataLength）
           // TODO 停止判定（eotString）
-          if (buffer.length > 40) {
-            if (!aborting) {
-              aborting = true;
-              final b = base64UrlEncode(buffer);
-              // TODO queryParameter.callbackを確認
-              await launchUrl(Uri.parse('http://10.167.2.216/query-receiver.html?value=$b'),
-                  mode: LaunchMode.externalApplication);
+          // 停止判定
+          if (!aborting && shouldAbort(buffer, behaviorSettings)) {
+            aborting = true;
+            final b = base64UrlEncode(buffer);
+            final callback = behaviorSettings.callback;
+            if (callback != null) {
+              final result = {"value": b};
+              final uri = callback.replace(queryParameters: result..addAll(callback.queryParameters));
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
             }
           }
         });
@@ -82,5 +86,17 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
         ]),
       ),
     );
+  }
+
+  bool shouldAbort(Uint8Buffer buffer, BehaviorSettings behaviorSettings) {
+    final dataLength = behaviorSettings.dataLength;
+    if (dataLength != null && buffer.length >= dataLength) {
+      return true;
+    }
+    final eotString = behaviorSettings.eotString;
+    if (eotString != null && utf8.decode(buffer).contains(eotString)) {
+      return true;
+    }
+    return false;
   }
 }

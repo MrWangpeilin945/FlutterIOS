@@ -3,7 +3,6 @@ import 'package:wellship_serial_client/data/enum/parity.dart';
 import 'package:wellship_serial_client/data/enum/stop_bits.dart';
 import 'package:wellship_serial_client/data/enum/trans_method.dart';
 import 'package:wellship_serial_client/data/model/behavior_settings.dart';
-import 'package:wellship_serial_client/data/model/bt_classic_settings.dart';
 import 'package:wellship_serial_client/data/model/wired_settings.dart';
 
 part 'app_settings.freezed.dart';
