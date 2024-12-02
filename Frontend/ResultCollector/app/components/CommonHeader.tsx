@@ -1,8 +1,7 @@
-import { Box, Button, Center, Dialog, Flex, Title } from "@mantine/core";
+import { Box, Button, Center, Dialog, Flex, Text } from "@mantine/core";
 import { useClickOutside, useDisclosure } from "@mantine/hooks";
 import { useNavigate } from "@remix-run/react";
 import { IconHomeFilled, IconUserFilled } from "@tabler/icons-react";
-import styles from "~/styles/common.module.css";
 
 type HeaderProps = {
   screenName: string;
@@ -17,50 +16,82 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
   const closeMenu = useClickOutside(hide);
 
   return (
-    <Box className={styles["basic-green"]} py="15">
-      <Flex justify="space-between" align="center" px="md">
+    <Box h={67} bg="primary" c="white01" pt={8} pb={8} pl={24} pr={24}>
+      <Flex justify="space-between" align="center">
         {/* ユーザアイコン */}
-        <Button className={styles["reverse-green-button"]} onClick={toggle}>
-          <IconUserFilled size={"2.3rem"} />
+        <Button
+          bg="white01"
+          c="primary"
+          h="auto"
+          pt={8}
+          pb={8}
+          pl={32}
+          pr={32}
+          radius={48}
+          onClick={toggle}
+        >
+          <IconUserFilled size={"24"} />
         </Button>
 
         {/* 画面名 */}
         <Center>
-          <Title order={1} c="white" fw={550}>
+          <Text size="lg" fw={700} c="white01" ta="center">
             {screenName}
-          </Title>
+          </Text>
         </Center>
 
         {/* ホームボタン */}
         <Button
-          className={styles["reverse-green-button"]}
-          leftSection={<IconHomeFilled size={"1.7rem"} />}
-          w={150}
+          bg="white01"
+          c="primary"
+          h="auto"
+          pt={8}
+          pb={8}
+          pl={32}
+          pr={32}
+          radius={48}
           onClick={() => navigate("/home")}
         >
-          ホーム
+          <IconHomeFilled size={"24"} />
+          <Text size="xs" fw={700} c="primary" pl={10}>
+            ホーム
+          </Text>
         </Button>
       </Flex>
       <div ref={closeMenu}>
         <Dialog
           opened={opened}
-          title=""
-          position={{ top: 50, left: 10 }}
+          position={{ top: 67, left: 0 }}
           onClose={hide}
-          w={200}
+          w="auto"
+          h={174}
+          p={32}
+          style={{ borderBottomLeftRadius: 8, borderBottomRightRadius: 8 }}
+          bg="white01"
         >
-          {staffName}
-          {/* ログアウトボタン */}
-          <Button
-            className={styles[""]}
-            color="grey"
-            variant="outline"
-            w={150}
-            radius="ms"
-            onClick={() => navigate("/login")}
-          >
-            ログアウト
-          </Button>
+          <Box>
+            <Text size="xs" c="black01" pb={24}>
+              {staffName}
+            </Text>
+            {/* ログアウトボタン */}
+            <Button
+              h="auto"
+              bg="white01"
+              c="primary"
+              variant="outline"
+              style={{ borderWidth: 2 }}
+              pt={8}
+              pb={8}
+              pl={32}
+              pr={32}
+              radius={48}
+              onClick={() => navigate("/login")}
+            >
+              <Text size="xs" fw={700} c="primary">
+                ログアウト
+              </Text>
+            </Button>
+          </Box>
         </Dialog>
       </div>
     </Box>
