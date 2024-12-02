@@ -45,35 +45,41 @@ export default function ExamSelectLR({
 
   const handleErrorMessage = () => {
     const initialMessages = examItems.examRegistResults || [];
-    let updatedMessages = [...initialMessages];
+    let updatedMessages: ExamRegistResult[] = [...initialMessages];
 
-    // 必須チェック用エラーメッセージ
-    const errorMessage: ExamRegistResult = {
-      description: getErrorMessage(
-        errorMessages.required,
-        `${examItems.name}は`,
-      ),
-      errorLevel: InputErrorLevel.異常,
-    };
+    examItemDetails.forEach((detail, index) => {
+      // 必須用エラーメッセージ
+      const errorMessage: ExamRegistResult = {
+        description: getErrorMessage(
+          errorMessages.required,
+          `${detail.name}は`, // 各 ExamItemDetail.name を使用
+        ),
+        errorLevel: InputErrorLevel.異常,
+      };
 
-    // 空の選択肢があるかどうかチェック
-    const hasEmptyValue = selectedValues.some((value) => value === "");
-
-    if (onRegisterPressed === true && hasEmptyValue) {
-      // 空の値がある場合、エラーメッセージを追加
-      if (
-        !updatedMessages.some(
-          (msg) => msg.description === errorMessage.description,
-        )
-      ) {
-        updatedMessages.push(errorMessage);
+      // 必須チェック: value が空ならエラーを追加
+      if (onRegisterPressed && !selectedValues[index]) {
+        // 同じエラーメッセージがない場合のみ追加
+        if (
+          !updatedMessages.some(
+            (msg) => msg.description === errorMessage.description,
+          )
+        ) {
+          updatedMessages.push(errorMessage);
+        }
       }
-    } else {
-      // 空の値がない場合、エラーメッセージを削除
-      updatedMessages = updatedMessages.filter(
-        (msg) => msg.description !== errorMessage.description,
-      );
-    }
+    });
+
+    // 既存メッセージから不要なものを削除
+    updatedMessages = updatedMessages.filter(
+      (msg) =>
+        !examItemDetails.some(
+          (detail, index) =>
+            msg.description ===
+              getErrorMessage(errorMessages.required, `${detail.name}は`) &&
+            selectedValues[index] !== "",
+        ),
+    );
 
     // エラーメッセージをソート
     updatedMessages.sort((a, b) => (b.errorLevel ?? 0) - (a.errorLevel ?? 0));
@@ -87,6 +93,7 @@ export default function ExamSelectLR({
     selectedValues,
   ]);
 
+  // 選択ボタン押下時
   const onSelect = (selector: ExamItemDetailOption, index: number) => {
     setSelectedValues((prevSelected) => {
       const updatedSelected = [...prevSelected];
@@ -108,7 +115,7 @@ export default function ExamSelectLR({
 
     // onClickで更新されたexamItemsを渡す
     onClick(updatedExamItems);
-  }, [selectedValues, examItems, examItemDetails, onClick]);
+  }, [selectedValues]);
 
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
@@ -140,7 +147,7 @@ export default function ExamSelectLR({
                 </Text>
               </Center>
             </Paper>
-            <Text ml="auto" fw={700} style={{ marginTop: 0, marginBottom: 0 }}>
+            <Text ml="auto" fw={700}>
               (前回：{detail.prevValue})
             </Text>
             <Stack key={index}>
