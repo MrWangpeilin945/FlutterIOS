@@ -49,7 +49,7 @@ export default function ExamSelect({
       errorLevel: InputErrorLevel.異常,
     };
 
-    if (onRegisterPressed === true && selected === "") {
+    if (onRegisterPressed && selected === "") {
       //メッセージを追加
       updatedMessages.push(errorMessage);
     } else {
