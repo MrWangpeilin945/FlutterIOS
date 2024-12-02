@@ -1,9 +1,10 @@
 import {
+  Box,
   Button,
+  Center,
   Container,
   Flex,
   LoadingOverlay,
-  Space,
   Text,
   Title,
 } from "@mantine/core";
@@ -122,41 +123,58 @@ export default function ExamMenuSelect() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="検査メニュー" staffName={staff?.name || ""} />
-        <Container fluid mt={20}>
+        <Container fluid bg="background" pt={32}>
           {!isFetching && (
             <>
               {examMenuList?.examMenus ? (
-                <Flex columnGap={5} rowGap={3} wrap="wrap">
-                  {examMenuList?.examMenus?.map((examMenu) => (
-                    <Button
-                      variant="outline"
-                      bg={
-                        getSelectedIndex(examMenu.examMenuId) >= 0
-                          ? "green03"
-                          : "white"
-                      }
-                      color={
-                        getSelectedIndex(examMenu.examMenuId) >= 0
-                          ? "primary"
-                          : "gray02"
-                      }
-                      w={300}
-                      key={examMenu.examMenuId}
-                      onClick={() => handleMenuButtonClick(examMenu.examMenuId)}
-                    >
-                      <Flex gap={5} wrap="nowrap" align="center">
-                        <Text w={30} fw={500} color="primary">
-                          {(() => {
-                            const index = getSelectedIndex(examMenu.examMenuId);
-                            return index >= 0 ? <>{index + 1}</> : null;
-                          })()}
+                <Center>
+                  <Flex w={1008} columnGap={24} rowGap={16} wrap="wrap">
+                    {examMenuList?.examMenus?.map((examMenu) => (
+                      <Button
+                        variant="outline"
+                        bg={
+                          getSelectedIndex(examMenu.examMenuId) >= 0
+                            ? "green03"
+                            : "white01"
+                        }
+                        color={
+                          getSelectedIndex(examMenu.examMenuId) >= 0
+                            ? "primary"
+                            : "gray03"
+                        }
+                        w={320}
+                        h={78}
+                        style={{ borderWidth: 2 }}
+                        key={examMenu.examMenuId}
+                        onClick={() =>
+                          handleMenuButtonClick(examMenu.examMenuId)
+                        }
+                      >
+                        {(() => {
+                          const index = getSelectedIndex(examMenu.examMenuId);
+                          return index >= 0 ? (
+                            <>
+                              <Text size="xl" fw={700} c="primary" pr={10}>
+                                {index + 1}
+                              </Text>
+                            </>
+                          ) : null;
+                        })()}
+                        <Text
+                          size="xl"
+                          fw={700}
+                          c={
+                            getSelectedIndex(examMenu.examMenuId) >= 0
+                              ? "primary"
+                              : "black01"
+                          }
+                        >
+                          {examMenu.examMenuName?.slice(0, 8)}
                         </Text>
-                        {examMenu.examMenuName?.slice(0, 8)}
-                        <Space w={30} />
-                      </Flex>
-                    </Button>
-                  ))}
-                </Flex>
+                      </Button>
+                    ))}
+                  </Flex>
+                </Center>
               ) : (
                 <>
                   {/* エラーメッセージを表示(検査メニュー情報の取得データが0件だった場合) */}
@@ -168,9 +186,20 @@ export default function ExamMenuSelect() {
                   </Title>
                 </>
               )}
-              <Space h={20} />
-              <Button onClick={() => callbackConfirm()}>開始する</Button>
-              <Space h={50} />
+              <Center>
+                <Box w={1008} ta="center" pt={80}>
+                  <Button
+                    w={860}
+                    h={75}
+                    bg="primary"
+                    onClick={() => callbackConfirm()}
+                  >
+                    <Text size="lg" fw={700} c={"white01"}>
+                      開始する
+                    </Text>
+                  </Button>
+                </Box>
+              </Center>
               <CommonDialog
                 message={errorMessage || ""}
                 buttonMessage="閉じる"
