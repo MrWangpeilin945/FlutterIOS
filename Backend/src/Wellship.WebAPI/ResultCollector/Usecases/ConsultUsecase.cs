@@ -1,4 +1,5 @@
 using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
@@ -10,14 +11,17 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 public class ConsultUsecase : IConsultUsecase
 {
     private readonly IConsultRepository _consultRepository;
+    private readonly IExamineeRepository _examineeRepository;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="consultRepository">受診リポジトリ</param>
-    public ConsultUsecase(IConsultRepository consultRepository)
+    /// <param name="examineeRepository">受診者リポジトリ</param>
+    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository)
     {
         _consultRepository = consultRepository;
+        _examineeRepository = examineeRepository;
     }
 
     /// <summary>
@@ -37,11 +41,45 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 未受診の検査項目を取得する
+    /// 未受診の検査メニューを取得する
     /// </summary>
-    public void GetUnexaminedItems()
+    public async Task<UnexaminedMenuList> GetUnexaminedMenusAsync(string consultNumber)
     {
+        // 受診単位に紐づく未受診の検査項目を取得する
+        // 検査項目明細単位の依頼に対して、検査結果あるいは検査中止のレコードが存在すれば受診済みとする
+        // 未受診の検査項目明細が1つ以上存在する検査メニューを「未受診の検査メニュー」として返す
 
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
+
+        // 未受診の検査メニューを取得する
+        var unexaminedConsults = await _consultRepository.GetUnexaminedConsultsAsync([consult.ConsultNumber]);
+
+        // 未受診の検査メニューがない受診の場合は、空リストを返す
+        if (!unexaminedConsults.Any())
+        {
+            return new UnexaminedMenuList()
+            {
+                ConsultId = consult.ConsultId,
+                ExamineeId = examinee.ExamineeId,
+                ExamineeName = examinee.Name,
+                UnexaminedMenus = []
+            };
+        }
+
+        // 未受診項目がある受診の場合は、検査メニュー単位の未受診リストを返す
+        var unexaminedConsult = unexaminedConsults.Single();
+        return new UnexaminedMenuList()
+        {
+            ConsultId = unexaminedConsult.ConsultId,
+            ExamineeId = examinee.ExamineeId,
+            ExamineeName = examinee.Name,
+            UnexaminedMenus = unexaminedConsult.UnexaminedExamMenus.Select(x => new ExamMenu()
+            {
+                ExamMenuId = x.ExamMenuId,
+                ExamMenuName = x.ExamMenuName
+            }).ToArray()
+        };
     }
 
     /// <summary>
