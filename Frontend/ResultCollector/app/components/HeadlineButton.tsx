@@ -1,4 +1,5 @@
-import { Button, Group, Text, Title } from "@mantine/core";
+import { Box, Button, Group, Text } from "@mantine/core";
+import styles from "~/styles/common.module.css";
 
 interface HeadlineButtonProps {
   title: string;
@@ -17,23 +18,42 @@ export default function HeadlineButton({
     <Group>
       <Button
         fullWidth
+        h="auto"
+        style={{ borderWidth: 2 }}
+        radius={24}
+        bg={selected ? "green03" : "white01"}
+        color={selected ? "primary" : "gray03"}
+        pt={16}
+        pb={16}
+        pl={32}
+        pr={32}
         variant="outline"
-        color={selected ? "lime.4" : "rgba(0, 0, 0, 1)"} // TODO：見出しボタンの背景色を変更
-        radius="md"
         justify="flex-start"
-        h={(elements ? elements.length + 1 : 1) * 30 + 50}
-        m={5}
-        py="xs"
         onClick={onClick}
       >
-        <div>
-          <Title order={1}>【{title}】</Title>
+        <Box>
+          <Text
+            className={styles["text-multiline"]}
+            size="md"
+            fw={700}
+            c={selected ? "primary" : "black"}
+            ta="left"
+          >
+            {title}
+          </Text>
           {elements?.map((elem, index) => (
-            <Text key={index} size="lg" fw={700}>
+            <Text
+              className={styles["text-multiline"]}
+              key={index}
+              size="sm"
+              c={selected ? "primary" : "black"}
+              pt={index === 0 ? 16 : 8}
+              ta="left"
+            >
               {elem}
             </Text>
           ))}
-        </div>
+        </Box>
       </Button>
     </Group>
   );
