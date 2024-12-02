@@ -71,7 +71,7 @@ Index==2,login_id
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241115112751
+ModifiedDateTime=20241127145942
 Position="MAIN",100,600
 ZOrder=1
 
@@ -599,11 +599,11 @@ Field="検査項目ID","exam_item_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査項目名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目グループID","exam_item_group_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="配置番号","position_number","integer","NOT NULL",,"","",$FFFFFFFF,""
-Field="単位","unit","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="単位","unit","text",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241113142043
+ModifiedDateTime=20241128113002
 Position="MAIN",2300,1500
 ZOrder=32
 
@@ -698,7 +698,7 @@ Comment=
 TableInnerOption=
 TableOption=
 Page=MAIN
-Left=1650
+Left=1600
 Top=1550
 Field="中止理由ID","cancel_reason_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="中止理由名","name","text","NOT NULL",,"","",$FFFFFFFF,""
@@ -708,7 +708,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241112170927
-Position="MAIN",1650,1550,540,119
+Position="MAIN",1600,1550,540,119
 ZOrder=37
 
 [Relation]
@@ -799,26 +799,27 @@ TermPos2=R
 ZOrder=41
 
 [Entity]
-PName=exam_item_orders
-LName=検査項目依頼
+PName=exam_item_notes
+LName=検査項目特記
 Comment=
 TableInnerOption=
 TableOption=
 Page=MAIN
 Left=1600
 Top=2450
-Field="検査項目ID","exam_item_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
 Field="受診ID","consult_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="検査項目ID","exam_item_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="特記事項","note","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241015170539
+ModifiedDateTime=20241127145609
 Position="MAIN",1600,2450
 ZOrder=43
 
 [Relation]
 Entity1=consult
-Entity2=exam_item_orders
+Entity2=exam_item_notes
 RelationType1=2
 RelationType2=3
 Fields1=consult_id
@@ -894,23 +895,22 @@ Width=664
 Height=115
 
 [Entity]
-PName=exam_item_cancels
-LName=検査項目中止
+PName=exam_cancels
+LName=検査中止
 Comment=
 TableInnerOption=
 TableOption=
 Page=MAIN
-Left=1100
-Top=1750
+Left=1050
+Top=1850
 Field="受診ID","consult_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
-Field="検査項目ID","exam_item_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
 Field="中止理由","cancel_reason_id","integer","NOT NULL",,"","",$FFFFFFFF,""
-Field="中止日時","cancel_timestamp","timestamp with time zone","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241017094530
-Position="MAIN",1100,1750,445,134
+ModifiedDateTime=20241127145124
+Position="MAIN",1050,1850,445,97
 ZOrder=51
 
 [Entity]
@@ -923,36 +923,14 @@ Page=MAIN
 Left=900
 Top=2400
 Field="受診ID","consult_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
-Field="検査項目ID","exam_item_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
-Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",2,"","",$FFFFFFFF,""
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
 Field="値","value","text",,,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241111165220
+ModifiedDateTime=20241127144933
 Position="MAIN",900,2400
 ZOrder=52
-
-[Relation]
-Entity1=consult
-Entity2=exam_results
-RelationType1=2
-RelationType2=3
-Fields1=consult_id
-Fields2=consult_id
-Cardinarity1=
-Cardinarity2=
-Position="MAIN",0,3095,6905,3249,R,R,""
-Dependence=1
-Caption=
-PName=
-LineMode=0
-Bar1=310
-Bar2=690
-Bar3=325
-TermPos1=R
-TermPos2=R
-ZOrder=53
 
 [Relation]
 Entity1=exam_menus
@@ -1066,13 +1044,12 @@ Left=900
 Top=2650
 Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="受診ID","consult_id","integer","NOT NULL",,"","",$FFFFFFFF,""
-Field="検査項目ID","exam_item_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目明細ID","consult_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="値","value","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241125124814
+ModifiedDateTime=20241127145031
 Position="MAIN",900,2650
 ZOrder=60
 
@@ -1237,7 +1214,7 @@ Height=165
 
 [Relation]
 Entity1=cancel_reasons
-Entity2=exam_item_cancels
+Entity2=exam_cancels
 RelationType1=2
 RelationType2=3
 Fields1=cancel_reason_id
@@ -1258,7 +1235,7 @@ ZOrder=73
 
 [Relation]
 Entity1=consult
-Entity2=exam_item_cancels
+Entity2=exam_cancels
 RelationType1=2
 RelationType2=3
 Fields1=consult_id
@@ -1324,7 +1301,7 @@ LName=検査結果出力履歴明細
 Comment=
 TableInnerOption=
 TableOption=
-Page=Main
+Page=MAIN
 Left=3200
 Top=2750
 Field="ID","id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
@@ -1333,7 +1310,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241126183112
-Position="Main",3200,2750
+Position="MAIN",3200,2750
 ZOrder=78
 
 [Relation]
@@ -1357,3 +1334,44 @@ Bar3=608
 TermPos1=R
 TermPos2=R
 ZOrder=79
+
+[Relation]
+Entity1=consult
+Entity2=exam_results
+RelationType1=2
+RelationType2=3
+Fields1=consult_id
+Fields2=consult_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,3672,6328,3597,R,R,""
+Dependence=1
+Caption=
+PName=
+LineMode=0
+Bar1=367
+Bar2=633
+Bar3=360
+TermPos1=R
+TermPos2=R
+ZOrder=80
+
+[Entity]
+PName=exam_cancel_histories
+LName=検査中止履歴
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=300
+Top=2650
+Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
+Field="受診ID","consult_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査項目明細ID","consult_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="値","value","text","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241127145426
+Position="MAIN",300,2650
+ZOrder=81

@@ -44,17 +44,18 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 未受診の検査項目を取得する
+    /// 未受診の検査メニューを取得する
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UnexaminedItemList))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UnexaminedMenuList))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
-    [Route("api/v{version:apiVersion}/consult/{consultNumber}/unexaminedItems")]
-    public IActionResult GetUnexaminedItems([FromRoute][Required] string consultNumber)
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/unexaminedMenus")]
+    public async Task<IActionResult> GetUnexaminedMenus([FromRoute][Required] string consultNumber)
     {
-        return Ok();
+        var results = await _consultUsecase.GetUnexaminedMenusAsync(consultNumber);
+        return Ok(results);
     }
 
     /// <summary>

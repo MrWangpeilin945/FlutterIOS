@@ -60,17 +60,24 @@ INSERT INTO exam_menus(exam_menu_id,name,order_number,created_at,created_by) VAL
 
 -- 検査項目グループ
 INSERT INTO exam_item_groups(exam_item_group_id,name,exam_menu_id,type,created_at,created_by) VALUES 
-    (1,'身体計測',1,1,CURRENT_TIMESTAMP,'init');
+    (1,'身体計測',1,1,CURRENT_TIMESTAMP,'init')
+  , (7,'血圧',7,7,CURRENT_TIMESTAMP,'init');
 
 -- 検査項目
 INSERT INTO exam_items(exam_item_id,name,exam_item_group_id,position_number,unit,created_at,created_by) VALUES 
     (1,'身長',1,1,'cm',CURRENT_TIMESTAMP,'init')
-  , (2,'体重',1,1,'kg',CURRENT_TIMESTAMP,'init');
+  , (2,'体重',1,1,'kg',CURRENT_TIMESTAMP,'init')
+  , (71,'血圧1',7,1,null,CURRENT_TIMESTAMP,'init')
+  , (72,'血圧2',7,2,null,CURRENT_TIMESTAMP,'init');
 
 -- 検査項目明細
 INSERT INTO exam_item_details(exam_item_detail_id,exam_item_id,set_previous_as_default,position_number,keyboard_type,created_at,created_by) VALUES 
     (1,1,False,1,0,CURRENT_TIMESTAMP,'init')
-  , (2,2,False,1,0,CURRENT_TIMESTAMP,'init');
+  , (2,2,False,1,0,CURRENT_TIMESTAMP,'init')
+  , (711,71,False,1,0,CURRENT_TIMESTAMP,'init')
+  , (712,71,False,2,0,CURRENT_TIMESTAMP,'init')
+  , (721,72,False,1,0,CURRENT_TIMESTAMP,'init')
+  , (722,72,False,2,0,CURRENT_TIMESTAMP,'init');
 
 
 -- ホームメニューグループ
@@ -87,7 +94,7 @@ INSERT INTO home_menus(home_menu_id,name,home_menu_group_id,order_number,path,cr
   , (5,'検査結果出力履歴',2,3,'examresult-export-history',CURRENT_TIMESTAMP,'init');
 
 -- 受診
-INSERT INTO resultcollector.consult(consult_id,consult_number,progress_status,export_status,place_schedule_id,examinee_id,created_at,created_by) VALUES 
+INSERT INTO consult(consult_id,consult_number,progress_status,export_status,place_schedule_id,examinee_id,created_at,created_by) VALUES 
     (1,'0001',11,11,2,2,CURRENT_TIMESTAMP,'init')
   , (2,'0002',41,11,2,12,CURRENT_TIMESTAMP,'init')
   , (3,'0003',51,11,1,18,CURRENT_TIMESTAMP,'init')
@@ -100,7 +107,7 @@ INSERT INTO roles(role_id,name,created_at,created_by) VALUES
   , (20,'管理者',CURRENT_TIMESTAMP,'init');
 
 -- 職員
-INSERT INTO resultcollector.staffs(staff_id,staff_code,login_id,name,password_hash,password_salt,enabled,role_id,created_at,created_by) VALUES 
+INSERT INTO staffs(staff_id,staff_code,login_id,name,password_hash,password_salt,enabled,role_id,created_at,created_by) VALUES 
     (1,'S001','S001','職員A',DECODE('cndlYnJ0MzU2Nzh0ZXNuZXNydHNlbXRhM3c0YW0zNGF3NG1hdzM0bWE0cWEzNG1yNzg=', 'base64'),DECODE('d3JhT1VZSVJUVDRFNXJld3J0', 'base64'),True,10,CURRENT_TIMESTAMP,'init')
   , (2,'S002','S002','職員B',DECODE('bWh0anV1ZHI1dXlzZXJ5', 'base64'),DECODE('ZXdiNWFxMzRyYmdlbnN5cmVtc2VyeQ==', 'base64'),True,20,CURRENT_TIMESTAMP,'init');
 
@@ -122,16 +129,79 @@ INSERT INTO equipments(equipment_id,name,exam_menu_id,app_launch_url,processing_
   , (5,'EQ005',5,'wsc://abcde','https://example.com/sctipts/eq005.js',CURRENT_TIMESTAMP,'init');
 
 -- 検査結果出力履歴
-INSERT INTO resultcollector.export_histories(id, place_schedule_id,exported_at,exported_by,created_at,created_by) VALUES 
+INSERT INTO export_histories(id, place_schedule_id,exported_at,exported_by,created_at,created_by) VALUES 
     ('af0971a0-186f-4b14-86a1-0c648d77c9af',2,TIMESTAMP '2024-11-25 12:57:15.506','職員B',CURRENT_TIMESTAMP,'init')
   , ('41293e22-4290-4f85-9179-9affda055cdd',3,TIMESTAMP '2024-10-22 20:00:00.000','職員A',CURRENT_TIMESTAMP,'init')
   , ('b53cc211-1b6a-4d20-8bb0-3c2a007661c6',1,TIMESTAMP '2024-10-03 13:20:00.000','職員B',CURRENT_TIMESTAMP,'init')
   , ('8f2edd5a-9ad3-4445-96a8-1b2129f60929',1,TIMESTAMP '2023-02-25 09:24:000.000','職員A',CURRENT_TIMESTAMP,'init');
 
 -- 検査結果出力履歴明細
-INSERT INTO resultcollector.export_history_details(id,consult_id,created_at,created_by) VALUES 
+INSERT INTO export_history_details(id,consult_id,created_at,created_by) VALUES 
     ('af0971a0-186f-4b14-86a1-0c648d77c9af',1,CURRENT_TIMESTAMP,'init')
   , ('af0971a0-186f-4b14-86a1-0c648d77c9af',2,CURRENT_TIMESTAMP,'init')
   , ('af0971a0-186f-4b14-86a1-0c648d77c9af',4,CURRENT_TIMESTAMP,'init')
   , ('b53cc211-1b6a-4d20-8bb0-3c2a007661c6',3,CURRENT_TIMESTAMP,'init')
   , ('8f2edd5a-9ad3-4445-96a8-1b2129f60929',5,CURRENT_TIMESTAMP,'init');
+
+-- 検査項目明細依頼
+INSERT INTO exam_item_detail_orders(consult_id,exam_item_detail_id,created_at,created_by) VALUES 
+    (1,1,CURRENT_TIMESTAMP,'init')
+  , (1,2,CURRENT_TIMESTAMP,'init')
+  , (1,711,CURRENT_TIMESTAMP,'init')
+  , (1,712,CURRENT_TIMESTAMP,'init')
+  , (1,721,CURRENT_TIMESTAMP,'init')
+  , (1,722,CURRENT_TIMESTAMP,'init')
+  , (2,1,CURRENT_TIMESTAMP,'init')
+  , (2,2,CURRENT_TIMESTAMP,'init')
+  , (2,711,CURRENT_TIMESTAMP,'init')
+  , (2,712,CURRENT_TIMESTAMP,'init')
+  , (2,721,CURRENT_TIMESTAMP,'init')
+  , (2,722,CURRENT_TIMESTAMP,'init')
+  , (3,1,CURRENT_TIMESTAMP,'init')
+  , (3,2,CURRENT_TIMESTAMP,'init')
+  , (3,711,CURRENT_TIMESTAMP,'init')
+  , (3,712,CURRENT_TIMESTAMP,'init')
+  , (4,1,CURRENT_TIMESTAMP,'init')
+  , (4,2,CURRENT_TIMESTAMP,'init')
+  , (4,711,CURRENT_TIMESTAMP,'init')
+  , (4,712,CURRENT_TIMESTAMP,'init')
+  , (4,721,CURRENT_TIMESTAMP,'init')
+  , (4,722,CURRENT_TIMESTAMP,'init');
+
+-- 中止理由
+INSERT INTO cancel_reasons(cancel_reason_id,name,exam_item_id,order_number,created_at,created_by) VALUES 
+    (1,'1_身体的理由',1,1,CURRENT_TIMESTAMP,'init')
+  , (2,'2_身体的理由',2,1,CURRENT_TIMESTAMP,'init')
+  , (3,'71_理由A',71,2,CURRENT_TIMESTAMP,'init')
+  , (4,'71_理由B',71,2,CURRENT_TIMESTAMP,'init')
+  , (5,'71_理由C',71,2,CURRENT_TIMESTAMP,'init')
+  , (6,'71_理由D',71,2,CURRENT_TIMESTAMP,'init')
+  , (7,'72_理由A',72,2,CURRENT_TIMESTAMP,'init')
+  , (8,'72_理由B',72,2,CURRENT_TIMESTAMP,'init')
+  , (9,'72_理由C',72,2,CURRENT_TIMESTAMP,'init')
+  , (10,'72_理由D',72,3,CURRENT_TIMESTAMP,'init');
+
+-- 検査結果
+INSERT INTO exam_results(consult_id,exam_item_detail_id,value,created_at,created_by) VALUES 
+    (1,1,'178',CURRENT_TIMESTAMP,'init')
+  , (1,2,'70',CURRENT_TIMESTAMP,'init')
+  , (1,711,'72',CURRENT_TIMESTAMP,'init')
+  , (1,712,'98',CURRENT_TIMESTAMP,'init')
+  , (1,721,'70',CURRENT_TIMESTAMP,'init')
+  , (1,722,'100',CURRENT_TIMESTAMP,'init')
+  , (2,1,'160',CURRENT_TIMESTAMP,'init')
+  , (2,711,'72',CURRENT_TIMESTAMP,'init')
+  , (2,721,'70',CURRENT_TIMESTAMP,'init')
+  , (2,722,'100',CURRENT_TIMESTAMP,'init')
+  , (3,1,'180',CURRENT_TIMESTAMP,'init')
+  , (3,2,'90',CURRENT_TIMESTAMP,'init')
+  , (3,711,'92',CURRENT_TIMESTAMP,'init')
+  , (3,712,'128',CURRENT_TIMESTAMP,'init')
+  , (4,711,'92',CURRENT_TIMESTAMP,'init')
+  , (4,712,'128',CURRENT_TIMESTAMP,'init');
+
+-- 検査中止
+INSERT INTO exam_cancels(consult_id,exam_item_detail_id,cancel_reason_id,created_at,created_by) VALUES 
+    (4,1,1,CURRENT_TIMESTAMP,'init')
+  , (4,2,2,CURRENT_TIMESTAMP,'init')
+  , (4,721,10,CURRENT_TIMESTAMP,'init');

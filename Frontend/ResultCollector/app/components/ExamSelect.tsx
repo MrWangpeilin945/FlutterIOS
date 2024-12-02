@@ -11,7 +11,7 @@ import { InputErrorLevel } from "~/domain/enums";
 
 type SelectProps = {
   examItems: InputExamItem;
-  onRegisterPressed: number;
+  onRegisterPressed: boolean;
   onClick: (updatedExamItem: InputExamItem | undefined) => void;
 };
 
@@ -49,7 +49,7 @@ export default function ExamSelect({
       errorLevel: InputErrorLevel.異常,
     };
 
-    if (onRegisterPressed === 1 && selected === "") {
+    if (onRegisterPressed && selected === "") {
       //メッセージを追加
       updatedMessages.push(errorMessage);
     } else {
