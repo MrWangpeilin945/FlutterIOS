@@ -16,7 +16,18 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
   const closeMenu = useClickOutside(hide);
 
   return (
-    <Box h={67} bg="primary" c="white01" pt={8} pb={8} pl={24} pr={24}>
+    <Box
+      h={67}
+      bg="primary"
+      c="white01"
+      pt={8}
+      pb={8}
+      pl={24}
+      pr={24}
+      pos="sticky"
+      top={0}
+      style={{ zIndex: 10 }}
+    >
       <Flex justify="space-between" align="center">
         {/* ユーザアイコン */}
         <Button
