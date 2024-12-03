@@ -37,20 +37,18 @@ export default function ExamNumeric({
   const [examValue, setExamValue] = useState(
     examItems.examItemDetails?.at(0)?.value || ""
   );
+  const [errMessages, setErrMessages] = useState<ExamRegistResult[]>();
   const closeKeyBoard = useClickOutside(() => setShowKeyboard(false));
   const handleConfirm: () => void = () => {
     setShowKeyboard(false);
   };
-  // APIのレスポンスがあればエラーメッセージの初期に設定
-  const [errMessages, setErrMessages] = useState<ExamRegistResult[]>();
-
-  // エラーメッセージの初期化
+  // APIのエラーメッセージの取得
   const getAPIErrorMessages = () => {
     const APIerror = examItems.examRegistResults || [];
     return APIerror || [];
   };
   // examItemsのrangesから、エラーレベルを取得して
-  // エラーメッセージを追加する。
+  // エラーメッセージを取得。
   const addErrorMessagesFromRanges = () => {
     const numericValue = Number.parseFloat(formatDecimalValue(examValue));
     const ranges = examItems.examItemDetails?.at(0)?.examNormalValueRanges;
