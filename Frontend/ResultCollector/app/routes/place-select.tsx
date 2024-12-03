@@ -1,4 +1,4 @@
-import { Container, LoadingOverlay, Stack, Title } from "@mantine/core";
+import { Container, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
@@ -89,11 +89,11 @@ export default function PlaceSelect() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="会場選択" staffName={staff?.name || ""} />
-        <Container fluid mt={20}>
+        <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
               {placesData?.placeSchedules ? (
-                <Stack>
+                <Stack gap={16}>
                   {placesData.placeSchedules.map((ps) => (
                     <HeadlineButton
                       key={ps.placeId}
@@ -115,9 +115,9 @@ export default function PlaceSelect() {
               ) : (
                 <>
                   {/* エラーメッセージを表示 */}
-                  <Title order={3}>
+                  <Text size="sm" c="black01">
                     {getErrorMessage(errorMessages.noData, "該当する会場")}
-                  </Title>
+                  </Text>
                 </>
               )}
               <CommonDialog
