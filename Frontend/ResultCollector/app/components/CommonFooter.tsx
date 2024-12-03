@@ -24,7 +24,13 @@ export default function CommonFooter({ items }: FooterProps) {
     <>
       {/*横並びにボタンを4つ配置*/}
       <Box>
-        <Grid w="100%" pos="fixed" bottom={0} gutter={{ base: 4 }}>
+        <Grid
+          w="100%"
+          pos="fixed"
+          bottom={0}
+          gutter={{ base: 4 }}
+          bg="background"
+        >
           {setItems?.map((item, index) => (
             <GridCol key={index} span={3}>
               <Button
