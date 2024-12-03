@@ -150,8 +150,8 @@ export default function ExamSelectLR({
                         w={524}
                         h={78}
                         variant="outline"
-                        bg={isSelected ? "green03" : "white"}
-                        color={isSelected ? "primary" : "gray02"}
+                        bg={isDisabled ? "gray03" : isSelected ? "green03" : "white"}
+                        color={isDisabled? "gray02": isSelected? "primary": "gray02"}
                         size="xl"
                         fw={700}
                         disabled={isDisabled}
