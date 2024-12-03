@@ -32,7 +32,7 @@ public class ExamItemDetail
     public required string Name { get; init; }
 
     /// <summary>
-    /// 検査実施するか
+    /// 検査依頼が存在するか
     /// </summary>
     [JsonPropertyName("hasOrder")]
     public required bool HasOrder { get; init; }
