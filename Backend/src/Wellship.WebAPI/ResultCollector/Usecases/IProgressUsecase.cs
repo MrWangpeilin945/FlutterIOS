@@ -8,7 +8,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 public interface IProgressUsecase
 {
     /// <summary>
-    /// 進捗状況を取得する
+    /// 会場日程IDを指定して進捗状況を取得する
     /// </summary>
-    public void GetProgress();
+    public Task<PlaceScheduleProgress> GetProgressAsync(int placeScheduleId);
 }

@@ -1,3 +1,5 @@
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 /// <summary>
@@ -5,4 +7,9 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 /// </summary>
 public interface IProgressRepository
 {
+
+    /// <summary>
+    /// 会場日程IDを指定して検査項目ごとの進捗状況を取得します。
+    /// </summary>
+    public Task<AggregatedProgress> GetAggregatedProgressAsync(int placeScheduleId);
 }
