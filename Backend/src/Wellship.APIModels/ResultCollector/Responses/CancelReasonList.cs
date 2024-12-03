@@ -8,17 +8,8 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class CancelReasonList
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public CancelReasonList(CancelReason[] cancelReasons)
-    {
-        CancelReasons = cancelReasons;
-    }
-
-    /// <summary>
     /// 中止理由リスト
     /// </summary>
     [JsonPropertyName("cancelReasons")]
-    public CancelReason[] CancelReasons { get; }
-
+    public required CancelReason[] CancelReasons { get; init; }
 }

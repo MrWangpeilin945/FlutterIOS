@@ -622,11 +622,12 @@ Field="検査項目明細名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目ID","exam_item_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="前回値を初期値としてセットするか","set_previous_as_default","boolean","NOT NULL",,"false","",$FFFFFFFF,""
 Field="配置番号","position_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査項目明細種別","type","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="キーボード種別","keyboard_type","integer","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241203113902
+ModifiedDateTime=20241203141457
 Position="MAIN",2100,1800
 ZOrder=33
 

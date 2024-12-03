@@ -35,6 +35,10 @@ export default function ExamineeHeader({
         align="center"
         px={24}
         py={8}
+        pos="sticky"
+        top={0}
+        w="100%"
+        style={{ zIndex: 10 }}
       >
         {/* ユーザアイコン */}
         <Button

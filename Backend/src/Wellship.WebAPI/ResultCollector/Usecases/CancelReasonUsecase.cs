@@ -1,5 +1,4 @@
-using Ryobi.Wellship.APIModels.Requests;
-using Ryobi.Wellship.Core.Exceptions;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -23,8 +22,18 @@ public class CancelReasonUsecase : ICancelReasonUsecase
     /// <summary>
     /// 中止理由を取得する
     /// </summary>
-    public void GetCancelReasons()
+    public async Task<CancelReasonList> GetCancelReasonsAsync()
     {
-        
+        var results = await _cancelReasonRepository.GetCancelReasonsAsync();
+
+        return new CancelReasonList()
+        {
+            CancelReasons = results.Select(x => new CancelReason()
+            {
+                CancelReasonId = x.CancelReasonId,
+                CancelReasonName = x.Name,
+                ExamItemId = x.ExamItemId
+            }).ToArray()
+        };
     }
 }

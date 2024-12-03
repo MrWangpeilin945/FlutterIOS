@@ -103,6 +103,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IIntegrationRepository, IntegrationRepository>();
         services.AddScoped<IExamineeRepository, ExamineeRepository>();
         services.AddScoped<IProgressRepository, ProgressRepository>();
+        services.AddScoped<ICancelReasonRepository, CancelReasonRepository>();
         return services;
     }
     /// <summary>
@@ -118,6 +119,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IEquipmentUsecase, EquipmentUsecase>();
         services.AddScoped<IIntegrationUsecase, IntegrationUsecase>();
         services.AddScoped<IProgressUsecase, ProgressUsecase>();
+        services.AddScoped<ICancelReasonUsecase, CancelReasonUsecase>();
         return services;
     }
     /// <summary>

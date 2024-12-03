@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Responses;
@@ -32,9 +34,9 @@ public class CancelReasonController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/cancelReasons")]
-    public IActionResult GetCancelReasons([FromQuery] int examItemId)
+    public async Task<IActionResult> GetCancelReasonsAsync()
     {
-        _cancelReasonUsecase.GetCancelReasons();
-        return Ok();
+        var results = await _cancelReasonUsecase.GetCancelReasonsAsync();
+        return Ok(results);
     }
 }

@@ -71,13 +71,13 @@ INSERT INTO exam_items(exam_item_id,name,exam_item_group_id,order_number,positio
   , (72,'血圧2',7,72,2,null,CURRENT_TIMESTAMP,'init');
 
 -- 検査項目明細
-INSERT INTO exam_item_details(exam_item_detail_id,name,exam_item_id,set_previous_as_default,position_number,keyboard_type,created_at,created_by) VALUES 
-    (1,'身長',1,False,1,0,CURRENT_TIMESTAMP,'init')
-  , (2,'体重',2,False,1,0,CURRENT_TIMESTAMP,'init')
-  , (711,'血圧1_上',71,False,1,0,CURRENT_TIMESTAMP,'init')
-  , (712,'血圧1_下',71,False,2,0,CURRENT_TIMESTAMP,'init')
-  , (721,'血圧2_上',72,False,1,0,CURRENT_TIMESTAMP,'init')
-  , (722,'血圧2_下',72,False,2,0,CURRENT_TIMESTAMP,'init');
+INSERT INTO exam_item_details(exam_item_detail_id,name,exam_item_id,set_previous_as_default,position_number,type,keyboard_type,created_at,created_by) VALUES 
+    (1,'身長',1,False,1,1,0,CURRENT_TIMESTAMP,'init')
+  , (2,'体重',2,False,1,1,0,CURRENT_TIMESTAMP,'init')
+  , (711,'血圧1_上',71,False,1,1,0,CURRENT_TIMESTAMP,'init')
+  , (712,'血圧1_下',71,False,2,1,0,CURRENT_TIMESTAMP,'init')
+  , (721,'血圧2_上',72,False,1,1,0,CURRENT_TIMESTAMP,'init')
+  , (722,'血圧2_下',72,False,2,1,0,CURRENT_TIMESTAMP,'init');
 
 
 -- ホームメニューグループ
