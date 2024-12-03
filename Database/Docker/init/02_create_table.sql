@@ -249,6 +249,7 @@ CREATE TABLE exam_item_details (
   , exam_item_id integer NOT NULL
   , set_previous_as_default boolean DEFAULT false NOT NULL
   , position_number integer NOT NULL
+  , type integer NOT NULL
   , keyboard_type integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -693,6 +694,7 @@ COMMENT ON COLUMN exam_item_details.exam_item_detail_id IS '検査項目明細ID
 COMMENT ON COLUMN exam_item_details.exam_item_id IS '検査項目ID';
 COMMENT ON COLUMN exam_item_details.set_previous_as_default IS '前回値を初期値としてセットするか';
 COMMENT ON COLUMN exam_item_details.position_number IS '配置番号';
+COMMENT ON COLUMN exam_item_details.type IS '検査項目明細種別';
 COMMENT ON COLUMN exam_item_details.keyboard_type IS 'キーボード種別';
 COMMENT ON COLUMN exam_item_details.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_details.created_by IS '作成者';
