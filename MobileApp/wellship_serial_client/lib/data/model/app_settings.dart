@@ -11,7 +11,7 @@ part 'app_settings.freezed.dart';
 abstract class AppSettings implements _$AppSettings {
   const AppSettings._();
   const factory AppSettings(
-      {required TransMethod transMethod,
+      {@Default(TransMethod.none) TransMethod transMethod,
       String? title,
       String? callback,
       @Default(9600) int baud,

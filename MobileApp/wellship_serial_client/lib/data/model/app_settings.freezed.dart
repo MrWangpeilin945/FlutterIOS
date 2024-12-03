@@ -36,12 +36,14 @@ mixin _$AppSettings {
   /// Create a copy of AppSettings
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $AppSettingsCopyWith<AppSettings> get copyWith => throw _privateConstructorUsedError;
+  $AppSettingsCopyWith<AppSettings> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 abstract class $AppSettingsCopyWith<$Res> {
-  factory $AppSettingsCopyWith(AppSettings value, $Res Function(AppSettings) then) =
+  factory $AppSettingsCopyWith(
+          AppSettings value, $Res Function(AppSettings) then) =
       _$AppSettingsCopyWithImpl<$Res, AppSettings>;
   @useResult
   $Res call(
@@ -64,7 +66,8 @@ abstract class $AppSettingsCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$AppSettingsCopyWithImpl<$Res, $Val extends AppSettings> implements $AppSettingsCopyWith<$Res> {
+class _$AppSettingsCopyWithImpl<$Res, $Val extends AppSettings>
+    implements $AppSettingsCopyWith<$Res> {
   _$AppSettingsCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
@@ -164,8 +167,10 @@ class _$AppSettingsCopyWithImpl<$Res, $Val extends AppSettings> implements $AppS
 }
 
 /// @nodoc
-abstract class _$$AppSettingsImplCopyWith<$Res> implements $AppSettingsCopyWith<$Res> {
-  factory _$$AppSettingsImplCopyWith(_$AppSettingsImpl value, $Res Function(_$AppSettingsImpl) then) =
+abstract class _$$AppSettingsImplCopyWith<$Res>
+    implements $AppSettingsCopyWith<$Res> {
+  factory _$$AppSettingsImplCopyWith(
+          _$AppSettingsImpl value, $Res Function(_$AppSettingsImpl) then) =
       __$$AppSettingsImplCopyWithImpl<$Res>;
   @override
   @useResult
@@ -189,9 +194,11 @@ abstract class _$$AppSettingsImplCopyWith<$Res> implements $AppSettingsCopyWith<
 }
 
 /// @nodoc
-class __$$AppSettingsImplCopyWithImpl<$Res> extends _$AppSettingsCopyWithImpl<$Res, _$AppSettingsImpl>
+class __$$AppSettingsImplCopyWithImpl<$Res>
+    extends _$AppSettingsCopyWithImpl<$Res, _$AppSettingsImpl>
     implements _$$AppSettingsImplCopyWith<$Res> {
-  __$$AppSettingsImplCopyWithImpl(_$AppSettingsImpl _value, $Res Function(_$AppSettingsImpl) _then)
+  __$$AppSettingsImplCopyWithImpl(
+      _$AppSettingsImpl _value, $Res Function(_$AppSettingsImpl) _then)
       : super(_value, _then);
 
   /// Create a copy of AppSettings
@@ -289,7 +296,7 @@ class __$$AppSettingsImplCopyWithImpl<$Res> extends _$AppSettingsCopyWithImpl<$R
 
 class _$AppSettingsImpl extends _AppSettings {
   const _$AppSettingsImpl(
-      {required this.transMethod,
+      {this.transMethod = TransMethod.none,
       this.title,
       this.callback,
       this.baud = 9600,
@@ -309,6 +316,7 @@ class _$AppSettingsImpl extends _AppSettings {
         super._();
 
   @override
+  @JsonKey()
   final TransMethod transMethod;
   @override
   final String? title;
@@ -366,23 +374,34 @@ class _$AppSettingsImpl extends _AppSettings {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AppSettingsImpl &&
-            (identical(other.transMethod, transMethod) || other.transMethod == transMethod) &&
+            (identical(other.transMethod, transMethod) ||
+                other.transMethod == transMethod) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.callback, callback) || other.callback == callback) &&
+            (identical(other.callback, callback) ||
+                other.callback == callback) &&
             (identical(other.baud, baud) || other.baud == baud) &&
-            (identical(other.dataBits, dataBits) || other.dataBits == dataBits) &&
+            (identical(other.dataBits, dataBits) ||
+                other.dataBits == dataBits) &&
             (identical(other.parity, parity) || other.parity == parity) &&
-            (identical(other.stopBits, stopBits) || other.stopBits == stopBits) &&
-            const DeepCollectionEquality().equals(other._ackTriggers, _ackTriggers) &&
-            (identical(other.ackString, ackString) || other.ackString == ackString) &&
-            (identical(other.eotString, eotString) || other.eotString == eotString) &&
-            (identical(other.dataLength, dataLength) || other.dataLength == dataLength) &&
+            (identical(other.stopBits, stopBits) ||
+                other.stopBits == stopBits) &&
+            const DeepCollectionEquality()
+                .equals(other._ackTriggers, _ackTriggers) &&
+            (identical(other.ackString, ackString) ||
+                other.ackString == ackString) &&
+            (identical(other.eotString, eotString) ||
+                other.eotString == eotString) &&
+            (identical(other.dataLength, dataLength) ||
+                other.dataLength == dataLength) &&
             (identical(other.useRts, useRts) || other.useRts == useRts) &&
             (identical(other.useDtr, useDtr) || other.useDtr == useDtr) &&
-            (identical(other.transmissionDataTrigger, transmissionDataTrigger) ||
+            (identical(
+                    other.transmissionDataTrigger, transmissionDataTrigger) ||
                 other.transmissionDataTrigger == transmissionDataTrigger) &&
-            (identical(other.transmissionData, transmissionData) || other.transmissionData == transmissionData) &&
-            (identical(other.debugMode, debugMode) || other.debugMode == debugMode));
+            (identical(other.transmissionData, transmissionData) ||
+                other.transmissionData == transmissionData) &&
+            (identical(other.debugMode, debugMode) ||
+                other.debugMode == debugMode));
   }
 
   @override
@@ -416,7 +435,7 @@ class _$AppSettingsImpl extends _AppSettings {
 
 abstract class _AppSettings extends AppSettings {
   const factory _AppSettings(
-      {required final TransMethod transMethod,
+      {final TransMethod transMethod,
       final String? title,
       final String? callback,
       final int baud,
@@ -471,5 +490,6 @@ abstract class _AppSettings extends AppSettings {
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AppSettingsImplCopyWith<_$AppSettingsImpl> get copyWith => throw _privateConstructorUsedError;
+  _$$AppSettingsImplCopyWith<_$AppSettingsImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }

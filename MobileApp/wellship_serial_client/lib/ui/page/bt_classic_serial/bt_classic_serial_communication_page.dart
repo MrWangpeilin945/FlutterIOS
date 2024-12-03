@@ -27,9 +27,6 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
 
     final connection = useState<BluetoothConnection?>(null);
     final text = useState<String>("");
-    useEffect(() {
-      return null;
-    }, []);
 
     useEffect(() {
       if (device == null) {
@@ -37,7 +34,7 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
           connection.value?.dispose();
         };
       }
-      BluetoothConnection.toAddress(device.address).then((conn) async {
+      BluetoothConnection.toAddress(serialSettings.address).then((conn) async {
         text.value = "";
         connection.value = conn;
         final buffer = Uint8Buffer();
@@ -67,7 +64,7 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
       return () {
         connection.value?.dispose();
       };
-    }, [device]);
+    }, [serialSettings.address]);
     return Scaffold(
       appBar: AppBar(
         title: Text(behaviorSettings.title ?? 'BluetoothClassic接続通信画面'),

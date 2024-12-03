@@ -49,13 +49,19 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
         final buffer = Uint8Buffer();
         // 多重に終了処理が行われないように
         bool aborting = false;
+        int ackCount = 0;
+        final ackTriggers = behaviorSettings.ackTriggers;
+        final ackString = behaviorSettings.ackString;
         port.inputStream!.listen((data) async {
           buffer.addAll(data);
-          text.value = utf8.decode(buffer);
-          // TODO ACK判定（ackTriggers, ackString）
-          // TODO 停止判定（dataLength）
-          // TODO 停止判定（eotString）
-          // 停止判定
+          text.value = utf8
+              .decode(buffer)
+              .replaceAllMapped(RegExp(r'[\x00-\x20]'), (x) => String.fromCharCode(0x2400 + x.group(0)!.codeUnitAt(0)))
+              .replaceAll(RegExp(r'[\x7f]'), String.fromCharCode(0x2421));
+          if (ackTriggers != null && ackTriggers.isEmpty == false && ackString != null) {
+            var hoge = buffer.first;
+            //
+          }
           if (!aborting && shouldAbort(buffer, behaviorSettings)) {
             aborting = true;
             final b = base64UrlEncode(buffer);
@@ -81,7 +87,7 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
         child: Column(children: [
           Text("firstDevice:${firstDevice.toString()}"),
           Text("UsbPort:${usbPort.value}"),
-          Text("text:${text.value}"),
+          SelectableText("text:${text.value}"),
           Text("error:${error.value}"),
         ]),
       ),

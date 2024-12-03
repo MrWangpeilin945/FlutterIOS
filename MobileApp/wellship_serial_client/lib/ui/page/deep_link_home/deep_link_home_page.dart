@@ -25,8 +25,8 @@ class DeepLinkHomePage extends ConsumerWidget {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ref.read(wiredSettingsProvider.notifier).state = settings.toWiredSettings();
         });
-      // router.replace(const WiredSerialCommunicationRoute());
-      // return const Scaffold();
+        router.replace(const WiredSerialCommunicationRoute());
+        return const Scaffold();
       case TransMethod.btClassic:
         WidgetsBinding.instance.addPostFrameCallback((_) {
           // TODO アプリに保存した設定からアドレス・デバイス名を取得・BtClassicSettingsを生成する
