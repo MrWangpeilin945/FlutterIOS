@@ -1,27 +1,25 @@
----
-config:
-  theme: forest
----
+%%{init:{'theme':'forest'}}%%
+
 sequenceDiagram
   participant fe as フロントエンド
-  participant ki as 機器データ分析.js
+  participant ana as 機器データ分析.js
   participant cmp as コンポーネント
   participant app as アプリ
   autonumber
 
-  opt 再測定ボタンを押下した場合
+  opt [測定する]ボタンをタップした場合
     fe ->>fe: ローカルストレージ監視開始
     fe ->>app: 機器連携アプリのURLへ遷移
   end
-  app -->> fe: 測定情報送信
-  fe -->>fe: 機器データ監視解除<br>ローカルストレージを削除
+  app -->> fe: 測定情報をローカルストレージに保存<br>アプリからブラウザに遷移
+  fe -->>fe: ローカルストレージ取得<br>機器データ監視解除<br>ローカルストレージを削除
 
-  fe ->> ki: 選択中の機器のデータ分析.js呼び出し
-  ki -->> fe: レスポンス取得
+  fe ->> ana: 選択中の機器のデータ分析.js呼び出し
+  ana -->> fe: レスポンス取得
   break 分析失敗
-    fe ->>cmp: 共通ダイアログ呼び出し
-    Note over fe,cmp: 機器情報の読み取りに失敗しました。
+    fe ->>cmp: 【CP0015】共通ダイアログを呼び出す
+    Note over fe,cmp: 「機器情報の読み取りに失敗しました。」
   end
   fe ->> fe: 検査項目明細に該当する機器データを設定する
   fe -->>cmp: 【CP1001~CP1011】検査項目グループ<br>機器測定データ表示
-  fe ->> fe: 再計測ボタンのDisabledチェック処理
+  fe ->> fe: [測定する]ボタンのDisabledチェック処理

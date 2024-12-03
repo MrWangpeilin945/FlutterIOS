@@ -67,11 +67,11 @@ export default function Teams() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="班選択" staffName={staff?.name || ""} />
-        <Container fluid mt={20}>
+        <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
               {teamsData?.teams ? (
-                <Stack>
+                <Stack gap={16}>
                   {teamsData.teams.map((tm) => (
                     <HeadlineButton
                       key={tm.teamId}

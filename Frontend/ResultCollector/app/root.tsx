@@ -35,6 +35,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
         <ColorSchemeScript />
+        <base href="/ResultCollector/" />
       </head>
       <body>
         <MantineProvider theme={customTheme}>
