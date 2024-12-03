@@ -78,7 +78,7 @@
               "examItemDetailId" : 1001,
               "equipmentLabel" : "Height",
               "name" : "身長",
-              "isPerforming" : true,
+              "hasOrder" : true,
               "cancelReasonId" : null,
               "value" : "157.0",
               "prevValue" : "155.5",

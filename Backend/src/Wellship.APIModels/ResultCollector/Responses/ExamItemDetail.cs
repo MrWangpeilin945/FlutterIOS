@@ -34,8 +34,8 @@ public class ExamItemDetail
     /// <summary>
     /// 検査実施するか
     /// </summary>
-    [JsonPropertyName("isPerforming")]
-    public bool IsPerforming { get; set; }
+    [JsonPropertyName("hasOrder")]
+    public required bool HasOrder { get; init; }
 
     /// <summary>
     /// 中止理由ID
