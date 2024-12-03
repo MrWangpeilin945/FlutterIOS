@@ -6,11 +6,6 @@ namespace Ryobi.Wellship.Core.Enums;
 public enum Sex
 {
     /// <summary>
-    /// 不明
-    /// </summary>
-    不明 = 0,
-
-    /// <summary>
     /// 男性
     /// </summary>
     男 = 1,
@@ -20,8 +15,4 @@ public enum Sex
     /// </summary>
     女 = 2,
 
-    /// <summary>
-    /// 適用不能
-    /// </summary>
-    適用不能 = 9
 }
