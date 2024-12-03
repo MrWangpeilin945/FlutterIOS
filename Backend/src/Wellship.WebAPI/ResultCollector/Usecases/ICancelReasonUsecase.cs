@@ -10,5 +10,5 @@ public interface ICancelReasonUsecase
     /// <summary>
     /// 中止理由を取得する
     /// </summary>
-    public void GetCancelReasons();
+    public Task<CancelReasonList> GetCancelReasonsAsync();
 }
