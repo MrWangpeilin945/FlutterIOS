@@ -10,9 +10,9 @@ import type {
 import { InputErrorLevel } from "~/domain/enums";
 
 type SelectProps = {
-  examItems: InputExamItem;
+  examItems: InputExamItem[];
   onRegisterPressed: boolean;
-  onClick: (updatedExamItem: InputExamItem | undefined) => void;
+  onClick: (updatedExamItem: InputExamItem[] | undefined) => void;
 };
 
 export default function ExamSelect({
@@ -20,31 +20,32 @@ export default function ExamSelect({
   onRegisterPressed,
   onClick,
 }: SelectProps) {
-  if (!examItems.examItemDetails?.length) {
+  const examItem = examItems[0];
+  if (!examItem.examItemDetails?.length) {
     return null; // examItemDetailsが空の場合は何も表示しない
   }
 
-  const examItemDetail = examItems.examItemDetails[0];
+  const examItemDetail = examItem.examItemDetails[0];
   if (!examItemDetail) {
     return null; // examItemDetailがundefinedの場合は何も表示しない
   }
 
   const [errMessages, setErrMessages] = useState<
     ExamRegistResult[] | undefined
-  >(examItems.examRegistResults);
+  >(examItem.examRegistResults);
   const [selected, setSelected] = useState(
     examItemDetail.value || examItemDetail.prevValue || undefined,
   );
 
   const handleErrorMessage = () => {
-    const initialMessages = examItems.examRegistResults || [];
+    const initialMessages = examItem.examRegistResults || [];
     let updatedMessages = [...initialMessages];
 
     //必須チェック
     const errorMessage: ExamRegistResult = {
       description: getErrorMessage(
         errorMessages.required,
-        `${examItems.name}は`,
+        `${examItem.name}は`,
       ),
       errorLevel: InputErrorLevel.異常,
     };
@@ -65,8 +66,8 @@ export default function ExamSelect({
   };
 
   useEffect(handleErrorMessage, [
-    examItems.examRegistResults,
-    examItems.name,
+    examItem.examRegistResults,
+    examItem.name,
     onRegisterPressed,
     selected,
   ]);
@@ -77,15 +78,21 @@ export default function ExamSelect({
     setSelected(newSelected);
 
     //examItemsのvalueを更新
-    const updatedExamItems: InputExamItem = {
-      ...examItems,
-      examItemDetails: (examItems.examItemDetails || []).map((detail) =>
-        detail.examItemDetailId === examItemDetail.examItemDetailId
-          ? { ...detail, value: newSelected }
-          : detail,
-      ),
-    };
-
+    const updatedExamItems: InputExamItem[] = examItems.map((item, index) =>
+      index === 0
+        ? {
+            ...item,
+            examItemDetails: item.examItemDetails?.map((detail, i) =>
+              i === 0
+                ? {
+                    ...detail,
+                    value: newSelected,
+                  }
+                : detail,
+            ),
+          }
+        : item,
+    );
     onClick(updatedExamItems);
   };
 
@@ -105,7 +112,7 @@ export default function ExamSelect({
         >
           <Center>
             <Text size="lg" fw={700}>
-              {examItems.name}
+              {examItem.name}
             </Text>
           </Center>
         </Paper>
@@ -114,7 +121,9 @@ export default function ExamSelect({
 
       <Group>
         {selectors.map((selector) => {
-          const isCancelled = examItemDetail.cancelReasonId !== undefined;
+          // グレーアウト表示判定
+          const isDisabled =
+            !examItemDetail.hasOrder || !!examItemDetail.cancelReasonId;
           const isSelected = selected === selector.code;
 
           return (
@@ -126,9 +135,9 @@ export default function ExamSelect({
               key={selector.orderNumber}
               onClick={() => onSelect(selector)}
               variant="outline"
-              bg={isCancelled ? "gray03" : isSelected ? "green03" : "white"}
-              color={isCancelled ? "gray02" : isSelected ? "primary" : "gray02"}
-              disabled={!!isCancelled}
+              bg={isDisabled ? "gray03" : isSelected ? "green03" : "white"}
+              color={isDisabled ? "gray02" : isSelected ? "primary" : "gray02"}
+              disabled={isDisabled}
             >
               {selector.name}
             </Button>
@@ -137,7 +146,7 @@ export default function ExamSelect({
       </Group>
 
       {(errMessages || []).map((error, index) => (
-        <Group key={index} c={error.errorLevel === 2 ? "warning" : "error"} >
+        <Group key={index} c={error.errorLevel === 2 ? "warning" : "error"}>
           <IconExclamationCircleFilled size={"32px"} />
           <Text size="sm" fw={700}>
             {error.description}
