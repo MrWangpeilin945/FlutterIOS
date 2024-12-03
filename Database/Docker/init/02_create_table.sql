@@ -246,6 +246,7 @@ ALTER TABLE consult ADD CONSTRAINT consult_IX1
 
 CREATE TABLE exam_item_details (
   exam_item_detail_id integer NOT NULL
+  , name text NOT NULL
   , exam_item_id integer NOT NULL
   , set_previous_as_default boolean DEFAULT false NOT NULL
   , position_number integer NOT NULL
@@ -259,6 +260,7 @@ CREATE TABLE exam_items (
   exam_item_id integer NOT NULL
   , name text NOT NULL
   , exam_item_group_id integer NOT NULL
+  , order_number integer NOT NULL
   , position_number integer NOT NULL
   , unit text
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -690,6 +692,7 @@ COMMENT ON COLUMN consult.created_by IS '作成者';
 
 COMMENT ON TABLE exam_item_details IS '検査項目明細';
 COMMENT ON COLUMN exam_item_details.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_item_details.name IS '検査項目明細名';
 COMMENT ON COLUMN exam_item_details.exam_item_id IS '検査項目ID';
 COMMENT ON COLUMN exam_item_details.set_previous_as_default IS '前回値を初期値としてセットするか';
 COMMENT ON COLUMN exam_item_details.position_number IS '配置番号';
@@ -701,6 +704,7 @@ COMMENT ON TABLE exam_items IS '検査項目';
 COMMENT ON COLUMN exam_items.exam_item_id IS '検査項目ID';
 COMMENT ON COLUMN exam_items.name IS '検査項目名';
 COMMENT ON COLUMN exam_items.exam_item_group_id IS '検査項目グループID';
+COMMENT ON COLUMN exam_items.order_number IS '表示順';
 COMMENT ON COLUMN exam_items.position_number IS '配置番号';
 COMMENT ON COLUMN exam_items.unit IS '単位';
 COMMENT ON COLUMN exam_items.created_at IS '作成日時';
