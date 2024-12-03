@@ -32,6 +32,18 @@ public class ExamItemDetail
     public required string Name { get; init; }
 
     /// <summary>
+    /// 検査実施するか
+    /// </summary>
+    [JsonPropertyName("isPerforming")]
+    public bool IsPerforming { get; set; }
+
+    /// <summary>
+    /// 中止理由ID
+    /// </summary>
+    [JsonPropertyName("cancelReasonId")]
+    public required int CancelReasonId { get; init; }
+
+    /// <summary>
     /// 今回値
     /// </summary>
     [JsonPropertyName("value")]
@@ -54,12 +66,6 @@ public class ExamItemDetail
     /// </summary>
     [JsonPropertyName("type")]
     public required int Type { get; init; }
-
-    /// <summary>
-    /// 中止理由ID
-    /// </summary>
-    [JsonPropertyName("cancelReasonId")]
-    public required int CancelReasonId { get; init; }
 
     /// <summary>
     /// 整数部最大桁数
