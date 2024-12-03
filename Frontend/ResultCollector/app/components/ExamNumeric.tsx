@@ -217,7 +217,9 @@ export default function ExamNumeric({
         {/* TODO:前回値のマックス横幅設定 */}
         <Stack gap="0">
           <Text size="md" fw="700" maw={""}>
-            (前回 : {examItems?.examItemDetails?.at(0)?.prevValue}）
+            {examItems?.examItemDetails?.at(0)?.prevValue
+              ? `(前回: ${examItems?.examItemDetails?.at(0)?.prevValue})`
+              : ""}
           </Text>
           <Text size="xs" fw="400">
             {examItems?.examItemDetails?.at(0)?.unit}
