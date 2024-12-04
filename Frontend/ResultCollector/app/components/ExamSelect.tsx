@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Button, Group, Text, Flex, Paper, Center } from "@mantine/core";
-import { IconExclamationCircleFilled } from "@tabler/icons-react";
+import {
+  IconExclamationCircleFilled,
+  IconSquareRoundedXFilled,
+} from "@tabler/icons-react";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import type {
   ExamItemDetailOption,
@@ -116,7 +119,11 @@ export default function ExamSelect({
             </Text>
           </Center>
         </Paper>
-        <Text>（前回：{examItemDetail.prevValue}）</Text>
+        {examItemDetail.prevValue && (
+          <Text ml="auto" fw={700} maw={271}>
+            (前回：{examItemDetail.prevValue})
+          </Text>
+        )}
       </Flex>
 
       <Group>
@@ -147,7 +154,11 @@ export default function ExamSelect({
 
       {(errMessages || []).map((error, index) => (
         <Group key={index} c={error.errorLevel === 2 ? "warning" : "error"}>
-          <IconExclamationCircleFilled size={"32px"} />
+          {error.errorLevel === 2 ? (
+            <IconExclamationCircleFilled size="32px" />
+          ) : (
+            <IconSquareRoundedXFilled size="32px" />
+          )}
           <Text size="sm" fw={700}>
             {error.description}
           </Text>
