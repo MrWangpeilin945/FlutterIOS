@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Button, Group, Text, Flex, Paper, Box, Stack } from "@mantine/core";
-import { IconExclamationCircleFilled } from "@tabler/icons-react";
+import {
+  IconExclamationCircleFilled,
+  IconSquareRoundedXFilled,
+} from "@tabler/icons-react";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import type {
   ExamItemDetailOption,
@@ -137,9 +140,11 @@ export default function ExamSelectLR({
                   {detail.name}
                 </Text>
               </Paper>
-              <Text ml="auto" fw={700}>
-                (前回：{detail.prevValue})
-              </Text>
+              {detail.prevValue && (
+                <Text ml="auto" fw={700} maw={271}>
+                  (前回：{detail.prevValue})
+                </Text>
+              )}
               <Stack key={index}>
                 {detail.examItemDetailOptions?.map(
                   (selector: ExamItemDetailOption) => {
@@ -150,8 +155,20 @@ export default function ExamSelectLR({
                         w={524}
                         h={78}
                         variant="outline"
-                        bg={isDisabled ? "gray03" : isSelected ? "green03" : "white"}
-                        color={isDisabled? "gray02": isSelected? "primary": "gray02"}
+                        bg={
+                          isDisabled
+                            ? "gray03"
+                            : isSelected
+                              ? "green03"
+                              : "white"
+                        }
+                        color={
+                          isDisabled
+                            ? "gray02"
+                            : isSelected
+                              ? "primary"
+                              : "gray02"
+                        }
                         size="xl"
                         fw={700}
                         disabled={isDisabled}
@@ -170,7 +187,11 @@ export default function ExamSelectLR({
 
       {(errMessages || []).map((error, index) => (
         <Group key={index} c={error.errorLevel === 2 ? "warning" : "error"}>
-          <IconExclamationCircleFilled size={"32px"} />
+          {error.errorLevel === 2 ? (
+            <IconExclamationCircleFilled size="32px" />
+          ) : (
+            <IconSquareRoundedXFilled size="32px" />
+          )}
           <Text size="sm" fw={700}>
             {error.description}
           </Text>
