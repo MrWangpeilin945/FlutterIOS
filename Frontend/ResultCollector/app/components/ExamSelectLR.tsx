@@ -43,7 +43,7 @@ export default function ExamSelectLR({
   const handleErrorMessage = () => {
     const initialMessages = examItem.examRegistResults || [];
     let updatedMessages: ExamRegistResult[] = [...initialMessages];
-  
+
     examItemDetails.forEach((detail, index) => {
       // 必須用エラーメッセージ
       const errorMessage: ExamRegistResult = {
@@ -53,7 +53,7 @@ export default function ExamSelectLR({
         ),
         errorLevel: InputErrorLevel.異常,
       };
-  
+
       // 必須チェック
       if (onRegisterPressed && !selectedValues[index]) {
         // value が空ならエラーを追加
@@ -61,17 +61,16 @@ export default function ExamSelectLR({
       } else {
         // valueが存在する場合はエラーを削除
         updatedMessages = updatedMessages.filter(
-          (msg) =>
-            msg.description !== errorMessage.description
+          (msg) => msg.description !== errorMessage.description,
         );
       }
     });
-  
+
     // 重複を除外する
     const uniqueErrorMessages = Array.from(
       new Map(updatedMessages.map((msg) => [msg.description, msg])).values(),
     );
-  
+
     // エラーメッセージをソート
     uniqueErrorMessages.sort(
       (a, b) => (b.errorLevel ?? 0) - (a.errorLevel ?? 0),
@@ -183,21 +182,21 @@ export default function ExamSelectLR({
         })}
       </Flex>
 
-      {(errMessages || []).map((error, index) => (
-        <Group
-          key={index}
-          c={error.errorLevel === InputErrorLevel.警告 ? "warning" : "error"}
-        >
-          {error.errorLevel === InputErrorLevel.警告 ? (
-            <IconExclamationCircleFilled size="32px" />
-          ) : (
-            <IconSquareRoundedXFilled size="32px" />
-          )}
-          <Text size="sm" fw={700}>
-            {error.description}
-          </Text>
-        </Group>
-      ))}
+      {(errMessages || []).map((error, index) => {
+        const isWarning = error.errorLevel === InputErrorLevel.警告;
+        return (
+          <Group key={index} c={isWarning ? "warning" : "error"}>
+            {isWarning ? (
+              <IconExclamationCircleFilled size="32px" />
+            ) : (
+              <IconSquareRoundedXFilled size="32px" />
+            )}
+            <Text size="sm" fw={700}>
+              {error.description}
+            </Text>
+          </Group>
+        );
+      })}
     </Flex>
   );
 }
