@@ -5,8 +5,8 @@ import {
   Container,
   Flex,
   LoadingOverlay,
+  Stack,
   Text,
-  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
@@ -123,83 +123,89 @@ export default function ExamMenuSelect() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="検査メニュー" staffName={staff?.name || ""} />
-        <Container fluid bg="background" pt={32}>
+        <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
               {examMenuList?.examMenus ? (
                 <Center>
-                  <Flex w={1008} columnGap={24} rowGap={16} wrap="wrap">
-                    {examMenuList?.examMenus?.map((examMenu) => (
-                      <Button
-                        variant="outline"
-                        bg={
-                          getSelectedIndex(examMenu.examMenuId) >= 0
-                            ? "green03"
-                            : "white01"
-                        }
-                        color={
-                          getSelectedIndex(examMenu.examMenuId) >= 0
-                            ? "primary"
-                            : "gray03"
-                        }
-                        w={320}
-                        h={78}
-                        style={{ borderWidth: 2 }}
-                        key={examMenu.examMenuId}
-                        onClick={() =>
-                          handleMenuButtonClick(examMenu.examMenuId)
-                        }
-                      >
-                        {(() => {
-                          const index = getSelectedIndex(examMenu.examMenuId);
-                          return index >= 0 ? (
-                            <>
-                              <Text size="xl" fw={700} c="primary" pr={10}>
-                                {index + 1}
-                              </Text>
-                            </>
-                          ) : null;
-                        })()}
-                        <Text
-                          size="xl"
-                          fw={700}
-                          c={
+                  <Stack>
+                    <Flex
+                      w={1008}
+                      columnGap={24}
+                      rowGap={16}
+                      wrap="wrap"
+                      pb={80}
+                    >
+                      {examMenuList?.examMenus?.map((examMenu) => (
+                        <Button
+                          variant="outline"
+                          bg={
+                            getSelectedIndex(examMenu.examMenuId) >= 0
+                              ? "green03"
+                              : "white01"
+                          }
+                          color={
                             getSelectedIndex(examMenu.examMenuId) >= 0
                               ? "primary"
-                              : "black01"
+                              : "gray03"
+                          }
+                          w={320}
+                          h={78}
+                          style={{ borderWidth: 2 }}
+                          key={examMenu.examMenuId}
+                          onClick={() =>
+                            handleMenuButtonClick(examMenu.examMenuId)
                           }
                         >
-                          {examMenu.examMenuName?.slice(0, 8)}
+                          {(() => {
+                            const index = getSelectedIndex(examMenu.examMenuId);
+                            return index >= 0 ? (
+                              <>
+                                <Text size="xl" fw={700} c="primary" pr={10}>
+                                  {index + 1}
+                                </Text>
+                              </>
+                            ) : null;
+                          })()}
+                          <Text
+                            size="xl"
+                            fw={700}
+                            c={
+                              getSelectedIndex(examMenu.examMenuId) >= 0
+                                ? "primary"
+                                : "black01"
+                            }
+                          >
+                            {examMenu.examMenuName?.slice(0, 8)}
+                          </Text>
+                        </Button>
+                      ))}
+                    </Flex>
+                    <Box w={1008} ta="center">
+                      <Button
+                        w={860}
+                        h={75}
+                        bg="primary"
+                        onClick={() => callbackConfirm()}
+                      >
+                        <Text size="lg" fw={700} c={"white01"}>
+                          開始する
                         </Text>
                       </Button>
-                    ))}
-                  </Flex>
+                    </Box>
+                  </Stack>
                 </Center>
               ) : (
                 <>
                   {/* エラーメッセージを表示(検査メニュー情報の取得データが0件だった場合) */}
-                  <Title order={3}>
+                  <Text size="sm" c="black01">
                     {getErrorMessage(
                       errorMessages.notFound,
                       "使用できる検査メニュー",
                     )}
-                  </Title>
+                  </Text>
                 </>
               )}
-              <Center>
-                <Box w={1008} ta="center" pt={80}>
-                  <Button
-                    w={860}
-                    h={75}
-                    bg="primary"
-                    onClick={() => callbackConfirm()}
-                  >
-                    <Text size="lg" fw={700} c={"white01"}>
-                      開始する
-                    </Text>
-                  </Button>
-                </Box>
-              </Center>
               <CommonDialog
                 message={errorMessage || ""}
                 buttonMessage="閉じる"
