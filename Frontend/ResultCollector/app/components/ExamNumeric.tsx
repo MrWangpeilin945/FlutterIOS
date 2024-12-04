@@ -177,7 +177,7 @@ export default function ExamNumeric({
 
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
-      <Group w="1036" gap="md">
+      <Group w="11168" gap="md">
         <Paper
           w={274}
           h={80}
@@ -216,7 +216,7 @@ export default function ExamNumeric({
         />
         {/* TODO:前回値のマックス横幅設定 */}
         <Stack gap="0">
-          <Text size="md" fw="700" maw={""}>
+          <Text size="md" fw="700" maw={"271"}>
             {examItems?.examItemDetails?.at(0)?.prevValue
               ? `(前回: ${examItems?.examItemDetails?.at(0)?.prevValue})`
               : ""}
@@ -231,7 +231,6 @@ export default function ExamNumeric({
           size="lg"
           bg={"white"}
           variant="outline"
-          ml={48}
           onClick={() => setExamValue("")}
         >
           クリア
