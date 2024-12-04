@@ -30,68 +30,28 @@ export default function ExamItemProgress({
   onClick,
 }: ExamItemProgressProps) {
   // 合計値を算出
-  const total = progress.details?.reduce(
-    (sum, detail) => sum + (detail.count || 0),
-    0,
-  );
+  const total =
+    progress.details?.reduce((sum, detail) => sum + (detail.count || 0), 0) ||
+    0;
+
+  const statusColors = [
+    { status: AggregatedProgressStatus.済, color: "blue01" },
+    { status: AggregatedProgressStatus.中止, color: "blue04" },
+    { status: AggregatedProgressStatus.来場, color: "blue02" },
+    { status: AggregatedProgressStatus.予定, color: "blue03" },
+  ];
 
   // 各項目の設定と割合を算出
-  const sections = [
-    {
-      value:
-        (progress.details?.find((d) => d.status === AggregatedProgressStatus.済)
-          ?.count || 0 / (total || 0)) * 100,
-      color: "blue01",
-      label: progress.details?.find(
-        (d) => d.status === AggregatedProgressStatus.済,
-      )?.statusName,
-      count:
-        progress.details?.find((d) => d.status === AggregatedProgressStatus.済)
-          ?.count || 0,
-    },
-    {
-      value:
-        (progress.details?.find(
-          (d) => d.status === AggregatedProgressStatus.中止,
-        )?.count || 0 / (total || 0)) * 100,
-      color: "blue04",
-      label: progress.details?.find(
-        (d) => d.status === AggregatedProgressStatus.中止,
-      )?.statusName,
-      count:
-        progress.details?.find(
-          (d) => d.status === AggregatedProgressStatus.中止,
-        )?.count || 0,
-    },
-    {
-      value:
-        (progress.details?.find(
-          (d) => d.status === AggregatedProgressStatus.来場,
-        )?.count || 0 / (total || 0)) * 100,
-      color: "blue02",
-      label: progress.details?.find(
-        (d) => d.status === AggregatedProgressStatus.来場,
-      )?.statusName,
-      count:
-        progress.details?.find(
-          (d) => d.status === AggregatedProgressStatus.来場,
-        )?.count || 0,
-    },
-    {
-      value:
-        (progress.details?.find(
-          (d) => d.status === AggregatedProgressStatus.予定,
-        )?.count || 0 / (total || 0)) * 100,
-      color: "blue03",
-      label: progress.details?.find(
-        (d) => d.status === AggregatedProgressStatus.予定,
-      )?.statusName,
-      count:
-        progress.details?.find(
-          (d) => d.status === AggregatedProgressStatus.予定,
-        )?.count || 0,
-    },
-  ];
+  const sections = statusColors.map(({ status, color }) => {
+    const detail = progress.details?.find((d) => d.status === status);
+    const count = detail?.count || 0;
+    return {
+      value: (count / total) * 100,
+      color,
+      label: detail?.statusName,
+      count,
+    };
+  });
 
   return (
     <Box className={styles.border}>
@@ -108,14 +68,12 @@ export default function ExamItemProgress({
       <Box>
         <Group>
           {sections.map((sections) => (
-            <>
-              <Stack key={sections.label} align="center">
-                <Button w={100} h={40} color={sections.color}>
-                  <Text size="lg">{sections.label}</Text>
-                </Button>
-                <Text size="lg">{sections.count}</Text>
-              </Stack>
-            </>
+            <Stack key={sections.label} align="center">
+              <Button w={100} h={40} color={sections.color}>
+                <Text size="lg">{sections.label}</Text>
+              </Button>
+              <Text size="lg">{sections.count}</Text>
+            </Stack>
           ))}
         </Group>
         <Progress.Root size="lg" mt={10}>
