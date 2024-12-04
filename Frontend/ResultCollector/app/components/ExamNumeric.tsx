@@ -42,6 +42,7 @@ export default function ExamNumeric({
   const handleConfirm: () => void = () => {
     setShowKeyboard(false);
   };
+
   // APIのエラーメッセージの取得
   const getAPIErrorMessages = () => {
     const APIerror = examItems.examRegistResults || [];
@@ -126,14 +127,11 @@ export default function ExamNumeric({
     sortErrorMessages(result);
   }, [examValue, onRegisterPressed]);
 
-  // 表示時の小数点処理
+  // 表示時の小数点追加処理
   const formatDecimalValue = (value: string) => {
     const floatValue = Number.parseFloat(value);
-    if (Number.isNaN(floatValue)) {
-      return value;
-    }
     const afterDecimalDigit = examItems?.examItemDetails?.at(0)?.decimalLength;
-    if (afterDecimalDigit) {
+    if (afterDecimalDigit && !Number.isNaN(floatValue)) {
       const result = (floatValue / 10 ** afterDecimalDigit)
         .toFixed(afterDecimalDigit)
         .toString();
@@ -141,7 +139,21 @@ export default function ExamNumeric({
     }
     return value;
   };
+
+  // 最大桁数を考慮してexamValueをセットする
+  const decimalLength = examItems?.examItemDetails?.at(0)?.decimalLength ?? 0;
+  const integerLength = examItems?.examItemDetails?.at(0)?.integerLength ?? 0;
+  const maxDigits = decimalLength + integerLength;
+  const setExamValueWithMaxDigits = (examValue: string) => {
+    if (examItems?.examItemDetails?.at(0)?.integerLength) {
+      setExamValue(examValue.slice(0, maxDigits));
+    } else {
+      setExamValue(examValue);
+    }
+  };
+
   // examItemsを更新して渡す処理
+  // TODO:エラーレベルでコールバックを制御するか確認
   const updatedExamItems = () => {
     if (errMessages?.at(0)?.errorLevel === 3) {
       return;
@@ -162,16 +174,17 @@ export default function ExamNumeric({
     };
     onChange(newExamItems);
   };
+
   // テキストボックス入力時の処理
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
-    value.replace(".", "");
-    setExamValue(value);
+    value.replace(".", ""); // テキストボックスの値を参照するので、小数点を取り除く
+    setExamValueWithMaxDigits(value);
     updatedExamItems();
   };
   // キーボード入力時の処理
   const handleKeyChange = (e: string) => {
-    setExamValue(e);
+    setExamValueWithMaxDigits(e);
     updatedExamItems();
   };
 

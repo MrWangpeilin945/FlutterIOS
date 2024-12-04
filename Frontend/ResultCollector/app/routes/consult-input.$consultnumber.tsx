@@ -10,7 +10,7 @@ export default function consultInput() {
       {
         positionNumber: 1,
         examItemId: 101,
-        examItemName: "スピッツ",
+        name: "検査項目検査項目",
         //どのような形式かは未確定
         errorMessages: [{ value: "エラー1" }, { value: "エラー2" }],
         examItemDetails: [
