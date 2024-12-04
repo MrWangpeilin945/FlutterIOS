@@ -23,7 +23,7 @@ import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
 
 type ExamNumericProps = {
-  examItems: InputExamItem;
+  examItems: InputExamItem[];
   onRegisterPressed: boolean;
   onChange: (newValue: InputExamItem) => void;
 };
@@ -33,10 +33,16 @@ export default function ExamNumeric({
   onRegisterPressed,
   onChange,
 }: ExamNumericProps) {
+  if (!examItems[0].examItemDetails?.length) {
+    return null; // examItemDetailsが空の場合は何も表示しない
+  }
+  const firstExamItemDetail =
+    examItems && examItems.length > 0 ? examItems[0].examItemDetails[0] : null;
+  if (!firstExamItemDetail) {
+    return null;
+  }
   const [showKeyboard, setShowKeyboard] = useState(false);
-  const [examValue, setExamValue] = useState(
-    examItems.examItemDetails?.at(0)?.value || ""
-  );
+  const [examValue, setExamValue] = useState(firstExamItemDetail?.value || "");
   const [errMessages, setErrMessages] = useState<ExamRegistResult[]>();
   const closeKeyBoard = useClickOutside(() => setShowKeyboard(false));
   const handleConfirm: () => void = () => {
@@ -45,34 +51,34 @@ export default function ExamNumeric({
 
   // APIのエラーメッセージの取得
   const getAPIErrorMessages = () => {
-    const APIerror = examItems.examRegistResults || [];
+    const APIerror = examItems[0].examRegistResults || [];
     return APIerror || [];
   };
   // examItemsのrangesから、エラーレベルを取得して
   // エラーメッセージを取得。
   const addErrorMessagesFromRanges = () => {
     const numericValue = Number.parseFloat(formatDecimalValue(examValue));
-    const ranges = examItems.examItemDetails?.at(0)?.examNormalValueRanges;
+    const ranges = firstExamItemDetail?.examNormalValueRanges;
     const errorLevel = ranges?.find((range) => {
       const minValue = range.minValue;
       const maxValue = range.maxValue;
       if (typeof minValue === "number" && typeof maxValue === "number")
         return numericValue >= minValue && numericValue <= maxValue;
     })?.errorLevel;
-    const warningMessage: ExamRegistResult = {
-      // TODO:具体的なメッセージが決定したら差し替え
-      description: "異常エラーです。",
-      errorLevel: InputErrorLevel.異常,
-    };
-    const alertMessage: ExamRegistResult = {
-      // TODO:具体的なメッセージが決定したら差し替え
-      description: "警告エラーです。",
-      errorLevel: InputErrorLevel.警告,
-    };
     if (errorLevel === 3) {
+      const warningMessage: ExamRegistResult = {
+        // TODO: 具体的なメッセージが決まったら差し替える
+        description: "異常エラーです。",
+        errorLevel: InputErrorLevel.異常,
+      };
       return [warningMessage];
     }
     if (errorLevel === 2) {
+      const alertMessage: ExamRegistResult = {
+        // TODO: 具体的なメッセージが決まったら差し替える
+        description: "警告エラーです。",
+        errorLevel: InputErrorLevel.警告,
+      };
       return [alertMessage];
     }
     return [];
@@ -84,7 +90,7 @@ export default function ExamNumeric({
       const numericMessage: ExamRegistResult = {
         description: getErrorMessage(
           errorMessages.alphaNumericString,
-          `${examItems.name}は`
+          `${examItems[0].name}は`
         ),
         errorLevel: InputErrorLevel.警告,
       };
@@ -97,7 +103,7 @@ export default function ExamNumeric({
     const requireMessage: ExamRegistResult = {
       description: getErrorMessage(
         errorMessages.required,
-        `${examItems.name}は`
+        `${examItems[0].name}は`
       ),
       errorLevel: InputErrorLevel.異常,
     };
@@ -114,7 +120,6 @@ export default function ExamNumeric({
     setErrMessages(sortedMessages);
   };
   // バリデーションチェックの走査
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     const messages = getAPIErrorMessages();
     const rangeError = addErrorMessagesFromRanges();
@@ -130,7 +135,7 @@ export default function ExamNumeric({
   // 表示時の小数点追加処理
   const formatDecimalValue = (value: string) => {
     const floatValue = Number.parseFloat(value);
-    const afterDecimalDigit = examItems?.examItemDetails?.at(0)?.decimalLength;
+    const afterDecimalDigit = firstExamItemDetail?.decimalLength;
     if (afterDecimalDigit && !Number.isNaN(floatValue)) {
       const result = (floatValue / 10 ** afterDecimalDigit)
         .toFixed(afterDecimalDigit)
@@ -141,11 +146,11 @@ export default function ExamNumeric({
   };
 
   // 最大桁数を考慮してexamValueをセットする
-  const decimalLength = examItems?.examItemDetails?.at(0)?.decimalLength ?? 0;
-  const integerLength = examItems?.examItemDetails?.at(0)?.integerLength ?? 0;
+  const decimalLength = firstExamItemDetail?.decimalLength ?? 0;
+  const integerLength = firstExamItemDetail?.integerLength ?? 0;
   const maxDigits = decimalLength + integerLength;
   const setExamValueWithMaxDigits = (examValue: string) => {
-    if (examItems?.examItemDetails?.at(0)?.integerLength) {
+    if (firstExamItemDetail?.integerLength) {
       setExamValue(examValue.slice(0, maxDigits));
     } else {
       setExamValue(examValue);
@@ -155,21 +160,21 @@ export default function ExamNumeric({
   // examItemsを更新して渡す処理
   // TODO:エラーレベルでコールバックを制御するか確認
   const updatedExamItems = () => {
-    if (errMessages?.at(0)?.errorLevel === 3) {
+    if (errMessages?.some((x) => x.errorLevel === InputErrorLevel.異常)) {
       return;
     }
     const newExamItems: InputExamItem = {
       ...examItems,
       examItemDetails: [
-        ...(examItems.examItemDetails?.[0]
+        ...(examItems[0].examItemDetails?.[0]
           ? [
               {
-                ...examItems.examItemDetails[0],
+                ...examItems[0].examItemDetails[0],
                 value: examValue,
               },
             ]
           : []),
-        ...(examItems.examItemDetails?.slice(1) ?? []),
+        ...(examItems[0].examItemDetails?.slice(1) ?? []),
       ],
     };
     onChange(newExamItems);
@@ -203,17 +208,18 @@ export default function ExamNumeric({
           }}
         >
           <Title size="lg" fw={700}>
-            {examItems.name}
+            {examItems[0].name}
           </Title>
         </Paper>
         <TextInput
-          className="input-textbox"
           classNames={{
-            input: `${styles.inputTextbox} ${
-              errMessages?.at(0)?.errorLevel === 3
-                ? styles.inputerror
-                : errMessages?.at(0)?.errorLevel === 2
-                ? styles.inputwarning
+            input: `${styles["input-textbox"]} ${
+              errMessages?.some((x) => x.errorLevel === InputErrorLevel.異常)
+                ? `${styles["input-error"]}`
+                : errMessages?.some(
+                    (x) => x.errorLevel === InputErrorLevel.警告
+                  )
+                ? `${styles["input-warning"]}`
                 : ""
             }`,
           }}
@@ -222,8 +228,8 @@ export default function ExamNumeric({
           size="inputComponent"
           value={formatDecimalValue(examValue)}
           disabled={
-            !!examItems.examItemDetails?.at(0)?.cancelReasonId ||
-            !examItems.examItemDetails?.at(0)?.isPerforming
+            !!firstExamItemDetail?.cancelReasonId ||
+            !firstExamItemDetail?.hasOrder
           }
           onClick={() => setShowKeyboard(true)}
           onChange={(e) => {
@@ -233,12 +239,12 @@ export default function ExamNumeric({
         {/* TODO:前回値のマックス横幅設定 */}
         <Stack gap="0">
           <Text size="md" fw="700" maw={"271"}>
-            {examItems?.examItemDetails?.at(0)?.prevValue
-              ? `(前回: ${examItems?.examItemDetails?.at(0)?.prevValue})`
+            {firstExamItemDetail?.prevValue
+              ? `(前回: ${firstExamItemDetail?.prevValue})`
               : ""}
           </Text>
           <Text size="xs" fw="400">
-            {examItems?.examItemDetails?.at(0)?.unit}
+            {firstExamItemDetail?.unit}
           </Text>
         </Stack>
         <Button
@@ -254,7 +260,10 @@ export default function ExamNumeric({
       </Group>
       {/* エラーメッセージを表示する。 */}
       {(errMessages || []).map((error, index) => (
-        <Group key={index} c={error.errorLevel === 3 ? "error" : "warning"}>
+        <Group
+          key={index}
+          c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
+        >
           <IconExclamationCircleFilled size={"1.7rem"} />
           <Text>{error.description}</Text>
         </Group>
