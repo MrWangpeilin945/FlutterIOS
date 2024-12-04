@@ -75,13 +75,13 @@
         {
             "examItemId" : 100,
             "examItemName" : "身長",
-            "isPerforming" : true,
+            "hasOrder" : true,
             "cancelReasonId" : null
         },
         {
             "examItemId" : 200,
             "examItemName" : "体重",
-            "isPerforming" : false,
+            "hasOrder" : false,
             "cancelReasonId" : 10
         }
     ],

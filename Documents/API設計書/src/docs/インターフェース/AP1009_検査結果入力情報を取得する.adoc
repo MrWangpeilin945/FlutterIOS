@@ -78,11 +78,12 @@
               "examItemDetailId" : 1001,
               "equipmentLabel" : "Height",
               "name" : "身長",
+              "hasOrder" : true,
+              "cancelReasonId" : null,
               "value" : "157.0",
               "prevValue" : "155.5",
               "unit" : "cm",
               "type" : 1, 
-              "cancelReasonId" : null,
               "integerLength" : 3,
               "decimalLength" : 1,
               "keyboard" : {
