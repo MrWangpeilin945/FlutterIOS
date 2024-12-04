@@ -26,9 +26,7 @@ export default function Progress() {
   const [staff] = useAtom(staffState);
   const [placeSchedule] = useAtom(placeScheduleState);
   const [examDate] = useAtom(examDateState);
-  const [targetDate] = useState(
-    examDate ? format(examDate, "yyyy/MM/dd") : null,
-  );
+  const [targetDate] = useState(examDate ? format(examDate, "yyyy/MM/dd") : "");
   const { isFetching, refetch } = useProgressGetProgress(
     "1",
     placeSchedule?.placeScheduleId || 0,
@@ -60,7 +58,7 @@ export default function Progress() {
         <CommonHeader screenName="進捗" staffName={staff?.name || ""} />
         <PlaceSchedule
           placeName={placeSchedule?.placeName || ""}
-          examDate={targetDate || ""}
+          examDate={targetDate}
         />
         <Container fluid>
           {!isFetching && (
