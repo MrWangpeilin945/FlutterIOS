@@ -23,6 +23,9 @@ export default function ExamSelect({
   onRegisterPressed,
   onClick,
 }: SelectProps) {
+  if (!examItems || examItems.length === 0) {
+    return null;
+  }
   const examItem = examItems[0];
   if (!examItem.examItemDetails?.length) {
     return null; // examItemDetailsが空の場合は何も表示しない
@@ -152,18 +155,21 @@ export default function ExamSelect({
         })}
       </Group>
 
-      {(errMessages || []).map((error, index) => (
-        <Group key={index} c={error.errorLevel === 2 ? "warning" : "error"}>
-          {error.errorLevel === 2 ? (
-            <IconExclamationCircleFilled size="32px" />
-          ) : (
-            <IconSquareRoundedXFilled size="32px" />
-          )}
-          <Text size="sm" fw={700}>
-            {error.description}
-          </Text>
-        </Group>
-      ))}
+      {(errMessages || []).map((error, index) => {
+        const isWarning = error.errorLevel === InputErrorLevel.警告;
+        return (
+          <Group key={index} c={isWarning ? "warning" : "error"}>
+            {isWarning ? (
+              <IconExclamationCircleFilled size="32px" />
+            ) : (
+              <IconSquareRoundedXFilled size="32px" />
+            )}
+            <Text size="sm" fw={700}>
+              {error.description}
+            </Text>
+          </Group>
+        );
+      })}
     </Flex>
   );
 }
