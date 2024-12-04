@@ -142,7 +142,7 @@ ALTER TABLE home_menus ADD CONSTRAINT home_menus_IX1
 
 CREATE TABLE keyboard_options (
   option_id integer NOT NULL
-  , exam_item_details_id integer NOT NULL
+  , exam_item_detail_id integer NOT NULL
   , value text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -465,7 +465,7 @@ ALTER TABLE home_menus
   ON UPDATE CASCADE;
 
 ALTER TABLE keyboard_options
-  ADD CONSTRAINT keyboard_options_FK1 FOREIGN KEY (exam_item_details_id) REFERENCES exam_item_details(exam_item_detail_id)
+  ADD CONSTRAINT keyboard_options_FK1 FOREIGN KEY (exam_item_detail_id) REFERENCES exam_item_details(exam_item_detail_id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -617,7 +617,7 @@ COMMENT ON COLUMN home_menus.created_by IS '作成者';
 
 COMMENT ON TABLE keyboard_options IS 'キーボード入力値リスト';
 COMMENT ON COLUMN keyboard_options.option_id IS 'ID';
-COMMENT ON COLUMN keyboard_options.exam_item_details_id IS '検査項目明細ID';
+COMMENT ON COLUMN keyboard_options.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN keyboard_options.value IS '入力値';
 COMMENT ON COLUMN keyboard_options.created_at IS '作成日時';
 COMMENT ON COLUMN keyboard_options.created_by IS '作成者';
