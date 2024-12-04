@@ -13,7 +13,7 @@ export default function IncompliedExam({
 }: IncompliedExamProps) {
   function concatItems(items: string[]): string {
     if (items.length === 0) {
-      return "未受診の検査項目はありません。";
+      return "未受診項目なし";
     }
     let result = "";
     let count = 0;
