@@ -231,23 +231,26 @@ public class ConsultRepository : IConsultRepository
 
         const string preSelectSql = @"
         select
-            exam_item_id as ExamItemId
-            , exam_item_detail_id as ExamItemDetailId 
+            d.exam_item_id as ExamItemId
+            , od.exam_item_detail_id as ExamItemDetailId
         from
-            resultcollector.exam_item_details 
+            resultcollector.exam_item_detail_orders od 
+            left join resultcollector.exam_item_details d 
+                on od.exam_item_detail_id = d.exam_item_detail_id 
         where
-            exam_item_id = any (@ExamItemIds);";
+            exam_item_id = any (@ExamItemIds) 
+            and od.consult_id = @ConsultId;";
 
-        // マスタから検査項目ー検査項目明細の関連付けを取得する
+        // マスタから検査項目ー検査項目明細の関連付けを取得する（検査依頼があるものに絞り込む）
         var examItemIds = examItemCancels.Select(x => x.ExamItemId).Distinct().ToArray();
-        var itemDetails = await connection.QueryAsync<(int examItemId, int examItemDetailId)>(preSelectSql, new { ExamItemIds = examItemIds });
+        var orderedItemDetails = await connection.QueryAsync<(int examItemId, int examItemDetailId)>(preSelectSql, new { ConsultId = consultId, ExamItemIds = examItemIds });
 
         // 検査項目明細単位で保存するオブジェクトを作る
         var saveItems = new List<object>();
         foreach (var examItemCancel in examItemCancels)
         {
-            // 明細単位にばらす
-            var detailIds = itemDetails.Where(x => x.examItemId == examItemCancel.ExamItemId).Select(x => x.examItemDetailId).Distinct().ToArray();
+            // 明細単位にばらす（依頼ありのみ）
+            var detailIds = orderedItemDetails.Where(x => x.examItemId == examItemCancel.ExamItemId).Select(x => x.examItemDetailId).Distinct().ToArray();
             foreach (var detailId in detailIds)
             {
                 var item = new
