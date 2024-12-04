@@ -97,4 +97,48 @@ public class ConsultUsecase : IConsultUsecase
     {
 
     }
+
+    /// <summary>
+    /// 検査の実施有無と中止理由を登録する
+    /// </summary>
+    public async Task RegisterExecutionsAsync(string consultNumber, ExecutionsRequest request)
+    {
+        // NOTE: 中止理由の登録ルール
+        // 前提：リクエストは検査項目単位、DBは検査項目明細単位
+        // 
+        // [1] isPerforming（検査実施する）：true & 中止理由：null
+        //   - a. 中止レコードがある => 中止レコードを削除する
+        //   - b. 中止レコードがない => 処理しない
+        //
+        // [2] isPerforming（検査実施する）：false & 中止理由：あり
+        //   - a. 中止レコードがある => 中止レコードを更新する
+        //   - b. 中止レコードがない => 中止レコードを挿入する
+
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
+
+        // [1] isPerforming（検査実施する）：true & 中止理由：null
+        var performingList = request.Executions.Where(x => x.IsPerforming && x.CancelReasonId is null).ToArray();
+
+        // [2] isPerforming（検査実施する）：false & 中止理由：あり
+        var notPerformingList = request.Executions.Where(x => !x.IsPerforming && x.CancelReasonId is not null).ToArray();
+
+        // [1]-a 削除対象
+        // 保存済みの中止レコードに対して検査項目IDで突合して、削除対象の検査項目明細IDを取得する
+        var removeTargets = performingList.SelectMany(req => examCancels.ExamItemDetailCancels
+                                                                .Where(x => x.ExamItemId == req.ExamItemId)
+                                                                .Select(x => x.ExamItemDetailId)
+                                                     ).ToArray();
+
+        // [2]-a,b
+        // UPSERTはリポジトリに任せる
+        var toSave = notPerformingList.Select(x => new Domain.Models.ExamItemCancel()
+        {
+            ExamItemId = x.ExamItemId,
+            CancelReasonId = (int)x.CancelReasonId!,
+        }).ToArray();
+
+        await _consultRepository.RemoveExamCancelsAsync(consult.ConsultId, removeTargets);
+        await _consultRepository.SaveExamCancelsAsync(consult.ConsultId, toSave);
+    }
 }

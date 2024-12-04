@@ -95,8 +95,9 @@ public class ConsultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/executions")]
-    public IActionResult RegisterExecutions([FromRoute] string consultNumber, [FromBody] ExecutionsRequest executions)
+    public async Task<IActionResult> RegisterExecutions([FromRoute] string consultNumber, [FromBody] ExecutionsRequest executions)
     {
+        await _consultUsecase.RegisterExecutionsAsync(consultNumber, executions);
         return Ok();
     }
 
