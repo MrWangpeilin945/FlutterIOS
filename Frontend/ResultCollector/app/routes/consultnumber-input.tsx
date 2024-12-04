@@ -37,25 +37,7 @@ export default function consultNumberInput() {
   ];
 
   // Todo 後に消す【CP0011】未受診検査項目の確認用の設定
-  const incompliedExams = [
-    "胸囲",
-    "検尿",
-    "視力",
-    "診察",
-    "胸部X線",
-    "心電図",
-    "マーゲン",
-    "肺活量",
-    "MRI",
-    "CT3",
-    "3",
-    "身長体重",
-    "診察",
-    "問診",
-    "健康指導",
-    "胃カメラ",
-    "エコーエコーエコーエコーエコーエコーエコーエコーエコーエコー",
-  ];
+  const incompliedExams: string[] = [];
 
   // キーボード以外の部分がクリックされると非表示に
   const closeKeyBoard = useClickOutside(() => setShowKeyboard(false));
