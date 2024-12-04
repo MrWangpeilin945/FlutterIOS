@@ -172,6 +172,7 @@ export default function ExamNumeric({
   // キーボード入力時の処理
   const handleKeyChange = (e: string) => {
     setExamValue(e);
+    updatedExamItems();
   };
 
   return (
@@ -195,12 +196,13 @@ export default function ExamNumeric({
         <TextInput
           className="input-textbox"
           classNames={{
-            input:
+            input: `${styles.inputTextbox} ${
               errMessages?.at(0)?.errorLevel === 3
                 ? styles.inputerror
                 : errMessages?.at(0)?.errorLevel === 2
                 ? styles.inputwarning
-                : styles.inputTextbox,
+                : ""
+            }`,
           }}
           w={"340"}
           radius={"md"}

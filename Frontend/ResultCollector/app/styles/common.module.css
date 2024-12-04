@@ -46,18 +46,17 @@
 .inputerror{
   outline :1px solid #E26264;
   color: #E26264;
-  height: 79px;
 }
 
 .inputwarning{
   outline :1px solid #EE6A00;
   color: #EE6A00;  
-  height: 79px;
 }
 
 .inputTextbox{
   height: 79px;
   text-align: right;
+  padding: 32px;
 }
 
 .large-input {
