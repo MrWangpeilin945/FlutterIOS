@@ -221,7 +221,10 @@ export default function ExamNumeric({
           radius={"md"}
           size="inputComponent"
           value={formatDecimalValue(examValue)}
-          disabled={!!examItems.examItemDetails?.at(0)?.cancelReasonId}
+          disabled={
+            !!examItems.examItemDetails?.at(0)?.cancelReasonId ||
+            !examItems.examItemDetails?.at(0)?.isPerforming
+          }
           onClick={() => setShowKeyboard(true)}
           onChange={(e) => {
             handleTextChange(e);
