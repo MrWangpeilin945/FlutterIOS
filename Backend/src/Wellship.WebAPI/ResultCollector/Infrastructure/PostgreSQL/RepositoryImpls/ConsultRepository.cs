@@ -207,6 +207,11 @@ public class ConsultRepository : IConsultRepository
     /// </summary>
     public async Task RemoveExamCancelsAsync(int consultId, int[] examItemDetailIds)
     {
+        if (examItemDetailIds.Length == 0)
+        {
+            return;
+        }
+
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
         delete 
