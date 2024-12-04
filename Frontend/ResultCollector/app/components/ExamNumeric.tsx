@@ -1,4 +1,5 @@
 import type React from "react";
+import { z } from "zod";
 import { useEffect, useState } from "react";
 import {
   Group,
@@ -85,30 +86,40 @@ export default function ExamNumeric({
   };
   // 半角数字のチェック
   const validationNumeric = () => {
-    const numericRegex = /^[0-9]+$/;
-    if (examValue && !numericRegex.test(examValue)) {
+    if (!examValue) {
+      return [];
+    }
+    const validationSchema = z
+      .string()
+      .regex(
+        /^[0-9]+$/,
+        getErrorMessage(errorMessages.numericString, `${examItems[0].name}は`)
+      );
+    const result = validationSchema.safeParse(examValue);
+    if (!result.success) {
       const numericMessage: ExamRegistResult = {
-        description: getErrorMessage(
-          errorMessages.alphaNumericString,
-          `${examItems[0].name}は`
-        ),
-        errorLevel: InputErrorLevel.警告,
+        description: result.error.errors[0].message,
+        errorLevel: InputErrorLevel.異常,
       };
-      return numericMessage || [];
+      return [numericMessage];
     }
     return [];
   };
   // 必須バリデーションチェック
   const validationRequire = () => {
-    const requireMessage: ExamRegistResult = {
-      description: getErrorMessage(
-        errorMessages.required,
-        `${examItems[0].name}は`
-      ),
-      errorLevel: InputErrorLevel.異常,
-    };
-    if (onRegisterPressed && examValue === "") {
-      return requireMessage || [];
+    const requireSchema = z
+      .string()
+      .min(
+        1,
+        getErrorMessage(errorMessages.required, `${examItems[0].name}は`)
+      );
+    const result = requireSchema.safeParse(examValue);
+    if (!result.success && onRegisterPressed) {
+      const numericMessage: ExamRegistResult = {
+        description: result.error.errors[0].message,
+        errorLevel: InputErrorLevel.異常,
+      };
+      return [numericMessage];
     }
     return [];
   };
@@ -227,10 +238,6 @@ export default function ExamNumeric({
           radius={"md"}
           size="inputComponent"
           value={formatDecimalValue(examValue)}
-          disabled={
-            !!firstExamItemDetail?.cancelReasonId ||
-            !firstExamItemDetail?.hasOrder
-          }
           onClick={() => setShowKeyboard(true)}
           onChange={(e) => {
             handleTextChange(e);
