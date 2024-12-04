@@ -24,7 +24,17 @@
 
 === クエリパラメータ
 
-なし
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|placeScheduleId
+|No
+|int
+|会場日程ID。指定した場合は、会場ロック状況を取得して返却する。
+|`25`
+
+|===
 
 === リクエストボディ
 
@@ -64,7 +74,7 @@
       ]
     }
   ],
-  "placeScheduleLockingStatus" : 1
+  "placeScheduleLockingStatus" : 21
 }
 ----
 
