@@ -23,10 +23,13 @@ export default function ExamSelectLR({
   onRegisterPressed,
   onClick,
 }: SelectProps) {
+  if (!examItems || examItems.length === 0) {
+    return null;
+  }
   const examItem = examItems[0];
   const examItemDetails = examItem.examItemDetails;
   if (!examItemDetails) {
-    return undefined;
+    return null;
   }
   const [errMessages, setErrMessages] = useState<
     ExamRegistResult[] | undefined
@@ -37,11 +40,10 @@ export default function ExamSelectLR({
     examItemDetails.map((detail) => detail.value ?? ""),
   );
 
-  //エラーメッセージ処理
   const handleErrorMessage = () => {
     const initialMessages = examItem.examRegistResults || [];
     let updatedMessages: ExamRegistResult[] = [...initialMessages];
-
+  
     examItemDetails.forEach((detail, index) => {
       // 必須用エラーメッセージ
       const errorMessage: ExamRegistResult = {
@@ -51,34 +53,30 @@ export default function ExamSelectLR({
         ),
         errorLevel: InputErrorLevel.異常,
       };
-
-      // 必須チェック: value が空ならエラーを追加
+  
+      // 必須チェック
       if (onRegisterPressed && !selectedValues[index]) {
-        // 同じエラーメッセージがない場合のみ追加
-        if (
-          !updatedMessages.some(
-            (msg) => msg.description === errorMessage.description,
-          )
-        ) {
-          updatedMessages.push(errorMessage);
-        }
+        // value が空ならエラーを追加
+        updatedMessages.push(errorMessage);
+      } else {
+        // valueが存在する場合はエラーを削除
+        updatedMessages = updatedMessages.filter(
+          (msg) =>
+            msg.description !== errorMessage.description
+        );
       }
     });
-
-    // 既存メッセージから不要なものを削除
-    updatedMessages = updatedMessages.filter(
-      (msg) =>
-        !examItemDetails.some(
-          (detail, index) =>
-            msg.description ===
-              getErrorMessage(errorMessages.required, `${detail.name}は`) &&
-            selectedValues[index] !== "",
-        ),
+  
+    // 重複を除外する
+    const uniqueErrorMessages = Array.from(
+      new Map(updatedMessages.map((msg) => [msg.description, msg])).values(),
     );
-
+  
     // エラーメッセージをソート
-    updatedMessages.sort((a, b) => (b.errorLevel ?? 0) - (a.errorLevel ?? 0));
-    setErrMessages(updatedMessages);
+    uniqueErrorMessages.sort(
+      (a, b) => (b.errorLevel ?? 0) - (a.errorLevel ?? 0),
+    );
+    setErrMessages(uniqueErrorMessages);
   };
 
   useEffect(() => {
@@ -186,8 +184,11 @@ export default function ExamSelectLR({
       </Flex>
 
       {(errMessages || []).map((error, index) => (
-        <Group key={index} c={error.errorLevel === 2 ? "warning" : "error"}>
-          {error.errorLevel === 2 ? (
+        <Group
+          key={index}
+          c={error.errorLevel === InputErrorLevel.警告 ? "warning" : "error"}
+        >
+          {error.errorLevel === InputErrorLevel.警告 ? (
             <IconExclamationCircleFilled size="32px" />
           ) : (
             <IconSquareRoundedXFilled size="32px" />
