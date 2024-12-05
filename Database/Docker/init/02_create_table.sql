@@ -99,8 +99,8 @@ CREATE TABLE exam_normal_options (
   , name text NOT NULL
   , threshold_id integer NOT NULL
   , exam_item_detail_id integer NOT NULL
-  , min_age varchar(7) NOT NULL
   , max_age varchar(7) NOT NULL
+  , min_age varchar(7) NOT NULL
   , target_sex integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -112,8 +112,8 @@ CREATE TABLE exam_normal_value_range (
   , name text NOT NULL
   , threshold_id integer NOT NULL
   , exam_item_detail_id integer NOT NULL
-  , min_age varchar(7) NOT NULL
   , max_age varchar(7) NOT NULL
+  , min_age varchar(7) NOT NULL
   , target_sex integer NOT NULL
   , max_value decimal NOT NULL
   , min_value decimal NOT NULL
@@ -672,8 +672,8 @@ COMMENT ON COLUMN exam_normal_options.normal_options_id IS '基準値選択肢ID
 COMMENT ON COLUMN exam_normal_options.name IS '名称';
 COMMENT ON COLUMN exam_normal_options.threshold_id IS '基準値パターンID:0: テナントの基準';
 COMMENT ON COLUMN exam_normal_options.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_normal_options.min_age IS '対象年齢上限';
-COMMENT ON COLUMN exam_normal_options.max_age IS '対象年齢下限';
+COMMENT ON COLUMN exam_normal_options.max_age IS '対象年齢上限';
+COMMENT ON COLUMN exam_normal_options.min_age IS '対象年齢下限';
 COMMENT ON COLUMN exam_normal_options.target_sex IS '対象性別';
 COMMENT ON COLUMN exam_normal_options.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_options.created_by IS '作成者';
@@ -683,8 +683,8 @@ COMMENT ON COLUMN exam_normal_value_range.range_id IS '範囲ID';
 COMMENT ON COLUMN exam_normal_value_range.name IS '名称';
 COMMENT ON COLUMN exam_normal_value_range.threshold_id IS '基準値パターンID:0: テナントの基準';
 COMMENT ON COLUMN exam_normal_value_range.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_normal_value_range.min_age IS '対象年齢上限';
-COMMENT ON COLUMN exam_normal_value_range.max_age IS '対象年齢下限';
+COMMENT ON COLUMN exam_normal_value_range.max_age IS '対象年齢上限';
+COMMENT ON COLUMN exam_normal_value_range.min_age IS '対象年齢下限';
 COMMENT ON COLUMN exam_normal_value_range.target_sex IS '対象性別';
 COMMENT ON COLUMN exam_normal_value_range.max_value IS '値上限';
 COMMENT ON COLUMN exam_normal_value_range.min_value IS '値下限';
