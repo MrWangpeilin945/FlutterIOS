@@ -18,7 +18,7 @@ flowchart TD
     E --> UseCaseEND(END)
 
     F[[Repository]] --> G[BEGIN]
-    G --> H["Upsert(一括):[DB]Thresholds(基準パターン)"]
+    G --> H["Upsert(一括):[DB]thresholds(基準パターン)"]
     H --> K[Commit]
     H -.Exception.-> ROOLBACK[ROOLBACK]
     K --> RepositoryEND[[END]]
@@ -104,18 +104,18 @@ list.Count()  <> 0
 ===== Insert
 
 * 条件
-** `[DB]Thresholds(基準パターン).threshold_code(基準パターンコード) == Threshold.Code` が存在しない
+** `[DB]thresholds(基準パターン).threshold_code(基準パターンコード) == Threshold.Code` が存在しない
 
 ===== Table
 
-* [DB]Thresholds(基準パターン)
+* [DB]thresholds(基準パターン)
 
 [cols="1,2,2" options="header"]
 |===
 |列|登録値|処理・変換
 
 |team_id
-|max([DB]Thresholds(基準パターン).threshold_id(基準パターンID)) + 1
+|max([DB]thresholds(基準パターン).threshold_id(基準パターンID)) + 1
 |
 
 |threshold_code
@@ -127,7 +127,7 @@ list.Count()  <> 0
 |
 
 |order_number
-|max([DB]Thresholds(基準パターン).order_number(表示順)) + 1
+|max([DB]thresholds(基準パターン).order_number(表示順)) + 1
 |
 
 |created_at
@@ -143,11 +143,11 @@ list.Count()  <> 0
 ===== Update
 
 * 条件
-** `[DB]Thresholds(基準パターン).threshold_code(基準パターンコード) == Threshold.Code` が存在する
+** `[DB]thresholds(基準パターン).threshold_code(基準パターンコード) == Threshold.Code` が存在する
 
 ===== Table
 
-* [DB]Thresholds(基準パターン)
+* [DB]thresholds(基準パターン)
 
 [cols="1,2,2" options="header"]
 |===
