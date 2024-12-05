@@ -46,7 +46,7 @@ StoreTeamsAsync
 |Teams
 |Yes
 |List<Team>
-|登録する受診者のリスト
+|登録する班のリスト
 
 |===
 

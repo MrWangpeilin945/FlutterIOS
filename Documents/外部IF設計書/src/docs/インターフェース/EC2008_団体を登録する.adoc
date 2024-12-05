@@ -46,7 +46,7 @@ StoreorganizationsAsync
 |organizations
 |Yes
 |List<Organization>
-|登録する受診者のリスト
+|登録する団体のリスト
 
 |===
 

@@ -46,7 +46,7 @@ StorePlacesAsync
 |Places
 |Yes
 |List<Place>
-|登録する受診者のリスト
+|登録する会場のリスト
 
 |===
 

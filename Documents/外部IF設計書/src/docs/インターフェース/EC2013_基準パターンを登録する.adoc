@@ -46,7 +46,7 @@ StoreThresholdsAsync
 |Thresholds
 |Yes
 |List<Threshold>
-|登録する受診者のリスト
+|登録する基準パターンのリスト
 
 |===
 
