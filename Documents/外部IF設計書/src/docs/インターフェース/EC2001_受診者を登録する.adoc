@@ -10,9 +10,13 @@
 [mermaid]
 ----
 flowchart TD
-    A[UseCase] --> B{検証}
-    B -- エラーあり --> C(ErrorObject生成、追加)
-    B -- エラー無 --> D[[Repository]]
+    A[UseCase] --> ERROR{ERROR検証}
+    ERROR -- エラーあり --> C(ErrorObject生成、追加)
+    ERROR -- エラー無 --> WORNING{WORNING検証}    
+    WORNING -- ワーニングあり --> DROP(WORNINGレコードDrop)
+    DROP(WORNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
+    DROP_REC --> D[[Repository]]
+    WORNING -- ワーニング無 --> D
     C --> E(返却)
     D --> E
     E --> UseCaseEND(END)
@@ -160,11 +164,15 @@ list.Count()  <> 0
 
 * None
 
-==== 検証
+==== ERROR検証
 
 * 団体の取得に失敗
 ** `[DB]organizations(団体).organization_code(団体コード) == Examinee.Affiliations.OrganizationCode` が存在しない
 *** Code `10001` : Message `登録されていない団体です。` InputNote [Examinee,InputNote]
+
+==== WORNING検証
+
+* None
 
 ==== 処理(Repository)
 
