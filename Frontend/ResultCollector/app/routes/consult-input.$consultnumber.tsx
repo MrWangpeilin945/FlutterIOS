@@ -87,7 +87,11 @@ export default function consultInput() {
         onRegisterPressed={1}
         onClick={handleConfirm}
       />
-      <ExamNumeric examItems={data.examItems} onChange={handleConfirm} />
+      <ExamNumeric
+        examItems={data.examItems}
+        onRegisterPressed={true}
+        onChange={handleConfirm}
+      />
       <CommonFooter />
     </>
   );
