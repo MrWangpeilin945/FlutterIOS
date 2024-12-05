@@ -62,7 +62,7 @@ CREATE TABLE exam_item_detail_options (
   option_id integer NOT NULL
   , code text NOT NULL
   , exam_item_detail_id integer NOT NULL
-  , name integer NOT NULL
+  , name text NOT NULL
   , order_number integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
