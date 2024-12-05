@@ -15,6 +15,7 @@ import {
 import { useClickOutside } from "@mantine/hooks";
 import Keyboard from "~/components/NumericKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
+import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import type {
   ExamRegistResult,
   InputExamItem,
@@ -53,4 +54,72 @@ export default function ExamNumericLR({
   const handleConfirm: () => void = () => {
     setShowKeyboard([false, false]);
   };
+
+  // APIのエラーメッセージの取得
+  const getAPIErrorMessages = () => {
+    // ExamNormalValueRangeを参照したエラーメッセージを追加
+    examItems = setRangesErrorMessage(examItems);
+    const APIerror = examItems[0].examRegistResults || [];
+    return APIerror || [];
+  };
+
+  // 半角数字のチェック
+  const validationNumeric = () => {
+    if (!examValue) {
+      return [];
+    }
+    const validationSchema = z
+      .string()
+      .regex(
+        /^[0-9]+$/,
+        getErrorMessage(errorMessages.numericString, `${examItems[0].name}は`)
+      );
+    const result = validationSchema.safeParse(examValue);
+    if (!result.success) {
+      const numericMessage: ExamRegistResult = {
+        description: result.error.errors[0].message,
+        errorLevel: InputErrorLevel.異常,
+      };
+      return [numericMessage];
+    }
+    return [];
+  };
+  // 必須バリデーションチェック
+  const validationRequire = () => {
+    const requireSchema = z
+      .string()
+      .min(
+        1,
+        getErrorMessage(errorMessages.required, `${examItems[0].name}は`)
+      );
+    const result = requireSchema.safeParse(examValue);
+    if (!result.success && onRegisterPressed) {
+      const numericMessage: ExamRegistResult = {
+        description: result.error.errors[0].message,
+        errorLevel: InputErrorLevel.異常,
+      };
+      return [numericMessage];
+    }
+    return [];
+  };
+
+  // 重複を削除して、エラーレベルに応じた並び替えを行う
+  const sortErrorMessages = (result: ExamRegistResult[]) => {
+    const uniqueErrorMessages = Array.from(
+      new Map(result.map((msg) => [msg.description, msg])).values()
+    );
+    const sortedMessages = uniqueErrorMessages.sort(
+      (a, b) => (b.errorLevel ?? 0) - (a.errorLevel ?? 0)
+    );
+    return sortedMessages;
+  };
+  // バリデーションチェックの走査
+  useEffect(() => {
+    const result = sortErrorMessages(
+      getAPIErrorMessages()
+        .concat(validationNumeric())
+        .concat(validationRequire())
+    );
+    setErrMessages(result);
+  }, [examValue, onRegisterPressed]);
 }
