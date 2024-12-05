@@ -113,6 +113,11 @@ list.Count()  <> 0
 |List<Affiliation> 
 |所属
 
+|InputNote
+|Yes
+|string
+|エラーオブジェクトに登録する入力項目Noなど
+
 |===
 
 ==== Affiliation
@@ -144,6 +149,11 @@ list.Count()  <> 0
 |string
 |エラーメッセージ
 
+|InputNote
+|Yes
+|string
+|入力項目Noなど
+
 |===
 
 ==== 列挙型
@@ -154,7 +164,7 @@ list.Count()  <> 0
 
 * 団体の取得に失敗
 ** `[DB]organizations(団体).organization_code(団体コード) == Examinee.Affiliations.OrganizationCode` が存在しない
-*** Code `10001` : Message `登録されていない団体です。`
+*** Code `10001` : Message `登録されていない団体です。` InputNote [Examinee,InputNote]
 
 ==== 処理(Repository)
 
