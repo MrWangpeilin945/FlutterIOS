@@ -36,17 +36,19 @@ export default function ExamNumeric({
 }: ExamNumericProps) {
   // 引数に必要な値が存在するかのチェック
   if (
-    ![0, 1, 2].every((index) =>
-      examItems[index]?.examItemDetails?.some(
-        (item) => item.positionNumber === 1 || item.positionNumber === 2
-      )
+    ![0, 1, 2].every(
+      (index) =>
+        examItems[index]?.examItemDetails &&
+        examItems[index].examItemDetails.length >= 2
     )
   ) {
     return null;
   }
 
   // 状態の宣言
-  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [showKeyboard, setShowKeyboard] = useState<boolean[]>(
+    Array(3).fill(false)
+  );
   const [examValue, setExamValue] = useState(firstExamItem?.value || "");
   const [errMessages, setErrMessages] = useState<ExamRegistResult[]>();
   const closeKeyBoard = useClickOutside(() => setShowKeyboard(false));
