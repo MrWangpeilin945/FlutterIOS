@@ -43,7 +43,7 @@ export default function IncompliedExam({
               borderTopRightRadius: "inherit",
             }}
             px="24"
-            py={"sm"}
+            py="12"
             bg={"green02"}
           >
             <Text size="xs" c="black" fw="500">
@@ -51,7 +51,7 @@ export default function IncompliedExam({
               さんの未受診検査項目はこちらです。
             </Text>
           </Box>
-          <Box px="24" py={"sm"}>
+          <Box px="24" py="12">
             <Text
               className={styles["text-multiline"]}
               size="xs"
