@@ -89,6 +89,34 @@ list.Count()  <> 0
 |string
 |班名
 
+|InputNote
+|Yes
+|string
+|エラーオブジェクトに登録する入力項目Noなど
+
+|===
+
+==== ErrorObject
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|エラーコード
+
+|Message
+|Yes
+|string
+|エラーメッセージ
+
+|InputNote
+|Yes
+|string
+|入力項目Noなど
+
 |===
 
 ==== 列挙型
