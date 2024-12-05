@@ -34,4 +34,10 @@ public interface IConsultUsecase
     /// 検査の実施有無と中止理由を登録する
     /// </summary>
     public Task RegisterExecutionsAsync(string consultNumber, ExecutionsRequest request);
+
+    /// <summary>
+    /// 検査結果入力情報を取得する
+    /// </summary>
+    public Task<InputExamItems> GetInputExamItemsExamineeAsync(string consultNumber, int examMenuId);
+
 }

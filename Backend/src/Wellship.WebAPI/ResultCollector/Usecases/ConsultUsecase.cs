@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+
 using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Exceptions;
@@ -12,16 +14,19 @@ public class ConsultUsecase : IConsultUsecase
 {
     private readonly IConsultRepository _consultRepository;
     private readonly IExamineeRepository _examineeRepository;
+    private readonly IExamItemRepository _examItemRepository;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="consultRepository">受診リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
-    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository)
+    /// <param name="examItemRepository">検査項目リポジトリ</param>
+    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamItemRepository examItemRepository)
     {
         _consultRepository = consultRepository;
         _examineeRepository = examineeRepository;
+        _examItemRepository = examItemRepository;
     }
 
     /// <summary>
@@ -140,5 +145,100 @@ public class ConsultUsecase : IConsultUsecase
 
         await _consultRepository.RemoveExamCancelsAsync(consult.ConsultId, removeTargets);
         await _consultRepository.SaveExamCancelsAsync(consult.ConsultId, toSave);
+    }
+
+    /// <summary>
+    /// 検査結果入力情報を取得する
+    /// </summary>
+    public async Task<InputExamItems> GetInputExamItemsExamineeAsync(string consultNumber, int examMenuId)
+    {
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
+        // 検査メニューに関連した検査項目情報を取得
+        var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
+        // 検査項目明細IDを取得
+        var examItemDetailIds = examItemGroups.SelectMany(group => group.ExamItems)
+                                              .SelectMany(item => item.ExamItemDetails)
+                                              .Select(detail => detail.ExamItemDetailId)
+                                              .ToArray();
+        // キーボード入力値リスト
+        var Keyboards = await _examItemRepository.GetKeyboardOptionssAsync(examItemDetailIds);
+        // 検査項目明細選択肢
+        var examItemDetailOptions = await _examItemRepository.GetExamItemDetailOptionsAsync(examItemDetailIds);
+
+        return new InputExamItems()
+        {
+            ConsultNumber = consultNumber,
+            Examinee = new InputExamExaminee(){
+                // TODO: 受付番号
+                ReceptionNumber = 100,
+                KanaName = examinee.KanaName,
+                Sex = (int)examinee.Sex,
+                // TODO: 健診時の年齢
+                ExamDateAge = 40
+            },
+            RelatedExamItems = [],                  // TODO: 関連検査項目
+            ExamItemGroups = 
+                examItemGroups.Select(eg => new ExamItemGroup
+                {
+                    Type = (int)eg.Type,
+                    ExamItems = eg.ExamItems.Select(ei => new InputExamItem
+                    {
+                        PositionNumber = ei.PositionNumber,
+                        ExamItemId = ei.ExamItemId,
+                        Name = ei.Name,
+                        ExamItemDetails = ei.ExamItemDetails.Select(ed => new ExamItemDetail
+                        {
+                            PositionNumber = ed.PositionNumber,
+                            ExamItemDetailId = ed.ExamItemDetailId,
+                            EquipmentLabel = ed.EquipmentLabel,
+                            Name = ed.Name,
+                            HasOrder = true,        // TODO: 検査依頼が存在するか
+                            CancelReasonId = null,  // TODO: 中止理由ID
+                            Value = "",             // TODO: 今回値
+                            PrevValue = "",         // TODO: 前回値
+                            Unit = ed.Unit,
+                            Type = (int)ed.Type,
+                            IntegerLength = ed.IntegerLength,
+                            DecimalLength = ed.DecimalLength,
+                            // キーボード入力
+                            Keyboard = new Keyboard{
+                                KeyboardType = (int)ed.KeyboardType,
+                                Values = Keyboards.Where(kb => kb.ExamItemDetailId == ed.ExamItemDetailId)
+                                                  .OrderBy(kb => kb.OptionId)
+                                                  .Select(kb => kb.Value)
+                                                  .ToArray()
+                            },
+                            // 選択肢
+                            ExamItemDetailOptions = 
+                                examItemDetailOptions.Where(op => op.ExamItemDetailId == ed.ExamItemDetailId)
+                                                     .OrderBy(op => op.OrderNumber)         
+                                                     .Select(op => new ExamItemDetailOption
+                                                        {
+                                                            OrderNumber = op.OrderNumber,
+                                                            Code = op.Code,
+                                                            Name = op.Name
+                                                        }).ToArray(),   
+                            ExamNormalValueRanges = []
+
+                            /*
+                            ExamItemDetailOptions = ed.ExamItemDetailOptions.Select(op => new ExamItemDetailOption
+                            {
+                                OrderNumber = op.OrderNumber,
+                                Code = op.Code,
+                                Name = op.Name
+                            }).ToArray(),
+                            ExamNormalValueRanges = ed.ExamNormalValueRanges.Select(en => new ExamNormalValueRange
+                            {
+                                ErrorLevel = (int)en.ErrorLevel,
+                                MaxValue = en.MaxValue,
+                                MinValue = en.MinValue
+                            }).ToArray()
+                            */
+                        }).ToArray(),
+                        ExamRegistResults = []      // TODO: 検査結果登録エラー
+                    }).ToArray()
+                }).ToArray()
+        };
     }
 }
