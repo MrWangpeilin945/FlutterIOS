@@ -14,6 +14,10 @@ export type PlaceScheduleGetTeamsParams = {
 date?: string;
 };
 
+export type HomeMenuGetHomeMenuSettingsParams = {
+placeScheduleId?: number | null;
+};
+
 export type EquipmentGetEquipmentSettingsParams = {
 examMenuId?: number;
 };
@@ -27,10 +31,6 @@ examMenuId?: number;
 
 export type ConsultGetExamItemsExamineeParams = {
 examMenuId?: number;
-};
-
-export type CancelReasonGetCancelReasonsParams = {
-examItemId?: number;
 };
 
 /**
@@ -321,6 +321,11 @@ export interface HomeMenuGroup {
 export interface HomeMenuGroupList {
   /** ホームメニューグループリスト */
   homeMenuGroups?: HomeMenuGroup[];
+  /**
+   * 会場日程状況
+   * @nullable
+   */
+  placeScheduleLockingStatus?: number | null;
 }
 
 /**
@@ -413,6 +418,8 @@ export interface ExamItemDetail {
   examItemDetailOptions?: ExamItemDetailOption[];
   /** 検査正常値範囲 */
   examNormalValueRanges?: ExamNormalValueRange[];
+  /** 検査依頼が存在するか */
+  hasOrder?: boolean;
   /** 整数部最大桁数 */
   integerLength?: number;
   /** キーボード */
@@ -472,20 +479,6 @@ export interface InputExamExaminee {
 }
 
 /**
- * 検査結果入力情報
- */
-export interface InputExamItems {
-  /** 受診番号 */
-  consultNumber?: string;
-  /** 受診者情報 */
-  examinee?: InputExamExaminee;
-  /** 検査結果入力項目グループ */
-  examItemGroups?: ExamItemGroup[];
-  /** 関連検査項目 */
-  relatedExamItems?: RelatedExamItem[];
-}
-
-/**
  * 実施有無と中止理由のリクエストモデル
  */
 export interface ExecutionRequest {
@@ -509,16 +502,6 @@ export interface ExecutionsRequest {
 }
 
 /**
- * 検査メニュー
- */
-export interface ExamMenu {
-  /** 検査メニューID */
-  examMenuId?: number;
-  /** 検査メニュー名 */
-  examMenuName?: string;
-}
-
-/**
  * 実施検査状況
  */
 export interface ExamDetail {
@@ -528,8 +511,8 @@ export interface ExamDetail {
   examItemId?: number;
   /** 検査項目名 */
   examItemName?: string;
-  /** 検査実施するか */
-  isPerforming?: boolean;
+  /** 検査依頼が存在するか */
+  hasOrder?: boolean;
 }
 
 /**
@@ -540,6 +523,20 @@ export interface RelatedExamItem {
   examItemName?: string;
   /** 検査結果 */
   examResult?: string;
+}
+
+/**
+ * 検査結果入力情報
+ */
+export interface InputExamItems {
+  /** 受診番号 */
+  consultNumber?: string;
+  /** 受診者情報 */
+  examinee?: InputExamExaminee;
+  /** 検査結果入力項目グループ */
+  examItemGroups?: ExamItemGroup[];
+  /** 関連検査項目 */
+  relatedExamItems?: RelatedExamItem[];
 }
 
 /**
@@ -565,6 +562,16 @@ export interface Examinee {
 }
 
 /**
+ * 検査メニュー
+ */
+export interface ExamMenu {
+  /** 検査メニューID */
+  examMenuId?: number;
+  /** 検査メニュー名 */
+  examMenuName?: string;
+}
+
+/**
  * 検査内容
  */
 export interface ExamContent {
@@ -585,27 +592,17 @@ export interface ExamContent {
 }
 
 /**
- * 検査項目
- */
-export interface ExamItem {
-  /** 検査項目ID */
-  examItemId?: number;
-  /** 検査項目名 */
-  examItemName?: string;
-}
-
-/**
  * 未受診の検査項目リスト
  */
-export interface UnexaminedItemList {
+export interface UnexaminedMenuList {
   /** 受診ID */
   consultId?: number;
   /** 受診者ID */
   examineeId?: number;
   /** 受診者名 */
   examineeName?: string;
-  /** 未受診の検査項目リスト */
-  unexaminedItems?: ExamItem[];
+  /** 未受診の検査メニューリスト */
+  unexaminedMenus?: ExamMenu[];
 }
 
 /**
