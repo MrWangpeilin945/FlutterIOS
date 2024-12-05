@@ -32,4 +32,20 @@ public interface IConsultRepository
     /// 未受診の検査項目を受診単位のリストで取得します。
     /// </summary>
     public Task<IEnumerable<UnexaminedConsult>> GetUnexaminedConsultsAsync(string[] consultNumbers);
+
+    /// <summary>
+    /// 受診を指定して検査中止を取得します。
+    /// </summary>
+    public Task<ExamCancel> GetExamCancelsAsync(int consultId);
+
+    /// <summary>
+    /// 検査中止を削除します。
+    /// </summary>
+    public Task RemoveExamCancelsAsync(int consultId, int[] examItemDetailIds);
+
+    /// <summary>
+    /// 検査中止を保存します。
+    /// すでに同じ検査項目明細の中止が存在すれば上書き更新、存在しなければ新規作成します。
+    /// </summary>
+    public Task SaveExamCancelsAsync(int consultId, IEnumerable<ExamItemCancel> examItemCancels);
 }
