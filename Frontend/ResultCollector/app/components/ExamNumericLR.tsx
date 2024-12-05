@@ -15,7 +15,6 @@ import {
 import { useClickOutside } from "@mantine/hooks";
 import Keyboard from "~/components/NumericKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
-import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import type {
   ExamRegistResult,
   InputExamItem,
@@ -42,12 +41,12 @@ export default function ExamNumericLR({
   ) {
     return null;
   }
-  const firstExamItem = examItems[0].examItemDetails;
+  const firstExamItemDetails = examItems[0].examItemDetails;
 
   // 状態の宣言
   const [showKeyboard, setShowKeyboard] = useState<boolean[]>([false, false]);
   const [examValue, setExamValue] = useState<string[]>(
-    firstExamItem.map((item) => item.value || "")
+    firstExamItemDetails.map((item) => item.value || "")
   );
   const [errMessages, setErrMessages] = useState<ExamRegistResult[]>();
   const closeKeyBoard = useClickOutside(() => setShowKeyboard([false, false]));
@@ -57,8 +56,7 @@ export default function ExamNumericLR({
 
   // APIのエラーメッセージの取得
   const getAPIErrorMessages = () => {
-    // ExamNormalValueRangeを参照したエラーメッセージを追加
-    examItems = setRangesErrorMessage(examItems);
+    // TODO:共通関数の追加 ExamNormalValueRangeを参照したエラーメッセージを追加
     const APIerror = examItems[0].examRegistResults || [];
     return APIerror || [];
   };
@@ -122,4 +120,79 @@ export default function ExamNumericLR({
     );
     setErrMessages(result);
   }, [examValue, onRegisterPressed]);
+
+  return (
+    <Flex justify="flex-start" align="flex-start" direction="column">
+      <Stack>
+        <Paper
+          w={274}
+          h={80}
+          className={styles["basic-grey"]}
+          radius="itemName"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Title size="lg" fw={700}>
+            {examItems[0].name}
+          </Title>
+        </Paper>
+        <Group>
+          {firstExamItemDetails?.map((detail, index) => (
+            <Stack key={index}>
+              <Paper
+                w={524}
+                h={51}
+                className={styles["basic-grey"]}
+                radius="itemName"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Title size="lg" fw={700}>
+                  {examItems[0].name}
+                </Title>
+              </Paper>
+              <Group>
+                <TextInput
+                  classNames={{
+                    input: `${styles["input-textbox"]} ${
+                      errMessages?.some(
+                        (x) => x.errorLevel === InputErrorLevel.異常
+                      )
+                        ? `${styles["input-error"]}`
+                        : errMessages?.some(
+                            (x) => x.errorLevel === InputErrorLevel.警告
+                          )
+                        ? `${styles["input-warning"]}`
+                        : ""
+                    }`,
+                  }}
+                  w={"340"}
+                  radius={"md"}
+                  size="inputComponent"
+                  value={"12"}
+                  onClick={() => setShowKeyboard(true)}
+                  onChange={(e) => {}}
+                />
+                {/* TODO:前回値のマックス横幅設定 */}
+                <Stack gap="0">
+                  <Text size="md" fw="700" maw={"172"}>
+                    前回:0000
+                  </Text>
+                  <Text size="xs" fw="400">
+                    cm
+                  </Text>
+                </Stack>
+              </Group>
+            </Stack>
+          ))}
+        </Group>
+      </Stack>
+    </Flex>
+  );
 }
