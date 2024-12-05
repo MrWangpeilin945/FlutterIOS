@@ -23,6 +23,7 @@ const getMaxErrorLevel = (examItemDetails: ExamItemDetail[]) => {
         return numericValue >= minValue && numericValue <= maxValue;
       }
     });
+    if (!valueRange?.errorLevel || !matchExamRange?.errorLevel) continue;
     if (
       valueRange &&
       (matchExamRange === null ||
