@@ -29,4 +29,9 @@ public interface IConsultUsecase
     /// 検査内容を取得する
     /// </summary>
     public void GetExamItemsExaminee();
+
+    /// <summary>
+    /// 検査の実施有無と中止理由を登録する
+    /// </summary>
+    public Task RegisterExecutionsAsync(string consultNumber, ExecutionsRequest request);
 }
