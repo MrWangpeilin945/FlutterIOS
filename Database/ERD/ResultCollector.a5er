@@ -304,19 +304,22 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=950
-Top=2100
+Top=2050
 Field="受診ID","consult_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="受診番号","consult_number","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="進捗状況","progress_status","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="結果出力状況","export_status","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="会場日程ID","place_schedule_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="特記事項","note","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="受診者ID","examinee_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="外部連携キー","external_connection_code","text","NOT NULL",,"","",$FFFFFFFF,""
 Index==2,consult_number
+Index==1,external_connection_code
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241125184734
-Position="MAIN",950,2100
+ModifiedDateTime=20241203143603
+Position="MAIN",950,2050
 ZOrder=17
 
 [Relation]
@@ -472,7 +475,7 @@ Fields1=place_schedule_id
 Fields2=place_schedule_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,5161,2076,6531,R,R,""
+Position="MAIN",0,5161,2076,6528,R,R,""
 Dependence=0
 Caption=
 PName=
@@ -922,7 +925,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=900
-Top=2400
+Top=2350
 Field="受診ID","consult_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
 Field="値","value","text",,,"","",$FFFFFFFF,""
@@ -930,7 +933,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241127144933
-Position="MAIN",900,2400
+Position="MAIN",900,2350
 ZOrder=52
 
 [Relation]
@@ -1121,11 +1124,11 @@ Comment=
 TableInnerOption=
 TableOption=
 Page=MAIN
-Left=3050
-Top=500
+Left=2900
+Top=300
 Field="範囲ID","range_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="名称","name","text","NOT NULL",,"","",$FFFFFFFF,""
-Field="対象団体ID","organization_id","integer","NOT NULL",,"","0: テナントの基準",$FFFFFFFF,""
+Field="基準値パターンID","threshold_id","integer","NOT NULL",,"","0: テナントの基準",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="対象年齢上限","min_age","varchar(7)","NOT NULL",,"","",$FFFFFFFF,""
 Field="対象年齢下限","max_age","varchar(7)","NOT NULL",,"","",$FFFFFFFF,""
@@ -1135,8 +1138,8 @@ Field="値下限","min_value","decimal","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241112155209
-Position="MAIN",3050,500
+ModifiedDateTime=20241205133942
+Position="MAIN",2900,300
 ZOrder=66
 
 [Entity]
@@ -1164,7 +1167,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=100
-Top=2200
+Top=2300
 Field="受診ID","consult_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="健診日","exam_date","date","NOT NULL",1,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",2,"","",$FFFFFFFF,""
@@ -1173,7 +1176,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241112155106
-Position="MAIN",100,2200
+Position="MAIN",100,2300
 ZOrder=70
 
 [Relation]
@@ -1377,3 +1380,230 @@ BkColor=$FFFFFF
 ModifiedDateTime=20241127145426
 Position="MAIN",300,2650
 ZOrder=81
+
+[Entity]
+PName=consult_thresholds
+LName=基準値
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=100
+Top=2150
+Field="基準値パターンID","threshold_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="受診ID","consult_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="優先度","priority","integer","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241205113619
+Position="MAIN",100,2150
+ZOrder=80
+
+[Entity]
+PName=thresholds
+LName=基準値パターン
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=100
+Top=1950
+Field="基準値パターンID","threshold_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="基準値パターンコード","threshold_code","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="基準値パターン名","name","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241205113607
+Position="MAIN",100,1950
+ZOrder=81
+
+[Relation]
+Entity1=thresholds
+Entity2=consult_thresholds
+RelationType1=2
+RelationType2=3
+Fields1=threshold_id
+Fields2=threshold_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,1420,4387,1454,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20241202164248
+LineMode=0
+Bar1=142
+Bar2=439
+Bar3=145
+TermPos1=R
+TermPos2=R
+ZOrder=84
+
+[Relation]
+Entity1=consult
+Entity2=consult_thresholds
+RelationType1=2
+RelationType2=4
+Fields1=consult_id
+Fields2=consult_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,823,4830,5316,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20241202164206
+LineMode=0
+Bar1=82
+Bar2=483
+Bar3=532
+TermPos1=R
+TermPos2=R
+ZOrder=85
+
+[Entity]
+PName=exam_normal_options
+LName=検査正常値選択肢
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=2900
+Top=650
+Field="基準値選択肢ID","normal_options_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="名称","name","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="基準値パターンID","threshold_id","integer","NOT NULL",,"","0: テナントの基準",$FFFFFFFF,""
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="対象年齢上限","min_age","varchar(7)","NOT NULL",,"","",$FFFFFFFF,""
+Field="対象年齢下限","max_age","varchar(7)","NOT NULL",,"","",$FFFFFFFF,""
+Field="対象性別","target_sex","integer","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241205133950
+Position="MAIN",2900,650
+ZOrder=87
+
+[Entity]
+PName=exam_normal_option_details
+LName=検査項目明細_選択肢
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=3500
+Top=700
+Field="基準値選択肢ID","normal_options_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="選択肢ID","option_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241205125714
+Position="MAIN",3500,700
+ZOrder=88
+
+[Relation]
+Entity1=exam_normal_options
+Entity2=exam_normal_option_details
+RelationType1=2
+RelationType2=4
+Fields1=normal_options_id
+Fields2=normal_options_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,2432,7568,2944,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20241205125551
+LineMode=0
+Bar1=243
+Bar2=757
+Bar3=294
+TermPos1=R
+TermPos2=R
+ZOrder=89
+
+[Relation]
+Entity1=exam_item_detail_options
+Entity2=exam_normal_option_details
+RelationType1=2
+RelationType2=3
+Fields1=option_id
+Fields2=option_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,10000,5580,8350,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20241205125633
+LineMode=0
+Bar1=1000
+Bar2=558
+Bar3=835
+TermPos1=R
+TermPos2=R
+ZOrder=90
+
+[Entity]
+PName=tickets
+LName=受付
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=850
+Top=2500
+Field="受診ID","consult_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="受付番号","ticket_number","text",,,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241205130248
+Position="MAIN",850,2500
+ZOrder=91
+
+[Relation]
+Entity1=consult
+Entity2=tickets
+RelationType1=2
+RelationType2=3
+Fields1=consult_id
+Fields2=consult_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,0,1245,0,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20241205130218
+LineMode=0
+Bar1=0
+Bar2=124
+Bar3=0
+TermPos1=R
+TermPos2=R
+ZOrder=92
+
+[Entity]
+PName=tickets_histories
+LName=受付履歴
+Comment=
+TableInnerOption=
+TableOption=
+Page=Main
+Left=250
+Top=2500
+Field="ID","id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
+Field="受診ID","consult_id","integer",,,"","",$FFFFFFFF,""
+Field="受付番号","ticket_number","text",,,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241205131718
+Position="Main",250,2500
+ZOrder=93
