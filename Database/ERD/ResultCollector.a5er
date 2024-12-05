@@ -1070,12 +1070,12 @@ Top=2100
 Field="選択肢ID","option_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="コード","code","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
-Field="名称","name","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="名称","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241112095503
+ModifiedDateTime=20241205154756
 Position="MAIN",3100,2100
 ZOrder=62
 
