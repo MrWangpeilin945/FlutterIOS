@@ -12,6 +12,9 @@ export default function IncompliedExam({
   incompliedExams,
 }: IncompliedExamProps) {
   function concatItems(items: string[]): string {
+    if (items.length === 0) {
+      return "未受診項目なし";
+    }
     let result = "";
     let count = 0;
     for (const item of items) {
@@ -32,15 +35,15 @@ export default function IncompliedExam({
 
   return (
     <Flex align="flex-start" direction="column">
-      <Box p="md" w={924}>
+      <Box w={924}>
         <Paper radius="lg" bg={"white"}>
           <Box
             style={{
               borderTopLeftRadius: "inherit",
               borderTopRightRadius: "inherit",
             }}
-            pl="sm"
-            p="md"
+            px="24"
+            py="12"
             bg={"green02"}
           >
             <Text size="xs" c="black" fw="500">
@@ -48,7 +51,7 @@ export default function IncompliedExam({
               さんの未受診検査項目はこちらです。
             </Text>
           </Box>
-          <Box pl="sm" p="md">
+          <Box px="24" py="12">
             <Text
               className={styles["text-multiline"]}
               size="xs"
