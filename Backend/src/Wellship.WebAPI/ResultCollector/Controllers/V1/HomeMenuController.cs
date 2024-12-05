@@ -29,6 +29,7 @@ public class HomeMenuController : ControllerBase
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HomeMenuGroupList))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/homeMenus")]
     public async Task<IActionResult> GetHomeMenuSettingsAsync([FromQuery] int? placeScheduleId)
