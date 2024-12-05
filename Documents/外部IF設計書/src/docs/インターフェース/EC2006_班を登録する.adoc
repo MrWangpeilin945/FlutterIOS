@@ -1,0 +1,180 @@
+== EC2006_班を登録する
+
+=== 概要
+
+* 外部連携で使用する
+* 引数の班をDBに登録する
+
+=== 処理フロー
+
+[mermaid]
+----
+flowchart TD
+    A[UseCase] --> B{検証}
+    B -- エラーあり --> C(ErrorObject生成、追加)
+    B -- エラー無 --> D[[Repository]]
+    C --> E(返却)
+    D --> E
+    E --> UseCaseEND(END)
+
+    F[[Repository]] --> G[BEGIN]
+    G --> H["Upsert(一括):[DB]teams(班)"]
+    H --> K[Commit]
+    H -.Exception.-> ROOLBACK[ROOLBACK]
+    K --> RepositoryEND[[END]]
+    ROOLBACK .-> RepositoryEND
+----
+
+=== 非機能
+
+* 1万レコードの登録を10秒以内に完了する
+* 検証・DB登録に失敗した場合、全てロールバックする
+
+=== UseCase
+
+[source]
+----
+StoreTeamsAsync
+----
+
+==== 引数
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Teams
+|Yes
+|List<Team>
+|登録する受診者のリスト
+
+|===
+
+==== 戻り値
+
+[source]
+----
+list<ErrorObject>
+----
+
+===== 正常登録
+
+[source]
+----
+list.Count() == 0
+----
+
+===== 異常有り
+
+[source]
+----
+list.Count()  <> 0
+----
+
+==== クラス
+
+===== Team
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|班コード
+
+|Name
+|Yes
+|string
+|班名
+
+|===
+
+==== 列挙型
+
+* None
+
+==== 検証
+
+* None
+
+==== 処理(Repository)
+
+===== Insert
+
+* 条件
+** `[DB]teams(班).team_code(班コード) == Team.Code` が存在しない
+
+===== Table
+
+* [DB]teams(班)
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|team_id
+|max([DB]teams(班).team_id(班ID)) + 1
+|
+
+|team_code
+|Team.Code
+|
+
+|name
+|Team.Name
+|
+
+|order_number
+|max([DB]teams(班).order_number(表示順)) + 1
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+===== Update
+
+* 条件
+** `[DB]teams(班).team_code(班コード) == Team.Code` が存在する
+
+===== Table
+
+* [DB]teams(班)
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|team_id
+|更新対象外
+|
+
+|team_code
+|更新対象外
+|
+
+|name
+|Team.Name
+|
+
+|order_number
+|更新対象外
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
