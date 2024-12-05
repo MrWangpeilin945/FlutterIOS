@@ -1,0 +1,311 @@
+== EC2001_受診者を登録する
+
+=== 概要
+
+* 外部連携で使用する
+* 引数の受診者をDBに登録する
+
+=== 処理フロー
+
+[mermaid]
+----
+flowchart TD
+    A[UseCase] --> B{検証}
+    B -- エラーあり --> C(ErrorObject生成、追加)
+    B -- エラー無 --> D[[Repository]]
+    C --> E(返却)
+    D --> E
+    E --> UseCaseEND(END)
+
+    F[[Repository]] --> G[BEGIN]
+    G --> H["Upsert(一括):[DB]examinees(受診者)"]
+    H --> I["Delete(一括):[DB]affiliations(所属)"]
+    I --> J["Insert(一括):[DB]affiliations(所属)"]
+    J --> K[Commit]
+    H -.Exception.-> ROOLBACK[ROOLBACK]
+    G -.Exception.-> ROOLBACK
+    J -.Exception.-> ROOLBACK
+    K --> RepositoryEND[[END]]
+    ROOLBACK .-> RepositoryEND
+----
+
+=== 非機能
+
+* 1万レコードの登録を10秒以内に完了する
+* 検証・DB登録に失敗した場合、全てロールバックする
+
+=== UseCase
+
+[source]
+----
+StoreExamineesAsync
+----
+
+==== 引数
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Examinees
+|Yes
+|List<Examinee>
+|登録する受診者のリスト
+
+|===
+
+==== 戻り値
+
+[source]
+----
+list<ErrorObject>
+----
+
+===== 正常登録
+
+[source]
+----
+list.Count() == 0
+----
+
+===== 異常有り
+
+[source]
+----
+list.Count()  <> 0
+----
+
+==== クラス
+
+===== Examinee
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|ExamineeCode
+|Yes
+|string
+|受診者コード
+
+|Name
+|Yes
+|string
+|氏名
+
+|KanaName
+|Yes
+|string
+|カナ氏名
+
+|Sex
+|Yes
+|enum<Wellship.Core\Enums\Sex>
+|性別
+
+|Birthdate
+|Yes
+|date
+|生年月日
+
+|Affiliations
+|Yes
+|List<Affiliation> 
+|所属
+
+|===
+
+==== Affiliation
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|OrganizationCode
+|Yes
+|string
+|団体コード
+
+|===
+
+==== ErrorObject
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|エラーコード
+
+|Message
+|Yes
+|string
+|エラーメッセージ
+
+|===
+
+==== 列挙型
+
+* None
+
+==== 検証
+
+* 団体の取得に失敗
+** `[DB]organizations(団体).organization_code(団体コード) == Examinee.Affiliations.OrganizationCode` が存在しない
+*** Code `10001` : Message `登録されていない団体です。`
+
+==== 処理(Repository)
+
+===== Insert
+
+* 条件
+** `[DB]examinees(受診者).examinee_code(受診者コード) == Examinee.ExamineeCode` が存在しない
+
+===== Table
+
+* [DB]examinees(受診者)
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|examinee_id
+|max(examinees(受診者).examinee_id(受診者コード)) + 1
+|
+
+|examinee_code
+|Examinee.ExamineeCode
+|
+
+|name
+|Examinee.Name
+|
+
+|kana_name
+|Examinee.KanaName
+|
+
+|sex
+|Examinee.Sex
+|
+
+|birthdate
+|Examinee.Birthdate
+|int型にパースする
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+* [DB]affiliations(所属)
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|examinee_id
+|[DB]examinees(受診者).examinee_id
+|[DB]examinees(受診者)にて登録した値
+
+|organization_id
+|`[DB]organizations.organization_id`
+|`[DB]organizations(団体).organization_code(団体コード) == Examinee.Affiliations.OrganizationCode`で検索し取得する
+
+|priority
+|Examinee.Affiliations のIndex
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+===== Update
+
+* 条件
+** `[DB]examinees(受診者).examinee_code(受診者コード) == Examinee.ExamineeCode` が存在する
+
+===== Table
+
+* [DB]examinees(受診者)
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|examinee_id
+|
+|更新対象外
+
+|examinee_code
+|
+|更新対象外
+
+|name
+|Examinee.Name
+|
+
+|kana_name
+|Examinee.KanaName
+|
+
+|sex
+|Examinee.Sex
+|
+
+|birthdate
+|Examinee.Birthdate
+|int型にパースする
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+* [DB]affiliations(所属)
+
+登録前に `[DB]affiliations(所属).examinee_id == 登録対象に含まれる[DB]examinees(受診者).examinee_id` を削除する
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|examinee_id
+|[DB]examinees(受診者).examinee_id
+|[DB]examinees(受診者)
+
+|organization_id
+|`[DB]organizations.organization_id`
+|`[DB]organizations(団体).organization_code(団体コード) == Examinee.Affiliations.OrganizationCode`で検索し取得する
+
+|priority
+|Examinee.Affiliations のIndex
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
