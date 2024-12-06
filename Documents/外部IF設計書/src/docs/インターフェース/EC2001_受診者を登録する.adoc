@@ -36,7 +36,7 @@ flowchart TD
 === 非機能
 
 * 1万レコードの登録を10秒以内に完了する
-* 検証・DB登録に失敗した場合、全てロールバックする
+* DB登録に失敗した場合、全てロールバックする
 
 === UseCase
 
@@ -166,18 +166,22 @@ list.Count()  <> 0
 
 ==== ERROR検証
 
-* 団体の取得に失敗
-** `[DB]organizations(団体).organization_code(団体コード) == Examinee.Affiliations.OrganizationCode` が存在しない
-*** Code `10001` : Message `登録されていない団体です。` InputNote [Examinee,InputNote]
+* None
 
 ==== WORNING検証
 
-* None
+* 団体が取得できない
+** `[DB]organizations(団体).organization_code(団体コード) == Examinee.Affiliations.OrganizationCode` が存在しない
+*** Examineeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたOrganizationCodeがシステム上に存在しません。Code:[Examinee.Affiliations.OrganizationCode]`
+**** InputNote [Examinee,InputNote]
 
 ==== 処理(Repository)
 
 * 下記の登録値は、呼びもとで指定する
-** `created_at` に登録する 'system.datetime.now()''
+** `created_at` に登録する `system.datetime.now()`
 ** `created_by` に登録する `'ExternalConnection'`
 
 ===== Table
