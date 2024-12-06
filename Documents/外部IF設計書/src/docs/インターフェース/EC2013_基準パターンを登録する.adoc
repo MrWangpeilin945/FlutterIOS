@@ -86,12 +86,12 @@ list.Count()  <> 0
 |Code
 |Yes
 |string
-|班コード
+|基準値パターンコード
 
 |Name
 |Yes
 |string
-|班名
+|基準値パターン名
 
 |InputNote
 |Yes
@@ -138,8 +138,8 @@ list.Count()  <> 0
 ==== 処理(Repository)
 
 * 下記の登録値は、呼びもとで指定する
-** `created_at` 登録する　'system.datetime.now()''
-** `created_by` `'ExternalConnection'`
+** `created_at` に登録する 'system.datetime.now()''
+** `created_by` に登録する `'ExternalConnection'`
 
 ===== Table
 
