@@ -1135,10 +1135,12 @@ Field="対象年齢下限","min_age","varchar(7)","NOT NULL",,"","",$FFFFFFFF,""
 Field="対象性別","target_sex","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="値上限","max_value","decimal","NOT NULL",,"","",$FFFFFFFF,""
 Field="値下限","min_value","decimal","NOT NULL",,"","",$FFFFFFFF,""
+Field="エラーレベル","error_level","integer","NOT NULL",,"","",$FFFFFFFF,""
+Index==2,threshold_id,exam_item_detail_id,max_age,target_sex,max_value
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241205171156
+ModifiedDateTime=20241206132408
 Position="MAIN",2900,300
 ZOrder=66
 
@@ -1480,10 +1482,12 @@ Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$
 Field="対象年齢上限","max_age","varchar(7)","NOT NULL",,"","",$FFFFFFFF,""
 Field="対象年齢下限","min_age","varchar(7)","NOT NULL",,"","",$FFFFFFFF,""
 Field="対象性別","target_sex","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="エラーレベル","error_level","integer","NOT NULL",,"","",$FFFFFFFF,""
+Index==2,threshold_id,exam_item_detail_id,max_age,target_sex,error_level
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241205171149
+ModifiedDateTime=20241206132433
 Position="MAIN",2900,650
 ZOrder=87
 
