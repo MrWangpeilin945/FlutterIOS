@@ -219,6 +219,14 @@ CREATE TABLE previous_results (
   , CONSTRAINT previous_results_PKC PRIMARY KEY (consult_id,exam_date,exam_item_detail_id)
 );
 
+CREATE TABLE prior_exam_menus (
+  current_exam_menu_id integer NOT NULL
+  , prior_exam_menu_id integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT prior_exam_menus_PKC PRIMARY KEY (current_exam_menu_id,prior_exam_menu_id)
+);
+
 CREATE TABLE role_permissions (
   functionality_id integer NOT NULL
   , role_id integer NOT NULL
@@ -583,6 +591,16 @@ ALTER TABLE previous_results
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE prior_exam_menus
+  ADD CONSTRAINT prior_exam_menus_FK1 FOREIGN KEY (current_exam_menu_id) REFERENCES exam_menus(exam_menu_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE prior_exam_menus
+  ADD CONSTRAINT prior_exam_menus_FK2 FOREIGN KEY (prior_exam_menu_id) REFERENCES exam_menus(exam_menu_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE role_permissions
   ADD CONSTRAINT role_permissions_FK1 FOREIGN KEY (role_id) REFERENCES roles(role_id)
   ON DELETE RESTRICT
@@ -769,6 +787,12 @@ COMMENT ON COLUMN previous_results.exam_item_detail_id IS '検査項目明細ID'
 COMMENT ON COLUMN previous_results.value IS '値';
 COMMENT ON COLUMN previous_results.created_at IS '作成日時';
 COMMENT ON COLUMN previous_results.created_by IS '作成者';
+
+COMMENT ON TABLE prior_exam_menus IS '前提検査メニュー';
+COMMENT ON COLUMN prior_exam_menus.current_exam_menu_id IS '現在検査メニューID';
+COMMENT ON COLUMN prior_exam_menus.prior_exam_menu_id IS '前提検査メニューID';
+COMMENT ON COLUMN prior_exam_menus.created_at IS '作成日時';
+COMMENT ON COLUMN prior_exam_menus.created_by IS '作成者';
 
 COMMENT ON TABLE role_permissions IS 'ロール機能許可';
 COMMENT ON COLUMN role_permissions.functionality_id IS '機能ID';
