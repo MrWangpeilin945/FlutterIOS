@@ -75,22 +75,13 @@
         "operationId": "CancelReason_GetCancelReasons",
         "parameters": [
           {
-            "name": "examItemId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          },
-          {
             "name": "version",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "x-position": 2
+            "x-position": 1
           }
         ],
         "responses": {
@@ -185,13 +176,13 @@
         }
       }
     },
-    "/api/v{version}/consult/{consultNumber}/unexaminedItems": {
+    "/api/v{version}/consult/{consultNumber}/unexaminedMenus": {
       "get": {
         "tags": [
           "Consult"
         ],
-        "summary": "未受診の検査項目を取得する",
-        "operationId": "Consult_GetUnexaminedItems",
+        "summary": "未受診の検査メニューを取得する",
+        "operationId": "Consult_GetUnexaminedMenus",
         "parameters": [
           {
             "name": "consultNumber",
@@ -219,7 +210,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UnexaminedItemList"
+                  "$ref": "#/components/schemas/UnexaminedMenuList"
                 }
               }
             }
@@ -640,13 +631,23 @@
         "operationId": "HomeMenu_GetHomeMenuSettings",
         "parameters": [
           {
+            "name": "placeScheduleId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
             "name": "version",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "x-position": 1
+            "x-position": 2
           }
         ],
         "responses": {
@@ -661,6 +662,16 @@
             }
           },
           "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
             "description": "",
             "content": {
               "application/json": {
@@ -1568,7 +1579,7 @@
           }
         }
       },
-      "UnexaminedItemList": {
+      "UnexaminedMenuList": {
         "type": "object",
         "description": "未受診の検査項目リスト",
         "additionalProperties": false,
@@ -1587,28 +1598,28 @@
             "type": "string",
             "description": "受診者名"
           },
-          "unexaminedItems": {
+          "unexaminedMenus": {
             "type": "array",
-            "description": "未受診の検査項目リスト",
+            "description": "未受診の検査メニューリスト",
             "items": {
-              "$ref": "#/components/schemas/ExamItem"
+              "$ref": "#/components/schemas/ExamMenu"
             }
           }
         }
       },
-      "ExamItem": {
+      "ExamMenu": {
         "type": "object",
-        "description": "検査項目",
+        "description": "検査メニュー",
         "additionalProperties": false,
         "properties": {
-          "examItemId": {
+          "examMenuId": {
             "type": "integer",
-            "description": "検査項目ID",
+            "description": "検査メニューID",
             "format": "int32"
           },
-          "examItemName": {
+          "examMenuName": {
             "type": "string",
-            "description": "検査項目名"
+            "description": "検査メニュー名"
           }
         }
       },
@@ -1738,30 +1749,14 @@
             "type": "string",
             "description": "検査項目名"
           },
-          "isPerforming": {
+          "hasOrder": {
             "type": "boolean",
-            "description": "検査実施するか"
+            "description": "検査依頼が存在するか"
           },
           "cancelReasonId": {
             "type": "integer",
             "description": "中止理由ID",
             "format": "int32"
-          }
-        }
-      },
-      "ExamMenu": {
-        "type": "object",
-        "description": "検査メニュー",
-        "additionalProperties": false,
-        "properties": {
-          "examMenuId": {
-            "type": "integer",
-            "description": "検査メニューID",
-            "format": "int32"
-          },
-          "examMenuName": {
-            "type": "string",
-            "description": "検査メニュー名"
           }
         }
       },
@@ -1937,6 +1932,15 @@
             "type": "string",
             "description": "検査項目明細名"
           },
+          "hasOrder": {
+            "type": "boolean",
+            "description": "検査依頼が存在するか"
+          },
+          "cancelReasonId": {
+            "type": "integer",
+            "description": "中止理由ID",
+            "format": "int32"
+          },
           "value": {
             "type": "string",
             "description": "今回値"
@@ -1952,11 +1956,6 @@
           "type": {
             "type": "integer",
             "description": "検査項目明細種別",
-            "format": "int32"
-          },
-          "cancelReasonId": {
-            "type": "integer",
-            "description": "中止理由ID",
             "format": "int32"
           },
           "integerLength": {
@@ -2133,6 +2132,12 @@
             "items": {
               "$ref": "#/components/schemas/HomeMenuGroup"
             }
+          },
+          "placeScheduleLockingStatus": {
+            "type": "integer",
+            "description": "会場日程状況",
+            "format": "int32",
+            "nullable": true
           }
         }
       },
