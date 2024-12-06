@@ -14,5 +14,5 @@ public interface IExamMenuRepository
     /// <summary>
     /// 前提検査メニューの設定一覧を取得します。
     /// </summary>
-    public Task<IEnumerable<Models.PriorExamMenu>> GetPriorExamMenusAsync();
+    public Task<Models.PriorExamMenu?> GetPriorExamMenusAsync(int currentExamMenuId);
 }

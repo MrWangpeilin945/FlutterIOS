@@ -43,22 +43,29 @@ public class ExamMenuRepository : IExamMenuRepository
     }
 
     /// <summary>
-    /// 前提検査メニューの設定一覧を取得します。
+    /// 現在の検査メニューIDを指定して、前提検査メニューの設定一覧を取得します。
+    /// 設定がなければnullを返します。 
     /// </summary>
-    public async Task<IEnumerable<PriorExamMenu>> GetPriorExamMenusAsync()
+    public async Task<PriorExamMenu?> GetPriorExamMenusAsync(int currentExamMenuId)
     {
-        // TODO: SQLを書く
-        return
-        [
-            new(2, [1]),
-            new(3, [1,2,]),
-            new(4, [1,2,3]),
-            new(5, [1,2,3,4]),
-            new(6, [1,2,3,4,5,]),
-            new(7, [1,2,3,4,5,6,]),
-            new(8, [1,2,3,4,5,6,7,]),
-            new(9, [1,2,3,4,5,6,7,8]),
-            new(10, [1,2,3,4,5,6,7,8,9])
-        ];
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            current_exam_menu_id as CurrentExamMenuId
+            , prior_exam_menu_id as PriorExamMenuId 
+        from
+            resultcollector.prior_exam_menus
+        where
+            current_exam_menu_id = @CurrentExamMenuId;";
+
+        var results = await connection.QueryAsync<Entities.PriorExamMenuEntity>(sql, new { CurrentExamMenuId = currentExamMenuId });
+
+        if (!results.Any())
+        {
+            return null;
+        }
+
+        var priorMenuIds = results.Select(x => x.PriorExamMenuId);
+        return new PriorExamMenu(currentExamMenuId, priorMenuIds);
     }
 }
