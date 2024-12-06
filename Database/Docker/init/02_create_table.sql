@@ -102,10 +102,14 @@ CREATE TABLE exam_normal_options (
   , max_age varchar(7) NOT NULL
   , min_age varchar(7) NOT NULL
   , target_sex integer NOT NULL
+  , error_level integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_normal_options_PKC PRIMARY KEY (normal_options_id)
 );
+
+ALTER TABLE exam_normal_options ADD CONSTRAINT exam_normal_options_IX1
+  UNIQUE (threshold_id,exam_item_detail_id,max_age,target_sex) ;
 
 CREATE TABLE exam_normal_value_range (
   range_id integer NOT NULL
@@ -117,10 +121,14 @@ CREATE TABLE exam_normal_value_range (
   , target_sex integer NOT NULL
   , max_value decimal NOT NULL
   , min_value decimal NOT NULL
+  , error_level integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_normal_value_range_PKC PRIMARY KEY (range_id)
 );
+
+ALTER TABLE exam_normal_value_range ADD CONSTRAINT exam_normal_value_range_IX1
+  UNIQUE (threshold_id,exam_item_detail_id,target_sex,max_age,max_value) ;
 
 CREATE TABLE exam_result_correlation_rules (
   id integer NOT NULL
@@ -675,6 +683,7 @@ COMMENT ON COLUMN exam_normal_options.exam_item_detail_id IS '検査項目明細
 COMMENT ON COLUMN exam_normal_options.max_age IS '対象年齢上限';
 COMMENT ON COLUMN exam_normal_options.min_age IS '対象年齢下限';
 COMMENT ON COLUMN exam_normal_options.target_sex IS '対象性別';
+COMMENT ON COLUMN exam_normal_options.error_level IS 'エラーレベル';
 COMMENT ON COLUMN exam_normal_options.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_options.created_by IS '作成者';
 
@@ -688,6 +697,7 @@ COMMENT ON COLUMN exam_normal_value_range.min_age IS '対象年齢下限';
 COMMENT ON COLUMN exam_normal_value_range.target_sex IS '対象性別';
 COMMENT ON COLUMN exam_normal_value_range.max_value IS '値上限';
 COMMENT ON COLUMN exam_normal_value_range.min_value IS '値下限';
+COMMENT ON COLUMN exam_normal_value_range.error_level IS 'エラーレベル';
 COMMENT ON COLUMN exam_normal_value_range.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_value_range.created_by IS '作成者';
 
