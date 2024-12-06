@@ -10,4 +10,9 @@ public interface IExamMenuRepository
     /// テナントに設定されているすべての検査メニューを表示順昇順で取得します。 
     /// </summary>
     public Task<IEnumerable<Models.ExamMenu>> GetExamMenusAsync();
+
+    /// <summary>
+    /// 前提検査メニューの設定一覧を取得します。
+    /// </summary>
+    public Task<IEnumerable<Models.PriorExamMenu>> GetPriorExamMenusAsync();
 }

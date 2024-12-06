@@ -12,16 +12,19 @@ public class ConsultUsecase : IConsultUsecase
 {
     private readonly IConsultRepository _consultRepository;
     private readonly IExamineeRepository _examineeRepository;
+    private readonly IExamMenuRepository _examMenuRepository;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="consultRepository">受診リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
-    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository)
+    /// <param name="examMenuRepository">検査メニューリポジトリ</param>
+    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamMenuRepository examMenuRepository)
     {
         _consultRepository = consultRepository;
         _examineeRepository = examineeRepository;
+        _examMenuRepository = examMenuRepository;
     }
 
     /// <summary>
@@ -140,5 +143,31 @@ public class ConsultUsecase : IConsultUsecase
 
         await _consultRepository.RemoveExamCancelsAsync(consult.ConsultId, removeTargets);
         await _consultRepository.SaveExamCancelsAsync(consult.ConsultId, toSave);
+    }
+
+    /// <summary>
+    /// 前提検査メニューを検証する
+    /// </summary>
+    public async Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenus(string consultNumber, int examMenuId)
+    {
+        // 未受診の検査メニューを取得する
+        var unexamined = await _consultRepository.GetUnexaminedConsultAsync(consultNumber);
+        var unexaminedMenuIds = unexamined.UnexaminedExamMenus.Select(x => x.ExamMenuId).ToArray();
+
+        // 前提検査メニューの設定を取得する
+        var priorExamMenus = await _examMenuRepository.GetPriorExamMenusAsync();
+        var priorExamMenu = priorExamMenus.SingleOrDefault(x => x.CurrentExamMenuId == examMenuId);
+
+        // 現在の検査メニューについて、前提検査メニューの設定がない場合はエラーなし
+        if (priorExamMenu is null)
+        {
+            return [];
+        }
+
+        // 前提検査が必要な検査メニューを返す
+        var missingPriorMenus = priorExamMenu.GetMissingPriorMenus(unexaminedMenuIds);
+        return unexamined.UnexaminedExamMenus.Where(x => missingPriorMenus.Contains(x.ExamMenuId))
+                                             .Select(x => new Domain.Models.ExamMenu() { MenuId = x.ExamMenuId, MenuName = x.ExamMenuName })
+                                             .ToArray();
     }
 }
