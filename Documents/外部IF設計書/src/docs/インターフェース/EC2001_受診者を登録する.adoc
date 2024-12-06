@@ -176,6 +176,10 @@ list.Count()  <> 0
 
 ==== 処理(Repository)
 
+* 下記の登録値は、呼びもとで指定する
+** `created_at` 登録する　'system.datetime.now()''
+** `created_by` `'ExternalConnection'`
+
 ===== Table
 
 * [DB]examinees(受診者)
