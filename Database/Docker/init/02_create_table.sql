@@ -317,10 +317,14 @@ CREATE UNIQUE INDEX consult_IX2
 CREATE TABLE exam_item_details (
   exam_item_detail_id integer NOT NULL
   , exam_item_id integer NOT NULL
+  , name text NOT NULL
   , set_previous_as_default boolean DEFAULT false NOT NULL
+  , order_number integer NOT NULL
   , position_number integer NOT NULL
   , type integer NOT NULL
   , keyboard_type integer NOT NULL
+  , integer_length integer NOT NULL
+  , decimal_length integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_item_details_PKC PRIMARY KEY (exam_item_detail_id)
@@ -836,10 +840,14 @@ COMMENT ON COLUMN consult.created_by IS '作成者';
 COMMENT ON TABLE exam_item_details IS '検査項目明細';
 COMMENT ON COLUMN exam_item_details.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_item_details.exam_item_id IS '検査項目ID';
+COMMENT ON COLUMN exam_item_details.name IS '検査項目明細名';
 COMMENT ON COLUMN exam_item_details.set_previous_as_default IS '前回値を初期値としてセットするか';
+COMMENT ON COLUMN exam_item_details.order_number IS '表示順';
 COMMENT ON COLUMN exam_item_details.position_number IS '配置番号';
 COMMENT ON COLUMN exam_item_details.type IS '検査項目明細種別';
 COMMENT ON COLUMN exam_item_details.keyboard_type IS 'キーボード種別';
+COMMENT ON COLUMN exam_item_details.integer_length IS '整数部桁数';
+COMMENT ON COLUMN exam_item_details.decimal_length IS '小数部桁数';
 COMMENT ON COLUMN exam_item_details.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_details.created_by IS '作成者';
 
