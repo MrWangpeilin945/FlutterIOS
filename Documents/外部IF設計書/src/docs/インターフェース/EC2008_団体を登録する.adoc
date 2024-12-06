@@ -133,20 +133,24 @@ list.Count()  <> 0
 
 ==== 処理(Repository)
 
-===== Insert
-
-* 条件
-** `[DB]organizations(団体).organization_code(団体コード) == Organization.Code` が存在しない
+* 下記の登録値は、呼びもとで指定する
+** `created_at` 登録する　'system.datetime.now()''
+** `created_by` `'ExternalConnection'`
 
 ===== Table
 
 * [DB]organizations(団体)
 
+===== Insert
+
+* 条件
+** `[DB]organizations(団体).organization_code(団体コード) == Organization.Code` が存在しない
+
 [cols="1,2,2" options="header"]
 |===
 |列|登録値|処理・変換
 
-|team_id
+|organization_id
 |max([DB]organizations(団体).organization_id(団体ID)) + 1
 |
 
@@ -176,10 +180,6 @@ list.Count()  <> 0
 
 * 条件
 ** `[DB]organizations(団体).organization_code(団体コード) == Organization.Code` が存在する
-
-===== Table
-
-* [DB]organizations(団体)
 
 [cols="1,2,2" options="header"]
 |===

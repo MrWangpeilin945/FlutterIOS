@@ -137,14 +137,18 @@ list.Count()  <> 0
 
 ==== 処理(Repository)
 
-===== Insert
-
-* 条件
-** `[DB]teams(班).team_code(班コード) == Team.Code` が存在しない
+* 下記の登録値は、呼びもとで指定する
+** `created_at` 登録する　'system.datetime.now()''
+** `created_by` `'ExternalConnection'`
 
 ===== Table
 
 * [DB]teams(班)
+
+====== Insert
+
+* 条件
+** `[DB]teams(班).team_code(班コード) == Team.Code` が存在しない
 
 [cols="1,2,2" options="header"]
 |===
@@ -180,10 +184,6 @@ list.Count()  <> 0
 
 * 条件
 ** `[DB]teams(班).team_code(班コード) == Team.Code` が存在する
-
-===== Table
-
-* [DB]teams(班)
 
 [cols="1,2,2" options="header"]
 |===

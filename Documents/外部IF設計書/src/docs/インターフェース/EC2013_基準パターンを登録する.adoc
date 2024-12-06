@@ -16,7 +16,7 @@ flowchart TD
     WORNING -- ワーニングあり --> DROP(WORNINGレコードDrop)
     DROP(WORNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
     DROP_REC --> D[[Repository]]
-    WORNING -- ワーニングなし --> D
+    WORNING -- ワーニング無 --> D
     C --> E(返却)
     D --> E
     E --> UseCaseEND(END)
@@ -137,20 +137,24 @@ list.Count()  <> 0
 
 ==== 処理(Repository)
 
-===== Insert
-
-* 条件
-** `[DB]thresholds(基準パターン).threshold_code(基準パターンコード) == Threshold.Code` が存在しない
+* 下記の登録値は、呼びもとで指定する
+** `created_at` 登録する　'system.datetime.now()''
+** `created_by` `'ExternalConnection'`
 
 ===== Table
 
 * [DB]thresholds(基準パターン)
 
+====== Insert
+
+* 条件
+** `[DB]thresholds(基準パターン).threshold_code(基準パターンコード) == Threshold.Code` が存在しない
+
 [cols="1,2,2" options="header"]
 |===
 |列|登録値|処理・変換
 
-|team_id
+|threshold_id
 |max([DB]thresholds(基準パターン).threshold_id(基準パターンID)) + 1
 |
 
@@ -180,10 +184,6 @@ list.Count()  <> 0
 
 * 条件
 ** `[DB]thresholds(基準パターン).threshold_code(基準パターンコード) == Threshold.Code` が存在する
-
-===== Table
-
-* [DB]thresholds(基準パターン)
 
 [cols="1,2,2" options="header"]
 |===
