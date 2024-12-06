@@ -109,7 +109,7 @@ CREATE TABLE exam_normal_options (
 );
 
 ALTER TABLE exam_normal_options ADD CONSTRAINT exam_normal_options_IX1
-  UNIQUE (threshold_id,exam_item_detail_id,max_age,target_sex) ;
+  UNIQUE (threshold_id,exam_item_detail_id,max_age,target_sex,error_level) ;
 
 CREATE TABLE exam_normal_value_range (
   range_id integer NOT NULL
@@ -128,7 +128,7 @@ CREATE TABLE exam_normal_value_range (
 );
 
 ALTER TABLE exam_normal_value_range ADD CONSTRAINT exam_normal_value_range_IX1
-  UNIQUE (threshold_id,exam_item_detail_id,target_sex,max_age,max_value) ;
+  UNIQUE (threshold_id,exam_item_detail_id,max_age,target_sex,max_value) ;
 
 CREATE TABLE exam_result_correlation_rules (
   id integer NOT NULL
