@@ -102,10 +102,14 @@ CREATE TABLE exam_normal_options (
   , max_age varchar(7) NOT NULL
   , min_age varchar(7) NOT NULL
   , target_sex integer NOT NULL
+  , error_level integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_normal_options_PKC PRIMARY KEY (normal_options_id)
 );
+
+ALTER TABLE exam_normal_options ADD CONSTRAINT exam_normal_options_IX1
+  UNIQUE (threshold_id,exam_item_detail_id,max_age,target_sex,error_level) ;
 
 CREATE TABLE exam_normal_value_range (
   range_id integer NOT NULL
@@ -117,10 +121,14 @@ CREATE TABLE exam_normal_value_range (
   , target_sex integer NOT NULL
   , max_value decimal NOT NULL
   , min_value decimal NOT NULL
+  , error_level integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_normal_value_range_PKC PRIMARY KEY (range_id)
 );
+
+ALTER TABLE exam_normal_value_range ADD CONSTRAINT exam_normal_value_range_IX1
+  UNIQUE (threshold_id,exam_item_detail_id,max_age,target_sex,max_value) ;
 
 CREATE TABLE exam_result_correlation_rules (
   id integer NOT NULL
@@ -309,10 +317,14 @@ CREATE UNIQUE INDEX consult_IX2
 CREATE TABLE exam_item_details (
   exam_item_detail_id integer NOT NULL
   , exam_item_id integer NOT NULL
+  , name text NOT NULL
   , set_previous_as_default boolean DEFAULT false NOT NULL
+  , order_number integer NOT NULL
   , position_number integer NOT NULL
   , type integer NOT NULL
   , keyboard_type integer NOT NULL
+  , integer_length integer NOT NULL
+  , decimal_length integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_item_details_PKC PRIMARY KEY (exam_item_detail_id)
@@ -675,6 +687,7 @@ COMMENT ON COLUMN exam_normal_options.exam_item_detail_id IS '検査項目明細
 COMMENT ON COLUMN exam_normal_options.max_age IS '対象年齢上限';
 COMMENT ON COLUMN exam_normal_options.min_age IS '対象年齢下限';
 COMMENT ON COLUMN exam_normal_options.target_sex IS '対象性別';
+COMMENT ON COLUMN exam_normal_options.error_level IS 'エラーレベル';
 COMMENT ON COLUMN exam_normal_options.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_options.created_by IS '作成者';
 
@@ -688,6 +701,7 @@ COMMENT ON COLUMN exam_normal_value_range.min_age IS '対象年齢下限';
 COMMENT ON COLUMN exam_normal_value_range.target_sex IS '対象性別';
 COMMENT ON COLUMN exam_normal_value_range.max_value IS '値上限';
 COMMENT ON COLUMN exam_normal_value_range.min_value IS '値下限';
+COMMENT ON COLUMN exam_normal_value_range.error_level IS 'エラーレベル';
 COMMENT ON COLUMN exam_normal_value_range.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_value_range.created_by IS '作成者';
 
@@ -826,10 +840,14 @@ COMMENT ON COLUMN consult.created_by IS '作成者';
 COMMENT ON TABLE exam_item_details IS '検査項目明細';
 COMMENT ON COLUMN exam_item_details.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_item_details.exam_item_id IS '検査項目ID';
+COMMENT ON COLUMN exam_item_details.name IS '検査項目明細名';
 COMMENT ON COLUMN exam_item_details.set_previous_as_default IS '前回値を初期値としてセットするか';
+COMMENT ON COLUMN exam_item_details.order_number IS '表示順';
 COMMENT ON COLUMN exam_item_details.position_number IS '配置番号';
 COMMENT ON COLUMN exam_item_details.type IS '検査項目明細種別';
 COMMENT ON COLUMN exam_item_details.keyboard_type IS 'キーボード種別';
+COMMENT ON COLUMN exam_item_details.integer_length IS '整数部桁数';
+COMMENT ON COLUMN exam_item_details.decimal_length IS '小数部桁数';
 COMMENT ON COLUMN exam_item_details.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_details.created_by IS '作成者';
 
