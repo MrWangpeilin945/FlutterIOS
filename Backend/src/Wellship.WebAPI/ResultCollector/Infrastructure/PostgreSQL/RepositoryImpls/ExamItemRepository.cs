@@ -30,7 +30,7 @@ public class ExamItemRepository : IExamItemRepository
     public async Task<IEnumerable<ExamItemGroup>> GetExamItemGroupsAsync(int examMenuId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
-        //TODO: 未実装 EquipmentLabel, IntegerLength, DecimalLength
+        //TODO: 未実装 EquipmentLabel
         const string sql = @"
         select 
             g.exam_item_group_id as ExamItemGroupId
@@ -41,11 +41,11 @@ public class ExamItemRepository : IExamItemRepository
             , d.position_number as ExamItemDetailPositionNumber 
             , d.exam_item_detail_id as ExamItemDetailId 
             , 'Height' as EquipmentLabel
-            , i.name as DetailName
+            , d.name as ExamItemDetailName
             , i.unit as Unit
             , d.type as ExamItemDetailType
-            , 10 as IntegerLength
-            , 3 as DecimalLength 
+            , integer_length as IntegerLength
+            , decimal_length as DecimalLength 
             , d.keyboard_type as KeyboardType
         from resultcollector.exam_item_groups g
         left join resultcollector.exam_items  i
@@ -57,9 +57,7 @@ public class ExamItemRepository : IExamItemRepository
             g.exam_item_group_id
             , i.position_number
             , i.exam_item_id
-            , d.position_number
-            , d.exam_item_id
-            , d.exam_item_detail_id;";
+            , d.order_number;";
 
         var results = await connection.QueryAsync<ExamItemGroupEntity>(sql, new { ExamMenuId = examMenuId });
         var examItemGroups = 
@@ -135,5 +133,34 @@ public class ExamItemRepository : IExamItemRepository
         order by
             order_number;";
         return await connection.QueryAsync<ExamItemDetailOption>(sql, new { ExamItemDetailIds = examItemDetailIds });
+    }
+
+    /// <summary>
+    /// 検査正常値範囲を取得します。
+    /// </summary>
+    /// <param name="thresholdIds">基準値パターンID</param>
+    /// <param name="examItemDetailIds">検査項目明細ID</param>
+    public async Task<IEnumerable<ExamNormalValueRange>> GetExamNormalValueRangesAsync(int[] thresholdIds, int[] examItemDetailIds)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select 
+            r.name as Name
+            , r.threshold_id as ThresholdId
+            , r.exam_item_detail_id as ExamItemDetailId
+            , r.min_age as MinAge
+            , r.max_age as MaxAge
+            , r.target_sex as TargetSex
+            , r.max_value as MaxValue
+            , r.min_value as MinValue
+            , r.error_level as ErrorLevel
+            , ct.priority as Priority
+        from resultcollector.exam_normal_value_range r
+        left join resultcollector.consult_thresholds ct 
+            on r.threshold_id = ct.threshold_id
+        where r.threshold_id = any(@ThresholdIds)
+        and r.exam_item_detail_id = any(@ExamItemDetailIds);";
+        return await connection.QueryAsync<ExamNormalValueRange>(sql, 
+                                new { ThresholdIds = thresholdIds, ExamItemDetailIds = examItemDetailIds });
     }
 }

@@ -70,18 +70,21 @@ public class ConsultRepository : IConsultRepository
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
         select
-            consult_id as ConsultId
-            , consult_number as ConsultNumber
-            , progress_status as ProgressStatus
-            , export_status as ExportStatus
-            , place_schedule_id as PlaceScheduleId
-            , examinee_id as ExamineeId 
+            c.consult_id as ConsultId
+            , c.consult_number as ConsultNumber
+            , c.progress_status as ProgressStatus
+            , c.export_status as ExportStatus
+            , c.place_schedule_id as PlaceScheduleId
+            , c.examinee_id as ExamineeId 
+            , t.ticket_number as TicketNumber
         from
-            resultcollector.consult 
+            resultcollector.consult c
+            left join resultcollector.tickets t
+                on c.consult_id = t.consult_id
         where
-            consult_number = any(@ConsultNumbers)
+            c.consult_number = any(@ConsultNumbers)
         order by
-            consult_id;";
+            c.consult_id;";
 
         var consults = await connection.QueryAsync<ConsultEntity>(sql, new { ConsultNumbers = consultNumbers });
 
@@ -93,6 +96,7 @@ public class ConsultRepository : IConsultRepository
             PlaceScheduleId = x.PlaceScheduleId,
             ExportStatus = (ConsultResultExportStatus)x.ExportStatus,
             ProgressStatus = (ConsultProgressStatus)x.ProgressStatus,
+            TicketNumber = x.TicketNumber
         });
     }
 
@@ -305,5 +309,22 @@ public class ConsultRepository : IConsultRepository
             , new_data.created_by
         );";
         await connection.ExecuteAsync(mergeSql, saveItems);
+    }
+
+    /// <summary>
+    /// 基準値の基準値パターンIDを取得する
+    /// </summary>
+    /// <param name="consultId">受診ID</param>
+    public async Task<IEnumerable<int>> GetConsultThresholds(int consultId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            threshold_id
+        from
+            resultcollector.consult_thresholds
+        where
+            consult_id = @ConsultId;";
+        return await connection.QueryAsync<int>(sql, new { ConsultId = consultId });
     }
 }

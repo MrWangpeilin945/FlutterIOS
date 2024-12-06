@@ -15,6 +15,7 @@ public class ConsultUsecase : IConsultUsecase
     private readonly IConsultRepository _consultRepository;
     private readonly IExamineeRepository _examineeRepository;
     private readonly IExamItemRepository _examItemRepository;
+    private readonly IPlaceScheduleRepository _placeScheduleRepository;
 
     /// <summary>
     /// コンストラクタ
@@ -22,11 +23,14 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="consultRepository">受診リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
     /// <param name="examItemRepository">検査項目リポジトリ</param>
-    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamItemRepository examItemRepository)
+    /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
+    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, 
+                          IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository)
     {
         _consultRepository = consultRepository;
         _examineeRepository = examineeRepository;
         _examItemRepository = examItemRepository;
+        _placeScheduleRepository = placeScheduleRepository;
     }
 
     /// <summary>
@@ -154,6 +158,13 @@ public class ConsultUsecase : IConsultUsecase
     {
         var consult = await _consultRepository.GetConsultAsync(consultNumber);
         var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
+        // 会場日程IDを指定して会場日程を取得する
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
+        // 健診日
+        DateOnly examDate = placeSchedule.ExamDate;
+        // 受診日の年齢
+        // NOTE: 年齢加算日は暫定で前日年齢加算
+        int examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算).Years;
         // 検査メニューに関連した検査項目情報を取得
         var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
         // 検査項目明細IDを取得
@@ -165,19 +176,23 @@ public class ConsultUsecase : IConsultUsecase
         var Keyboards = await _examItemRepository.GetKeyboardOptionssAsync(examItemDetailIds);
         // 検査項目明細選択肢
         var examItemDetailOptions = await _examItemRepository.GetExamItemDetailOptionsAsync(examItemDetailIds);
+        // 基準値パターンIDを取得
+        var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
+        // 検査正常値範囲を取得
+        var examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds);
+        // 対象年齢・対象性別で絞り込む
+        var normalValueRanges = examNormalValueRanges.Where(x => ((int)x.TargetSex & (int)examinee.Sex) == (int)examinee.Sex);
 
         return new InputExamItems()
         {
             ConsultNumber = consultNumber,
             Examinee = new InputExamExaminee(){
-                // TODO: 受付番号
-                ReceptionNumber = 100,
+                TicketNumber = consult.TicketNumber,
                 KanaName = examinee.KanaName,
                 Sex = (int)examinee.Sex,
-                // TODO: 健診時の年齢
-                ExamDateAge = 40
+                ExamDateAge = examAge
             },
-            RelatedExamItems = [],                  // TODO: 関連検査項目
+            RelatedExamItems = [],                  // TODO: 関連検査項目 後方作業へ
             ExamItemGroups = 
                 examItemGroups.Select(eg => new ExamItemGroup
                 {
@@ -218,25 +233,19 @@ public class ConsultUsecase : IConsultUsecase
                                                             OrderNumber = op.OrderNumber,
                                                             Code = op.Code,
                                                             Name = op.Name
-                                                        }).ToArray(),   
-                            ExamNormalValueRanges = []
-
-                            /*
-                            ExamItemDetailOptions = ed.ExamItemDetailOptions.Select(op => new ExamItemDetailOption
-                            {
-                                OrderNumber = op.OrderNumber,
-                                Code = op.Code,
-                                Name = op.Name
-                            }).ToArray(),
-                            ExamNormalValueRanges = ed.ExamNormalValueRanges.Select(en => new ExamNormalValueRange
-                            {
-                                ErrorLevel = (int)en.ErrorLevel,
-                                MaxValue = en.MaxValue,
-                                MinValue = en.MinValue
-                            }).ToArray()
-                            */
+                                                        }).ToArray(),
+                            // 検査正常値範囲
+                            ExamNormalValueRanges = 
+                                normalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
+                                                 .OrderBy(r => r.Priority)
+                                                 .Select(r => new ExamNormalValueRange
+                                                 {
+                                                    ErrorLevel = (int)r.ErrorLevel,
+                                                    MaxValue = r.MaxValue,
+                                                    MinValue = r.MinValue
+                                                 }).ToArray()
                         }).ToArray(),
-                        ExamRegistResults = []      // TODO: 検査結果登録エラー
+                        ExamRegistResults = []      // TODO: 検査結果登録エラー 後方作業へ
                     }).ToArray()
                 }).ToArray()
         };

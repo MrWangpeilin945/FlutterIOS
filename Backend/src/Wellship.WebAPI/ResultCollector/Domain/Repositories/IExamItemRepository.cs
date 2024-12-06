@@ -22,4 +22,11 @@ public interface IExamItemRepository
     /// </summary>
     /// <param name="examItemDetailIds">検査項目明細ID</param>
     Task<IEnumerable<Models.ExamItemDetailOption>> GetExamItemDetailOptionsAsync(int[] examItemDetailIds);
+
+    /// <summary>
+    /// 検査正常値範囲を取得します。
+    /// </summary>
+    /// <param name="thresholdIds">基準値パターンID</param>
+    /// <param name="examItemDetailIds">検査項目明細ID</param>
+    Task<IEnumerable<Models.ExamNormalValueRange>> GetExamNormalValueRangesAsync(int[] thresholdIds, int[] examItemDetailIds);
 }
