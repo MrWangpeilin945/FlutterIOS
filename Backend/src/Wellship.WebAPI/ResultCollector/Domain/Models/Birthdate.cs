@@ -46,12 +46,54 @@ public sealed class Birthdate
     /// <param name="mode">年齢計算モード（加算方法）</param>
     public Age GetAge(DateOnly startDate, AgeCalcMode mode)
     {
-        // TODO: ここに年齢計算ロジックを書く
+        if(mode == AgeCalcMode.前日年齢加算)
+        {
+            // 年齢到達日は前日のため、起算日を１日後に移動する
+            startDate = startDate.AddDays(1); 
+        }
+        int monthDiff = (startDate.Month + (startDate.Year - Value.Year) * 12) - Value.Month;
+        int years = (int)Math.Floor(monthDiff / 12m);
+        int months = monthDiff % 12;
+        int days = 0;
+        if (Value.Day <= startDate.Day)
+        {
+            days = startDate.Day - Value.Day;
+        }
+        else
+        {
+            // 前月の月末日を求める
+            int monthDays = DateTime.DaysInMonth(startDate.AddMonths(-1).Year, startDate.AddMonths(-1).Month);
+            // 起算年の誕生日月の月日数を求める
+            int birthMonthDays = DateTime.DaysInMonth(startDate.Year, Value.Month);
+            int diffDay = monthDays - Value.Day;
+            if( Value.Day < birthMonthDays && birthMonthDays < monthDays)
+            {
+                diffDay = birthMonthDays - Value.Day;
+            }
+            if (diffDay >= 0 && Value.Day != birthMonthDays)
+            {
+                days = diffDay + startDate.Day;
+            }
+            else
+            {
+                days = startDate.Day;
+            }
+            //年月の調整
+            if (months > 0)
+            {
+                months -= 1;
+            }
+            else
+            {
+                months = 11;
+                years -= 1;
+            }
+        }
         return new Age()
         {
-            Years = 40,
-            Months = 0,
-            Days = 0
+            Years = years,
+            Months = months,
+            Days = days
         };
     }
 }

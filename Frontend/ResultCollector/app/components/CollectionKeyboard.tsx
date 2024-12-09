@@ -75,6 +75,7 @@ export default function CollectionKeyboard(props: KeyboardProps) {
                   bg={keyValue === value ? "green03" : ""} //選択済みか判定
                   value={keyValue}
                   onClick={(e) => handlerKeyboardClick(e.currentTarget.value)}
+                  tabIndex={-1}
                 >
                   {keyValue}
                 </Button>
