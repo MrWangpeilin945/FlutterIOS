@@ -1117,14 +1117,15 @@ Field="検査結果相関ルールID","correlation_rule_id","integer","NOT NULL"
 Field="名称","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査メニューID","exam_menu_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="優先度","priority","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="発火条件種別","trigger_type","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="エラーレベル","error_level","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="出力メッセージ","message","text","NOT NULL",,"","",$FFFFFFFF,""
-Index==2,priority
+Index==2,exam_menu_id,priority
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241209134049
-Position="MAIN",1900,400,646,190
+ModifiedDateTime=20241209141033
+Position="MAIN",1900,400,646,222
 ZOrder=65
 
 [Entity]
@@ -1695,7 +1696,7 @@ LName=検査結果相関ルール_判定値
 Comment=
 TableInnerOption=
 TableOption=
-Page=Main
+Page=MAIN
 Left=1050
 Top=300
 Field="検査結果相関ルールID","correlation_rule_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
@@ -1705,7 +1706,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241209133540
-Position="Main",1050,300
+Position="MAIN",1050,300
 ZOrder=98
 
 [Relation]

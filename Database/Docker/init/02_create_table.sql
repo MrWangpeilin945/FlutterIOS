@@ -45,6 +45,7 @@ CREATE TABLE correlation_rules (
   , name text NOT NULL
   , exam_menu_id integer NOT NULL
   , priority integer NOT NULL
+  , trigger_type integer NOT NULL
   , error_level integer NOT NULL
   , message text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -53,7 +54,7 @@ CREATE TABLE correlation_rules (
 );
 
 ALTER TABLE correlation_rules ADD CONSTRAINT correlation_rules_IX1
-  UNIQUE (priority) ;
+  UNIQUE (exam_menu_id,priority) ;
 
 CREATE TABLE decision_rules (
   decision_rule_id integer NOT NULL
@@ -91,7 +92,6 @@ CREATE TABLE exam_cancels (
   , created_by text NOT NULL
   , CONSTRAINT exam_cancels_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
 );
-
 
 CREATE TABLE exam_item_detail_options (
   option_id integer NOT NULL
@@ -690,6 +690,7 @@ COMMENT ON COLUMN correlation_rules.correlation_rule_id IS '検査結果相関�
 COMMENT ON COLUMN correlation_rules.name IS '名称';
 COMMENT ON COLUMN correlation_rules.exam_menu_id IS '検査メニューID';
 COMMENT ON COLUMN correlation_rules.priority IS '優先度';
+COMMENT ON COLUMN correlation_rules.trigger_type IS '発火条件種別';
 COMMENT ON COLUMN correlation_rules.error_level IS 'エラーレベル';
 COMMENT ON COLUMN correlation_rules.message IS '出力メッセージ';
 COMMENT ON COLUMN correlation_rules.created_at IS '作成日時';
