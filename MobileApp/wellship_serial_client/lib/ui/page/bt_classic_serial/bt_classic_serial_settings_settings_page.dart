@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wellship_serial_client/data/model/bt_classic_settings.dart';
 import 'package:wellship_serial_client/data/provider/bt_classic_devices_provider.dart';
+import 'package:wellship_serial_client/data/provider/bt_classic_settings_provider.dart';
 import 'package:wellship_serial_client/ui/component/wsc_select_dialog.dart';
 import 'package:wellship_serial_client/ui/route/app_route.dart';
 import 'package:wellship_serial_client/ui/route/app_route.gr.dart';
