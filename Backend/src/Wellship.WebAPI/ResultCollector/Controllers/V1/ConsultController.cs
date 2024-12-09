@@ -117,4 +117,16 @@ public class ConsultController : ControllerBase
         _consultUsecase.GetExamItemsExaminee();
         return Ok();
     }
+
+    /// <summary>
+    /// 前提検査メニューを検証する
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(InputExamItems))]
+    [HttpGet]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/prior/{currentExamId}")]
+    public async Task<IActionResult> ValidatePriorExamMenus([FromRoute][Required] string consultNumber, [FromRoute][Required] int currentExamId)
+    {
+        var results = await _consultUsecase.ValidatePriorExamMenus(consultNumber, currentExamId);
+        return Ok(results);
+    }
 }

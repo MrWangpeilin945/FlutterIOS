@@ -152,7 +152,14 @@ public class ConsultUsecase : IConsultUsecase
     public async Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenus(string consultNumber, int examMenuId)
     {
         // 未受診の検査メニューを取得する
-        var unexamined = await _consultRepository.GetUnexaminedConsultAsync(consultNumber);
+        var unexaminedList = await _consultRepository.GetUnexaminedConsultsAsync([consultNumber]);
+        var unexamined = unexaminedList.SingleOrDefault(x => x.ConsultNumber == consultNumber);
+
+        // 指定した受診について、未受診の検査メニューがない場合は、エラーなし
+        if (unexamined is null)
+        {
+            return [];
+        }
         var unexaminedMenuIds = unexamined.UnexaminedExamMenus.Select(x => x.ExamMenuId).ToArray();
 
         // 前提検査メニューの設定を取得する
