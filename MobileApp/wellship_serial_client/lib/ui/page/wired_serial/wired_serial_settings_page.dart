@@ -68,19 +68,23 @@ class WiredSerialSettingsPage extends HookConsumerWidget {
                   title: const Text("データビット数"),
                   subtitle: Text(dataBitsState.value.toString()),
                   onTap: () async {
-                    final controller =
-                        TextEditingController.fromValue(TextEditingValue(text: dataBitsState.value.toString()));
                     await showDialog(
                       context: context,
                       builder: (context) {
-                        return WscInputDialog(
+                        return WscSelectDialog(
                           title: "データビット数を入力してください",
-                          keyboardType: TextInputType.number,
-                          controller: controller,
-                          onConfirmed: () {
-                            dataBitsState.value = int.tryParse(controller.text) ?? 0;
-                            Navigator.pop(context);
-                          },
+                          items: const [5, 6, 7, 8],
+                          mapper: (x) => RadioListTile(
+                            value: x,
+                            title: Text(x.toString()),
+                            groupValue: dataBitsState.value,
+                            onChanged: (value) {
+                              if (value != null) {
+                                dataBitsState.value = value;
+                              }
+                              Navigator.pop(context);
+                            },
+                          ),
                         );
                       },
                     );
