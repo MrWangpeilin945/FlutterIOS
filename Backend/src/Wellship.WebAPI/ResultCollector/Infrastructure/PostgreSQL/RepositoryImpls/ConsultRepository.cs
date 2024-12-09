@@ -346,7 +346,7 @@ public class ConsultRepository : IConsultRepository
         where
             o.consult_id = @ConsultId;";
 
-        var response = await connection.QueryAsync<ExamCancelEntity>(sql, new { ConsultId = consultId });
+        var response = await connection.QueryAsync<ExamOrderEntity>(sql, new { ConsultId = consultId });
 
         return new ExamOrder()
         {
@@ -355,6 +355,39 @@ public class ConsultRepository : IConsultRepository
             {
                 ExamItemId = x.ExamItemId,
                 ExamItemDetailId = x.ExamItemDetailId
+            })
+        };
+    }
+
+    /// <summary>
+    /// 受診を指定して検査結果を取得します。
+    /// </summary>
+    public async Task<ExamResult> GetExamResultsAsync(int consultId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            r.consult_id as ConsultId
+            , d.exam_item_id as ExamItemId
+            , r.exam_item_detail_id as ExamItemDetailId
+            , r.value as Value
+        from
+            resultcollector.exam_results r 
+            left join resultcollector.exam_item_details d 
+                on r.exam_item_detail_id = d.exam_item_detail_id
+        where
+            r.consult_id = @ConsultId;";
+
+        var response = await connection.QueryAsync<ExamResultEntity>(sql, new { ConsultId = consultId });
+
+        return new ExamResult()
+        {
+            ConsultId = consultId,
+            ExamItemDetailResults = response.Select(x => new ExamItemDetailResult()
+            {
+                ExamItemId = x.ExamItemId,
+                ExamItemDetailId = x.ExamItemDetailId,
+                Value = x.Value
             })
         };
     }
