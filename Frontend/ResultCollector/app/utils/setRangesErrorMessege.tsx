@@ -9,14 +9,14 @@ import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 
 // 受け取ったExamItemDetailsから
 // 最も高いエラーレベルに該当するExamNormalValueRangeを返す
-const getMaxErrorLevel = (examItemDetails: ExamItemDetail[]) => {
+const getMaxErrorLevelByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
   let matchExamRange: ExamNormalValueRange | null = null;
   for (const examItemDetail of examItemDetails) {
     const numericValue = Number.parseFloat(examItemDetail.value || "");
     const ranges = examItemDetail.examNormalValueRanges;
     if (!numericValue || !ranges) continue;
     // ValueもしくはexamNormalValueRangesが無い場合次のループに進む
-    const valueRange = ranges?.find((range) => {
+    const valueRange = ranges.find((range) => {
       const minValue = range.minValue;
       const maxValue = range.maxValue;
       if (typeof minValue === "number" && typeof maxValue === "number") {
@@ -40,7 +40,9 @@ const getMaxErrorLevel = (examItemDetails: ExamItemDetail[]) => {
 export const setRangesErrorMessage = (inputexamItems: InputExamItem[]) => {
   for (const examitem of inputexamItems) {
     if (!examitem.examItemDetails) continue;
-    const matchExamRange = getMaxErrorLevel(examitem.examItemDetails);
+    const matchExamRange = getMaxErrorLevelByRangeCheck(
+      examitem.examItemDetails
+    );
     if (matchExamRange === null) continue;
     const rangesErrorMessage: ExamRegistResult = {
       description: getErrorMessage(
