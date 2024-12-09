@@ -30,7 +30,6 @@ public class ExamItemRepository : IExamItemRepository
     public async Task<IEnumerable<ExamItemGroup>> GetExamItemGroupsAsync(int examMenuId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
-        //TODO: 未実装 EquipmentLabel
         const string sql = @"
         select 
             g.exam_item_group_id as ExamItemGroupId
@@ -40,7 +39,7 @@ public class ExamItemRepository : IExamItemRepository
             , i.name as ExamItemName
             , d.position_number as ExamItemDetailPositionNumber 
             , d.exam_item_detail_id as ExamItemDetailId 
-            , 'Height' as EquipmentLabel
+            , d.equipment_label as EquipmentLabel
             , d.name as ExamItemDetailName
             , i.unit as Unit
             , d.type as ExamItemDetailType
