@@ -66,7 +66,7 @@ export default function ExamNumeric({
       if (typeof minValue === "number" && typeof maxValue === "number")
         return numericValue >= minValue && numericValue <= maxValue;
     })?.errorLevel;
-    if (errorLevel === 3) {
+    if (errorLevel === InputErrorLevel.異常) {
       const warningMessage: ExamRegistResult = {
         // TODO: 具体的なメッセージが決まったら差し替える
         description: "異常エラーです。",
@@ -74,7 +74,7 @@ export default function ExamNumeric({
       };
       return [warningMessage];
     }
-    if (errorLevel === 2) {
+    if (errorLevel === InputErrorLevel.警告) {
       const alertMessage: ExamRegistResult = {
         // TODO: 具体的なメッセージが決まったら差し替える
         description: "警告エラーです。",

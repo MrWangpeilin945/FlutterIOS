@@ -43,17 +43,17 @@
   padding-bottom: 70px;
 }
 
-.input-error{
+.input-error {
   outline :1px solid #E26264;
   color: #E26264;
 }
 
-.input-warning{
+.input-warning {
   outline :1px solid #EE6A00;
   color: #EE6A00;  
 }
 
-.input-textbox{
+.input-textbox {
   height: 79px;
   text-align: right;
   padding: 32px;
