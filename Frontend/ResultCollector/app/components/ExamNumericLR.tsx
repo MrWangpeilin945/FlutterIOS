@@ -115,8 +115,8 @@ export default function ExamNumericLR({
   useEffect(() => {
     const result = sortErrorMessages(
       getAPIErrorMessages()
-        .concat(validationNumeric())
-        .concat(validationRequire())
+      // .concat(validationNumeric())
+      // .concat(validationRequire())
     );
     setErrMessages(result);
   }, [examValue, onRegisterPressed]);
@@ -154,7 +154,7 @@ export default function ExamNumericLR({
                 }}
               >
                 <Title size="lg" fw={700}>
-                  {examItems[0].name}
+                  {detail.name}
                 </Title>
               </Paper>
               <Group>
@@ -175,17 +175,17 @@ export default function ExamNumericLR({
                   w={"340"}
                   radius={"md"}
                   size="inputComponent"
-                  value={"12"}
+                  value={detail.value}
                   onClick={() => setShowKeyboard(true)}
                   onChange={(e) => {}}
                 />
                 {/* TODO:前回値のマックス横幅設定 */}
                 <Stack gap="0">
                   <Text size="md" fw="700" maw={"172"}>
-                    前回:0000
+                    {detail.prevValue ? `(前回: ${detail.prevValue})` : ""}
                   </Text>
                   <Text size="xs" fw="400">
-                    cm
+                    {detail.unit}
                   </Text>
                 </Stack>
               </Group>
@@ -193,6 +193,16 @@ export default function ExamNumericLR({
           ))}
         </Group>
       </Stack>
+      {/* エラーメッセージの表示 */}
+      {(errMessages || []).map((error, index) => (
+        <Group
+          key={index}
+          c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
+        >
+          <IconExclamationCircleFilled size={"1.7rem"} />
+          <Text>{error.description}</Text>
+        </Group>
+      ))}
     </Flex>
   );
 }
