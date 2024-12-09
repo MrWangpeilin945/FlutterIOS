@@ -22,7 +22,7 @@ export default function consultInput() {
           positionNumber: 1, //血圧の上なのか下なのかのテキストボックス位置を指定する
           examItemDetailId: 1001,
           name: "左",
-          value: "100.0", //前回値初期値化設定があれば、ここに入れておいてほしい   インクリメントの場合登録済みなら、登録済みの値、未登録なら次のインクリメント値をもらう
+          value: "1000", //前回値初期値化設定があれば、ここに入れておいてほしい   インクリメントの場合登録済みなら、登録済みの値、未登録なら次のインクリメント値をもらう
           prevValue: "120",
           unit: "cm",
           type: 1, //1:入力、2:選択、3：演算値など ※ここのテーブル設定を知らないのでとりあえずの例
@@ -58,14 +58,14 @@ export default function consultInput() {
           positionNumber: 2, //血圧の上なのか下なのかのテキストボックス位置を指定する
           examItemDetailId: 1001,
           name: "右",
-          value: "", //前回値初期値化設定があれば、ここに入れておいてほしい   インクリメントの場合登録済みなら、登録済みの値、未登録なら次のインクリメント値をもらう
-          prevValue: "120",
-          unit: "cm",
+          value: "752", //前回値初期値化設定があれば、ここに入れておいてほしい   インクリメントの場合登録済みなら、登録済みの値、未登録なら次のインクリメント値をもらう
+          prevValue: "800",
+          unit: "kg",
           type: 1, //1:入力、2:選択、3：演算値など ※ここのテーブル設定を知らないのでとりあえずの例
           cancelReasonId: undefined,
           equipmentLabel: "★value1", //検討中連携している機器のどのパラメータに該当するかのプロパティ的なもの
-          decimalLength: 1, //小数点以下の入力 ※必要か？
-          integerLength: 3,
+          decimalLength: 2, //小数点以下の入力 ※必要か？
+          integerLength: 4,
           keyboard: {
             keyboardType: 1, //0～9タイプか、カスタムか
             values: ["0.1", "0.2", "0.3"], //0～9タイプの時は不要

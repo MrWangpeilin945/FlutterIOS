@@ -22,6 +22,7 @@ import type {
 import { InputErrorLevel } from "~/domain/enums";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
+import { G } from "node_modules/msw/lib/core/GraphQLHandler-D6mLMXGZ";
 
 type ExamNumericLRProps = {
   examItems: InputExamItem[];
@@ -44,14 +45,94 @@ export default function ExamNumericLR({
   const firstExamItemDetails = examItems[0].examItemDetails;
 
   // 状態の宣言
-  const [showKeyboard, setShowKeyboard] = useState<boolean[]>([false, false]);
-  const [examValue, setExamValue] = useState<string[]>(
+  const [examValues, setExamValues] = useState<string[]>(
     firstExamItemDetails.map((item) => item.value || "")
   );
+  const [showKeyboards, setShowKeyboards] = useState<boolean[]>(
+    firstExamItemDetails.map(() => false)
+  );
+  const closeKeyBoard = useClickOutside(() =>
+    setShowKeyboards(Array(firstExamItemDetails.length).fill(false))
+  );
   const [errMessages, setErrMessages] = useState<ExamRegistResult[]>();
-  const closeKeyBoard = useClickOutside(() => setShowKeyboard([false, false]));
+
+  // テキストボックス押下時の動作
+  const handleTextboxClick = (index: number) => {
+    setShowKeyboards((prev) => {
+      const updated = [...prev];
+      updated[index] = true;
+      return updated;
+    });
+  };
+
+  // キーボードの確定キー押下時に非表示にする
   const handleConfirm: () => void = () => {
-    setShowKeyboard([false, false]);
+    setShowKeyboards(Array(firstExamItemDetails.length).fill(false));
+  };
+
+  // 表示時の小数点追加処理
+  const formatDecimalValue = (value: string, index: number) => {
+    const floatValue = Number.parseFloat(value);
+    const afterDecimalDigit = firstExamItemDetails[index]?.decimalLength;
+    if (afterDecimalDigit && !Number.isNaN(floatValue)) {
+      const result = (floatValue / 10 ** afterDecimalDigit)
+        .toFixed(afterDecimalDigit)
+        .toString();
+      return result;
+    }
+    return value;
+  };
+
+  // 最大桁数を考慮してexamValueをセットする
+  const setExamValueWithMaxDigits = (examValue: string, index: number) => {
+    const decimalLength = firstExamItemDetails[index]?.decimalLength ?? null;
+    const integerLength = firstExamItemDetails[index]?.integerLength ?? 0;
+    const updatedExamValue = [...examValues];
+    if (decimalLength) {
+      const maxDigits = decimalLength + integerLength;
+      updatedExamValue[index] = examValue.slice(0, maxDigits);
+    } else {
+      updatedExamValue[index] = examValue;
+    }
+    setExamValues(updatedExamValue);
+  };
+
+  // examItemsを更新して渡す処理
+  // TODO:エラーレベルでコールバックを制御するか確認
+  const updatedExamItems = () => {
+    if (errMessages?.some((x) => x.errorLevel === InputErrorLevel.異常)) {
+      return;
+    }
+    const newExamItemDetails = firstExamItemDetails.map((item, index) => {
+      return {
+        ...item,
+        value: examValues[index],
+      };
+    });
+    const newExamItems: InputExamItem = {
+      ...examItems[0],
+      examItemDetails: newExamItemDetails,
+    };
+    onChange(newExamItems);
+  };
+
+  // テキストボックス入力時の処理
+  const handleTextChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const value = e.currentTarget.value;
+    value.replace(".", ""); // テキストボックスの値を参照するので、小数点を取り除く
+    setExamValueWithMaxDigits(value, index);
+    updatedExamItems();
+  };
+
+  // キーボード入力時の処理
+  const handleKeyChange = (e: string, index: number) => {
+    setExamValueWithMaxDigits(e, index);
+    updatedExamItems();
+    console.log(examValues);
+    console.log(index);
   };
 
   // APIのエラーメッセージの取得
@@ -63,7 +144,7 @@ export default function ExamNumericLR({
 
   // 半角数字のチェック
   const validationNumeric = () => {
-    if (!examValue) {
+    if (!examValues) {
       return [];
     }
     const validationSchema = z
@@ -72,7 +153,7 @@ export default function ExamNumericLR({
         /^[0-9]+$/,
         getErrorMessage(errorMessages.numericString, `${examItems[0].name}は`)
       );
-    const result = validationSchema.safeParse(examValue);
+    const result = validationSchema.safeParse(examValues);
     if (!result.success) {
       const numericMessage: ExamRegistResult = {
         description: result.error.errors[0].message,
@@ -90,7 +171,7 @@ export default function ExamNumericLR({
         1,
         getErrorMessage(errorMessages.required, `${examItems[0].name}は`)
       );
-    const result = requireSchema.safeParse(examValue);
+    const result = requireSchema.safeParse(examValues);
     if (!result.success && onRegisterPressed) {
       const numericMessage: ExamRegistResult = {
         description: result.error.errors[0].message,
@@ -119,7 +200,7 @@ export default function ExamNumericLR({
       // .concat(validationRequire())
     );
     setErrMessages(result);
-  }, [examValue, onRegisterPressed]);
+  }, [examValues, onRegisterPressed]);
 
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
@@ -139,7 +220,7 @@ export default function ExamNumericLR({
             {examItems[0].name}
           </Title>
         </Paper>
-        <Group>
+        <Group gap={16}>
           {firstExamItemDetails?.map((detail, index) => (
             <Stack key={index}>
               <Paper
@@ -175,9 +256,11 @@ export default function ExamNumericLR({
                   w={"340"}
                   radius={"md"}
                   size="inputComponent"
-                  value={detail.value}
-                  onClick={() => setShowKeyboard(true)}
-                  onChange={(e) => {}}
+                  value={formatDecimalValue(examValues[index], index)}
+                  onClick={() => handleTextboxClick(index)}
+                  onChange={(e) => {
+                    handleTextChange(e, index);
+                  }}
                 />
                 {/* TODO:前回値のマックス横幅設定 */}
                 <Stack gap="0">
@@ -192,17 +275,36 @@ export default function ExamNumericLR({
             </Stack>
           ))}
         </Group>
-      </Stack>
-      {/* エラーメッセージの表示 */}
-      {(errMessages || []).map((error, index) => (
-        <Group
-          key={index}
-          c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
-        >
-          <IconExclamationCircleFilled size={"1.7rem"} />
-          <Text>{error.description}</Text>
+        {/* エラーメッセージの表示 */}
+        {(errMessages || []).map((error, index) => (
+          <Group
+            key={index}
+            c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
+          >
+            <IconExclamationCircleFilled size={"1.7rem"} />
+            <Text>{error.description}</Text>
+          </Group>
+        ))}
+        <Group>
+          {firstExamItemDetails?.map((detail, index) => (
+            <Stack key={index}>
+              <Box w={540}>
+                {showKeyboards[index] && (
+                  <div ref={closeKeyBoard}>
+                    <Keyboard
+                      value={examValues[index]}
+                      onChange={(e: string) => {
+                        handleKeyChange(e, index);
+                      }}
+                      onConfirm={handleConfirm}
+                    />
+                  </div>
+                )}
+              </Box>
+            </Stack>
+          ))}
         </Group>
-      ))}
+      </Stack>
     </Flex>
   );
 }
