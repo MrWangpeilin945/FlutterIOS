@@ -18,5 +18,6 @@ class BluetoothPermissionsHandler {
     }
   }
 
-  Future<PermissionStatus> request() async => await Permission.bluetoothScan.request();
+  Future<PermissionStatus> requestScan() async => await Permission.bluetoothScan.request();
+  Future<PermissionStatus> requestConnect() async => await Permission.bluetoothConnect.request();
 }

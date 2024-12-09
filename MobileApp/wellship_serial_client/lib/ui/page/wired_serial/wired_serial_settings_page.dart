@@ -96,11 +96,14 @@ class WiredSerialSettingsPage extends HookConsumerWidget {
                         return WscSelectDialog(
                           title: "パリティビットを選択してください",
                           items: Parity.values,
-                          onSelect: (value) {
-                            parityBitState.value = value ?? Parity.none;
-                            Navigator.pop(context);
-                          },
-                          selected: parityBitState.value,
+                          mapper: (x) => RadioListTile(
+                              value: x,
+                              title: Text(x.name),
+                              groupValue: parityBitState.value,
+                              onChanged: (value) {
+                                parityBitState.value = value ?? Parity.none;
+                                Navigator.pop(context);
+                              }),
                         );
                       },
                     );
@@ -116,11 +119,15 @@ class WiredSerialSettingsPage extends HookConsumerWidget {
                         return WscSelectDialog(
                           title: "ストップビットを選択してください",
                           items: StopBits.values,
-                          onSelect: (value) {
-                            stopBitState.value = value ?? StopBits.stopBits_1;
-                            Navigator.pop(context);
-                          },
-                          selected: stopBitState.value,
+                          mapper: (x) => RadioListTile(
+                            value: x,
+                            groupValue: stopBitState.value,
+                            title: Text(x.name),
+                            onChanged: (value) {
+                              stopBitState.value = value ?? StopBits.stopBits_1;
+                              Navigator.pop(context);
+                            },
+                          ),
                         );
                       },
                     );

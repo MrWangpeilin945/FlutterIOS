@@ -59,7 +59,6 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
               .replaceAllMapped(RegExp(r'[\x00-\x20]'), (x) => String.fromCharCode(0x2400 + x.group(0)!.codeUnitAt(0)))
               .replaceAll(RegExp(r'[\x7f]'), String.fromCharCode(0x2421));
           if (ackTriggers != null && ackTriggers.isEmpty == false && ackString != null) {
-            var hoge = buffer.first;
             //
           }
           if (!aborting && shouldAbort(buffer, behaviorSettings)) {

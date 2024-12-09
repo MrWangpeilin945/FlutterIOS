@@ -1,6 +1,9 @@
 ﻿import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:wellship_serial_client/data/handler/bluetooth_permission_handler.dart';
+import 'package:wellship_serial_client/data/handler/location_permission_handler.dart';
 import 'package:wellship_serial_client/ui/component/wsc_menu_button.dart';
 import 'package:wellship_serial_client/ui/route/app_route.dart';
 import 'package:wellship_serial_client/ui/route/app_route.gr.dart';
@@ -33,7 +36,18 @@ class HomePage extends ConsumerWidget {
                       text: '有線接続',
                     ),
                     WscMenuButton(
-                      onPressed: () => {router.push(const BtClassicSerialSettingsRoute())},
+                      onPressed: () async {
+                        final result = await _requestPermission();
+                        if (!result && context.mounted) {
+                          showDialog(
+                              context: context,
+                              builder: (context) => const AlertDialog(
+                                    content: Text('必要な権限が与えられていないため実行できません。\r\n設定画面から位置情報・付近のデバイスを検出する権限を付与してください。'),
+                                  ));
+                          return;
+                        }
+                        router.push(const BtClassicSerialSettingsRoute());
+                      },
                       text: '無線接続（BR/EDR）',
                     ),
                     const WscMenuButton(
@@ -48,5 +62,16 @@ class HomePage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<bool> _requestPermission() async {
+    final locationPermissionHandler = LocationPermissionsHandler();
+    final bluetoothPermissionHandler = BluetoothPermissionsHandler();
+    final locationPermission = await locationPermissionHandler.request();
+    final bluetoothScanPermission = await bluetoothPermissionHandler.requestScan();
+    final bluetoothConnectPermission = await bluetoothPermissionHandler.requestConnect();
+    return locationPermission == PermissionStatus.granted &&
+        bluetoothScanPermission == PermissionStatus.granted &&
+        bluetoothConnectPermission == PermissionStatus.granted;
   }
 }
