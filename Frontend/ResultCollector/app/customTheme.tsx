@@ -13,7 +13,7 @@ import styles from "./styles/theme.module.css";
 export const customTheme = createTheme({
   colors: {
     // プライマリカラー
-    primary: colorsTuple("#009485"),
+    primary: colorsTuple("#00979A"),
     // システムの背景色
     background: colorsTuple("#F2F2F2"),
     // 標準の背景色
@@ -32,6 +32,8 @@ export const customTheme = createTheme({
     femalePrimary: colorsTuple("#FFBEB7"),
     // 女性のセカンダリカラー
     femaleSecondary: colorsTuple("#F56358"),
+    // ストライプカラー
+    stripe: colorsTuple("#EAF7F2"),
     // 緑系の色
     green01: colorsTuple("#38A676"),
     green02: colorsTuple("#98DBBA"),
