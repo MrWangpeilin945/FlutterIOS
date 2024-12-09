@@ -84,6 +84,7 @@ export default function NumericKeyboard(props: KeyboardProps) {
                   color={keyValue === "AC" || keyValue === "確定" ? "gray01" : "black"}
                   value={keyValue}
                   onClick={(e) => handlerKeyboardClick(e.currentTarget.value)}
+                  tabIndex={-1}
                 >
                   {keyValue}
                 </Button>
