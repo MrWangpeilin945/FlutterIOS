@@ -47,6 +47,7 @@ CREATE TABLE correlation_rules (
   , priority integer NOT NULL
   , trigger_type integer NOT NULL
   , error_level integer NOT NULL
+  , exam_item_id integer NOT NULL
   , message text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -692,6 +693,7 @@ COMMENT ON COLUMN correlation_rules.exam_menu_id IS '検査メニューID';
 COMMENT ON COLUMN correlation_rules.priority IS '優先度';
 COMMENT ON COLUMN correlation_rules.trigger_type IS '発火条件種別';
 COMMENT ON COLUMN correlation_rules.error_level IS 'エラーレベル';
+COMMENT ON COLUMN correlation_rules.exam_item_id IS '検査項目ID_出力用';
 COMMENT ON COLUMN correlation_rules.message IS '出力メッセージ';
 COMMENT ON COLUMN correlation_rules.created_at IS '作成日時';
 COMMENT ON COLUMN correlation_rules.created_by IS '作成者';
