@@ -1,14 +1,16 @@
 import {
-  Box,
   Button,
-  Center,
   Container,
+  Flex,
   Group,
   LoadingOverlay,
   Modal,
+  Stack,
   Table,
   Text,
-  Title,
+  getSize,
+  getThemeColor,
+  useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
@@ -103,24 +105,85 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
 
   return (
     <Modal
-      size="md"
-      radius="md"
+      size={800}
+      radius={32}
       opened={isOpen}
       onClose={handleCancel}
       title={title}
       closeOnClickOutside={false} // modalの外クリックしても消えないように
       withCloseButton={false} // closeボタンを消す
-      centered
+      styles={{
+        header: {
+          height: 75,
+          background: getThemeColor("primary", useMantineTheme()),
+          padding: "16px 0px",
+        },
+        title: {
+          color: getThemeColor("white01", useMantineTheme()),
+          fontSize: getSize("lg", "mantine-font-size"),
+          lineHeight: getSize("lg", "mantine-line-height"),
+          fontWeight: 700,
+          margin: "0px auto",
+        },
+        body: {
+          height: 417,
+          background: getThemeColor("white01", useMantineTheme()),
+          padding: 0,
+        },
+      }}
     >
-      {children}
-      <Center>
-        <Button w={200} h={80} variant="outline" onClick={handleCancel} mt="xl">
-          <Title order={2}>戻る</Title>
-        </Button>
-        <Button w={200} h={80} variant="filled" onClick={handleOk} mt="xl">
-          <Title order={2}>未出力確定</Title>
-        </Button>
-      </Center>
+      <Flex w={800} pt={24} pl={16} pr={16}>
+        <Flex m="0px auto">{children}</Flex>
+      </Flex>
+      <Flex
+        w={800}
+        pt={24}
+        pb={24}
+        pl={16}
+        pr={16}
+        pos="absolute"
+        bottom={0}
+        bg="white01"
+        c="gray02"
+        style={{ borderTop: "1px solid" }}
+      >
+        <Flex columnGap={24} m="0px auto">
+          <Button
+            variant="outline"
+            w={360}
+            h={64}
+            bg="white01"
+            color="primary"
+            pt={16}
+            pb={16}
+            pl={32}
+            pr={32}
+            style={{ borderWidth: 2 }}
+            onClick={handleCancel}
+          >
+            <Text size="lg" fw={700} c="primary">
+              戻る
+            </Text>
+          </Button>
+          <Button
+            variant="filled"
+            w={360}
+            h={64}
+            bg="primary"
+            color="primary"
+            pt={16}
+            pb={16}
+            pl={32}
+            pr={32}
+            style={{ borderWidth: 2 }}
+            onClick={handleOk}
+          >
+            <Text size="lg" fw={700} c="white01">
+              未出力確定
+            </Text>
+          </Button>
+        </Flex>
+      </Flex>
     </Modal>
   );
 });
@@ -240,35 +303,50 @@ export default function ExamresultExportHistory() {
           screenName="検査結果出力履歴"
           staffName={staff?.name || ""}
         />
-        <Container fluid mt={20}>
+        <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
               {exportHistory?.exportHistories ? (
-                <Table>
-                  <Table.Thead>
+                <Table bg="white01" striped="even" stripedColor="stripe">
+                  <Table.Thead
+                    h={80}
+                    bg="background"
+                    fz="xs"
+                    fw={700}
+                    c="black01"
+                  >
                     <Table.Tr>
-                      <Table.Th>出力者</Table.Th>
-                      <Table.Th>健診日</Table.Th>
-                      <Table.Th>会場</Table.Th>
-                      <Table.Th>件数</Table.Th>
+                      <Table.Th ta="center">出力者</Table.Th>
+                      <Table.Th ta="center">健診日</Table.Th>
+                      <Table.Th ta="center">会場</Table.Th>
+                      <Table.Th ta="center">件数</Table.Th>
+                      <Table.Th ta="center" />
                     </Table.Tr>
                   </Table.Thead>
-                  <Table.Tbody>
+                  <Table.Tbody h={118} fz="xs" c="black01">
                     {exportHistory?.exportHistories?.map((eh) => (
                       <Table.Tr key={eh.placeScheduleId}>
-                        <Table.Td>{eh.exportedBy}</Table.Td>
-                        <Table.Td>
+                        <Table.Td w={267}>{eh.exportedBy}</Table.Td>
+                        <Table.Td ta="center">
                           {eh.examDate &&
                             format(
                               parse(eh.examDate, "yyyy-MM-dd", new Date()),
                               "yyyy/MM/dd",
                             )}
                         </Table.Td>
-                        <Table.Td>{eh.placeName}</Table.Td>
-                        <Table.Td>{eh.dataCount}</Table.Td>
-                        <Table.Td>
+                        <Table.Td w={397}>{eh.placeName}</Table.Td>
+                        <Table.Td ta="center">{eh.dataCount}</Table.Td>
+                        <Table.Td ta="center">
                           <Button
                             variant="outline"
+                            w={160}
+                            h={66}
+                            bg="white01"
+                            color="primary"
+                            pt={16}
+                            pb={16}
+                            pl={32}
+                            pr={32}
                             onClick={() =>
                               handleClick(
                                 eh.exportId,
@@ -277,9 +355,10 @@ export default function ExamresultExportHistory() {
                                 eh.dataCount,
                               )
                             }
-                            mt="xs"
                           >
-                            <Title order={2}>未出力</Title>
+                            <Text size="lg" fw={700} c="primary">
+                              未出力
+                            </Text>
                           </Button>
                         </Table.Td>
                       </Table.Tr>
@@ -289,12 +368,12 @@ export default function ExamresultExportHistory() {
               ) : (
                 <>
                   {/* エラーメッセージを表示 */}
-                  <Title order={3}>
+                  <Text size="sm" c="black01">
                     {getErrorMessage(
                       errorMessages.notFound,
                       "出力済みのデータ",
                     )}
-                  </Title>
+                  </Text>
                 </>
               )}
               <CommonDialog
@@ -304,10 +383,12 @@ export default function ExamresultExportHistory() {
                 buttonMessage="閉じる"
               />
               <ResultsOutputConfirmDialog ref={ref} title="検査結果出力履歴">
-                <Box>
-                  <Group wrap="nowrap">
-                    <Text size="xs">健診日：</Text>
-                    <Text size="xs">
+                <Stack>
+                  <Group wrap="nowrap" gap={0}>
+                    <Text size="lg" c="black01">
+                      健診日：
+                    </Text>
+                    <Text size="lg" c="black01">
                       {resultsOutputConfirmDialog?.examDate &&
                         format(
                           parse(
@@ -319,27 +400,23 @@ export default function ExamresultExportHistory() {
                         )}
                     </Text>
                   </Group>
-                </Box>
-                <Box>
-                  <Group wrap="nowrap">
-                    <Text size="xs" style={{ whiteSpace: "nowrap" }}>
+                  <Group wrap="nowrap" gap={0} align="flex-start">
+                    <Text size="lg" c="black01">
                       会場：
                     </Text>
-                    <Text size="xs">
+                    <Text w={646} size="lg" c="black01">
                       {resultsOutputConfirmDialog?.placeName}
                     </Text>
                   </Group>
-                </Box>
-                <Box>
-                  <Group wrap="nowrap">
-                    <Text size="xs" style={{ whiteSpace: "nowrap" }}>
+                  <Group wrap="nowrap" gap={0} align="flex-start">
+                    <Text size="lg" c="black01">
                       件数：
                     </Text>
-                    <Text size="xs">
+                    <Text size="lg" c="black01">
                       {resultsOutputConfirmDialog?.dataCount}
                     </Text>
                   </Group>
-                </Box>
+                </Stack>
               </ResultsOutputConfirmDialog>
             </>
           )}
