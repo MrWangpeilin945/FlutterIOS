@@ -327,4 +327,35 @@ public class ConsultRepository : IConsultRepository
             consult_id = @ConsultId;";
         return await connection.QueryAsync<int>(sql, new { ConsultId = consultId });
     }
+
+    /// <summary>
+    /// 受診を指定して検査依頼を取得します。
+    /// </summary>
+    public async Task<ExamOrder> GetExamOrdersAsync(int consultId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            o.consult_id as ConsultId
+            , d.exam_item_id as ExamItemId
+            , o.exam_item_detail_id as ExamItemDetailId
+        from
+            resultcollector.exam_item_detail_orders o 
+            left join resultcollector.exam_item_details d 
+                on o.exam_item_detail_id = d.exam_item_detail_id
+        where
+            o.consult_id = @ConsultId;";
+
+        var response = await connection.QueryAsync<ExamCancelEntity>(sql, new { ConsultId = consultId });
+
+        return new ExamOrder()
+        {
+            ConsultId = consultId,
+            ExamItemDetailOrders = response.Select(x => new ExamItemDetailOrder()
+            {
+                ExamItemId = x.ExamItemId,
+                ExamItemDetailId = x.ExamItemDetailId
+            })
+        };
+    }
 }

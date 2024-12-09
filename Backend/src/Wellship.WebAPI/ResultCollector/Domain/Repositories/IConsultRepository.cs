@@ -54,4 +54,10 @@ public interface IConsultRepository
     /// </summary>
     /// <param name="consultId">受診ID</param>
     public Task<IEnumerable<int>> GetConsultThresholds(int consultId);
+
+    /// <summary>
+    /// 受診を指定して検査依頼を取得します。
+    /// </summary>
+    public Task<ExamOrder> GetExamOrdersAsync(int consultId);
+
 }

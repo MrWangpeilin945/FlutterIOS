@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Options;
-
 using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Exceptions;
@@ -150,7 +148,6 @@ public class ConsultUsecase : IConsultUsecase
         await _consultRepository.RemoveExamCancelsAsync(consult.ConsultId, removeTargets);
         await _consultRepository.SaveExamCancelsAsync(consult.ConsultId, toSave);
     }
-
     /// <summary>
     /// 検査結果入力情報を取得する
     /// </summary>
@@ -191,7 +188,11 @@ public class ConsultUsecase : IConsultUsecase
                 normalValueRanges.Add(normatValue);
             }
         }
-        
+        // 検査中止を取得
+        var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
+        // 検査依頼を取得
+        var examOrders = await _consultRepository.GetExamOrdersAsync(consult.ConsultId);
+
         return new InputExamItems()
         {
             ConsultNumber = consultNumber,
@@ -206,7 +207,7 @@ public class ConsultUsecase : IConsultUsecase
                 examItemGroups.Select(eg => new ExamItemGroup
                 {
                     Type = (int)eg.Type,
-                    ExamItems = eg.ExamItems.Select(ei => new InputExamItem
+                    ExamItems = eg.ExamItems.Select(ei => new InputExamItem 
                     {
                         PositionNumber = ei.PositionNumber,
                         ExamItemId = ei.ExamItemId,
@@ -217,8 +218,8 @@ public class ConsultUsecase : IConsultUsecase
                             ExamItemDetailId = ed.ExamItemDetailId,
                             EquipmentLabel = ed.EquipmentLabel,
                             Name = ed.Name,
-                            HasOrder = true,        // TODO: 検査依頼が存在するか
-                            CancelReasonId = null,  // TODO: 中止理由ID
+                            HasOrder = examOrders.ExamItemDetailOrders.Where(x => x.ExamItemDetailId == ed.ExamItemDetailId).Any(),
+                            CancelReasonId = GetExamCancelAsync(ed.ExamItemDetailId, examCancels),
                             Value = "",             // TODO: 今回値
                             PrevValue = "",         // TODO: 前回値
                             Unit = ed.Unit,
@@ -258,5 +259,22 @@ public class ConsultUsecase : IConsultUsecase
                     }).ToArray()
                 }).ToArray()
         };
+    }
+
+    /// <summary>
+    /// 検査項目明細IDの中止理由を取得する
+    /// </summary>
+    /// <param name="examItemDetailId">検査項目明細ID</param>
+    /// <param name="examCancels">検査中止</param>
+    /// <returns></returns>
+    private int? GetExamCancelAsync(int examItemDetailId, Domain.Models.ExamCancel examCancels)
+    {
+        var cancelReasonId = examCancels.ExamItemDetailCancels.Where(x => x.ExamItemDetailId == examItemDetailId)
+                                                              .Select(x => x.CancelReasonId).ToArray();
+        if (cancelReasonId.Length > 0)
+        {
+            cancelReasonId.ElementAt(0);
+        }
+        return null;
     }
 }
