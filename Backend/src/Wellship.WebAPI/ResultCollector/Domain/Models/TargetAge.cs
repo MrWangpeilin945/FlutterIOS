@@ -7,9 +7,16 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 /// </summary>
 public sealed class TargetAge
 {
+    /// <summary>
+    /// 最小年齢
+    /// </summary>
     public Age MinAge { get; } 
     
+    /// <summary>
+    /// 最大年齢
+    /// </summary>
     public Age MaxAge { get; }
+    
     /// <summary>
     /// コンストラクタ
     /// </summary>

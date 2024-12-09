@@ -164,7 +164,7 @@ public class ConsultUsecase : IConsultUsecase
         DateOnly examDate = placeSchedule.ExamDate;
         // 受診日の年齢
         // NOTE: 年齢加算日は暫定で前日年齢加算
-        int examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算).Years;
+        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
         // 検査メニューに関連した検査項目情報を取得
         var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
         // 検査項目明細IDを取得
@@ -180,9 +180,18 @@ public class ConsultUsecase : IConsultUsecase
         var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
         // 検査正常値範囲を取得
         var examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds);
-        // 対象年齢・対象性別で絞り込む
-        var normalValueRanges = examNormalValueRanges.Where(x => ((int)x.TargetSex & (int)examinee.Sex) == (int)examinee.Sex);
-
+        // 検査正常値範囲を対象年齢・対象性別で絞り込む
+        List<Domain.Models.ExamNormalValueRange> normalValueRanges = new List<Domain.Models.ExamNormalValueRange>();
+        foreach (var normatValue in examNormalValueRanges.Where(x => ((int)x.TargetSex & (int)examinee.Sex) == (int)examinee.Sex))
+        {
+            var targetAge = new Domain.Models.TargetAge(normatValue.MinAge, normatValue.MaxAge);
+            if (targetAge.IsTargetAge(examAge))
+            {
+                // 対象年齢
+                normalValueRanges.Add(normatValue);
+            }
+        }
+        
         return new InputExamItems()
         {
             ConsultNumber = consultNumber,
@@ -190,7 +199,7 @@ public class ConsultUsecase : IConsultUsecase
                 TicketNumber = consult.TicketNumber,
                 KanaName = examinee.KanaName,
                 Sex = (int)examinee.Sex,
-                ExamDateAge = examAge
+                ExamDateAge = examAge.Years
             },
             RelatedExamItems = [],                  // TODO: 関連検査項目 後方作業へ
             ExamItemGroups = 
