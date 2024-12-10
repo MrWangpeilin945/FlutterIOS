@@ -8,6 +8,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useClickOutside, useDisclosure } from "@mantine/hooks";
+import { useFocusTrap } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
 import { isAxiosError } from "axios";
@@ -16,7 +17,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { z } from "zod";
-import { useConsultGetUnexaminedItems } from "~/api/wellship";
+import { useConsultGetUnexaminedMenus } from "~/api/wellship";
 import { useConsultVerifyConsultNumber } from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
 import CommonDialog from "~/components/CommonDialog";
@@ -34,14 +35,15 @@ export const meta: MetaFunction = () => {
 
 export default function consultNumberInput() {
   const navigate = useNavigate();
+  const focusTrapRef = useFocusTrap();
   const [placeSchedule] = useAtom(placeScheduleState);
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [staff] = useAtom(staffState);
-  const [incompliedData, setIncompliedData] = useState<string[]>([]);
-  const [examineeName, setExamineeName] = useState("");
-  const [isExistNum, setIsExistNum] = useState(false);
+  const [beforeIncompData, setBeforeIncompData] = useState<string[]>([]);
+  const [beforeExamName, setBeforeExamName] = useState("");
+  const [isBeforeNum, setIsBeforeNum] = useState(false);
   const [menu] = useAtom(examMenuState);
 
   // URLのパスパラメータ
@@ -51,7 +53,7 @@ export default function consultNumberInput() {
   );
 
   //AP1008呼び出し用(GET系APIの定義)
-  const { isFetching, refetch } = useConsultGetUnexaminedItems(
+  const { isFetching, refetch } = useConsultGetUnexaminedMenus(
     "1",
     consultNumber || "",
     { query: { enabled: false } },
@@ -74,26 +76,26 @@ export default function consultNumberInput() {
         const result = await refetch();
         if (result.data) {
           //成功時
-          setIsExistNum(true);
+          setIsBeforeNum(true);
 
           const examineeName = result.data.data.examineeName || "";
-          setExamineeName(examineeName);
+          setBeforeExamName(examineeName);
 
           //未実施検査項目の取得
-          if (result.data.data.unexaminedItems) {
+          if (result.data.data.unexaminedMenus) {
             const incompliedList: string[] =
-              result.data.data.unexaminedItems.map(
-                (examItem) => examItem.examItemName || "",
+              result.data.data.unexaminedMenus.map(
+                (ExamMenu) => ExamMenu.examMenuName || "",
               );
-            setIncompliedData(incompliedList);
+            setBeforeIncompData(incompliedList);
           }
         } else if (result.error) {
-          if (result.error.status === 404) {
+          if (result.error.status === 400) {
+            setErrorMessage(getErrorMessage(errorMessages.invalid, "受診番号"));
+          } else if (result.error.status === 404) {
             setErrorMessage(
               getErrorMessage(errorMessages.noData, "該当の受診番号のデータ"),
             );
-          } else if (result.error.status === 400) {
-            setErrorMessage(getErrorMessage(errorMessages.invalid, "受診番号"));
           } else if (result.error.status === 500) {
             setErrorMessage(getErrorMessage(errorMessages.serverError));
           }
@@ -138,7 +140,7 @@ export default function consultNumberInput() {
   };
 
   //AP1007_受診番号を検証する
-  const verifyConsultNo = async () => {
+  const verifyConsultNumber = async () => {
     // POST時のリクエストボディを生成する
     const body = {
       consultNumber: consultNumber || "",
@@ -154,10 +156,9 @@ export default function consultNumberInput() {
           //受診番号ありの場合
           if (consultNumber) {
             //検査メニューIDをパスパラメータへセット
-            let exammenuid = "";
+            let exammenuid = 0;
             if (menu) {
-              const firstVal = menu[0];
-              exammenuid = firstVal.id as unknown as string;
+              exammenuid = menu[0]?.id || 0;
             }
             //次の画面に遷移
             navigate(
@@ -178,8 +179,6 @@ export default function consultNumberInput() {
           }
           open();
         }
-      } finally {
-        /* empty */
       }
     };
     postMutateAsync();
@@ -195,13 +194,8 @@ export default function consultNumberInput() {
   // 確定処理
   const handleConfirm = async () => {
     if (validationCheck()) {
-      await verifyConsultNo();
+      await verifyConsultNumber();
     }
-  };
-
-  // 初期フォーカス
-  const ref = (element: HTMLInputElement | null) => {
-    element?.focus();
   };
 
   return (
@@ -218,28 +212,30 @@ export default function consultNumberInput() {
               </Title>
             </Group>
             <Center>
-              <Group mt={50}>
-                <Paper
-                  className={styles["basic-grey"]}
-                  radius="lg"
-                  px="xl"
-                  py="md"
-                >
-                  <Title order={1} fw={500}>
-                    受診番号
-                  </Title>
-                </Paper>
-                <Box>
-                  <TextInput
-                    size="xl"
-                    value={consultNumber || ""}
-                    onFocus={() => setShowKeyboard(true)}
-                    onChange={(e) => handleInputChange(e)}
-                    onKeyDown={handleKeyDown}
-                    ref={ref}
-                  />
-                </Box>
-              </Group>
+              <div ref={focusTrapRef}>
+                <Group mt={50}>
+                  <Paper
+                    className={styles["basic-grey"]}
+                    radius="lg"
+                    px="xl"
+                    py="md"
+                  >
+                    <Title order={1} fw={500}>
+                      受診番号
+                    </Title>
+                  </Paper>
+                  <Box>
+                    <TextInput
+                      data-autofocus
+                      size="xl"
+                      value={consultNumber || ""}
+                      onFocus={() => setShowKeyboard(true)}
+                      onChange={(e) => handleInputChange(e)}
+                      onKeyDown={handleKeyDown}
+                    />
+                  </Box>
+                </Group>
+              </div>
             </Center>
             {showKeyboard && (
               <Center>
@@ -252,11 +248,11 @@ export default function consultNumberInput() {
                 </div>
               </Center>
             )}
-            {isExistNum && (
+            {isBeforeNum && (
               <Box mt="50">
                 <IncompliedExam
-                  name={examineeName}
-                  incompliedExams={incompliedData}
+                  name={beforeExamName}
+                  incompliedExams={beforeIncompData}
                 />
               </Box>
             )}
