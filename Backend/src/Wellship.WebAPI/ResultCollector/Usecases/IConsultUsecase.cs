@@ -34,4 +34,9 @@ public interface IConsultUsecase
     /// 検査の実施有無と中止理由を登録する
     /// </summary>
     public Task RegisterExecutionsAsync(string consultNumber, ExecutionsRequest request);
+
+    /// <summary>
+    /// 前提検査メニューを検証する
+    /// </summary>
+    public Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenus(string consultNumber, int examMenuId);
 }

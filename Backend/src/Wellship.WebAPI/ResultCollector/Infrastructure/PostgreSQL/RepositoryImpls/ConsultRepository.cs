@@ -97,20 +97,6 @@ public class ConsultRepository : IConsultRepository
     }
 
     /// <summary>
-    /// 受診番号を指定して未受診の検査項目を取得します。
-    /// </summary>
-    public async Task<UnexaminedConsult> GetUnexaminedConsultAsync(string consultNumber)
-    {
-        var results = await GetUnexaminedConsultsAsync([consultNumber]);
-        if (!results.Any())
-        {
-            throw new ConsultNumberNotFoundException();
-        }
-
-        return results.Single();
-    }
-
-    /// <summary>
     /// 未受診の検査項目明細を受診単位のリストで取得します。
     /// </summary>
     public async Task<IEnumerable<UnexaminedConsult>> GetUnexaminedConsultsAsync(string[] consultNumbers)

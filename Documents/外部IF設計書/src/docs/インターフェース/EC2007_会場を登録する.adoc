@@ -1,0 +1,216 @@
+== EC2007_会場を登録する
+
+=== 概要
+
+* 外部連携で使用する
+* 引数の会場をDBに登録する
+
+=== 処理フロー
+
+[mermaid]
+----
+flowchart TD
+    A[UseCase] --> ERROR{ERROR検証}
+    ERROR -- エラーあり --> C(ErrorObject生成、追加)
+    ERROR -- エラー無 --> WORNING{WORNING検証}    
+    WORNING -- ワーニングあり --> DROP(WORNINGレコードDrop)
+    DROP(WORNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
+    DROP_REC --> D[[Repository]]
+    WORNING -- ワーニング無 --> D
+    C --> E(返却)
+    D --> E
+    E --> UseCaseEND(END)
+
+    F[[Repository]] --> G[BEGIN]
+    G --> H["Upsert(一括):[DB]places(会場)"]
+    H --> K[Commit]
+    H -.Exception.-> ROOLBACK[ROOLBACK]
+    K --> RepositoryEND[[END]]
+    ROOLBACK .-> RepositoryEND
+----
+
+=== 非機能
+
+* 1万レコードの登録を10秒以内に完了する
+* DB登録に失敗した場合、全てロールバックする
+
+=== UseCase
+
+[source]
+----
+StorePlacesAsync
+----
+
+==== 引数
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Places
+|Yes
+|List<Place>
+|登録する会場のリスト
+
+|===
+
+==== 戻り値
+
+[source]
+----
+list<ErrorObject>
+----
+
+===== 正常登録
+
+[source]
+----
+list.Count() == 0
+----
+
+===== 異常有り
+
+[source]
+----
+list.Count()  <> 0
+----
+
+==== クラス
+
+===== Place
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|班コード
+
+|Name
+|Yes
+|string
+|班名
+
+|InputNote
+|Yes
+|string
+|エラーオブジェクトに登録する入力項目Noなど
+
+|===
+
+==== ErrorObject
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|エラーコード
+
+|Message
+|Yes
+|string
+|エラーメッセージ
+
+|InputNote
+|Yes
+|string
+|入力項目Noなど
+
+|===
+
+==== 列挙型
+
+* None
+
+==== ERROR検証
+
+* None
+
+==== WORNING検証
+
+* None
+
+==== 処理(Repository)
+
+* 下記の登録値は、呼びもとで指定する
+** `created_at` に登録する `system.datetime.now()`
+** `created_by` に登録する `'ExternalConnection'`
+
+===== Table
+
+* [DB]places(会場)
+
+===== Insert
+
+* 条件
+** `[DB]places(会場).place_code(会場コード) == Place.Code` が存在しない
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|place_id
+|max([DB]places(会場).place_id(会場ID)) + 1
+|
+
+|place_code
+|Place.Code
+|
+
+|name
+|Place.Name
+|
+
+|order_number
+|max([DB]places(会場).order_number(表示順)) + 1
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+===== Update
+
+* 条件
+** `[DB]places(会場).place_code(会場コード) == Place.Code` が存在する
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|place_id
+|更新対象外
+|
+
+|place_code
+|更新対象外
+|
+
+|name
+|Place.Name
+|
+
+|order_number
+|更新対象外
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
