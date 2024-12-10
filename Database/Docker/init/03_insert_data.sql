@@ -184,20 +184,20 @@ INSERT INTO cancel_reasons(cancel_reason_id,name,exam_item_id,order_number,creat
 INSERT INTO exam_results(consult_id,exam_item_detail_id,value,created_at,created_by) VALUES 
     (1,1,'178',CURRENT_TIMESTAMP,'init')
   , (1,2,'70',CURRENT_TIMESTAMP,'init')
-  , (1,711,'72',CURRENT_TIMESTAMP,'init')
-  , (1,712,'98',CURRENT_TIMESTAMP,'init')
-  , (1,721,'70',CURRENT_TIMESTAMP,'init')
-  , (1,722,'100',CURRENT_TIMESTAMP,'init')
+  , (1,711,'98',CURRENT_TIMESTAMP,'init')
+  , (1,712,'72',CURRENT_TIMESTAMP,'init')
+  , (1,721,'100',CURRENT_TIMESTAMP,'init')
+  , (1,722,'70',CURRENT_TIMESTAMP,'init')
   , (2,1,'160',CURRENT_TIMESTAMP,'init')
   , (2,711,'72',CURRENT_TIMESTAMP,'init')
-  , (2,721,'70',CURRENT_TIMESTAMP,'init')
-  , (2,722,'100',CURRENT_TIMESTAMP,'init')
+  , (2,721,'100',CURRENT_TIMESTAMP,'init')
+  , (2,722,'70',CURRENT_TIMESTAMP,'init')
   , (3,1,'180',CURRENT_TIMESTAMP,'init')
   , (3,2,'90',CURRENT_TIMESTAMP,'init')
-  , (3,711,'92',CURRENT_TIMESTAMP,'init')
-  , (3,712,'128',CURRENT_TIMESTAMP,'init')
-  , (4,711,'92',CURRENT_TIMESTAMP,'init')
-  , (4,712,'128',CURRENT_TIMESTAMP,'init');
+  , (3,711,'128',CURRENT_TIMESTAMP,'init')
+  , (3,712,'92',CURRENT_TIMESTAMP,'init')
+  , (4,711,'128',CURRENT_TIMESTAMP,'init')
+  , (4,712,'92',CURRENT_TIMESTAMP,'init');
 
 -- 検査中止
 INSERT INTO exam_cancels(consult_id,exam_item_detail_id,cancel_reason_id,created_at,created_by) VALUES 
