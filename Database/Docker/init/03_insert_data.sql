@@ -204,3 +204,12 @@ INSERT INTO exam_cancels(consult_id,exam_item_detail_id,cancel_reason_id,created
     (4,1,1,CURRENT_TIMESTAMP,'init')
   , (4,2,2,CURRENT_TIMESTAMP,'init')
   , (4,721,10,CURRENT_TIMESTAMP,'init');
+
+-- 前提検査メニュー
+INSERT INTO resultcollector.prior_exam_menus(current_exam_menu_id,prior_exam_menu_id,created_at,created_by) VALUES 
+    (5,2,CURRENT_TIMESTAMP,'init')
+  , (5,3,CURRENT_TIMESTAMP,'init')
+  , (5,4,CURRENT_TIMESTAMP,'init')
+  , (6,1,CURRENT_TIMESTAMP,'init')
+  , (6,2,CURRENT_TIMESTAMP,'init')
+  , (7,8,CURRENT_TIMESTAMP,'init');

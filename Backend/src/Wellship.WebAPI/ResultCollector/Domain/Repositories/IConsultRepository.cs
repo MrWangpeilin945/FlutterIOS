@@ -24,11 +24,6 @@ public interface IConsultRepository
     public Task<IEnumerable<Consult>> GetConsultsAsync(string[] consultNumbers);
 
     /// <summary>
-    /// 受診番号を指定して未受診の検査項目を取得します。
-    /// </summary>
-    public Task<UnexaminedConsult> GetUnexaminedConsultAsync(string consultNumber);
-
-    /// <summary>
     /// 未受診の検査項目を受診単位のリストで取得します。
     /// </summary>
     public Task<IEnumerable<UnexaminedConsult>> GetUnexaminedConsultsAsync(string[] consultNumbers);

@@ -12,6 +12,7 @@ public class ConsultUsecase : IConsultUsecase
 {
     private readonly IConsultRepository _consultRepository;
     private readonly IExamineeRepository _examineeRepository;
+    private readonly IExamMenuRepository _examMenuRepository;
     private readonly IExamItemRepository _examItemRepository;
     private readonly IPlaceScheduleRepository _placeScheduleRepository;
 
@@ -20,13 +21,15 @@ public class ConsultUsecase : IConsultUsecase
     /// </summary>
     /// <param name="consultRepository">受診リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
+    /// <param name="examMenuRepository">検査メニューリポジトリ</param>
     /// <param name="examItemRepository">検査項目リポジトリ</param>
     /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
-    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, 
+    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamMenuRepository examMenuRepository,
                           IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository)
     {
         _consultRepository = consultRepository;
         _examineeRepository = examineeRepository;
+        _examMenuRepository = examMenuRepository;
         _examItemRepository = examItemRepository;
         _placeScheduleRepository = placeScheduleRepository;
     }
@@ -148,6 +151,40 @@ public class ConsultUsecase : IConsultUsecase
         await _consultRepository.RemoveExamCancelsAsync(consult.ConsultId, removeTargets);
         await _consultRepository.SaveExamCancelsAsync(consult.ConsultId, toSave);
     }
+
+    /// <summary>
+    /// 前提検査メニューを検証する
+    /// 前提検査メニューのうち、未受診の検査メニューがあれば返却する
+    /// </summary>
+    public async Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenus(string consultNumber, int examMenuId)
+    {
+        // 未受診の検査メニューを取得する
+        var unexaminedList = await _consultRepository.GetUnexaminedConsultsAsync([consultNumber]);
+        var unexamined = unexaminedList.SingleOrDefault(x => x.ConsultNumber == consultNumber);
+
+        // 指定した受診について、未受診の検査メニューがない場合は、エラーなし
+        if (unexamined is null)
+        {
+            return [];
+        }
+        var unexaminedMenuIds = unexamined.UnexaminedExamMenus.Select(x => x.ExamMenuId).ToArray();
+
+        // 前提検査メニューの設定を取得する
+        var priorExamMenusSetting = await _examMenuRepository.GetPriorExamMenusAsync(examMenuId);
+
+        // 現在の検査メニューについて、前提検査メニューの設定がない場合はエラーなし
+        if (priorExamMenusSetting is null)
+        {
+            return [];
+        }
+
+        // 前提検査が必要な検査メニューを返す
+        var missingPriorMenus = priorExamMenusSetting.GetMissingPriorMenus(unexaminedMenuIds);
+        return unexamined.UnexaminedExamMenus.Where(x => missingPriorMenus.Contains(x.ExamMenuId))
+                                             .Select(x => new Domain.Models.ExamMenu() { MenuId = x.ExamMenuId, MenuName = x.ExamMenuName })
+                                             .ToArray();
+    }
+
     /// <summary>
     /// 検査結果入力情報を取得する
     /// </summary>
