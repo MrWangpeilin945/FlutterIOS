@@ -391,4 +391,50 @@ public class ConsultRepository : IConsultRepository
             })
         };
     }
+
+    /// <summary>
+    /// 受診を指定して過去検査結果を取得します。
+    /// </summary>
+    public async Task<PreviousResult> GetPreviousResultsAsync(int consultId, DateOnly examDate)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            p.consult_id as ConsultId
+            , p.exam_date as ExamDate
+            , d.exam_item_id as ExamItemId
+            , p.exam_item_detail_id as ExamItemDetailId
+            , p.value as Value
+        from
+            resultcollector.previous_results p 
+            left join resultcollector.exam_item_details d 
+                on p.exam_item_detail_id = d.exam_item_detail_id
+        where
+            p.consult_id = @ConsultId
+            and p.exam_date < @ExamDate::date  
+        order by
+            p.exam_date desc;";
+
+        var response = await connection.QueryAsync<PreviousResultEntity>(sql, new { ConsultId = consultId, ExamDate = examDate.ToString("yyyy-MM-dd")});
+        // 受診日の直近日
+        var previousDate = DateTime.Parse(examDate.ToString("yyyy-MM-dd"));
+        if(response.Any())
+        {
+            previousDate = response.Select(x => x.ExamDate).ElementAt(0);
+        }
+        return new PreviousResult()
+        {
+            ConsultId = consultId,
+            ExamDate = DateOnly.FromDateTime(previousDate),
+            // 受診日の直近日の過去検査結果のみ返す
+            ExamItemDetailResults = response.Where(x => x.ExamDate == previousDate)
+                                            .Select(x => new ExamItemDetailResult()
+            {
+                ExamItemId = x.ExamItemId,
+                ExamItemDetailId = x.ExamItemDetailId,
+                Value = x.Value
+            })
+        };
+    }
+
 }

@@ -194,6 +194,8 @@ public class ConsultUsecase : IConsultUsecase
         var examOrders = await _consultRepository.GetExamOrdersAsync(consult.ConsultId);
         // 検査結果を取得
         var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
+        // 過去検査結果を取得
+        var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
 
         return new InputExamItems()
         {
@@ -229,7 +231,10 @@ public class ConsultUsecase : IConsultUsecase
                                             ? examResults.ExamItemDetailResults.Where(x => x.ExamItemDetailId == ed.ExamItemDetailId)
                                                                                .Select(x => x.Value).ElementAt(0)
                                             : "",  
-                            PrevValue = "",         // TODO: 前回値
+                            PrevValue = previousResults.ExamItemDetailResults.Where(x => x.ExamItemDetailId == ed.ExamItemDetailId).Any()
+                                            ? previousResults.ExamItemDetailResults.Where(x => x.ExamItemDetailId == ed.ExamItemDetailId)
+                                                                                   .Select(x => x.Value).ElementAt(0)
+                                            : "",  
                             Unit = ed.Unit,
                             Type = (int)ed.Type,
                             IntegerLength = ed.IntegerLength,

@@ -1,14 +1,19 @@
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 /// <summary>
-/// 検査結果のエンティティ
+/// 過去検査結果のエンティティ
 /// </summary>
-public class ExamResultEntity
+public class PreviousResultEntity
 {
     /// <summary>
     /// 受診ID
     /// </summary>
     public required int ConsultId { get; set; }
+
+    /// <summary>
+    /// 健診日
+    /// </summary>
+    public required DateTime ExamDate { get; set; }
 
     /// <summary>
     /// 検査項目ID

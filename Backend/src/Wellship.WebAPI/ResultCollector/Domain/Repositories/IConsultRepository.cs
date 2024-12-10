@@ -65,4 +65,9 @@ public interface IConsultRepository
     /// </summary>
     public Task<ExamResult> GetExamResultsAsync(int consultId);
 
+    /// <summary>
+    /// 受診を指定して過去検査結果を取得します。
+    /// </summary>
+    public Task<PreviousResult> GetPreviousResultsAsync(int consultId, DateOnly examDate);
+
 }
