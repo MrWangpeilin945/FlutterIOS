@@ -1,6 +1,6 @@
 ﻿namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
 {
-    public class Organization
+    public class ThresholdEntity
     {
     }
 }
