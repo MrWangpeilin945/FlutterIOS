@@ -1,4 +1,3 @@
-import { range } from "@mantine/hooks";
 import type {
   InputExamItem,
   ExamItemDetail,
@@ -8,55 +7,57 @@ import type {
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 
 // 受け取ったExamItemDetailsから
-// 最も高いエラーレベルに該当するExamNormalValueRangeを返す
-const getMaxErrorLevelByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
-  let matchExamRange: ExamNormalValueRange | null = null;
-  for (const examItemDetail of examItemDetails) {
-    const numericValue = Number.parseFloat(examItemDetail.value || "");
-    const ranges = examItemDetail.examNormalValueRanges;
-    if (!numericValue || !ranges) continue;
-    // ValueもしくはexamNormalValueRangesが無い場合次のループに進む
-    const valueRange = ranges.find((range) => {
-      const minValue = range.minValue;
-      const maxValue = range.maxValue;
-      if (typeof minValue === "number" && typeof maxValue === "number") {
-        return numericValue >= minValue && numericValue <= maxValue;
-      }
-    });
-    if (!valueRange?.errorLevel || !matchExamRange?.errorLevel) continue;
-    if (
-      valueRange &&
-      (matchExamRange === null ||
-        valueRange.errorLevel > matchExamRange.errorLevel)
-    ) {
-      matchExamRange = valueRange;
+// それぞれの最も高いエラーレベルに該当するExamNormalValueRangeを返す
+const getMaxErrorLevelsByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
+  const matchExamRanges: ExamNormalValueRange[] = [];
+  for (const { value, examNormalValueRanges } of examItemDetails) {
+    const numericValue = Number.parseFloat(value || "");
+    if (!numericValue || !examNormalValueRanges) continue;
+    // errorLevelの高い順にソート
+    const sortedRanges = [...examNormalValueRanges].sort(
+      (a, b) => (b.errorLevel || 0) - (a.errorLevel || 0)
+    );
+    // 範囲にマッチする最初の値を返す
+    const matchRange = sortedRanges.find(
+      ({ minValue, maxValue }) =>
+        typeof minValue === "number" &&
+        typeof maxValue === "number" &&
+        numericValue >= minValue &&
+        numericValue <= maxValue
+    );
+    if (matchRange) {
+      matchExamRanges.push(matchRange);
     }
   }
-  return matchExamRange;
+  return matchExamRanges;
 };
 
-// 受け取ったInputexamitem[]の、examRegistresultsにエラーを追加して
-// Inputexamitem[]を返す
-export const setRangesErrorMessage = (inputexamItems: InputExamItem[]) => {
-  for (const examitem of inputexamItems) {
-    if (!examitem.examItemDetails) continue;
-    const matchExamRange = getMaxErrorLevelByRangeCheck(
-      examitem.examItemDetails
-    );
-    if (matchExamRange === null) continue;
+// 受け取ったInputexamitemの、examRegistresultsにエラーを追加して
+// Inputexamitemを返す
+export const setRangesErrorMessage = (inputexamItem: InputExamItem) => {
+  if (!inputexamItem.examItemDetails) {
+    return inputexamItem;
+  }
+  const matchExamRanges = getMaxErrorLevelsByRangeCheck(
+    inputexamItem.examItemDetails
+  );
+  if (matchExamRanges.length === 0) {
+    return inputexamItem;
+  }
+  if (!inputexamItem.examRegistResults) {
+    inputexamItem.examRegistResults = [];
+  }
+  for (const { minValue, maxValue, errorLevel } of matchExamRanges) {
     const rangesErrorMessage: ExamRegistResult = {
       description: getErrorMessage(
         errorMessages.numberRange,
-        `${examitem.name}は`,
-        `${matchExamRange.minValue}`,
-        `${matchExamRange.maxValue}`
+        `${inputexamItem.name}は`,
+        `${minValue}`,
+        `${maxValue}`
       ),
-      errorLevel: matchExamRange.errorLevel,
+      errorLevel: errorLevel,
     };
-    if (!examitem.examRegistResults) {
-      examitem.examRegistResults = [];
-    }
-    examitem.examRegistResults?.push(rangesErrorMessage);
+    inputexamItem.examRegistResults.push(rangesErrorMessage);
   }
-  return inputexamItems;
+  return inputexamItem;
 };
