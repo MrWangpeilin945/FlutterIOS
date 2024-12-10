@@ -1,7 +1,5 @@
 using FluentAssertions;
 
-using Microsoft.AspNetCore.Identity;
-
 using Moq;
 
 using Ryobi.Wellship.APIModels.Requests;
@@ -15,15 +13,24 @@ namespace Ryobi.Wellship.WebAPI.Tests.ResultCollector.Usecases;
 
 public class ConsultUsecaseTests
 {
+    private readonly Mock<IExamineeRepository> _examineeRepositoryMock;
+    private readonly Mock<IConsultRepository> _consultRepositoryMock;
+    private readonly Mock<IExamMenuRepository> _examMenuRepositoryMock;
+
+    public ConsultUsecaseTests()
+    {
+        _examineeRepositoryMock = new Mock<IExamineeRepository>();
+        _consultRepositoryMock = new Mock<IConsultRepository>();
+        _examMenuRepositoryMock = new Mock<IExamMenuRepository>();
+    }
+
     [Fact]
     public async Task 受診番号が存在する場合に例外がスローされない()
     {
         // Arrange
-        var consultationRepositoryMock = new Mock<IConsultRepository>();
-        consultationRepositoryMock.Setup(x => x.ConsultExistsAsync(It.IsAny<string>())).ReturnsAsync(true);
-        var examineeRepositoryMock = new Mock<IExamineeRepository>();
+        _consultRepositoryMock.Setup(x => x.ConsultExistsAsync(It.IsAny<string>())).ReturnsAsync(true);
 
-        var usecase = new ConsultUsecase(consultationRepositoryMock.Object, examineeRepositoryMock.Object);
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object);
         var request = new ConsultNumberRequest
         {
             ConsultNumber = "12345"
@@ -39,11 +46,9 @@ public class ConsultUsecaseTests
     public async Task 受診番号が存在しない場合に例外がスローされる()
     {
         // Arrange
-        var consultationRepositoryMock = new Mock<IConsultRepository>();
-        consultationRepositoryMock.Setup(x => x.ConsultExistsAsync(It.IsAny<string>())).ReturnsAsync(false);
-        var examineeRepositoryMock = new Mock<IExamineeRepository>();
+        _consultRepositoryMock.Setup(x => x.ConsultExistsAsync(It.IsAny<string>())).ReturnsAsync(false);
 
-        var usecase = new ConsultUsecase(consultationRepositoryMock.Object, examineeRepositoryMock.Object);
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object);
         var request = new ConsultNumberRequest
         {
             ConsultNumber = "54321"
@@ -66,8 +71,7 @@ public class ConsultUsecaseTests
             new APIModels.Responses.ExamMenu { ExamMenuId = 7, ExamMenuName = "血圧" }
         };
 
-        var consultRepository = new Mock<IConsultRepository>();
-        consultRepository.Setup(x => x.GetConsultAsync(consultNumber))
+        _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber))
                          .ReturnsAsync(new Consult
                          {
                              ConsultId = 1,
@@ -78,7 +82,7 @@ public class ConsultUsecaseTests
                              PlaceScheduleId = 1
                          });
 
-        consultRepository.Setup(x => x.GetUnexaminedConsultsAsync(new[] { consultNumber }))
+        _consultRepositoryMock.Setup(x => x.GetUnexaminedConsultsAsync(new[] { consultNumber }))
                          .ReturnsAsync([
                             new(){
                                 ConsultId = 1,
@@ -94,8 +98,7 @@ public class ConsultUsecaseTests
                                         ExamMenuName = "血圧"
                                     }]}]);
 
-        var examineeRepository = new Mock<IExamineeRepository>();
-        examineeRepository.Setup(x => x.GetExamineeAsync(1))
+        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(1))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
                               ExamineeId = 1,
@@ -106,7 +109,7 @@ public class ConsultUsecaseTests
                               Birthdate = new Birthdate("19991129")
                           });
 
-        var usecase = new ConsultUsecase(consultRepository.Object, examineeRepository.Object);
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object);
 
         // Act
         var result = await usecase.GetUnexaminedMenusAsync(consultNumber);
@@ -122,8 +125,7 @@ public class ConsultUsecaseTests
         // Arrange
         var consultNumber = "yourConsultNumber";
 
-        var consultRepository = new Mock<IConsultRepository>();
-        consultRepository.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(new Consult()
+        _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(new Consult()
         {
             ConsultNumber = "1",
             ProgressStatus = ConsultProgressStatus.検査中,
@@ -132,8 +134,7 @@ public class ConsultUsecaseTests
             ConsultId = 1,
             ExamineeId = 1
         });
-        var examineeRepository = new Mock<IExamineeRepository>();
-        examineeRepository.Setup(x => x.GetExamineeAsync(1))
+        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(1))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
                               ExamineeId = 1,
@@ -144,7 +145,7 @@ public class ConsultUsecaseTests
                               Birthdate = new Birthdate("19991129")
                           });
 
-        var usecase = new ConsultUsecase(consultRepository.Object, examineeRepository.Object);
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object);
 
         // Act
         var result = await usecase.GetUnexaminedMenusAsync(consultNumber);
@@ -161,8 +162,6 @@ public class ConsultUsecaseTests
         // 代表的な動作例を書いています。
 
         // Arrange
-        var consultationRepositoryMock = new Mock<IConsultRepository>();
-        var examineeRepository = new Mock<IExamineeRepository>();
 
         // リクエスト内容
         var consultNumber = "12345";
@@ -199,17 +198,17 @@ public class ConsultUsecaseTests
             ]
         };
 
-        consultationRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(consult);
-        consultationRepositoryMock.Setup(x => x.GetExamCancelsAsync(consult.ConsultId)).ReturnsAsync(examCancels);
+        _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(consult);
+        _consultRepositoryMock.Setup(x => x.GetExamCancelsAsync(consult.ConsultId)).ReturnsAsync(examCancels);
 
-        var usecase = new ConsultUsecase(consultationRepositoryMock.Object, examineeRepository.Object);
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object);
 
         // Act
         await usecase.RegisterExecutionsAsync(consultNumber, request);
 
         // Assert
-        consultationRepositoryMock.Verify(x => x.RemoveExamCancelsAsync(consult.ConsultId, It.IsAny<int[]>()), Times.Once);
-        consultationRepositoryMock.Verify(x => x.SaveExamCancelsAsync(consult.ConsultId, It.IsAny<ExamItemCancel[]>()), Times.Once);
+        _consultRepositoryMock.Verify(x => x.RemoveExamCancelsAsync(consult.ConsultId, It.IsAny<int[]>()), Times.Once);
+        _consultRepositoryMock.Verify(x => x.SaveExamCancelsAsync(consult.ConsultId, It.IsAny<ExamItemCancel[]>()), Times.Once);
     }
 
     [Fact]
@@ -219,8 +218,6 @@ public class ConsultUsecaseTests
         // 代表的な動作例を書いています。
 
         // Arrange
-        var consultationRepositoryMock = new Mock<IConsultRepository>();
-        var examineeRepository = new Mock<IExamineeRepository>();
 
         // リクエスト内容
         var consultNumber = "12345";
@@ -250,16 +247,16 @@ public class ConsultUsecaseTests
             ExamItemDetailCancels = []
         };
 
-        consultationRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(consult);
-        consultationRepositoryMock.Setup(x => x.GetExamCancelsAsync(consult.ConsultId)).ReturnsAsync(examCancel);
+        _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(consult);
+        _consultRepositoryMock.Setup(x => x.GetExamCancelsAsync(consult.ConsultId)).ReturnsAsync(examCancel);
 
-        var usecase = new ConsultUsecase(consultationRepositoryMock.Object, examineeRepository.Object);
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object);
 
         // Act
         await usecase.RegisterExecutionsAsync(consultNumber, request);
 
         // Assert
-        consultationRepositoryMock.Verify(x => x.RemoveExamCancelsAsync(consult.ConsultId, It.IsAny<int[]>()), Times.Once());
-        consultationRepositoryMock.Verify(x => x.SaveExamCancelsAsync(consult.ConsultId, It.IsAny<ExamItemCancel[]>()), Times.Once);
+        _consultRepositoryMock.Verify(x => x.RemoveExamCancelsAsync(consult.ConsultId, It.IsAny<int[]>()), Times.Once());
+        _consultRepositoryMock.Verify(x => x.SaveExamCancelsAsync(consult.ConsultId, It.IsAny<ExamItemCancel[]>()), Times.Once);
     }
 }
