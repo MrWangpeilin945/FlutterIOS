@@ -49,16 +49,16 @@ public sealed class TargetAge
     public bool IsTargetAge(Age age)
     {
         int ageValue = age.Years * 10000 + age.Months * 100 + age.Days;
+        // 年齢下限
         int minValue = MinAge.Years * 10000 + MinAge.Months * 100 + MinAge.Days;
-        if (ageValue < minValue)
-        {
-            return false;
-        }
+        // 年齢上限
         int maxValue = MaxAge.Years * 10000 + MaxAge.Months * 100 + MaxAge.Days;
-        if (ageValue > maxValue)
+        if (minValue <= ageValue && ageValue < maxValue)
         {
-            return false;
+            // 年齢下限以上 かつ 年齢上限未満は対象
+            // minValue <= ageValue < maxValue
+            return true;
         }
-        return true;
+        return false;
     }
 }
