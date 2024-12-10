@@ -34,11 +34,7 @@ export default function ExamNumeric({
   onRegisterPressed,
   onChange,
 }: ExamNumericProps) {
-  if (!examItems[0].examItemDetails?.length) {
-    return null; // examItemDetailsが空の場合は何も表示しない
-  }
-  const firstExamItemDetail =
-    examItems && examItems.length > 0 ? examItems[0].examItemDetails[0] : null;
+  const firstExamItemDetail = examItems?.[0]?.examItemDetails?.[0];
   if (!firstExamItemDetail) {
     return null;
   }
