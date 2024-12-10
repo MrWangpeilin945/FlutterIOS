@@ -1,4 +1,4 @@
-import { Container, LoadingOverlay, Stack, Title } from "@mantine/core";
+import { Container, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
@@ -91,9 +91,9 @@ export default function Teams() {
               ) : (
                 <>
                   {/* エラーメッセージを表示 */}
-                  <Title order={3}>
+                  <Text size="sm" c="black01">
                     {getErrorMessage(errorMessages.noData, "該当する班")}
-                  </Title>
+                  </Text>
                 </>
               )}
               <CommonDialog

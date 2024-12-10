@@ -12,16 +12,19 @@ public class ConsultUsecase : IConsultUsecase
 {
     private readonly IConsultRepository _consultRepository;
     private readonly IExamineeRepository _examineeRepository;
+    private readonly IExamMenuRepository _examMenuRepository;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="consultRepository">受診リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
-    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository)
+    /// <param name="examMenuRepository">検査メニューリポジトリ</param>
+    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamMenuRepository examMenuRepository)
     {
         _consultRepository = consultRepository;
         _examineeRepository = examineeRepository;
+        _examMenuRepository = examMenuRepository;
     }
 
     /// <summary>
@@ -96,5 +99,82 @@ public class ConsultUsecase : IConsultUsecase
     public void GetExamItemsExaminee()
     {
 
+    }
+
+    /// <summary>
+    /// 検査の実施有無と中止理由を登録する
+    /// </summary>
+    public async Task RegisterExecutionsAsync(string consultNumber, ExecutionsRequest request)
+    {
+        // NOTE: 中止理由の登録ルール
+        // 前提：リクエストは検査項目単位、DBは検査項目明細単位
+        // 
+        // [1] isPerforming（検査実施する）：true & 中止理由：null
+        //   - a. 中止レコードがある => 中止レコードを削除する
+        //   - b. 中止レコードがない => 処理しない
+        //
+        // [2] isPerforming（検査実施する）：false & 中止理由：あり
+        //   - a. 中止レコードがある => 中止レコードを更新する
+        //   - b. 中止レコードがない => 中止レコードを挿入する
+
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
+
+        // [1] isPerforming（検査実施する）：true & 中止理由：null
+        var performingList = request.Executions.Where(x => x.IsPerforming && x.CancelReasonId is null).ToArray();
+
+        // [2] isPerforming（検査実施する）：false & 中止理由：あり
+        var notPerformingList = request.Executions.Where(x => !x.IsPerforming && x.CancelReasonId is not null).ToArray();
+
+        // [1]-a 削除対象
+        // 保存済みの中止レコードに対して検査項目IDで突合して、削除対象の検査項目明細IDを取得する
+        var removeTargets = performingList.SelectMany(req => examCancels.ExamItemDetailCancels
+                                                                .Where(x => x.ExamItemId == req.ExamItemId)
+                                                                .Select(x => x.ExamItemDetailId)
+                                                     ).ToArray();
+
+        // [2]-a,b
+        // UPSERTはリポジトリに任せる
+        var toSave = notPerformingList.Select(x => new Domain.Models.ExamItemCancel()
+        {
+            ExamItemId = x.ExamItemId,
+            CancelReasonId = (int)x.CancelReasonId!,
+        }).ToArray();
+
+        await _consultRepository.RemoveExamCancelsAsync(consult.ConsultId, removeTargets);
+        await _consultRepository.SaveExamCancelsAsync(consult.ConsultId, toSave);
+    }
+
+    /// <summary>
+    /// 前提検査メニューを検証する
+    /// 前提検査メニューのうち、未受診の検査メニューがあれば返却する
+    /// </summary>
+    public async Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenus(string consultNumber, int examMenuId)
+    {
+        // 未受診の検査メニューを取得する
+        var unexaminedList = await _consultRepository.GetUnexaminedConsultsAsync([consultNumber]);
+        var unexamined = unexaminedList.SingleOrDefault(x => x.ConsultNumber == consultNumber);
+
+        // 指定した受診について、未受診の検査メニューがない場合は、エラーなし
+        if (unexamined is null)
+        {
+            return [];
+        }
+        var unexaminedMenuIds = unexamined.UnexaminedExamMenus.Select(x => x.ExamMenuId).ToArray();
+
+        // 前提検査メニューの設定を取得する
+        var priorExamMenusSetting = await _examMenuRepository.GetPriorExamMenusAsync(examMenuId);
+
+        // 現在の検査メニューについて、前提検査メニューの設定がない場合はエラーなし
+        if (priorExamMenusSetting is null)
+        {
+            return [];
+        }
+
+        // 前提検査が必要な検査メニューを返す
+        var missingPriorMenus = priorExamMenusSetting.GetMissingPriorMenus(unexaminedMenuIds);
+        return unexamined.UnexaminedExamMenus.Where(x => missingPriorMenus.Contains(x.ExamMenuId))
+                                             .Select(x => new Domain.Models.ExamMenu() { MenuId = x.ExamMenuId, MenuName = x.ExamMenuName })
+                                             .ToArray();
     }
 }

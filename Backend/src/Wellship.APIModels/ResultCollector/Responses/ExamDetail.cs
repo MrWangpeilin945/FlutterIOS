@@ -8,39 +8,28 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class ExamDetail
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public ExamDetail(int examItemId, string examItemName, bool isPerforming, int cancelReasonId)
-    {
-        ExamItemId = examItemId;
-        ExamItemName = examItemName;
-        IsPerforming = isPerforming;
-        CancelReasonId = cancelReasonId;
-    }
-
-    /// <summary>
     /// 検査項目ID
     /// </summary>
     [JsonPropertyName("examItemId")]
-    public int ExamItemId { get; }
+    public required int ExamItemId { get; init;}
 
     /// <summary>
     /// 検査項目名
     /// </summary>
     [JsonPropertyName("examItemName")]
-    public string ExamItemName { get; }
+    public required string ExamItemName { get; init;}
 
     /// <summary>
-    /// 検査実施するか
+    /// 検査依頼が存在するか
     /// </summary>
-    [JsonPropertyName("isPerforming")]
+    [JsonPropertyName("hasOrder")]
 
-    public bool IsPerforming { get; }
+    public required bool HasOrder { get; init;}
 
     /// <summary>
     /// 中止理由ID
     /// </summary>
     [JsonPropertyName("cancelReasonId")]
 
-    public int CancelReasonId { get; }
+    public required int CancelReasonId { get; init;}
 }
