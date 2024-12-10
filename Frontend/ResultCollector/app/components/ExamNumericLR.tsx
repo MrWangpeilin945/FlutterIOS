@@ -8,13 +8,13 @@ import {
   Paper,
   Text,
   TextInput,
-  Button,
   Flex,
   Box,
 } from "@mantine/core";
 import { useClickOutside } from "@mantine/hooks";
 import Keyboard from "~/components/NumericKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
+import { setRangesErrorMessage } from "~/utils/test";
 import type {
   ExamRegistResult,
   InputExamItem,
@@ -22,7 +22,6 @@ import type {
 import { InputErrorLevel } from "~/domain/enums";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
-import { G } from "node_modules/msw/lib/core/GraphQLHandler-D6mLMXGZ";
 
 type ExamNumericLRProps = {
   examItems: InputExamItem[];
