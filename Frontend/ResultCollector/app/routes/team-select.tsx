@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { usePlaceScheduleGetTeams } from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
 import CommonDialog from "~/components/CommonDialog";
-import CommonFooter from "~/components/CommonFooter";
 import CommonHeader from "~/components/CommonHeader";
 import HeadlineButton from "~/components/HeadlineButton";
 import type { PlaceScheduleTeams } from "~/domain/wellship.schemas";
@@ -92,7 +91,7 @@ export default function Teams() {
                 <>
                   {/* エラーメッセージを表示 */}
                   <Text size="sm" c="black01">
-                    {getErrorMessage(errorMessages.noData, "該当する班")}
+                    班の設定がありませんでした。
                   </Text>
                 </>
               )}
@@ -105,7 +104,6 @@ export default function Teams() {
             </>
           )}
         </Container>
-        <CommonFooter />
       </AuthWrapper>
     </>
   );
