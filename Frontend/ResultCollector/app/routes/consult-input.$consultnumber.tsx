@@ -38,17 +38,17 @@ export default function consultInput() {
           examNormalValueRanges: [
             //エラーレベルの高い順でソートして渡してもらう
             {
-              errorLevel: 4,
+              errorLevel: 3,
               minValue: 0.0,
               maxValue: 50.5,
             },
             {
-              errorLevel: 4,
+              errorLevel: 3,
               minValue: 250.0,
-              maxValue: 999.9,
+              maxValue: 999.0,
             },
             {
-              errorLevel: 3,
+              errorLevel: 2,
               minValue: 50.0,
               maxValue: 100.0,
             },
@@ -58,7 +58,7 @@ export default function consultInput() {
           positionNumber: 2, //血圧の上なのか下なのかのテキストボックス位置を指定する
           examItemDetailId: 1001,
           name: "右",
-          value: "752", //前回値初期値化設定があれば、ここに入れておいてほしい   インクリメントの場合登録済みなら、登録済みの値、未登録なら次のインクリメント値をもらう
+          value: "70000", //前回値初期値化設定があれば、ここに入れておいてほしい   インクリメントの場合登録済みなら、登録済みの値、未登録なら次のインクリメント値をもらう
           prevValue: "800",
           unit: "kg",
           type: 1, //1:入力、2:選択、3：演算値など ※ここのテーブル設定を知らないのでとりあえずの例
@@ -74,17 +74,17 @@ export default function consultInput() {
           examNormalValueRanges: [
             //エラーレベルの高い順でソートして渡してもらう
             {
-              errorLevel: 4,
+              errorLevel: 3,
               minValue: 0.0,
               maxValue: 50.5,
             },
             {
-              errorLevel: 4,
+              errorLevel: 3,
               minValue: 250.0,
-              maxValue: 999.9,
+              maxValue: 900.0,
             },
             {
-              errorLevel: 3,
+              errorLevel: 2,
               minValue: 50.0,
               maxValue: 100.0,
             },
