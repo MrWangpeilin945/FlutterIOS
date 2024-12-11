@@ -441,7 +441,7 @@ public class ConsultUsecaseTests
                 ]
             },
             new(){
-                CorrelationRuleId = 1,
+                CorrelationRuleId = 2,
                 Name = "リクエスト値が同じであること",
                 ExamMenuId = 5,
                 Priority = 1,
