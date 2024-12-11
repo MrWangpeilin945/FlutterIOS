@@ -16,6 +16,11 @@ public interface IPlaceScheduleRepository
     /// <summary>
     /// 会場日程IDを指定して会場日程を取得する
     /// </summary>
+    public Task<PlaceSchedule> GetPlaceScheduleAsync(int placeScheduleId);
+
+    /// <summary>
+    /// 会場日程IDを指定して会場日程を取得する
+    /// </summary>
     public Task<IEnumerable<PlaceSchedule>> GetPlaceSchedulesAsync(int[] placeScheduleIds);
 
     /// <summary>

@@ -3,7 +3,7 @@ namespace Ryobi.Wellship.Core.Enums;
 /// <summary>
 /// 検査項目明細種別
 /// </summary>
-enum ExamItemDetailType
+public enum ExamItemDetailType
 {
     /// <summary>
     /// 入力

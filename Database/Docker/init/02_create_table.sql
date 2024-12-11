@@ -6,7 +6,6 @@ set search_path = resultcollector;
 CREATE TABLE affiliations (
   examinee_id integer NOT NULL
   , organization_id integer NOT NULL
-  , priority integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT affiliations_PKC PRIMARY KEY (examinee_id,organization_id)
@@ -56,17 +55,6 @@ CREATE TABLE exam_decision_rule (
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_decision_rule_PKC PRIMARY KEY (id)
-);
-
-CREATE TABLE exam_item_detail_options (
-  option_id integer NOT NULL
-  , code text NOT NULL
-  , exam_item_detail_id integer NOT NULL
-  , name text NOT NULL
-  , order_number integer NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT exam_item_detail_options_PKC PRIMARY KEY (option_id)
 );
 
 CREATE TABLE exam_item_detail_orders (
@@ -322,6 +310,17 @@ ALTER TABLE consult ADD CONSTRAINT consult_IX1
 CREATE UNIQUE INDEX consult_IX2
   ON consult(external_connection_code);
 
+CREATE TABLE exam_item_detail_options (
+  option_id integer NOT NULL
+  , code text NOT NULL
+  , exam_item_detail_id integer NOT NULL
+  , name text NOT NULL
+  , order_number integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_item_detail_options_PKC PRIMARY KEY (option_id)
+);
+
 CREATE TABLE exam_item_details (
   exam_item_detail_id integer NOT NULL
   , exam_item_id integer NOT NULL
@@ -333,6 +332,7 @@ CREATE TABLE exam_item_details (
   , keyboard_type integer NOT NULL
   , integer_length integer NOT NULL
   , decimal_length integer NOT NULL
+  , equipment_label text
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_item_details_PKC PRIMARY KEY (exam_item_detail_id)
@@ -629,7 +629,6 @@ ALTER TABLE tickets
 COMMENT ON TABLE affiliations IS '所属';
 COMMENT ON COLUMN affiliations.examinee_id IS '受診者ID';
 COMMENT ON COLUMN affiliations.organization_id IS '団体ID';
-COMMENT ON COLUMN affiliations.priority IS '優先度';
 COMMENT ON COLUMN affiliations.created_at IS '作成日時';
 COMMENT ON COLUMN affiliations.created_by IS '作成者';
 
@@ -668,15 +667,6 @@ COMMENT ON TABLE exam_decision_rule IS '検査実施判断ルール';
 COMMENT ON COLUMN exam_decision_rule.id IS 'ID';
 COMMENT ON COLUMN exam_decision_rule.created_at IS '作成日時';
 COMMENT ON COLUMN exam_decision_rule.created_by IS '作成者';
-
-COMMENT ON TABLE exam_item_detail_options IS '検査項目明細_選択肢';
-COMMENT ON COLUMN exam_item_detail_options.option_id IS '選択肢ID';
-COMMENT ON COLUMN exam_item_detail_options.code IS 'コード';
-COMMENT ON COLUMN exam_item_detail_options.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_item_detail_options.name IS '名称';
-COMMENT ON COLUMN exam_item_detail_options.order_number IS '表示順';
-COMMENT ON COLUMN exam_item_detail_options.created_at IS '作成日時';
-COMMENT ON COLUMN exam_item_detail_options.created_by IS '作成者';
 
 COMMENT ON TABLE exam_item_detail_orders IS '検査項目明細依頼';
 COMMENT ON COLUMN exam_item_detail_orders.consult_id IS '受診ID';
@@ -861,6 +851,15 @@ COMMENT ON COLUMN consult.external_connection_code IS '外部連携キー';
 COMMENT ON COLUMN consult.created_at IS '作成日時';
 COMMENT ON COLUMN consult.created_by IS '作成者';
 
+COMMENT ON TABLE exam_item_detail_options IS '検査項目明細_選択肢';
+COMMENT ON COLUMN exam_item_detail_options.option_id IS '選択肢ID';
+COMMENT ON COLUMN exam_item_detail_options.code IS 'コード';
+COMMENT ON COLUMN exam_item_detail_options.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_item_detail_options.name IS '名称';
+COMMENT ON COLUMN exam_item_detail_options.order_number IS '表示順';
+COMMENT ON COLUMN exam_item_detail_options.created_at IS '作成日時';
+COMMENT ON COLUMN exam_item_detail_options.created_by IS '作成者';
+
 COMMENT ON TABLE exam_item_details IS '検査項目明細';
 COMMENT ON COLUMN exam_item_details.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_item_details.exam_item_id IS '検査項目ID';
@@ -872,6 +871,7 @@ COMMENT ON COLUMN exam_item_details.type IS '検査項目明細種別';
 COMMENT ON COLUMN exam_item_details.keyboard_type IS 'キーボード種別';
 COMMENT ON COLUMN exam_item_details.integer_length IS '整数部桁数';
 COMMENT ON COLUMN exam_item_details.decimal_length IS '小数部桁数';
+COMMENT ON COLUMN exam_item_details.equipment_label IS '機器ラベル';
 COMMENT ON COLUMN exam_item_details.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_details.created_by IS '作成者';
 
@@ -961,3 +961,4 @@ COMMENT ON COLUMN exam_menus.name IS '検査メニュー名';
 COMMENT ON COLUMN exam_menus.order_number IS '表示順';
 COMMENT ON COLUMN exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN exam_menus.created_by IS '作成者';
+

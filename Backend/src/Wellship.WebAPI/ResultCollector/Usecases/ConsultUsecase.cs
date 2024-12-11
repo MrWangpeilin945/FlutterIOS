@@ -13,6 +13,8 @@ public class ConsultUsecase : IConsultUsecase
     private readonly IConsultRepository _consultRepository;
     private readonly IExamineeRepository _examineeRepository;
     private readonly IExamMenuRepository _examMenuRepository;
+    private readonly IExamItemRepository _examItemRepository;
+    private readonly IPlaceScheduleRepository _placeScheduleRepository;
 
     /// <summary>
     /// コンストラクタ
@@ -20,11 +22,16 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="consultRepository">受診リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
     /// <param name="examMenuRepository">検査メニューリポジトリ</param>
-    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamMenuRepository examMenuRepository)
+    /// <param name="examItemRepository">検査項目リポジトリ</param>
+    /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
+    public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamMenuRepository examMenuRepository,
+                          IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository)
     {
         _consultRepository = consultRepository;
         _examineeRepository = examineeRepository;
         _examMenuRepository = examMenuRepository;
+        _examItemRepository = examItemRepository;
+        _placeScheduleRepository = placeScheduleRepository;
     }
 
     /// <summary>
@@ -176,5 +183,111 @@ public class ConsultUsecase : IConsultUsecase
         return unexamined.UnexaminedExamMenus.Where(x => missingPriorMenus.Contains(x.ExamMenuId))
                                              .Select(x => new Domain.Models.ExamMenu() { MenuId = x.ExamMenuId, MenuName = x.ExamMenuName })
                                              .ToArray();
+    }
+
+    /// <summary>
+    /// 検査結果入力情報を取得する
+    /// </summary>
+    public async Task<InputExamItems> GetInputExamItemsExamineeAsync(string consultNumber, int examMenuId)
+    {
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
+        // 会場日程IDを指定して会場日程を取得する
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
+        // 健診日
+        DateOnly examDate = placeSchedule.ExamDate;
+        // 受診日の年齢
+        // NOTE: 年齢加算日は暫定で前日年齢加算
+        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 検査メニューに関連した検査項目情報を取得
+        var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
+        // 検査項目明細IDを取得
+        var examItemDetailIds = examItemGroups.SelectMany(group => group.ExamItems)
+                                              .SelectMany(item => item.ExamItemDetails)
+                                              .Select(detail => detail.ExamItemDetailId)
+                                              .ToArray();
+        // キーボード入力値リスト
+        var Keyboards = await _examItemRepository.GetKeyboardOptionssAsync(examItemDetailIds);
+        // 検査項目明細選択肢
+        var examItemDetailOptions = await _examItemRepository.GetExamItemDetailOptionsAsync(examItemDetailIds);
+        // 基準値パターンIDを取得
+        var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
+        // 検査正常値範囲を取得
+        var examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
+        // 検査中止を取得
+        var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
+        // 検査依頼を取得
+        var examOrders = await _consultRepository.GetExamOrdersAsync(consult.ConsultId);
+        // 検査結果を取得
+        var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
+        // 過去検査結果を取得
+        var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
+
+        return new InputExamItems()
+        {
+            ConsultNumber = consultNumber,
+            Examinee = new InputExamExaminee(){
+                TicketNumber = consult.TicketNumber,
+                KanaName = examinee.KanaName,
+                Sex = (int)examinee.Sex,
+                ExamDateAge = examAge.Years
+            },
+            RelatedExamItems = [],                  // TODO: 関連検査項目 後方作業へ
+            ExamItemGroups = 
+                examItemGroups.Select(eg => new ExamItemGroup
+                {
+                    Type = (int)eg.Type,
+                    ExamItems = eg.ExamItems.Select(ei => new InputExamItem 
+                    {
+                        PositionNumber = ei.PositionNumber,
+                        ExamItemId = ei.ExamItemId,
+                        Name = ei.Name,
+                        ExamItemDetails = ei.ExamItemDetails.Select(ed => new ExamItemDetail
+                        {
+                            PositionNumber = ed.PositionNumber,
+                            ExamItemDetailId = ed.ExamItemDetailId,
+                            EquipmentLabel = ed.EquipmentLabel,
+                            Name = ed.Name,
+                            HasOrder = examOrders.ExamItemDetailOrders.Any(x => x.ExamItemDetailId == ed.ExamItemDetailId),
+                            CancelReasonId = examCancels.ExamItemDetailCancels.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.CancelReasonId,
+                            Value = examResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
+                            PrevValue = previousResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
+                            Unit = ed.Unit,
+                            Type = (int)ed.Type,
+                            IntegerLength = ed.IntegerLength,
+                            DecimalLength = ed.DecimalLength,
+                            // キーボード入力
+                            Keyboard = new Keyboard{
+                                KeyboardType = (int)ed.KeyboardType,
+                                Values = Keyboards.Where(kb => kb.ExamItemDetailId == ed.ExamItemDetailId)
+                                                  .OrderBy(kb => kb.OptionId)
+                                                  .Select(kb => kb.Value)
+                                                  .ToArray()
+                            },
+                            // 選択肢
+                            ExamItemDetailOptions = 
+                                examItemDetailOptions.Where(op => op.ExamItemDetailId == ed.ExamItemDetailId)
+                                                     .OrderBy(op => op.OrderNumber)         
+                                                     .Select(op => new ExamItemDetailOption
+                                                        {
+                                                            OrderNumber = op.OrderNumber,
+                                                            Code = op.Code,
+                                                            Name = op.Name
+                                                        }).ToArray(),
+                            // 検査正常値範囲
+                            ExamNormalValueRanges = 
+                                examNormalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
+                                                     .OrderBy(r => r.ErrorLevel)
+                                                     .Select(r => new ExamNormalValueRange
+                                                        {
+                                                            ErrorLevel = (int)r.ErrorLevel,
+                                                            MaxValue = r.MaxValue,
+                                                            MinValue = r.MinValue
+                                                        }).ToArray()
+                        }).ToArray(),
+                        ExamRegistResults = []      // TODO: 検査結果登録エラー 後方作業へ
+                    }).ToArray()
+                }).ToArray()
+        };
     }
 }
