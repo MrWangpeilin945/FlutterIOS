@@ -39,4 +39,9 @@ public interface IConsultUsecase
     /// 前提検査メニューを検証する
     /// </summary>
     public Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenus(string consultNumber, int examMenuId);
+
+    /// <summary>
+    /// 検査結果相関ルールで検証する
+    /// </summary>
+    public Task<IEnumerable<Domain.Models.RuleError>> ValidateCorrelationRuleAsync(string consultNumber, ResultsRequest result);
 }

@@ -3,6 +3,7 @@ using FluentAssertions;
 using Moq;
 
 using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
@@ -258,5 +259,33 @@ public class ConsultUsecaseTests
         // Assert
         _consultRepositoryMock.Verify(x => x.RemoveExamCancelsAsync(consult.ConsultId, It.IsAny<int[]>()), Times.Once());
         _consultRepositoryMock.Verify(x => x.SaveExamCancelsAsync(consult.ConsultId, It.IsAny<ExamItemCancel[]>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task 検査結果相関ルールで検証する_2つの数値の差分_エラーがある()
+    {
+        // Arrange        
+
+        var consultNumber = "0002";
+        var resultsRequest = new ResultsRequest()
+        {
+            ExamMenuId = 5,
+            ExamResults = [
+                new(){
+                    ExamItemId = 5,
+                    ExamItemDetails = [
+                        new(){ExamItemDetailId = 5, Value = "81"}
+                    ]
+                }
+            ]
+        };
+
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object);
+
+        // Act
+        var errors = await usecase.ValidateCorrelationRuleAsync(consultNumber, resultsRequest);
+
+        // Assert
+        errors.Should().NotBeNullOrEmpty();
     }
 }

@@ -18,7 +18,7 @@ public class TriggerFactory
     {
         return triggerType switch
         {
-            RuleTriggerType.ThresholdExceeded => throw new NotImplementedException(),
+            RuleTriggerType.ThresholdExceeded => new ThresholdExceeded(inputValues, conditionValues, errorLevel),
             RuleTriggerType.AllInputsNotEqual => new AllInputsNotEqual(inputValues, errorLevel),
             _ => throw new NotImplementedException()
         };

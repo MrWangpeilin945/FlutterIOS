@@ -1,6 +1,9 @@
 using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.APIModels.Responses;
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models.Triggers;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -77,7 +80,7 @@ public class ConsultUsecase : IConsultUsecase
             ConsultId = unexaminedConsult.ConsultId,
             ExamineeId = examinee.ExamineeId,
             ExamineeName = examinee.Name,
-            UnexaminedMenus = unexaminedConsult.UnexaminedExamMenus.Select(x => new ExamMenu()
+            UnexaminedMenus = unexaminedConsult.UnexaminedExamMenus.Select(x => new APIModels.Responses.ExamMenu()
             {
                 ExamMenuId = x.ExamMenuId,
                 ExamMenuName = x.ExamMenuName
@@ -176,5 +179,102 @@ public class ConsultUsecase : IConsultUsecase
         return unexamined.UnexaminedExamMenus.Where(x => missingPriorMenus.Contains(x.ExamMenuId))
                                              .Select(x => new Domain.Models.ExamMenu() { MenuId = x.ExamMenuId, MenuName = x.ExamMenuName })
                                              .ToArray();
+    }
+
+    /// <summary>
+    /// 検査結果相関ルールで検証します。
+    /// </summary>
+    public async Task<IEnumerable<Domain.Models.RuleError>> ValidateCorrelationRuleAsync(string consultNumber, ResultsRequest result)
+    {
+        // var consult = await _consultRepository.GetConsultAsync(consultNumber);
+
+        var examMenuId = result.ExamMenuId;
+
+        // Repo1. 検査結果相関ルールマスタを取得する（examMenuId）
+        var ruleList = new List<Domain.Models.CorrelationRule>()
+        {
+            new(){
+                CorrelationRuleId = 1,
+                Name = "腹囲_前回差20cm以上",
+                ExamMenuId = 5,
+                Priority = 1,
+                TriggerType = RuleTriggerType.ThresholdExceeded,
+                ErrorLevel = InputErrorLevel.警告,
+                ExamItemId = 5,
+                Message = "腹囲が前回より20cm以上です。",
+                Evaluations = [
+                    new CorrelationRuleEvaluation(){VariableNumber = 1, EvaluationValue = "20"}
+                ],
+                ExamItemDetails = [
+                    new CorrelationRuleExamItemDetail(){VariableNumber = 1, ExamItemDetailId = 5, SourceType = SourceType.今回値},
+                    new CorrelationRuleExamItemDetail(){VariableNumber = 2, ExamItemDetailId = 5, SourceType = SourceType.前回値}
+                ]
+            }
+        };
+
+        // Repo2. DBから前回値を取得する（consultId）
+        var 前回値として取得が必要な検査項目明細ID = ruleList.SelectMany(x => x.ExamItemDetails)
+                                                          .Where(x => x.SourceType == SourceType.前回値)
+                                                          .Select(x => x.ExamItemDetailId).Distinct().ToArray();
+        var 前回値リスト = new Dictionary<int, string>() {
+            { 1, "168" },
+            { 5, "60" }
+        };
+
+        // Repo3. DBから今回値を取得する
+        var 今回値として取得が必要な検査項目明細ID = ruleList.SelectMany(x => x.ExamItemDetails)
+                                                          .Where(x => x.SourceType == SourceType.今回値)
+                                                          .Select(x => x.ExamItemDetailId).Distinct().ToArray();
+        var 今回値リスト = new Dictionary<int, string>() {
+            { 1, "169" },
+            { 5, "71" }
+        };
+
+        // リクエスト値を取得する
+        var リクエスト値リスト = result.ExamResults.SelectMany(x => x.ExamItemDetails)
+                                                 .ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+
+        // 保存済み今回値とリクエスト値と合成する
+        // リクエスト値を優先する
+        var 合成済みの今回値リスト = 今回値リスト.Where(x => !リクエスト値リスト.ContainsKey(x.Key))
+                                              .Concat(リクエスト値リスト)
+                                              .ToDictionary(x => x.Key, x => x.Value);
+
+        // トリガーを作る
+        var errors = new List<Domain.Models.RuleError>();
+        foreach (var rule in ruleList)
+        {
+            var triggerType = rule.TriggerType;
+            var errorLevel = rule.ErrorLevel;
+            var conditionValues = rule.Evaluations.OrderBy(x => x.VariableNumber)
+                                                  .Select(x => x.EvaluationValue)
+                                                  .ToList();
+            var inputValues = rule.ExamItemDetails.OrderBy(x => x.VariableNumber)
+                                                  .Select(x => x.SourceType switch
+                                                  {
+                                                      SourceType.今回値 => 合成済みの今回値リスト.TryGetValue(x.ExamItemDetailId, out var 今回値) ? 今回値 : "",
+                                                      SourceType.前回値 => 前回値リスト.TryGetValue(x.ExamItemDetailId, out var 前回値) ? 前回値 : "",
+                                                      _ => throw new NotSupportedException(nameof(x.SourceType))
+                                                  }).ToList();
+
+            var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues, conditionValues, errorLevel);
+
+            if (trigger.IsMatch())
+            {
+                errors.Add(new RuleError()
+                {
+                    ErrorLevel = trigger.GetErrorLevel(),
+                    Message = rule.Message,
+                    Priority = rule.Priority,
+                    ExamItemId = rule.ExamItemId
+                });
+            }
+        }
+
+        // 返却するエラーレベル
+        var errorLevels = new List<InputErrorLevel>() { InputErrorLevel.警告, InputErrorLevel.異常 };
+
+        return errors.Where(x => errorLevels.Contains(x.ErrorLevel))
+                     .OrderBy(x => x.Priority);
     }
 }
