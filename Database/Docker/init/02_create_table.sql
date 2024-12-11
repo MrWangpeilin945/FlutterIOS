@@ -350,7 +350,7 @@ CREATE TABLE exam_items (
 );
 
 CREATE TABLE examinees (
-  examinee_id uuid DEFAULT gen_random_uuid ()",",$FFFFFFFF," NOT NULL
+  examinee_id uuid DEFAULT gen_random_uuid () NOT NULL
   , examinee_code text NOT NULL
   , name text NOT NULL
   , kana_name text NOT NULL

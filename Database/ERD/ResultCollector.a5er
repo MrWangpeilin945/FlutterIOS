@@ -242,7 +242,7 @@ TableOption=
 Page=MAIN
 Left=400
 Top=1700
-Field="受診者ID","examinee_id","uuid","NOT NULL",0,"gen_random_uuid ()\Q,\Q,$FFFFFFFF,\Q","",$FFFFFFFF,""
+Field="受診者ID","examinee_id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="受診者コード","examinee_code","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="氏名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="カナ氏名","kana_name","text","NOT NULL",,"","",$FFFFFFFF,""
@@ -252,7 +252,7 @@ Index==2,examinee_code
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241211105423
+ModifiedDateTime=20241211144107
 Position="MAIN",400,1700
 ZOrder=12
 
