@@ -11,7 +11,7 @@ public class Place
     /// 会場ID
     /// </summary>
     [JsonPropertyName("placeId")]
-    public required int PlaceId { get; init; }
+    public required Guid PlaceId { get; init; }
 
     /// <summary>
     /// 会場名

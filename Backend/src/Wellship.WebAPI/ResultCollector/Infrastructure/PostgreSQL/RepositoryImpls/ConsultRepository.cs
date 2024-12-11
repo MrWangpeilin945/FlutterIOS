@@ -162,7 +162,7 @@ public class ConsultRepository : IConsultRepository
     /// <summary>
     /// 受診を指定して検査中止を取得します。
     /// </summary>
-    public async Task<ExamCancel> GetExamCancelsAsync(int consultId)
+    public async Task<ExamCancel> GetExamCancelsAsync(Guid consultId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
@@ -195,7 +195,7 @@ public class ConsultRepository : IConsultRepository
     /// <summary>
     /// 検査中止を削除します。
     /// </summary>
-    public async Task RemoveExamCancelsAsync(int consultId, int[] examItemDetailIds)
+    public async Task RemoveExamCancelsAsync(Guid consultId, int[] examItemDetailIds)
     {
         if (examItemDetailIds.Length == 0)
         {
@@ -218,7 +218,7 @@ public class ConsultRepository : IConsultRepository
     /// 検査中止を保存します。
     /// すでに同じ検査項目明細の中止が存在すれば上書き更新、存在しなければ新規作成します。
     /// </summary>
-    public async Task SaveExamCancelsAsync(int consultId, IEnumerable<ExamItemCancel> examItemCancels)
+    public async Task SaveExamCancelsAsync(Guid consultId, IEnumerable<ExamItemCancel> examItemCancels)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
 
@@ -301,7 +301,7 @@ public class ConsultRepository : IConsultRepository
     /// 基準値の基準値パターンIDを取得する
     /// </summary>
     /// <param name="consultId">受診ID</param>
-    public async Task<IEnumerable<int>> GetConsultThresholds(int consultId)
+    public async Task<IEnumerable<int>> GetConsultThresholds(Guid consultId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
@@ -317,7 +317,7 @@ public class ConsultRepository : IConsultRepository
     /// <summary>
     /// 受診を指定して検査依頼を取得します。
     /// </summary>
-    public async Task<ExamOrder> GetExamOrdersAsync(int consultId)
+    public async Task<ExamOrder> GetExamOrdersAsync(Guid consultId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
@@ -348,7 +348,7 @@ public class ConsultRepository : IConsultRepository
     /// <summary>
     /// 受診を指定して検査結果を取得します。
     /// </summary>
-    public async Task<ExamResult> GetExamResultsAsync(int consultId)
+    public async Task<ExamResult> GetExamResultsAsync(Guid consultId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
@@ -381,7 +381,7 @@ public class ConsultRepository : IConsultRepository
     /// <summary>
     /// 受診を指定して過去検査結果を取得します。
     /// </summary>
-    public async Task<PreviousResult> GetPreviousResultsAsync(int consultId, DateOnly examDate)
+    public async Task<PreviousResult> GetPreviousResultsAsync(Guid consultId, DateOnly examDate)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"

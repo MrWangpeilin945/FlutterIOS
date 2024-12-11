@@ -10,7 +10,7 @@ public class Consult
     /// <summary>
     /// 受診者ID
     /// </summary>
-    public required int ConsultId { get; init; }
+    public required Guid ConsultId { get; init; }
 
     /// <summary>
     /// 受診番号
@@ -30,12 +30,12 @@ public class Consult
     /// <summary>
     /// 会場日程ID
     /// </summary>
-    public required int PlaceScheduleId { get; init; }
+    public required Guid PlaceScheduleId { get; init; }
 
     /// <summary>
     /// 受診者ID
     /// </summary>
-    public required int ExamineeId { get; init; }
+    public required Guid ExamineeId { get; init; }
 
     /// <summary>
     /// 受付番号

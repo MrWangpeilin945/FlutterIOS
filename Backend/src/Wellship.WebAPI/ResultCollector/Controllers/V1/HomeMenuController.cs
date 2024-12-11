@@ -32,7 +32,7 @@ public class HomeMenuController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/homeMenus")]
-    public async Task<IActionResult> GetHomeMenuSettingsAsync([FromQuery] int? placeScheduleId)
+    public async Task<IActionResult> GetHomeMenuSettingsAsync([FromQuery] Guid? placeScheduleId)
     {
         var results = await _homeMenuUsecase.GetHomeMenusAsync(placeScheduleId);
         return Ok(results);

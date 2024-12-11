@@ -8,7 +8,7 @@ public class Team
     /// <summary>
     /// 班ID
     /// </summary>
-    public int Id { get; init; }
+    public Guid Id { get; init; }
 
     /// <summary>
     /// 班コード

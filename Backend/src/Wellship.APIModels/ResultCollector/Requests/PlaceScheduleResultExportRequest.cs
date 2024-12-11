@@ -11,7 +11,7 @@ public class PlaceScheduleResultExportRequest
     /// 会場日程ID
     /// </summary>
     [JsonPropertyName("placeScheduleId")]
-    public int PlaceScheduleId { get; set; }
+    public Guid PlaceScheduleId { get; set; }
 
     /// <summary>
     /// 会場日程データ出力状況

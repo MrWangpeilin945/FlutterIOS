@@ -21,7 +21,7 @@ public class StaffUsecaseTests
         // テーブルから取得するもの
         var staffEntity = new StaffEntity()
         {
-            StaffId = 123,
+            StaffId = Guid.Parse("a5d78b8f-7e9b-4f8c-b506-8fc86b1d7681"),
             StaffCode = "STF123",
             LoginId = "STF123",
             Name = "職員　太郎",
@@ -35,7 +35,7 @@ public class StaffUsecaseTests
         // ユースケースで変換後に期待するもの
         var expectedStaff = new APIModels.Responses.Staff()
         {
-            StaffId = 123,
+            StaffId = Guid.Parse("a5d78b8f-7e9b-4f8c-b506-8fc86b1d7681"),
             StaffName = "職員　太郎"
         };
 

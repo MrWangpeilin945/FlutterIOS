@@ -25,33 +25,33 @@ public class IntegrationUsecaseTests
         _placeSchedules =
         [
             new(){
-                Id = 3,
-                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = 1,Code = "P001",Name = "会場A",OrderNumber = 1},
-                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = 2,Code = "T002",Name = "B班",OrderNumber = 2},
+                Id = Guid.Parse("5840728b-a1a7-41e7-a61a-04d8937fa6d0"),
+                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = Guid.Parse("26f5f912-e580-4e39-b378-9d3c7367fa63"),Code = "P001",Name = "会場A",OrderNumber = 1},
+                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = Guid.Parse("5805ab65-c6ab-45d2-a6ad-3daffb18df25"),Code = "T002",Name = "B班",OrderNumber = 2},
                 ExamDate = new DateOnly(2024,11,30),
                 StartTime = "1000",
                 PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査完了
             },
             new(){
-                Id = 4,
-                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = 2,Code = "P002",Name = "会場B",OrderNumber = 2},
-                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = 2,Code = "T002",Name = "B班",OrderNumber = 2},
+                Id = Guid.Parse("5b0b6b26-1792-4ffb-aeb4-9d50ab377a39"),
+                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = Guid.Parse("79461e14-58c7-4319-b1ad-da6fc7081553"),Code = "P002",Name = "会場B",OrderNumber = 2},
+                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = Guid.Parse("5805ab65-c6ab-45d2-a6ad-3daffb18df25"),Code = "T002",Name = "B班",OrderNumber = 2},
                 ExamDate = new DateOnly(2024,11,30),
                 StartTime = "1000",
                 PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査中
             },
             new(){
-                Id = 2,
-                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = 1,Code = "P001",Name = "会場A",OrderNumber = 1},
-                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = 1,Code = "T001",Name = "A班",OrderNumber = 1},
+                Id = Guid.Parse("425a269b-b33b-43a3-912c-3108382888be"),
+                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = Guid.Parse("26f5f912-e580-4e39-b378-9d3c7367fa63"),Code = "P001",Name = "会場A",OrderNumber = 1},
+                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = Guid.Parse("fc6c7909-c7c9-440c-bb55-576e92aaefa4"),Code = "T001",Name = "A班",OrderNumber = 1},
                 ExamDate = new DateOnly(2024,10,21),
                 StartTime = "1300",
                 PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査完了
             },
             new(){
-                Id = 1,
-                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = 1,Code = "P001",Name = "会場A",OrderNumber = 1},
-                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = 1,Code = "T001",Name = "A班",OrderNumber = 1},
+                Id = Guid.Parse("0a605051-584d-4b6e-8556-b110699b8db2"),
+                Place = new WebAPI.ResultCollector.Domain.Models.Place(){Id = Guid.Parse("26f5f912-e580-4e39-b378-9d3c7367fa63"),Code = "P001",Name = "会場A",OrderNumber = 1},
+                Team = new WebAPI.ResultCollector.Domain.Models.Team(){Id = Guid.Parse("fc6c7909-c7c9-440c-bb55-576e92aaefa4"),Code = "T001",Name = "A班",OrderNumber = 1},
                 ExamDate = new DateOnly(2024,11,30),
                 StartTime = "1000",
                 PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査完了
@@ -59,14 +59,14 @@ public class IntegrationUsecaseTests
         ];
 
         _exportHistories = [
-            new(){ExportId = new Guid("5d0628e7-1051-4475-8a00-34abacd828ee"),PlaceScheduleId = 1,DataCount = 13,ExportedAt = DateTime.Parse("2024-11-30 17:00"),ExportedBy = "職員A"},
-            new(){ExportId = new Guid("846c3347-14ff-4e4e-9ee3-bcb1452ae953"),PlaceScheduleId = 1,DataCount = 45,ExportedAt = DateTime.Parse("2024-11-30 13:00"),ExportedBy = "職員B"},
-            new(){ExportId = new Guid("4c0f1413-aa13-4886-94b4-851e42200f79"),PlaceScheduleId = 2,DataCount = 2,ExportedAt = DateTime.Parse("2024-10-21 17:30"),ExportedBy = "職員B"}
+            new(){ExportId = new Guid("5d0628e7-1051-4475-8a00-34abacd828ee"),PlaceScheduleId = Guid.Parse("2d8dcfc8-0de4-4bf2-92fd-69f893b7fdef"),DataCount = 13,ExportedAt = DateTime.Parse("2024-11-30 17:00"),ExportedBy = "職員A"},
+            new(){ExportId = new Guid("846c3347-14ff-4e4e-9ee3-bcb1452ae953"),PlaceScheduleId = Guid.Parse("2d8dcfc8-0de4-4bf2-92fd-69f893b7fdef"),DataCount = 45,ExportedAt = DateTime.Parse("2024-11-30 13:00"),ExportedBy = "職員B"},
+            new(){ExportId = new Guid("4c0f1413-aa13-4886-94b4-851e42200f79"),PlaceScheduleId = Guid.Parse("e26bc962-62d1-4751-8aa0-8eda2b4d1a05"),DataCount = 2,ExportedAt = DateTime.Parse("2024-10-21 17:30"),ExportedBy = "職員B"}
         ];
 
         _exportPlaceSchedules = [
-            new(){PlaceScheduleId = 1, ExportStatusCount11 = 103, ExportStatusCount21 = 4, ExportStatusCount31 = 97},
-            new(){PlaceScheduleId = 2, ExportStatusCount11 = 0, ExportStatusCount21 = 0, ExportStatusCount31 = 3}
+            new(){PlaceScheduleId = Guid.Parse("fd56de1a-bc54-418a-93f0-1a6df8aa7c48"), ExportStatusCount11 = 103, ExportStatusCount21 = 4, ExportStatusCount31 = 97},
+            new(){PlaceScheduleId = Guid.Parse("42156088-826b-4dd8-8b90-3f5fb5ce911c"), ExportStatusCount11 = 0, ExportStatusCount21 = 0, ExportStatusCount31 = 3}
         ];
     }
 
@@ -76,7 +76,7 @@ public class IntegrationUsecaseTests
         // Arrange
 
         _integrationRepositoryMock.Setup(r => r.GetExportHistoryAsync()).ReturnsAsync(_exportHistories);
-        _placeScheduleRepositoryMock.Setup(r => r.GetPlaceSchedulesAsync(new int[] { 1, 2 })).ReturnsAsync(_placeSchedules);
+        _placeScheduleRepositoryMock.Setup(r => r.GetPlaceSchedulesAsync(new Guid[] { Guid.Parse("0446d70f-4037-424e-9ca7-2b96cfe5c5f7"), Guid.Parse("20dde363-c6ca-486e-ac9b-9f4c58227294") })).ReturnsAsync(_placeSchedules);
 
         var integrationUsecase = new IntegrationUsecase(_integrationRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
 
@@ -87,7 +87,7 @@ public class IntegrationUsecaseTests
             ExportHistories = [
                 new(){
                     ExportId = new Guid("5d0628e7-1051-4475-8a00-34abacd828ee"),
-                    PlaceScheduleId = 1,
+                    PlaceScheduleId = Guid.Parse("c4b0c87d-e1ca-4e55-ae97-5e49fa2aed8f"),
                     PlaceName = "会場A",
                     PlaceScheduleLockingStatus = (int)PlaceScheduleLockingStatus.検査完了,
                     ExamDate = DateOnly.Parse("2024-11-30"),
@@ -97,7 +97,7 @@ public class IntegrationUsecaseTests
                 },
                 new(){
                     ExportId = new Guid("846c3347-14ff-4e4e-9ee3-bcb1452ae953"),
-                    PlaceScheduleId = 1,
+                    PlaceScheduleId = Guid.Parse("c4b0c87d-e1ca-4e55-ae97-5e49fa2aed8f"),
                     PlaceName = "会場A",
                     PlaceScheduleLockingStatus = (int)PlaceScheduleLockingStatus.検査完了,
                     ExamDate = DateOnly.Parse("2024-11-30"),
@@ -107,7 +107,7 @@ public class IntegrationUsecaseTests
                 },
                 new(){
                     ExportId = new Guid("4c0f1413-aa13-4886-94b4-851e42200f79"),
-                    PlaceScheduleId = 2,
+                    PlaceScheduleId = Guid.Parse("cf86c60c-dde3-44d0-a1ee-f6e82a3e70f5"),
                     PlaceName = "会場A",
                     PlaceScheduleLockingStatus = (int)PlaceScheduleLockingStatus.検査完了,
                     ExamDate = DateOnly.Parse("2024-10-21"),
@@ -131,7 +131,7 @@ public class IntegrationUsecaseTests
         // Arrange
 
         _integrationRepositoryMock.Setup(r => r.GetExportHistoryAsync()).ReturnsAsync([]);
-        _placeScheduleRepositoryMock.Setup(r => r.GetPlaceSchedulesAsync(new int[] { })).ReturnsAsync([]);
+        _placeScheduleRepositoryMock.Setup(r => r.GetPlaceSchedulesAsync(new Guid[] { })).ReturnsAsync([]);
 
         var integrationUsecase = new IntegrationUsecase(_integrationRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
 
@@ -153,7 +153,7 @@ public class IntegrationUsecaseTests
     {
         // Arrange
         _integrationRepositoryMock.Setup(r => r.GetExportPlaceSchedulesAsync()).ReturnsAsync(_exportPlaceSchedules);
-        _placeScheduleRepositoryMock.Setup(r => r.GetPlaceSchedulesAsync(new int[] { 1, 2 })).ReturnsAsync(_placeSchedules);
+        _placeScheduleRepositoryMock.Setup(r => r.GetPlaceSchedulesAsync(new Guid[] { Guid.Parse("011f8986-049f-4e65-9de8-25952267005c"), Guid.Parse("feb7b78e-2d7c-448e-bb80-7b1ef541b6f2") })).ReturnsAsync(_placeSchedules);
 
         var integrationUsecase = new IntegrationUsecase(_integrationRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
 
@@ -161,7 +161,7 @@ public class IntegrationUsecaseTests
         {
             ExportData = [
                new APIModels.Responses.ExportData(){
-                PlaceScheduleId = 1,
+                PlaceScheduleId = Guid.Parse("feb7b78e-2d7c-448e-bb80-7b1ef541b6f2"),
                 ExamDate = new DateOnly(2024,11,30),
                 PlaceName = "会場A",
                 StartTime = "10:00",
@@ -185,7 +185,7 @@ public class IntegrationUsecaseTests
                 ]
                },
                new APIModels.Responses.ExportData(){
-                PlaceScheduleId = 2,
+                PlaceScheduleId = Guid.Parse("feb7b78e-2d7c-448e-bb80-7b1ef541b6f2"),
                 ExamDate = new DateOnly(2024,10,21),
                 PlaceName = "会場A",
                 StartTime = "13:00",
@@ -223,7 +223,7 @@ public class IntegrationUsecaseTests
     {
         // Arrange
         _integrationRepositoryMock.Setup(r => r.GetExportPlaceSchedulesAsync()).ReturnsAsync([]);
-        _placeScheduleRepositoryMock.Setup(r => r.GetPlaceSchedulesAsync(new int[] { })).ReturnsAsync([]);
+        _placeScheduleRepositoryMock.Setup(r => r.GetPlaceSchedulesAsync(new Guid[] { })).ReturnsAsync([]);
 
         var integrationUsecase = new IntegrationUsecase(_integrationRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
 

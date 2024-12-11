@@ -9,5 +9,5 @@ public interface IExamineeRepository
     /// 受診者IDで受診者を取得します。
     /// </summary>
     /// <param name="examineeId">ログインID</param>
-    public Task<Models.Examinee> GetExamineeAsync(int examineeId);
+    public Task<Models.Examinee> GetExamineeAsync(Guid examineeId);
 }

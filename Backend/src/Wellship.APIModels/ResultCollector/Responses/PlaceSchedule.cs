@@ -11,13 +11,13 @@ public class PlaceSchedule
     /// 会場日程ID
     /// </summary>
     [JsonPropertyName("placeScheduleId")]
-    public required int PlaceScheduleId { get; init; }
+    public required Guid PlaceScheduleId { get; init; }
 
     /// <summary>
     /// 会場ID
     /// </summary>
     [JsonPropertyName("placeId")]
-    public required int PlaceId { get; init; }
+    public required Guid PlaceId { get; init; }
 
     /// <summary>
     /// 会場名
