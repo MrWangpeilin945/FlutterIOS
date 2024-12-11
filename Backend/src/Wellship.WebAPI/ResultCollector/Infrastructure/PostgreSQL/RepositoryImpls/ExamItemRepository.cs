@@ -171,24 +171,80 @@ public class ExamItemRepository : IExamItemRepository
     /// <param name="examMenuId">検査メニューID</param>
     public async Task<IEnumerable<CorrelationRule>> GetCorrelationRulesAsync(int examMenuId)
     {
-        return [
-            new(){
-                CorrelationRuleId = 1,
-                Name = "腹囲_前回差20cm以上",
-                ExamMenuId = 5,
-                Priority = 1,
-                TriggerType = RuleTriggerType.ThresholdExceeded,
-                ErrorLevel = InputErrorLevel.警告,
-                ExamItemId = 5,
-                Message = "腹囲が前回より20cm以上です。",
-                Evaluations = [
-                    new CorrelationRuleEvaluation(){VariableNumber = 1, EvaluationValue = "20"}
-                ],
-                ExamItemDetails = [
-                    new CorrelationRuleExamItemDetail(){VariableNumber = 1, ExamItemDetailId = 5, SourceType = SourceType.今回値},
-                    new CorrelationRuleExamItemDetail(){VariableNumber = 2, ExamItemDetailId = 5, SourceType = SourceType.前回値}
-                ]
-            }
-        ];
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+
+        // 検査結果相関ルール_メインテーブル
+        const string mainSql = @"
+        select
+            r.correlation_rule_id as CorrelationRuleId
+            , r.name as Name
+            , r.exam_menu_id as ExamMenuId
+            , r.priority as Priority
+            , r.trigger_type as TriggerType
+            , r.error_level as ErrorLevel
+            , r.exam_item_id as ExamItemId
+            , r.message as Message 
+        from
+            resultcollector.correlation_rules r
+        where
+            r.exam_menu_id = @ExamMenuId;";
+
+        var correlationRules = await connection.QueryAsync<CorrelationRuleEntity>(mainSql, new { ExamMenuId = examMenuId });
+
+        // 検査結果相関ルール_判定値テーブル
+        const string evaluationSql = @"
+        select
+            r.correlation_rule_id as CorrelationRuleId
+            , e.variable_number as VariableNumber
+            , e.evaluation_value as EvaluationValue 
+        from
+            resultcollector.correlation_rules r 
+            left join resultcollector.correlation_rule_evaluations e 
+                on r.correlation_rule_id = e.correlation_rule_id
+        where
+            r.exam_menu_id = @ExamMenuId;";
+
+        var evaluations = await connection.QueryAsync<CorrelationRuleEvaluationEntity>(evaluationSql, new { ExamMenuId = examMenuId });
+
+        // 検査結果相関ルール_検査項目明細テーブル
+        const string examItemDetailSql = @"
+        select
+            r.correlation_rule_id as CorrelationRuleId
+            , d.variable_number as VariableNumber
+            , d.source_type as SourceType
+            , d.exam_item_detail_id as ExamItemDetailId 
+        from
+            resultcollector.correlation_rules r 
+            left join resultcollector.correlation_rule_exam_item_details d 
+                on r.correlation_rule_id = d.correlation_rule_id
+        where
+            r.exam_menu_id = @ExamMenuId;";
+
+        var examItemDetails = await connection.QueryAsync<CorrelationRuleExamItemDetailEntity>(examItemDetailSql, new { ExamMenuId = examMenuId });
+
+        return correlationRules.Select(x => new CorrelationRule()
+        {
+            CorrelationRuleId = x.CorrelationRuleId,
+            Name = x.Name,
+            ExamMenuId = x.ExamMenuId,
+            Priority = x.Priority,
+            TriggerType = (RuleTriggerType)x.TriggerType,
+            ErrorLevel = (InputErrorLevel)x.ErrorLevel,
+            ExamItemId = x.ExamItemId,
+            Message = x.Message,
+            Evaluations = evaluations.Where(ev => ev.CorrelationRuleId == x.CorrelationRuleId)
+                                     .Select(ev => new CorrelationRuleEvaluation()
+                                     {
+                                         VariableNumber = ev.VariableNumber,
+                                         EvaluationValue = ev.EvaluationValue
+                                     }),
+            ExamItemDetails = examItemDetails.Where(ei => ei.CorrelationRuleId == x.CorrelationRuleId)
+                                             .Select(ei => new CorrelationRuleExamItemDetail()
+                                             {
+                                                 VariableNumber = ei.VariableNumber,
+                                                 SourceType = (SourceType)ei.SourceType,
+                                                 ExamItemDetailId = ei.ExamItemDetailId
+                                             })
+        });
     }
 }
