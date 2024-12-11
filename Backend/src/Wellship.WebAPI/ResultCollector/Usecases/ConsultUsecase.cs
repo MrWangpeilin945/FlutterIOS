@@ -301,61 +301,30 @@ public class ConsultUsecase : IConsultUsecase
     /// </summary>
     public async Task<IEnumerable<Domain.Models.RuleError>> ValidateCorrelationRuleAsync(string consultNumber, ResultsRequest result)
     {
-        // var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
 
         var examMenuId = result.ExamMenuId;
 
-        // Repo1. 検査結果相関ルールマスタを取得する（examMenuId）
-        var ruleList = new List<Domain.Models.CorrelationRule>()
-        {
-            new(){
-                CorrelationRuleId = 1,
-                Name = "腹囲_前回差20cm以上",
-                ExamMenuId = 5,
-                Priority = 1,
-                TriggerType = RuleTriggerType.ThresholdExceeded,
-                ErrorLevel = InputErrorLevel.警告,
-                ExamItemId = 5,
-                Message = "腹囲が前回より20cm以上です。",
-                Evaluations = [
-                    new CorrelationRuleEvaluation(){VariableNumber = 1, EvaluationValue = "20"}
-                ],
-                ExamItemDetails = [
-                    new CorrelationRuleExamItemDetail(){VariableNumber = 1, ExamItemDetailId = 5, SourceType = SourceType.今回値},
-                    new CorrelationRuleExamItemDetail(){VariableNumber = 2, ExamItemDetailId = 5, SourceType = SourceType.前回値}
-                ]
-            }
-        };
+        // 検査結果相関ルールマスタを取得する
+        var ruleList = await _examItemRepository.GetCorrelationRulesAsync(examMenuId);
 
-        // Repo2. DBから前回値を取得する（consultId）
-        var 前回値として取得が必要な検査項目明細ID = ruleList.SelectMany(x => x.ExamItemDetails)
-                                                          .Where(x => x.SourceType == SourceType.前回値)
-                                                          .Select(x => x.ExamItemDetailId).Distinct().ToArray();
-        var 前回値リスト = new Dictionary<int, string>() {
-            { 1, "168" },
-            { 5, "60" }
-        };
-
-        // Repo3. DBから今回値を取得する
-        var 今回値として取得が必要な検査項目明細ID = ruleList.SelectMany(x => x.ExamItemDetails)
-                                                          .Where(x => x.SourceType == SourceType.今回値)
-                                                          .Select(x => x.ExamItemDetailId).Distinct().ToArray();
-        var 今回値リスト = new Dictionary<int, string>() {
-            { 1, "169" },
-            { 5, "71" }
-        };
+        // DBから前回値と今回値を取得する
+        var dbCurrentResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
+        var dbPreResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, placeSchedule.ExamDate);
+        var currentResults = dbCurrentResults.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+        var preResults = dbPreResults.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value);
 
         // リクエスト値を取得する
-        var リクエスト値リスト = result.ExamResults.SelectMany(x => x.ExamItemDetails)
-                                                 .ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+        var currentRequestResults = result.ExamResults.SelectMany(x => x.ExamItemDetails)
+                                                      .ToDictionary(x => x.ExamItemDetailId, x => x.Value);
 
-        // 保存済み今回値とリクエスト値と合成する
-        // リクエスト値を優先する
-        var 合成済みの今回値リスト = 今回値リスト.Where(x => !リクエスト値リスト.ContainsKey(x.Key))
-                                              .Concat(リクエスト値リスト)
-                                              .ToDictionary(x => x.Key, x => x.Value);
+        // DBの今回値とリクエスト値と合成する（リクエスト値を優先する）
+        var concatenatedCurrentResults = currentResults.Where(x => !currentRequestResults.ContainsKey(x.Key))
+                                                       .Concat(currentRequestResults)
+                                                       .ToDictionary(x => x.Key, x => x.Value);
 
-        // トリガーを作る
+        // トリガーをセットアップして検証する
         var errors = new List<Domain.Models.RuleError>();
         foreach (var rule in ruleList)
         {
@@ -364,16 +333,18 @@ public class ConsultUsecase : IConsultUsecase
             var conditionValues = rule.Evaluations.OrderBy(x => x.VariableNumber)
                                                   .Select(x => x.EvaluationValue)
                                                   .ToList();
+
             var inputValues = rule.ExamItemDetails.OrderBy(x => x.VariableNumber)
                                                   .Select(x => x.SourceType switch
                                                   {
-                                                      SourceType.今回値 => 合成済みの今回値リスト.TryGetValue(x.ExamItemDetailId, out var 今回値) ? 今回値 : "",
-                                                      SourceType.前回値 => 前回値リスト.TryGetValue(x.ExamItemDetailId, out var 前回値) ? 前回値 : "",
+                                                      SourceType.今回値 => concatenatedCurrentResults.TryGetValue(x.ExamItemDetailId, out var currVal) ? currVal : "",
+                                                      SourceType.前回値 => preResults.TryGetValue(x.ExamItemDetailId, out var prevVal) ? prevVal : "",
                                                       _ => throw new NotSupportedException(nameof(x.SourceType))
                                                   }).ToList();
 
             var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues, conditionValues, errorLevel);
 
+            // トリガーの条件に一致すればエラーに追加する
             if (trigger.IsMatch())
             {
                 errors.Add(new RuleError()
@@ -386,9 +357,8 @@ public class ConsultUsecase : IConsultUsecase
             }
         }
 
-        // 返却するエラーレベル
+        // 条件に一致したトリガーのうち、エラーレベルが警告と異常の結果のみ返す
         var errorLevels = new List<InputErrorLevel>() { InputErrorLevel.警告, InputErrorLevel.異常 };
-
         return errors.Where(x => errorLevels.Contains(x.ErrorLevel))
                      .OrderBy(x => x.Priority);
     }

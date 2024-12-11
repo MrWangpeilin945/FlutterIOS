@@ -1,5 +1,3 @@
-
-using System.Runtime.Intrinsics.Arm;
 using Dapper;
 
 using Ryobi.Wellship.Core.Enums;
@@ -60,7 +58,7 @@ public class ExamItemRepository : IExamItemRepository
             , d.order_number;";
 
         var results = await connection.QueryAsync<ExamItemGroupEntity>(sql, new { ExamMenuId = examMenuId });
-        var examItemGroups = 
+        var examItemGroups =
             results
             .GroupBy(g => g.ExamItemGroupId)
             .Select(eg => new ExamItemGroup
@@ -68,7 +66,7 @@ public class ExamItemRepository : IExamItemRepository
                 ExamItemGroupId = eg.First().ExamItemGroupId,
                 Type = eg.First().GroupType,
                 //検査項目
-                ExamItems = 
+                ExamItems =
                         eg.GroupBy(e => e.ExamItemId)
                             .Select(ei => new ExamItem
                             {
@@ -76,7 +74,7 @@ public class ExamItemRepository : IExamItemRepository
                                 ExamItemId = ei.First().ExamItemId,
                                 Name = ei.First().ExamItemName,
                                 // 検査項目明細
-                                ExamItemDetails 
+                                ExamItemDetails
                                     = ei.Select(ed => new ExamItemDetail
                                     {
                                         PositionNumber = ed.ExamItemDetailPositionNumber,
@@ -89,7 +87,7 @@ public class ExamItemRepository : IExamItemRepository
                                         DecimalLength = ed.DecimalLength,
                                         KeyboardType = ed.KeyboardType
                                     })
-                            })    
+                            })
             });
         return examItemGroups;
     }
@@ -162,8 +160,35 @@ public class ExamItemRepository : IExamItemRepository
             on r.threshold_id = ct.threshold_id
         where r.threshold_id = any(@ThresholdIds)
         and r.exam_item_detail_id = any(@ExamItemDetailIds);";
-        var normalValueRanges = await connection.QueryAsync<ExamNormalValueRange>(sql, 
+        var normalValueRanges = await connection.QueryAsync<ExamNormalValueRange>(sql,
                                         new { ThresholdIds = thresholdIds, ExamItemDetailIds = examItemDetailIds });
         return normalValueRanges.Where(x => x.IsTargetAge(age) && x.IsTargetSex(sex));
+    }
+
+    /// <summary>
+    /// 検査結果相関ルールを取得します。
+    /// </summary>
+    /// <param name="examMenuId">検査メニューID</param>
+    public async Task<IEnumerable<CorrelationRule>> GetCorrelationRulesAsync(int examMenuId)
+    {
+        return [
+            new(){
+                CorrelationRuleId = 1,
+                Name = "腹囲_前回差20cm以上",
+                ExamMenuId = 5,
+                Priority = 1,
+                TriggerType = RuleTriggerType.ThresholdExceeded,
+                ErrorLevel = InputErrorLevel.警告,
+                ExamItemId = 5,
+                Message = "腹囲が前回より20cm以上です。",
+                Evaluations = [
+                    new CorrelationRuleEvaluation(){VariableNumber = 1, EvaluationValue = "20"}
+                ],
+                ExamItemDetails = [
+                    new CorrelationRuleExamItemDetail(){VariableNumber = 1, ExamItemDetailId = 5, SourceType = SourceType.今回値},
+                    new CorrelationRuleExamItemDetail(){VariableNumber = 2, ExamItemDetailId = 5, SourceType = SourceType.前回値}
+                ]
+            }
+        ];
     }
 }

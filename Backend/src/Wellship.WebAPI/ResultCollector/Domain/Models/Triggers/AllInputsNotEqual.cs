@@ -25,6 +25,11 @@ public sealed class AllInputsNotEqual : TriggerBase
     /// </summary>
     public override bool IsMatch()
     {
+        if (_inputValues.Count < 1)
+        {
+            return false;
+        }
+
         return _inputValues.Distinct().Count() > 1;
     }
 

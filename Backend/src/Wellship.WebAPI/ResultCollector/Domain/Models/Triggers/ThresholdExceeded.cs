@@ -26,12 +26,24 @@ public sealed class ThresholdExceeded : TriggerBase
     /// </summary>
     public override bool IsMatch()
     {
-        decimal input1 = Convert.ToDecimal(_inputValues[0]);
-        decimal input2 = Convert.ToDecimal(_inputValues[1]);
-        decimal threshold = Convert.ToDecimal(_conditionValues[0]);
+        if (_inputValues.Count != 2 || _conditionValues.Count != 1)
+        {
+            return false;
+        }
+        if (!decimal.TryParse(_inputValues[0], out var input1))
+        {
+            return false;
+        }
+        if (!decimal.TryParse(_inputValues[1], out var input2))
+        {
+            return false;
+        }
+        if (!decimal.TryParse(_conditionValues[0], out var threshold))
+        {
+            return false;
+        }
 
-        decimal absoluteDifference = Math.Abs(input2 - input1);
-
+        var absoluteDifference = Math.Abs(input2 - input1);
         return absoluteDifference > threshold;
     }
 
