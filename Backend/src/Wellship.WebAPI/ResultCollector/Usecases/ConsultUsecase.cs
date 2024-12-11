@@ -248,19 +248,10 @@ public class ConsultUsecase : IConsultUsecase
                             ExamItemDetailId = ed.ExamItemDetailId,
                             EquipmentLabel = ed.EquipmentLabel,
                             Name = ed.Name,
-                            HasOrder = examOrders.ExamItemDetailOrders.Where(x => x.ExamItemDetailId == ed.ExamItemDetailId).Any(),
-                            CancelReasonId = examCancels.ExamItemDetailCancels.Where(x => x.ExamItemDetailId == ed.ExamItemDetailId).Any()
-                                            ? examCancels.ExamItemDetailCancels.Where(x => x.ExamItemDetailId == ed.ExamItemDetailId)
-                                                                               .Select(x => x.CancelReasonId).ElementAt(0) 
-                                            : null,
-                            Value = examResults.ExamItemDetailResults.Where(x => x.ExamItemDetailId == ed.ExamItemDetailId).Any()
-                                            ? examResults.ExamItemDetailResults.Where(x => x.ExamItemDetailId == ed.ExamItemDetailId)
-                                                                               .Select(x => x.Value).ElementAt(0)
-                                            : "",  
-                            PrevValue = previousResults.ExamItemDetailResults.Where(x => x.ExamItemDetailId == ed.ExamItemDetailId).Any()
-                                            ? previousResults.ExamItemDetailResults.Where(x => x.ExamItemDetailId == ed.ExamItemDetailId)
-                                                                                   .Select(x => x.Value).ElementAt(0)
-                                            : "",  
+                            HasOrder = examOrders.ExamItemDetailOrders.Any(x => x.ExamItemDetailId == ed.ExamItemDetailId),
+                            CancelReasonId = examCancels.ExamItemDetailCancels.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.CancelReasonId,
+                            Value = examResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
+                            PrevValue = previousResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
                             Unit = ed.Unit,
                             Type = (int)ed.Type,
                             IntegerLength = ed.IntegerLength,
@@ -286,7 +277,7 @@ public class ConsultUsecase : IConsultUsecase
                             // 検査正常値範囲
                             ExamNormalValueRanges = 
                                 examNormalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
-                                                     .OrderBy(r => r.Priority)
+                                                     .OrderBy(r => r.ErrorLevel)
                                                      .Select(r => new ExamNormalValueRange
                                                         {
                                                             ErrorLevel = (int)r.ErrorLevel,

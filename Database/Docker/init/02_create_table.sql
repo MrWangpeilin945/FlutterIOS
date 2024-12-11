@@ -6,7 +6,6 @@ set search_path = resultcollector;
 CREATE TABLE affiliations (
   examinee_id integer NOT NULL
   , organization_id integer NOT NULL
-  , priority integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT affiliations_PKC PRIMARY KEY (examinee_id,organization_id)
@@ -630,7 +629,6 @@ ALTER TABLE tickets
 COMMENT ON TABLE affiliations IS '所属';
 COMMENT ON COLUMN affiliations.examinee_id IS '受診者ID';
 COMMENT ON COLUMN affiliations.organization_id IS '団体ID';
-COMMENT ON COLUMN affiliations.priority IS '優先度';
 COMMENT ON COLUMN affiliations.created_at IS '作成日時';
 COMMENT ON COLUMN affiliations.created_by IS '作成者';
 
@@ -963,3 +961,4 @@ COMMENT ON COLUMN exam_menus.name IS '検査メニュー名';
 COMMENT ON COLUMN exam_menus.order_number IS '表示順';
 COMMENT ON COLUMN exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN exam_menus.created_by IS '作成者';
+
