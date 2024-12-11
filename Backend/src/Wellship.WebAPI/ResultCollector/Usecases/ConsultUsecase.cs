@@ -213,7 +213,8 @@ public class ConsultUsecase : IConsultUsecase
         // 基準値パターンIDを取得
         var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
         // 検査正常値範囲を取得
-        var examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds);
+        var examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
+        /*
         // 検査正常値範囲を対象年齢・対象性別で絞り込む
         List<Domain.Models.ExamNormalValueRange> normalValueRanges = new List<Domain.Models.ExamNormalValueRange>();
         foreach (var normatValue in examNormalValueRanges.Where(x => ((int)x.TargetSex & (int)examinee.Sex) == (int)examinee.Sex))
@@ -225,6 +226,7 @@ public class ConsultUsecase : IConsultUsecase
                 normalValueRanges.Add(normatValue);
             }
         }
+        */
         // 検査中止を取得
         var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
         // 検査依頼を取得
@@ -296,14 +298,14 @@ public class ConsultUsecase : IConsultUsecase
                                                         }).ToArray(),
                             // 検査正常値範囲
                             ExamNormalValueRanges = 
-                                normalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
-                                                 .OrderBy(r => r.Priority)
-                                                 .Select(r => new ExamNormalValueRange
-                                                 {
-                                                    ErrorLevel = (int)r.ErrorLevel,
-                                                    MaxValue = r.MaxValue,
-                                                    MinValue = r.MinValue
-                                                 }).ToArray()
+                                examNormalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
+                                                     .OrderBy(r => r.Priority)
+                                                     .Select(r => new ExamNormalValueRange
+                                                        {
+                                                            ErrorLevel = (int)r.ErrorLevel,
+                                                            MaxValue = r.MaxValue,
+                                                            MinValue = r.MinValue
+                                                        }).ToArray()
                         }).ToArray(),
                         ExamRegistResults = []      // TODO: 検査結果登録エラー 後方作業へ
                     }).ToArray()

@@ -1,3 +1,6 @@
+using Ryobi.Wellship.Core.Enums;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 /// <summary>
@@ -28,5 +31,7 @@ public interface IExamItemRepository
     /// </summary>
     /// <param name="thresholdIds">基準値パターンID</param>
     /// <param name="examItemDetailIds">検査項目明細ID</param>
-    Task<IEnumerable<Models.ExamNormalValueRange>> GetExamNormalValueRangesAsync(int[] thresholdIds, int[] examItemDetailIds);
+    /// <param name="age">受診者の健診時の年齢</param>
+    /// <param name="sex">受診者の性別</param>
+    Task<IEnumerable<Models.ExamNormalValueRange>> GetExamNormalValueRangesAsync(int[] thresholdIds, int[] examItemDetailIds, Age age, Sex sex);
 }

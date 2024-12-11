@@ -2,6 +2,7 @@
 using System.Runtime.Intrinsics.Arm;
 using Dapper;
 
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
@@ -139,7 +140,9 @@ public class ExamItemRepository : IExamItemRepository
     /// </summary>
     /// <param name="thresholdIds">基準値パターンID</param>
     /// <param name="examItemDetailIds">検査項目明細ID</param>
-    public async Task<IEnumerable<ExamNormalValueRange>> GetExamNormalValueRangesAsync(int[] thresholdIds, int[] examItemDetailIds)
+    /// <param name="age">受診者の健診時の年齢</param>
+    /// <param name="sex">受診者の性別</param>
+    public async Task<IEnumerable<ExamNormalValueRange>> GetExamNormalValueRangesAsync(int[] thresholdIds, int[] examItemDetailIds, Age age, Sex sex)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
@@ -159,7 +162,8 @@ public class ExamItemRepository : IExamItemRepository
             on r.threshold_id = ct.threshold_id
         where r.threshold_id = any(@ThresholdIds)
         and r.exam_item_detail_id = any(@ExamItemDetailIds);";
-        return await connection.QueryAsync<ExamNormalValueRange>(sql, 
-                                new { ThresholdIds = thresholdIds, ExamItemDetailIds = examItemDetailIds });
+        var normalValueRanges = await connection.QueryAsync<ExamNormalValueRange>(sql, 
+                                        new { ThresholdIds = thresholdIds, ExamItemDetailIds = examItemDetailIds });
+        return normalValueRanges.Where(x => x.IsTargetAge(age) && x.IsTargetSex(sex));
     }
 }
