@@ -212,7 +212,7 @@ export default function consultNumberInput() {
               </Title>
             </Group>
             <Center>
-              <div ref={focusTrapRef}>
+              <div>
                 <Group mt={50}>
                   <Paper
                     className={styles["basic-grey"]}
@@ -232,6 +232,7 @@ export default function consultNumberInput() {
                       onFocus={() => setShowKeyboard(true)}
                       onChange={(e) => handleInputChange(e)}
                       onKeyDown={handleKeyDown}
+                      ref={focusTrapRef}
                     />
                   </Box>
                 </Group>
