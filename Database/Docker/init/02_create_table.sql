@@ -4,16 +4,16 @@
 set search_path = resultcollector;
 
 CREATE TABLE affiliations (
-  examinee_id integer NOT NULL
-  , organization_id integer NOT NULL
+  examinee_id uuid NOT NULL
+  , organization_id uuid NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT affiliations_PKC PRIMARY KEY (examinee_id,organization_id)
 );
 
 CREATE TABLE consult_thresholds (
-  threshold_id integer NOT NULL
-  , consult_id integer NOT NULL
+  threshold_id uuid NOT NULL
+  , consult_id uuid NOT NULL
   , priority integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -33,7 +33,7 @@ CREATE TABLE equipments (
 
 CREATE TABLE exam_cancel_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
-  , consult_id integer NOT NULL
+  , consult_id uuid NOT NULL
   , consult_item_detail_id integer NOT NULL
   , value text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -42,7 +42,7 @@ CREATE TABLE exam_cancel_histories (
 );
 
 CREATE TABLE exam_cancels (
-  consult_id integer NOT NULL
+  consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
   , cancel_reason_id integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -58,7 +58,7 @@ CREATE TABLE exam_decision_rule (
 );
 
 CREATE TABLE exam_item_detail_orders (
-  consult_id integer NOT NULL
+  consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -66,7 +66,7 @@ CREATE TABLE exam_item_detail_orders (
 );
 
 CREATE TABLE exam_item_notes (
-  consult_id integer NOT NULL
+  consult_id uuid NOT NULL
   , exam_item_id integer NOT NULL
   , note text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -83,9 +83,9 @@ CREATE TABLE exam_normal_option_details (
 );
 
 CREATE TABLE exam_normal_options (
-  normal_options_id integer NOT NULL
+  normal_options_id uuid DEFAULT gen_random_uuid () NOT NULL
   , name text NOT NULL
-  , threshold_id integer NOT NULL
+  , threshold_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
   , max_age varchar(7) NOT NULL
   , min_age varchar(7) NOT NULL
@@ -100,9 +100,9 @@ ALTER TABLE exam_normal_options ADD CONSTRAINT exam_normal_options_IX1
   UNIQUE (threshold_id,exam_item_detail_id,max_age,target_sex,error_level) ;
 
 CREATE TABLE exam_normal_value_range (
-  range_id integer NOT NULL
+  range_id uuid DEFAULT gen_random_uuid () NOT NULL
   , name text NOT NULL
-  , threshold_id integer NOT NULL
+  , threshold_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
   , max_age varchar(7) NOT NULL
   , min_age varchar(7) NOT NULL
@@ -127,7 +127,7 @@ CREATE TABLE exam_result_correlation_rules (
 
 CREATE TABLE exam_result_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
-  , consult_id integer NOT NULL
+  , consult_id uuid NOT NULL
   , consult_item_detail_id integer NOT NULL
   , value text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -136,7 +136,7 @@ CREATE TABLE exam_result_histories (
 );
 
 CREATE TABLE exam_results (
-  consult_id integer NOT NULL
+  consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
   , value text
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -146,7 +146,7 @@ CREATE TABLE exam_results (
 
 CREATE TABLE export_history_details (
   id uuid NOT NULL
-  , consult_id integer NOT NULL
+  , consult_id uuid NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT export_history_details_PKC PRIMARY KEY (id,consult_id)
@@ -176,7 +176,7 @@ CREATE TABLE keyboard_options (
 );
 
 CREATE TABLE organizations (
-  organization_id integer NOT NULL
+  organization_id uuid DEFAULT gen_random_uuid () NOT NULL
   , organization_code text NOT NULL
   , name text NOT NULL
   , order_number integer NOT NULL
@@ -190,7 +190,7 @@ ALTER TABLE organizations ADD CONSTRAINT organizations_IX1
 
 CREATE TABLE place_schedule_lock_histoies (
   id uuid DEFAULT gen_random_uuid () NOT NULL
-  , place_schedule_id integer NOT NULL
+  , place_schedule_id uuid NOT NULL
   , status integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -198,7 +198,7 @@ CREATE TABLE place_schedule_lock_histoies (
 );
 
 CREATE TABLE previous_results (
-  consult_id integer NOT NULL
+  consult_id uuid NOT NULL
   , exam_date date NOT NULL
   , exam_item_detail_id integer NOT NULL
   , value text NOT NULL
@@ -225,7 +225,7 @@ CREATE TABLE role_permissions (
 
 CREATE TABLE staff_login_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
-  , staff_id integer NOT NULL
+  , staff_id uuid NOT NULL
   , login_timestamp timestamp with time zone NOT NULL
   , login_success boolean NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -234,7 +234,7 @@ CREATE TABLE staff_login_histories (
 );
 
 CREATE TABLE staffs (
-  staff_id integer NOT NULL
+  staff_id uuid DEFAULT gen_random_uuid () NOT NULL
   , staff_code text NOT NULL
   , login_id text NOT NULL
   , name text NOT NULL
@@ -254,7 +254,7 @@ ALTER TABLE staffs ADD CONSTRAINT staffs_IX2
   UNIQUE (login_id) ;
 
 CREATE TABLE thresholds (
-  threshold_id integer NOT NULL
+  threshold_id uuid DEFAULT gen_random_uuid () NOT NULL
   , threshold_code text NOT NULL
   , name text NOT NULL
   , order_number integer NOT NULL
@@ -264,7 +264,7 @@ CREATE TABLE thresholds (
 );
 
 CREATE TABLE tickets (
-  consult_id integer NOT NULL
+  consult_id uuid NOT NULL
   , ticket_number text
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -273,7 +273,7 @@ CREATE TABLE tickets (
 
 CREATE TABLE tickets_histories (
   id uuid NOT NULL
-  , consult_id integer
+  , consult_id uuid
   , ticket_number text
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -291,13 +291,13 @@ CREATE TABLE cancel_reasons (
 );
 
 CREATE TABLE consult (
-  consult_id integer NOT NULL
+  consult_id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_number text NOT NULL
   , progress_status integer NOT NULL
   , export_status integer NOT NULL
-  , place_schedule_id integer NOT NULL
+  , place_schedule_id uuid NOT NULL
   , note text NOT NULL
-  , examinee_id integer NOT NULL
+  , examinee_id uuid NOT NULL
   , external_connection_code text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -350,7 +350,7 @@ CREATE TABLE exam_items (
 );
 
 CREATE TABLE examinees (
-  examinee_id integer NOT NULL
+  examinee_id uuid DEFAULT gen_random_uuid () NOT NULL
   , examinee_code text NOT NULL
   , name text NOT NULL
   , kana_name text NOT NULL
@@ -366,7 +366,7 @@ ALTER TABLE examinees ADD CONSTRAINT examinees_IX1
 
 CREATE TABLE export_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
-  , place_schedule_id integer NOT NULL
+  , place_schedule_id uuid NOT NULL
   , exported_at timestamp with time zone NOT NULL
   , exported_by text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -392,9 +392,9 @@ CREATE TABLE home_menu_groups (
 );
 
 CREATE TABLE place_schedule (
-  place_schedule_id integer NOT NULL
-  , place_id integer NOT NULL
-  , team_id integer NOT NULL
+  place_schedule_id uuid DEFAULT gen_random_uuid () NOT NULL
+  , place_id uuid NOT NULL
+  , team_id uuid NOT NULL
   , status integer NOT NULL
   , exam_date date NOT NULL
   , start_time varchar(4) NOT NULL
@@ -404,7 +404,7 @@ CREATE TABLE place_schedule (
 );
 
 CREATE TABLE places (
-  place_id integer NOT NULL
+  place_id uuid DEFAULT gen_random_uuid () NOT NULL
   , place_code text NOT NULL
   , name text NOT NULL
   , order_number integer NOT NULL
@@ -425,7 +425,7 @@ CREATE TABLE roles (
 );
 
 CREATE TABLE teams (
-  team_id integer NOT NULL
+  team_id uuid DEFAULT gen_random_uuid () NOT NULL
   , team_code text NOT NULL
   , name text NOT NULL
   , order_number integer NOT NULL
