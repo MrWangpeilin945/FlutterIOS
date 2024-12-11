@@ -1,6 +1,6 @@
 
 using Dapper;
-
+using Namotion.Reflection;
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
@@ -34,18 +34,26 @@ public class ExamineeRepository : IExamineeRepository
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
         select
-            examinee_id as ExamineeId
-            , examinee_code as ExamineeCode
-            , name as Name
-            , kana_name as KanaName
-            , sex as Sex
-            , birthdate as Birthdate 
+            e.examinee_id as ExamineeId
+            , e.examinee_code as ExamineeCode
+            , e.name as Name
+            , e.kana_name as KanaName
+            , e.sex as Sex
+            , e.birthdate as Birthdate 
+            , a.organization_id as OrganizationId
+            , o.organization_code as OrganizationCode
+            , o.name as OrganizationName
+            , o.order_number as OrderNumber
         from
-            resultcollector.examinees 
+            resultcollector.examinees e
+            left join resultcollector.affiliations a
+                on e.examinee_id = a.examinee_id
+            left join resultcollector.organizations o
+                on a.organization_id = o.organization_id
         where
-            examinee_id = @ExamineeId;";
+            e.examinee_id = @ExamineeId;";
 
-        var examinee = await connection.QuerySingleOrDefaultAsync<ExamineeEntity>(sql, new { ExamineeId = examineeId });
+        var examinee = await connection.QueryAsync<ExamineeEntity>(sql, new { ExamineeId = examineeId });
 
         if (examinee is null)
         {
@@ -54,12 +62,44 @@ public class ExamineeRepository : IExamineeRepository
 
         return new Examinee()
         {
-            ExamineeId = examinee.ExamineeId,
-            ExamineeCode = examinee.ExamineeCode,
-            Name = examinee.Name,
-            KanaName = examinee.KanaName,
-            Sex = (Sex)examinee.Sex,
-            Birthdate = new Birthdate(DateOnly.FromDateTime(examinee.Birthdate))
+            ExamineeId = examinee.First().ExamineeId,
+            ExamineeCode = examinee.First().ExamineeCode,
+            Name = examinee.First().Name,
+            KanaName = examinee.First().KanaName,
+            Sex = (Sex)examinee.First().Sex,
+            Birthdate = new Birthdate(DateOnly.FromDateTime(examinee.First().Birthdate)),
+            // TODO: 団体が存在しないときにNULLが返るのを修正する
+            Affiliations = examinee.Select(x => new Affiliations
+                                    {
+                                        OrganizationId = x.OrganizationId,
+                                        OrganizationCode = x.OrganizationCode,
+                                        OrganizationName = x.OrganizationName,
+                                        OrderNumber = x.OrderNumber
+                                    }) ?? []
         };
+    }
+
+    /// <summary>
+    /// 所属団体を取得します。
+    /// </summary>
+    /// <param name="examineeId">受診者ID</param>
+    public async Task<IEnumerable<Affiliations>> GetAffiliationsAsync(int examineeId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            a.organization_id as OrganizationId
+            , o.organization_code as OrganizationCode
+            , o.name as Name
+            , a.priority as Priority
+            , o.order_number as OrderNumber
+        from
+            resultcollector.affiliations a
+            left join resultcollector.organizations o
+            on a.organization_id = o.organization_id
+        where
+            examinee_id = @ExamineeId;";
+
+        return await connection.QueryAsync<Affiliations>(sql, new { ExamineeId = examineeId });
     }
 }

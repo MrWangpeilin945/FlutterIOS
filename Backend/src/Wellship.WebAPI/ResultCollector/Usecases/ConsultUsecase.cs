@@ -103,9 +103,39 @@ public class ConsultUsecase : IConsultUsecase
     /// <summary>
     /// 検査内容を取得する
     /// </summary>
-    public void GetExamItemsExaminee()
+    public async Task<ExamContent> GetExamItemsExamineeAsync(string consultNumber, int examMenuId)
     {
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
+        // 会場日程IDを指定して会場日程を取得する
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
+        // 健診日
+        DateOnly examDate = placeSchedule.ExamDate;
+        // 受診日の年齢
+        // NOTE: 年齢加算日は暫定で前日年齢加算
+        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
 
+        return new ExamContent()
+        {
+            ConsultNumber = consultNumber,
+            Examinee = new Examinee()
+            {
+                TicketNumber = consult.TicketNumber,
+                Name = examinee.Name,
+                KanaName = examinee.KanaName,
+                Birthdate = examinee.Birthdate.Value,
+                Sex = (int)examinee.Sex,
+                Organizations = examinee.Affiliations.OrderBy(x => x.OrderNumber)
+                                                     .Select(x => x.OrganizationName).ToArray(),
+                SameNameAlert = true,       // TODO: 同姓同名アラート
+                ExamDateAge = examAge.Years
+            },
+            IsComplete = true,          // TODO: 検査実施判断
+            RelatedExamItems = [],      // TODO: 関連検査項目
+            ExamItems = [],             // TODO: 実施検査項目
+            ExamDecisionResult = [],    // TODO: 検査実施判断結果
+            UnexaminedItems = []        // TODO: 未実施検査項目
+        };
     }
 
     /// <summary>

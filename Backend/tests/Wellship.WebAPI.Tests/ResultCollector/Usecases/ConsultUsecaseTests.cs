@@ -108,12 +108,19 @@ public class ConsultUsecaseTests
         _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(1))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
-                              ExamineeId = 1,
-                              ExamineeCode = "10001",
-                              Name = "両備　太郎",
-                              KanaName = "リョウビ　タロウ",
-                              Sex = Sex.男,
-                              Birthdate = new Birthdate("19991129")
+                                ExamineeId = 1,
+                                ExamineeCode = "10001",
+                                Name = "両備　太郎",
+                                KanaName = "リョウビ　タロウ",
+                                Sex = Sex.男,
+                                Birthdate = new Birthdate("19991129"),
+                                Affiliations = [new Affiliations
+                                {
+                                    OrganizationId = 1,
+                                    OrganizationCode = "0001",
+                                    OrganizationName = "",
+                                    OrderNumber = 1
+                                }]
                           });
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
@@ -146,12 +153,19 @@ public class ConsultUsecaseTests
         _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(1))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
-                              ExamineeId = 1,
-                              ExamineeCode = "10001",
-                              Name = "両備　太郎",
-                              KanaName = "リョウビ　タロウ",
-                              Sex = Sex.男,
-                              Birthdate = new Birthdate("19991129")
+                                ExamineeId = 1,
+                                ExamineeCode = "10001",
+                                Name = "両備　太郎",
+                                KanaName = "リョウビ　タロウ",
+                                Sex = Sex.男,
+                                Birthdate = new Birthdate("19991129"),
+                                Affiliations = [new Affiliations
+                                {
+                                    OrganizationId = 1,
+                                    OrganizationCode = "0001",
+                                    OrganizationName = "",
+                                    OrderNumber = 1
+                                }]
                           });
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,

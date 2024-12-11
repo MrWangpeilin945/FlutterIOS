@@ -36,4 +36,9 @@ public class Examinee
     /// 生年月日
     /// </summary>
     public required Birthdate Birthdate { get; init; }
+
+    /// <summary>
+    /// 所属団体
+    /// </summary>
+    public required IEnumerable<Affiliations> Affiliations { get; init; }
 }
