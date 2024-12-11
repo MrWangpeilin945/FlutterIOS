@@ -22,7 +22,6 @@ import type {
 import { InputErrorLevel } from "~/domain/enums";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
-import Index from "~/routes/_index";
 
 type ExamNumericLRProps = {
   examItems: InputExamItem[];
@@ -134,14 +133,17 @@ export default function ExamNumericLR({
     updatedExamItems();
   };
 
+  // エラーメッセージ用の関数
+  const handleErrorMessages = () => {
+    const APIMessages = e;
+  };
   // APIのエラーメッセージの取得
   const getAPIErrorMessages = () => {
-    const updatedExamItem = updatedExamItems();
     // TODO:共通関数の追加 ExamNormalValueRangeを参照したエラーメッセージを追加
-    const examItem = setRangesErrorMessage(updatedExamItem);
+    const examItem = setRangesErrorMessage(examItems[0]);
     const APIerror = examItem.examRegistResults || [];
-    console.log(examItem.examItemDetails);
-    console.log(updatedExamItem.examItemDetails);
+    console.log(examItem.examRegistResults);
+    console.log(examItems[0].examRegistResults);
     console.log(examValues);
     return APIerror || [];
   };
@@ -175,23 +177,27 @@ export default function ExamNumericLR({
   };
   // 必須バリデーションチェック
   const validationRequire = () => {
-    const requireSchema = z
-      .string()
-      .min(
-        1,
-        getErrorMessage(errorMessages.required, `${examItems[0].name}は`)
-      );
-    for (const examValue of examValues) {
+    const requireMessages: ExamRegistResult[] = [];
+    examValues.forEach((examValue, index) => {
+      const requireSchema = z
+        .string()
+        .min(
+          1,
+          getErrorMessage(
+            errorMessages.required,
+            `${examItems[0].name}の${firstExamItemDetails[index].name}は`
+          )
+        );
       const result = requireSchema.safeParse(examValue);
       if (!result.success && onRegisterPressed) {
-        const numericMessage: ExamRegistResult = {
+        const requireMessage: ExamRegistResult = {
           description: result.error.errors[0].message,
           errorLevel: InputErrorLevel.異常,
         };
-        return [numericMessage];
+        requireMessages.push(requireMessage);
       }
-      return [];
-    }
+    });
+    return requireMessages;
   };
 
   // 重複を削除して、エラーレベルに応じた並び替えを行う
@@ -207,8 +213,9 @@ export default function ExamNumericLR({
   // バリデーションチェックの走査
   useEffect(() => {
     const result = sortErrorMessages(
-      getAPIErrorMessages().concat(validationNumeric())
-      // .concat(validationRequire())
+      getAPIErrorMessages()
+        .concat(validationNumeric())
+        .concat(validationRequire())
     );
     setErrMessages(result);
   }, [examValues, onRegisterPressed]);
