@@ -214,19 +214,6 @@ public class ConsultUsecase : IConsultUsecase
         var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
         // 検査正常値範囲を取得
         var examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
-        /*
-        // 検査正常値範囲を対象年齢・対象性別で絞り込む
-        List<Domain.Models.ExamNormalValueRange> normalValueRanges = new List<Domain.Models.ExamNormalValueRange>();
-        foreach (var normatValue in examNormalValueRanges.Where(x => ((int)x.TargetSex & (int)examinee.Sex) == (int)examinee.Sex))
-        {
-            var targetAge = new Domain.Models.TargetAge(normatValue.MinAge, normatValue.MaxAge);
-            if (targetAge.IsTargetAge(examAge))
-            {
-                // 対象年齢
-                normalValueRanges.Add(normatValue);
-            }
-        }
-        */
         // 検査中止を取得
         var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
         // 検査依頼を取得
