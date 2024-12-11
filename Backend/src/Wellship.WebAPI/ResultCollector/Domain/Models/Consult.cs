@@ -36,4 +36,9 @@ public class Consult
     /// 受診者ID
     /// </summary>
     public required int ExamineeId { get; init; }
+
+    /// <summary>
+    /// 受付番号
+    /// </summary>
+    public required string TicketNumber { get; init; }
 }

@@ -82,6 +82,20 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
     /// <summary>
     /// 会場日程IDを指定して会場日程を取得する
     /// </summary>
+    public async Task<Domain.Models.PlaceSchedule> GetPlaceScheduleAsync(int placeScheduleId)
+    {
+        var placeSchedule = await GetPlaceSchedulesAsync([placeScheduleId]);
+        if(!placeSchedule.Any())
+        {
+            // 会場日程が存在しない            
+            throw new PlaceScheduleNotFoundException();
+        }
+        return placeSchedule.ElementAt(0);
+    }
+
+    /// <summary>
+    /// 会場日程IDを指定して会場日程を取得する
+    /// </summary>
     public async Task<IEnumerable<Domain.Models.PlaceSchedule>> GetPlaceSchedulesAsync(int[] placeScheduleIds)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();

@@ -103,6 +103,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IIntegrationRepository, IntegrationRepository>();
         services.AddScoped<IExamineeRepository, ExamineeRepository>();
         services.AddScoped<ICancelReasonRepository, CancelReasonRepository>();
+        services.AddScoped<IExamItemRepository, ExamItemRepository>();
         return services;
     }
     /// <summary>

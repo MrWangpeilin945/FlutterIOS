@@ -198,7 +198,7 @@ list.Count()  <> 0
 |列|登録値|処理・変換
 
 |examinee_id
-|max(examinees(受診者).examinee_id(受診者コード)) + 1
+|dotNet `Guid.NewGuid()`
 |
 
 |examinee_code

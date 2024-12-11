@@ -38,7 +38,7 @@ flowchart TD
 
 [source]
 ----
-StoreorganizationsAsync
+StoreOrganizationsAsync
 ----
 
 ==== 引数
@@ -151,8 +151,8 @@ list.Count()  <> 0
 |列|登録値|処理・変換
 
 |organization_id
-|max([DB]organizations(団体).organization_id(団体ID)) + 1
 |
+|DB:DEFAULT
 
 |organization_code
 |Organization.Code
