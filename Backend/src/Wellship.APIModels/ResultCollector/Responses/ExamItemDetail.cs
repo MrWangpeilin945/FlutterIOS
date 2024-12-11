@@ -41,7 +41,7 @@ public class ExamItemDetail
     /// 中止理由ID
     /// </summary>
     [JsonPropertyName("cancelReasonId")]
-    public required int CancelReasonId { get; init; }
+    public required int? CancelReasonId { get; init; }
 
     /// <summary>
     /// 今回値

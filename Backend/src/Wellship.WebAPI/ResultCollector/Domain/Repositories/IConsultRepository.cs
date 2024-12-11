@@ -43,4 +43,26 @@ public interface IConsultRepository
     /// すでに同じ検査項目明細の中止が存在すれば上書き更新、存在しなければ新規作成します。
     /// </summary>
     public Task SaveExamCancelsAsync(int consultId, IEnumerable<ExamItemCancel> examItemCancels);
+
+    /// <summary>
+    /// 基準値の基準値パターンIDを取得する
+    /// </summary>
+    /// <param name="consultId">受診ID</param>
+    public Task<IEnumerable<int>> GetConsultThresholds(int consultId);
+
+    /// <summary>
+    /// 受診を指定して検査依頼を取得します。
+    /// </summary>
+    public Task<ExamOrder> GetExamOrdersAsync(int consultId);
+
+    /// <summary>
+    /// 受診を指定して検査結果を取得します。
+    /// </summary>
+    public Task<ExamResult> GetExamResultsAsync(int consultId);
+
+    /// <summary>
+    /// 受診を指定して過去検査結果を取得します。
+    /// </summary>
+    public Task<PreviousResult> GetPreviousResultsAsync(int consultId, DateOnly examDate);
+
 }

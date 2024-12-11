@@ -53,7 +53,7 @@
 {
   "consultNumber": "012345678",
   "examinee" : {
-    "receptionNumber" : 10,
+    "ticketNumber" : "10",
     "kanaName" : "リョウビ　タロウ",
     "sex" : 1,
     "examDateAge" : 49
@@ -127,3 +127,4 @@
 ** JWT認証に失敗
 * 404 NotFound
 ** 指定した受診が存在しない
+** 指定した会場日程が存在しない
