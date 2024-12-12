@@ -22,9 +22,9 @@
 
 |placeScheduleId
 |Yes
-|number
+|string
 |出力対象の会場日程ID
-|28
+|`ed282fd3-8ef5-426a-b1c3-c2a0fced1c13`
 
 |===
 
@@ -37,7 +37,7 @@
 [source,json]
 ----
 {
-  "placeScheduleId": 28
+  "placeScheduleId": "ed282fd3-8ef5-426a-b1c3-c2a0fced1c13"
 }
 ----
 
