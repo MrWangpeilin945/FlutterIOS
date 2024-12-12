@@ -8,7 +8,7 @@ public class Place
     /// <summary>
     /// 会場ID
     /// </summary>
-    public required int Id { get; init; }
+    public required Guid Id { get; init; }
 
     /// <summary>
     /// 会場コード

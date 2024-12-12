@@ -25,13 +25,13 @@ public class HomeMenuUsecase : IHomeMenuUsecase
     /// <summary>
     /// ホームメニュー項目を取得する
     /// </summary>
-    public async Task<HomeMenuGroupList> GetHomeMenusAsync(int? placeScheduleId)
+    public async Task<HomeMenuGroupList> GetHomeMenusAsync(Guid? placeScheduleId)
     {
         // 会場日程IDが渡された場合、会場ロック状況を取得する
         int? status = placeScheduleId switch
         {
             null => null,
-            not null => (await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync((int)placeScheduleId)).Status
+            not null => (await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync((Guid)placeScheduleId)).Status
         };
 
         // 機能ごとの利用可能条件の設定

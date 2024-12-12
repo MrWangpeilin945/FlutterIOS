@@ -15,5 +15,5 @@ public interface IStaffRepository
     /// 職員IDで職員を取得します。
     /// </summary>
     /// <param name="staffId">職員ID</param>
-    public Task<Models.Staff> GetStaffByStaffIdAsync(int staffId);
+    public Task<Models.Staff> GetStaffByStaffIdAsync(Guid staffId);
 }

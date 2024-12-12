@@ -11,7 +11,7 @@ public class Staff
     /// 職員ID
     /// </summary>
     [JsonPropertyName("staffId")]
-    public required int StaffId { get; init; }
+    public required Guid StaffId { get; init; }
 
     /// <summary>
     /// 職員名

@@ -1506,12 +1506,12 @@ TableOption=
 Page=MAIN
 Left=3500
 Top=700
-Field="基準値選択肢ID","normal_options_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="基準値選択肢ID","normal_options_id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
 Field="選択肢ID","option_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241205125714
+ModifiedDateTime=20241211152544
 Position="MAIN",3500,700
 ZOrder=88
 

@@ -75,7 +75,7 @@ CREATE TABLE exam_item_notes (
 );
 
 CREATE TABLE exam_normal_option_details (
-  normal_options_id integer NOT NULL
+  normal_options_id uuid NOT NULL
   , option_id integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL

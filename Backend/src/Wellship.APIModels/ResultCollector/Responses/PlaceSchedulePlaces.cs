@@ -11,7 +11,7 @@ public class PlaceSchedulePlaces
     /// 班ID
     /// </summary>
     [JsonPropertyName("teamId")]
-    public required int TeamId { get; init; }
+    public required Guid TeamId { get; init; }
 
     /// <summary>
     /// 班名
