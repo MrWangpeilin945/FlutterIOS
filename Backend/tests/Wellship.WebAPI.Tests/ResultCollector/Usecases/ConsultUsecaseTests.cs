@@ -92,9 +92,9 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(x => x.GetUnexaminedConsultsAsync(new[] { consultNumber }))
                          .ReturnsAsync([
                             new(){
-                                ConsultId = Guid.Parse("801564fd-693e-485a-9a46-b08096af6f72"),
+                                ConsultId = Guid.Parse("8d670eb8-d9f2-40b2-bfa6-cef6403be53d"),
                                 ConsultNumber = "0001",
-                                ExamineeId = Guid.Parse("0c12f466-4aeb-4082-be96-6de8d9dd7b1f"),
+                                ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
                                 UnexaminedExamMenus = [
                                     new UnexaminedExamMenu(){
                                         ExamMenuId = 1,
@@ -105,10 +105,10 @@ public class ConsultUsecaseTests
                                         ExamMenuName = "血圧"
                                     }]}]);
 
-        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("f453b9de-dfe7-4559-90e0-d71f7751e92a")))
+        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3")))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
-                              ExamineeId = Guid.Parse("c3a77574-4acd-43a3-8f93-d8f3fa2c3e6a"),
+                              ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
                               ExamineeCode = "10001",
                               Name = "両備　太郎",
                               KanaName = "リョウビ　タロウ",
@@ -143,10 +143,10 @@ public class ConsultUsecaseTests
             ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
             TicketNumber = "1029"
         });
-        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("1e5cd89e-66f9-445a-b3e4-4e34654e6a2c")))
+        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df")))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
-                              ExamineeId = Guid.Parse("7743875d-c775-4333-a40a-6de633b42cfc"),
+                              ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
                               ExamineeCode = "10001",
                               Name = "両備　太郎",
                               KanaName = "リョウビ　タロウ",
