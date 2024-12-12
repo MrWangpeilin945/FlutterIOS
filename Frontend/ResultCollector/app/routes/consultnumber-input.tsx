@@ -212,31 +212,29 @@ export default function consultNumberInput() {
               </Title>
             </Group>
             <Center>
-              <div>
-                <Group mt={50}>
-                  <Paper
-                    className={styles["basic-grey"]}
-                    radius="lg"
-                    px="xl"
-                    py="md"
-                  >
-                    <Title order={1} fw={500}>
-                      受診番号
-                    </Title>
-                  </Paper>
-                  <Box>
-                    <TextInput
-                      data-autofocus
-                      size="xl"
-                      value={consultNumber || ""}
-                      onFocus={() => setShowKeyboard(true)}
-                      onChange={(e) => handleInputChange(e)}
-                      onKeyDown={handleKeyDown}
-                      ref={focusTrapRef}
-                    />
-                  </Box>
-                </Group>
-              </div>
+              <Group mt={50}>
+                <Paper
+                  className={styles["basic-grey"]}
+                  radius="lg"
+                  px="xl"
+                  py="md"
+                >
+                  <Title order={1} fw={500}>
+                    受診番号
+                  </Title>
+                </Paper>
+                <Box>
+                  <TextInput
+                    data-autofocus
+                    size="xl"
+                    value={consultNumber || ""}
+                    onFocus={() => setShowKeyboard(true)}
+                    onChange={(e) => handleInputChange(e)}
+                    onKeyDown={handleKeyDown}
+                    ref={focusTrapRef}
+                  />
+                </Box>
+              </Group>
             </Center>
             {showKeyboard && (
               <Center>
