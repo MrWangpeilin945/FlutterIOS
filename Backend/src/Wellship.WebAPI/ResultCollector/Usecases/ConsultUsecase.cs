@@ -298,7 +298,6 @@ public class ConsultUsecase : IConsultUsecase
     /// </summary>
     public async Task<IEnumerable<Domain.Models.RangeError>> ValidateNormalValueRangeAsync(string consultNumber, ResultsRequest result)
     {
-        var examMenuId = result.ExamMenuId;
         var consult = await _consultRepository.GetConsultAsync(consultNumber);
         var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
@@ -307,22 +306,18 @@ public class ConsultUsecase : IConsultUsecase
         // NOTE: 年齢加算日は暫定で前日年齢加算
         var examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
 
-        var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
-        var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
-        var examItemDetailIds = examItemGroups.SelectMany(group => group.ExamItems)
-                                              .SelectMany(item => item.ExamItemDetails)
-                                              .Select(detail => detail.ExamItemDetailId)
-                                              .ToArray();
-
-        // 検査正常値範囲を取得（年齢と性別による絞り込み）
-        var ranges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
-
         // DBとリクエスト値から今回値を取得して合成する（リクエスト値を優先する）
         var dbCurrentResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
         var dbCurrentMap = dbCurrentResults.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value);
         var requestMap = result.ExamResults.SelectMany(x => x.ExamItemDetails).ToDictionary(x => x.ExamItemDetailId, x => x.Value);
         var currentMap = requestMap.Concat(dbCurrentMap.Where(x => !requestMap.ContainsKey(x.Key)))
                                    .ToDictionary(x => x.Key, x => x.Value);
+
+        var examItemDetailIds = currentMap.Select(x => x.Key).ToArray();
+
+        // 検査正常値範囲を取得（年齢と性別による絞り込み）
+        var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
+        var ranges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
 
         var errors = new List<Domain.Models.RangeError>();
         foreach (var current in currentMap)
