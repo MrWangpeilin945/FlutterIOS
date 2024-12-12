@@ -84,6 +84,7 @@ CREATE TABLE exam_menu_note_consult (
 CREATE TABLE exam_menu_note_exam_items (
   menu_note_id integer NOT NULL
   , exam_item_id integer NOT NULL
+  , order_number integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_menu_note_exam_items_PKC PRIMARY KEY (menu_note_id,exam_item_id)
@@ -92,7 +93,8 @@ CREATE TABLE exam_menu_note_exam_items (
 CREATE TABLE exam_menu_note_results (
   menu_note_id integer NOT NULL
   , exam_item_detail_id integer NOT NULL
-  , source_type integer
+  , source_type integer NOT NULL
+  , order_number integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_menu_note_results_PKC PRIMARY KEY (menu_note_id,exam_item_detail_id)
@@ -756,6 +758,7 @@ COMMENT ON COLUMN exam_menu_note_consult.created_by IS '作成者';
 COMMENT ON TABLE exam_menu_note_exam_items IS '検査メニュー特記_検査項目';
 COMMENT ON COLUMN exam_menu_note_exam_items.menu_note_id IS '検査メニュー特記ID';
 COMMENT ON COLUMN exam_menu_note_exam_items.exam_item_id IS '検査項目ID';
+COMMENT ON COLUMN exam_menu_note_exam_items.order_number IS '表示順';
 COMMENT ON COLUMN exam_menu_note_exam_items.created_at IS '作成日時';
 COMMENT ON COLUMN exam_menu_note_exam_items.created_by IS '作成者';
 
@@ -763,6 +766,7 @@ COMMENT ON TABLE exam_menu_note_results IS '検査メニュー特記_検査結�
 COMMENT ON COLUMN exam_menu_note_results.menu_note_id IS '検査メニュー特記ID';
 COMMENT ON COLUMN exam_menu_note_results.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_menu_note_results.source_type IS 'データソース種別';
+COMMENT ON COLUMN exam_menu_note_results.order_number IS '表示順';
 COMMENT ON COLUMN exam_menu_note_results.created_at IS '作成日時';
 COMMENT ON COLUMN exam_menu_note_results.created_by IS '作成者';
 
