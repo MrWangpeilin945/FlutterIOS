@@ -109,7 +109,6 @@ public class ConsultUsecaseTests
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
                                 ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
-                                ExamineeId = 1,
                                 ExamineeCode = "10001",
                                 Name = "両備　太郎",
                                 KanaName = "リョウビ　タロウ",
