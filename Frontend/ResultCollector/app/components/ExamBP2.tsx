@@ -265,7 +265,7 @@ export default function ExamBody({
         // グレーアウト表示判定
         // TODO:hasOrderの追加
         const isDisabled = !!detail?.cancelReasonId;
-        const isBMI = item.positionNumber === 3;
+        const isAVE = item.positionNumber === 3;
 
         return (
           <Flex
@@ -281,8 +281,8 @@ export default function ExamBody({
                 key={positionNumber}
                 w={274}
                 h={80}
-                bg={isBMI ? "white" : "gray02"}
-                c={isBMI ? "gray02" : "white"}
+                bg={isAVE ? "white" : "gray02"}
+                c={isAVE ? "gray02" : "white"}
                 radius="itemName"
                 px={32}
                 py={16}
@@ -293,57 +293,60 @@ export default function ExamBody({
               </Paper>
               {details?.map((detail, detailIndex) => (
                 <Flex key={detail.positionNumber}>
-                  <Text size="lg" fw={700} ta="center">
-                    {detail.value}
-                  </Text>
+                  {isAVE ? (
+                    <Text
+                      w={170}
+                      h={80}
+                      size="inputComponent"
+                      c={isDisabled ? "gray02" : "black"}
+                      px={32}
+                    >
+                      {detail?.value}
+                    </Text>
+                  ) : (
+                    <TextInput
+                      classNames={{
+                        input: `${styles["input-textbox"]} ${
+                          examRegistResults?.some(
+                            (x) => x.errorLevel === InputErrorLevel.異常
+                          )
+                            ? `${styles["input-error"]}`
+                            : examRegistResults?.some(
+                                (x) => x.errorLevel === InputErrorLevel.警告
+                              )
+                            ? `${styles["input-warning"]}`
+                            : ""
+                        }`,
+                      }}
+                      w={170}
+                      radius="md"
+                      size="inputComponent"
+                      bg={isDisabled ? "gray03" : ""}
+                      c={isDisabled ? "gray02" : ""}
+                      value={detail?.value}
+                      onChange={(e) =>
+                        handleChange(positionNumber, e.currentTarget.value)
+                      }
+                      onFocus={() => toggleKeyboard(index)}
+                      disabled={isDisabled}
+                    />
+                  )}
+                  {detailIndex !== details.length - 1 && (
+                    <Text w={21.5} size="inputComponent" ml={8}>
+                      /
+                    </Text>
+                  )}
                 </Flex>
               ))}
-              {isBMI ? (
-                <Text
-                  w={340}
-                  h={80}
-                  size="inputComponent"
-                  ta="right"
-                  c={isDisabled ? "gray02" : "black"}
-                  px={32}
-                >
-                  {detail?.value}
-                </Text>
-              ) : (
-                <TextInput
-                  classNames={{
-                    input: `${styles["input-textbox"]} ${
-                      examRegistResults?.some(
-                        (x) => x.errorLevel === InputErrorLevel.異常
-                      )
-                        ? `${styles["input-error"]}`
-                        : examRegistResults?.some(
-                            (x) => x.errorLevel === InputErrorLevel.警告
-                          )
-                        ? `${styles["input-warning"]}`
-                        : ""
-                    }`,
-                  }}
-                  w={340}
-                  radius="md"
-                  size="inputComponent"
-                  bg={isDisabled ? "gray03" : ""}
-                  c={isDisabled ? "gray02" : ""}
-                  value={detail?.value}
-                  onChange={(e) =>
-                    handleChange(positionNumber, e.currentTarget.value)
-                  }
-                  onFocus={() => toggleKeyboard(index)}
-                  disabled={isDisabled}
-                />
-              )}
-              <Stack w={173} gap={4} mt="auto">
-                {detail?.prevValue && (
-                  <Text fw={700}>(前回：{detail.prevValue})</Text>
+              <Stack w={216} gap={4} mt="auto">
+                {details?.[0].prevValue && details?.[1].prevValue && (
+                  <Text fw={700}>
+                    (前回：{details[0].prevValue}/{details[1].prevValue})
+                  </Text>
                 )}
                 <Text size="xs">{detail?.unit}</Text>
               </Stack>
-              {!isBMI && (
+              {!isAVE && (
                 <Button
                   w={154}
                   h={64}
