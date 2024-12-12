@@ -8,6 +8,7 @@ import 'package:typed_data/typed_buffers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:usb_serial/usb_serial.dart';
 import 'package:wellship_serial_client/data/model/behavior_settings.dart';
+import 'package:wellship_serial_client/data/provider/behavior_settings_provider.dart';
 import 'package:wellship_serial_client/data/provider/wired_devices_provider.dart';
 import 'package:wellship_serial_client/data/model/wired_settings.dart';
 
@@ -59,7 +60,12 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
               .replaceAllMapped(RegExp(r'[\x00-\x20]'), (x) => String.fromCharCode(0x2400 + x.group(0)!.codeUnitAt(0)))
               .replaceAll(RegExp(r'[\x7f]'), String.fromCharCode(0x2421));
           if (ackTriggers != null && ackTriggers.isEmpty == false && ackString != null) {
-            //
+            final checkText = utf8.decode(buffer);
+            final count = RegExp(ackTriggers.first).allMatches(checkText).length;
+            if (ackCount < count) {
+              port.write(utf8.encode(ackString));
+              ackCount = count;
+            }
           }
           if (!aborting && shouldAbort(buffer, behaviorSettings)) {
             aborting = true;
@@ -79,16 +85,63 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
     }, [firstDevice]);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('有線接続通信画面'),
+        title: Text(behaviorSettings.title ?? '有線接続通信画面'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Center(
-        child: Column(children: [
-          Text("firstDevice:${firstDevice.toString()}"),
-          Text("UsbPort:${usbPort.value}"),
-          SelectableText("text:${text.value}"),
-          Text("error:${error.value}"),
-        ]),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '接続先',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                ListTile(
+                    title: Text(firstDevice?.deviceName ?? ''),
+                    trailing: const IconButton(
+                      onPressed: null,
+                      icon: Icon(Icons.settings),
+                    ),
+                    onTap: null),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.teal,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        usbPort.value != null ? "準備完了！" : "準備中",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              padding: const EdgeInsets.all(16),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.teal.shade900),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SelectableText(text.value),
+            ),
+          ),
+        ],
       ),
     );
   }

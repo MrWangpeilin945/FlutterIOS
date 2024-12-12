@@ -10,8 +10,9 @@ import 'package:retry/retry.dart';
 import 'package:typed_data/typed_buffers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wellship_serial_client/data/model/behavior_settings.dart';
+import 'package:wellship_serial_client/data/provider/behavior_settings_provider.dart';
 import 'package:wellship_serial_client/data/provider/bt_classic_devices_provider.dart';
-import 'package:wellship_serial_client/data/model/bt_classic_settings.dart';
+import 'package:wellship_serial_client/data/provider/bt_classic_settings_provider.dart';
 
 @RoutePage()
 class BtClassicSerialCommunicationPage extends HookConsumerWidget {
@@ -43,12 +44,19 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
           final buffer = Uint8Buffer();
           // 多重に終了処理が行われないように
           bool aborting = false;
+          int ackCount = 0;
+          final ackTriggers = behaviorSettings.ackTriggers;
+          final ackString = behaviorSettings.ackString;
           conn.input!.listen((data) async {
             buffer.addAll(data);
             text.value = utf8.decode(buffer);
-            // TODO ACK判定（ackTriggers, ackString）
-            if (behaviorSettings.ackString != null && behaviorSettings.ackTriggers?.isNotEmpty == true) {
-              final ackString = behaviorSettings.ackString ?? "";
+            if (ackTriggers != null && ackTriggers.isEmpty == false && ackString != null) {
+              final checkText = utf8.decode(buffer);
+              final count = RegExp(ackTriggers.first).allMatches(checkText).length;
+              if (ackCount < count) {
+                conn.output.add(utf8.encode(ackString));
+                ackCount = count;
+              }
             }
             // 停止判定
             if (!aborting && shouldAbort(buffer, behaviorSettings)) {
@@ -66,9 +74,7 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
         },
         maxAttempts: 99999,
         delayFactor: const Duration(seconds: 1),
-        retryIf: (p0) {
-          return p0 is PlatformException;
-        },
+        retryIf: (e) => e is PlatformException,
       );
       return () {
         connection.value?.dispose();
@@ -79,16 +85,61 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
         title: Text(behaviorSettings.title ?? 'BluetoothClassic接続通信画面'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Center(
-        child: Column(children: [
-          Text("targetDevice:${device?.name} (${device?.address})"),
-          Text("connection:${connection.value}"),
-          Text(
-            connection.value != null ? "準備完了！" : "準備中",
-            style: const TextStyle(fontSize: 28),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '接続先',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                ListTile(
+                    title: Text(serialSettings.deviceName ?? '未選択'),
+                    subtitle: Text(serialSettings.address ?? ''),
+                    trailing: const IconButton(
+                      onPressed: null,
+                      icon: Icon(Icons.settings),
+                    ),
+                    onTap: null),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.teal,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        connection.value != null ? "準備完了！" : "準備中",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          Text("text:${text.value}"),
-        ]),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              padding: const EdgeInsets.all(16),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.teal.shade900),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SelectableText(text.value),
+            ),
+          ),
+        ],
       ),
     );
   }

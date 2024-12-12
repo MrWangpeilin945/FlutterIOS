@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:wellship_serial_client/data/model/behavior_settings.dart';
 import 'package:wellship_serial_client/data/model/bt_classic_settings.dart';
+import 'package:wellship_serial_client/data/provider/behavior_settings_provider.dart';
 import 'package:wellship_serial_client/data/provider/bt_classic_devices_provider.dart';
 import 'package:wellship_serial_client/data/provider/bt_classic_settings_provider.dart';
 import 'package:wellship_serial_client/ui/component/wsc_select_dialog.dart';
@@ -113,6 +115,12 @@ class BtClassicSerialSettingsPage extends HookConsumerWidget {
               }
               ref.read(btClassicSettingsProvider.notifier).state =
                   BtClassicSettings(deviceName: selectedDevice.name, address: selectedDevice.address);
+              // ref.read(behaviorSettingsProvider.notifier).state = BehaviorSettings(
+              //     ackString: '\x06',
+              //     ackTriggers: ['\x20'],
+              //     eotString: '\r\n',
+              //     dataLength: 128,
+              //     callback: Uri.parse('http://10.167.2.216/'));
               router.push(const BtClassicSerialCommunicationRoute());
             },
             child: const Text('読み取り開始')),

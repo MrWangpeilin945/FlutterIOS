@@ -4,9 +4,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wellship_serial_client/data/enum/parity.dart';
 import 'package:wellship_serial_client/data/enum/stop_bits.dart';
-import 'package:wellship_serial_client/data/model/termination_condition.dart';
+import 'package:wellship_serial_client/data/model/behavior_settings.dart';
 import 'package:wellship_serial_client/data/model/wired_settings.dart';
-import 'package:wellship_serial_client/data/provider/termination_condition_provider.dart';
+import 'package:wellship_serial_client/data/provider/behavior_settings_provider.dart';
 import 'package:wellship_serial_client/ui/component/wsc_input_dialog.dart';
 import 'package:wellship_serial_client/ui/component/wsc_select_dialog.dart';
 import 'package:wellship_serial_client/ui/route/app_route.dart';
@@ -27,7 +27,7 @@ class WiredSerialSettingsPage extends HookConsumerWidget {
     final useDtrState = useState<bool>(wiredSettings.useDtr);
     final useRtsState = useState<bool>(wiredSettings.useRts);
     final ackString = useState<String>('\x06');
-    final ackTriggers = useState<List<String>>([]);
+    final ackTriggers = useState<List<String>>(['\x20']);
     final eotString = useState<String>('\r\n');
     final dataLength = useState<int>(128);
 
@@ -193,12 +193,12 @@ class WiredSerialSettingsPage extends HookConsumerWidget {
                   stopBits: stopBitState.value,
                   useRts: useRtsState.value,
                   useDtr: useDtrState.value);
-              ref.read(terminationConditionProvider.notifier).state = TerminationCondition(
-                ackString: ackString.value,
-                ackTriggers: ackTriggers.value,
-                eotString: eotString.value,
-                dataLength: dataLength.value,
-              );
+              ref.read(behaviorSettingsProvider.notifier).state = BehaviorSettings(
+                  ackString: ackString.value,
+                  ackTriggers: ackTriggers.value,
+                  eotString: eotString.value,
+                  dataLength: dataLength.value,
+                  callback: Uri.parse('http://10.167.2.216/'));
               router.push(const WiredSerialCommunicationRoute());
             },
             child: const Text('読み取り開始')),
