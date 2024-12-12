@@ -53,7 +53,7 @@ export const setRangesErrorMessage = (inputexamItem: InputExamItem) => {
   for (const { minValue, maxValue, errorLevel } of matchExamRanges) {
     const rangesErrorMessage: ExamRegistResult = {
       // TODO：エラーメッセージの詳細を決定
-      description: `${inputexamItem.name}に入力された値が正常値ではありません。`,
+      description: "入力された値が正常値ではありません。",
       errorLevel: errorLevel,
     };
     inputexamItem.examRegistResults.push(rangesErrorMessage);
