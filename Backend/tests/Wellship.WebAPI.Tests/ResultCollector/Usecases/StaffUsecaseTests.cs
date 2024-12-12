@@ -15,7 +15,7 @@ public class StaffUsecaseTests
     public async Task 職員を取得してAPIレスポンス型に変換できる()
     {
         // Arrange
-        var staffId = 123;
+        var staffId = Guid.Parse("a5d78b8f-7e9b-4f8c-b506-8fc86b1d7681");
         var staffRepositoryMock = new Mock<IStaffRepository>();
 
         // テーブルから取得するもの

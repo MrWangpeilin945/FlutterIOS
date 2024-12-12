@@ -48,7 +48,7 @@ public interface IConsultRepository
     /// 基準値の基準値パターンIDを取得する
     /// </summary>
     /// <param name="consultId">受診ID</param>
-    public Task<IEnumerable<int>> GetConsultThresholds(Guid consultId);
+    public Task<IEnumerable<Guid>> GetConsultThresholds(Guid consultId);
 
     /// <summary>
     /// 受診を指定して検査依頼を取得します。

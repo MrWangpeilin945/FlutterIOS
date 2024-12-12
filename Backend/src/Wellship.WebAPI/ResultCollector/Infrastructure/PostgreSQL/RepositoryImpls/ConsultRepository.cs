@@ -301,7 +301,7 @@ public class ConsultRepository : IConsultRepository
     /// 基準値の基準値パターンIDを取得する
     /// </summary>
     /// <param name="consultId">受診ID</param>
-    public async Task<IEnumerable<int>> GetConsultThresholds(Guid consultId)
+    public async Task<IEnumerable<Guid>> GetConsultThresholds(Guid consultId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
@@ -311,7 +311,7 @@ public class ConsultRepository : IConsultRepository
             resultcollector.consult_thresholds
         where
             consult_id = @ConsultId;";
-        return await connection.QueryAsync<int>(sql, new { ConsultId = consultId });
+        return await connection.QueryAsync<Guid>(sql, new { ConsultId = consultId });
     }
 
     /// <summary>
