@@ -1,5 +1,5 @@
-import { Box, Text } from "@mantine/core";
-import styles from "~/styles/common.module.css";
+import { Stack, Text } from "@mantine/core";
+import { format, parse } from "date-fns";
 
 type PlaceScheduleProps = {
   placeName: string;
@@ -11,9 +11,14 @@ export default function PlaceSchedule({
   examDate,
 }: PlaceScheduleProps) {
   return (
-    <Box className={styles.border}>
-      <Text>{placeName}</Text>
-      <Text>{examDate}</Text>
-    </Box>
+    <Stack gap={16}>
+      <Text size="lg" fw={700} c="black01">
+        {placeName}
+      </Text>
+      <Text size="sm" c="black01">
+        {examDate !== "" &&
+          format(parse(examDate, "yyyy-MM-dd", new Date()), "yyyy/MM/dd")}
+      </Text>
+    </Stack>
   );
 }
