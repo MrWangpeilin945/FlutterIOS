@@ -8,12 +8,12 @@ public class PlaceScheduleStatus
     /// <summary>
     /// 会場日程ID
     /// </summary>
-    public required int PlaceScheduleId { get; init; }
+    public required Guid PlaceScheduleId { get; init; }
 
     /// <summary>
     /// 会場ID
     /// </summary>
-    public required int PlaceId { get; init; }
+    public required Guid PlaceId { get; init; }
 
     /// <summary>
     /// 会場名

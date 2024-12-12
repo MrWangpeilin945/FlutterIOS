@@ -8,7 +8,7 @@ public class PlaceSchedulePlaceTeam
     /// <summary>
     /// 会場日程ID
     /// </summary>
-    public required int PlaceScheduleId { get; set; }
+    public required Guid PlaceScheduleId { get; set; }
 
     /// <summary>
     /// 状況
@@ -28,7 +28,7 @@ public class PlaceSchedulePlaceTeam
     /// <summary>
     /// 会場ID
     /// </summary>
-    public required int PlaceId { get; set; }
+    public required Guid PlaceId { get; set; }
 
     /// <summary>
     /// 会場コード
@@ -48,7 +48,7 @@ public class PlaceSchedulePlaceTeam
     /// <summary>
     /// 班ID
     /// </summary>
-    public required int TeamId { get; set; }
+    public required Guid TeamId { get; set; }
 
     /// <summary>
     /// 班コード

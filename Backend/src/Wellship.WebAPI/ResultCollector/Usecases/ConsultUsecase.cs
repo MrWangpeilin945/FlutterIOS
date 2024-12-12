@@ -243,7 +243,11 @@ public class ConsultUsecase : IConsultUsecase
         // 基準値パターンIDを取得
         var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
         // 検査正常値範囲を取得
-        var examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
+        IEnumerable<Domain.Models.ExamNormalValueRange> examNormalValueRanges = [];
+        if(thresholds.Any())
+        {
+            examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
+        }
         // 検査中止を取得
         var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
         // 検査依頼を取得
