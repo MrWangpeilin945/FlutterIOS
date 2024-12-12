@@ -258,13 +258,8 @@ export default function ExamBody({
     <>
       {examItemsData.map((item, index) => {
         const { positionNumber, name, examRegistResults = [] } = item;
-        const firstDetail = item.examItemDetails?.[0] ?? [];
-        const secondDetail = item.examItemDetails?.[1] ?? [];
-        const detail = item.examItemDetails?.[0];
         const details = item.examItemDetails;
-        // グレーアウト表示判定
-        // TODO:hasOrderの追加
-        const isDisabled = !!detail?.cancelReasonId;
+        const isDisabled = !!details?.[0]?.cancelReasonId;
         const isBMI = item.positionNumber === 3;
 
         return (
@@ -276,113 +271,17 @@ export default function ExamBody({
             w={1038}
             mb={16}
           >
-            <Flex align="center" gap="md">
-              <Paper
-                key={positionNumber}
-                w={274}
-                h={80}
-                bg={isBMI ? "white" : "gray02"}
-                c={isBMI ? "gray02" : "white"}
-                radius="itemName"
-                px={32}
-                py={16}
-              >
-                <Text size="lg" fw={700} ta="center">
-                  {name}
-                </Text>
-              </Paper>
-              {details?.map((detail, detailIndex) => (
-                <Flex key={detail.positionNumber}>
-                  <Text size="lg" fw={700} ta="center">
-                    {detail.value}
-                  </Text>
-                </Flex>
-              ))}
-              {isBMI ? (
-                <Text
-                  w={340}
-                  h={80}
-                  size="inputComponent"
-                  ta="right"
-                  c={isDisabled ? "gray02" : "black"}
-                  px={32}
-                >
-                  {detail?.value}
-                </Text>
-              ) : (
-                <TextInput
-                  classNames={{
-                    input: `${styles["input-textbox"]} ${
-                      examRegistResults?.some(
-                        (x) => x.errorLevel === InputErrorLevel.異常
-                      )
-                        ? `${styles["input-error"]}`
-                        : examRegistResults?.some(
-                            (x) => x.errorLevel === InputErrorLevel.警告
-                          )
-                        ? `${styles["input-warning"]}`
-                        : ""
-                    }`,
-                  }}
-                  w={340}
-                  radius="md"
-                  size="inputComponent"
-                  bg={isDisabled ? "gray03" : ""}
-                  c={isDisabled ? "gray02" : ""}
-                  value={detail?.value}
-                  onChange={(e) =>
-                    handleChange(positionNumber, e.currentTarget.value)
-                  }
-                  onFocus={() => toggleKeyboard(index)}
-                  disabled={isDisabled}
-                />
-              )}
-              <Stack w={173} gap={4} mt="auto">
-                {detail?.prevValue && (
-                  <Text fw={700}>(前回：{detail.prevValue})</Text>
-                )}
-                <Text size="xs">{detail?.unit}</Text>
-              </Stack>
-              {!isBMI && (
-                <Button
-                  w={154}
-                  h={64}
-                  size="lg"
-                  bg={"white"}
-                  variant="outline"
-                  onClick={() => handleChange(positionNumber, "")}
-                  ml={49}
-                  tabIndex={-1}
-                >
-                  クリア
-                </Button>
-              )}
-            </Flex>
+            <Text size="lg" fw={700} ta="center">
+              {name}
+            </Text>
 
-            {/* エラーメッセージの表示 */}
-            {examRegistResults.map((error, idx) => {
-              const isWarning = error.errorLevel === InputErrorLevel.警告;
-              return (
-                <Group key={idx} c={isWarning ? "warning" : "error"}>
-                  <IconExclamationCircleFilled size={"32px"} />
-                  <Text size="sm" fw={700}>
-                    {error.description}
-                  </Text>
-                </Group>
-              );
-            })}
-            {/* キーボード表示 */}
-            {showKeyboards[index] && (
-              <Box ref={closeKeyBoard} mx="auto">
-                <NumericKeyboard
-                  value={removeDecimalAndLeadingZero(detail?.value ?? "")}
-                  onChange={(newValue) =>
-                    handleChange(positionNumber, newValue)
-                  }
-                  onConfirm={handleConfirm}
-                />
-              </Box>
-            )}
+            {details?.map((detail, detailIndex) => (
+              <Flex key={detail.positionNumber}>
+                <Text size="lg" fw={700} ta="center">
+                  {detail.value}
+                </Text>
+              </Flex>
+            ))}
           </Flex>
         );
       })}
