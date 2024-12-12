@@ -44,4 +44,9 @@ public interface IConsultUsecase
     /// 検査結果入力情報を取得する
     /// </summary>
     public Task<InputExamItems> GetInputExamItemsExamineeAsync(string consultNumber, int examMenuId);
+
+    /// <summary>
+    /// 検査正常値を検証する
+    /// </summary>
+    public Task<IEnumerable<Domain.Models.RangeError>> ValidateNormalValueRangeAsync(string consultNumber, ResultsRequest result);
 }

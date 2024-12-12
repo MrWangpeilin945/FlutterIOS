@@ -226,18 +226,19 @@ public class ConsultUsecase : IConsultUsecase
         return new InputExamItems()
         {
             ConsultNumber = consultNumber,
-            Examinee = new InputExamExaminee(){
+            Examinee = new InputExamExaminee()
+            {
                 TicketNumber = consult.TicketNumber,
                 KanaName = examinee.KanaName,
                 Sex = (int)examinee.Sex,
                 ExamDateAge = examAge.Years
             },
             RelatedExamItems = [],                  // TODO: 関連検査項目 後方作業へ
-            ExamItemGroups = 
+            ExamItemGroups =
                 examItemGroups.Select(eg => new ExamItemGroup
                 {
                     Type = (int)eg.Type,
-                    ExamItems = eg.ExamItems.Select(ei => new InputExamItem 
+                    ExamItems = eg.ExamItems.Select(ei => new InputExamItem
                     {
                         PositionNumber = ei.PositionNumber,
                         ExamItemId = ei.ExamItemId,
@@ -257,7 +258,8 @@ public class ConsultUsecase : IConsultUsecase
                             IntegerLength = ed.IntegerLength,
                             DecimalLength = ed.DecimalLength,
                             // キーボード入力
-                            Keyboard = new Keyboard{
+                            Keyboard = new Keyboard
+                            {
                                 KeyboardType = (int)ed.KeyboardType,
                                 Values = Keyboards.Where(kb => kb.ExamItemDetailId == ed.ExamItemDetailId)
                                                   .OrderBy(kb => kb.OptionId)
@@ -265,29 +267,83 @@ public class ConsultUsecase : IConsultUsecase
                                                   .ToArray()
                             },
                             // 選択肢
-                            ExamItemDetailOptions = 
+                            ExamItemDetailOptions =
                                 examItemDetailOptions.Where(op => op.ExamItemDetailId == ed.ExamItemDetailId)
-                                                     .OrderBy(op => op.OrderNumber)         
+                                                     .OrderBy(op => op.OrderNumber)
                                                      .Select(op => new ExamItemDetailOption
-                                                        {
-                                                            OrderNumber = op.OrderNumber,
-                                                            Code = op.Code,
-                                                            Name = op.Name
-                                                        }).ToArray(),
+                                                     {
+                                                         OrderNumber = op.OrderNumber,
+                                                         Code = op.Code,
+                                                         Name = op.Name
+                                                     }).ToArray(),
                             // 検査正常値範囲
-                            ExamNormalValueRanges = 
+                            ExamNormalValueRanges =
                                 examNormalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
                                                      .OrderBy(r => r.ErrorLevel)
                                                      .Select(r => new ExamNormalValueRange
-                                                        {
-                                                            ErrorLevel = (int)r.ErrorLevel,
-                                                            MaxValue = r.MaxValue,
-                                                            MinValue = r.MinValue
-                                                        }).ToArray()
+                                                     {
+                                                         ErrorLevel = (int)r.ErrorLevel,
+                                                         MaxValue = r.MaxValue,
+                                                         MinValue = r.MinValue
+                                                     }).ToArray()
                         }).ToArray(),
                         ExamRegistResults = []      // TODO: 検査結果登録エラー 後方作業へ
                     }).ToArray()
                 }).ToArray()
         };
+    }
+
+    /// <summary>
+    /// 検査正常値を検証する
+    /// </summary>
+    public async Task<IEnumerable<Domain.Models.RangeError>> ValidateNormalValueRangeAsync(string consultNumber, ResultsRequest result)
+    {
+        var examMenuId = result.ExamMenuId;
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
+        var examDate = placeSchedule.ExamDate;
+        // 受診日の年齢
+        // NOTE: 年齢加算日は暫定で前日年齢加算
+        var examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+
+        var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
+        var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
+        var examItemDetailIds = examItemGroups.SelectMany(group => group.ExamItems)
+                                              .SelectMany(item => item.ExamItemDetails)
+                                              .Select(detail => detail.ExamItemDetailId)
+                                              .ToArray();
+
+        // 検査正常値範囲を取得（年齢と性別による絞り込み）
+        var ranges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
+
+        // DBとリクエスト値から今回値を取得して合成する（リクエスト値を優先する）
+        var dbCurrentResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
+        var dbCurrentMap = dbCurrentResults.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+        var requestMap = result.ExamResults.SelectMany(x => x.ExamItemDetails).ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+        var currentMap = requestMap.Concat(dbCurrentMap.Where(x => !requestMap.ContainsKey(x.Key)))
+                                   .ToDictionary(x => x.Key, x => x.Value);
+
+        var errors = new List<Domain.Models.RangeError>();
+        foreach (var current in currentMap)
+        {
+            // 検査結果がMin-Maxに当てはまる設定を取得
+            var range = ranges.Where(x => x.ExamItemDetailId == current.Key && x.ValueInRange(current.Value))
+                              .OrderBy(x => x.Priority)
+                              .FirstOrDefault();
+
+            if (range is not null)
+            {
+                errors.Add(new Domain.Models.RangeError()
+                {
+                    Name = range.Name,
+                    ExamItemDetailId = range.ExamItemDetailId,
+                    MinValue = range.MinValue,
+                    MaxValue = range.MaxValue,
+                    ErrorLevel = range.ErrorLevel
+                });
+            }
+        }
+        return errors;
     }
 }
