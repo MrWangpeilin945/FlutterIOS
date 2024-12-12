@@ -193,12 +193,12 @@ class WiredSerialSettingsPage extends HookConsumerWidget {
                   stopBits: stopBitState.value,
                   useRts: useRtsState.value,
                   useDtr: useDtrState.value);
-              ref.read(behaviorSettingsProvider.notifier).state = BehaviorSettings(
-                  ackString: ackString.value,
-                  ackTriggers: ackTriggers.value,
-                  eotString: eotString.value,
-                  dataLength: dataLength.value,
-                  callback: Uri.parse('http://10.167.2.216/'));
+              // ref.read(behaviorSettingsProvider.notifier).state = BehaviorSettings(
+              //     ackString: ackString.value,
+              //     ackTriggers: ackTriggers.value,
+              //     eotString: eotString.value,
+              //     dataLength: dataLength.value,
+              //     callback: Uri.parse('http://10.167.2.216/'));
               router.push(const WiredSerialCommunicationRoute());
             },
             child: const Text('読み取り開始')),

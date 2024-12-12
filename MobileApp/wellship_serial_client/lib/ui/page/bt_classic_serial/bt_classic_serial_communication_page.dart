@@ -49,7 +49,11 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
           final ackString = behaviorSettings.ackString;
           conn.input!.listen((data) async {
             buffer.addAll(data);
-            text.value = utf8.decode(buffer);
+            text.value = utf8
+                .decode(buffer)
+                .replaceAllMapped(
+                    RegExp(r'[\x00-\x20]'), (x) => String.fromCharCode(0x2400 + x.group(0)!.codeUnitAt(0)))
+                .replaceAll(RegExp(r'[\x7f]'), String.fromCharCode(0x2421));
             if (ackTriggers != null && ackTriggers.isEmpty == false && ackString != null) {
               final checkText = utf8.decode(buffer);
               final count = RegExp(ackTriggers.first).allMatches(checkText).length;

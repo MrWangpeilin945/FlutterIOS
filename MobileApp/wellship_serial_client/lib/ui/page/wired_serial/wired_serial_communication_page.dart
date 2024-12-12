@@ -138,7 +138,9 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
                 border: Border.all(color: Colors.teal.shade900),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: SelectableText(text.value),
+              child: SelectableText(
+                text.value,
+              ),
             ),
           ),
         ],
