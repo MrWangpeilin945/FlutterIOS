@@ -583,8 +583,18 @@ ALTER TABLE exam_menu_note_exam_items
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE exam_menu_note_exam_items
+  ADD CONSTRAINT exam_menu_note_exam_items_FK2 FOREIGN KEY (exam_item_id) REFERENCES exam_items(exam_item_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE exam_menu_note_results
   ADD CONSTRAINT exam_menu_note_results_FK1 FOREIGN KEY (menu_note_id) REFERENCES exam_menu_notes(menu_note_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE exam_menu_note_results
+  ADD CONSTRAINT exam_menu_note_results_FK2 FOREIGN KEY (exam_item_detail_id) REFERENCES exam_item_details(exam_item_detail_id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
