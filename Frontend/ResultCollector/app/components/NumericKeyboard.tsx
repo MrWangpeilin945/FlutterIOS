@@ -11,18 +11,10 @@ type KeyboardProps = {
 
 export default function NumericKeyboard(props: KeyboardProps) {
   const keyboardValues = [
-    "7",
-    "8",
-    "9",
-    "4",
-    "5",
-    "6",
-    "1",
-    "2",
-    "3",
-    "AC",
-    "0",
-    "確定",
+    "7","8","9",
+    "4","5","6",
+    "1","2","3",
+    "AC","0","確定",
   ];
 
   // 小数点と先頭の0を除去して数値部分だけを取得する処理
