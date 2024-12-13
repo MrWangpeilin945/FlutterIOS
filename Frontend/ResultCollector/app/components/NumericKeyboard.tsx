@@ -19,11 +19,17 @@ export default function NumericKeyboard(props: KeyboardProps) {
 
   // 小数点と先頭の0を除去して数値部分だけを取得する処理
   const convertValue = (value: string): string => {
-    // 小数点を取り除く
-    const withoutDecimal = value.replace(".", "");
-    // 先頭の0を除去
-    const withoutLeadingZero = withoutDecimal.replace(/^0+/, "");
-    return withoutLeadingZero || "0"; // 空になった場合は "0" を返す
+    if (
+      props.integerLength !== undefined &&
+      props.decimalLength !== undefined
+    ) {
+      // 小数点を取り除く
+      const withoutDecimal = value.replace(".", "");
+      // 先頭の0を除去
+      const withoutLeadingZero = withoutDecimal.replace(/^0+/, "");
+      return withoutLeadingZero || "0"; // 空になった場合は "0" を返す
+    }
+    return value;
   };
   const [value, setValue] = useState(convertValue(props.value));
 
