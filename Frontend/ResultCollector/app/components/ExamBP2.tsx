@@ -13,9 +13,10 @@ import { useClickOutside } from "@mantine/hooks";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import { z } from "zod";
 import { InputErrorLevel } from "~/domain/enums";
-import type { ExamItemDetail, InputExamItem } from "~/domain/wellship.schemas";
+import type { InputExamItem } from "~/domain/wellship.schemas";
 import NumericKeyboard from "./NumericKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
+import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import styles from "~/styles/common.module.css";
 import React from "react";
 
@@ -52,9 +53,7 @@ export default function ExamBody({
   const toggleKeyboard2 = (index: number, detailIndex: number) => {
     setShowKeyboards((prev) => {
       const updated = [...prev];
-      console.log(updated[index][detailIndex]);
       updated[index][detailIndex] = true;
-      console.log(updated[index][detailIndex]);
       return updated;
     });
   };
@@ -102,11 +101,8 @@ export default function ExamBody({
           ),
         }),
     });
-
-    // バリデーション対象データを取得
-    const valueToValidate = item.examItemDetails?.[0]?.value || "";
-    const result = schema.safeParse({ value: valueToValidate });
-
+    // 基準値によるチェック
+    setRangesErrorMessage(item);
     // エラーメッセージを更新
     let updatedErrors = item.examRegistResults || [];
     // 既に存在するコンポーネントのエラーメッセージを削除
@@ -218,29 +214,56 @@ export default function ExamBody({
               ? { ...detail, value }
               : detail
           );
-          console.log(detailPositionNumber);
         }
       }
-      //BMIの計算処理
-      const height =
-        Number.parseFloat(
-          updatedExamItems[0].examItemDetails?.[0].value ?? "0"
-        ) / 100;
-      const weight = Number.parseFloat(
-        updatedExamItems[1].examItemDetails?.[0].value ?? "0"
+      // 平均値の計算処理
+      const AVE1 = Math.round(
+        (Number.parseFloat(
+          updatedExamItems[0].examItemDetails?.[0].value ?? ""
+        ) +
+          Number.parseFloat(
+            updatedExamItems[1].examItemDetails?.[0].value ?? ""
+          )) /
+          2
       );
-      const bmi = weight && height ? String(weight / height ** 2) : "0";
-      // BMIの値を設定
-      if (item.positionNumber === 4) {
+      const AVE2 = Math.round(
+        (Number.parseFloat(
+          updatedExamItems[0].examItemDetails?.[1].value ?? ""
+        ) +
+          Number.parseFloat(
+            updatedExamItems[1].examItemDetails?.[1].value ?? ""
+          )) /
+          2
+      );
+      // 平均値の保存処理
+      if (item.positionNumber === 3) {
         item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
           const decimalLength = detail.decimalLength ?? 0;
           const integerLength = detail.integerLength ?? 0;
           const maxDigits = decimalLength + integerLength + 1;
           if (idx === 0) {
-            if (detail.integerLength) {
-              return { ...detail, value: bmi.slice(0, maxDigits) };
+            if (AVE1) {
+              if (detail.integerLength) {
+                return {
+                  ...detail,
+                  value: AVE1.toString().slice(0, maxDigits),
+                };
+              }
+              return { ...detail, value: AVE1.toString() };
             }
-            return { ...detail, value: bmi };
+            return { ...detail, value: "" }; // 計算する値が無い場合、空白にする
+          }
+          if (idx === 1) {
+            if (AVE2) {
+              if (detail.integerLength) {
+                return {
+                  ...detail,
+                  value: AVE2.toString().slice(0, maxDigits),
+                };
+              }
+              return { ...detail, value: AVE2.toString() };
+            }
+            return { ...detail, value: "" };
           }
           return detail;
         });
@@ -268,6 +291,7 @@ export default function ExamBody({
   };
 
   // 小数点と先頭の0を除去して数値部分だけを取得する処理
+  // TODO：キーボードのコンポーネントの仕様変更に伴い削除予定
   const removeDecimalAndLeadingZero = (value: string): string => {
     // 小数点を取り除く
     const withoutDecimal = value.replace(".", "");
@@ -292,7 +316,6 @@ export default function ExamBody({
             justify="flex-start"
             align="flex-start"
             direction="column"
-            w={1038}
             mb={16}
           >
             <Flex align="center" gap="md">
@@ -310,57 +333,76 @@ export default function ExamBody({
                   {name}
                 </Text>
               </Paper>
-              {details?.map((detail, detailIndex) => (
-                <Flex key={detail.positionNumber}>
-                  {isAVE ? (
-                    <Text
-                      w={170}
-                      h={80}
-                      size="inputComponent"
-                      c={isDisabled ? "gray02" : "black"}
-                      px={32}
-                    >
-                      {detail?.value}
-                    </Text>
-                  ) : (
-                    <TextInput
-                      classNames={{
-                        input: `${styles["input-textbox"]} ${
-                          examRegistResults?.some(
-                            (x) => x.errorLevel === InputErrorLevel.異常
-                          )
-                            ? `${styles["input-error"]}`
+              {details?.map((detail, detailIndex) => {
+                const isDisabled =
+                  !!details?.[detailIndex]?.cancelReasonId ||
+                  details?.[detailIndex]?.hasOrder;
+                return (
+                  <Flex key={detail.positionNumber}>
+                    {isAVE ? (
+                      <Text
+                        w={170}
+                        h={80}
+                        size="inputComponent"
+                        c={
+                          isDisabled
+                            ? "gray"
+                            : examRegistResults?.some(
+                                (x) => x.errorLevel === InputErrorLevel.異常
+                              )
+                            ? "error"
                             : examRegistResults?.some(
                                 (x) => x.errorLevel === InputErrorLevel.警告
                               )
-                            ? `${styles["input-warning"]}`
-                            : ""
-                        }`,
-                      }}
-                      w={170}
-                      radius="md"
-                      size="inputComponent"
-                      bg={isDisabled ? "gray03" : ""}
-                      c={isDisabled ? "gray02" : ""}
-                      value={detail?.value}
-                      onChange={(e) =>
-                        handleChange(
-                          positionNumber,
-                          e.currentTarget.value,
-                          detail.positionNumber
-                        )
-                      }
-                      onClick={() => toggleKeyboard2(index, detailIndex)}
-                      disabled={isDisabled}
-                    />
-                  )}
-                  {detailIndex !== details.length - 1 && (
-                    <Text w={21.5} size="inputComponent" ml={8}>
-                      /
-                    </Text>
-                  )}
-                </Flex>
-              ))}
+                            ? "warning"
+                            : "black"
+                        }
+                        px={32}
+                        mt={-8}
+                        ta={"right"}
+                      >
+                        {detail?.value}
+                      </Text>
+                    ) : (
+                      <TextInput
+                        classNames={{
+                          input: `${styles["input-textbox"]} ${
+                            examRegistResults?.some(
+                              (x) => x.errorLevel === InputErrorLevel.異常
+                            )
+                              ? `${styles["input-error"]}`
+                              : examRegistResults?.some(
+                                  (x) => x.errorLevel === InputErrorLevel.警告
+                                )
+                              ? `${styles["input-warning"]}`
+                              : ""
+                          }`,
+                        }}
+                        w={170}
+                        radius="md"
+                        size="inputComponent"
+                        bg={isDisabled ? "gray03" : ""}
+                        c={isDisabled ? "gray02" : ""}
+                        value={detail?.value}
+                        onChange={(e) =>
+                          handleChange(
+                            positionNumber,
+                            e.currentTarget.value,
+                            detail.positionNumber
+                          )
+                        }
+                        onClick={() => toggleKeyboard2(index, detailIndex)}
+                        disabled={isDisabled}
+                      />
+                    )}
+                    {detailIndex !== details.length - 1 && (
+                      <Text w={30} h={72} ml={16} c={"gray02"} size={"80px"}>
+                        /
+                      </Text>
+                    )}
+                  </Flex>
+                );
+              })}
               <Stack w={216} gap={4} mt="auto">
                 {details?.[0].prevValue && details?.[1].prevValue && (
                   <Text fw={700}>
@@ -373,11 +415,11 @@ export default function ExamBody({
                 <Button
                   w={154}
                   h={64}
+                  ml={16}
                   size="lg"
                   bg={"white"}
                   variant="outline"
                   onClick={() => handleChange(positionNumber, "")}
-                  ml={49}
                   tabIndex={-1}
                 >
                   クリア
