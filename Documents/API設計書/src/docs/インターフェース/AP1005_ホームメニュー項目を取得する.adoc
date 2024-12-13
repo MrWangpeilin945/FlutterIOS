@@ -24,7 +24,17 @@
 
 === クエリパラメータ
 
-なし
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|placeScheduleId
+|No
+|string
+|会場日程ID。指定した場合は、会場ロック状況を取得して返却する。
+|`f4c60b54-4275-4f3a-8abb-a666e773c181`
+
+|===
 
 === リクエストボディ
 
@@ -64,7 +74,7 @@
       ]
     }
   ],
-  "placeScheduleLockingStatus" : 1
+  "placeScheduleLockingStatus" : 21
 }
 ----
 
@@ -73,3 +83,5 @@
 * 200 OK
 * 401 Unauthorized
 ** JWT認証に失敗
+* 404 NotFound
+** （クエリパラメータに会場日程IDがある場合）指定した会場日程が存在しない

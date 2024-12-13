@@ -36,7 +36,7 @@ public class StaffController : ControllerBase
     {
         // TODO: 認証認可の部品が出来次第、JWTから自身の職員IDを取得する
 
-        var staffId = 1; // TODO: ダミーのIDです。
+        var staffId = Guid.Parse("affd0000-0000-0000-0000-000000000001"); // TODO: ダミーのIDです。
         var result = await _administratorUsecase.GetStaffAsync(staffId);
         return Ok(result);
     }

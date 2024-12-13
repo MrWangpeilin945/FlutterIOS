@@ -29,7 +29,7 @@ public class ExamineeRepository : IExamineeRepository
     /// 受診者IDで受診者を取得します。
     /// </summary>
     /// <param name="examineeId">ログインID</param>
-    public async Task<Examinee> GetExamineeAsync(int examineeId)
+    public async Task<Examinee> GetExamineeAsync(Guid examineeId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"

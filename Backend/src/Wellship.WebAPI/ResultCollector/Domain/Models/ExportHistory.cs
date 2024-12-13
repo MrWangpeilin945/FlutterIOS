@@ -13,7 +13,7 @@ public class ExportHistory
     /// <summary>
     /// 会場日程ID
     /// </summary>
-    public required int PlaceScheduleId { get; init; }
+    public required Guid PlaceScheduleId { get; init; }
 
     /// <summary>
     /// 出力件数

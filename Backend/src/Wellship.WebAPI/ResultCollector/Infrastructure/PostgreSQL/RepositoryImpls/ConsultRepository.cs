@@ -70,18 +70,21 @@ public class ConsultRepository : IConsultRepository
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
         select
-            consult_id as ConsultId
-            , consult_number as ConsultNumber
-            , progress_status as ProgressStatus
-            , export_status as ExportStatus
-            , place_schedule_id as PlaceScheduleId
-            , examinee_id as ExamineeId 
+            c.consult_id as ConsultId
+            , c.consult_number as ConsultNumber
+            , c.progress_status as ProgressStatus
+            , c.export_status as ExportStatus
+            , c.place_schedule_id as PlaceScheduleId
+            , c.examinee_id as ExamineeId 
+            , t.ticket_number as TicketNumber
         from
-            resultcollector.consult 
+            resultcollector.consult c
+            left join resultcollector.tickets t
+                on c.consult_id = t.consult_id
         where
-            consult_number = any(@ConsultNumbers)
+            c.consult_number = any(@ConsultNumbers)
         order by
-            consult_id;";
+            c.consult_id;";
 
         var consults = await connection.QueryAsync<ConsultEntity>(sql, new { ConsultNumbers = consultNumbers });
 
@@ -93,21 +96,8 @@ public class ConsultRepository : IConsultRepository
             PlaceScheduleId = x.PlaceScheduleId,
             ExportStatus = (ConsultResultExportStatus)x.ExportStatus,
             ProgressStatus = (ConsultProgressStatus)x.ProgressStatus,
+            TicketNumber = x.TicketNumber
         });
-    }
-
-    /// <summary>
-    /// 受診番号を指定して未受診の検査項目を取得します。
-    /// </summary>
-    public async Task<UnexaminedConsult> GetUnexaminedConsultAsync(string consultNumber)
-    {
-        var results = await GetUnexaminedConsultsAsync([consultNumber]);
-        if (!results.Any())
-        {
-            throw new ConsultNumberNotFoundException();
-        }
-
-        return results.Single();
     }
 
     /// <summary>
@@ -168,4 +158,269 @@ public class ConsultRepository : IConsultRepository
                                  });
         return unexaminedConsults;
     }
+
+    /// <summary>
+    /// 受診を指定して検査中止を取得します。
+    /// </summary>
+    public async Task<ExamCancel> GetExamCancelsAsync(Guid consultId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            c.consult_id as ConsultId
+            , d.exam_item_id as ExamItemId
+            , c.exam_item_detail_id as ExamItemDetailId
+            , c.cancel_reason_id as CancelReasonId 
+        from
+            resultcollector.exam_cancels c 
+            left join resultcollector.exam_item_details d 
+                on c.exam_item_detail_id = d.exam_item_detail_id
+        where
+            c.consult_id = @ConsultId;";
+
+        var response = await connection.QueryAsync<ExamCancelEntity>(sql, new { ConsultId = consultId });
+
+        return new ExamCancel()
+        {
+            ConsultId = consultId,
+            ExamItemDetailCancels = response.Select(x => new ExamItemDetailCancel()
+            {
+                ExamItemId = x.ExamItemId,
+                ExamItemDetailId = x.ExamItemDetailId,
+                CancelReasonId = x.CancelReasonId
+            })
+        };
+    }
+
+    /// <summary>
+    /// 検査中止を削除します。
+    /// </summary>
+    public async Task RemoveExamCancelsAsync(Guid consultId, int[] examItemDetailIds)
+    {
+        if (examItemDetailIds.Length == 0)
+        {
+            return;
+        }
+
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        delete 
+        from
+            resultcollector.exam_cancels 
+        where
+            consult_id = @ConsultId
+            and exam_item_detail_id = any (@ExamItemDetailIds);";
+
+        await connection.ExecuteAsync(sql, new { ConsultId = consultId, ExamItemDetailIds = examItemDetailIds });
+    }
+
+    /// <summary>
+    /// 検査中止を保存します。
+    /// すでに同じ検査項目明細の中止が存在すれば上書き更新、存在しなければ新規作成します。
+    /// </summary>
+    public async Task SaveExamCancelsAsync(Guid consultId, IEnumerable<ExamItemCancel> examItemCancels)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+
+        var operationTime = DateTime.UtcNow;
+
+        const string preSelectSql = @"
+        select
+            d.exam_item_id as ExamItemId
+            , od.exam_item_detail_id as ExamItemDetailId
+        from
+            resultcollector.exam_item_detail_orders od 
+            left join resultcollector.exam_item_details d 
+                on od.exam_item_detail_id = d.exam_item_detail_id 
+        where
+            exam_item_id = any (@ExamItemIds) 
+            and od.consult_id = @ConsultId;";
+
+        // マスタから検査項目ー検査項目明細の関連付けを取得する（検査依頼があるものに絞り込む）
+        var examItemIds = examItemCancels.Select(x => x.ExamItemId).Distinct().ToArray();
+        var orderedItemDetails = await connection.QueryAsync<(int examItemId, int examItemDetailId)>(preSelectSql, new { ConsultId = consultId, ExamItemIds = examItemIds });
+
+        // 検査項目明細単位で保存するオブジェクトを作る
+        var saveItems = new List<object>();
+        foreach (var examItemCancel in examItemCancels)
+        {
+            // 明細単位にばらす（依頼ありのみ）
+            var detailIds = orderedItemDetails.Where(x => x.examItemId == examItemCancel.ExamItemId).Select(x => x.examItemDetailId).Distinct().ToArray();
+            foreach (var detailId in detailIds)
+            {
+                var item = new
+                {
+                    ConsultId = consultId,
+                    ExamItemDetailId = detailId,
+                    CancelReasonId = examItemCancel.CancelReasonId,
+                    CreatedAt = operationTime, // TODO: システム時刻を取るサービスを作る 
+                    CreatedBy = "作成者（仮）" // TODO: JWTから操作者の情報を取得する
+                };
+                saveItems.Add(item);
+            }
+        }
+
+        // UPSERTを実行する
+        // 複合主キーのconsult_idとexam_item_detail_idが一致するレコードがあれば
+        // cancel_reason_id, created_at, created_byを更新する
+        // なければレコードを新規作成する
+        const string mergeSql = @"
+        merge 
+        into resultcollector.exam_cancels as ec 
+            using (values (@ConsultId, @ExamItemDetailId, @CancelReasonId, @CreatedAt, @CreatedBy)) as new_data( 
+                consult_id
+                , exam_item_detail_id
+                , cancel_reason_id
+                , created_at
+                , created_by
+            ) 
+                on ec.consult_id = new_data.consult_id 
+                and ec.exam_item_detail_id = new_data.exam_item_detail_id when matched then update 
+        set
+            cancel_reason_id = new_data.cancel_reason_id 
+            , created_at = new_data.created_at
+            , created_by = new_data.created_by when not matched then 
+        insert ( 
+            consult_id
+            , exam_item_detail_id
+            , cancel_reason_id
+            , created_at
+            , created_by
+        ) 
+        values ( 
+            new_data.consult_id
+            , new_data.exam_item_detail_id
+            , new_data.cancel_reason_id
+            , new_data.created_at
+            , new_data.created_by
+        );";
+        await connection.ExecuteAsync(mergeSql, saveItems);
+    }
+
+    /// <summary>
+    /// 基準値の基準値パターンIDを取得する
+    /// </summary>
+    /// <param name="consultId">受診ID</param>
+    public async Task<IEnumerable<Guid>> GetConsultThresholds(Guid consultId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            threshold_id
+        from
+            resultcollector.consult_thresholds
+        where
+            consult_id = @ConsultId;";
+        return await connection.QueryAsync<Guid>(sql, new { ConsultId = consultId });
+    }
+
+    /// <summary>
+    /// 受診を指定して検査依頼を取得します。
+    /// </summary>
+    public async Task<ExamOrder> GetExamOrdersAsync(Guid consultId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            o.consult_id as ConsultId
+            , d.exam_item_id as ExamItemId
+            , o.exam_item_detail_id as ExamItemDetailId
+        from
+            resultcollector.exam_item_detail_orders o 
+            left join resultcollector.exam_item_details d 
+                on o.exam_item_detail_id = d.exam_item_detail_id
+        where
+            o.consult_id = @ConsultId;";
+
+        var response = await connection.QueryAsync<ExamOrderEntity>(sql, new { ConsultId = consultId });
+
+        return new ExamOrder()
+        {
+            ConsultId = consultId,
+            ExamItemDetailOrders = response.Select(x => new ExamItemDetailOrder()
+            {
+                ExamItemId = x.ExamItemId,
+                ExamItemDetailId = x.ExamItemDetailId
+            })
+        };
+    }
+
+    /// <summary>
+    /// 受診を指定して検査結果を取得します。
+    /// </summary>
+    public async Task<ExamResult> GetExamResultsAsync(Guid consultId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            r.consult_id as ConsultId
+            , d.exam_item_id as ExamItemId
+            , r.exam_item_detail_id as ExamItemDetailId
+            , r.value as Value
+        from
+            resultcollector.exam_results r 
+            left join resultcollector.exam_item_details d 
+                on r.exam_item_detail_id = d.exam_item_detail_id
+        where
+            r.consult_id = @ConsultId;";
+
+        var response = await connection.QueryAsync<ExamResultEntity>(sql, new { ConsultId = consultId });
+
+        return new ExamResult()
+        {
+            ConsultId = consultId,
+            ExamItemDetailResults = response.Select(x => new ExamItemDetailResult()
+            {
+                ExamItemId = x.ExamItemId,
+                ExamItemDetailId = x.ExamItemDetailId,
+                Value = x.Value
+            })
+        };
+    }
+
+    /// <summary>
+    /// 受診を指定して過去検査結果を取得します。
+    /// </summary>
+    public async Task<PreviousResult> GetPreviousResultsAsync(Guid consultId, DateOnly examDate)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            p.consult_id as ConsultId
+            , p.exam_date as ExamDate
+            , d.exam_item_id as ExamItemId
+            , p.exam_item_detail_id as ExamItemDetailId
+            , p.value as Value
+        from
+            resultcollector.previous_results p 
+            left join resultcollector.exam_item_details d 
+                on p.exam_item_detail_id = d.exam_item_detail_id
+        where
+            p.consult_id = @ConsultId
+            and p.exam_date < @ExamDate::date  
+        order by
+            p.exam_date desc;";
+
+        var response = await connection.QueryAsync<PreviousResultEntity>(sql, new { ConsultId = consultId, ExamDate = examDate.ToString("yyyy-MM-dd")});
+        // 受診日の直近日
+        var previousDate = DateTime.Parse(examDate.ToString("yyyy-MM-dd"));
+        if(response.Any())
+        {
+            previousDate = response.Select(x => x.ExamDate).ElementAt(0);
+        }
+        return new PreviousResult()
+        {
+            ConsultId = consultId,
+            ExamDate = DateOnly.FromDateTime(previousDate),
+            // 受診日の直近日の過去検査結果のみ返す
+            ExamItemDetailResults = response.Where(x => x.ExamDate == previousDate)
+                                            .Select(x => new ExamItemDetailResult()
+            {
+                ExamItemId = x.ExamItemId,
+                ExamItemDetailId = x.ExamItemDetailId,
+                Value = x.Value
+            })
+        };
+    }
+
 }

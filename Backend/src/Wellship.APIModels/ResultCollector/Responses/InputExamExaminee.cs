@@ -10,8 +10,8 @@ public class InputExamExaminee
     /// <summary>
     /// 受付番号
     /// </summary>
-    [JsonPropertyName("receptionNumber")]
-    public required int ReceptionNumber { get; init;}
+    [JsonPropertyName("ticketNumber")]
+    public required string TicketNumber { get; init;}
 
     /// <summary>
     /// カナ氏名

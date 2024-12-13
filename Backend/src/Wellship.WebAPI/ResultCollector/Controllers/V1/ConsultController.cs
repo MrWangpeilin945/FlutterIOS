@@ -95,8 +95,9 @@ public class ConsultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/executions")]
-    public IActionResult RegisterExecutions([FromRoute] string consultNumber, [FromBody] ExecutionsRequest executions)
+    public async Task<IActionResult> RegisterExecutions([FromRoute] string consultNumber, [FromBody] ExecutionsRequest executions)
     {
+        await _consultUsecase.RegisterExecutionsAsync(consultNumber, executions);
         return Ok();
     }
 
@@ -111,9 +112,22 @@ public class ConsultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/inputExamItems")]
-    public IActionResult GetInputExamItemsExamineeAsync([FromRoute][Required] int consultNumber, [FromQuery][Required] int examMenuId)
+    public async Task<IActionResult> GetInputExamItemsExamineeAsync([FromRoute][Required] string consultNumber, [FromQuery][Required] int examMenuId)
     {
-        _consultUsecase.GetExamItemsExaminee();
-        return Ok();
+        var results = await _consultUsecase.GetInputExamItemsExamineeAsync(consultNumber, examMenuId);
+        return Ok(results);
+    }
+
+    /// <summary>
+    /// 前提検査メニューを検証する（仮：動作確認用）
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(InputExamItems))]
+    [HttpGet]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/prior/{currentExamId}")]
+    public async Task<IActionResult> ValidatePriorExamMenus([FromRoute][Required] string consultNumber, [FromRoute][Required] int currentExamId)
+    {
+        // TODO: 検証ロジックを実装後に削除すること
+        var results = await _consultUsecase.ValidatePriorExamMenus(consultNumber, currentExamId);
+        return Ok(results);
     }
 }

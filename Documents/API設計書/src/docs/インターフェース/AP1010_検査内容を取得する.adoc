@@ -55,7 +55,7 @@
     "consultNumber": "012345678",
     "consultName" : "定期健康健診",
     "examinee" : {
-        "receptionNumber" : 10,
+        "ticketNumber" : "10",
         "name" : "両備 太郎",
         "kanaName" : "リョウビ　タロウ",
         "birthdate" : "1975-10-30",

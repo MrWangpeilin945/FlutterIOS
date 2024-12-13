@@ -8,7 +8,7 @@ public class Team
     /// <summary>
     /// 班ID
     /// </summary>
-    public int TeamId { get; set; }
+    public Guid TeamId { get; set; }
     /// <summary>
     /// 班名
     /// </summary>

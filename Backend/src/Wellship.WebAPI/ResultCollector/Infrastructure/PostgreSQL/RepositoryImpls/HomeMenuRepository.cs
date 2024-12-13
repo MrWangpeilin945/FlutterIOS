@@ -47,19 +47,17 @@ public class HomeMenuRepository : IHomeMenuRepository
         var results = await connection.QueryAsync<HomeMenuGroupEntity>(sql);
         return results.OrderBy(c => c.GroupOrderNumber)
                       .ThenBy(c => c.MenuOrderNumber)
+                      .GroupBy(g => g.GroupId)
                       .Select(c => new Domain.Models.HomeMenuGroup
                       {
-                          GroupId = c.GroupId,
-                          GroupName = c.GroupName,
-                          HomeMenus = new List<Domain.Models.HomeMenu>
+                          GroupId = c.Key,
+                          GroupName = c.First().GroupName,
+                          HomeMenus = c.Select(g => new Domain.Models.HomeMenu
                           {
-                              new Domain.Models.HomeMenu
-                              {
-                                  MenuId = c.MenuId,
-                                  MenuName = c.MenuName,
-                                  Path = c.Path
-                              }
-                          }
+                              MenuId = g.MenuId,
+                              MenuName = g.MenuName,
+                              Path = g.Path
+                          })
                       }).ToList();
     }
 }

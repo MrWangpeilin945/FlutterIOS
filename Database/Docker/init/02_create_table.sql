@@ -4,12 +4,20 @@
 set search_path = resultcollector;
 
 CREATE TABLE affiliations (
-  examinee_id integer NOT NULL
-  , organization_id integer NOT NULL
-  , priority integer NOT NULL
+  examinee_id uuid NOT NULL
+  , organization_id uuid NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT affiliations_PKC PRIMARY KEY (examinee_id,organization_id)
+);
+
+CREATE TABLE consult_thresholds (
+  threshold_id uuid NOT NULL
+  , consult_id uuid NOT NULL
+  , priority integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT consult_thresholds_PKC PRIMARY KEY (threshold_id,consult_id)
 );
 
 CREATE TABLE equipments (
@@ -25,7 +33,7 @@ CREATE TABLE equipments (
 
 CREATE TABLE exam_cancel_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
-  , consult_id integer NOT NULL
+  , consult_id uuid NOT NULL
   , consult_item_detail_id integer NOT NULL
   , value text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -34,7 +42,7 @@ CREATE TABLE exam_cancel_histories (
 );
 
 CREATE TABLE exam_cancels (
-  consult_id integer NOT NULL
+  consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
   , cancel_reason_id integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -49,19 +57,8 @@ CREATE TABLE exam_decision_rule (
   , CONSTRAINT exam_decision_rule_PKC PRIMARY KEY (id)
 );
 
-CREATE TABLE exam_item_detail_options (
-  option_id integer NOT NULL
-  , code text NOT NULL
-  , exam_item_detail_id integer NOT NULL
-  , name integer NOT NULL
-  , order_number integer NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT exam_item_detail_options_PKC PRIMARY KEY (option_id)
-);
-
 CREATE TABLE exam_item_detail_orders (
-  consult_id integer NOT NULL
+  consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -69,7 +66,7 @@ CREATE TABLE exam_item_detail_orders (
 );
 
 CREATE TABLE exam_item_notes (
-  consult_id integer NOT NULL
+  consult_id uuid NOT NULL
   , exam_item_id integer NOT NULL
   , note text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -77,20 +74,49 @@ CREATE TABLE exam_item_notes (
   , CONSTRAINT exam_item_notes_PKC PRIMARY KEY (consult_id,exam_item_id)
 );
 
-CREATE TABLE exam_normal_value_range (
-  range_id integer NOT NULL
+CREATE TABLE exam_normal_option_details (
+  normal_options_id uuid NOT NULL
+  , option_id integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_normal_option_details_PKC PRIMARY KEY (normal_options_id,option_id)
+);
+
+CREATE TABLE exam_normal_options (
+  normal_options_id uuid DEFAULT gen_random_uuid () NOT NULL
   , name text NOT NULL
-  , organization_id integer NOT NULL
+  , threshold_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
-  , min_age varchar(7) NOT NULL
   , max_age varchar(7) NOT NULL
+  , min_age varchar(7) NOT NULL
+  , target_sex integer NOT NULL
+  , error_level integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_normal_options_PKC PRIMARY KEY (normal_options_id)
+);
+
+ALTER TABLE exam_normal_options ADD CONSTRAINT exam_normal_options_IX1
+  UNIQUE (threshold_id,exam_item_detail_id,max_age,target_sex,error_level) ;
+
+CREATE TABLE exam_normal_value_range (
+  range_id uuid DEFAULT gen_random_uuid () NOT NULL
+  , name text NOT NULL
+  , threshold_id uuid NOT NULL
+  , exam_item_detail_id integer NOT NULL
+  , max_age varchar(7) NOT NULL
+  , min_age varchar(7) NOT NULL
   , target_sex integer NOT NULL
   , max_value decimal NOT NULL
   , min_value decimal NOT NULL
+  , error_level integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_normal_value_range_PKC PRIMARY KEY (range_id)
 );
+
+ALTER TABLE exam_normal_value_range ADD CONSTRAINT exam_normal_value_range_IX1
+  UNIQUE (threshold_id,exam_item_detail_id,max_age,target_sex,max_value) ;
 
 CREATE TABLE exam_result_correlation_rules (
   id integer NOT NULL
@@ -101,7 +127,7 @@ CREATE TABLE exam_result_correlation_rules (
 
 CREATE TABLE exam_result_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
-  , consult_id integer NOT NULL
+  , consult_id uuid NOT NULL
   , consult_item_detail_id integer NOT NULL
   , value text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -110,7 +136,7 @@ CREATE TABLE exam_result_histories (
 );
 
 CREATE TABLE exam_results (
-  consult_id integer NOT NULL
+  consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
   , value text
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -120,7 +146,7 @@ CREATE TABLE exam_results (
 
 CREATE TABLE export_history_details (
   id uuid NOT NULL
-  , consult_id integer NOT NULL
+  , consult_id uuid NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT export_history_details_PKC PRIMARY KEY (id,consult_id)
@@ -142,7 +168,7 @@ ALTER TABLE home_menus ADD CONSTRAINT home_menus_IX1
 
 CREATE TABLE keyboard_options (
   option_id integer NOT NULL
-  , exam_item_details_id integer NOT NULL
+  , exam_item_detail_id integer NOT NULL
   , value text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -150,7 +176,7 @@ CREATE TABLE keyboard_options (
 );
 
 CREATE TABLE organizations (
-  organization_id integer NOT NULL
+  organization_id uuid DEFAULT gen_random_uuid () NOT NULL
   , organization_code text NOT NULL
   , name text NOT NULL
   , order_number integer NOT NULL
@@ -164,7 +190,7 @@ ALTER TABLE organizations ADD CONSTRAINT organizations_IX1
 
 CREATE TABLE place_schedule_lock_histoies (
   id uuid DEFAULT gen_random_uuid () NOT NULL
-  , place_schedule_id integer NOT NULL
+  , place_schedule_id uuid NOT NULL
   , status integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -172,13 +198,21 @@ CREATE TABLE place_schedule_lock_histoies (
 );
 
 CREATE TABLE previous_results (
-  consult_id integer NOT NULL
+  consult_id uuid NOT NULL
   , exam_date date NOT NULL
   , exam_item_detail_id integer NOT NULL
   , value text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT previous_results_PKC PRIMARY KEY (consult_id,exam_date,exam_item_detail_id)
+);
+
+CREATE TABLE prior_exam_menus (
+  current_exam_menu_id integer NOT NULL
+  , prior_exam_menu_id integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT prior_exam_menus_PKC PRIMARY KEY (current_exam_menu_id,prior_exam_menu_id)
 );
 
 CREATE TABLE role_permissions (
@@ -191,7 +225,7 @@ CREATE TABLE role_permissions (
 
 CREATE TABLE staff_login_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
-  , staff_id integer NOT NULL
+  , staff_id uuid NOT NULL
   , login_timestamp timestamp with time zone NOT NULL
   , login_success boolean NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -200,7 +234,7 @@ CREATE TABLE staff_login_histories (
 );
 
 CREATE TABLE staffs (
-  staff_id integer NOT NULL
+  staff_id uuid DEFAULT gen_random_uuid () NOT NULL
   , staff_code text NOT NULL
   , login_id text NOT NULL
   , name text NOT NULL
@@ -219,6 +253,33 @@ ALTER TABLE staffs ADD CONSTRAINT staffs_IX1
 ALTER TABLE staffs ADD CONSTRAINT staffs_IX2
   UNIQUE (login_id) ;
 
+CREATE TABLE thresholds (
+  threshold_id uuid DEFAULT gen_random_uuid () NOT NULL
+  , threshold_code text NOT NULL
+  , name text NOT NULL
+  , order_number integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT thresholds_PKC PRIMARY KEY (threshold_id)
+);
+
+CREATE TABLE tickets (
+  consult_id uuid NOT NULL
+  , ticket_number text
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT tickets_PKC PRIMARY KEY (consult_id)
+);
+
+CREATE TABLE tickets_histories (
+  id uuid NOT NULL
+  , consult_id uuid
+  , ticket_number text
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT tickets_histories_PKC PRIMARY KEY (id)
+);
+
 CREATE TABLE cancel_reasons (
   cancel_reason_id integer NOT NULL
   , name text NOT NULL
@@ -230,12 +291,14 @@ CREATE TABLE cancel_reasons (
 );
 
 CREATE TABLE consult (
-  consult_id integer NOT NULL
+  consult_id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_number text NOT NULL
   , progress_status integer NOT NULL
   , export_status integer NOT NULL
-  , place_schedule_id integer NOT NULL
-  , examinee_id integer NOT NULL
+  , place_schedule_id uuid NOT NULL
+  , note text NOT NULL
+  , examinee_id uuid NOT NULL
+  , external_connection_code text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT consult_PKC PRIMARY KEY (consult_id)
@@ -244,13 +307,32 @@ CREATE TABLE consult (
 ALTER TABLE consult ADD CONSTRAINT consult_IX1
   UNIQUE (consult_number) ;
 
+CREATE UNIQUE INDEX consult_IX2
+  ON consult(external_connection_code);
+
+CREATE TABLE exam_item_detail_options (
+  option_id integer NOT NULL
+  , code text NOT NULL
+  , exam_item_detail_id integer NOT NULL
+  , name text NOT NULL
+  , order_number integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_item_detail_options_PKC PRIMARY KEY (option_id)
+);
+
 CREATE TABLE exam_item_details (
   exam_item_detail_id integer NOT NULL
   , exam_item_id integer NOT NULL
+  , name text NOT NULL
   , set_previous_as_default boolean DEFAULT false NOT NULL
+  , order_number integer NOT NULL
   , position_number integer NOT NULL
   , type integer NOT NULL
   , keyboard_type integer NOT NULL
+  , integer_length integer NOT NULL
+  , decimal_length integer NOT NULL
+  , equipment_label text
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_item_details_PKC PRIMARY KEY (exam_item_detail_id)
@@ -268,7 +350,7 @@ CREATE TABLE exam_items (
 );
 
 CREATE TABLE examinees (
-  examinee_id integer NOT NULL
+  examinee_id uuid DEFAULT gen_random_uuid () NOT NULL
   , examinee_code text NOT NULL
   , name text NOT NULL
   , kana_name text NOT NULL
@@ -284,7 +366,7 @@ ALTER TABLE examinees ADD CONSTRAINT examinees_IX1
 
 CREATE TABLE export_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
-  , place_schedule_id integer NOT NULL
+  , place_schedule_id uuid NOT NULL
   , exported_at timestamp with time zone NOT NULL
   , exported_by text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -310,9 +392,9 @@ CREATE TABLE home_menu_groups (
 );
 
 CREATE TABLE place_schedule (
-  place_schedule_id integer NOT NULL
-  , place_id integer NOT NULL
-  , team_id integer NOT NULL
+  place_schedule_id uuid DEFAULT gen_random_uuid () NOT NULL
+  , place_id uuid NOT NULL
+  , team_id uuid NOT NULL
   , status integer NOT NULL
   , exam_date date NOT NULL
   , start_time varchar(4) NOT NULL
@@ -322,7 +404,7 @@ CREATE TABLE place_schedule (
 );
 
 CREATE TABLE places (
-  place_id integer NOT NULL
+  place_id uuid DEFAULT gen_random_uuid () NOT NULL
   , place_code text NOT NULL
   , name text NOT NULL
   , order_number integer NOT NULL
@@ -343,7 +425,7 @@ CREATE TABLE roles (
 );
 
 CREATE TABLE teams (
-  team_id integer NOT NULL
+  team_id uuid DEFAULT gen_random_uuid () NOT NULL
   , team_code text NOT NULL
   , name text NOT NULL
   , order_number integer NOT NULL
@@ -399,6 +481,16 @@ ALTER TABLE consult
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE consult_thresholds
+  ADD CONSTRAINT consult_thresholds_FK1 FOREIGN KEY (threshold_id) REFERENCES thresholds(threshold_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE consult_thresholds
+  ADD CONSTRAINT consult_thresholds_FK2 FOREIGN KEY (consult_id) REFERENCES consult(consult_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE equipments
   ADD CONSTRAINT equipments_FK1 FOREIGN KEY (exam_menu_id) REFERENCES exam_menus(exam_menu_id)
   ON DELETE RESTRICT
@@ -444,6 +536,16 @@ ALTER TABLE exam_items
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE exam_normal_option_details
+  ADD CONSTRAINT exam_normal_option_details_FK1 FOREIGN KEY (normal_options_id) REFERENCES exam_normal_options(normal_options_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE exam_normal_option_details
+  ADD CONSTRAINT exam_normal_option_details_FK2 FOREIGN KEY (option_id) REFERENCES exam_item_detail_options(option_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE exam_results
   ADD CONSTRAINT exam_results_FK1 FOREIGN KEY (consult_id) REFERENCES consult(consult_id)
   ON DELETE RESTRICT
@@ -465,7 +567,7 @@ ALTER TABLE home_menus
   ON UPDATE CASCADE;
 
 ALTER TABLE keyboard_options
-  ADD CONSTRAINT keyboard_options_FK1 FOREIGN KEY (exam_item_details_id) REFERENCES exam_item_details(exam_item_detail_id)
+  ADD CONSTRAINT keyboard_options_FK1 FOREIGN KEY (exam_item_detail_id) REFERENCES exam_item_details(exam_item_detail_id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -489,6 +591,16 @@ ALTER TABLE previous_results
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE prior_exam_menus
+  ADD CONSTRAINT prior_exam_menus_FK1 FOREIGN KEY (current_exam_menu_id) REFERENCES exam_menus(exam_menu_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE prior_exam_menus
+  ADD CONSTRAINT prior_exam_menus_FK2 FOREIGN KEY (prior_exam_menu_id) REFERENCES exam_menus(exam_menu_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE role_permissions
   ADD CONSTRAINT role_permissions_FK1 FOREIGN KEY (role_id) REFERENCES roles(role_id)
   ON DELETE RESTRICT
@@ -509,12 +621,23 @@ ALTER TABLE staffs
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE tickets
+  ADD CONSTRAINT tickets_FK1 FOREIGN KEY (consult_id) REFERENCES consult(consult_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 COMMENT ON TABLE affiliations IS '所属';
 COMMENT ON COLUMN affiliations.examinee_id IS '受診者ID';
 COMMENT ON COLUMN affiliations.organization_id IS '団体ID';
-COMMENT ON COLUMN affiliations.priority IS '優先度';
 COMMENT ON COLUMN affiliations.created_at IS '作成日時';
 COMMENT ON COLUMN affiliations.created_by IS '作成者';
+
+COMMENT ON TABLE consult_thresholds IS '基準値';
+COMMENT ON COLUMN consult_thresholds.threshold_id IS '基準値パターンID';
+COMMENT ON COLUMN consult_thresholds.consult_id IS '受診ID';
+COMMENT ON COLUMN consult_thresholds.priority IS '優先度';
+COMMENT ON COLUMN consult_thresholds.created_at IS '作成日時';
+COMMENT ON COLUMN consult_thresholds.created_by IS '作成者';
 
 COMMENT ON TABLE equipments IS '検査機器';
 COMMENT ON COLUMN equipments.equipment_id IS '検査機器ID';
@@ -545,15 +668,6 @@ COMMENT ON COLUMN exam_decision_rule.id IS 'ID';
 COMMENT ON COLUMN exam_decision_rule.created_at IS '作成日時';
 COMMENT ON COLUMN exam_decision_rule.created_by IS '作成者';
 
-COMMENT ON TABLE exam_item_detail_options IS '検査項目明細_選択肢';
-COMMENT ON COLUMN exam_item_detail_options.option_id IS '選択肢ID';
-COMMENT ON COLUMN exam_item_detail_options.code IS 'コード';
-COMMENT ON COLUMN exam_item_detail_options.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_item_detail_options.name IS '名称';
-COMMENT ON COLUMN exam_item_detail_options.order_number IS '表示順';
-COMMENT ON COLUMN exam_item_detail_options.created_at IS '作成日時';
-COMMENT ON COLUMN exam_item_detail_options.created_by IS '作成者';
-
 COMMENT ON TABLE exam_item_detail_orders IS '検査項目明細依頼';
 COMMENT ON COLUMN exam_item_detail_orders.consult_id IS '受診ID';
 COMMENT ON COLUMN exam_item_detail_orders.exam_item_detail_id IS '検査項目明細ID';
@@ -567,16 +681,35 @@ COMMENT ON COLUMN exam_item_notes.note IS '特記事項';
 COMMENT ON COLUMN exam_item_notes.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_notes.created_by IS '作成者';
 
+COMMENT ON TABLE exam_normal_option_details IS '検査項目明細_選択肢';
+COMMENT ON COLUMN exam_normal_option_details.normal_options_id IS '基準値選択肢ID';
+COMMENT ON COLUMN exam_normal_option_details.option_id IS '選択肢ID';
+COMMENT ON COLUMN exam_normal_option_details.created_at IS '作成日時';
+COMMENT ON COLUMN exam_normal_option_details.created_by IS '作成者';
+
+COMMENT ON TABLE exam_normal_options IS '検査正常値選択肢';
+COMMENT ON COLUMN exam_normal_options.normal_options_id IS '基準値選択肢ID';
+COMMENT ON COLUMN exam_normal_options.name IS '名称';
+COMMENT ON COLUMN exam_normal_options.threshold_id IS '基準値パターンID:0: テナントの基準';
+COMMENT ON COLUMN exam_normal_options.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_normal_options.max_age IS '対象年齢上限';
+COMMENT ON COLUMN exam_normal_options.min_age IS '対象年齢下限';
+COMMENT ON COLUMN exam_normal_options.target_sex IS '対象性別';
+COMMENT ON COLUMN exam_normal_options.error_level IS 'エラーレベル';
+COMMENT ON COLUMN exam_normal_options.created_at IS '作成日時';
+COMMENT ON COLUMN exam_normal_options.created_by IS '作成者';
+
 COMMENT ON TABLE exam_normal_value_range IS '検査正常値範囲';
 COMMENT ON COLUMN exam_normal_value_range.range_id IS '範囲ID';
 COMMENT ON COLUMN exam_normal_value_range.name IS '名称';
-COMMENT ON COLUMN exam_normal_value_range.organization_id IS '対象団体ID:0: テナントの基準';
+COMMENT ON COLUMN exam_normal_value_range.threshold_id IS '基準値パターンID:0: テナントの基準';
 COMMENT ON COLUMN exam_normal_value_range.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_normal_value_range.min_age IS '対象年齢上限';
-COMMENT ON COLUMN exam_normal_value_range.max_age IS '対象年齢下限';
+COMMENT ON COLUMN exam_normal_value_range.max_age IS '対象年齢上限';
+COMMENT ON COLUMN exam_normal_value_range.min_age IS '対象年齢下限';
 COMMENT ON COLUMN exam_normal_value_range.target_sex IS '対象性別';
 COMMENT ON COLUMN exam_normal_value_range.max_value IS '値上限';
 COMMENT ON COLUMN exam_normal_value_range.min_value IS '値下限';
+COMMENT ON COLUMN exam_normal_value_range.error_level IS 'エラーレベル';
 COMMENT ON COLUMN exam_normal_value_range.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_value_range.created_by IS '作成者';
 
@@ -617,7 +750,7 @@ COMMENT ON COLUMN home_menus.created_by IS '作成者';
 
 COMMENT ON TABLE keyboard_options IS 'キーボード入力値リスト';
 COMMENT ON COLUMN keyboard_options.option_id IS 'ID';
-COMMENT ON COLUMN keyboard_options.exam_item_details_id IS '検査項目明細ID';
+COMMENT ON COLUMN keyboard_options.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN keyboard_options.value IS '入力値';
 COMMENT ON COLUMN keyboard_options.created_at IS '作成日時';
 COMMENT ON COLUMN keyboard_options.created_by IS '作成者';
@@ -645,6 +778,12 @@ COMMENT ON COLUMN previous_results.value IS '値';
 COMMENT ON COLUMN previous_results.created_at IS '作成日時';
 COMMENT ON COLUMN previous_results.created_by IS '作成者';
 
+COMMENT ON TABLE prior_exam_menus IS '前提検査メニュー';
+COMMENT ON COLUMN prior_exam_menus.current_exam_menu_id IS '現在検査メニューID';
+COMMENT ON COLUMN prior_exam_menus.prior_exam_menu_id IS '前提検査メニューID';
+COMMENT ON COLUMN prior_exam_menus.created_at IS '作成日時';
+COMMENT ON COLUMN prior_exam_menus.created_by IS '作成者';
+
 COMMENT ON TABLE role_permissions IS 'ロール機能許可';
 COMMENT ON COLUMN role_permissions.functionality_id IS '機能ID';
 COMMENT ON COLUMN role_permissions.role_id IS 'ロールID';
@@ -671,6 +810,27 @@ COMMENT ON COLUMN staffs.role_id IS 'ロールID';
 COMMENT ON COLUMN staffs.created_at IS '作成日時';
 COMMENT ON COLUMN staffs.created_by IS '作成者';
 
+COMMENT ON TABLE thresholds IS '基準値パターン';
+COMMENT ON COLUMN thresholds.threshold_id IS '基準値パターンID';
+COMMENT ON COLUMN thresholds.threshold_code IS '基準値パターンコード';
+COMMENT ON COLUMN thresholds.name IS '基準値パターン名';
+COMMENT ON COLUMN thresholds.order_number IS '表示順';
+COMMENT ON COLUMN thresholds.created_at IS '作成日時';
+COMMENT ON COLUMN thresholds.created_by IS '作成者';
+
+COMMENT ON TABLE tickets IS '受付';
+COMMENT ON COLUMN tickets.consult_id IS '受診ID';
+COMMENT ON COLUMN tickets.ticket_number IS '受付番号';
+COMMENT ON COLUMN tickets.created_at IS '作成日時';
+COMMENT ON COLUMN tickets.created_by IS '作成者';
+
+COMMENT ON TABLE tickets_histories IS '受付履歴';
+COMMENT ON COLUMN tickets_histories.id IS 'ID';
+COMMENT ON COLUMN tickets_histories.consult_id IS '受診ID';
+COMMENT ON COLUMN tickets_histories.ticket_number IS '受付番号';
+COMMENT ON COLUMN tickets_histories.created_at IS '作成日時';
+COMMENT ON COLUMN tickets_histories.created_by IS '作成者';
+
 COMMENT ON TABLE cancel_reasons IS '中止理由';
 COMMENT ON COLUMN cancel_reasons.cancel_reason_id IS '中止理由ID';
 COMMENT ON COLUMN cancel_reasons.name IS '中止理由名';
@@ -685,17 +845,33 @@ COMMENT ON COLUMN consult.consult_number IS '受診番号';
 COMMENT ON COLUMN consult.progress_status IS '進捗状況';
 COMMENT ON COLUMN consult.export_status IS '結果出力状況';
 COMMENT ON COLUMN consult.place_schedule_id IS '会場日程ID';
+COMMENT ON COLUMN consult.note IS '特記事項';
 COMMENT ON COLUMN consult.examinee_id IS '受診者ID';
+COMMENT ON COLUMN consult.external_connection_code IS '外部連携キー';
 COMMENT ON COLUMN consult.created_at IS '作成日時';
 COMMENT ON COLUMN consult.created_by IS '作成者';
+
+COMMENT ON TABLE exam_item_detail_options IS '検査項目明細_選択肢';
+COMMENT ON COLUMN exam_item_detail_options.option_id IS '選択肢ID';
+COMMENT ON COLUMN exam_item_detail_options.code IS 'コード';
+COMMENT ON COLUMN exam_item_detail_options.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_item_detail_options.name IS '名称';
+COMMENT ON COLUMN exam_item_detail_options.order_number IS '表示順';
+COMMENT ON COLUMN exam_item_detail_options.created_at IS '作成日時';
+COMMENT ON COLUMN exam_item_detail_options.created_by IS '作成者';
 
 COMMENT ON TABLE exam_item_details IS '検査項目明細';
 COMMENT ON COLUMN exam_item_details.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_item_details.exam_item_id IS '検査項目ID';
+COMMENT ON COLUMN exam_item_details.name IS '検査項目明細名';
 COMMENT ON COLUMN exam_item_details.set_previous_as_default IS '前回値を初期値としてセットするか';
+COMMENT ON COLUMN exam_item_details.order_number IS '表示順';
 COMMENT ON COLUMN exam_item_details.position_number IS '配置番号';
 COMMENT ON COLUMN exam_item_details.type IS '検査項目明細種別';
 COMMENT ON COLUMN exam_item_details.keyboard_type IS 'キーボード種別';
+COMMENT ON COLUMN exam_item_details.integer_length IS '整数部桁数';
+COMMENT ON COLUMN exam_item_details.decimal_length IS '小数部桁数';
+COMMENT ON COLUMN exam_item_details.equipment_label IS '機器ラベル';
 COMMENT ON COLUMN exam_item_details.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_details.created_by IS '作成者';
 
@@ -785,3 +961,4 @@ COMMENT ON COLUMN exam_menus.name IS '検査メニュー名';
 COMMENT ON COLUMN exam_menus.order_number IS '表示順';
 COMMENT ON COLUMN exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN exam_menus.created_by IS '作成者';
+

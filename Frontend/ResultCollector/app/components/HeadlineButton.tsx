@@ -36,7 +36,7 @@ export default function HeadlineButton({
             className={styles["text-multiline"]}
             size="md"
             fw={700}
-            c={selected ? "primary" : "black"}
+            c={selected ? "primary" : "black01"}
             ta="left"
           >
             {title}
@@ -46,7 +46,7 @@ export default function HeadlineButton({
               className={styles["text-multiline"]}
               key={index}
               size="sm"
-              c={selected ? "primary" : "black"}
+              c={selected ? "primary" : "black01"}
               pt={index === 0 ? 16 : 8}
               ta="left"
             >
