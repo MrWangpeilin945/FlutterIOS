@@ -14,6 +14,12 @@ public class ExamContent
     public required string ConsultNumber { get; init; }
 
     /// <summary>
+    /// 特記事項
+    /// </summary>
+    [JsonPropertyName("consultName")]
+    public required string ConsultName { get; init; }
+
+    /// <summary>
     /// 受診者情報
     /// </summary>
     [JsonPropertyName("examinee")]

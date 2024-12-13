@@ -114,10 +114,21 @@ public class ConsultUsecase : IConsultUsecase
         // 受診日の年齢
         // NOTE: 年齢加算日は暫定で前日年齢加算
         Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 検査メニューに関連した検査項目情報を取得
+        var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
+        // 検査中止を取得
+        var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
+        // 検査依頼を取得
+        var examOrders = await _consultRepository.GetExamOrdersAsync(consult.ConsultId);
+        // 未受診の検査メニューを取得
+        var unexaminedItems = await GetUnexaminedMenusAsync(consultNumber);
+        // 同姓同名アラート
+        var sameNameAlert = await _placeScheduleRepository.IsSamename(consultNumber);
 
         return new ExamContent()
         {
             ConsultNumber = consultNumber,
+            ConsultName = consult.Note,
             Examinee = new Examinee()
             {
                 TicketNumber = consult.TicketNumber,
@@ -127,14 +138,29 @@ public class ConsultUsecase : IConsultUsecase
                 Sex = (int)examinee.Sex,
                 Organizations = examinee.Affiliations.OrderBy(x => x.OrderNumber)
                                                      .Select(x => x.OrganizationName).ToArray(),
-                SameNameAlert = true,       // TODO: 同姓同名アラート
+                SameNameAlert = sameNameAlert,
                 ExamDateAge = examAge.Years
             },
-            IsComplete = true,          // TODO: 検査実施判断
-            RelatedExamItems = [],      // TODO: 関連検査項目
-            ExamItems = [],             // TODO: 実施検査項目
-            ExamDecisionResult = [],    // TODO: 検査実施判断結果
-            UnexaminedItems = []        // TODO: 未実施検査項目
+            IsComplete = true,              // TODO: 検査実施判断    後方作業へ
+            RelatedExamItems = [],          // TODO: 関連検査項目    後方作業へ
+            ExamItems = examItemGroups.OrderBy(group => group.ExamItemGroupId)
+                                      .SelectMany(group => group.ExamItems)
+                                      .OrderBy(Item => Item.PositionNumber)
+                                      .Select(item => new ExamDetail
+                                      {
+                                        ExamItemId = item.ExamItemId,
+                                        ExamItemName = item.Name,
+                                        HasOrder = examOrders.ExamItemDetailOrders
+                                                             .Any(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId)),
+                                        CancelReasonId = examCancels.ExamItemDetailCancels
+                                                                    .SingleOrDefault(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId))?.CancelReasonId
+                                      }).ToArray(),
+            ExamDecisionResult = [],        // TODO: 検査実施判断結果    後方作業へ
+            UnexaminedItems = unexaminedItems.UnexaminedMenus.Select(x => new ExamMenu
+                                                                    {
+                                                                        ExamMenuId = x.ExamMenuId,
+                                                                        ExamMenuName = x.ExamMenuName
+                                                                    }).ToArray(),
         };
     }
 

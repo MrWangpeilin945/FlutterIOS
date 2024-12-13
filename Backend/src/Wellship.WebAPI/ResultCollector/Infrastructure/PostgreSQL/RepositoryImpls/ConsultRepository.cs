@@ -75,6 +75,7 @@ public class ConsultRepository : IConsultRepository
             , c.progress_status as ProgressStatus
             , c.export_status as ExportStatus
             , c.place_schedule_id as PlaceScheduleId
+            , c.note as Note
             , c.examinee_id as ExamineeId 
             , t.ticket_number as TicketNumber
         from
@@ -94,6 +95,7 @@ public class ConsultRepository : IConsultRepository
             ConsultNumber = x.ConsultNumber,
             ExamineeId = x.ExamineeId,
             PlaceScheduleId = x.PlaceScheduleId,
+            Note = x.Note,
             ExportStatus = (ConsultResultExportStatus)x.ExportStatus,
             ProgressStatus = (ConsultProgressStatus)x.ProgressStatus,
             TicketNumber = x.TicketNumber

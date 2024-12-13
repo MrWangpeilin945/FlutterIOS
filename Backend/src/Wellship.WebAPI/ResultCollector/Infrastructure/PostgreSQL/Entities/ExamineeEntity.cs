@@ -38,7 +38,7 @@ public class ExamineeEntity
     /// <summary>
     /// 団体ID
     /// </summary>
-    public required int OrganizationId { get; init; }
+    public required Guid OrganizationId { get; init; }
 
     /// <summary>
     /// 団体コード

@@ -68,38 +68,14 @@ public class ExamineeRepository : IExamineeRepository
             KanaName = examinee.First().KanaName,
             Sex = (Sex)examinee.First().Sex,
             Birthdate = new Birthdate(DateOnly.FromDateTime(examinee.First().Birthdate)),
-            // TODO: 団体が存在しないときにNULLが返るのを修正する
-            Affiliations = examinee.Select(x => new Affiliations
-                                    {
-                                        OrganizationId = x.OrganizationId,
-                                        OrganizationCode = x.OrganizationCode,
-                                        OrganizationName = x.OrganizationName,
-                                        OrderNumber = x.OrderNumber
-                                    }) ?? []
+            Affiliations = string.IsNullOrWhiteSpace(examinee.First().OrganizationCode) ? []
+                            : examinee.Select(x => new Affiliations
+                                        {
+                                            OrganizationId = x.OrganizationId,
+                                            OrganizationCode = x.OrganizationCode,
+                                            OrganizationName = x.OrganizationName,
+                                            OrderNumber = x.OrderNumber
+                                        })
         };
-    }
-
-    /// <summary>
-    /// 所属団体を取得します。
-    /// </summary>
-    /// <param name="examineeId">受診者ID</param>
-    public async Task<IEnumerable<Affiliations>> GetAffiliationsAsync(int examineeId)
-    {
-        var connection = await _dbConnectionProvider.GetOrOpenAsync();
-        const string sql = @"
-        select
-            a.organization_id as OrganizationId
-            , o.organization_code as OrganizationCode
-            , o.name as Name
-            , a.priority as Priority
-            , o.order_number as OrderNumber
-        from
-            resultcollector.affiliations a
-            left join resultcollector.organizations o
-            on a.organization_id = o.organization_id
-        where
-            examinee_id = @ExamineeId;";
-
-        return await connection.QueryAsync<Affiliations>(sql, new { ExamineeId = examineeId });
     }
 }

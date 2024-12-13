@@ -181,7 +181,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
         return placeSchedule;
     }
 
-        /// <summary>
+    /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
     public async Task UpdatePlaceScheduleLockingStatusAsync(Guid placeScheduleId, PlaceScheduleLockingStatus status)
@@ -211,5 +211,49 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
         where
             place_schedule_id = @PlaceScheduleId;";
         await connection.QueryAsync(updateSql, new { Status = (int)status, PlaceScheduleId = placeScheduleId });
+    }
+
+    /// <summary>
+    /// 会場日程での同姓同名の有無を判定する
+    /// </summary>
+    public async Task<bool> IsSamename(string consultNumber)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            count(*)
+        from
+            resultcollector.consult as c
+            left join resultcollector.examinees as e 
+                on c.examinee_id = e.examinee_id 
+        where
+            e.examinee_id != (
+                select 
+                    examinee_id 
+                from 
+                    resultcollector.consult 
+                where 
+                    consult_number = @ConsultNumber
+                )
+            and e.kana_name = (
+                select 
+                    e2.kana_name
+                from 
+                    resultcollector.consult c2
+                    left join resultcollector.examinees e2
+                        on c2.examinee_id = e2.examinee_id
+                where 
+                    c2.consult_number = @ConsultNumber
+            )
+            and c.place_schedule_id = (
+                select
+                    place_schedule_id
+                from
+                    resultcollector.consult
+                where
+                    consult_number = @ConsultNumber
+            );";
+        var results = await connection.QueryAsync<int>(sql, new { ConsultNumber = consultNumber });
+        return results.Any(x => x != 0);
     }
 }
