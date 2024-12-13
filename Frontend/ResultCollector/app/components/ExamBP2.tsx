@@ -15,6 +15,7 @@ import { z } from "zod";
 import { InputErrorLevel } from "~/domain/enums";
 import type { InputExamItem } from "~/domain/wellship.schemas";
 import NumericKeyboard from "./NumericKeyboard";
+import CollectionKeyboard from "./CollectionKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import styles from "~/styles/common.module.css";
@@ -57,15 +58,6 @@ export default function ExamBody({
       return updated;
     });
   };
-  // const toggleKeyboard = (index: number) => {
-  //   setShowKeyboards((prev) => {
-  //     const updated = [...prev];
-  //     updated[index] = !updated[index];
-  //     console.log(showKeyboards);
-  //     return updated;
-  //   });
-  // };
-
   const handleErrorMessage = (item: InputExamItem): InputExamItem => {
     if (item.examRegistResults) {
       // エラーレベルが高い順にソート
@@ -159,37 +151,6 @@ export default function ExamBody({
     setExamItemsData(updatedItems);
   }, [onRegisterPressed, examItems]);
 
-  // 表示時の小数点追加処理
-  const formatDecimalValue = (
-    value: string,
-    integerLength: number,
-    decimalLength: number
-  ): string => {
-    if (!value || integerLength <= 0 || decimalLength < 0) return value;
-    const totalLength = integerLength + decimalLength;
-    const paddedValue = value.padStart(totalLength, "0");
-
-    let integerPart = paddedValue.slice(0, integerLength);
-    const decimalPart = paddedValue.slice(integerLength, totalLength);
-
-    // 整数部が不足する場合、0で補填
-    if (integerPart.length < integerLength) {
-      integerPart =
-        "0".repeat(integerLength - integerPart.length) + integerPart;
-    }
-    let formattedValue = `${integerPart}.${decimalPart}`;
-
-    // 整数部が1未満の場合、整数部の先頭ゼロは除去しない
-    if (Number.parseInt(formattedValue) < 1) {
-      formattedValue = `0.${decimalPart}`;
-    } else {
-      // 整数部の先頭にゼロがついている場合、それを除去
-      formattedValue = formattedValue.replace(/^0+/, "");
-    }
-
-    return formattedValue;
-  };
-
   //変更イベント
   const handleChange = (
     positionNumber: number | undefined,
@@ -211,7 +172,7 @@ export default function ExamBody({
           // 該当するdetailの値を更新
           item.examItemDetails = item.examItemDetails?.map((detail) =>
             detail.positionNumber === detailPositionNumber
-              ? { ...detail, value }
+              ? { ...detail, value: value.slice(0, detail.integerLength ?? 3) }
               : detail
           );
         }
@@ -238,9 +199,8 @@ export default function ExamBody({
       // 平均値の保存処理
       if (item.positionNumber === 3) {
         item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
-          const decimalLength = detail.decimalLength ?? 0;
-          const integerLength = detail.integerLength ?? 0;
-          const maxDigits = decimalLength + integerLength + 1;
+          const integerLength = detail.integerLength ?? 0; // 血圧なので、小数部分は考慮しない
+          const maxDigits = integerLength + 1;
           if (idx === 0) {
             if (AVE1) {
               if (detail.integerLength) {
@@ -384,6 +344,7 @@ export default function ExamBody({
                         bg={isDisabled ? "gray03" : ""}
                         c={isDisabled ? "gray02" : ""}
                         value={detail?.value}
+                        maxLength={detail?.integerLength ?? 3}
                         onChange={(e) =>
                           handleChange(
                             positionNumber,
@@ -444,17 +405,25 @@ export default function ExamBody({
                 {/* キーボード表示 */}
                 {showKeyboards[index][detailIndex] && (
                   <Box ref={closeKeyBoard} mx="auto">
-                    <NumericKeyboard
-                      value={removeDecimalAndLeadingZero(detail?.value ?? "")}
-                      onChange={(newValue) =>
-                        handleChange(
-                          positionNumber,
-                          newValue,
-                          detail.positionNumber
-                        )
-                      }
-                      onConfirm={handleConfirm}
-                    />
+                    {detail.keyboard?.keyboardType === 1 ||
+                    !detail.keyboard?.keyboardType ? (
+                      <NumericKeyboard
+                        value={removeDecimalAndLeadingZero(detail?.value ?? "")}
+                        onChange={(newValue) =>
+                          handleChange(
+                            positionNumber,
+                            newValue,
+                            detail.positionNumber
+                          )
+                        }
+                        onConfirm={handleConfirm}
+                      />
+                    ) : (
+                      <CollectionKeyboard
+                        keyboardValues={detail.keyboard?.values ?? []}
+                        onChange={handleConfirm}
+                      />
+                    )}
                   </Box>
                 )}
               </React.Fragment>
