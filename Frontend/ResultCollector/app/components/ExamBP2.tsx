@@ -265,9 +265,6 @@ export default function ExamBody({
       {examItemsData.map((item, index) => {
         const { positionNumber, name, examRegistResults = [] } = item;
         const details = item.examItemDetails;
-        // グレーアウト表示判定
-        // TODO:hasOrderの追加
-        const isDisabled = !!details?.[0].cancelReasonId;
         const isAVE = item.positionNumber === 3;
 
         return (
@@ -294,9 +291,11 @@ export default function ExamBody({
                 </Text>
               </Paper>
               {details?.map((detail, detailIndex) => {
+                // グレーアウト表示判定
                 const isDisabled =
                   !!details?.[detailIndex]?.cancelReasonId ||
-                  details?.[detailIndex]?.hasOrder;
+                  !details?.[detailIndex]?.hasOrder;
+
                 return (
                   <Flex key={detail.positionNumber}>
                     {isAVE ? (
@@ -327,9 +326,11 @@ export default function ExamBody({
                       <TextInput
                         classNames={{
                           input: `${styles["input-textbox"]} ${
-                            examRegistResults?.some(
-                              (x) => x.errorLevel === InputErrorLevel.異常
-                            )
+                            isDisabled
+                              ? `${styles["input-textbox"]}`
+                              : examRegistResults?.some(
+                                  (x) => x.errorLevel === InputErrorLevel.異常
+                                )
                               ? `${styles["input-error"]}`
                               : examRegistResults?.some(
                                   (x) => x.errorLevel === InputErrorLevel.警告
