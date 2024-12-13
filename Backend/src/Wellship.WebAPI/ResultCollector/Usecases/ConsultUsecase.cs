@@ -214,7 +214,7 @@ public class ConsultUsecase : IConsultUsecase
         var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
         // 検査正常値範囲を取得
         IEnumerable<Domain.Models.ExamNormalValueRange> examNormalValueRanges = [];
-        if(thresholds.Any())
+        if (thresholds.Any())
         {
             examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
         }
@@ -227,21 +227,28 @@ public class ConsultUsecase : IConsultUsecase
         // 過去検査結果を取得
         var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
 
+        // 検査メニュー特記の設定を取得
+        var menuNotes = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
+        // 受診に紐づく検査項目特記を取得
+        var examItemNoteData = await _consultRepository.GetExamItemNotesAsync(consult.ConsultId);
+
+
         return new InputExamItems()
         {
             ConsultNumber = consultNumber,
-            Examinee = new InputExamExaminee(){
+            Examinee = new InputExamExaminee()
+            {
                 TicketNumber = consult.TicketNumber,
                 KanaName = examinee.KanaName,
                 Sex = (int)examinee.Sex,
                 ExamDateAge = examAge.Years
             },
-            RelatedExamItems = [],                  // TODO: 関連検査項目 後方作業へ
-            ExamItemGroups = 
+            RelatedExamItems = GetRelatedExamItems(menuNotes, examItemNoteData, examResults, previousResults).ToArray(),
+            ExamItemGroups =
                 examItemGroups.Select(eg => new ExamItemGroup
                 {
                     Type = (int)eg.Type,
-                    ExamItems = eg.ExamItems.Select(ei => new InputExamItem 
+                    ExamItems = eg.ExamItems.Select(ei => new InputExamItem
                     {
                         PositionNumber = ei.PositionNumber,
                         ExamItemId = ei.ExamItemId,
@@ -261,7 +268,8 @@ public class ConsultUsecase : IConsultUsecase
                             IntegerLength = ed.IntegerLength,
                             DecimalLength = ed.DecimalLength,
                             // キーボード入力
-                            Keyboard = new Keyboard{
+                            Keyboard = new Keyboard
+                            {
                                 KeyboardType = (int)ed.KeyboardType,
                                 Values = Keyboards.Where(kb => kb.ExamItemDetailId == ed.ExamItemDetailId)
                                                   .OrderBy(kb => kb.OptionId)
@@ -269,29 +277,73 @@ public class ConsultUsecase : IConsultUsecase
                                                   .ToArray()
                             },
                             // 選択肢
-                            ExamItemDetailOptions = 
+                            ExamItemDetailOptions =
                                 examItemDetailOptions.Where(op => op.ExamItemDetailId == ed.ExamItemDetailId)
-                                                     .OrderBy(op => op.OrderNumber)         
+                                                     .OrderBy(op => op.OrderNumber)
                                                      .Select(op => new ExamItemDetailOption
-                                                        {
-                                                            OrderNumber = op.OrderNumber,
-                                                            Code = op.Code,
-                                                            Name = op.Name
-                                                        }).ToArray(),
+                                                     {
+                                                         OrderNumber = op.OrderNumber,
+                                                         Code = op.Code,
+                                                         Name = op.Name
+                                                     }).ToArray(),
                             // 検査正常値範囲
-                            ExamNormalValueRanges = 
+                            ExamNormalValueRanges =
                                 examNormalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
                                                      .OrderBy(r => r.ErrorLevel)
                                                      .Select(r => new ExamNormalValueRange
-                                                        {
-                                                            ErrorLevel = (int)r.ErrorLevel,
-                                                            MaxValue = r.MaxValue,
-                                                            MinValue = r.MinValue
-                                                        }).ToArray()
+                                                     {
+                                                         ErrorLevel = (int)r.ErrorLevel,
+                                                         MaxValue = r.MaxValue,
+                                                         MinValue = r.MinValue
+                                                     }).ToArray()
                         }).ToArray(),
                         ExamRegistResults = []      // TODO: 検査結果登録エラー 後方作業へ
                     }).ToArray()
                 }).ToArray()
         };
+    }
+
+    /// <summary>
+    /// 検査メニュー特記を取得する
+    /// </summary>
+    private IEnumerable<RelatedExamItem> GetRelatedExamItems(
+        IEnumerable<Domain.Models.MenuNote> menuNotes,
+        IEnumerable<Domain.Models.ExamItemNote> examItemNotes,
+        Domain.Models.ExamResult? examResults,
+        Domain.Models.PreviousResult? previousResults)
+    {
+
+        var currentResultMap = examResults?.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value) ?? [];
+        var previousResultMap = previousResults?.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value) ?? [];
+        var itemNoteMap = examItemNotes.ToDictionary(x => x.ExamItemId, x => x.Note);
+
+        var results = menuNotes.Select(x => new RelatedExamItem()
+        {
+            ExamItemName = x.Name,
+            ExamResult = ConvertDetailValueToText(x, currentResultMap, previousResultMap, itemNoteMap)
+        });
+        return results;
+    }
+
+
+    private string ConvertDetailValueToText(Domain.Models.MenuNote menuNote, Dictionary<int, string> currentResultMap, Dictionary<int, string> previousResultMap, Dictionary<int, string> itemNoteMap)
+    {
+        // 検査結果
+        var rsls = menuNote.ExamResults.Select(x => x.SourceType switch
+                                       {
+                                           Core.Enums.SourceType.今回値 => currentResultMap.TryGetValue(x.ExamItemDetailId, out var currentResult) ? currentResult : "",
+                                           Core.Enums.SourceType.前回値 => previousResultMap.TryGetValue(x.ExamItemDetailId, out var previousResult) ? previousResult : "",
+                                           _ => ""
+                                       });
+
+        // TODO: 回答が選択肢の場合はコード→名称変換が必要。
+        // 複数ある場合のまとめ方は？、や／で区切る？
+
+
+        // 検査項目特記
+        var it = menuNote.ExamItemNotes.Select(x => itemNoteMap.TryGetValue(x.ExamItemId, out var itemNote) ? itemNote : "");
+
+        // TOOD: 表示用の文字列として組み立てる
+        return "";
     }
 }
