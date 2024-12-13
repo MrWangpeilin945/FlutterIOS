@@ -45,13 +45,13 @@ export default function Home() {
   );
 
   //availableConditions[]に、条件:placeScheduleSelected が存在するか
-  const getPlaceSelected = (conditions: string[]) => {
-    return conditions.find((element) => element === "placeScheduleSelected");
+  const isPlaceSelected = (conditions: string[]) => {
+    return conditions.some((element) => element === "placeScheduleSelected");
   };
 
   //availableConditions[]に、条件:placeScheduleUnlocked が存在するか
-  const getPlaceUnlocked = (conditions: string[]) => {
-    return conditions.find((element) => element === "placeScheduleUnlocked");
+  const isPlaceUnlocked = (conditions: string[]) => {
+    return conditions.some((element) => element === "placeScheduleUnlocked");
   };
 
   //ホームメニューボタンの名称を取得
@@ -61,13 +61,13 @@ export default function Home() {
       //jotaiの班、会場のどちらかがない場合
       name = `${menus.menuName}【班と会場を選択してください】`;
     } else if (
-      getPlaceSelected(menus?.availableConditions || []) &&
+      isPlaceSelected(menus?.availableConditions || []) &&
       !placeSchedule
     ) {
       //availableConditions[placeScheduleSelected]有りで、jotaiのplaceScheduleStateに値がない場合
       name = `${menus.menuName}【班と会場を選択してください】`;
     } else if (
-      getPlaceUnlocked(menus?.availableConditions || []) &&
+      isPlaceUnlocked(menus?.availableConditions || []) &&
       placeSchedulelocking === PlaceScheduleLockingStatus.検査完了
     ) {
       //availableConditions[placeScheduleUnlocked]有りで、placeSchedulelockingStatusの値が(検査完了)である場合
@@ -85,7 +85,7 @@ export default function Home() {
       //jotaiの班、会場のどちらかがない場合
       disabled = true;
     } else if (
-      getPlaceSelected(menus?.availableConditions || []) &&
+      isPlaceSelected(menus?.availableConditions || []) &&
       !placeSchedule
     ) {
       //availableConditions[placeScheduleSelected]有りで、jotaiのplaceScheduleStateに値がない場合
