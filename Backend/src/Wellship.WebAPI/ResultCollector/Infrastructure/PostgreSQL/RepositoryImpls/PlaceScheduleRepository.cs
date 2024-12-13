@@ -85,7 +85,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
     public async Task<Domain.Models.PlaceSchedule> GetPlaceScheduleAsync(Guid placeScheduleId)
     {
         var placeSchedule = await GetPlaceSchedulesAsync([placeScheduleId]);
-        if(!placeSchedule.Any())
+        if (!placeSchedule.Any())
         {
             // 会場日程が存在しない            
             throw new PlaceScheduleNotFoundException();
@@ -146,20 +146,6 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
                 OrderNumber = x.TeamOrderNumber
             },
         }).ToArray();
-    }
-
-    /// <summary>
-    /// 会場日程IDを指定して会場日程リストを取得する
-    /// </summary>
-    public async Task<Domain.Models.PlaceSchedule> GetPlaceScheduleAsync(int placeScheduleId)
-    {
-        var placeSchedules = await GetPlaceSchedulesAsync([placeScheduleId]);
-        if (!placeSchedules.Any())
-        {
-            throw new ResourceNotFoundException("指定した会場日程が存在しません。");
-        }
-
-        return placeSchedules.Single();
     }
 
     /// <summary>

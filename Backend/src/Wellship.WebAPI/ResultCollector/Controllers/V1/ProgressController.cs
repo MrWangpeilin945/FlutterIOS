@@ -33,7 +33,7 @@ public class ProgressController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/progress/{placeScheduleId}")]
-    public async Task<IActionResult> GetProgress([FromRoute][Required] int placeScheduleId)
+    public async Task<IActionResult> GetProgress([FromRoute][Required] Guid placeScheduleId)
     {
         var results = await _progressUsecase.GetProgressAsync(placeScheduleId);
         return Ok(results);
