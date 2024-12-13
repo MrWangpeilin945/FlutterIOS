@@ -8,7 +8,7 @@ public class PreviousResultEntity
     /// <summary>
     /// 受診ID
     /// </summary>
-    public required int ConsultId { get; set; }
+    public required Guid ConsultId { get; set; }
 
     /// <summary>
     /// 健診日

@@ -8,7 +8,7 @@ public class ExamineeEntity
     /// <summary>
     /// 受診者ID
     /// </summary>
-    public required int ExamineeId { get; init; }
+    public required Guid ExamineeId { get; init; }
 
     /// <summary>
     /// 受診者コード

@@ -81,21 +81,21 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber))
                          .ReturnsAsync(new Consult
                          {
-                             ConsultId = 1,
+                             ConsultId = Guid.Parse("8d670eb8-d9f2-40b2-bfa6-cef6403be53d"),
                              ConsultNumber = "0001",
-                             ExamineeId = 1,
+                             ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
                              ProgressStatus = ConsultProgressStatus.検査中,
                              ExportStatus = ConsultResultExportStatus.未出力,
-                             PlaceScheduleId = 1,
+                             PlaceScheduleId = Guid.Parse("531eb00c-1850-4d5e-9561-f24cdfd9a250"),
                              TicketNumber = "1029"
                          });
 
         _consultRepositoryMock.Setup(x => x.GetUnexaminedConsultsAsync(new[] { consultNumber }))
                          .ReturnsAsync([
                             new(){
-                                ConsultId = 1,
+                                ConsultId = Guid.Parse("8d670eb8-d9f2-40b2-bfa6-cef6403be53d"),
                                 ConsultNumber = "0001",
-                                ExamineeId = 1,
+                                ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
                                 UnexaminedExamMenus = [
                                     new UnexaminedExamMenu(){
                                         ExamMenuId = 1,
@@ -106,10 +106,10 @@ public class ConsultUsecaseTests
                                         ExamMenuName = "血圧"
                                     }]}]);
 
-        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(1))
+        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3")))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
-                              ExamineeId = 1,
+                              ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
                               ExamineeCode = "10001",
                               Name = "両備　太郎",
                               KanaName = "リョウビ　タロウ",
@@ -139,15 +139,15 @@ public class ConsultUsecaseTests
             ConsultNumber = "1",
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
-            PlaceScheduleId = 1,
-            ConsultId = 1,
-            ExamineeId = 1,
+            PlaceScheduleId = Guid.Parse("6df8bdff-66c0-4113-afd6-985a78bd35ff"),
+            ConsultId = Guid.Parse("0c48b92e-7b65-4e39-8d19-7dcdead5a763"),
+            ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
             TicketNumber = "1029"
         });
-        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(1))
+        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df")))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
-                              ExamineeId = 1,
+                              ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
                               ExamineeCode = "10001",
                               Name = "両備　太郎",
                               KanaName = "リョウビ　タロウ",
@@ -190,19 +190,19 @@ public class ConsultUsecaseTests
         // DBの受診情報
         var consult = new Consult()
         {
-            ConsultId = 1,
+            ConsultId = Guid.Parse("7400c9cc-c2ee-48ef-a12e-5c3244631a6d"),
             ConsultNumber = "0001",
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
-            PlaceScheduleId = 1,
-            ExamineeId = 1,
+            PlaceScheduleId = Guid.Parse("caab7279-109a-4c63-bc9a-83fa25c59a91"),
+            ExamineeId = Guid.Parse("9944b7f3-0728-4801-853f-424a9c23a0b9"),
             TicketNumber = "1029"
         };
 
         // すでに存在するキャンセルレコード
         var examCancels = new ExamCancel()
         {
-            ConsultId = 1,
+            ConsultId = Guid.Parse("ea0729d2-30c6-46e8-8fef-e73a666b71cd"),
             ExamItemDetailCancels = [
                 new ExamItemDetailCancel() {ExamItemDetailId = 1, ExamItemId = 1, CancelReasonId = 1},
                 new ExamItemDetailCancel() {ExamItemDetailId = 711, ExamItemId = 71, CancelReasonId = 3},
@@ -244,12 +244,12 @@ public class ConsultUsecaseTests
         // DBの受診情報
         var consult = new Consult()
         {
-            ConsultId = 1,
+            ConsultId = Guid.Parse("4a778828-c758-4437-99ec-3493310edf46"),
             ConsultNumber = "0001",
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
-            PlaceScheduleId = 1,
-            ExamineeId = 1,
+            PlaceScheduleId = Guid.Parse("ed3e8d23-2c9f-4b0c-bfb1-e933afc8ee49"),
+            ExamineeId = Guid.Parse("9409a9a9-163e-4721-a1ae-9fa83017bcf7"),
             TicketNumber = "1029"
         };
 
@@ -257,7 +257,7 @@ public class ConsultUsecaseTests
         var examCancel = new ExamCancel()
         {
             // キャンセルレコードなし
-            ConsultId = 1,
+            ConsultId = Guid.Parse("4075747f-579b-4fc0-ad8e-4ef1c0fc6c9f"),
             ExamItemDetailCancels = []
         };
 
