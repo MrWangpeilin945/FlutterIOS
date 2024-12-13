@@ -55,7 +55,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// <summary>
     /// 班を指定して会場日程を取得する
     /// </summary>
-    public async Task<PlaceSchedulePlaces> GetTeamPlaceSchedulesAsync(DateOnly examDate, int teamId)
+    public async Task<PlaceSchedulePlaces> GetTeamPlaceSchedulesAsync(DateOnly examDate, Guid teamId)
     {
         var placeSchedules = await _placeScheduleRepository.GetPlaceSchedulesAsync(examDate);
         var team = placeSchedules.Where(x => x.ExamDate == examDate)
@@ -87,7 +87,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// <summary>
     /// 会場ロック状態を取得する
     /// </summary>
-    public async Task<PlaceScheduleLocking> GetPlaceScheduleLockingStatusAsync(int placeScheduleId)
+    public async Task<PlaceScheduleLocking> GetPlaceScheduleLockingStatusAsync(Guid placeScheduleId)
     {
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync(placeScheduleId);
         return new APIModels.Responses.PlaceScheduleLocking()
@@ -105,7 +105,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
-    public async Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, PlaceScheduleLockingStatus status)
+    public async Task UpdatePlaceScheduleLockingStatusAsync(Guid placeScheduleId, PlaceScheduleLockingStatus status)
     {
         await _placeScheduleRepository.UpdatePlaceScheduleLockingStatusAsync(placeScheduleId, status);
     }

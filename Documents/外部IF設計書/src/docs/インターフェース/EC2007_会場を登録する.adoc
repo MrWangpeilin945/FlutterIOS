@@ -155,8 +155,8 @@ list.Count()  <> 0
 |列|登録値|処理・変換
 
 |place_id
-|max([DB]places(会場).place_id(会場ID)) + 1
 |
+|DB:DEFAULT
 
 |place_code
 |Place.Code

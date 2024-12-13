@@ -11,13 +11,13 @@ public class UnexaminedMenuList
     /// 受診ID
     /// </summary>
     [JsonPropertyName("consultId")]
-    public required int ConsultId { get; init; }
+    public required Guid ConsultId { get; init; }
 
     /// <summary>
     /// 受診者ID
     /// </summary>
     [JsonPropertyName("examineeId")]
-    public required int ExamineeId { get; init; }
+    public required Guid ExamineeId { get; init; }
 
     /// <summary>
     /// 受診者名

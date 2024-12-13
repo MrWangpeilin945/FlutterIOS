@@ -155,8 +155,8 @@ list.Count()  <> 0
 |列|登録値|処理・変換
 
 |threshold_id
-|max([DB]thresholds(基準パターン).threshold_id(基準パターンID)) + 1
 |
+|DB:DEFAULT
 
 |threshold_code
 |Threshold.Code

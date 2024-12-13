@@ -104,6 +104,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IExamineeRepository, ExamineeRepository>();
         services.AddScoped<IProgressRepository, ProgressRepository>();
         services.AddScoped<ICancelReasonRepository, CancelReasonRepository>();
+        services.AddScoped<IExamItemRepository, ExamItemRepository>();
         return services;
     }
     /// <summary>

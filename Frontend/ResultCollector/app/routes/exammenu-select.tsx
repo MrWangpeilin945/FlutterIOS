@@ -199,10 +199,7 @@ export default function ExamMenuSelect() {
                 <>
                   {/* エラーメッセージを表示(検査メニュー情報の取得データが0件だった場合) */}
                   <Text size="sm" c="black01">
-                    {getErrorMessage(
-                      errorMessages.notFound,
-                      "使用できる検査メニュー",
-                    )}
+                    検査メニューの設定がありませんでした。
                   </Text>
                 </>
               )}

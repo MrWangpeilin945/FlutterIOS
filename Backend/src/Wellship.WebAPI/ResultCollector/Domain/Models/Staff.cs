@@ -29,7 +29,7 @@ public class Staff
     /// <summary>
     /// 職員ID
     /// </summary>
-    public int StaffId { get; }
+    public Guid StaffId { get; }
 
     /// <summary>
     /// 職員コード

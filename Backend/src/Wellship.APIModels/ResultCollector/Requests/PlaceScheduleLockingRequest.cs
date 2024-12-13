@@ -11,7 +11,7 @@ public class PlaceScheduleLockingRequest
     /// 会場日程ID
     /// </summary>
     [JsonPropertyName("placeScheduleId")]
-    public int PlaceScheduleId { get; set; }
+    public Guid PlaceScheduleId { get; set; }
 
     /// <summary>
     /// ロック状態

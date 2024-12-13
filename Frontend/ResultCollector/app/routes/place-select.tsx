@@ -116,7 +116,7 @@ export default function PlaceSelect() {
                 <>
                   {/* エラーメッセージを表示 */}
                   <Text size="sm" c="black01">
-                    {getErrorMessage(errorMessages.noData, "該当する会場")}
+                    会場の設定がありませんでした。
                   </Text>
                 </>
               )}

@@ -11,7 +11,7 @@ public class PlaceScheduleProgress
     /// 会場日程ID
     /// </summary>
     [JsonPropertyName("placeScheduleId")]
-    public required int PlaceScheduleId { get; init; }
+    public required Guid PlaceScheduleId { get; init; }
 
     /// <summary>
     /// 会場名

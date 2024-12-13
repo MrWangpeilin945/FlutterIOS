@@ -155,8 +155,8 @@ list.Count()  <> 0
 |列|登録値|処理・変換
 
 |team_id
-|max([DB]teams(班).team_id(班ID)) + 1
 |
+|DB:DEFAULT
 
 |team_code
 |Team.Code

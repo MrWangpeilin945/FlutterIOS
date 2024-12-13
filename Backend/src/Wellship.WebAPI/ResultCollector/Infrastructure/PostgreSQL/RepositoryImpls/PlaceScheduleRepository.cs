@@ -82,7 +82,21 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
     /// <summary>
     /// 会場日程IDを指定して会場日程リストを取得する
     /// </summary>
-    public async Task<IEnumerable<Domain.Models.PlaceSchedule>> GetPlaceSchedulesAsync(int[] placeScheduleIds)
+    public async Task<Domain.Models.PlaceSchedule> GetPlaceScheduleAsync(Guid placeScheduleId)
+    {
+        var placeSchedule = await GetPlaceSchedulesAsync([placeScheduleId]);
+        if(!placeSchedule.Any())
+        {
+            // 会場日程が存在しない            
+            throw new PlaceScheduleNotFoundException();
+        }
+        return placeSchedule.ElementAt(0);
+    }
+
+    /// <summary>
+    /// 会場日程IDを指定して会場日程を取得する
+    /// </summary>
+    public async Task<IEnumerable<Domain.Models.PlaceSchedule>> GetPlaceSchedulesAsync(Guid[] placeScheduleIds)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
@@ -151,7 +165,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
     /// <summary>
     /// 会場ロック状態を取得する
     /// </summary>
-    public async Task<Domain.Models.PlaceScheduleStatus> GetPlaceScheduleLockingStatusAsync(int placeScheduleId)
+    public async Task<Domain.Models.PlaceScheduleStatus> GetPlaceScheduleLockingStatusAsync(Guid placeScheduleId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
@@ -184,7 +198,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
     /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
-    public async Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, PlaceScheduleLockingStatus status)
+    public async Task UpdatePlaceScheduleLockingStatusAsync(Guid placeScheduleId, PlaceScheduleLockingStatus status)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string selectSql = @"
