@@ -14,6 +14,7 @@ import BoothNote from "~/components/BoothNote";
 import CommonFooter from "~/components/CommonFooter";
 import { ErrorModal } from "~/components/ErrorModal";
 import ExamineeHeader from "~/components/ExamineeHeader";
+import ExamNumeric from "~/components/ExamNumeric";
 import ExamSelect from "~/components/ExamSelect";
 import {
   connectionEquipmentState,
@@ -431,5 +432,8 @@ export default function consultInput() {
         <CommonFooter />
       </AuthWrapper>
     </>
+  );
+}
+
   );
 }

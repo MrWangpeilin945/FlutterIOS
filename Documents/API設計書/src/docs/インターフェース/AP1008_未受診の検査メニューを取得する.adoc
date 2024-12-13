@@ -1,16 +1,18 @@
-== AP1008_未受診の検査項目を取得する
+== AP1008_未受診の検査メニューを取得する
 
 === 概要
 
 * 受診番号入力画面から利用する
 * 受診番号を指定して、未受診の検査メニューリストを取得する
 * 検査メニューは表示順の昇順でソートする
+* 検査項目明細単位の依頼レコードに対して、検査結果あるいは検査中止のレコードが存在すれば受診済みとする
+* 未受診の検査項目明細が1つ以上存在する検査メニューを「未受診の検査メニュー」として返す
 
 === URI
 
 [source]
 ----
-[GET] /consult/{consultNumber}/unexaminedItems
+[GET] /consult/{consultNumber}/unexaminedMenus
 ----
 
 === リクエストヘッダー
@@ -42,10 +44,10 @@
 [source,json]
 ----
 {
-  "consultId": 1234,
-  "examineeId" : 1,
+  "consultId": "9c7ee990-7ad6-4cbf-a1c6-c2cf5b74cf8f",
+  "examineeId" : "fc8238ad-86ef-4062-8fd0-5c4a8b9d3865",
   "examineeName":"青空 太郎",
-  "unexaminedItems": [
+  "unexaminedMenus": [
     {
       "examMenuId": 3,
       "examMenuName": "身体計測"

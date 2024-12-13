@@ -1,4 +1,5 @@
 using Ryobi.Wellship.APIModels.Requests;
+using Ryobi.Wellship.APIModels.Responses;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -15,9 +16,9 @@ public interface IConsultUsecase
     public Task VerifyConsultNumberAsync(ConsultNumberRequest consultNumberRequest);
 
     /// <summary>
-    /// 未受診の検査項目を取得する
+    /// 未受診の検査メニューを取得する
     /// </summary>
-    public void GetUnexaminedItems();
+    public Task<UnexaminedMenuList> GetUnexaminedMenusAsync(string consultNumber);
 
     /// <summary>
     /// 簡易な受診者情報を取得する
@@ -28,4 +29,19 @@ public interface IConsultUsecase
     /// 検査内容を取得する
     /// </summary>
     public void GetExamItemsExaminee();
+
+    /// <summary>
+    /// 検査の実施有無と中止理由を登録する
+    /// </summary>
+    public Task RegisterExecutionsAsync(string consultNumber, ExecutionsRequest request);
+
+    /// <summary>
+    /// 前提検査メニューを検証する
+    /// </summary>
+    public Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenus(string consultNumber, int examMenuId);
+
+    /// <summary>
+    /// 検査結果入力情報を取得する
+    /// </summary>
+    public Task<InputExamItems> GetInputExamItemsExamineeAsync(string consultNumber, int examMenuId);
 }

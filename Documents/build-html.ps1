@@ -1,9 +1,9 @@
 ﻿# HTMLとして出力する
 
 $docnames = @(
-    [PSCustomObject]@{Name = 'architecture'; JpName = 'アーキテクチャ設計書' },
-    [PSCustomObject]@{Name = 'webapi-design'; JpName = 'API設計書' },
-    [PSCustomObject]@{Name = 'ui-design'; JpName = 'UI設計書' }
+    # [PSCustomObject]@{Name = 'architecture'; JpName = 'アーキテクチャ設計書' },
+    # [PSCustomObject]@{Name = 'ui-design'; JpName = 'UI設計書' },
+    [PSCustomObject]@{Name = 'webapi-design'; JpName = 'API設計書' }
 )
 
 $docnames | ForEach-Object {

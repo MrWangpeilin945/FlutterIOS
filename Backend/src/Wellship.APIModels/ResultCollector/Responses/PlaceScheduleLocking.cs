@@ -11,13 +11,13 @@ public class PlaceScheduleLocking
     /// 会場日程ID
     /// </summary>
     [JsonPropertyName("placeScheduleId")]
-    public int PlaceScheduleId { get; init;}
+    public Guid PlaceScheduleId { get; init;}
 
     /// <summary>
     /// 会場ID
     /// </summary>
     [JsonPropertyName("placeId")]
-    public int PlaceId { get; init;}
+    public Guid PlaceId { get; init;}
 
     /// <summary>
     /// 会場名

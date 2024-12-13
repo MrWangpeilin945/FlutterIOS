@@ -1,4 +1,4 @@
-import { Container, LoadingOverlay, Stack, Title } from "@mantine/core";
+import { Container, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { usePlaceScheduleGetTeams } from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
 import CommonDialog from "~/components/CommonDialog";
-import CommonFooter from "~/components/CommonFooter";
 import CommonHeader from "~/components/CommonHeader";
 import HeadlineButton from "~/components/HeadlineButton";
 import type { PlaceScheduleTeams } from "~/domain/wellship.schemas";
@@ -67,11 +66,11 @@ export default function Teams() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="班選択" staffName={staff?.name || ""} />
-        <Container fluid mt={20}>
+        <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
               {teamsData?.teams ? (
-                <Stack>
+                <Stack gap={16}>
                   {teamsData.teams.map((tm) => (
                     <HeadlineButton
                       key={tm.teamId}
@@ -91,9 +90,9 @@ export default function Teams() {
               ) : (
                 <>
                   {/* エラーメッセージを表示 */}
-                  <Title order={3}>
-                    {getErrorMessage(errorMessages.noData, "該当する班")}
-                  </Title>
+                  <Text size="sm" c="black01">
+                    班の設定がありませんでした。
+                  </Text>
                 </>
               )}
               <CommonDialog
@@ -105,7 +104,6 @@ export default function Teams() {
             </>
           )}
         </Container>
-        <CommonFooter />
       </AuthWrapper>
     </>
   );

@@ -101,6 +101,9 @@ public static class IServiceCollectionExtension
         services.AddScoped<IExamMenuRepository, ExamMenuRepository>();
         services.AddScoped<IEquipmentRepository, EquipmentRepository>();
         services.AddScoped<IIntegrationRepository, IntegrationRepository>();
+        services.AddScoped<IExamineeRepository, ExamineeRepository>();
+        services.AddScoped<ICancelReasonRepository, CancelReasonRepository>();
+        services.AddScoped<IExamItemRepository, ExamItemRepository>();
         return services;
     }
     /// <summary>
@@ -115,6 +118,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IExamMenuUsecase, ExamMenuUsecase>();
         services.AddScoped<IEquipmentUsecase, EquipmentUsecase>();
         services.AddScoped<IIntegrationUsecase, IntegrationUsecase>();
+        services.AddScoped<ICancelReasonUsecase, CancelReasonUsecase>();
         return services;
     }
     /// <summary>

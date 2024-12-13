@@ -53,7 +53,7 @@
 {
   "consultNumber": "012345678",
   "examinee" : {
-    "receptionNumber" : 10,
+    "ticketNumber" : "10",
     "kanaName" : "リョウビ　タロウ",
     "sex" : 1,
     "examDateAge" : 49
@@ -78,11 +78,12 @@
               "examItemDetailId" : 1001,
               "equipmentLabel" : "Height",
               "name" : "身長",
+              "hasOrder" : true,
+              "cancelReasonId" : null,
               "value" : "157.0",
               "prevValue" : "155.5",
               "unit" : "cm",
               "type" : 1, 
-              "cancelReasonId" : null,
               "integerLength" : 3,
               "decimalLength" : 1,
               "keyboard" : {
@@ -126,3 +127,4 @@
 ** JWT認証に失敗
 * 404 NotFound
 ** 指定した受診が存在しない
+** 指定した会場日程が存在しない

@@ -1,8 +1,8 @@
-import { Container, LoadingOverlay, Stack, Title } from "@mantine/core";
+import { Container, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { usePlaceScheduleGetTeamPlaceSchedules } from "~/api/wellship";
@@ -12,7 +12,12 @@ import CommonFooter from "~/components/CommonFooter";
 import CommonHeader from "~/components/CommonHeader";
 import HeadlineButton from "~/components/HeadlineButton";
 import type { PlaceSchedulePlaces } from "~/domain/wellship.schemas";
-import { placeScheduleState, staffState, teamState } from "~/store/store";
+import {
+  examDateState,
+  placeScheduleState,
+  staffState,
+  teamState,
+} from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
 export const meta: MetaFunction = () => {
@@ -27,6 +32,7 @@ export default function PlaceSelect() {
   const [placeSchedule, setPlaceSchedule] = useAtom(placeScheduleState);
   const [team] = useAtom(teamState);
   const [staff] = useAtom(staffState);
+  const [, setExamDate] = useAtom(examDateState);
   const [targetDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const { isFetching, refetch } = usePlaceScheduleGetTeamPlaceSchedules(
     "1",
@@ -54,13 +60,18 @@ export default function PlaceSelect() {
     fetchPlaceSchedules();
   }, []);
 
-  // jotaiに会場ID、会場名、会場日程ID、開始時刻を保存して遷移
+  // jotaiに健診日、会場ID、会場名、会場日程ID、開始時刻を保存して遷移
   const callbackClick = (
+    examDate?: string,
     placeId?: number,
     placeName?: string,
     placeScheduleId?: number,
     startTime?: string,
   ) => {
+    if (examDate) {
+      setExamDate(parse(examDate, "yyyy-MM-dd", new Date()));
+    }
+
     if (placeId !== undefined && placeName && placeScheduleId !== undefined) {
       const placeScheduleData = {
         placeId,
@@ -78,11 +89,11 @@ export default function PlaceSelect() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="会場選択" staffName={staff?.name || ""} />
-        <Container fluid mt={20}>
+        <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
               {placesData?.placeSchedules ? (
-                <Stack>
+                <Stack gap={16}>
                   {placesData.placeSchedules.map((ps) => (
                     <HeadlineButton
                       key={ps.placeId}
@@ -91,6 +102,7 @@ export default function PlaceSelect() {
                       selected={placeSchedule?.placeId === ps.placeId}
                       onClick={() =>
                         callbackClick(
+                          placesData.examDate,
                           ps.placeId,
                           ps.placeName,
                           ps.placeScheduleId,
@@ -103,9 +115,9 @@ export default function PlaceSelect() {
               ) : (
                 <>
                   {/* エラーメッセージを表示 */}
-                  <Title order={3}>
-                    {getErrorMessage(errorMessages.noData, "該当する会場")}
-                  </Title>
+                  <Text size="sm" c="black01">
+                    会場の設定がありませんでした。
+                  </Text>
                 </>
               )}
               <CommonDialog

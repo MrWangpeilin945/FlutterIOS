@@ -29,10 +29,8 @@
 ----
 enum Sex
 {
-    不明 = 0,
     男 = 1,
-    女 = 2,
-    適用不能 = 9
+    女 = 2
 }
 ----
 
@@ -139,13 +137,12 @@ enum ConsultResultExportStatus
 
 ソフトウェアキーボードのタイプです。
 
-フロントエンドの実装単位が決まり次第、値を振ります。
-
 [source,csharp]
 ----
 enum KeyboardType
 {
-    テンキー = 1
+    テンキー = 1,
+    選択肢 = 2
 }
 ----
 
@@ -171,6 +168,21 @@ enum ExamItemGroupType
     視力,
     聴力,
     通過
+}
+----
+
+=== 検査項目明細種別
+
+フロントエンドで入力や選択を出し分けるためのタイプです。
+検査項目種別ごとに設定します。
+
+[source,csharp]
+----
+enum ExamItemDetailType
+{
+    入力 = 1,
+    選択 = 2,
+    演算値 =3
 }
 ----
 

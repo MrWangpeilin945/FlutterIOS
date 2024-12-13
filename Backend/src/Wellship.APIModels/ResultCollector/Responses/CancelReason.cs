@@ -8,31 +8,21 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class CancelReason
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public CancelReason(int cancelReasonId, string cancelReasonName, int examItemId)
-    {
-        CancelReasonId = cancelReasonId;
-        CancelReasonName = cancelReasonName;
-        ExamItemId = examItemId;
-    }
-
-    /// <summary>
     /// 中止理由ID
     /// </summary>
     [JsonPropertyName("cancelReasonId")]
-    public int CancelReasonId { get; }
+    public required int CancelReasonId { get; init; }
 
     /// <summary>
     /// 中止理由名
     /// </summary>
     [JsonPropertyName("cancelReasonName")]
-    public string CancelReasonName { get; }
+    public required string CancelReasonName { get; init; }
 
     /// <summary>
     /// 検査項目ID
     /// </summary>
     [JsonPropertyName("examItemId")]
-    public int ExamItemId { get; }
+    public required int ExamItemId { get; init; }
 
 }

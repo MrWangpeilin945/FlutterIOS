@@ -13,4 +13,9 @@ public class HomeMenuGroupList
     [JsonPropertyName("homeMenuGroups")]
     public required HomeMenuGroup[] HomeMenuGroups { get; init; }
 
+    /// <summary>
+    /// 会場日程状況
+    /// </summary>
+    [JsonPropertyName("placeScheduleLockingStatus")]
+    public required int? PlaceScheduleLockingStatus { get; init; }
 }
