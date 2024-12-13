@@ -13,9 +13,10 @@ import { useClickOutside } from "@mantine/hooks";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import { z } from "zod";
 import { InputErrorLevel } from "~/domain/enums";
-import type { ExamItemDetail, InputExamItem } from "~/domain/wellship.schemas";
+import type { InputExamItem } from "~/domain/wellship.schemas";
 import NumericKeyboard from "./NumericKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
+import { setRangesErrorMessage } from "~/utils/setRangesErrorMessege";
 import styles from "~/styles/common.module.css";
 
 type BodyProps = {
@@ -143,37 +144,6 @@ export default function ExamBody({
     setExamItemsData(updatedItems);
   }, [onRegisterPressed, examItems]);
 
-  // 表示時の小数点追加処理
-  const formatDecimalValue = (
-    value: string,
-    integerLength: number,
-    decimalLength: number,
-  ): string => {
-    if (!value || integerLength <= 0 || decimalLength < 0) return value;
-    const totalLength = integerLength + decimalLength;
-    const paddedValue = value.padStart(totalLength, "0");
-
-    let integerPart = paddedValue.slice(0, integerLength);
-    const decimalPart = paddedValue.slice(integerLength, totalLength);
-
-    // 整数部が不足する場合、0で補填
-    if (integerPart.length < integerLength) {
-      integerPart =
-        "0".repeat(integerLength - integerPart.length) + integerPart;
-    }
-    let formattedValue = `${integerPart}.${decimalPart}`;
-
-    // 整数部が1未満の場合、整数部の先頭ゼロは除去しない
-    if (Number.parseInt(formattedValue) < 1) {
-      formattedValue = `0.${decimalPart}`;
-    } else {
-      // 整数部の先頭にゼロがついている場合、それを除去
-      formattedValue = formattedValue.replace(/^0+/, "");
-    }
-
-    return formattedValue;
-  };
-
   //変更イベント
   const handleChange = (positionNumber: number | undefined, value: string) => {
     const updatedExamItems = [...examItemsData];
@@ -183,17 +153,8 @@ export default function ExamBody({
       if (item.positionNumber === positionNumber) {
         // 該当するexamItemDetailsの最初のvalueを更新
         item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
-          const decimalLength = detail.decimalLength ?? 0;
-          const integerLength = detail.integerLength ?? 0;
-
-          const cleanedValue = formatDecimalValue(
-            value,
-            integerLength,
-            decimalLength,
-          );
-
           if (idx === 0) {
-            return { ...detail, value: cleanedValue };
+            return { ...detail, value: value };
           }
           return detail;
         });
@@ -223,8 +184,12 @@ export default function ExamBody({
           return detail;
         });
       }
+
       // 各アイテムに対してバリデーションを実行
-      const validatedItem = validationCheck(item);
+      let validatedItem = validationCheck(item);
+      if (item.positionNumber !== 4) {
+        validatedItem = setRangesErrorMessage(validatedItem);
+      }
       // バリデーション結果を反映
       Object.assign(item, validatedItem);
     }
@@ -243,15 +208,6 @@ export default function ExamBody({
     if (!isValidatedError) {
       onChange(updatedExamItems);
     }
-  };
-
-  // 小数点と先頭の0を除去して数値部分だけを取得する処理
-  const removeDecimalAndLeadingZero = (value: string): string => {
-    // 小数点を取り除く
-    const withoutDecimal = value.replace(".", "");
-    // 先頭の0を除去
-    const withoutLeadingZero = withoutDecimal.replace(/^0+/, "");
-    return withoutLeadingZero || "0"; // 空になった場合は "0" を返す
   };
 
   return (
@@ -322,7 +278,7 @@ export default function ExamBody({
                   onChange={(e) =>
                     handleChange(positionNumber, e.currentTarget.value)
                   }
-                  onFocus={() => toggleKeyboard(index)}
+                  onClick={() => toggleKeyboard(index)}
                   disabled={isDisabled}
                 />
               )}
@@ -364,7 +320,9 @@ export default function ExamBody({
             {showKeyboards[index] && (
               <Box ref={closeKeyBoard} mx="auto">
                 <NumericKeyboard
-                  value={removeDecimalAndLeadingZero(detail?.value ?? "")}
+                  value={detail?.value ?? ""}
+                  integerLength={detail?.integerLength}
+                  decimalLength={detail?.decimalLength}
                   onChange={(newValue) =>
                     handleChange(positionNumber, newValue)
                   }
