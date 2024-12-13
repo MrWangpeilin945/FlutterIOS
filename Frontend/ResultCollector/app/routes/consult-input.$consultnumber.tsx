@@ -86,8 +86,10 @@ export default function consultInput() {
       examItemId: 102,
       name: "血圧2",
       examRegistResults: [
-        { description: "APIエラー1:異常", errorLevel: 2 },
-        { description: "APIエラー2:警告", errorLevel: 3 },
+        {
+          description: "APIエラー1:警告 脈圧が正常値ではありません。",
+          errorLevel: 2,
+        },
       ],
       examItemDetails: [
         {

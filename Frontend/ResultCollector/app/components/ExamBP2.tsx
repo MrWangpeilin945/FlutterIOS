@@ -17,6 +17,7 @@ import type { ExamItemDetail, InputExamItem } from "~/domain/wellship.schemas";
 import NumericKeyboard from "./NumericKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import styles from "~/styles/common.module.css";
+import React from "react";
 
 type BodyProps = {
   examItems: InputExamItem[];
@@ -36,22 +37,35 @@ export default function ExamBody({
   const [examItemsData, setExamItemsData] = useState(examItems);
 
   // キーボードの表示状態を管理する
-  const [showKeyboards, setShowKeyboards] = useState(
-    examItems.map(() => false) // 初期状態はすべて false
+  const [showKeyboards, setShowKeyboards] = useState<boolean[][]>(
+    examItems.map((examItem) => {
+      const { examItemDetails } = examItem;
+      return examItemDetails ? examItemDetails.map(() => false) : [];
+    })
   );
-  const closeKeyBoard = useClickOutside(() =>
-    setShowKeyboards(Array(examItems.length).fill(false))
-  );
+  const closeKeyBoard = useClickOutside(() => {
+    setShowKeyboards((prev) => prev.map((row) => row.map(() => false)));
+  });
   const handleConfirm = () => {
-    setShowKeyboards(Array(examItems.length).fill(false));
+    setShowKeyboards((prev) => prev.map((row) => row.map(() => false)));
   };
-  const toggleKeyboard = (index: number) => {
+  const toggleKeyboard2 = (index: number, detailIndex: number) => {
     setShowKeyboards((prev) => {
       const updated = [...prev];
-      updated[index] = !updated[index];
+      console.log(updated[index][detailIndex]);
+      updated[index][detailIndex] = true;
+      console.log(updated[index][detailIndex]);
       return updated;
     });
   };
+  // const toggleKeyboard = (index: number) => {
+  //   setShowKeyboards((prev) => {
+  //     const updated = [...prev];
+  //     updated[index] = !updated[index];
+  //     console.log(showKeyboards);
+  //     return updated;
+  //   });
+  // };
 
   const handleErrorMessage = (item: InputExamItem): InputExamItem => {
     if (item.examRegistResults) {
@@ -95,32 +109,38 @@ export default function ExamBody({
 
     // エラーメッセージを更新
     let updatedErrors = item.examRegistResults || [];
+    // 既に存在するコンポーネントのエラーメッセージを削除
+    const errorMessageRequired = getErrorMessage(
+      errorMessages.required,
+      `${item.name}は`
+    );
+    updatedErrors = updatedErrors.filter(
+      (error) => error.description !== errorMessageRequired
+    );
 
-    // バリデーションが失敗した場合
-    if (!result.success) {
-      const error = result.error.errors[0]; // 最初のエラーだけ取得
-      updatedErrors.push({
-        description: error.message,
-        errorLevel: InputErrorLevel.異常,
-      });
-    } else {
-      // 必須エラーを削除するために確認
-      const errorMessageRequired = getErrorMessage(
-        errorMessages.required,
-        `${item.name}は`
-      );
-      updatedErrors = updatedErrors.filter(
-        (error) => error.description !== errorMessageRequired
-      );
+    // 半角数字エラーを削除
+    const errorMessageNumeric = getErrorMessage(
+      errorMessages.numericString,
+      `${item.name}は`
+    );
+    updatedErrors = updatedErrors.filter(
+      (error) => error.description !== errorMessageNumeric
+    );
 
-      // 半角数字エラーを削除
-      const errorMessageNumeric = getErrorMessage(
-        errorMessages.numericString,
-        `${item.name}は`
-      );
-      updatedErrors = updatedErrors.filter(
-        (error) => error.description !== errorMessageNumeric
-      );
+    // バリデーションチェック
+    for (const detail of item.examItemDetails || []) {
+      const valueToValidate = detail.value || "";
+      const result = schema.safeParse({ value: valueToValidate });
+
+      // エラーメッセージを追加する
+      if (!result.success) {
+        const errorMessage = result.error.errors[0].message;
+        updatedErrors.push({
+          description: errorMessage,
+          errorLevel: InputErrorLevel.異常,
+        });
+        break; // この検査項目についてのチェックを終える
+      }
     }
 
     const prevItem = {
@@ -175,30 +195,32 @@ export default function ExamBody({
   };
 
   //変更イベント
-  const handleChange = (positionNumber: number | undefined, value: string) => {
+  const handleChange = (
+    positionNumber: number | undefined,
+    value: string,
+    detailPositionNumber?: number
+  ) => {
     const updatedExamItems = [...examItemsData];
 
-    // 該当するアイテムを更新
+    // 該当するitemを更新
     for (const item of updatedExamItems) {
       if (item.positionNumber === positionNumber) {
-        // 該当するexamItemDetailsの最初のvalueを更新
-        item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
-          const decimalLength = detail.decimalLength ?? 0;
-          const integerLength = detail.integerLength ?? 0;
-
-          const cleanedValue = formatDecimalValue(
-            value,
-            integerLength,
-            decimalLength
+        // 該当するitemの全てのdetailの値をvalueに変更
+        if (detailPositionNumber === undefined) {
+          item.examItemDetails = item.examItemDetails?.map((detail) => ({
+            ...detail,
+            value: value,
+          }));
+        } else {
+          // 該当するdetailの値を更新
+          item.examItemDetails = item.examItemDetails?.map((detail) =>
+            detail.positionNumber === detailPositionNumber
+              ? { ...detail, value }
+              : detail
           );
-
-          if (idx === 0) {
-            return { ...detail, value: cleanedValue };
-          }
-          return detail;
-        });
+          console.log(detailPositionNumber);
+        }
       }
-
       //BMIの計算処理
       const height =
         Number.parseFloat(
@@ -258,13 +280,10 @@ export default function ExamBody({
     <>
       {examItemsData.map((item, index) => {
         const { positionNumber, name, examRegistResults = [] } = item;
-        const firstDetail = item.examItemDetails?.[0] ?? [];
-        const secondDetail = item.examItemDetails?.[1] ?? [];
-        const detail = item.examItemDetails?.[0];
         const details = item.examItemDetails;
         // グレーアウト表示判定
         // TODO:hasOrderの追加
-        const isDisabled = !!detail?.cancelReasonId;
+        const isDisabled = !!details?.[0].cancelReasonId;
         const isAVE = item.positionNumber === 3;
 
         return (
@@ -325,9 +344,13 @@ export default function ExamBody({
                       c={isDisabled ? "gray02" : ""}
                       value={detail?.value}
                       onChange={(e) =>
-                        handleChange(positionNumber, e.currentTarget.value)
+                        handleChange(
+                          positionNumber,
+                          e.currentTarget.value,
+                          detail.positionNumber
+                        )
                       }
-                      onFocus={() => toggleKeyboard(index)}
+                      onClick={() => toggleKeyboard2(index, detailIndex)}
                       disabled={isDisabled}
                     />
                   )}
@@ -344,7 +367,7 @@ export default function ExamBody({
                     (前回：{details[0].prevValue}/{details[1].prevValue})
                   </Text>
                 )}
-                <Text size="xs">{detail?.unit}</Text>
+                <Text size="xs">{details?.[0].unit}</Text>
               </Stack>
               {!isAVE && (
                 <Button
@@ -374,18 +397,26 @@ export default function ExamBody({
                 </Group>
               );
             })}
-            {/* キーボード表示 */}
-            {showKeyboards[index] && (
-              <Box ref={closeKeyBoard} mx="auto">
-                <NumericKeyboard
-                  value={removeDecimalAndLeadingZero(detail?.value ?? "")}
-                  onChange={(newValue) =>
-                    handleChange(positionNumber, newValue)
-                  }
-                  onConfirm={handleConfirm}
-                />
-              </Box>
-            )}
+            {details?.map((detail, detailIndex) => (
+              <React.Fragment key={detail.positionNumber}>
+                {/* キーボード表示 */}
+                {showKeyboards[index][detailIndex] && (
+                  <Box ref={closeKeyBoard} mx="auto">
+                    <NumericKeyboard
+                      value={removeDecimalAndLeadingZero(detail?.value ?? "")}
+                      onChange={(newValue) =>
+                        handleChange(
+                          positionNumber,
+                          newValue,
+                          detail.positionNumber
+                        )
+                      }
+                      onConfirm={handleConfirm}
+                    />
+                  </Box>
+                )}
+              </React.Fragment>
+            ))}
           </Flex>
         );
       })}
