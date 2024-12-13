@@ -42,21 +42,23 @@ export const setRangesErrorMessage = (inputexamItem: InputExamItem) => {
   const matchExamRanges = getMaxErrorLevelsByRangeCheck(
     inputexamItem.examItemDetails
   );
+  console.log(inputexamItem.examRegistResults);
   // 既に存在するExamNormalValueRangeによるエラーメッセージを削除
-  inputexamItem.examRegistResults.filter(
-    (error) =>
-      !error.description?.includes("入力された値が正常値ではありません。")
+  inputexamItem.examRegistResults = inputexamItem.examRegistResults.filter(
+    (error) => !error.description?.includes("正常値ではありません。")
   );
+  console.log(inputexamItem.examRegistResults);
   if (matchExamRanges.length === 0) {
     return inputexamItem;
   }
   for (const { minValue, maxValue, errorLevel } of matchExamRanges) {
     const rangesErrorMessage: ExamRegistResult = {
       // TODO：エラーメッセージの詳細を決定
-      description: "入力された値が正常値ではありません。",
+      description: `入力された値が${minValue}から${maxValue}であり、正常値ではありません。`,
       errorLevel: errorLevel,
     };
     inputexamItem.examRegistResults.push(rangesErrorMessage);
   }
+  console.log(inputexamItem.examRegistResults);
   return inputexamItem;
 };
