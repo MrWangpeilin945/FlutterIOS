@@ -103,9 +103,65 @@ public class ConsultUsecase : IConsultUsecase
     /// <summary>
     /// 検査内容を取得する
     /// </summary>
-    public void GetExamItemsExaminee()
+    public async Task<ExamContent> GetExamItemsExamineeAsync(string consultNumber, int examMenuId)
     {
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
+        // 会場日程IDを指定して会場日程を取得する
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
+        // 健診日
+        DateOnly examDate = placeSchedule.ExamDate;
+        // 受診日の年齢
+        // NOTE: 年齢加算日は暫定で前日年齢加算
+        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 検査メニューに関連した検査項目情報を取得
+        var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
+        // 検査中止を取得
+        var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
+        // 検査依頼を取得
+        var examOrders = await _consultRepository.GetExamOrdersAsync(consult.ConsultId);
+        // 未受診の検査メニューを取得
+        var unexaminedItems = await GetUnexaminedMenusAsync(consultNumber);
+        // 同姓同名アラート
+        var sameNameAlert = await _placeScheduleRepository.IsSamename(consultNumber);
 
+        return new ExamContent()
+        {
+            ConsultNumber = consultNumber,
+            ConsultName = consult.Note,
+            Examinee = new Examinee()
+            {
+                TicketNumber = consult.TicketNumber,
+                Name = examinee.Name,
+                KanaName = examinee.KanaName,
+                Birthdate = examinee.Birthdate.Value,
+                Sex = (int)examinee.Sex,
+                Organizations = examinee.Affiliations.OrderBy(x => x.OrderNumber)
+                                                     .Select(x => x.OrganizationName).ToArray(),
+                SameNameAlert = sameNameAlert,
+                ExamDateAge = examAge.Years
+            },
+            IsComplete = true,              // TODO: 検査実施判断    後方作業へ
+            RelatedExamItems = [],          // TODO: 関連検査項目    後方作業へ
+            ExamItems = examItemGroups.OrderBy(group => group.ExamItemGroupId)
+                                      .SelectMany(group => group.ExamItems)
+                                      .OrderBy(Item => Item.PositionNumber)
+                                      .Select(item => new ExamDetail
+                                      {
+                                        ExamItemId = item.ExamItemId,
+                                        ExamItemName = item.Name,
+                                        HasOrder = examOrders.ExamItemDetailOrders
+                                                             .Any(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId)),
+                                        CancelReasonId = examCancels.ExamItemDetailCancels
+                                                                    .SingleOrDefault(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId))?.CancelReasonId
+                                      }).ToArray(),
+            ExamDecisionResult = [],        // TODO: 検査実施判断結果    後方作業へ
+            UnexaminedItems = unexaminedItems.UnexaminedMenus.Select(x => new ExamMenu
+                                                                    {
+                                                                        ExamMenuId = x.ExamMenuId,
+                                                                        ExamMenuName = x.ExamMenuName
+                                                                    }).ToArray(),
+        };
     }
 
     /// <summary>
