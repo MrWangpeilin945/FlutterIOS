@@ -14,7 +14,7 @@ public class ProgressUsecaseTests
     public async Task 進捗を取得する()
     {
         // Arrange
-        var placeScheduleId = 1;
+        var placeScheduleId = Guid.Parse("e1b9277a-c0a7-4de5-b36f-bc912e1189dd");
 
         var progressRepositoryMock = new Mock<IProgressRepository>();
         var placeScheduleRepositoryMock = new Mock<IPlaceScheduleRepository>();
@@ -22,7 +22,7 @@ public class ProgressUsecaseTests
         progressRepositoryMock.Setup(r => r.GetAggregatedProgressAsync(placeScheduleId))
                               .ReturnsAsync(new AggregatedProgress()
                               {
-                                  PlaceScheduleId = 1,
+                                  PlaceScheduleId = Guid.Parse("e1b9277a-c0a7-4de5-b36f-bc912e1189dd"),
                                   AggregatedProgressDetails = [
                                     new AggregatedProgressDetail(){ExamItemId = 1, ExamItemName = "身長", Count11 = 10, Count21 = 8, Count41 = 0, Count51 = 0},
                                     new AggregatedProgressDetail(){ExamItemId = 2, ExamItemName = "体重", Count11 = 11, Count21 = 9, Count41 = 1, Count51 = 0},
@@ -33,9 +33,9 @@ public class ProgressUsecaseTests
         placeScheduleRepositoryMock.Setup(r => r.GetPlaceScheduleAsync(placeScheduleId))
                                    .ReturnsAsync(new PlaceSchedule()
                                    {
-                                       Id = 1,
-                                       Place = new() { Id = 1, Code = "P001", Name = "会場1", OrderNumber = 1 },
-                                       Team = new() { Id = 1, Code = "T001", Name = "班1", OrderNumber = 1 },
+                                       Id = Guid.Parse("e1b9277a-c0a7-4de5-b36f-bc912e1189dd"),
+                                       Place = new() { Id = Guid.Parse("3236630c-9863-4e7b-88c5-530226a9375b"), Code = "P001", Name = "会場1", OrderNumber = 1 },
+                                       Team = new() { Id = Guid.Parse("477cc2ca-e837-4f59-b8cc-ec351116f34d"), Code = "T001", Name = "班1", OrderNumber = 1 },
                                        ExamDate = new DateOnly(2024, 12, 3),
                                        StartTime = "0900",
                                        PlaceScheduleLockingStatus = Core.Enums.PlaceScheduleLockingStatus.検査中
@@ -45,7 +45,7 @@ public class ProgressUsecaseTests
 
         var expected = new APIModels.Responses.PlaceScheduleProgress()
         {
-            PlaceScheduleId = 1,
+            PlaceScheduleId = Guid.Parse("e1b9277a-c0a7-4de5-b36f-bc912e1189dd"),
             PlaceName = "会場1",
             ExamDate = new DateOnly(2024, 12, 3),
             Progress = [
