@@ -69,7 +69,7 @@ const useResultsOutputConfirmState = () => {
     [],
   );
 
-  // 「未出力確定」ボタン用の関数
+  // 「未出力にする」ボタン用の関数
   const handleOk = useCallback(() => {
     resolve(true);
     setState(initialState);
@@ -102,6 +102,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
   useImperativeHandle(ref, () => ({ resultsOutputConfirm }), [
     resultsOutputConfirm,
   ]);
+  const theme = useMantineTheme();
 
   return (
     <Modal
@@ -115,11 +116,11 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
       styles={{
         header: {
           height: 75,
-          background: getThemeColor("primary", useMantineTheme()),
+          background: getThemeColor("primary", theme),
           padding: "16px 0px",
         },
         title: {
-          color: getThemeColor("white01", useMantineTheme()),
+          color: getThemeColor("white01", theme),
           fontSize: getSize("lg", "mantine-font-size"),
           lineHeight: getSize("lg", "mantine-line-height"),
           fontWeight: 700,
@@ -127,20 +128,18 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
         },
         body: {
           height: 417,
-          background: getThemeColor("white01", useMantineTheme()),
+          background: getThemeColor("white01", theme),
           padding: 0,
         },
       }}
     >
-      <Flex w={800} pt={24} pl={16} pr={16}>
+      <Flex w={800} pt={24} px={16}>
         <Flex m="0px auto">{children}</Flex>
       </Flex>
       <Flex
         w={800}
-        pt={24}
-        pb={24}
-        pl={16}
-        pr={16}
+        py={24}
+        px={16}
         pos="absolute"
         bottom={0}
         bg="white01"
@@ -154,10 +153,8 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
             h={64}
             bg="white01"
             color="primary"
-            pt={16}
-            pb={16}
-            pl={32}
-            pr={32}
+            py={16}
+            px={32}
             style={{ borderWidth: 2 }}
             onClick={handleCancel}
           >
@@ -171,15 +168,13 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
             h={64}
             bg="primary"
             color="primary"
-            pt={16}
-            pb={16}
-            pl={32}
-            pr={32}
+            py={16}
+            px={32}
             style={{ borderWidth: 2 }}
             onClick={handleOk}
           >
             <Text size="lg" fw={700} c="white01">
-              未出力確定
+              未出力にする
             </Text>
           </Button>
         </Flex>
@@ -245,7 +240,7 @@ export default function ExamresultExportHistory() {
         const body = {
           exportId: exportId,
         };
-        // 「未出力確定」ボタン押下時はAP1021_出力した結果を未出力に戻す
+        // 「未出力にする」ボタン押下時はAP1021_出力した結果を未出力に戻す
         const postMutateAsync = async () => {
           try {
             const result = await mutateAsync({
@@ -303,7 +298,7 @@ export default function ExamresultExportHistory() {
           screenName="検査結果出力履歴"
           staffName={staff?.name || ""}
         />
-        <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
+        <Container fluid bg="background" py={32} px={24}>
           {!isFetching && (
             <>
               {exportHistory?.exportHistories ? (
@@ -339,14 +334,12 @@ export default function ExamresultExportHistory() {
                         <Table.Td ta="center">
                           <Button
                             variant="outline"
-                            w={160}
-                            h={66}
+                            w={246}
+                            h={64}
                             bg="white01"
                             color="primary"
-                            pt={16}
-                            pb={16}
-                            pl={32}
-                            pr={32}
+                            py={16}
+                            px={32}
                             onClick={() =>
                               handleClick(
                                 eh.exportId,
@@ -357,7 +350,7 @@ export default function ExamresultExportHistory() {
                             }
                           >
                             <Text size="lg" fw={700} c="primary">
-                              未出力
+                              未出力にする
                             </Text>
                           </Button>
                         </Table.Td>
