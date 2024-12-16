@@ -73,7 +73,7 @@ const useResultsOutputConfirmState = () => {
     [],
   );
 
-  // 「出力確定」ボタン用の関数
+  // 「登録する」ボタン用の関数
   const handleOk = useCallback(() => {
     resolve(true);
     setState(initialState);
@@ -106,6 +106,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
   useImperativeHandle(ref, () => ({ resultsOutputConfirm }), [
     resultsOutputConfirm,
   ]);
+  const theme = useMantineTheme();
 
   return (
     <Modal
@@ -119,11 +120,11 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
       styles={{
         header: {
           height: 75,
-          background: getThemeColor("primary", useMantineTheme()),
+          background: getThemeColor("primary", theme),
           padding: "16px 0px",
         },
         title: {
-          color: getThemeColor("white01", useMantineTheme()),
+          color: getThemeColor("white01", theme),
           fontSize: getSize("lg", "mantine-font-size"),
           lineHeight: getSize("lg", "mantine-line-height"),
           fontWeight: 700,
@@ -131,20 +132,18 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
         },
         body: {
           height: 385,
-          background: getThemeColor("white01", useMantineTheme()),
+          background: getThemeColor("white01", theme),
           padding: 0,
         },
       }}
     >
-      <Flex w={800} pt={24} pl={16} pr={16}>
+      <Flex w={800} pt={24} px={16}>
         <Flex m="0px auto">{children}</Flex>
       </Flex>
       <Flex
         w={800}
-        pt={24}
-        pb={24}
-        pl={16}
-        pr={16}
+        py={24}
+        px={16}
         pos="absolute"
         bottom={0}
         bg="white01"
@@ -158,10 +157,8 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
             h={64}
             bg="white01"
             color="primary"
-            pt={16}
-            pb={16}
-            pl={32}
-            pr={32}
+            py={16}
+            px={32}
             style={{ borderWidth: 2 }}
             onClick={handleCancel}
           >
@@ -175,15 +172,13 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
             h={64}
             bg="primary"
             color="primary"
-            pt={16}
-            pb={16}
-            pl={32}
-            pr={32}
+            py={16}
+            px={32}
             style={{ borderWidth: 2 }}
             onClick={handleOk}
           >
             <Text size="lg" fw={700} c="white01">
-              出力確定
+              登録する
             </Text>
           </Button>
         </Flex>
@@ -246,7 +241,7 @@ export default function ExamresultExport() {
         const body = {
           placeScheduleId: placeScheduleId,
         };
-        // 「出力確定」ボタン押下時はAP1019_連携用に検査結果を出力する
+        // 「登録する」ボタン押下時はAP1019_連携用に検査結果を出力する
         const postMutateAsync = async () => {
           try {
             const result = await mutateAsync({
@@ -300,7 +295,7 @@ export default function ExamresultExport() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching || isLoading} />
         <CommonHeader screenName="検査結果出力" staffName={staff?.name || ""} />
-        <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
+        <Container fluid bg="background" py={32} px={24}>
           {!isFetching && (
             <>
               {exportData?.exportData ? (
@@ -336,14 +331,12 @@ export default function ExamresultExport() {
                         <Table.Td ta="center">
                           <Button
                             variant="outline"
-                            w={140}
-                            h={66}
+                            w={154}
+                            h={64}
                             bg="white01"
                             color="gray03"
-                            pt={16}
-                            pb={16}
-                            pl={32}
-                            pr={32}
+                            py={16}
+                            px={32}
                             style={{ borderWidth: 2 }}
                             onClick={() => navigate("/placeschedule-lock")}
                           >
@@ -386,8 +379,8 @@ export default function ExamresultExport() {
                         <Table.Td ta="center">
                           <Button
                             variant="outline"
-                            w={160}
-                            h={66}
+                            w={186}
+                            h={64}
                             bg={
                               ed.placeScheduleLockingStatus ===
                               PlaceScheduleLockingStatus.検査完了
@@ -400,10 +393,8 @@ export default function ExamresultExport() {
                                 ? "primary"
                                 : "gray03"
                             }
-                            pt={16}
-                            pb={16}
-                            pl={32}
-                            pr={32}
+                            py={16}
+                            px={32}
                             onClick={
                               ed.placeScheduleLockingStatus ===
                               PlaceScheduleLockingStatus.検査完了
@@ -426,7 +417,7 @@ export default function ExamresultExport() {
                                   : "gray02"
                               }
                             >
-                              出力
+                              出力する
                             </Text>
                           </Button>
                         </Table.Td>
