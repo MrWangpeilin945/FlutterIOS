@@ -59,16 +59,16 @@ INSERT INTO exam_menus(exam_menu_id,name,order_number,created_at,created_by) VAL
   , (9,'握力',9,CURRENT_TIMESTAMP,'init');
 
 -- 検査項目グループ
-INSERT INTO exam_item_groups(exam_item_group_id,name,exam_menu_id,type,created_at,created_by) VALUES 
-    (1,'身体計測',1,1,CURRENT_TIMESTAMP,'init')
-  , (7,'血圧',7,7,CURRENT_TIMESTAMP,'init');
+INSERT INTO exam_item_groups(exam_item_group_id,name,exam_menu_id,type,order_number,created_at,created_by) VALUES 
+    (1,'身体計測',1,1,1,CURRENT_TIMESTAMP,'init')
+  , (7,'血圧',7,7,2,CURRENT_TIMESTAMP,'init');
 
 -- 検査項目
-INSERT INTO exam_items(exam_item_id,name,exam_item_group_id,position_number,unit,created_at,created_by) VALUES 
-    (1,'身長',1,1,'cm',CURRENT_TIMESTAMP,'init')
-  , (2,'体重',1,1,'kg',CURRENT_TIMESTAMP,'init')
-  , (71,'血圧1',7,1,null,CURRENT_TIMESTAMP,'init')
-  , (72,'血圧2',7,2,null,CURRENT_TIMESTAMP,'init');
+INSERT INTO exam_items(exam_item_id,name,exam_item_group_id,position_number,unit,order_number,created_at,created_by) VALUES 
+    (1,'身長',1,1,'cm',1,CURRENT_TIMESTAMP,'init')
+  , (2,'体重',1,1,'kg',2,CURRENT_TIMESTAMP,'init')
+  , (71,'血圧1',7,1,null,1,CURRENT_TIMESTAMP,'init')
+  , (72,'血圧2',7,2,null,2,CURRENT_TIMESTAMP,'init');
 
 -- 検査項目明細
 INSERT INTO exam_item_details(exam_item_detail_id,exam_item_id,name,set_previous_as_default,order_number,position_number,type,keyboard_type,integer_length,decimal_length,equipment_label,created_at,created_by) VALUES 
