@@ -31,6 +31,11 @@ public class ConsultEntity
     public required Guid PlaceScheduleId { get; init; }
 
     /// <summary>
+    /// 特記事項
+    /// </summary>
+    public required string Note { get; init; }
+
+    /// <summary>
     /// 受診者ID
     /// </summary>
     public required Guid ExamineeId { get; init; }

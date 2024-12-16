@@ -80,10 +80,10 @@ public class ConsultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/examItems")]
-    public IActionResult GetExamItemsExaminee([FromQuery][Required] int examMenuId)
+    public async Task<IActionResult> GetExamItemsExaminee([FromRoute][Required] string consultNumber, [FromQuery][Required] int examMenuId)
     {
-        _consultUsecase.GetExamItemsExaminee();
-        return Ok();
+        var results = await _consultUsecase.GetExamItemsExamineeAsync(consultNumber, examMenuId);
+        return Ok(results);
     }
 
     /// <summary>

@@ -85,6 +85,7 @@ public class ConsultUsecaseTests
                              ConsultNumber = "0001",
                              ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
                              ProgressStatus = ConsultProgressStatus.検査中,
+                             Note = "定期健康診断",
                              ExportStatus = ConsultResultExportStatus.未出力,
                              PlaceScheduleId = Guid.Parse("531eb00c-1850-4d5e-9561-f24cdfd9a250"),
                              TicketNumber = "1029"
@@ -109,12 +110,19 @@ public class ConsultUsecaseTests
         _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3")))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
-                              ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
-                              ExamineeCode = "10001",
-                              Name = "両備　太郎",
-                              KanaName = "リョウビ　タロウ",
-                              Sex = Sex.男,
-                              Birthdate = new Birthdate("19991129")
+                                ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
+                                ExamineeCode = "10001",
+                                Name = "両備　太郎",
+                                KanaName = "リョウビ　タロウ",
+                                Sex = Sex.男,
+                                Birthdate = new Birthdate("19991129"),
+                                Affiliations = [new Affiliations
+                                {
+                                    OrganizationId = Guid.Parse("7bf76a3d-8bb4-41f5-8bd5-3b8fc8482511"),
+                                    OrganizationCode = "0001",
+                                    OrganizationName = "",
+                                    OrderNumber = 1
+                                }]
                           });
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
@@ -140,6 +148,7 @@ public class ConsultUsecaseTests
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             PlaceScheduleId = Guid.Parse("6df8bdff-66c0-4113-afd6-985a78bd35ff"),
+            Note = "定期健康診断",
             ConsultId = Guid.Parse("0c48b92e-7b65-4e39-8d19-7dcdead5a763"),
             ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
             TicketNumber = "1029"
@@ -147,12 +156,19 @@ public class ConsultUsecaseTests
         _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df")))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
-                              ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
-                              ExamineeCode = "10001",
-                              Name = "両備　太郎",
-                              KanaName = "リョウビ　タロウ",
-                              Sex = Sex.男,
-                              Birthdate = new Birthdate("19991129")
+                                ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
+                                ExamineeCode = "10001",
+                                Name = "両備　太郎",
+                                KanaName = "リョウビ　タロウ",
+                                Sex = Sex.男,
+                                Birthdate = new Birthdate("19991129"),
+                                Affiliations = [new Affiliations
+                                {
+                                    OrganizationId = Guid.Parse("7bf76a3d-8bb4-41f5-8bd5-3b8fc8482511"),
+                                    OrganizationCode = "0001",
+                                    OrganizationName = "",
+                                    OrderNumber = 1
+                                }]
                           });
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
@@ -195,6 +211,7 @@ public class ConsultUsecaseTests
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             PlaceScheduleId = Guid.Parse("caab7279-109a-4c63-bc9a-83fa25c59a91"),
+            Note = "定期健康診断",
             ExamineeId = Guid.Parse("9944b7f3-0728-4801-853f-424a9c23a0b9"),
             TicketNumber = "1029"
         };
@@ -249,6 +266,7 @@ public class ConsultUsecaseTests
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             PlaceScheduleId = Guid.Parse("ed3e8d23-2c9f-4b0c-bfb1-e933afc8ee49"),
+            Note = "定期健康診断",
             ExamineeId = Guid.Parse("9409a9a9-163e-4721-a1ae-9fa83017bcf7"),
             TicketNumber = "1029"
         };
