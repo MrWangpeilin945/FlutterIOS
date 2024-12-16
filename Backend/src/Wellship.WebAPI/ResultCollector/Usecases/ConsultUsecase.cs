@@ -2,7 +2,6 @@ using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
-using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models.Triggers;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
@@ -407,7 +406,7 @@ public class ConsultUsecase : IConsultUsecase
             // トリガーの条件に一致すればエラーに追加する
             if (trigger.IsMatch())
             {
-                errors.Add(new RuleError()
+                errors.Add(new Domain.Models.RuleError()
                 {
                     ErrorLevel = trigger.GetErrorLevel(),
                     Message = rule.Message,

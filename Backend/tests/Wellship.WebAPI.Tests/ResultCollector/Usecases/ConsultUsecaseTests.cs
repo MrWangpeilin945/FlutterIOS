@@ -299,7 +299,7 @@ public class ConsultUsecaseTests
         // Arrange
 
         var consultNumber = "0002";
-        var consultId = 2;
+        var consultId = Guid.Parse("8dda2a54-5217-425f-bba9-ab821a9647fe");
         var examDate = new DateOnly(2024, 11, 30);
 
         var consult = new Consult()
@@ -308,16 +308,17 @@ public class ConsultUsecaseTests
             ConsultNumber = consultNumber,
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
-            ExamineeId = 2,
-            PlaceScheduleId = 1,
-            TicketNumber = "1002"
+            ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
+            PlaceScheduleId = Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"),
+            TicketNumber = "1002",
+            Note = "定期健康診断"
         };
 
         var placeSchedule = new WebAPI.ResultCollector.Domain.Models.PlaceSchedule()
         {
-            Id = 1,
-            Place = new WebAPI.ResultCollector.Domain.Models.Place() { Id = 1, Code = "001", Name = "会場1", OrderNumber = 1 },
-            Team = new Team() { Id = 1, Code = "001", Name = "1班", OrderNumber = 1 },
+            Id = Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"),
+            Place = new WebAPI.ResultCollector.Domain.Models.Place() { Id = Guid.Parse("45449e64-5632-4fcb-9261-5c136531a86a"), Code = "001", Name = "会場1", OrderNumber = 1 },
+            Team = new Team() { Id = Guid.Parse("1eb0a120-a76c-49d7-a2da-47fccf5bef44"), Code = "001", Name = "1班", OrderNumber = 1 },
             ExamDate = examDate,
             StartTime = "1000",
             PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査中
@@ -364,7 +365,7 @@ public class ConsultUsecaseTests
         };
 
         _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(consult);
-        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleAsync(1)).ReturnsAsync(placeSchedule);
+        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleAsync(Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"))).ReturnsAsync(placeSchedule);
         _consultRepositoryMock.Setup(x => x.GetExamResultsAsync(consultId)).ReturnsAsync(examResult);
         _consultRepositoryMock.Setup(x => x.GetPreviousResultsAsync(consultId, examDate)).ReturnsAsync(previousResult);
         _examItemRepositoryMock.Setup(x => x.GetCorrelationRulesAsync(examMenuId)).ReturnsAsync(rules);
@@ -396,7 +397,7 @@ public class ConsultUsecaseTests
         // Arrange
 
         var consultNumber = "0002";
-        var consultId = 2;
+        var consultId = Guid.Parse("8dda2a54-5217-425f-bba9-ab821a9647fe");
         var examDate = new DateOnly(2024, 11, 30);
 
         var consult = new Consult()
@@ -405,16 +406,17 @@ public class ConsultUsecaseTests
             ConsultNumber = consultNumber,
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
-            ExamineeId = 2,
-            PlaceScheduleId = 1,
-            TicketNumber = "1002"
+            ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
+            PlaceScheduleId = Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"),
+            TicketNumber = "1002",
+            Note = "定期健康診断"
         };
 
         var placeSchedule = new WebAPI.ResultCollector.Domain.Models.PlaceSchedule()
         {
-            Id = 1,
-            Place = new WebAPI.ResultCollector.Domain.Models.Place() { Id = 1, Code = "001", Name = "会場1", OrderNumber = 1 },
-            Team = new Team() { Id = 1, Code = "001", Name = "1班", OrderNumber = 1 },
+            Id = Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"),
+            Place = new WebAPI.ResultCollector.Domain.Models.Place() { Id = Guid.Parse("45449e64-5632-4fcb-9261-5c136531a86a"), Code = "001", Name = "会場1", OrderNumber = 1 },
+            Team = new Team() { Id = Guid.Parse("1eb0a120-a76c-49d7-a2da-47fccf5bef44"), Code = "001", Name = "1班", OrderNumber = 1 },
             ExamDate = examDate,
             StartTime = "1000",
             PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査中
@@ -479,7 +481,7 @@ public class ConsultUsecaseTests
         };
 
         _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(consult);
-        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleAsync(1)).ReturnsAsync(placeSchedule);
+        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleAsync(Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"))).ReturnsAsync(placeSchedule);
         _consultRepositoryMock.Setup(x => x.GetExamResultsAsync(consultId)).ReturnsAsync(examResult);
         _consultRepositoryMock.Setup(x => x.GetPreviousResultsAsync(consultId, examDate)).ReturnsAsync(previousResult);
         _examItemRepositoryMock.Setup(x => x.GetCorrelationRulesAsync(examMenuId)).ReturnsAsync(rules);
