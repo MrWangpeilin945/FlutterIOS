@@ -583,10 +583,11 @@ Field="検査項目グループID","exam_item_group_id","integer","NOT NULL",0,"
 Field="検査項目グループ名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査メニューID","exam_menu_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目グループ種別","type","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241112095535
+ModifiedDateTime=20241216093251
 Position="MAIN",2150,1250
 ZOrder=31
 
@@ -604,10 +605,11 @@ Field="検査項目名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目グループID","exam_item_group_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="配置番号","position_number","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="単位","unit","text",,,"","",$FFFFFFFF,""
+Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241128113002
+ModifiedDateTime=20241216093330
 Position="MAIN",2300,1500
 ZOrder=32
 

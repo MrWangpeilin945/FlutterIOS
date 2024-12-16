@@ -80,12 +80,12 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
     }
 
     /// <summary>
-    /// 会場日程IDを指定して会場日程を取得する
+    /// 会場日程IDを指定して会場日程リストを取得する
     /// </summary>
     public async Task<Domain.Models.PlaceSchedule> GetPlaceScheduleAsync(Guid placeScheduleId)
     {
         var placeSchedule = await GetPlaceSchedulesAsync([placeScheduleId]);
-        if(!placeSchedule.Any())
+        if (!placeSchedule.Any())
         {
             // 会場日程が存在しない            
             throw new PlaceScheduleNotFoundException();
