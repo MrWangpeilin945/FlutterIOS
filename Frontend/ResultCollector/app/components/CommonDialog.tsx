@@ -1,5 +1,12 @@
-import { Button, Center, Modal, Title } from "@mantine/core";
-import styles from "~/styles/common.module.css";
+import {
+  Button,
+  Center,
+  Modal,
+  Stack,
+  Text,
+  getThemeColor,
+  useMantineTheme,
+} from "@mantine/core";
 
 interface CommonDialogProps {
   message: string;
@@ -7,38 +14,59 @@ interface CommonDialogProps {
   isOpen: boolean; // 表示・非表示用
   onClose: () => void; // 閉じる
 }
-
 export default function CommonDialog({
   message,
   buttonMessage,
   isOpen,
   onClose,
 }: CommonDialogProps) {
+  const theme = useMantineTheme();
+
   return (
     <Modal
-      size={500}
-      radius="md"
+      radius="16"
+      size={668}
       opened={isOpen}
       onClose={onClose}
       withCloseButton={false} // headerなくす
       closeOnClickOutside={false} // modalの外クリックしても消えないように
       centered
+      styles={{
+        body: {
+          background: getThemeColor("white01", theme),
+          padding: "64px 64px 32px",
+        },
+      }}
     >
-      <Title
-        className={styles["text-wrap"]}
-        size="lg"
-        maw={400} // 最大幅の制限
-        mx="md"
-        my="xl"
-        order={2}
-      >
-        {message}
-      </Title>
-      <Center>
-        <Button w={200} h={80} variant="filled" onClick={onClose} mt="xl">
-          <Title order={2}>{buttonMessage}</Title>
-        </Button>
-      </Center>
+      <Stack gap={64}>
+        <Text
+          size="lg"
+          c="black01"
+          style={{
+            wordBreak: "break-word",
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {message}
+        </Text>
+        <Center>
+          <Button
+            w={214}
+            h={64}
+            variant="filled"
+            bg="primary"
+            color="primary"
+            py={16}
+            px={32}
+            style={{ borderWidth: 2 }}
+            onClick={onClose}
+          >
+            <Text size="lg" fw={700} c="white01">
+              {buttonMessage}
+            </Text>
+          </Button>
+        </Center>
+      </Stack>
     </Modal>
   );
 }
