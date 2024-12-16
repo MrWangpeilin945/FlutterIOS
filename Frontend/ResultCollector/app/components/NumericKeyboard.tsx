@@ -11,10 +11,18 @@ type KeyboardProps = {
 
 export default function NumericKeyboard(props: KeyboardProps) {
   const keyboardValues = [
-    "7","8","9",
-    "4","5","6",
-    "1","2","3",
-    "AC","0","確定",
+    "7",
+    "8",
+    "9",
+    "4",
+    "5",
+    "6",
+    "1",
+    "2",
+    "3",
+    "AC",
+    "0",
+    "確定",
   ];
 
   // 小数点と先頭の0を除去して数値部分だけを取得する処理
@@ -50,8 +58,7 @@ export default function NumericKeyboard(props: KeyboardProps) {
     const decimalPart = paddedValue.slice(integerLength, totalLength);
     // 整数部が不足する場合、0で補填
     if (integerPart.length < integerLength) {
-      integerPart =
-        "0".repeat(integerLength - integerPart.length) + integerPart;
+      integerPart = integerPart.padStart(integerLength, "0");
     }
     let formattedValue = `${integerPart}.${decimalPart}`;
     // 整数部が1未満の場合、整数部の先頭ゼロは除去しない
