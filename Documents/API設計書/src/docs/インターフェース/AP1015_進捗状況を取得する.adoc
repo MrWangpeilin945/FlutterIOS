@@ -57,17 +57,17 @@
         },
         {
           "status": 21,
-          "name": "来場",
+          "statusName": "来場",
           "count": 8
         },
         {
           "status": 41,
-          "name": "済",
+          "statusName": "済",
           "count": 20
         },
         {
           "status": 51,
-          "name": "中止",
+          "statusName": "中止",
           "count": 1
         }
       ]
