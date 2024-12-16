@@ -97,6 +97,24 @@ export default function ExamBody({
     // エラーメッセージを更新
     let updatedErrors = item.examRegistResults || [];
 
+    // 必須エラーを削除
+    const errorMessageRequired = getErrorMessage(
+      errorMessages.required,
+      `${item.name}は`,
+    );
+    updatedErrors = updatedErrors.filter(
+      (error) => error.description !== errorMessageRequired,
+    );
+
+    // 半角数字エラーを削除
+    const errorMessageNumeric = getErrorMessage(
+      errorMessages.numericString,
+      `${item.name}は`,
+    );
+    updatedErrors = updatedErrors.filter(
+      (error) => error.description !== errorMessageNumeric,
+    );
+
     // バリデーションが失敗した場合
     if (!result.success) {
       const error = result.error.errors[0]; // 最初のエラーだけ取得
@@ -104,24 +122,6 @@ export default function ExamBody({
         description: error.message,
         errorLevel: InputErrorLevel.異常,
       });
-    } else {
-      // 必須エラーを削除するために確認
-      const errorMessageRequired = getErrorMessage(
-        errorMessages.required,
-        `${item.name}は`,
-      );
-      updatedErrors = updatedErrors.filter(
-        (error) => error.description !== errorMessageRequired,
-      );
-
-      // 半角数字エラーを削除
-      const errorMessageNumeric = getErrorMessage(
-        errorMessages.numericString,
-        `${item.name}は`,
-      );
-      updatedErrors = updatedErrors.filter(
-        (error) => error.description !== errorMessageNumeric,
-      );
     }
 
     const prevItem = {
