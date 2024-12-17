@@ -1,49 +1,36 @@
-import {
-  Button,
-  Center,
-  Flex,
-  Grid,
-  GridCol,
-  LoadingOverlay,
-  Stack,
-  Text,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
-import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import BoothNote from "~/components/BoothNote";
-import CommonFooter from "~/components/CommonFooter";
-import { ErrorModal } from "~/components/ErrorModal";
-import ExamineeHeader from "~/components/ExamineeHeader";
-import ExamNumeric from "~/components/ExamNumeric";
-import ExamSelect from "~/components/ExamSelect";
+import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
+import { Button, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { useAtom } from "jotai";
+import { type AxiosResponse, isAxiosError } from "axios";
+import {
+  useConsultGetInputExamItemsExaminee,
+  useResultRegisterResults,
+  useResultVerifyResults,
+} from "~/api/wellship";
+import type {
+  ExamItemGroup,
+  InputExamItem,
+  InputExamItems,
+  ResultsRequest,
+  VerifyExamItems,
+} from "~/domain/wellship.schemas";
 import {
   connectionEquipmentState,
   examMenuState,
   staffState,
 } from "~/store/store";
-import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
-import {
-  resultRegisterResults,
-  resultVerifyResults,
-  useConsultGetInputExamItemsExaminee,
-  useResultVerifyResults,
-} from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
-import type {
-  ExamItemDetail,
-  ExamItemDetailOption,
-  ExamItemGroup,
-  InputExamItem,
-  InputExamItems,
-  ResultRequest,
-  ResultsRequest,
-  VerifyExamItems,
-} from "~/domain/wellship.schemas";
-import { type AxiosResponse, isAxiosError } from "axios";
+import CommonFooter from "~/components/CommonFooter";
+import ExamineeHeader from "~/components/ExamineeHeader";
+import BoothNote from "~/components/BoothNote";
 import CommonDialog from "~/components/CommonDialog";
 import ConfirmDialog from "~/components/ConfirmDialog";
+import ExamNumeric from "~/components/ExamNumeric";
+import ExamSelect from "~/components/ExamSelect";
+import ExamSelectLR from "~/components/ExamSelectLR";
+import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
 export default function consultInput() {
   const navigate = useNavigate();
@@ -69,7 +56,7 @@ export default function consultInput() {
   //機器連携用
   const [value, setValue] = useState<string>(
     localStorage.getItem("value") || "",
-  ); //jsonにvalueセット方法どうするか
+  ); //TODO:jsonにvalueセット方法どうするか
   const [isWatching, setIsWatching] = useState(false); // 監視状態を管理するフラグ
 
   //AP1009呼び出し用(GET系APIの定義)
@@ -165,7 +152,6 @@ export default function consultInput() {
       if (event.key === "value") {
         setValue(event.newValue || "");
         //TODO:valueにsetする処理　どこのvalueを更新するかの判定をどうするか
-        console.log(event);
 
         // 初回の変更後に監視を解除
         if (isWatching) {
@@ -265,9 +251,9 @@ export default function consultInput() {
     }
   };
 
-  const { mutateAsync } = useResultVerifyResults();
   //AP1013_検査結果を検証する
   const verifyResults = async () => {
+    const { mutateAsync } = useResultVerifyResults();
     let result: AxiosResponse<VerifyExamItems>;
     const resultsRequest = makeBody();
     if (!consultnumber) return;
@@ -333,29 +319,49 @@ export default function consultInput() {
 
   //AP1014_検査結果を登録する
   const registerResults = async () => {
+    const { mutateAsync } = useResultRegisterResults();
+    let result: AxiosResponse;
     const resultsRequest = makeBody();
     if (!consultnumber) return;
-    await resultRegisterResults("1", consultnumber, resultsRequest)
-      .then(() => {
-        // 成功時の処理
-        continuingExam();
-      })
-      .catch((error) => {
-        if (error.responce.status === 400) {
-          setErrorMessage(
-            getErrorMessage(errorMessages.invalid, "指定した受診番号"),
-          );
-        } else if (error.responce.status === 403) {
-          setErrorMessage("会場ロック中です。管理者のみ更新可能です。");
-        } else if (error.responce.status === 404) {
-          setErrorMessage(
-            getErrorMessage(errorMessages.notFound, "指定した受診情報が"),
-          );
-        } else if (error.responce.status === 500) {
-          setErrorMessage(getErrorMessage(errorMessages.serverError));
+    const postMutateAsync = async () => {
+      try {
+        result = await mutateAsync({
+          version: "1",
+          consultNumber: consultnumber,
+          data: resultsRequest,
+        });
+        if (result.status === 200) {
+          // 正常時の処理
+          continuingExam();
         }
+      } catch (error) {
+        let errorMessage = "";
+        // AxiosErrorかどうかを確認
+        if (isAxiosError(error) && error.response) {
+          const status = error.response.status;
+          // エラー処理
+          if (status === 400) {
+            errorMessage = getErrorMessage(
+              errorMessages.invalid,
+              "指定した受診番号",
+            );
+          } else if (status === 403) {
+            errorMessage = "会場ロック中です。管理者のみ更新可能です。";
+          } else if (status === 404) {
+            errorMessage = getErrorMessage(
+              errorMessages.notFound,
+              "指定した受診情報",
+            );
+          } else if (status === 500) {
+            errorMessage = getErrorMessage(errorMessages.serverError);
+          }
+        }
+        // 共通ダイアログにエラーメッセージを表示
+        setErrorMessage(errorMessage);
         openCommon();
-      });
+      }
+    };
+    postMutateAsync();
   };
 
   //登録処理
@@ -365,7 +371,6 @@ export default function consultInput() {
     setIsLoading(false);
   };
 
-  //検査項目コンポーネント
   const ExamItemRender = ({
     groupIndex,
     examItemGroup,
@@ -374,35 +379,96 @@ export default function consultInput() {
     examItemGroup: ExamItemGroup;
   }) => {
     const { type, examItems } = examItemGroup;
-    console.log(examData);
 
     // 検査項目が存在しない場合のチェック
     if (!examItems || examItems.length === 0) {
       return <Text>検査項目がありません</Text>;
     }
 
-    // 単一選択の場合
-    if (type === 2) {
-      return (
-        <ExamSelect
-          key={groupIndex} 
-          examItems={examItems}
-          onRegisterPressed={true}
-          onClick={(updatedExamItem) =>
-            callbackChangeValue(updatedExamItem, groupIndex)
-          }
-        />
-      );
-    }
+    // 共通のコールバック関数
+    const handleChange = (updatedExamItem: InputExamItem[] | undefined) =>
+      callbackChangeValue(updatedExamItem, groupIndex);
 
-    // 通過（typeが13の場合）: 処理を中断する
-    if (type === 13) {
-      setConfirmMessage("実施済みです。取消してよろしいですか。");
-      return null; // UIのレンダリングをスキップ
+    // typeによるコンポーネントの切り替え
+    switch (type) {
+      case 1:
+        return (
+          <ExamNumeric
+            key={groupIndex}
+            examItems={examItems}
+            onRegisterPressed={true}
+            onChange={handleChange}
+          />
+        );
+      case 2:
+        return (
+          <ExamSelect
+            key={groupIndex}
+            examItems={examItems}
+            onRegisterPressed={true}
+            onClick={handleChange}
+          />
+        );
+      case 5:
+        return (
+          <ExamNumericLR
+            key={groupIndex}
+            examItems={examItems}
+            onRegisterPressed={true}
+            onChange={handleChange}
+          />
+        );
+      case 6:
+        return (
+          <ExamSelectLR
+            key={groupIndex}
+            examItems={examItems}
+            onRegisterPressed={true}
+            onClick={handleChange}
+          />
+        );
+      case 7:
+        return (
+          <ExamBody
+            key={groupIndex}
+            examItems={examItems}
+            onRegisterPressed={true}
+            onChange={handleChange}
+          />
+        );
+      case 9:
+        return (
+          <ExamBP2
+            key={groupIndex}
+            examItems={examItems}
+            onRegisterPressed={true}
+            onChange={handleChange}
+          />
+        );
+      case 11:
+        return (
+          <ExamVision
+            key={groupIndex}
+            examItems={examItems}
+            onRegisterPressed={true}
+            onChange={handleChange}
+          />
+        );
+      case 12:
+        return (
+          <ExamHearing
+            key={groupIndex}
+            examItems={examItems}
+            onRegisterPressed={true}
+            onChange={handleChange}
+          />
+        );
+      case 13:
+        setConfirmMessage("実施済みです。取消してよろしいですか。");
+        return null; // UIのレンダリングをスキップ
+      default:
+        return <Text>未対応のタイプ: {type}</Text>;
     }
-
-    // 他のtypeに対する処理
-    return <Text>未対応のタイプ: {type}</Text>;
   };
 
   return (
@@ -410,11 +476,11 @@ export default function consultInput() {
       <AuthWrapper>
         <LoadingOverlay visible={isLoading} />
         <ExamineeHeader
-          staffName={staffData?.name ? staffData.name : ""}
-          managerId={100001} //TODO:staffDataを渡すように
-          name="リョウビ タロウ"
-          gender={1}
-          age={35}
+          staffName={staffData?.name ?? ""}
+          managerId={staffData?.id ?? 0}
+          name={examData?.examinee?.kanaName ?? ""}
+          gender={examData?.examinee?.sex ?? 0}
+          age={examData?.examinee?.examDateAge ?? 0}
         />
         <BoothNote relatedExamItems={examData?.relatedExamItems ?? []} />
         <Stack align="center" gap={32} px={32} mt={32}>
@@ -449,7 +515,6 @@ export default function consultInput() {
           </Button>
         </Stack>
 
-        {/* TODO:確認ダイアログの実装、onclickで登録処理呼び出し */}
         <ConfirmDialog
           message={confirmMessage}
           confirmButtonMessage={"登録する"}
