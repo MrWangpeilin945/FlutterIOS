@@ -146,7 +146,6 @@ public class ExamMenuRepository : IExamMenuRepository
                                                      .Select(n => new MenuNoteExamResult()
                                                      {
                                                          SourceType = (SourceType)n.SourceType,
-                                                         OrderNumber = n.OrderNumber,
                                                          ExamItemDetailId = n.ExamItemDetailId
                                                      })
                         });
