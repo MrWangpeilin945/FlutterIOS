@@ -1,4 +1,16 @@
-import { Button, LoadingOverlay } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Center,
+  Container,
+  Flex,
+  Group,
+  Image,
+  LoadingOverlay,
+  Space,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
@@ -143,42 +155,76 @@ export default function Login() {
   };
 
   return (
-    <div>
-      <div>
-        <LoadingOverlay visible={isFetching || isLoading} />
-        <>
-          <h1>ログイン画面</h1>
-          <label>
-            利用者ID&nbsp;
-            <input
-              type="text"
-              value={loginId}
-              onChange={(e) => setLoginId(e.target.value)}
-              maxLength={20}
-            />
-            &nbsp;&nbsp;
-          </label>
-          <br />
-          <label>
-            パスワード&nbsp;
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-          <br />
-          <Button variant="primary" onClick={() => handleConfirm()}>
-            ログイン
-          </Button>
+    <>
+      <LoadingOverlay visible={isFetching || isLoading} />
+      <Container fluid>
+        <Center style={{ flexDirection: "column" }}>
+          <Space h={144} />
+          <Image src="./wellship-logo.svg" w={566} h={131} />
+          <Space h={128} />
+          <Flex columnGap={16}>
+            <Group w="486" justify="flex-end">
+              <Text size="sm" c="black01" ta="right">
+                利用者ID
+              </Text>
+              <TextInput
+                value={loginId}
+                onChange={(e) => setLoginId(e.target.value)}
+                maxLength={20}
+                styles={{
+                  input: {
+                    height: "auto",
+                    width: 340,
+                    padding: "16px 32px",
+                  },
+                }}
+              />
+            </Group>
+          </Flex>
+          <Space h={16} />
+          <Flex columnGap={16}>
+            <Group w="486" justify="flex-end">
+              <Text size="sm" c="black01" ta="right">
+                パスワード
+              </Text>
+              <TextInput
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                maxLength={20}
+                styles={{
+                  input: {
+                    height: "auto",
+                    width: 340,
+                    padding: "16px 32px",
+                  },
+                }}
+              />
+            </Group>
+          </Flex>
+          <Space h={128} />
+          <Box>
+            <Button
+              w={860}
+              h={75}
+              bg="primary"
+              onClick={() => handleConfirm()}
+              px={32}
+              py={16}
+            >
+              <Text size="lg" fw={700} c={"white01"}>
+                ログイン
+              </Text>
+            </Button>
+          </Box>
           <CommonDialog
             message={errorMessage || ""}
             buttonMessage="閉じる"
             isOpen={opened}
             onClose={close}
           />
-        </>
-      </div>
-    </div>
+        </Center>
+      </Container>
+    </>
   );
 }
