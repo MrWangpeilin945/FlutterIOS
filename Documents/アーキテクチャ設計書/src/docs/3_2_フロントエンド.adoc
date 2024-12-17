@@ -220,8 +220,8 @@ export default function Hoge() {
 [options="header"]
 |===
 |[green]#色#| [green]#テーマ名# | [green]#説明#
-|pass:[<span style="color:#00ADA4;font-size:30pt">■</span>] +
-#00ADA4| primary | プライマリカラー
+|pass:[<span style="color:#00979A;font-size:30pt">■</span>] +
+#00979A| primary | プライマリカラー
 |pass:[<span style="color:#F2F2F2;font-size:30pt">■</span>] +
 #F2F2F2| background | システムの背景色
 |pass:[<span style="color:#FFFFFF;font-size:30pt">■</span>] +
@@ -246,6 +246,8 @@ export default function Hoge() {
 |pass:[<span style="color:#F3948E;font-size:30pt">■</span>] +
 #F3948E| femaleSecondary | 女性のセカンダリカラー +
 受診者ヘッダー（女性用）上のボタンのラベル
+|pass:[<span style="color:#EAF7F2;font-size:30pt">■</span>] +
+#EAF7F2| stripe | 一覧のストライプカラー
 |pass:[<span style="color:#70CBA9;font-size:30pt">■</span>] +
 #70CBA9| green01 | トグルスイッチ、ツールチップ
 |pass:[<span style="color:#98DBBA;font-size:30pt">■</span>] +
@@ -270,3 +272,37 @@ export default function Hoge() {
 |pass:[<span style="color:#EAEAEA;font-size:30pt">■</span>] +
 #EAEAEA| gray04 | 個人属性情報のタイトルの背景色
 |===
+
+== フロントエンドでの認証について
+
+2024/12/11の打ち合わせにて決定
+
+* axiosでAPIを呼ぶときリフレッシュのcookieの付与ルールについて
+** cookieのpath属性
+*** /api/v1/auth/refresh
+*** ↑ axiosでのアクセス時に自動で付くことを確認する（タスク）
+* 認証情報の保存先について（確認）
+** JWT:localstorage、リフレッシュトークン:Cookie
+*** 鍵がfront側にあるので厳密な保護は出来ないが鍵の暗号化しますか？（AITEL実績）
+* JWTの検証について（認識合わせ・相談）
+** expireの時間のみ検証
+** 端末とサーバーの時刻が合わない可能性があるので、
+*** 端末とサーバーの時間のズレを持っておくとかして考慮したい
+**** offsetを持っておいて、端末の時間＋offsetでサーバー時間として扱う
+*** AITEL同様送信→401確認→リフレッシュでも良いかも…（問題があれば）
+* JWT・リフレッシュトークンの取得・更新・破棄について（認識合わせ）
+** 認証→localstorageに保存
+** ページ遷移→localstrageのJWTの有効期限チェック
+** APIアクセス→localstrageのJWTの有効期限チェック
+** 有効期限チェックに失敗→リフレッシュ（できればロックしておきたい）
+** リフレッシュ→（401：JWT/RefreshTokenがおかしいorリフレッシュトークン期限切れ）→破棄・ログアウト
+* JWT/RefreshTokenの渡し方
+** jwt→httpヘッダのAuthorizationにBearer {jwt}
+*** ログイン系のみ、ログインしていない状態でアクセスを許可する想定
+** refreshtoken→httpヘッダのcookieのrefreshToken（必要ならハンドリングをする）
+* 一旦、frontendから参照する予定があるclaim（認識合わせ）
+** exp
+** iat
+* ログアウト時のrefreshTokenの破棄について
+** frontendから制御はしない
+* login系のAPIは完成したら連絡する

@@ -8,17 +8,17 @@ public class PlaceSchedule
     /// <summary>
     /// 会場日程ID
     /// </summary>
-    public int PlaceScheduleId { get; set; }
+    public Guid PlaceScheduleId { get; set; }
 
     /// <summary>
     /// 班ID
     /// </summary>
-    public int TeamId { get; set; }
+    public Guid TeamId { get; set; }
 
     /// <summary>
     /// 会場ID
     /// </summary>
-    public int PlaceId { get; set; }
+    public Guid PlaceId { get; set; }
 
     /// <summary>
     /// 開始時刻

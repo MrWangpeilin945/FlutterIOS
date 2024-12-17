@@ -10,7 +10,7 @@ public class Examinee
     /// <summary>
     /// 受診者ID
     /// </summary>
-    public required int ExamineeId { get; init; }
+    public required Guid ExamineeId { get; init; }
 
     /// <summary>
     /// 受診者コード
@@ -36,4 +36,9 @@ public class Examinee
     /// 生年月日
     /// </summary>
     public required Birthdate Birthdate { get; init; }
+
+    /// <summary>
+    /// 所属団体
+    /// </summary>
+    public required IEnumerable<Affiliations> Affiliations { get; init; }
 }

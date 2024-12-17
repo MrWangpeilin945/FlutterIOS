@@ -22,9 +22,9 @@
 
 |placeScheduleId
 |Yes
-|number
+|string
 |会場日程ID
-|54
+|`ed282fd3-8ef5-426a-b1c3-c2a0fced1c13`
 
 |===
 
@@ -41,7 +41,7 @@
 [source,json]
 ----
 {
-  "placeScheduleId": 15,
+  "placeScheduleId": "ed282fd3-8ef5-426a-b1c3-c2a0fced1c13",
   "placeId": 4,
   "placeName": "会場D",
   "examDate": "2024-10-21",

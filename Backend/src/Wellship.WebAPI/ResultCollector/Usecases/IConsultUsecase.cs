@@ -28,7 +28,7 @@ public interface IConsultUsecase
     /// <summary>
     /// 検査内容を取得する
     /// </summary>
-    public void GetExamItemsExaminee();
+    public Task<ExamContent> GetExamItemsExamineeAsync(string consultNumber, int examMenuId);
 
     /// <summary>
     /// 検査の実施有無と中止理由を登録する
@@ -39,4 +39,14 @@ public interface IConsultUsecase
     /// 前提検査メニューを検証する
     /// </summary>
     public Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenus(string consultNumber, int examMenuId);
+
+    /// <summary>
+    /// 検査結果入力情報を取得する
+    /// </summary>
+    public Task<InputExamItems> GetInputExamItemsExamineeAsync(string consultNumber, int examMenuId);
+
+    /// <summary>
+    /// 検査結果相関ルールで検証する
+    /// </summary>
+    public Task<IEnumerable<Domain.Models.RuleError>> ValidateCorrelationRuleAsync(string consultNumber, ResultsRequest result);
 }

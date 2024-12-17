@@ -8,7 +8,7 @@ public class ExamCancelEntity
     /// <summary>
     /// 受診ID
     /// </summary>
-    public int ConsultId { get; set; }
+    public Guid ConsultId { get; set; }
 
     /// <summary>
     /// 検査項目ID
