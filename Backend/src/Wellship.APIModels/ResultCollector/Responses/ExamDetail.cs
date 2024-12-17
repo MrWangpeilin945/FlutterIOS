@@ -31,5 +31,5 @@ public class ExamDetail
     /// </summary>
     [JsonPropertyName("cancelReasonId")]
 
-    public required int CancelReasonId { get; init;}
+    public required int? CancelReasonId { get; init;}
 }
