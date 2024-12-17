@@ -60,7 +60,7 @@ public class StaffRepository : IStaffRepository
     /// 職員IDで職員を取得します。
     /// </summary>
     /// <param name="staffId">職員ID</param>
-    public async Task<Staff> GetStaffByStaffIdAsync(int staffId)
+    public async Task<Staff> GetStaffByStaffIdAsync(Guid staffId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"

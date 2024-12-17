@@ -8,7 +8,7 @@ public class StaffEntity
     /// <summary>
     /// 職員ID
     /// </summary>
-    public int StaffId { get; set; }
+    public Guid StaffId { get; set; }
 
     /// <summary>
     /// 職員コード

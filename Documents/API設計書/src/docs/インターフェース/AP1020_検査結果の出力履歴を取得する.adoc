@@ -34,7 +34,7 @@
   "exportHistories": [
     {
       "exportId" : "c0873b41-ac80-403e-ae35-336065b0411f"
-      "placeScheduleId": 23,
+      "placeScheduleId": "ed282fd3-8ef5-426a-b1c3-c2a0fced1c13",
       "placeName": "会場B",
       "placeScheduleLockingStatus" : 1,
       "examDate": "2024-10-21",

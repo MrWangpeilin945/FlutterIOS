@@ -15,7 +15,7 @@ public class ExamNormalValueRange
     /// <summary>
     /// 基準値パターンID
     /// </summary>
-    public required int ThresholdId { get; init; }
+    public required Guid ThresholdId { get; init; }
 
     /// <summary>
     /// 検査項目明細ID

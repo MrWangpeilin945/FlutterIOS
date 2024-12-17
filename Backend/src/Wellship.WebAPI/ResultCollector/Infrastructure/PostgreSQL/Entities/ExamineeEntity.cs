@@ -8,7 +8,7 @@ public class ExamineeEntity
     /// <summary>
     /// 受診者ID
     /// </summary>
-    public required int ExamineeId { get; init; }
+    public required Guid ExamineeId { get; init; }
 
     /// <summary>
     /// 受診者コード
@@ -34,4 +34,25 @@ public class ExamineeEntity
     /// 生年月日
     /// </summary>
     public required DateTime Birthdate { get; init; }
+
+    /// <summary>
+    /// 団体ID
+    /// </summary>
+    public required Guid OrganizationId { get; init; }
+
+    /// <summary>
+    /// 団体コード
+    /// </summary>
+    public required string OrganizationCode { get; init; }
+
+    /// <summary>
+    /// 団体名
+    /// </summary>
+    public required string OrganizationName { get; init; }
+
+    /// <summary>
+    /// 表示順
+    /// </summary>
+    public required int OrderNumber { get; init; }
+
 }

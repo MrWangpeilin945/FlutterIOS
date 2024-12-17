@@ -33,5 +33,11 @@ public interface IExamItemRepository
     /// <param name="examItemDetailIds">検査項目明細ID</param>
     /// <param name="age">受診者の健診時の年齢</param>
     /// <param name="sex">受診者の性別</param>
-    Task<IEnumerable<Models.ExamNormalValueRange>> GetExamNormalValueRangesAsync(int[] thresholdIds, int[] examItemDetailIds, Age age, Sex sex);
+    Task<IEnumerable<Models.ExamNormalValueRange>> GetExamNormalValueRangesAsync(Guid[] thresholdIds, int[] examItemDetailIds, Age age, Sex sex);
+
+    /// <summary>
+    /// 検査結果相関ルールを取得します。
+    /// </summary>
+    /// <param name="examMenuId">検査メニューID</param>
+    Task<IEnumerable<Models.CorrelationRule>> GetCorrelationRulesAsync(int examMenuId);
 }
