@@ -1,0 +1,404 @@
+== EC2002_受付を更新する
+
+=== 概要
+
+* 外部連携で使用する
+* 引数の受付をDBに登録する
+
+=== 処理フロー
+
+[mermaid]
+----
+flowchart TD
+    A[UseCase] --> ERROR{ERROR検証}
+    ERROR -- エラーあり --> C(ErrorObject生成、追加)
+    ERROR -- エラー無 --> WORNING{WORNING検証}    
+    WORNING -- ワーニングあり --> DROP(WORNINGレコードDrop)
+    DROP(WORNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
+    DROP_REC --> D[[Repository]]
+    WORNING -- ワーニング無 --> D
+    C --> E(返却)
+    D --> E
+    E --> UseCaseEND(END)
+
+    F[[Repository]] --> G[BEGIN]
+    G --> H["Update(一括):[DB]consult(受診)"]
+    H --> I["Upsert(一括):[DB]tickets(受付)"]
+    I --> J["Insert(一括):[DB]tickets_histories(受付履歴)"]
+    J --> K[Commit]
+    H -.Exception.-> ROLLBACK[ROLLBACK]
+    G -.Exception.-> ROLLBACK
+    I -.Exception.-> ROLLBACK
+    J -.Exception.-> ROLLBACK
+    K --> RepositoryEND[[END]]
+    ROLLBACK .-> RepositoryEND
+----
+
+=== 非機能
+
+* 1万レコードの登録を10秒以内に完了する
+* 検証・DB登録に失敗した場合、全てロールバックする
+
+=== UseCase
+
+[source]
+----
+StoreTicketsAsync
+----
+
+==== 引数
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Tickets
+|Yes
+|List<Ticket>
+|登録する受付のリスト
+
+|===
+
+==== 戻り値
+
+[source]
+----
+list<ErrorObject>
+----
+
+===== 正常登録
+
+[source]
+----
+list.Count() == 0
+----
+
+===== 異常有り
+
+[source]
+----
+list.Count()  <> 0
+----
+
+==== クラス
+
+===== Ticket
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|SortNo
+|Yes
+|num
+|処理順
+
+|ConnectionCode
+|Yes
+|string
+|連携キー（重複あり）
+
+|ConnectionMode
+|Yes
+|string
+|連携モード
+
+|TicketNumber
+|No
+|string
+|受付番号
+
+|===
+
+==== ErrorObject
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|エラーコード
+
+|Message
+|Yes
+|string
+|エラーメッセージ
+
+|InputNote
+|Yes
+|string
+|入力項目Noなど
+
+|===
+
+==== 列挙型
+
+* None
+
+==== ERROR検証
+
+* 連携キーの取得に失敗
+** `[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCode` が存在しない
+*** Code `10001` : Message `該当する連携キーが見つかりません。` InputNote [Ticket,InputNote]
+
+==== WORNING検証
+
+* None
+
+=== 処理(Repository)
+
+==== ワークテーブル登録
+
+* `Ticket` をワークテーブルに登録する。
+* `Ticket.ConnectionCode` でグループ化し、 `Ticket.SortNo` が大きいレコードで `[DB]consult(受診)` と `[DB]tickets(受付)` の更新処理を行う。
+*  `[DB]tickets_histories(受付履歴)` は全レコード更新を行う。
+
+==== 更新処理
+
+* 条件①
+** `Ticket.ConnectionMode  == 追加`
+
+* [DB]consult(受診)
+** Update
+*** `Ticket.ConnectionCode == [DB]consult(受診).external_connection_code(外部連携キー)` のレコード
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|
+|更新対象外
+
+|consult_number
+|
+|更新対象外
+
+|progress_status
+|`'21'`（検査中）
+|
+
+|export_status
+|
+|更新対象外
+
+|place_schedule_id
+|
+|更新対象外
+
+|note
+|
+|更新対象外
+
+|examinee_id
+|
+|更新対象外
+
+|external_connection_code
+|
+|更新対象外
+
+|===
+
+* [DB]tickets(受付)
+** Upsert
+*** `Ticket.ConnectionCode == [DB]consult(受診).external_connection_code(外部連携キー)` で検索して取得した `[DB]consult(受診).consult_id(受診ID) == [DB]tickets(受付).consult_id(受診ID)` のレコード
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|`'[DB]consult.consult_id'`
+|[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCodeで検索して取得
+
+|ticket_number
+|`'Ticket.TicketNumber'`
+|
+
+|===
+
+* [DB]tickets_histories(受付履歴)
+** Insert
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|id
+|UUID自動付番
+|
+
+|consult_id
+|`'[DB]consult.consult_id(受診ID)'`
+|[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCodeで検索して取得
+
+|ticket_number
+|`'Ticket.TicketNumber'`
+|
+
+|追加削除
+|`'追加'`
+|
+
+|===
+
+* 条件②
+** `Ticket.ConnectionMode  == 削除` AND `[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCodeで検索して取得した[DB]consult(受診).consult_id(受診ID) == [DB]tickets(受付).consult_id(受診ID)が存在する`
+
+* [DB]consult(受診)
+** Update
+*** `Ticket.ConnectionCode == [DB]consult(受診).external_connection_code(外部連携キー)` のレコード
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|
+|更新対象外
+
+|consult_number
+|
+|更新対象外
+
+|progress_status
+|`'11'`（来場待）
+|
+
+|export_status
+|
+|更新対象外
+
+|place_schedule_id
+|
+|更新対象外
+
+|note
+|
+|更新対象外
+
+|examinee_id
+|
+|更新対象外
+
+|external_connection_code
+|
+|更新対象外
+
+|===
+
+* [DB]tickets(受付)
+** Delete
+*** `Ticket.ConnectionCode == [DB]consult(受診).external_connection_code(外部連携キー)` で検索して取得した `[DB]consult(受診).consult_id(受診ID) == [DB]tickets(受付).consult_id(受診ID)` のレコード
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|
+|
+
+|ticket_number
+|
+|
+
+|===
+
+* [DB]tickets_histories(受付履歴)
+** Insert
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|id
+|UUID自動付番
+|
+
+|consult_id
+|`'[DB]consult(受診).consult_id(受診ID)'`
+|`[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCode` で検索して取得
+
+|ticket_number
+|`'Ticket.TicketNumber'`
+|
+
+|追加削除
+|`'削除'`
+|
+
+|===
+
+* 条件③
+** `Ticket.ConnectionMode  == 削除` AND `[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCodeで検索して取得した[DB]consult(受診).consult_id(受診ID) == [DB]tickets(受付).consult_id(受診ID)が存在しない`
+
+* [DB]consult(受診)
+** Update
+*** `Ticket.ConnectionCode == [DB]consult(受診).external_connection_code(外部連携キー)` のレコード
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|
+|更新対象外
+
+|consult_number
+|
+|更新対象外
+
+|progress_status
+|`'11'`（来場待）
+|
+
+|export_status
+|
+|更新対象外
+
+|place_schedule_id
+|
+|更新対象外
+
+|note
+|
+|更新対象外
+
+|examinee_id
+|
+|更新対象外
+
+|external_connection_code
+|
+|更新対象外
+
+|===
+
+* [DB]tickets_histories(受付履歴)
+** Insert
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|id
+|UUID自動付番
+|
+
+|consult_id
+|`'[DB]consult(受診).consult_id(受診ID)'`
+|`[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCode` で検索して取得
+
+|ticket_number
+|`空文字`
+|
+
+|追加削除
+|`'削除'`
+|
+
+|===
