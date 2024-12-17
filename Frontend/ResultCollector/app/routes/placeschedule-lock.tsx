@@ -34,7 +34,7 @@ export const meta: MetaFunction = () => {
   return [{ title: "会場ロック" }];
 };
 
-export default function consultNumberInput() {
+export default function PlaceScheduleLock() {
   const [isLoading, setIsLoading] = useState(false);
   const [staff] = useAtom(staffState);
   const [placeSchedule] = useAtom(placeScheduleState);
@@ -79,7 +79,7 @@ export default function consultNumberInput() {
       if (result.error.status === 400) {
         setMessage(getErrorMessage(errorMessages.invalid, "パラメータ"));
       } else if (result.error.status === 404) {
-        setMessage(getErrorMessage(errorMessages.noData, "該当する会場日程"));
+        setMessage(getErrorMessage(errorMessages.notFound, "該当する会場日程"));
       } else if (result.error.status === 500) {
         setMessage(getErrorMessage(errorMessages.serverError));
       }
@@ -177,7 +177,7 @@ export default function consultNumberInput() {
                           placeScheduleLock.placeScheduleLockingStatus ===
                           button.placeScheduleLockingStatus
                             ? "primary"
-                            : "gray02"
+                            : "gray03"
                         }
                         w={700}
                         m={10}
