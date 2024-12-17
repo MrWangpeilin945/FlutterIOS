@@ -49,7 +49,7 @@ export default function ExamineeInfo({
           <Box display="table-cell">
             <Group gap={10} justify="flex-end" wrap="nowrap">
               <IconAlertCircle
-                size={"32"}
+                size={32}
                 fill={getThemeColor("warning", theme)}
                 color={getThemeColor("white01", theme)}
               />
