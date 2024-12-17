@@ -1,13 +1,4 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Group,
-  Progress,
-  Text,
-  getThemeColor,
-  useMantineTheme,
-} from "@mantine/core";
+import { Box, Button, Divider, Group, Progress, Text } from "@mantine/core";
 import { AggregatedProgressStatus } from "~/domain/enums";
 
 type ProgressData = {
@@ -29,7 +20,6 @@ export default function ExamItemProgress({
   progress,
   onClick,
 }: ExamItemProgressProps) {
-  const theme = useMantineTheme();
   // 合計値を算出
   const total =
     progress.details?.reduce((sum, detail) => sum + (detail.count || 0), 0) ||
@@ -59,15 +49,11 @@ export default function ExamItemProgress({
       <Text size="md" fw={700} c="black01" pb={16}>
         {progress.examItemName}
       </Text>
-      <Divider
-        size="xs"
-        pb={16}
-        style={{ "--divider-color": getThemeColor("gray03", theme) }}
-      />
+      <Divider size="xs" pb={16} />
       <Group>
         {sections.map((sections) => (
           <Box key={sections.label}>
-            <Button w={154} h={66} py={16} px={32} color={sections.color}>
+            <Button w={154} h={75} py={16} px={32} color={sections.color}>
               <Text size="lg" fw={700} c="white01">
                 {sections.label}
               </Text>
