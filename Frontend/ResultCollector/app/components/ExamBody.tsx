@@ -71,6 +71,8 @@ export default function ExamBody({
   };
 
   const validationCheck = (item: InputExamItem) => {
+    // BMIはバリデーションチェックを実施しない
+    if (item.positionNumber === 4) return item;
     // 必須チェックと半角数字チェックを一度に行うスキーマ
     const schema = z
       .string()
@@ -180,12 +182,10 @@ export default function ExamBody({
         });
       }
 
-      // BMI以外の項目に対してバリデーションチェックを実施
-      if (item.positionNumber !== 4) {
-        const validatedItem = validationCheck(item);
-        // バリデーション結果を反映
-        Object.assign(item, validatedItem);
-      }
+      // バリデーションチェックを実施
+      const validatedItem = validationCheck(item);
+      // バリデーション結果を反映
+      Object.assign(item, validatedItem);
     }
 
     // BMIの計算と設定処理
