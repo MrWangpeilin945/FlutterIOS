@@ -61,7 +61,7 @@ export default function ConfirmDialog({
           <Group gap={24} wrap="nowrap">
             <Button
               w={214}
-              h={64}
+              h={75}
               variant="outline"
               bg="white01"
               color="primary"
@@ -76,7 +76,7 @@ export default function ConfirmDialog({
             </Button>
             <Button
               w={214}
-              h={64}
+              h={75}
               variant="filled"
               bg="primary"
               color="primary"
