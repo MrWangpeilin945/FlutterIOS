@@ -3,17 +3,13 @@ import { z } from "zod";
 import { useEffect, useState } from "react";
 import {
   Group,
-  Stack,
   Title,
   Paper,
   Text,
-  TextInput,
+  Textarea,
   Button,
   Flex,
-  Box,
 } from "@mantine/core";
-import { useClickOutside } from "@mantine/hooks";
-import Keyboard from "~/components/NumericKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import type {
   ExamRegistResult,
@@ -34,7 +30,8 @@ export default function ExamFreeInput({
   onRegisterPressed,
   onChange,
 }: ExamFreeInputProps) {
-  const firstExamItemDetail = examItems?.[0]?.examItemDetails?.[0];
+  const firstExamItem = examItems?.[0];
+  const firstExamItemDetail = firstExamItem.examItemDetails?.[0];
   if (!firstExamItemDetail) {
     return null;
   }
@@ -43,38 +40,17 @@ export default function ExamFreeInput({
 
   // APIのエラーメッセージの取得
   const getAPIErrorMessages = () => {
-    const APIerror = examItems[0].examRegistResults || [];
+    const APIerror = firstExamItem.examRegistResults || [];
     return APIerror || [];
   };
 
-  // 半角数字のチェック
-  const validationNumeric = () => {
-    if (!examValue) {
-      return [];
-    }
-    const validationSchema = z
-      .string()
-      .regex(
-        /^[0-9]+$/,
-        getErrorMessage(errorMessages.numericString, `${examItems[0].name}は`)
-      );
-    const result = validationSchema.safeParse(examValue);
-    if (!result.success) {
-      const numericMessage: ExamRegistResult = {
-        description: result.error.errors[0].message,
-        errorLevel: InputErrorLevel.異常,
-      };
-      return [numericMessage];
-    }
-    return [];
-  };
   // 必須バリデーションチェック
   const validationRequire = () => {
     const requireSchema = z
       .string()
       .min(
         1,
-        getErrorMessage(errorMessages.required, `${examItems[0].name}は`)
+        getErrorMessage(errorMessages.required, `${firstExamItem.name}は`)
       );
     const result = requireSchema.safeParse(examValue);
     if (!result.success && onRegisterPressed) {
@@ -96,36 +72,10 @@ export default function ExamFreeInput({
   // バリデーションチェックの走査
   useEffect(() => {
     const messages = getAPIErrorMessages();
-    const numericError = validationNumeric();
     const requireError = validationRequire();
-    const result = messages.concat(numericError).concat(requireError);
+    const result = messages.concat(requireError);
     sortErrorMessages(result);
   }, [examValue, onRegisterPressed]);
-
-  // 表示時の小数点追加処理
-  const formatDecimalValue = (value: string) => {
-    const floatValue = Number.parseFloat(value);
-    const afterDecimalDigit = firstExamItemDetail?.decimalLength;
-    if (afterDecimalDigit && !Number.isNaN(floatValue)) {
-      const result = (floatValue / 10 ** afterDecimalDigit)
-        .toFixed(afterDecimalDigit)
-        .toString();
-      return result;
-    }
-    return value;
-  };
-
-  // 最大桁数を考慮してexamValueをセットする
-  const decimalLength = firstExamItemDetail?.decimalLength ?? 0;
-  const integerLength = firstExamItemDetail?.integerLength ?? 0;
-  const maxDigits = decimalLength + integerLength;
-  const setExamValueWithMaxDigits = (examValue: string) => {
-    if (firstExamItemDetail?.integerLength) {
-      setExamValue(examValue.slice(0, maxDigits));
-    } else {
-      setExamValue(examValue);
-    }
-  };
 
   // examItemsを更新して渡す処理
   // TODO:エラーレベルでコールバックを制御するか確認
@@ -136,15 +86,15 @@ export default function ExamFreeInput({
     const newExamItems: InputExamItem = {
       ...examItems,
       examItemDetails: [
-        ...(examItems[0].examItemDetails?.[0]
+        ...(firstExamItemDetail
           ? [
               {
-                ...examItems[0].examItemDetails[0],
+                ...firstExamItemDetail,
                 value: examValue,
               },
             ]
           : []),
-        ...(examItems[0].examItemDetails?.slice(1) ?? []),
+        ...(firstExamItem.examItemDetails?.slice(1) ?? []),
       ],
     };
     onChange(newExamItems);
@@ -153,19 +103,13 @@ export default function ExamFreeInput({
   // テキストボックス入力時の処理
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
-    value.replace(".", ""); // テキストボックスの値を参照するので、小数点を取り除く
-    setExamValueWithMaxDigits(value);
-    updatedExamItems();
-  };
-  // キーボード入力時の処理
-  const handleKeyChange = (e: string) => {
-    setExamValueWithMaxDigits(e);
+    setExamValue(value);
     updatedExamItems();
   };
 
   return (
-    <Flex justify="flex-start" align="flex-start" direction="column">
-      <Group w="11168" gap="md">
+    <Flex mt={16} justify="flex-start" align="flex-start" direction="column">
+      <Flex gap={16} justify="flex-start" align="flex-start">
         <Paper
           w={274}
           h={80}
@@ -178,12 +122,12 @@ export default function ExamFreeInput({
           }}
         >
           <Title size="lg" fw={700}>
-            {examItems[0].name}
+            {firstExamItem.name}
           </Title>
         </Paper>
-        <TextInput
+        <Textarea
           classNames={{
-            input: `${styles["input-textbox"]} ${
+            input: `${styles["input-textare"]} ${
               errMessages?.some((x) => x.errorLevel === InputErrorLevel.異常)
                 ? `${styles["input-error"]}`
                 : errMessages?.some(
@@ -193,28 +137,23 @@ export default function ExamFreeInput({
                 : ""
             }`,
           }}
-          w={"340"}
+          w={"524"}
           radius={"md"}
-          size="inputComponent"
-          value={formatDecimalValue(examValue)}
+          size="sm"
+          value={examValue}
           onChange={(e) => {
             handleTextChange(e);
           }}
+          autosize
+          minRows={1}
+          maxRows={4}
         />
         {/* TODO:前回値のマックス横幅設定 */}
-        <Stack gap="0">
-          <Text size="md" fw="700" maw={"271"}>
-            {firstExamItemDetail?.prevValue
-              ? `(前回: ${firstExamItemDetail?.prevValue})`
-              : ""}
-          </Text>
-          <Text size="xs" fw="400">
-            {firstExamItemDetail?.unit}
-          </Text>
-        </Stack>
+
         <Button
           w={154}
           h={64}
+          ml={48}
           size="lg"
           bg={"white"}
           variant="outline"
@@ -222,7 +161,18 @@ export default function ExamFreeInput({
         >
           クリア
         </Button>
-      </Group>
+      </Flex>
+      <Text
+        mt={16}
+        ml={287}
+        size="md"
+        fw="700"
+        className={styles["text-multiline"]}
+      >
+        {firstExamItemDetail?.prevValue
+          ? `(前回値)\n${firstExamItemDetail?.prevValue}`
+          : ""}
+      </Text>
       {/* エラーメッセージを表示する。 */}
       {(errMessages || []).map((error, index) => (
         <Group

@@ -59,6 +59,11 @@
   padding: 32px;
 }
 
+.input-textare {
+  max-height: 200px;
+  padding: 16px 24px;
+}
+
 .large-input {
   width: 100%;
   height: 80px;
