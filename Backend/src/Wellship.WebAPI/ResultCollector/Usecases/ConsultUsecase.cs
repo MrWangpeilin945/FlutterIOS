@@ -362,50 +362,6 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 検査メニュー特記を取得する
-    /// </summary>
-    private IEnumerable<RelatedExamItem> GetRelatedExamItems(
-        IEnumerable<Domain.Models.MenuNote> menuNotes,
-        IEnumerable<Domain.Models.ExamItemNote> examItemNotes,
-        Domain.Models.ExamResult? examResults,
-        Domain.Models.PreviousResult? previousResults)
-    {
-
-        var currentResultMap = examResults?.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value) ?? [];
-        var previousResultMap = previousResults?.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value) ?? [];
-        var itemNoteMap = examItemNotes.ToDictionary(x => x.ExamItemId, x => x.Note);
-
-        var results = menuNotes.Select(x => new RelatedExamItem()
-        {
-            ExamItemName = x.Name,
-            ExamResult = ConvertDetailValueToText(x, currentResultMap, previousResultMap, itemNoteMap)
-        });
-        return results;
-    }
-
-
-    private string ConvertDetailValueToText(Domain.Models.MenuNote menuNote, Dictionary<int, string> currentResultMap, Dictionary<int, string> previousResultMap, Dictionary<int, string> itemNoteMap)
-    {
-        // 検査結果
-        var rsls = menuNote.ExamResults.Select(x => x.SourceType switch
-                                       {
-                                           Core.Enums.SourceType.今回値 => currentResultMap.TryGetValue(x.ExamItemDetailId, out var currentResult) ? currentResult : "",
-                                           Core.Enums.SourceType.前回値 => previousResultMap.TryGetValue(x.ExamItemDetailId, out var previousResult) ? previousResult : "",
-                                           _ => ""
-                                       });
-
-        // TODO: 回答が選択肢の場合はコード→名称変換が必要。
-        // 複数ある場合のまとめ方は？、や／で区切る？
-
-
-        // 検査項目特記
-        var it = menuNote.ExamItemNotes.Select(x => itemNoteMap.TryGetValue(x.ExamItemId, out var itemNote) ? itemNote : "");
-
-        // TOOD: 表示用の文字列として組み立てる
-        return "";
-    }
-
-    /// <summary>
     /// 検査結果相関ルールで検証します。
     /// </summary>
     public async Task<IEnumerable<Domain.Models.RuleError>> ValidateCorrelationRuleAsync(string consultNumber, ResultsRequest result)
@@ -470,5 +426,49 @@ public class ConsultUsecase : IConsultUsecase
         var errorLevels = new List<InputErrorLevel>() { InputErrorLevel.警告, InputErrorLevel.異常 };
         return errors.Where(x => errorLevels.Contains(x.ErrorLevel))
                      .OrderBy(x => x.Priority);
+    }
+
+    /// <summary>
+    /// 検査メニュー特記を取得する
+    /// </summary>
+    private IEnumerable<RelatedExamItem> GetRelatedExamItems(
+        IEnumerable<Domain.Models.MenuNote> menuNotes,
+        IEnumerable<Domain.Models.ExamItemNote> examItemNotes,
+        Domain.Models.ExamResult? examResults,
+        Domain.Models.PreviousResult? previousResults)
+    {
+
+        var currentResultMap = examResults?.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value) ?? [];
+        var previousResultMap = previousResults?.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value) ?? [];
+        var itemNoteMap = examItemNotes.ToDictionary(x => x.ExamItemId, x => x.Note);
+
+        var results = menuNotes.Select(x => new RelatedExamItem()
+        {
+            ExamItemName = x.Name,
+            ExamResult = ConvertDetailValueToText(x, currentResultMap, previousResultMap, itemNoteMap)
+        });
+        return results;
+    }
+
+
+    private string ConvertDetailValueToText(Domain.Models.MenuNote menuNote, Dictionary<int, string> currentResultMap, Dictionary<int, string> previousResultMap, Dictionary<int, string> itemNoteMap)
+    {
+        // 検査結果
+        var rsls = menuNote.ExamResults.Select(x => x.SourceType switch
+                                       {
+                                           Core.Enums.SourceType.今回値 => currentResultMap.TryGetValue(x.ExamItemDetailId, out var currentResult) ? currentResult : "",
+                                           Core.Enums.SourceType.前回値 => previousResultMap.TryGetValue(x.ExamItemDetailId, out var previousResult) ? previousResult : "",
+                                           _ => ""
+                                       });
+
+        // TODO: 回答が選択肢の場合はコード→名称変換が必要。
+        // 複数ある場合のまとめ方は？、や／で区切る？
+
+
+        // 検査項目特記
+        var it = menuNote.ExamItemNotes.Select(x => itemNoteMap.TryGetValue(x.ExamItemId, out var itemNote) ? itemNote : "");
+
+        // TOOD: 表示用の文字列として組み立てる
+        return "";
     }
 }
