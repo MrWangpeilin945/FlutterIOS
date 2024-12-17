@@ -54,12 +54,8 @@ export default function NumericKeyboard(props: KeyboardProps) {
     if (!value || integerLength <= 0 || decimalLength < 0) return value;
     const totalLength = integerLength + decimalLength;
     const paddedValue = value.padStart(totalLength, "0");
-    let integerPart = paddedValue.slice(0, integerLength);
+    const integerPart = paddedValue.slice(0, integerLength);
     const decimalPart = paddedValue.slice(integerLength, totalLength);
-    // 整数部が不足する場合、0で補填
-    if (integerPart.length < integerLength) {
-      integerPart = integerPart.padStart(integerLength, "0");
-    }
     let formattedValue = `${integerPart}.${decimalPart}`;
     // 整数部が1未満の場合、整数部の先頭ゼロは除去しない
     if (Number.parseInt(formattedValue) < 1) {
