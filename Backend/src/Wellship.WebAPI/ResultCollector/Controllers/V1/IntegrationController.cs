@@ -50,9 +50,14 @@ public class IntegrationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/integrations/examResults/{placeScheduleId}/export")]
-    public IActionResult ExportResults([FromRoute][Required] int placeScheduleId, [FromBody] ResultExportRequest request)
+    public async Task<IActionResult> ExportResults([FromRoute][Required] Guid placeScheduleId, [FromBody] ResultExportRequest request)
     {
-        _integrationUsecase.ExportResults();
+        if (placeScheduleId != request.PlaceScheduleId)
+        {
+            return BadRequest("パスパラメータとリクエストボディ内の値が一致しません。");
+        }
+
+        await _integrationUsecase.ExportResultsAsync(placeScheduleId);
         return Ok();
     }
 
