@@ -52,7 +52,7 @@ export default function CommonDialog({
         <Center>
           <Button
             w={214}
-            h={64}
+            h={75}
             variant="filled"
             bg="primary"
             color="primary"
