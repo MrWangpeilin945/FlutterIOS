@@ -83,6 +83,7 @@ export enum ConsultResultExportStatus {
  */
 export enum KeyboardType {
   テンキー = 1,
+  選択肢 = 2,
 }
 
 /**
@@ -103,6 +104,16 @@ export enum ExamItemGroupType {
   視力,
   聴力,
   通過,
+}
+
+/**
+ * 検査項目明細種別
+ * @description フロントエンドで入力や選択を出し分けるためのタイプです。 検査項目種別ごとに設定します。
+ */
+enum ExamItemDetailType {
+  入力 = 1,
+  選択 = 2,
+  演算値 = 3,
 }
 
 /**
