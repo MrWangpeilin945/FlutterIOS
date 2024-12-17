@@ -15,8 +15,9 @@ import { z } from "zod";
 import { InputErrorLevel } from "~/domain/enums";
 import type { InputExamItem } from "~/domain/wellship.schemas";
 import NumericKeyboard from "./NumericKeyboard";
+import CollectionKeyboard from "./CollectionKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
-import { setRangesErrorMessage } from "~/utils/setRangesErrorMessege";
+import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import styles from "~/styles/common.module.css";
 
 type BodyProps = {
@@ -36,23 +37,19 @@ export default function ExamBody({
 
   const [examItemsData, setExamItemsData] = useState(examItems);
 
-  // キーボードの表示状態を管理する
-  const [showKeyboards, setShowKeyboards] = useState(
-    examItems.map(() => false), // 初期状態はすべて false
-  );
-  const closeKeyBoard = useClickOutside(() =>
-    setShowKeyboards(Array(examItems.length).fill(false)),
-  );
+  // キーボードの表示インデックスを状態として管理する
+  const [activeKeyboard, setActiveKeyboard] = useState<number | null>(null);
+
+  // キーボードの表示/非表示をトグルする関数
+  const toggleKeyboard = (positionNumber: number) => {
+    setActiveKeyboard((prevNumber) =>
+      prevNumber === positionNumber ? null : positionNumber,
+    );
+  };
   const handleConfirm = () => {
-    setShowKeyboards(Array(examItems.length).fill(false));
+    setActiveKeyboard(null);
   };
-  const toggleKeyboard = (index: number) => {
-    setShowKeyboards((prev) => {
-      const updated = [...prev];
-      updated[index] = !updated[index];
-      return updated;
-    });
-  };
+  const closeKeyBoard = useClickOutside(() => setActiveKeyboard(null));
 
   const handleErrorMessage = (item: InputExamItem): InputExamItem => {
     if (item.examRegistResults) {
@@ -75,24 +72,16 @@ export default function ExamBody({
 
   const validationCheck = (item: InputExamItem) => {
     // 必須チェックと半角数字チェックを一度に行うスキーマ
-    const schema = z.object({
-      value: z
-        .string()
-        .min(1, {
-          message: getErrorMessage(errorMessages.required, `${item.name}は`),
-        }) // 必須チェック
-        .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-          // 半角数字チェック
-          message: getErrorMessage(
-            errorMessages.numericString,
-            `${item.name}は`,
-          ),
-        }),
-    });
+    const schema = z
+      .string()
+      .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)) // 必須チェック
+      .refine((value) => /^\d+(\.\d+)?$/.test(value), {
+        message: getErrorMessage(errorMessages.numericString, `${item.name}は`),
+      });
 
     // バリデーション対象データを取得
     const valueToValidate = item.examItemDetails?.[0]?.value || "";
-    const result = schema.safeParse({ value: valueToValidate });
+    const result = schema.safeParse(valueToValidate);
 
     // エラーメッセージを更新
     let updatedErrors = item.examRegistResults || [];
@@ -128,8 +117,8 @@ export default function ExamBody({
       ...item,
       examRegistResults: updatedErrors,
     };
-
-    return handleErrorMessage(prevItem);
+    const rangesValidatedItem = setRangesErrorMessage(prevItem);
+    return handleErrorMessage(rangesValidatedItem);
   };
 
   useEffect(() => {
@@ -137,12 +126,43 @@ export default function ExamBody({
       let validatedData: InputExamItem = item;
       // onRegisterPressedがtrueの場合のみvalidationCheckを実行
       if (onRegisterPressed) {
-        validatedData = validationCheck(item); // 必須バリデーションを実行
+        validatedData = validationCheck(item);
       }
       return validatedData;
     });
     setExamItemsData(updatedItems);
   }, [onRegisterPressed, examItems]);
+
+  // BMI計算処理
+  const setBMIValue = (updatedExamItems: InputExamItem[]): InputExamItem[] => {
+    const heightValue = updatedExamItems[0].examItemDetails?.[0].value ?? "0";
+    const weightValue = updatedExamItems[1].examItemDetails?.[0].value ?? "0";
+
+    // BMIの計算
+    const height = Number.parseFloat(heightValue) / 100;
+    const weight = Number.parseFloat(weightValue);
+    const bmi = Number.isNaN(weight / height ** 2) ? 0 : weight / height ** 2;
+    const bmiString = String(bmi);
+
+    return updatedExamItems.map((item) => {
+      if (item.positionNumber === 4) {
+        item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
+          const decimalLength = detail.decimalLength ?? 0;
+          const integerLength = detail.integerLength ?? 0;
+          const maxDigits = decimalLength + integerLength + 1;
+
+          if (idx === 0) {
+            if (detail.integerLength) {
+              return { ...detail, value: bmiString.slice(0, maxDigits) };
+            }
+            return { ...detail, value: bmiString };
+          }
+          return detail;
+        });
+      }
+      return item;
+    });
+  };
 
   //変更イベント
   const handleChange = (positionNumber: number | undefined, value: string) => {
@@ -160,59 +180,39 @@ export default function ExamBody({
         });
       }
 
-      //BMIの計算処理
-      const height =
-        Number.parseFloat(
-          updatedExamItems[0].examItemDetails?.[0].value ?? "0",
-        ) / 100;
-      const weight = Number.parseFloat(
-        updatedExamItems[1].examItemDetails?.[0].value ?? "0",
-      );
-      const bmi = weight && height ? String(weight / height ** 2) : "0";
-      // BMIの値を設定
-      if (item.positionNumber === 4) {
-        item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
-          const decimalLength = detail.decimalLength ?? 0;
-          const integerLength = detail.integerLength ?? 0;
-          const maxDigits = decimalLength + integerLength + 1;
-          if (idx === 0) {
-            if (detail.integerLength) {
-              return { ...detail, value: bmi.slice(0, maxDigits) };
-            }
-            return { ...detail, value: bmi };
-          }
-          return detail;
-        });
-      }
-
-      // 各アイテムに対してバリデーションを実行
-      let validatedItem = validationCheck(item);
+      // BMI以外の項目に対してバリデーションチェックを実施
       if (item.positionNumber !== 4) {
-        validatedItem = setRangesErrorMessage(validatedItem);
+        const validatedItem = validationCheck(item);
+        // バリデーション結果を反映
+        Object.assign(item, validatedItem);
       }
-      // バリデーション結果を反映
-      Object.assign(item, validatedItem);
     }
+
+    // BMIの計算と設定処理
+    const bmiUpdatedExamItems = setBMIValue(updatedExamItems);
     // 更新されたデータをステートに設定
-    setExamItemsData(updatedExamItems);
-    // 2つのエラーが存在するか確認
-    const isValidatedError = updatedExamItems.some((item) =>
+    setExamItemsData(bmiUpdatedExamItems);
+    // 3つのエラーが存在するか確認
+    const isValidatedError = bmiUpdatedExamItems.some((item) =>
       item.examRegistResults?.some(
         (error) =>
           error.description ===
             getErrorMessage(errorMessages.required, `${item.name}は`) ||
           error.description ===
-            getErrorMessage(errorMessages.numericString, `${item.name}は`),
+            getErrorMessage(errorMessages.numericString, `${item.name}は`) ||
+          //TODO:基準値エラーメッセージは未確定（部分一致予定）
+          error.description?.includes("正常値ではありません"),
       ),
     );
+
     if (!isValidatedError) {
-      onChange(updatedExamItems);
+      onChange(bmiUpdatedExamItems);
     }
   };
 
   return (
     <>
-      {examItemsData.map((item, index) => {
+      {examItemsData.map((item) => {
         const { positionNumber, name, examRegistResults = [] } = item;
         const detail = item.examItemDetails?.[0];
         // グレーアウト表示判定
@@ -278,7 +278,7 @@ export default function ExamBody({
                   onChange={(e) =>
                     handleChange(positionNumber, e.currentTarget.value)
                   }
-                  onClick={() => toggleKeyboard(index)}
+                  onClick={() => toggleKeyboard(item.positionNumber ?? 0)}
                   disabled={isDisabled}
                 />
               )}
@@ -317,17 +317,26 @@ export default function ExamBody({
               );
             })}
             {/* キーボード表示 */}
-            {showKeyboards[index] && (
+            {activeKeyboard === item.positionNumber && (
               <Box ref={closeKeyBoard} mx="auto">
-                <NumericKeyboard
-                  value={detail?.value ?? ""}
-                  integerLength={detail?.integerLength}
-                  decimalLength={detail?.decimalLength}
-                  onChange={(newValue) =>
-                    handleChange(positionNumber, newValue)
-                  }
-                  onConfirm={handleConfirm}
-                />
+                {detail?.keyboard?.keyboardType === 1 ? (
+                  <NumericKeyboard
+                    value={detail?.value ?? ""}
+                    integerLength={detail?.integerLength}
+                    decimalLength={detail?.decimalLength}
+                    onChange={(newValue) =>
+                      handleChange(positionNumber, newValue)
+                    }
+                    onConfirm={handleConfirm}
+                  />
+                ) : (
+                  <CollectionKeyboard
+                    keyboardValues={detail?.keyboard?.values ?? []}
+                    onChange={(newValue) =>
+                      handleChange(positionNumber, newValue)
+                    }
+                  />
+                )}
               </Box>
             )}
           </Flex>
