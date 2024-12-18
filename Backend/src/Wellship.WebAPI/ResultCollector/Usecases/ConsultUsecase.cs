@@ -95,14 +95,6 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 簡易な受診者情報を取得する
-    /// </summary>
-    public void GetSimpleExaminee()
-    {
-
-    }
-
-    /// <summary>
     /// 検査内容を取得する
     /// </summary>
     public async Task<ExamContent> GetExamItemsExamineeAsync(string consultNumber, int examMenuId)

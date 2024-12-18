@@ -14,30 +14,33 @@ export default function BoothNote({ relatedExamItems }: BoothNoteProps) {
 
   return (
     <>
-      <Flex px={10} wrap="wrap" direction="row">
-        {relatedExamItems.map((examItem, index) => (
-          <Group key={index} mt={5} style={{ width: "calc(50% - 8px)" }}>
-            <Flex gap="xs" align="flex-start" wrap="nowrap">
-              <Paper
-                bg="gray03"
-                c="gray01"
-                radius="md"
-                px={3}
-                w={210}
-                miw={210}
-              >
-                <Text size="xs" fw={700} ta="center">
-                  {examItem.examItemName?.slice(0, 8)}
+      <Flex direction="column">
+        <Flex px={16} wrap="wrap" direction="row" gap={16}>
+          {relatedExamItems.map((examItem, index) => (
+            <Group key={index} mt={5} style={{ width: "calc(50% - 8px)" }}>
+              <Flex gap={16} align="center" wrap="nowrap">
+                <Paper
+                  bg="gray03"
+                  c="gray01"
+                  radius="md"
+                  w={210}
+                  miw={210}
+                  h={51}
+                  py={8}
+                >
+                  <Text size="xs" fw={700} ta="center">
+                    {examItem.examItemName?.slice(0, 8)}
+                  </Text>
+                </Paper>
+                <Text size="xs" truncate="end" className={styles["text-wrap"]}>
+                  {examItem.examResult}
                 </Text>
-              </Paper>
-              <Text size="xs" truncate="end" className={styles["text-wrap"]}>
-                {examItem.examResult}
-              </Text>
-            </Flex>
-          </Group>
-        ))}
+              </Flex>
+            </Group>
+          ))}
+        </Flex>
+        <Divider mt={16} />
       </Flex>
-      <Divider mt={5} mx={5} />
     </>
   );
 }
