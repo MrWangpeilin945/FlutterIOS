@@ -1,4 +1,3 @@
-import type React from "react";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import {
@@ -11,10 +10,7 @@ import {
   Flex,
 } from "@mantine/core";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
-import type {
-  ExamRegistResult,
-  InputExamItem,
-} from "~/domain/wellship.schemas";
+import type { InputExamItem } from "~/domain/wellship.schemas";
 import { InputErrorLevel } from "~/domain/enums";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
@@ -22,7 +18,7 @@ import styles from "~/styles/common.module.css";
 type ExamFreeInputProps = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
-  onChange: (newValue: InputExamItem) => void;
+  onChange: (newExamItems: InputExamItem[] | undefined) => void;
 };
 
 export default function ExamFreeInput({
@@ -30,82 +26,138 @@ export default function ExamFreeInput({
   onRegisterPressed,
   onChange,
 }: ExamFreeInputProps) {
-  const firstExamItem = examItems?.[0];
-  const firstExamItemDetail = firstExamItem.examItemDetails?.[0];
-  if (!firstExamItemDetail) {
+  // 引数のチェック
+  if (
+    !examItems ||
+    examItems.length === 0 ||
+    !examItems.some(
+      (item) =>
+        item.positionNumber === 1 &&
+        item.examItemDetails?.some((detail) => detail.positionNumber === 1)
+    )
+  ) {
     return null;
   }
-  const [examValue, setExamValue] = useState(firstExamItemDetail?.value || "");
-  const [errMessages, setErrMessages] = useState<ExamRegistResult[]>();
 
-  // APIのエラーメッセージの取得
-  const getAPIErrorMessages = () => {
-    const APIerror = firstExamItem.examRegistResults || [];
-    return APIerror || [];
-  };
+  const [examItemsData, setExamItemsData] = useState(examItems);
 
-  // 必須バリデーションチェック
-  const validationRequire = () => {
-    const requireSchema = z
-      .string()
-      .min(
-        1,
-        getErrorMessage(errorMessages.required, `${firstExamItem.name}は`)
+  const firstPositionExamItem = examItemsData.find(
+    (item) => item.positionNumber === 1
+  );
+  const firstPositionDetail = firstPositionExamItem?.examItemDetails?.find(
+    (detail) => detail.positionNumber === 1
+  );
+
+  // エラーメッセージの並び替え
+  const handleErrorMessage = (item: InputExamItem): InputExamItem => {
+    if (item.examRegistResults) {
+      // エラーレベルが高い順にソート
+      item.examRegistResults.sort((a, b) => {
+        const levelA = a.errorLevel ?? 0;
+        const levelB = b.errorLevel ?? 0;
+        return levelB - levelA;
+      });
+
+      // 重複を除外
+      item.examRegistResults = item.examRegistResults.filter(
+        (result, index, self) =>
+          index === self.findIndex((r) => r.description === result.description)
       );
-    const result = requireSchema.safeParse(examValue);
-    if (!result.success && onRegisterPressed) {
-      const numericMessage: ExamRegistResult = {
-        description: result.error.errors[0].message,
-        errorLevel: InputErrorLevel.異常,
-      };
-      return [numericMessage];
     }
-    return [];
+    return item;
   };
-  // エラーレベルに応じた並び替え
-  const sortErrorMessages = (result: ExamRegistResult[]) => {
-    const sortedMessages = result.sort(
-      (a, b) => (b.errorLevel ?? 0) - (a.errorLevel ?? 0)
+
+  const validationCheck = (item: InputExamItem) => {
+    // 必須チェック行うスキーマ
+    const schema = z
+      .string()
+      .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)); // 必須チェック
+    // バリデーション対象データを取得
+    const valueToValidate =
+      item.examItemDetails?.find((item) => item.positionNumber === 1)?.value ||
+      "";
+    const result = schema.safeParse(valueToValidate);
+
+    // エラーメッセージを更新
+    let updatedErrors = item.examRegistResults || [];
+
+    // 必須エラーを削除
+    const errorMessageRequired = getErrorMessage(
+      errorMessages.required,
+      `${item.name}は`
     );
-    setErrMessages(sortedMessages);
-  };
-  // バリデーションチェックの走査
-  useEffect(() => {
-    const messages = getAPIErrorMessages();
-    const requireError = validationRequire();
-    const result = messages.concat(requireError);
-    sortErrorMessages(result);
-  }, [examValue, onRegisterPressed]);
+    updatedErrors = updatedErrors.filter(
+      (error) => error.description !== errorMessageRequired
+    );
 
-  // examItemsを更新して渡す処理
-  // TODO:エラーレベルでコールバックを制御するか確認
-  const updatedExamItems = () => {
-    if (errMessages?.some((x) => x.errorLevel === InputErrorLevel.異常)) {
-      return;
+    // バリデーションが失敗した場合
+    if (!result.success) {
+      const error = result.error.errors[0];
+      updatedErrors.push({
+        description: error.message,
+        errorLevel: InputErrorLevel.異常,
+      });
     }
-    const newExamItems: InputExamItem = {
-      ...examItems,
-      examItemDetails: [
-        ...(firstExamItemDetail
-          ? [
-              {
-                ...firstExamItemDetail,
-                value: examValue,
-              },
-            ]
-          : []),
-        ...(firstExamItem.examItemDetails?.slice(1) ?? []),
-      ],
+    const validatedItem = {
+      ...item,
+      examRegistResults: updatedErrors,
     };
-    onChange(newExamItems);
+    return handleErrorMessage(validatedItem);
   };
 
-  // テキストボックス入力時の処理
-  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.value;
-    setExamValue(value);
-    updatedExamItems();
+  useEffect(() => {
+    const updatedItems = examItems.map((item) => {
+      // positionNumberが1のアイテムのみに対してバリデーションチェックを実行
+      if (item.positionNumber === 1) {
+        let validatedData: InputExamItem = item;
+        if (onRegisterPressed) {
+          validatedData = validationCheck(item);
+        }
+        return validatedData;
+      }
+      return item;
+    });
+    setExamItemsData(updatedItems);
+  }, [onRegisterPressed, examItems]);
+
+  // 変更を保存し、コールバックする
+  const handleChange = (value: string) => {
+    const updatedExamItems = [...examItemsData];
+    for (const item of updatedExamItems) {
+      if (item.positionNumber === 1) {
+        item.examItemDetails = item.examItemDetails?.map((detail) =>
+          detail.positionNumber === 1 ? { ...detail, value: value } : detail
+        );
+        const validatedItem = validationCheck(item);
+        Object.assign(item, validatedItem);
+      }
+    }
+    // 値の保存
+    setExamItemsData(updatedExamItems);
+
+    // 必須エラーの存在を確認
+    const hasValidationError = updatedExamItems.some(
+      (item) =>
+        item.positionNumber === 1 &&
+        item.examRegistResults?.some(
+          (error) =>
+            error.description ===
+            getErrorMessage(
+              errorMessages.required,
+              `${firstPositionExamItem?.name}は`
+            )
+        )
+    );
+
+    // 必須エラーがない場合にのみコールバック
+    if (!hasValidationError) {
+      onChange(updatedExamItems);
+    }
   };
+
+  const { name, examRegistResults = [] } = firstPositionExamItem || {};
+  const isDisabled =
+    !firstPositionDetail?.hasOrder || !!firstPositionDetail.cancelReasonId;
 
   return (
     <Flex mt={16} justify="flex-start" align="flex-start" direction="column">
@@ -122,15 +174,19 @@ export default function ExamFreeInput({
           }}
         >
           <Title size="lg" fw={700}>
-            {firstExamItem.name}
+            {name}
           </Title>
         </Paper>
         <Textarea
           classNames={{
-            input: `${styles["input-textare"]} ${
-              errMessages?.some((x) => x.errorLevel === InputErrorLevel.異常)
+            input: `${styles["input-textarea"]} ${
+              isDisabled
+                ? ""
+                : examRegistResults?.some(
+                    (x) => x.errorLevel === InputErrorLevel.異常
+                  )
                 ? `${styles["input-error"]}`
-                : errMessages?.some(
+                : examRegistResults?.some(
                     (x) => x.errorLevel === InputErrorLevel.警告
                   )
                 ? `${styles["input-warning"]}`
@@ -140,16 +196,13 @@ export default function ExamFreeInput({
           w={"524"}
           radius={"md"}
           size="sm"
-          value={examValue}
-          onChange={(e) => {
-            handleTextChange(e);
-          }}
+          value={firstPositionDetail?.value}
+          onChange={(e) => handleChange(e.currentTarget.value)}
           autosize
           minRows={1}
           maxRows={4}
+          disabled={isDisabled}
         />
-        {/* TODO:前回値のマックス横幅設定 */}
-
         <Button
           w={154}
           h={64}
@@ -157,7 +210,7 @@ export default function ExamFreeInput({
           size="lg"
           bg={"white"}
           variant="outline"
-          onClick={() => setExamValue("")}
+          onClick={() => handleChange("")}
         >
           クリア
         </Button>
@@ -169,12 +222,12 @@ export default function ExamFreeInput({
         fw="700"
         className={styles["text-multiline"]}
       >
-        {firstExamItemDetail?.prevValue
-          ? `(前回値)\n${firstExamItemDetail?.prevValue}`
+        {firstPositionDetail?.prevValue
+          ? `(前回値)\n${firstPositionDetail?.prevValue}`
           : ""}
       </Text>
       {/* エラーメッセージを表示する。 */}
-      {(errMessages || []).map((error, index) => (
+      {(examRegistResults || []).map((error, index) => (
         <Group
           key={index}
           c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
