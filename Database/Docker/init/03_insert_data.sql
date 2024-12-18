@@ -109,8 +109,10 @@ INSERT INTO roles(role_id,name,created_at,created_by) VALUES
 
 -- 職員
 INSERT INTO staffs(staff_id,staff_code,login_id,name,password_hash,password_salt,enabled,role_id,created_at,created_by) VALUES 
-    ('affd0000-0000-0000-0000-000000000001','S001','S001','職員A',DECODE('cndlYnJ0MzU2Nzh0ZXNuZXNydHNlbXRhM3c0YW0zNGF3NG1hdzM0bWE0cWEzNG1yNzg=', 'base64'),DECODE('d3JhT1VZSVJUVDRFNXJld3J0', 'base64'),True,10,CURRENT_TIMESTAMP,'init')
-  , ('affd0000-0000-0000-0000-000000000002','S002','S002','職員B',DECODE('bWh0anV1ZHI1dXlzZXJ5', 'base64'),DECODE('ZXdiNWFxMzRyYmdlbnN5cmVtc2VyeQ==', 'base64'),True,20,CURRENT_TIMESTAMP,'init');
+    -- 職員Aパスワード：syokuinA
+    ('affd0000-0000-0000-0000-000000000001','S001','S001','職員A',DECODE('TX+Y1tzM7x6bfFxQob8oVpkSfY+avT+MJpGRzzJ54yilcsTx1T987plGIUW7ORJhfcPAPqreEzyyjzq2ufsw+w==', 'base64'),DECODE('NaGPpMzTwdKiSWC8zWjj84nKm8WlXvlZSwIJ4o7kjo9/j4Hllkk61/8Vz14JVAx/KGt3GMGNE0Z/LmEb7Qfe4fAjf+aVMNkyuAywRBzwT7hUbzivt3NHohOVgIg3tYnVdLn+M4sORWIiYmq5kot9zWc02rRFeSraF4jORxQXucQ=', 'base64'),True,10,CURRENT_TIMESTAMP,'init')
+    -- 職員Bパスワード：syokuinB
+  , ('affd0000-0000-0000-0000-000000000002','S002','S002','職員B',DECODE('yQTwvk3Ikc+VmAq6nFXfoXeDbNR1RGOnuK62e5NLz6quuPp/5mtxBFZLxDLqngERjYu7AyPAO2FhW/R0e7oxyw==', 'base64'),DECODE('q0T+ID2EsZ5blalDOD1Jweorjd/z+g4f1yChM/2+OcEBdvZikMyVYIDURkklt5W3JtCP41bpb6rWl6MnL+R6naTj0a4CqRkToVU6GXhhMNlAHbei8RBDHSWi9fSX5+c68pJaYflvndTCaUQAO/0jDpwW9rzE0jBzlx7H2kZzPMc=', 'base64'),True,20,CURRENT_TIMESTAMP,'init');
 
 -- 団体
 INSERT INTO organizations(organization_id,organization_code,name,order_number,created_at,created_by) VALUES 

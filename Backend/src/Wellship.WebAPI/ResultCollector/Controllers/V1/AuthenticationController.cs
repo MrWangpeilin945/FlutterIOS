@@ -30,9 +30,10 @@ public class AuthenticationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/staff/login")]
-    public IActionResult Login([FromBody] StaffLoginRequest request)
+    public async Task<IActionResult> LoginAsync([FromBody] StaffLoginRequest request)
     {
-        _authenticationUsecase.Login();
-        return Ok();
+        var accessToken = await _authenticationUsecase.LoginStaffAsync(request.LoginId, request.Password);
+        var response = new StaffLoginResponse { Token = accessToken };
+        return Ok(response);
     }
 }
