@@ -250,7 +250,7 @@ export default function consultInput() {
     let result: AxiosResponse<VerifyExamItems>;
     const resultsRequest = makeBody();
     if (!consultnumber) return;
-    
+
     const postMutateAsync = async () => {
       try {
         result = await verifyMutateAsync({
@@ -382,6 +382,7 @@ export default function consultInput() {
     const handleChange = (updatedExamItem: InputExamItem[] | undefined) =>
       callbackChangeValue(updatedExamItem, groupIndex);
 
+    // TODO:enum参照予定
     // typeによるコンポーネントの切り替え
     switch (type) {
       case 1:
@@ -400,6 +401,24 @@ export default function consultInput() {
             examItems={examItems}
             onRegisterPressed={true}
             onClick={handleChange}
+          />
+        );
+      case 3:
+        return (
+          <ExamBP2
+            key={groupIndex}
+            examItems={examItems}
+            onRegisterPressed={true}
+            onChange={handleChange}
+          />
+        );
+      case 4:
+        return (
+          <ExamFreeInput
+            key={groupIndex}
+            examItems={examItems}
+            onRegisterPressed={true}
+            onChange={handleChange}
           />
         );
       case 5:
@@ -429,16 +448,7 @@ export default function consultInput() {
             onChange={handleChange}
           />
         );
-      case 9:
-        return (
-          <ExamBP2
-            key={groupIndex}
-            examItems={examItems}
-            onRegisterPressed={true}
-            onChange={handleChange}
-          />
-        );
-      case 11:
+      case 8:
         return (
           <ExamVision
             key={groupIndex}
@@ -447,7 +457,7 @@ export default function consultInput() {
             onChange={handleChange}
           />
         );
-      case 12:
+      case 9:
         return (
           <ExamHearing
             key={groupIndex}
@@ -456,7 +466,7 @@ export default function consultInput() {
             onChange={handleChange}
           />
         );
-      case 13:
+      case 10:
         setConfirmMessage("実施済みです。取消してよろしいですか。");
         return null; // UIのレンダリングをスキップ
       default:
