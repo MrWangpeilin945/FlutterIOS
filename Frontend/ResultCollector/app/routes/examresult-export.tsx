@@ -1,14 +1,16 @@
 import {
-  Box,
   Button,
-  Center,
   Container,
+  Flex,
   Group,
   LoadingOverlay,
   Modal,
+  Stack,
   Table,
   Text,
-  Title,
+  getSize,
+  getThemeColor,
+  useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
@@ -71,7 +73,7 @@ const useResultsOutputConfirmState = () => {
     [],
   );
 
-  // 「出力確定」ボタン用の関数
+  // 「登録する」ボタン用の関数
   const handleOk = useCallback(() => {
     resolve(true);
     setState(initialState);
@@ -104,27 +106,83 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
   useImperativeHandle(ref, () => ({ resultsOutputConfirm }), [
     resultsOutputConfirm,
   ]);
+  const theme = useMantineTheme();
 
   return (
     <Modal
-      size="md"
-      radius="md"
+      size={800}
+      radius={32}
       opened={isOpen}
       onClose={handleCancel}
       title={title}
       closeOnClickOutside={false} // modalの外クリックしても消えないように
       withCloseButton={false} // closeボタンを消す
-      centered
+      styles={{
+        header: {
+          height: 75,
+          background: getThemeColor("primary", theme),
+          padding: "16px 0px",
+        },
+        title: {
+          color: getThemeColor("white01", theme),
+          fontSize: getSize("lg", "mantine-font-size"),
+          lineHeight: getSize("lg", "mantine-line-height"),
+          fontWeight: 700,
+          margin: "0px auto",
+        },
+        body: {
+          height: 385,
+          background: getThemeColor("white01", theme),
+          padding: 0,
+        },
+      }}
     >
-      {children}
-      <Center>
-        <Button w={200} h={80} variant="outline" onClick={handleCancel} mt="xl">
-          <Title order={2}>戻る</Title>
-        </Button>
-        <Button w={200} h={80} variant="filled" onClick={handleOk} mt="xl">
-          <Title order={2}>出力確定</Title>
-        </Button>
-      </Center>
+      <Flex w={800} pt={24} px={16}>
+        <Flex m="0px auto">{children}</Flex>
+      </Flex>
+      <Flex
+        w={800}
+        py={24}
+        px={16}
+        pos="absolute"
+        bottom={0}
+        bg="white01"
+        c="gray02"
+        style={{ borderTop: "1px solid" }}
+      >
+        <Flex columnGap={24} m="0px auto">
+          <Button
+            variant="outline"
+            w={360}
+            h={64}
+            bg="white01"
+            color="primary"
+            py={16}
+            px={32}
+            style={{ borderWidth: 2 }}
+            onClick={handleCancel}
+          >
+            <Text size="lg" fw={700} c="primary">
+              戻る
+            </Text>
+          </Button>
+          <Button
+            variant="filled"
+            w={360}
+            h={64}
+            bg="primary"
+            color="primary"
+            py={16}
+            px={32}
+            style={{ borderWidth: 2 }}
+            onClick={handleOk}
+          >
+            <Text size="lg" fw={700} c="white01">
+              登録する
+            </Text>
+          </Button>
+        </Flex>
+      </Flex>
     </Modal>
   );
 });
@@ -183,7 +241,7 @@ export default function ExamresultExport() {
         const body = {
           placeScheduleId: placeScheduleId,
         };
-        // 「出力確定」ボタン押下時はAP1019_連携用に検査結果を出力する
+        // 「登録する」ボタン押下時はAP1019_連携用に検査結果を出力する
         const postMutateAsync = async () => {
           try {
             const result = await mutateAsync({
@@ -237,82 +295,109 @@ export default function ExamresultExport() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching || isLoading} />
         <CommonHeader screenName="検査結果出力" staffName={staff?.name || ""} />
-        <Container fluid mt={20}>
+        <Container fluid bg="background" py={32} px={24}>
           {!isFetching && (
             <>
               {exportData?.exportData ? (
-                <Table>
-                  <Table.Thead>
+                <Table bg="white01" striped="even" stripedColor="stripe">
+                  <Table.Thead
+                    h={80}
+                    bg="background"
+                    fz="xs"
+                    fw={700}
+                    c="black01"
+                  >
                     <Table.Tr>
-                      <Table.Th>健診日</Table.Th>
-                      <Table.Th>会場</Table.Th>
-                      <Table.Th>会場ロック</Table.Th>
-                      <Table.Th>未</Table.Th>
-                      <Table.Th>保留</Table.Th>
-                      <Table.Th>済</Table.Th>
-                      <Table.Th>出力</Table.Th>
+                      <Table.Th ta="center">健診日</Table.Th>
+                      <Table.Th ta="center">会場</Table.Th>
+                      <Table.Th ta="center">会場ロック</Table.Th>
+                      <Table.Th ta="center">未</Table.Th>
+                      <Table.Th ta="center">保留</Table.Th>
+                      <Table.Th ta="center">済</Table.Th>
+                      <Table.Th ta="center">出力</Table.Th>
                     </Table.Tr>
                   </Table.Thead>
-                  <Table.Tbody>
+                  <Table.Tbody h={118} fz="xs" c="black01">
                     {exportData?.exportData?.map((ed) => (
                       <Table.Tr key={ed.placeScheduleId}>
-                        <Table.Td>
+                        <Table.Td ta="center">
                           {ed.examDate &&
                             format(
                               parse(ed.examDate, "yyyy-MM-dd", new Date()),
                               "yyyy/MM/dd",
                             )}
                         </Table.Td>
-                        <Table.Td>{ed.placeName}</Table.Td>
-                        <Table.Td>
+                        <Table.Td w={297}>{ed.placeName}</Table.Td>
+                        <Table.Td ta="center">
                           <Button
                             variant="outline"
-                            color={
-                              ed.placeScheduleLockingStatus ===
-                              PlaceScheduleLockingStatus.検査完了
-                                ? "blue04"
-                                : "orange01"
-                            }
+                            w={154}
+                            h={64}
+                            bg="white01"
+                            color="gray03"
+                            py={16}
+                            px={32}
+                            style={{ borderWidth: 2 }}
                             onClick={() => navigate("/placeschedule-lock")}
-                            mt="xs"
                           >
-                            <Title order={2}>
+                            <Text
+                              size="lg"
+                              fw={700}
+                              c={
+                                ed.placeScheduleLockingStatus ===
+                                PlaceScheduleLockingStatus.検査完了
+                                  ? "blue04"
+                                  : "orange01"
+                              }
+                            >
                               {ed.placeScheduleLockingStatus ===
                               PlaceScheduleLockingStatus.検査完了
                                 ? "済"
                                 : ed.placeScheduleLockingStatus ===
                                     PlaceScheduleLockingStatus.検査中 && "未"}
-                            </Title>
+                            </Text>
                           </Button>
                         </Table.Td>
-                        <Table.Td>
+                        <Table.Td ta="center">
                           {ed.details?.find(
                             (d) =>
                               d.status === ConsultResultExportStatus.未出力,
                           )?.count || 0}
                         </Table.Td>
-                        <Table.Td>
+                        <Table.Td ta="center">
                           {ed.details?.find(
                             (d) =>
                               d.status === ConsultResultExportStatus.出力保留,
                           )?.count || 0}
                         </Table.Td>
-                        <Table.Td>
+                        <Table.Td ta="center">
                           {ed.details?.find(
                             (d) =>
                               d.status === ConsultResultExportStatus.出力済み,
                           )?.count || 0}
                         </Table.Td>
-                        <Table.Td>
+                        <Table.Td ta="center">
                           <Button
                             variant="outline"
+                            w={186}
+                            h={64}
+                            bg={
+                              ed.placeScheduleLockingStatus ===
+                              PlaceScheduleLockingStatus.検査完了
+                                ? "white01"
+                                : "gray03"
+                            }
                             color={
-                              ed.placeScheduleLockingStatus === 1
-                                ? "#00ada4"
-                                : "grey"
-                            } // TODO：会場ロック状態によってボタン表示を切り替える必要あり
+                              ed.placeScheduleLockingStatus ===
+                              PlaceScheduleLockingStatus.検査完了
+                                ? "primary"
+                                : "gray03"
+                            }
+                            py={16}
+                            px={32}
                             onClick={
-                              ed.placeScheduleLockingStatus === 1
+                              ed.placeScheduleLockingStatus ===
+                              PlaceScheduleLockingStatus.検査完了
                                 ? () =>
                                     handleClick(
                                       ed.placeScheduleId,
@@ -321,9 +406,19 @@ export default function ExamresultExport() {
                                     )
                                 : undefined
                             }
-                            mt="xs"
                           >
-                            <Title order={2}>出力</Title>
+                            <Text
+                              size="lg"
+                              fw={700}
+                              c={
+                                ed.placeScheduleLockingStatus ===
+                                PlaceScheduleLockingStatus.検査完了
+                                  ? "primary"
+                                  : "gray02"
+                              }
+                            >
+                              出力する
+                            </Text>
                           </Button>
                         </Table.Td>
                       </Table.Tr>
@@ -333,9 +428,9 @@ export default function ExamresultExport() {
               ) : (
                 <>
                   {/* エラーメッセージを表示 */}
-                  <Title order={3}>
+                  <Text size="sm" c="black01">
                     {getErrorMessage(errorMessages.notFound, "検査結果データ")}
-                  </Title>
+                  </Text>
                 </>
               )}
               <CommonDialog
@@ -345,10 +440,12 @@ export default function ExamresultExport() {
                 buttonMessage="閉じる"
               />
               <ResultsOutputConfirmDialog ref={ref} title="検査結果出力">
-                <Box>
-                  <Group wrap="nowrap">
-                    <Text size="xs">登録日：</Text>
-                    <Text size="xs">
+                <Stack>
+                  <Group wrap="nowrap" gap={0}>
+                    <Text size="lg" c="black01">
+                      登録日：
+                    </Text>
+                    <Text size="lg" c="black01">
                       {resultsOutputConfirmDialog?.examDate &&
                         format(
                           parse(
@@ -360,17 +457,15 @@ export default function ExamresultExport() {
                         )}
                     </Text>
                   </Group>
-                </Box>
-                <Box>
-                  <Group wrap="nowrap">
-                    <Text size="xs" style={{ whiteSpace: "nowrap" }}>
+                  <Group wrap="nowrap" gap={0} align="flex-start">
+                    <Text size="lg" c="black01">
                       会場：
                     </Text>
-                    <Text size="xs">
+                    <Text w={646} size="lg" c="black01">
                       {resultsOutputConfirmDialog?.placeName}
                     </Text>
                   </Group>
-                </Box>
+                </Stack>
               </ResultsOutputConfirmDialog>
             </>
           )}

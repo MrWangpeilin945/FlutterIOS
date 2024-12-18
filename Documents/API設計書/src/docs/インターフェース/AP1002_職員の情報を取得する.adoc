@@ -31,7 +31,7 @@
 [source,json]
 ----
 {
-  "staffId": 1234,
+  "staffId": "650bb720-0958-4b7f-a930-36d29806bbd8",
   "staffName": "両備 太郎"
 }
 ----

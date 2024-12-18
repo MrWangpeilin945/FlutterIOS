@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Responses;
@@ -32,9 +33,9 @@ public class ProgressController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/progress/{placeScheduleId}")]
-    public IActionResult GetProgress([FromRoute][Required] int placeScheduleId)
+    public async Task<IActionResult> GetProgress([FromRoute][Required] Guid placeScheduleId)
     {
-        _progressUsecase.GetProgress();
-        return Ok();
+        var results = await _progressUsecase.GetProgressAsync(placeScheduleId);
+        return Ok(results);
     }
 }

@@ -8,31 +8,20 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class Progress
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public Progress(int examItemId, string examItemName, ProgressDetail[] details)
-    {
-        ExamItemId = examItemId;
-        ExamItemName = examItemName;
-        Details = details;
-    }
-
-    /// <summary>
     /// 検査項目ID
     /// </summary>
     [JsonPropertyName("examItemId")]
-    public int ExamItemId { get; }
+    public required int ExamItemId { get; init; }
 
     /// <summary>
     /// 検査項目名
     /// </summary>
     [JsonPropertyName("examItemName")]
-    public string ExamItemName { get; }
+    public required string ExamItemName { get; init; }
 
     /// <summary>
     /// 進捗明細
     /// </summary>
     [JsonPropertyName("details")]
-    public ProgressDetail[] Details { get; }
-
+    public required ProgressDetail[] Details { get; init; }
 }

@@ -15,7 +15,7 @@ public interface IIntegrationUsecase
     /// <summary>
     /// 連携用に検査結果を出力する
     /// </summary>
-    public void ExportResults();
+    public Task ExportResultsAsync(Guid placeScheduleId);
 
     /// <summary>
     /// 検査結果の出力履歴を取得する
