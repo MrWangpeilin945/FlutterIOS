@@ -214,6 +214,7 @@ export default function ConsultNumberInput() {
                 <Box className={styles["basic-green"]} w={24} h={41} />
                 <Text
                   size="md"
+                  fw={700}
                   w="100%"
                   style={{
                     textOverflow: "ellipsis",
