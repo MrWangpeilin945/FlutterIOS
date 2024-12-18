@@ -31,11 +31,22 @@ public class MenuNoteResult
     }
 
     /// <summary>
+    /// 検査メニュー特記の名称
+    /// 画面上にタグとして表示する
+    /// </summary>
+    public string MenuNoteName
+    {
+        get
+        {
+            return _menuNote.Name;
+        }
+    }
+
+    /// <summary>
     /// 特記の表示用に文字列を組み立てて取得します。
     /// </summary>
     public string GetDisplayText()
     {
-        // 親テーブルに
         if (_menuNote.ExamResults.Any())
         {
             return GetDisplayResultText();

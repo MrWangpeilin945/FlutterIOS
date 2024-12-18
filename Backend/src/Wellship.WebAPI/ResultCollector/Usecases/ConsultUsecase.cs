@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+
 using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Enums;
@@ -119,6 +121,25 @@ public class ConsultUsecase : IConsultUsecase
         // 同姓同名アラート
         var sameNameAlert = await _placeScheduleRepository.IsSamename(consultNumber);
 
+        // 検査項目明細IDを取得
+        var examItemDetailIds = examItemGroups.SelectMany(group => group.ExamItems)
+                                              .SelectMany(item => item.ExamItemDetails)
+                                              .Select(detail => detail.ExamItemDetailId)
+                                              .ToArray();
+
+        var 受診特記一覧 = await _consultRepository.GetConsultNotesAsync(consult.ConsultId);
+        var 検査項目明細マスタ一覧 = await _examItemRepository.GetExamItemDetailChildrenAsync(examItemDetailIds);
+        var 検査メニュー特記一覧 = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
+        var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
+        var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
+
+        var examNoteResults = 検査メニュー特記一覧.Select(x => new Domain.Models.MenuNoteResult(x, 検査項目明細マスタ一覧, examResults, previousResults, 受診特記一覧)).ToArray();
+        var relatedExamItems = examNoteResults.Select(x => new RelatedExamItem()
+        {
+            ExamItemName = x.MenuNoteName,
+            ExamResult = x.GetDisplayText()
+        }).ToArray();
+
         return new ExamContent()
         {
             ConsultNumber = consultNumber,
@@ -136,7 +157,7 @@ public class ConsultUsecase : IConsultUsecase
                 ExamDateAge = examAge.Years
             },
             IsComplete = true,              // TODO: 検査実施判断    後方作業へ
-            RelatedExamItems = [],          // TODO: 関連検査項目    後方作業へ
+            RelatedExamItems = relatedExamItems,
             ExamItems = examItemGroups.OrderBy(group => group.ExamItemGroupId)
                                       .SelectMany(group => group.ExamItems)
                                       .OrderBy(Item => Item.PositionNumber)
@@ -277,8 +298,17 @@ public class ConsultUsecase : IConsultUsecase
         // 過去検査結果を取得
         var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
 
-        // 検査メニュー特記の設定を取得
-        var menuNotes = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
+        var 受診特記一覧 = await _consultRepository.GetConsultNotesAsync(consult.ConsultId);
+        var 検査項目明細マスタ一覧 = await _examItemRepository.GetExamItemDetailChildrenAsync(examItemDetailIds);
+        var 検査メニュー特記一覧 = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
+
+
+        var examNoteResults = 検査メニュー特記一覧.Select(x => new Domain.Models.MenuNoteResult(x, 検査項目明細マスタ一覧, examResults, previousResults, 受診特記一覧)).ToArray();
+        var relatedExamItems = examNoteResults.Select(x => new RelatedExamItem()
+        {
+            ExamItemName = x.MenuNoteName,
+            ExamResult = x.GetDisplayText()
+        }).ToArray();
 
         return new InputExamItems()
         {
@@ -290,7 +320,7 @@ public class ConsultUsecase : IConsultUsecase
                 Sex = (int)examinee.Sex,
                 ExamDateAge = examAge.Years
             },
-            RelatedExamItems = [],                  // TODO: 関連検査項目 後方作業へ
+            RelatedExamItems = relatedExamItems,
             ExamItemGroups =
                 examItemGroups.Select(eg => new APIModels.Responses.ExamItemGroup
                 {
