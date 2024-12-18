@@ -1,4 +1,4 @@
-import { Container, LoadingOverlay, Stack, Title } from "@mantine/core";
+import { Container, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { format } from "date-fns";
@@ -26,7 +26,7 @@ export default function Progress() {
   const [staff] = useAtom(staffState);
   const [placeSchedule] = useAtom(placeScheduleState);
   const [examDate] = useAtom(examDateState);
-  const [targetDate] = useState(examDate ? format(examDate, "yyyy/MM/dd") : "");
+  const [targetDate] = useState(examDate ? format(examDate, "yyyy-MM-dd") : "");
   const { isFetching, refetch } = useProgressGetProgress(
     "1",
     placeSchedule?.placeScheduleId || 0,
@@ -56,15 +56,15 @@ export default function Progress() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="進捗" staffName={staff?.name || ""} />
-        <PlaceSchedule
-          placeName={placeSchedule?.placeName || ""}
-          examDate={targetDate}
-        />
-        <Container fluid>
+        <Container fluid bg="background" py={32} px={24}>
+          <PlaceSchedule
+            placeName={placeSchedule?.placeName || ""}
+            examDate={targetDate}
+          />
           {!isFetching && (
             <>
               {progressData?.progress ? (
-                <Stack>
+                <Stack gap={16} pt={24}>
                   {progressData?.progress?.map((p) => (
                     <ExamItemProgress
                       key={p.examItemId}
@@ -76,9 +76,9 @@ export default function Progress() {
               ) : (
                 <>
                   {/* エラーメッセージを表示 */}
-                  <Title order={3}>
+                  <Text size="sm" c="black01" pt={64}>
                     {getErrorMessage(errorMessages.notFound, "進捗データ")}
-                  </Title>
+                  </Text>
                 </>
               )}
               <CommonDialog
