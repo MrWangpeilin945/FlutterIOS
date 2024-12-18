@@ -14,7 +14,6 @@ import {
 import { useClickOutside } from "@mantine/hooks";
 import Keyboard from "~/components/NumericKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
-import { setRangesErrorMessage } from "~/utils/tet";
 import type {
   ExamRegistResult,
   InputExamItem,
@@ -35,190 +34,190 @@ export default function ExamNumericLR({
   onChange,
 }: ExamNumericLRProps) {
   // 必要な引数のチェック
-  if (
-    !examItems[0]?.examItemDetails ||
-    examItems[0].examItemDetails.length < 2
-  ) {
+  if (!examItems || examItems.length === 0) {
     return null;
   }
-  const firstExamItemDetails = examItems[0].examItemDetails;
 
-  // 状態の宣言
-  const [examValues, setExamValues] = useState<string[]>(
-    firstExamItemDetails.map((item) => item.value || "")
-  );
-  const [showKeyboards, setShowKeyboards] = useState<boolean[]>(
-    firstExamItemDetails.map(() => false)
-  );
-  const closeKeyBoard = useClickOutside(() =>
-    setShowKeyboards(Array(firstExamItemDetails.length).fill(false))
-  );
-  const [errMessages, setErrMessages] = useState<ExamRegistResult[]>();
+  const [examItemsData, setExamItemsData] = useState(examItems);
 
-  // テキストボックス押下時の動作
-  const handleTextboxClick = (index: number) => {
-    setShowKeyboards((prev) => {
-      const updated = [...prev];
-      updated[index] = true;
-      return updated;
-    });
+  // キーボードの表示インデックスを状態として管理する
+  const [showKeyboards, setShowKeyboards] = useState<{
+    left: boolean;
+    right: boolean;
+  }>({
+    left: false,
+    right: false,
+  });
+
+  // キーボードの表示/非表示をトグルする関数
+  const toggleKeyboard = (positionNumber: number) => {
+    setActiveKeyboard((prevNumber) =>
+      prevNumber === positionNumber ? null : positionNumber
+    );
   };
-
-  // キーボードの確定キー押下時に非表示にする
-  const handleConfirm: () => void = () => {
-    setShowKeyboards(Array(firstExamItemDetails.length).fill(false));
+  const handleConfirm = () => {
+    setActiveKeyboard(null);
   };
+  const closeKeyBoard = useClickOutside(() => setActiveKeyboard(null));
 
-  // 表示時の小数点追加処理
-  const formatDecimalValue = (value: string, index: number) => {
-    const floatValue = Number.parseFloat(value);
-    const afterDecimalDigit = firstExamItemDetails[index]?.decimalLength;
-    if (afterDecimalDigit && !Number.isNaN(floatValue)) {
-      const result = (floatValue / 10 ** afterDecimalDigit)
-        .toFixed(afterDecimalDigit)
-        .toString();
-      return result;
+  const handleErrorMessage = (item: InputExamItem): InputExamItem => {
+    if (item.examRegistResults) {
+      // エラーレベルが高い順にソート
+      item.examRegistResults.sort((a, b) => {
+        const levelA = a.errorLevel ?? 0;
+        const levelB = b.errorLevel ?? 0;
+        return levelB - levelA;
+      });
+
+      // 重複を除外
+      item.examRegistResults = item.examRegistResults.filter(
+        (result, index, self) =>
+          index === self.findIndex((r) => r.description === result.description)
+      );
     }
-    return value;
+
+    return item;
   };
 
-  // 最大桁数を考慮してexamValueをセットする
-  const setExamValueWithMaxDigits = (examValue: string, index: number) => {
-    const decimalLength = firstExamItemDetails[index]?.decimalLength ?? null;
-    const integerLength = firstExamItemDetails[index]?.integerLength ?? 0;
-    const updatedExamValue = [...examValues];
-    if (decimalLength) {
-      const maxDigits = decimalLength + integerLength;
-      updatedExamValue[index] = examValue.slice(0, maxDigits);
-    } else {
-      updatedExamValue[index] = examValue;
+  const validationCheck = (item: InputExamItem) => {
+    // BMIはバリデーションチェックを実施しない
+    if (item.positionNumber === 4) return item;
+    // 必須チェックと半角数字チェックを一度に行うスキーマ
+    const schema = z
+      .string()
+      .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)) // 必須チェック
+      .refine((value) => /^\d+(\.\d+)?$/.test(value), {
+        message: getErrorMessage(errorMessages.numericString, `${item.name}は`),
+      });
+
+    // バリデーション対象データを取得
+    const valueToValidate = item.examItemDetails?.[0]?.value || "";
+    const result = schema.safeParse(valueToValidate);
+
+    // エラーメッセージを更新
+    let updatedErrors = item.examRegistResults || [];
+
+    // 必須エラーを削除
+    const errorMessageRequired = getErrorMessage(
+      errorMessages.required,
+      `${item.name}は`
+    );
+    updatedErrors = updatedErrors.filter(
+      (error) => error.description !== errorMessageRequired
+    );
+
+    // 半角数字エラーを削除
+    const errorMessageNumeric = getErrorMessage(
+      errorMessages.numericString,
+      `${item.name}は`
+    );
+    updatedErrors = updatedErrors.filter(
+      (error) => error.description !== errorMessageNumeric
+    );
+
+    // バリデーションが失敗した場合
+    if (!result.success) {
+      const error = result.error.errors[0]; // 最初のエラーだけ取得
+      updatedErrors.push({
+        description: error.message,
+        errorLevel: InputErrorLevel.異常,
+      });
     }
-    setExamValues(updatedExamValue);
-  };
 
-  // examItemsを更新して渡す処理
-  const updatedExamItems = () => {
-    // if (errMessages?.some((x) => x.errorLevel === InputErrorLevel.異常)) {
-    //   return;
-    // }
-    // TODO：どのときにコールバックしないかは確認
-    const newExamItemDetails = firstExamItemDetails.map((item, index) => {
-      return {
-        ...item,
-        value: examValues[index],
-      };
-    });
-    const newExamItems: InputExamItem = {
-      ...examItems[0],
-      examItemDetails: newExamItemDetails,
+    const prevItem = {
+      ...item,
+      examRegistResults: updatedErrors,
     };
-    onChange(newExamItems);
-    return newExamItems;
+    const rangesValidatedItem = setRangesErrorMessage(prevItem);
+    return handleErrorMessage(rangesValidatedItem);
   };
 
-  // テキストボックス入力時の処理
-  const handleTextChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
-    const value = e.currentTarget.value;
-    value.replace(".", ""); // テキストボックスの値を参照するので、小数点を取り除く
-    setExamValueWithMaxDigits(value, index);
-    updatedExamItems();
-  };
-
-  // キーボード入力時の処理
-  const handleKeyChange = (e: string, index: number) => {
-    setExamValueWithMaxDigits(e, index);
-    updatedExamItems();
-  };
-
-  // エラーメッセージ用の関数
-  const handleErrorMessages = () => {
-    const APIMessages = e;
-  };
-  // APIのエラーメッセージの取得
-  const getAPIErrorMessages = () => {
-    // TODO:共通関数の追加 ExamNormalValueRangeを参照したエラーメッセージを追加
-    const examItem = setRangesErrorMessage(examItems[0]);
-    const APIerror = examItem.examRegistResults || [];
-    console.log(examItem.examRegistResults);
-    console.log(examItems[0].examRegistResults);
-    console.log(examValues);
-    return APIerror || [];
-  };
-
-  // 半角数字のチェック
-  const validationNumeric = () => {
-    const numericMessages: ExamRegistResult[] = [];
-    examValues.forEach((examValue, Index) => {
-      if (!examValue) {
-        return [];
-      }
-      const validationSchema = z
-        .string()
-        .regex(
-          /^[0-9]+$/,
-          getErrorMessage(
-            errorMessages.numericString,
-            `${examItems[0].name}の${firstExamItemDetails[Index].name}は`
-          )
-        );
-      const result = validationSchema.safeParse(examValue);
-      if (!result.success) {
-        const numericMessage: ExamRegistResult = {
-          description: result.error.errors[0].message,
-          errorLevel: InputErrorLevel.異常,
-        };
-        numericMessages.push(numericMessage);
-      }
-    });
-    return numericMessages;
-  };
-  // 必須バリデーションチェック
-  const validationRequire = () => {
-    const requireMessages: ExamRegistResult[] = [];
-    examValues.forEach((examValue, index) => {
-      const requireSchema = z
-        .string()
-        .min(
-          1,
-          getErrorMessage(
-            errorMessages.required,
-            `${examItems[0].name}の${firstExamItemDetails[index].name}は`
-          )
-        );
-      const result = requireSchema.safeParse(examValue);
-      if (!result.success && onRegisterPressed) {
-        const requireMessage: ExamRegistResult = {
-          description: result.error.errors[0].message,
-          errorLevel: InputErrorLevel.異常,
-        };
-        requireMessages.push(requireMessage);
-      }
-    });
-    return requireMessages;
-  };
-
-  // 重複を削除して、エラーレベルに応じた並び替えを行う
-  const sortErrorMessages = (result: ExamRegistResult[]) => {
-    const uniqueErrorMessages = Array.from(
-      new Map(result.map((msg) => [msg.description, msg])).values()
-    );
-    const sortedMessages = uniqueErrorMessages.sort(
-      (a, b) => (b.errorLevel ?? 0) - (a.errorLevel ?? 0)
-    );
-    return sortedMessages;
-  };
-  // バリデーションチェックの走査
   useEffect(() => {
-    const result = sortErrorMessages(
-      getAPIErrorMessages()
-        .concat(validationNumeric())
-        .concat(validationRequire())
+    const updatedItems = examItems.map((item) => {
+      let validatedData: InputExamItem = item;
+      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
+      if (onRegisterPressed) {
+        validatedData = validationCheck(item);
+      }
+      return validatedData;
+    });
+    setExamItemsData(updatedItems);
+  }, [onRegisterPressed, examItems]);
+
+  // BMI計算処理
+  const setBMIValue = (updatedExamItems: InputExamItem[]): InputExamItem[] => {
+    const heightValue = updatedExamItems[0].examItemDetails?.[0].value ?? "0";
+    const weightValue = updatedExamItems[1].examItemDetails?.[0].value ?? "0";
+
+    // BMIの計算
+    const height = Number.parseFloat(heightValue) / 100;
+    const weight = Number.parseFloat(weightValue);
+    const bmi = Number.isNaN(weight / height ** 2) ? 0 : weight / height ** 2;
+    const bmiString = String(bmi);
+
+    return updatedExamItems.map((item) => {
+      if (item.positionNumber === 4) {
+        item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
+          const decimalLength = detail.decimalLength ?? 0;
+          const integerLength = detail.integerLength ?? 0;
+          const maxDigits = decimalLength + integerLength + 1;
+
+          if (idx === 0) {
+            if (detail.integerLength) {
+              return { ...detail, value: bmiString.slice(0, maxDigits) };
+            }
+            return { ...detail, value: bmiString };
+          }
+          return detail;
+        });
+      }
+      return item;
+    });
+  };
+
+  //変更イベント
+  const handleChange = (positionNumber: number | undefined, value: string) => {
+    const updatedExamItems = [...examItemsData];
+
+    // 該当するアイテムを更新
+    for (const item of updatedExamItems) {
+      if (item.positionNumber === positionNumber) {
+        // 該当するexamItemDetailsの最初のvalueを更新
+        item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
+          if (idx === 0) {
+            return { ...detail, value: value };
+          }
+          return detail;
+        });
+      }
+
+      // バリデーションチェックを実施
+      const validatedItem = validationCheck(item);
+      // バリデーション結果を反映
+      Object.assign(item, validatedItem);
+    }
+
+    // BMIの計算と設定処理
+    const bmiUpdatedExamItems = setBMIValue(updatedExamItems);
+    // 更新されたデータをステートに設定
+    setExamItemsData(bmiUpdatedExamItems);
+    // 3つのエラーが存在するか確認
+    const isValidatedError = bmiUpdatedExamItems.some((item) =>
+      item.examRegistResults?.some(
+        (error) =>
+          error.description ===
+            getErrorMessage(errorMessages.required, `${item.name}は`) ||
+          error.description ===
+            getErrorMessage(errorMessages.numericString, `${item.name}は`) ||
+          //TODO:基準値エラーメッセージは未確定（部分一致予定）
+          error.description?.includes("正常値ではありません")
+      )
     );
-    setErrMessages(result);
-  }, [examValues, onRegisterPressed]);
+
+    if (!isValidatedError) {
+      onChange(bmiUpdatedExamItems);
+    }
+  };
 
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
