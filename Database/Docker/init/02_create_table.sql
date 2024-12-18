@@ -309,8 +309,9 @@ CREATE TABLE tickets (
 
 CREATE TABLE tickets_histories (
   id uuid NOT NULL
-  , consult_id uuid
+  , consult_id uuid NOT NULL
   , ticket_number text
+  , action_type varchar(1) NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT tickets_histories_PKC PRIMARY KEY (id)
@@ -922,6 +923,7 @@ COMMENT ON TABLE tickets_histories IS '受付履歴';
 COMMENT ON COLUMN tickets_histories.id IS 'ID';
 COMMENT ON COLUMN tickets_histories.consult_id IS '受診ID';
 COMMENT ON COLUMN tickets_histories.ticket_number IS '受付番号';
+COMMENT ON COLUMN tickets_histories.action_type IS '操作区分:I:Ins/U:Upd/D:Del';
 COMMENT ON COLUMN tickets_histories.created_at IS '作成日時';
 COMMENT ON COLUMN tickets_histories.created_by IS '作成者';
 
