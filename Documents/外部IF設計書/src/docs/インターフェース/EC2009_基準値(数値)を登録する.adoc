@@ -1,0 +1,269 @@
+== EC2009_基準値(数値)を登録する
+
+=== 概要
+
+* 外部連携で使用する
+* 引数の検査正常値範囲をDBに登録する
+
+=== 処理フロー
+
+[mermaid]
+----
+flowchart TD
+    A[UseCase] --> ERROR{ERROR検証}
+    ERROR -- エラーあり --> C(ErrorObject生成、追加)
+    ERROR -- エラー無 --> WORNING{WORNING検証}    
+    WORNING -- ワーニングあり --> DROP(WORNINGレコードDrop)
+    DROP(WORNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
+    DROP_REC --> D[[Repository]]
+    WORNING -- ワーニングなし --> D
+    C --> E(返却)
+    D --> E
+    E --> UseCaseEND(END)
+
+    F[[Repository]] --> G[BEGIN]
+    G --> H["Upsert(一括):[DB]exam_normal_value_range(検査正常値範囲)"]
+    H --> K[Commit]
+    H -.Exception.-> ROOLBACK[ROOLBACK]
+    K --> RepositoryEND[[END]]
+    ROOLBACK .-> RepositoryEND
+----
+
+=== 非機能
+
+* 1万レコードの登録を10秒以内に完了する
+* DB登録に失敗した場合、全てロールバックする
+
+=== UseCase
+
+Wellship.WebAPI
+
+[source]
+----
+StoreExamNormalValueRangeAsync
+----
+
+==== 引数
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|ExamNormalValueRanges
+|Yes
+|List<ExamNormalValueRange>
+|登録する基準パターンのリスト
+
+|===
+
+==== 戻り値
+
+[source]
+----
+list<ErrorObject>
+----
+
+===== 正常登録
+
+[source]
+----
+list.Count() == 0
+----
+
+===== 異常有り
+
+[source]
+----
+list.Count() <> 0
+----
+
+==== クラス
+
+===== ExamNormalValueRange
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Name
+|Yes
+|string
+|名称
+
+|ThresholdCd
+|Yes
+|string
+|基準値パターンCD
+
+|ExamItemDetailCd
+|Yes
+|string
+|検査項目明細CD
+
+|MaxAge
+|Yes
+|string
+|対象年齢上限
+
+|MinAge
+|Yes
+|string
+|対象年齢下限
+
+|TargetSex
+|Yes
+|enum<Wellship.Core\Enums\TargetSex>
+|対象性別
+
+|MaxValue
+|Yes
+|decimal
+|値上限
+
+|MinValue
+|Yes
+|decimal
+|値下限
+
+|ErrorLevel
+|Yes
+|integer
+|エラーレベル
+
+|InputNote
+|Yes
+|string
+|エラーオブジェクトに登録する入力項目Noなど
+
+|===
+
+==== ErrorObject
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|エラーコード
+
+|Message
+|Yes
+|string
+|エラーメッセージ
+
+|InputNote
+|Yes
+|string
+|入力項目Noなど
+
+|===
+
+==== 列挙型
+
+* None
+
+==== ERROR検証
+
+* None
+
+==== WORNING検証
+
+* 基準値パターンが取得できない
+** `[DB]thresholds(基準値パターン).threshold_code(基準値パターンコード)` == `ExamNormalValueRange.ThresholdCd` が存在しない
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたThresholdCdがシステム上に存在しません。Code:[ExamNormalValueRange.ThresholdCd]`
+**** InputNote `ExamNormalValueRange.InputNote`
+
+* 検査項目明細IDが取得できない
+** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `ExamNormalValueRange.ExamItemDetailCd` が存在しない
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたExamItemDetailCdがシステム上に存在しません。Code:[ExamNormalValueRange.ExamItemDetailCd]`
+**** InputNote `ExamNormalValueRange.InputNote`
+
+* PKが重複するレコードが存在する
+** ExamNormalValueRangesを以下の条件でGroupByし、複数レコードが存在する
+**** `[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCd` で検索した `[DB]thresholds.threshold_id`
+**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id`
+**** `ExamNormalValueRange.TargetSex`
+**** `ExamNormalValueRange.MaxAge` ※左0埋め7桁にそろえる
+**** `ExamNormalValueRange.MaxValue`
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。Code:[ExamNormalValueRange.ExamItemDetailCd]/[ExamNormalValueRange.ThresholdCd]/[ExamNormalValueRange.ExamItemDetailCd]/[ExamNormalValueRange.TargetSex]/[ExamNormalValueRange.MaxAge]/[ExamNormalValueRange.MaxValue]`
+**** InputNote `ExamNormalValueRange.InputNote`
+
+==== 処理(Repository)
+
+===== Table
+
+* [DB]exam_normal_value_range(検査正常値範囲)
+
+===== Upsert
+
+* 競合条件
+** `[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCd` で検索した `[DB]thresholds.threshold_id`
+And `[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id` +
+And `[DB]exam_normal_value_range(検査正常値範囲).target_sex(対象性別)` == `ExamNormalValueRange.TargetSex` +
+And `[DB]exam_normal_value_range(検査正常値範囲).max_age(対象年齢上限)`  ※左0埋め7桁にそろえる == `ExamNormalValueRange.MaxAge`  ※左0埋め7桁にそろえる +
+And `[DB]exam_normal_value_range(検査正常値範囲).max_value(値上限)` == `ExamNormalValueRange.MaxValue` 
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|range_id
+|
+|DB:DEFAULT
+
+|name
+|ExamNormalValueRange.Name
+|
+
+|threshold_id
+|`[DB]thresholds.threshold_id`
+|`[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCd` で検索し、`threshold_id`を登録する
+
+|exam_item_detail_id
+|`[DB]external_exam_item_details.exam_item_detail_id`
+|`[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCd` で検索し、`exam_item_detail_id`を登録する
+
+|max_age
+|ExamNormalValueRange.MaxAge
+|左0埋め7桁
+
+|min_age
+|ExamNormalValueRange.MinAge
+|左0埋め7桁
+
+|target_sex
+|ExamNormalValueRange.TargetSex
+|int型にパースする
+
+|max_value
+|ExamNormalValueRange.MaxValue
+|
+
+|min_value
+|ExamNormalValueRange.MinValue
+|
+
+|error_level
+|ExamNormalValueRange.ErrorLevel
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
