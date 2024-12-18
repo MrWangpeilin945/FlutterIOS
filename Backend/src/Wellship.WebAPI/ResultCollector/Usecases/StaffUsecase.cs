@@ -21,7 +21,7 @@ public class StaffUsecase : IStaffUsecase
     /// <summary>
     /// 職員の情報を取得する
     /// </summary>
-    public async Task<APIModels.Responses.Staff> GetStaffAsync(int staffId)
+    public async Task<APIModels.Responses.Staff> GetStaffAsync(Guid staffId)
     {
         var staff = await _staffRepository.GetStaffByStaffIdAsync(staffId);
         return new APIModels.Responses.Staff()

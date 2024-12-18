@@ -8,67 +8,51 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class Examinee
 {
     /// <summary>
-    /// コンストラクタ
+    /// 受付番号
     /// </summary>
-    public Examinee(int examineeId, string name, string kanaName, DateOnly birthdate, int sex, 
-                    string[] organizations, bool sameNameAlert, int examDateAge)
-    {
-        ExamineeId = examineeId;
-        Name = name;
-        Name = kanaName;
-        Birthdate = birthdate;
-        Sex = sex;
-        Organizations = organizations;
-        SameNameAlert = sameNameAlert;
-        ExamDateAge = examDateAge;
-    }
-
-    /// <summary>
-    /// 受診者ID
-    /// </summary>
-    [JsonPropertyName("examineeId")]
-    public int ExamineeId { get; }
+    [JsonPropertyName("ticketNumber")]
+    public required string TicketNumber { get; init; }
 
     /// <summary>
     /// 氏名
     /// </summary>
     [JsonPropertyName("name")]
-    public string Name { get; } = "";
+    public required string Name { get; init; } = "";
 
     /// <summary>
     /// カナ氏名
     /// </summary>
     [JsonPropertyName("kanaName")]
-    public string KanaName { get; } = "";
+    public required string KanaName { get; init; } = "";
 
     /// <summary>
     /// 生年月日
     /// </summary>
     [JsonPropertyName("birthdate")]
-    public DateOnly Birthdate { get; }    
+    public required DateOnly Birthdate { get; init; }    
 
     /// <summary>
     /// 性別
     /// </summary>
     [JsonPropertyName("sex")]
-    public int Sex { get; }    
+    public required int Sex { get; init; }    
 
     /// <summary>
     /// 事業所名
     /// </summary>
     [JsonPropertyName("organizations")]
-    public string[] Organizations { get; }    
+    public required string[] Organizations { get; init; }    
 
     /// <summary>
     /// 同姓同名アラート
     /// </summary>
     [JsonPropertyName("sameNameAlert")]
-    public bool SameNameAlert { get; }    
+    public required bool SameNameAlert { get; init; }    
 
     /// <summary>
     /// 受診日年齢
     /// </summary>
     [JsonPropertyName("examDateAge")]
-    public int ExamDateAge { get; }    
+    public required int ExamDateAge { get; init; }    
 
 }

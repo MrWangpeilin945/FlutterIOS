@@ -33,9 +33,9 @@
 
 |teamId
 |Yes
-|number 
+|string 
 |選択した班で絞り込む
-|`15`
+|`07da1051-94b7-4138-aa7e-0db6a668c932`
 
 |===
 
@@ -48,19 +48,19 @@
 [source,json]
 ----
 {
-  "teamId": 15,
+  "teamId": "07da1051-94b7-4138-aa7e-0db6a668c932",
   "teamName": "J班",
   "examDate": "2024-09-25",
   "placeSchedules": [
     {
-      "placeScheduleId": 10,
-      "placeId": 1,
+      "placeScheduleId": "190ac4fe-5ff9-4912-9b68-7a8c6d2e855e",
+      "placeId": "1b52be92-6220-4120-be94-971fc7d832c0",
       "placeName": "会場A",
       "startTime": "09:00"
     },
     {
-      "placeScheduleId": 15,
-      "placeId": 4,
+      "placeScheduleId": "191c9f11-2883-4a40-8a93-801c51bc7d36",
+      "placeId": "49281cd6-cb03-4a4d-96fd-fb5f53a3f228",
       "placeName": "会場D",
       "startTime": "13:00"
     }

@@ -8,38 +8,26 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class PlaceScheduleProgress
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public PlaceScheduleProgress(int placeScheduleId, string placeName, DateOnly examDate, Progress[] progress)
-    {
-        PlaceScheduleId = placeScheduleId;
-        PlaceName = placeName;
-        ExamDate = examDate;
-        Progress = progress;
-    }
-
-    /// <summary>
     /// 会場日程ID
     /// </summary>
     [JsonPropertyName("placeScheduleId")]
-    public int PlaceScheduleId { get; }
+    public required Guid PlaceScheduleId { get; init; }
 
     /// <summary>
     /// 会場名
     /// </summary>
     [JsonPropertyName("placeName")]
-    public string PlaceName { get; }
+    public required string PlaceName { get; init; }
 
     /// <summary>
     /// 健診日
     /// </summary>
     [JsonPropertyName("examDate")]
-    public DateOnly ExamDate { get; }
+    public required DateOnly ExamDate { get; init; }
 
     /// <summary>
     /// 進捗状況
     /// </summary>
     [JsonPropertyName("progress")]
-    public Progress[] Progress { get; }
-
+    public required Progress[] Progress { get; init; }
 }

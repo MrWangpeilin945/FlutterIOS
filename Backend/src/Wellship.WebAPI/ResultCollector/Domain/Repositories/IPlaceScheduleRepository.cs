@@ -9,22 +9,32 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 public interface IPlaceScheduleRepository
 {
     /// <summary>
-    /// 健診日を指定して会場日程を取得する
+    /// 健診日を指定して会場日程一覧を取得する
     /// </summary>
     public Task<IEnumerable<PlaceSchedule>> GetPlaceSchedulesAsync(DateOnly date);
 
     /// <summary>
+    /// 会場日程IDを指定して会場日程一覧を取得する
+    /// </summary>
+    public Task<PlaceSchedule> GetPlaceScheduleAsync(Guid placeScheduleId);
+
+    /// <summary>
     /// 会場日程IDを指定して会場日程を取得する
     /// </summary>
-    public Task<IEnumerable<PlaceSchedule>> GetPlaceSchedulesAsync(int[] placeScheduleIds);
+    public Task<IEnumerable<PlaceSchedule>> GetPlaceSchedulesAsync(Guid[] placeScheduleIds);
 
     /// <summary>
     /// 会場ロック状態を取得する
     /// </summary>
-    public Task<PlaceScheduleStatus> GetPlaceScheduleLockingStatusAsync(int placeScheduleId);
+    public Task<PlaceScheduleStatus> GetPlaceScheduleLockingStatusAsync(Guid placeScheduleId);
 
     /// <summary>
     /// 会場ロック状態を更新する
     /// </summary>
-    public Task UpdatePlaceScheduleLockingStatusAsync(int placeScheduleId, PlaceScheduleLockingStatus status);
+    public Task UpdatePlaceScheduleLockingStatusAsync(Guid placeScheduleId, PlaceScheduleLockingStatus status);
+
+    /// <summary>
+    /// 会場日程での同姓同名の有無を判定する
+    /// </summary>
+    public Task<bool> IsSamename(string consultNumber);
 }

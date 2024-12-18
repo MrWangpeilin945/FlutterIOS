@@ -10,7 +10,7 @@ public class PlaceSchedule
     /// <summary>
     /// 会場日程ID
     /// </summary>
-    public required int Id { get; init; }
+    public required Guid Id { get; init; }
 
     /// <summary>
     /// 会場
