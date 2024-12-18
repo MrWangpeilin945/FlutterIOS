@@ -11,6 +11,7 @@ public class MenuNoteResult
     private readonly IEnumerable<ExamItemDetailChild> _detailChildren;
     private readonly IEnumerable<ExamItemDetailResult> _currentResults;
     private readonly IEnumerable<ExamItemDetailResult> _previousResults;
+    private readonly IEnumerable<ConsultNote> _consultNote;
 
     /// <summary>
     /// コンストラクタ
@@ -19,18 +20,36 @@ public class MenuNoteResult
     /// <param name="detailChildren">検査項目明細とその子要素のマスタ</param>
     /// <param name="examResult">今回値</param>
     /// <param name="previousResult">前回値</param>
-    public MenuNoteResult(MenuNote menuNote, IEnumerable<ExamItemDetailChild> detailChildren, ExamResult examResult, PreviousResult previousResult)
+    /// <param name="consultNotes">受診特記</param>
+    public MenuNoteResult(MenuNote menuNote, IEnumerable<ExamItemDetailChild> detailChildren, ExamResult examResult, PreviousResult previousResult, IEnumerable<ConsultNote> consultNotes)
     {
         _menuNote = menuNote;
         _detailChildren = detailChildren;
         _currentResults = examResult.ExamItemDetailResults;
         _previousResults = previousResult.ExamItemDetailResults;
+        _consultNote = consultNotes;
     }
 
     /// <summary>
     /// 特記の表示用に文字列を組み立てて取得します。
     /// </summary>
     public string GetDisplayText()
+    {
+        // 親テーブルに
+        if (_menuNote.ExamResults.Any())
+        {
+            return GetDisplayResultText();
+        }
+
+        if (_menuNote.ConsultNotes.Any())
+        {
+            return GetDisplayConsultNoteText();
+        }
+
+        return "";
+    }
+
+    private string GetDisplayResultText()
     {
         var 今回値の明細IDs = _menuNote.ExamResults.Where(x => x.SourceType == Core.Enums.SourceType.今回値).Select(x => x.ExamItemDetailId).ToArray();
         var 前回値の明細IDs = _menuNote.ExamResults.Where(x => x.SourceType == Core.Enums.SourceType.前回値).Select(x => x.ExamItemDetailId).ToArray();
@@ -42,6 +61,13 @@ public class MenuNoteResult
         var 前回値テキスト = string.Join("/", 表示用前回値リスト);
 
         return $"{今回値テキスト}({前回値テキスト}){_menuNote.Suffix}";
+    }
+
+    private string GetDisplayConsultNoteText()
+    {
+        var consultNotes = _menuNote.ConsultNotes.Select(x => _consultNote.SingleOrDefault(c => c.Code == x.Code)).Select(x => x?.Note ?? "");
+        var joinText = string.Join("/", consultNotes);
+        return $"{joinText}{_menuNote.Suffix}";
     }
 
     private string Get表示用値(int 明細ID, IEnumerable<ExamItemDetailResult> 回答リスト)

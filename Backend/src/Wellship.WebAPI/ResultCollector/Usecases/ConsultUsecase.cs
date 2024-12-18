@@ -287,9 +287,6 @@ public class ConsultUsecase : IConsultUsecase
 
         // 検査メニュー特記の設定を取得
         var menuNotes = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
-        // 受診に紐づく検査項目特記を取得
-        var examItemNoteData = await _consultRepository.GetExamItemNotesAsync(consult.ConsultId);
-
 
         return new InputExamItems()
         {
@@ -426,62 +423,5 @@ public class ConsultUsecase : IConsultUsecase
         var errorLevels = new List<InputErrorLevel>() { InputErrorLevel.警告, InputErrorLevel.異常 };
         return errors.Where(x => errorLevels.Contains(x.ErrorLevel))
                      .OrderBy(x => x.Priority);
-    }
-
-    /// <summary>
-    /// 検査メニュー特記を取得する
-    /// </summary>
-    private IEnumerable<RelatedExamItem> GetRelatedExamItems(
-        IEnumerable<Domain.Models.ExamItemDetailChild> examItemDetailChildrend,
-        IEnumerable<Domain.Models.MenuNote> menuNotes,
-        IEnumerable<Domain.Models.ExamItemNote> examItemNotes,
-        Domain.Models.ExamResult? examResults,
-        Domain.Models.PreviousResult? previousResults)
-    {
-        var currentResultMap = examResults?.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value) ?? [];
-        var previousResultMap = previousResults?.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value) ?? [];
-        var itemNoteMap = examItemNotes.ToDictionary(x => x.ExamItemId, x => x.Note);
-
-        var results = menuNotes.Select(x => new RelatedExamItem()
-        {
-            ExamItemName = x.Name,
-            ExamResult = ConvertDetailValueToText(x, examItemDetailChildrend, currentResultMap, previousResultMap, itemNoteMap)
-        });
-        return results;
-    }
-
-
-    private string ConvertDetailValueToText(
-        Domain.Models.MenuNote menuNote,
-        IEnumerable<Domain.Models.ExamItemDetailChild> examItemDetailChildrend,
-        Dictionary<int, string> currentResultMap,
-        Dictionary<int, string> previousResultMap,
-        Dictionary<int, string> itemNoteMap
-        )
-    {
-        var examItemDetailIds = new[] { 1, 2, 3 }; // TODO:
-        // 検査結果
-        var rsls = menuNote.ExamResults.Select(x => x.SourceType switch
-                                       {
-                                           SourceType.今回値 => currentResultMap.TryGetValue(x.ExamItemDetailId, out var currentResult) ? currentResult : "",
-                                           SourceType.前回値 => previousResultMap.TryGetValue(x.ExamItemDetailId, out var previousResult) ? previousResult : "",
-                                           _ => ""
-                                       });
-
-        // TODO: 回答が選択肢の場合はコード→名称変換が必要。
-        // 複数ある場合のまとめ方は？、や／で区切る？
-
-        var 前回値 = menuNote.ExamResults.Where(x => x.SourceType == SourceType.前回値)
-                                        .Select(x => previousResultMap.TryGetValue(x.ExamItemDetailId, out var 前回値) ? 前回値 : null);
-        var 今回値 = menuNote.ExamResults.Where(x => x.SourceType == SourceType.今回値)
-                                         .Select(x => previousResultMap.TryGetValue(x.ExamItemDetailId, out var 今回値) ? 今回値 : null);
-
-        // 検査項目特記
-        var it = menuNote.ExamItemNotes.Select(x => itemNoteMap.TryGetValue(x.ExamItemId, out var itemNote) ? itemNote : "");
-
-
-
-        // TOOD: 表示用の文字列として組み立てる
-        return "";
     }
 }

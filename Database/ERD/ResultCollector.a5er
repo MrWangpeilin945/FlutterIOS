@@ -1810,11 +1810,12 @@ Field="検査メニュー特記ID","menu_note_id","integer","NOT NULL",0,"","",$
 Field="名称","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査メニューID","exam_menu_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="接尾辞","suffix","text",,,"","",$FFFFFFFF,""
 Index==2,order_number,exam_menu_id
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241212152117
+ModifiedDateTime=20241218181936
 Position="MAIN",3000,1450
 ZOrder=97
 

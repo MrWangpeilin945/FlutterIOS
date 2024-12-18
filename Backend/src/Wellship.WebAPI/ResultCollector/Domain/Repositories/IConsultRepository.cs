@@ -68,5 +68,5 @@ public interface IConsultRepository
     /// <summary>
     /// 受診を指定して検査項目特記を取得します。
     /// </summary>
-    public Task<IEnumerable<ExamItemNote>> GetExamItemNotesAsync(Guid consultId);
+    public Task<IEnumerable<ConsultNote>> GetConsultNotesAsync(Guid consultId);
 }

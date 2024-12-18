@@ -27,9 +27,9 @@ public class MenuNote
     public required string Suffix { get; init; }
 
     /// <summary>
-    /// 検査メニュー特記と検査項目特記の関連
+    /// 検査メニュー特記と受診特記の関連
     /// </summary>
-    public required IEnumerable<MenuNoteExamItem> ExamItemNotes { get; init; }
+    public required IEnumerable<MenuNoteConsult> ConsultNotes { get; init; }
 
     /// <summary>
     /// 検査メニュー特記と検査結果（明細単位）の関連

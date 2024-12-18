@@ -1,14 +1,14 @@
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 /// <summary>
-/// 受診に紐づく検査項目単位の特記事項
+/// 受診に紐づく特記事項
 /// </summary>
-public class ExamItemNote
+public class ConsultNote
 {
     /// <summary>
-    /// 検査項目ID
+    /// 検査特記コード
     /// </summary>
-    public required int ExamItemId { get; init; }
+    public required string Code { get; init; }
 
     /// <summary>
     /// 特記事項

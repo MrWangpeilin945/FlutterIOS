@@ -428,19 +428,19 @@ public class ConsultRepository : IConsultRepository
     /// <summary>
     /// 受診を指定して検査項目特記を取得します。
     /// </summary>
-    public async Task<IEnumerable<ExamItemNote>> GetExamItemNotesAsync(Guid consultId)
+    public async Task<IEnumerable<ConsultNote>> GetConsultNotesAsync(Guid consultId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
         select
-            n.exam_item_id as ExamItemId
+            n.code as Code
             , n.note as Note 
         from
             resultcollector.exam_item_notes n 
         where
             consult_id = @ConsultId;";
 
-        var response = await connection.QueryAsync<ExamItemNote>(sql, new { ConsultId = consultId });
+        var response = await connection.QueryAsync<ConsultNote>(sql, new { ConsultId = consultId });
         return response;
     }
 }

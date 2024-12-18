@@ -24,4 +24,9 @@ public class MenuNoteEntity
     /// 検査メニューID
     /// </summary>
     public required int ExamMenuId { get; init; }
+
+    /// <summary>
+    /// 接尾辞
+    /// </summary>
+    public required string? Suffix { get; init; }
 }

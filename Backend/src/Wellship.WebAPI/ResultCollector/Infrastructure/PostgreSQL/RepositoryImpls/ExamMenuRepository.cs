@@ -92,7 +92,7 @@ public class ExamMenuRepository : IExamMenuRepository
             n.order_number;";
 
         // 検査メニュー特記_検査項目テーブル
-        const string itemsSql = @"
+        const string consultSql = @"
         select
             n.menu_note_id
             , nr.exam_item_detail_id
@@ -125,7 +125,7 @@ public class ExamMenuRepository : IExamMenuRepository
 
         // SQL実行
         var menuNotes = await connection.QueryAsync<Entities.MenuNoteEntity>(mainSql, new { ExamMenuId = examMenuId });
-        var noteExamItems = await connection.QueryAsync<Entities.MenuNoteExamItemEntity>(itemsSql, new { ExamMenuId = examMenuId });
+        var noteExamItems = await connection.QueryAsync<Entities.MenuNoteConsultEntity>(consultSql, new { ExamMenuId = examMenuId });
         var noteResults = await connection.QueryAsync<Entities.MenuNoteExamResultEntity>(resultsSql, new { ExamMenuId = examMenuId });
 
         // ドメインモデルにマッピング
@@ -135,12 +135,12 @@ public class ExamMenuRepository : IExamMenuRepository
                             MenuNoteId = x.MenuNoteId,
                             Name = x.Name,
                             ExamMenuId = x.ExamMenuId,
-                            Suffix = "", // TODO:
-                            ExamItemNotes = noteExamItems.Where(n => n.MenuNoteId == x.MenuNoteId)
+                            Suffix = x.Suffix ?? "",
+                            ConsultNotes = noteExamItems.Where(n => n.MenuNoteId == x.MenuNoteId)
                                                          .OrderBy(n => n.OrderNumber)
-                                                         .Select(n => new MenuNoteExamItem()
+                                                         .Select(n => new MenuNoteConsult()
                                                          {
-                                                             ExamItemId = n.ExamItemId
+                                                             Code = n.Code
                                                          }),
                             ExamResults = noteResults.Where(n => n.MenuNoteId == x.MenuNoteId)
                                                      .OrderBy(n => n.OrderNumber)

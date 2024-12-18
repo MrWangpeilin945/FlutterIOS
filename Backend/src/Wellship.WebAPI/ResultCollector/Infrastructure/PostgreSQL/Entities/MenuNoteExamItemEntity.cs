@@ -1,9 +1,9 @@
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 /// <summary>
-/// 検査メニュー特記_検査項目特記のエンティティ
+/// 検査メニュー特記_受診特記のエンティティ
 /// </summary>
-public class MenuNoteExamItemEntity
+public class MenuNoteConsultEntity
 {
     /// <summary>
     /// 検査メニュー特記ID
@@ -11,9 +11,9 @@ public class MenuNoteExamItemEntity
     public int MenuNoteId { get; init; }
 
     /// <summary>
-    /// 検査項目ID
+    /// 検査特記コード
     /// </summary>
-    public required int ExamItemId { get; init; }
+    public required string Code { get; init; }
 
     /// <summary>
     /// 表示順
