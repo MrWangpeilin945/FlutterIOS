@@ -46,10 +46,21 @@ public sealed class Birthdate
     /// <param name="mode">年齢計算モード（加算方法）</param>
     public Age GetAge(DateOnly startDate, AgeCalcMode mode)
     {
-        if(mode == AgeCalcMode.前日年齢加算)
+        DateOnly initStartDate = startDate;
+        if (mode == AgeCalcMode.前日年齢加算)
         {
+            if (startDate == Value)
+            {
+                // 生年月日に達していないため-1を返す
+                return new Age()
+                {
+                    Years = 0,
+                    Months = 0,
+                    Days = -1
+                };
+            }
             // 年齢到達日は前日のため、起算日を１日後に移動する
-            startDate = startDate.AddDays(1); 
+            startDate = startDate.AddDays(1);
         }
         int monthDiff = (startDate.Month + (startDate.Year - Value.Year) * 12) - Value.Month;
         int years = (int)Math.Floor(monthDiff / 12m);
@@ -66,11 +77,11 @@ public sealed class Birthdate
             // 起算年の誕生日月の月日数を求める
             int birthMonthDays = DateTime.DaysInMonth(startDate.Year, Value.Month);
             int diffDay = monthDays - Value.Day;
-            if( Value.Day < birthMonthDays && birthMonthDays < monthDays)
+            if (Value.Day < birthMonthDays && birthMonthDays < monthDays)
             {
-                diffDay = birthMonthDays - Value.Day;
+                diffDay = birthMonthDays - Value.Day + 1;
             }
-            if (diffDay >= 0 && Value.Day != birthMonthDays)
+            if (diffDay >= 0 && (Value.Day != birthMonthDays || (mode == AgeCalcMode.前日年齢加算 && startDate.Day == 1)))
             {
                 days = diffDay + startDate.Day;
             }
@@ -81,7 +92,17 @@ public sealed class Birthdate
             //年月の調整
             if (months > 0)
             {
-                months -= 1;
+                // 起算月の日数
+                int startMonthDays = DateTime.DaysInMonth(startDate.Year, startDate.Month);
+                if (initStartDate.Day == days && startMonthDays == days)
+                {
+                    // 月年齢を減算せず、日年齢をクリアする
+                    days = 0;
+                }
+                else
+                {
+                    months -= 1;
+                }
             }
             else
             {
