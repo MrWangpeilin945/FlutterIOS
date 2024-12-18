@@ -4,32 +4,32 @@ import type {
   ExamRegistResult,
   ExamNormalValueRange,
 } from "~/domain/wellship.schemas";
-import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 
 // 受け取ったExamItemDetailsから
 // それぞれの最も高いエラーレベルに該当するExamNormalValueRangeを返す
 const getMaxErrorLevelsByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
-  const matchExamRanges: ExamNormalValueRange[] = [];
-  for (const { value, examNormalValueRanges } of examItemDetails) {
-    const numericValue = Number.parseFloat(value || "");
-    if (!numericValue || !examNormalValueRanges) continue;
-    // errorLevelの高い順にソート
-    const sortedRanges = [...examNormalValueRanges].sort(
-      (a, b) => (b.errorLevel || 0) - (a.errorLevel || 0)
-    );
-    // 範囲にマッチする最初の値を返す
-    const matchRange = sortedRanges.find(
-      ({ minValue, maxValue }) =>
-        typeof minValue === "number" &&
-        typeof maxValue === "number" &&
-        numericValue >= minValue &&
-        numericValue <= maxValue
-    );
-    if (matchRange) {
-      matchExamRanges.push(matchRange);
-    }
-  }
-  return matchExamRanges;
+  return examItemDetails.reduce(
+    (
+      matchExamRanges: ExamNormalValueRange[],
+      { value, examNormalValueRanges }
+    ) => {
+      const numericValue = Number.parseFloat(value || "");
+      if (numericValue && examNormalValueRanges) {
+        const matchRange = examNormalValueRanges.find(
+          ({ minValue, maxValue }) =>
+            typeof minValue === "number" &&
+            typeof maxValue === "number" &&
+            numericValue >= minValue &&
+            numericValue <= maxValue
+        );
+        if (matchRange) {
+          matchExamRanges.push(matchRange);
+        }
+      }
+      return matchExamRanges;
+    },
+    []
+  );
 };
 
 // 受け取ったInputexamitemの、examRegistresultsにエラーを追加して
@@ -42,23 +42,32 @@ export const setRangesErrorMessage = (inputexamItem: InputExamItem) => {
   const matchExamRanges = getMaxErrorLevelsByRangeCheck(
     inputexamItem.examItemDetails
   );
-  console.log(inputexamItem.examRegistResults);
   // 既に存在するExamNormalValueRangeによるエラーメッセージを削除
   inputexamItem.examRegistResults = inputexamItem.examRegistResults.filter(
-    (error) => !error.description?.includes("正常値ではありません。")
+    (error) => {
+      const description = error.description || "";
+      return !(
+        description === "入力値を確認してください。" ||
+        description === "入力に誤りがあります。"
+      );
+    }
   );
-  console.log(inputexamItem.examRegistResults);
+  // 該当するエラーが無いときはそのまま返す
   if (matchExamRanges.length === 0) {
     return inputexamItem;
   }
-  for (const { minValue, maxValue, errorLevel } of matchExamRanges) {
-    const rangesErrorMessage: ExamRegistResult = {
-      // TODO：エラーメッセージの詳細を決定
-      description: `入力された値が${minValue}から${maxValue}であり、正常値ではありません。`,
-      errorLevel: errorLevel,
-    };
-    inputexamItem.examRegistResults.push(rangesErrorMessage);
-  }
-  console.log(inputexamItem.examRegistResults);
+  // エラーレベルに応じたエラーメッセージを追加
+  const rangesErrorMessages = matchExamRanges
+    .filter(({ errorLevel }) => errorLevel === 2 || errorLevel === 3)
+    .map(({ errorLevel }) => ({
+      description:
+        errorLevel === 2
+          ? "入力値を確認してください。"
+          : "入力に誤りがあります。",
+      errorLevel,
+    }));
+
+  inputexamItem.examRegistResults.push(...rangesErrorMessages);
+
   return inputexamItem;
 };
