@@ -10,14 +10,13 @@ import {
   TextInput,
   Flex,
   Box,
+  Button,
 } from "@mantine/core";
 import { useClickOutside } from "@mantine/hooks";
 import Keyboard from "~/components/NumericKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
-import type {
-  ExamRegistResult,
-  InputExamItem,
-} from "~/domain/wellship.schemas";
+import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
+import type { InputExamItem } from "~/domain/wellship.schemas";
 import { InputErrorLevel } from "~/domain/enums";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
@@ -25,7 +24,7 @@ import styles from "~/styles/common.module.css";
 type ExamNumericLRProps = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
-  onChange: (newValue: InputExamItem) => void;
+  onChange: (newExamItems: InputExamItem[] | undefined) => void;
 };
 
 export default function ExamNumericLR({
@@ -33,11 +32,22 @@ export default function ExamNumericLR({
   onRegisterPressed,
   onChange,
 }: ExamNumericLRProps) {
-  // 必要な引数のチェック
+  // 引数のチェック
   if (!examItems || examItems.length === 0) {
     return null;
   }
+  const firstPosition = examItems.find((item) => item.positionNumber === 1);
 
+  if (
+    !firstPosition?.examItemDetails?.some(
+      (detail) => detail.positionNumber === 1
+    ) ||
+    !firstPosition?.examItemDetails?.some(
+      (detail) => detail.positionNumber === 2
+    )
+  ) {
+    return null;
+  }
   const [examItemsData, setExamItemsData] = useState(examItems);
 
   // キーボードの表示インデックスを状態として管理する
@@ -50,15 +60,32 @@ export default function ExamNumericLR({
   });
 
   // キーボードの表示/非表示をトグルする関数
-  const toggleKeyboard = (positionNumber: number) => {
-    setActiveKeyboard((prevNumber) =>
-      prevNumber === positionNumber ? null : positionNumber
-    );
+  const toggleKeyboard = (detailPositionNumber: number) => {
+    setShowKeyboards((prevKeyboards) => {
+      // positionNumberによって切り替えるフラグを制御する
+      if (detailPositionNumber === 1 || detailPositionNumber === 2) {
+        return {
+          ...prevKeyboards,
+          left:
+            detailPositionNumber === 1
+              ? !prevKeyboards.left
+              : prevKeyboards.left,
+          right:
+            detailPositionNumber === 2
+              ? !prevKeyboards.right
+              : prevKeyboards.right,
+        };
+      }
+      return prevKeyboards;
+    });
   };
+  // キーボードのACボタン押下時にキーボードを非表示にする
   const handleConfirm = () => {
-    setActiveKeyboard(null);
+    setShowKeyboards({ left: false, right: false });
   };
-  const closeKeyBoard = useClickOutside(() => setActiveKeyboard(null));
+  const closeKeyBoard = useClickOutside(() =>
+    setShowKeyboards({ left: false, right: false })
+  );
 
   const handleErrorMessage = (item: InputExamItem): InputExamItem => {
     if (item.examRegistResults) {
@@ -80,48 +107,62 @@ export default function ExamNumericLR({
   };
 
   const validationCheck = (item: InputExamItem) => {
-    // BMIはバリデーションチェックを実施しない
-    if (item.positionNumber === 4) return item;
-    // 必須チェックと半角数字チェックを一度に行うスキーマ
-    const schema = z
-      .string()
-      .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)) // 必須チェック
-      .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-        message: getErrorMessage(errorMessages.numericString, `${item.name}は`),
-      });
-
-    // バリデーション対象データを取得
-    const valueToValidate = item.examItemDetails?.[0]?.value || "";
-    const result = schema.safeParse(valueToValidate);
-
+    // positionNumberが異なる場合、処理を行わない
+    if (item.positionNumber !== 1) {
+      return item;
+    }
     // エラーメッセージを更新
     let updatedErrors = item.examRegistResults || [];
 
-    // 必須エラーを削除
-    const errorMessageRequired = getErrorMessage(
-      errorMessages.required,
-      `${item.name}は`
-    );
-    updatedErrors = updatedErrors.filter(
-      (error) => error.description !== errorMessageRequired
-    );
+    // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
+    for (const { name, positionNumber, value } of item.examItemDetails ?? []) {
+      if (positionNumber !== 1 && positionNumber !== 2) {
+        continue; // 対象のpositionNumberでない場合、処理をスキップする
+      }
+      // 必須チェックと半角数字チェックを一度に行うスキーマ
+      const schema = z
+        .string()
+        .min(
+          1,
+          getErrorMessage(errorMessages.required, `${item.name}:${name}は`)
+        ) // 必須チェック
+        .refine((value) => /^\d+(\.\d+)?$/.test(value), {
+          message: getErrorMessage(
+            errorMessages.numericString,
+            `${item.name}:${name}は`
+          ),
+        });
 
-    // 半角数字エラーを削除
-    const errorMessageNumeric = getErrorMessage(
-      errorMessages.numericString,
-      `${item.name}は`
-    );
-    updatedErrors = updatedErrors.filter(
-      (error) => error.description !== errorMessageNumeric
-    );
+      // バリデーション対象データを取得
+      const valueToValidate = value;
+      const result = schema.safeParse(valueToValidate);
 
-    // バリデーションが失敗した場合
-    if (!result.success) {
-      const error = result.error.errors[0]; // 最初のエラーだけ取得
-      updatedErrors.push({
-        description: error.message,
-        errorLevel: InputErrorLevel.異常,
-      });
+      // 必須エラーを削除
+      const errorMessageRequired = getErrorMessage(
+        errorMessages.required,
+        `${item.name}:${name}は`
+      );
+      updatedErrors = updatedErrors.filter(
+        (error) => error.description !== errorMessageRequired
+      );
+
+      // 半角数字エラーを削除
+      const errorMessageNumeric = getErrorMessage(
+        errorMessages.numericString,
+        `${item.name}:${name}は`
+      );
+      updatedErrors = updatedErrors.filter(
+        (error) => error.description !== errorMessageNumeric
+      );
+
+      // バリデーションが失敗した場合
+      if (!result.success) {
+        const error = result.error.errors[0]; // 最初のエラーだけ取得
+        updatedErrors.push({
+          description: error.message,
+          errorLevel: InputErrorLevel.異常,
+        });
+      }
     }
 
     const prevItem = {
@@ -144,65 +185,46 @@ export default function ExamNumericLR({
     setExamItemsData(updatedItems);
   }, [onRegisterPressed, examItems]);
 
-  // BMI計算処理
-  const setBMIValue = (updatedExamItems: InputExamItem[]): InputExamItem[] => {
-    const heightValue = updatedExamItems[0].examItemDetails?.[0].value ?? "0";
-    const weightValue = updatedExamItems[1].examItemDetails?.[0].value ?? "0";
-
-    // BMIの計算
-    const height = Number.parseFloat(heightValue) / 100;
-    const weight = Number.parseFloat(weightValue);
-    const bmi = Number.isNaN(weight / height ** 2) ? 0 : weight / height ** 2;
-    const bmiString = String(bmi);
-
-    return updatedExamItems.map((item) => {
-      if (item.positionNumber === 4) {
-        item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
-          const decimalLength = detail.decimalLength ?? 0;
-          const integerLength = detail.integerLength ?? 0;
-          const maxDigits = decimalLength + integerLength + 1;
-
-          if (idx === 0) {
-            if (detail.integerLength) {
-              return { ...detail, value: bmiString.slice(0, maxDigits) };
-            }
-            return { ...detail, value: bmiString };
-          }
-          return detail;
-        });
-      }
-      return item;
-    });
-  };
-
   //変更イベント
-  const handleChange = (positionNumber: number | undefined, value: string) => {
+  const handleChange = (
+    value: string,
+    positionNumber: number | undefined,
+    detailsPositionNumber?: number
+  ) => {
+    // 対象のpositionNumberか確認
+    if (positionNumber !== 1) {
+      return null;
+    }
     const updatedExamItems = [...examItemsData];
 
     // 該当するアイテムを更新
     for (const item of updatedExamItems) {
       if (item.positionNumber === positionNumber) {
-        // 該当するexamItemDetailsの最初のvalueを更新
-        item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
-          if (idx === 0) {
-            return { ...detail, value: value };
-          }
-          return detail;
-        });
+        // クリアボタン用の処理
+        if (detailsPositionNumber === undefined) {
+          item.examItemDetails = item.examItemDetails?.map((detail) => ({
+            ...detail,
+            value: value,
+          }));
+        } else {
+          // 該当するdetailの値を更新
+          item.examItemDetails = item.examItemDetails?.map((detail) =>
+            detail.positionNumber === detailsPositionNumber
+              ? { ...detail, value: value.slice(0, detail.integerLength ?? 3) }
+              : detail
+          );
+        }
       }
-
       // バリデーションチェックを実施
       const validatedItem = validationCheck(item);
       // バリデーション結果を反映
       Object.assign(item, validatedItem);
     }
 
-    // BMIの計算と設定処理
-    const bmiUpdatedExamItems = setBMIValue(updatedExamItems);
     // 更新されたデータをステートに設定
-    setExamItemsData(bmiUpdatedExamItems);
-    // 3つのエラーが存在するか確認
-    const isValidatedError = bmiUpdatedExamItems.some((item) =>
+    setExamItemsData(updatedExamItems);
+    // API以外の異常エラーが存在するか確認
+    const isValidatedError = updatedExamItems.some((item) =>
       item.examRegistResults?.some(
         (error) =>
           error.description ===
@@ -210,15 +232,23 @@ export default function ExamNumericLR({
           error.description ===
             getErrorMessage(errorMessages.numericString, `${item.name}は`) ||
           //TODO:基準値エラーメッセージは未確定（部分一致予定）
-          error.description?.includes("正常値ではありません")
+          error.description === "入力に誤りがあります。"
       )
     );
 
     if (!isValidatedError) {
-      onChange(bmiUpdatedExamItems);
+      onChange(updatedExamItems);
     }
   };
 
+  const firstPositionItem = examItemsData.find(
+    (item) => item.positionNumber === 1
+  );
+  const { positionNumber, examItemDetails, examRegistResults, name } =
+    firstPositionItem ?? {};
+  const targetDetails = examItemDetails?.filter(
+    (detail) => detail.positionNumber === 1 || detail.positionNumber === 2
+  );
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Stack>
@@ -234,12 +264,12 @@ export default function ExamNumericLR({
           }}
         >
           <Title size="lg" fw={700}>
-            {examItems[0].name}
+            {name}
           </Title>
         </Paper>
         <Group gap={16}>
-          {firstExamItemDetails?.map((detail, index) => (
-            <Stack key={index}>
+          {targetDetails?.map((detail) => (
+            <Stack key={detail.positionNumber}>
               <Paper
                 w={524}
                 h={51}
@@ -259,11 +289,11 @@ export default function ExamNumericLR({
                 <TextInput
                   classNames={{
                     input: `${styles["input-textbox"]} ${
-                      errMessages?.some(
+                      firstPositionItem?.examRegistResults?.some(
                         (x) => x.errorLevel === InputErrorLevel.異常
                       )
                         ? `${styles["input-error"]}`
-                        : errMessages?.some(
+                        : firstPositionItem?.examRegistResults?.some(
                             (x) => x.errorLevel === InputErrorLevel.警告
                           )
                         ? `${styles["input-warning"]}`
@@ -273,11 +303,15 @@ export default function ExamNumericLR({
                   w={"340"}
                   radius={"md"}
                   size="inputComponent"
-                  value={formatDecimalValue(examValues[index], index)}
-                  onClick={() => handleTextboxClick(index)}
-                  onChange={(e) => {
-                    handleTextChange(e, index);
-                  }}
+                  value={detail.value}
+                  onClick={() => toggleKeyboard(detail.positionNumber ?? 0)}
+                  onChange={(e) =>
+                    handleChange(
+                      e.currentTarget.value,
+                      positionNumber ?? 0,
+                      detail.positionNumber ?? 0
+                    )
+                  }
                 />
                 {/* TODO:前回値のマックス横幅設定 */}
                 <Stack gap="0">
@@ -293,7 +327,7 @@ export default function ExamNumericLR({
           ))}
         </Group>
         {/* エラーメッセージの表示 */}
-        {(errMessages || []).map((error, index) => (
+        {(examRegistResults || []).map((error, index) => (
           <Group
             key={index}
             c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
@@ -303,16 +337,22 @@ export default function ExamNumericLR({
           </Group>
         ))}
         <Group>
-          {firstExamItemDetails?.map((detail, index) => (
-            <Stack key={index}>
+          {targetDetails?.map((detail) => (
+            <Stack key={detail.positionNumber}>
               <Box w={540}>
-                {showKeyboards[index] && (
+                {showKeyboards[
+                  detail.positionNumber === 1 ? "left" : "right"
+                ] && (
                   <div ref={closeKeyBoard}>
                     <Keyboard
-                      value={examValues[index]}
-                      onChange={(e: string) => {
-                        handleKeyChange(e, index);
-                      }}
+                      value={detail?.value ?? ""}
+                      onChange={(newValue) =>
+                        handleChange(
+                          newValue,
+                          positionNumber ?? 0,
+                          detail.positionNumber ?? 0
+                        )
+                      }
                       onConfirm={handleConfirm}
                     />
                   </div>
@@ -322,6 +362,18 @@ export default function ExamNumericLR({
           ))}
         </Group>
       </Stack>
+      <Button
+        w={154}
+        h={64}
+        ml={914}
+        size="lg"
+        bg={"white"}
+        variant="outline"
+        onClick={() => handleChange("", positionNumber)}
+        tabIndex={-1}
+      >
+        クリア
+      </Button>
     </Flex>
   );
 }
