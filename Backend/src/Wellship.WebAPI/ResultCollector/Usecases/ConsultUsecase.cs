@@ -95,14 +95,6 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 簡易な受診者情報を取得する
-    /// </summary>
-    public void GetSimpleExaminee()
-    {
-
-    }
-
-    /// <summary>
     /// 検査内容を取得する
     /// </summary>
     public async Task<ExamContent> GetExamItemsExamineeAsync(string consultNumber, int examMenuId)
@@ -150,19 +142,19 @@ public class ConsultUsecase : IConsultUsecase
                                       .OrderBy(Item => Item.PositionNumber)
                                       .Select(item => new ExamDetail
                                       {
-                                        ExamItemId = item.ExamItemId,
-                                        ExamItemName = item.Name,
-                                        HasOrder = examOrders.ExamItemDetailOrders
+                                          ExamItemId = item.ExamItemId,
+                                          ExamItemName = item.Name,
+                                          HasOrder = examOrders.ExamItemDetailOrders
                                                              .Any(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId)),
-                                        CancelReasonId = examCancels.ExamItemDetailCancels
+                                          CancelReasonId = examCancels.ExamItemDetailCancels
                                                                     .SingleOrDefault(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId))?.CancelReasonId
                                       }).ToArray(),
             ExamDecisionResult = [],        // TODO: 検査実施判断結果    後方作業へ
             UnexaminedItems = unexaminedItems.UnexaminedMenus.Select(x => new ExamMenu
-                                                                    {
-                                                                        ExamMenuId = x.ExamMenuId,
-                                                                        ExamMenuName = x.ExamMenuName
-                                                                    }).ToArray(),
+            {
+                ExamMenuId = x.ExamMenuId,
+                ExamMenuName = x.ExamMenuName
+            }).ToArray(),
         };
     }
 
@@ -272,7 +264,7 @@ public class ConsultUsecase : IConsultUsecase
         var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
         // 検査正常値範囲を取得
         IEnumerable<Domain.Models.ExamNormalValueRange> examNormalValueRanges = [];
-        if(thresholds.Any())
+        if (thresholds.Any())
         {
             examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
         }
