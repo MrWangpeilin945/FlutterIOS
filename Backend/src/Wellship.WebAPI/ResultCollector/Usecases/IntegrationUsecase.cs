@@ -73,9 +73,10 @@ public class IntegrationUsecase : IIntegrationUsecase
     /// <summary>
     /// 連携用に検査結果を出力する
     /// </summary>
-    public void ExportResults()
+    public async Task ExportResultsAsync(Guid placeScheduleId)
     {
-
+        // TODO: 外部インターフェースの結果出力処理を呼び出す
+        throw new NotImplementedException("外部インターフェースの実装待ちです。");
     }
 
     /// <summary>

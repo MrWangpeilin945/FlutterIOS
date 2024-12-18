@@ -21,11 +21,6 @@ public interface IConsultUsecase
     public Task<UnexaminedMenuList> GetUnexaminedMenusAsync(string consultNumber);
 
     /// <summary>
-    /// 簡易な受診者情報を取得する
-    /// </summary>
-    public void GetSimpleExaminee();
-
-    /// <summary>
     /// 検査内容を取得する
     /// </summary>
     public Task<ExamContent> GetExamItemsExamineeAsync(string consultNumber, int examMenuId);
