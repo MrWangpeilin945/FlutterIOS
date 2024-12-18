@@ -188,6 +188,14 @@ CREATE TABLE export_history_details (
   , CONSTRAINT export_history_details_PKC PRIMARY KEY (id,consult_id)
 );
 
+CREATE TABLE external_exam_item_details (
+  exam_item_detail_id integer NOT NULL
+  , external_exam_item_detail_code text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT external_exam_item_details_PKC PRIMARY KEY (exam_item_detail_id,external_exam_item_detail_code)
+);
+
 CREATE TABLE home_menus (
   home_menu_id integer NOT NULL
   , name text NOT NULL
@@ -832,6 +840,12 @@ COMMENT ON COLUMN export_history_details.id IS 'ID';
 COMMENT ON COLUMN export_history_details.consult_id IS '受診ID';
 COMMENT ON COLUMN export_history_details.created_at IS '作成日時';
 COMMENT ON COLUMN export_history_details.created_by IS '作成者';
+
+COMMENT ON TABLE external_exam_item_details IS '外部検査項目明細';
+COMMENT ON COLUMN external_exam_item_details.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN external_exam_item_details.external_exam_item_detail_code IS '外部コード検査項目明細CD';
+COMMENT ON COLUMN external_exam_item_details.created_at IS '作成日時';
+COMMENT ON COLUMN external_exam_item_details.created_by IS '作成者';
 
 COMMENT ON TABLE home_menus IS 'ホームメニュー';
 COMMENT ON COLUMN home_menus.home_menu_id IS 'ホームメニューID';

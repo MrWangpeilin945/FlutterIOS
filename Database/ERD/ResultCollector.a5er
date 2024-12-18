@@ -973,7 +973,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=3100
-Top=1900
+Top=1700
 Field="ID","option_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="入力値","value","text","NOT NULL",,"","",$FFFFFFFF,""
@@ -981,7 +981,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241204194235
-Position="MAIN",3100,1900,606,99
+Position="MAIN",3100,1700,606,99
 ZOrder=55
 
 [Relation]
@@ -1074,7 +1074,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=3100
-Top=2100
+Top=1850
 Field="選択肢ID","option_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="コード","code","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
@@ -1084,7 +1084,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241205154756
-Position="MAIN",3100,2100
+Position="MAIN",3100,1850
 ZOrder=62
 
 [Relation]
@@ -1795,3 +1795,43 @@ Bar3=374
 TermPos1=R
 TermPos2=R
 ZOrder=96
+
+[Entity]
+PName=external_exam_item_details
+LName=外部検査項目明細
+Comment=
+TableInnerOption=
+TableOption=
+Page=Main
+Left=3100
+Top=2100
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="外部コード検査項目明細CD","external_exam_item_detail_code","text","NOT NULL",1,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241218133856
+Position="Main",3100,2100
+ZOrder=100
+
+[Relation]
+Entity1=exam_item_details
+Entity2=external_exam_item_details
+RelationType1=3
+RelationType2=3
+Fields1=exam_item_detail_id
+Fields2=exam_item_detail_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,7622,2378,7723,R,R,""
+Dependence=0
+Caption=
+PName=
+ModifiedDateTime=20241218133955
+LineMode=0
+Bar1=762
+Bar2=238
+Bar3=772
+TermPos1=R
+TermPos2=R
+ZOrder=101
