@@ -49,7 +49,7 @@ export default function consultInput() {
     useDisclosure(false);
   const [openedConfirm, { open: openConfirm, close: closeConfirm }] =
     useDisclosure(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [commonMessage, setCommonMessage] = useState<string>("");
   const [confirmMessage, setConfirmMessage] = useState<string>("");
   const [visibleRemeasurement, setVisibleRemeasurement] = useState(true);
   const [disabledRemeasurement, setDisabledRemeasurement] = useState(false);
@@ -71,13 +71,13 @@ export default function consultInput() {
     //受診番号の受け取り確認
     //TODO:仕様変更予定
     if (!consultnumber) {
-      setErrorMessage("必要な受診番号がありません");
+      setCommonMessage("必要な受診番号がありません");
       openCommon();
       return;
     }
     //検査メニューIDの受け取り確認
     if (!examMenuId) {
-      setErrorMessage("必要な検査メニューIDがありません");
+      setCommonMessage("必要な検査メニューIDがありません");
       open();
       return;
     }
@@ -90,13 +90,13 @@ export default function consultInput() {
         setExamData(result.data.data);
       } else if (result.error) {
         if (result.error.status === 400) {
-          setErrorMessage(
+          setCommonMessage(
             getErrorMessage(errorMessages.invalid, "受診番号と検査項目"),
           );
         } else if (result.error.status === 404) {
-          setErrorMessage(getErrorMessage(errorMessages.notFound, "検査項目"));
+          setCommonMessage(getErrorMessage(errorMessages.notFound, "検査項目"));
         } else if (result.error.status === 500) {
-          setErrorMessage(getErrorMessage(errorMessages.serverError));
+          setCommonMessage(getErrorMessage(errorMessages.serverError));
         }
         openCommon();
       }
@@ -135,13 +135,6 @@ export default function consultInput() {
     //TODO:初期表示の時だけ処理を走らせるか確認
     handleRemeasurementCheck();
   }, [examData, connectionEquipmentState]);
-
-  const callbackCloseModal = () => {
-    close();
-    if (!consultnumber || !examMenuId) {
-      navigate(-1);
-    }
-  };
 
   //機器連携：監視用
   useEffect(() => {
@@ -241,7 +234,7 @@ export default function consultInput() {
   //エラーレベルによる分岐処理
   const errorBranch = (errorLevel?: number) => {
     if (errorLevel === 3) {
-      setErrorMessage("エラーがあります。内容を確認してください"); //改行文字入れるかも
+      setCommonMessage("エラーがあります。内容を確認してください"); //改行文字入れるかも
       openCommon();
     } else if (errorLevel === 2) {
       setConfirmMessage("ワーニングがありますが、登録します。よろしいですか。");
@@ -252,15 +245,15 @@ export default function consultInput() {
   };
 
   //AP1013_検査結果を検証する
+  const verifyMutateAsync = useResultVerifyResults().mutateAsync;
   const verifyResults = async () => {
-    const { mutateAsync } = useResultVerifyResults();
     let result: AxiosResponse<VerifyExamItems>;
     const resultsRequest = makeBody();
     if (!consultnumber) return;
-
+    
     const postMutateAsync = async () => {
       try {
-        result = await mutateAsync({
+        result = await verifyMutateAsync({
           version: "1",
           consultNumber: consultnumber,
           data: resultsRequest,
@@ -291,7 +284,7 @@ export default function consultInput() {
           }
         }
         // 共通ダイアログにエラーメッセージを表示
-        setErrorMessage(errorMessage);
+        setCommonMessage(errorMessage);
         openCommon();
       }
     };
@@ -318,14 +311,14 @@ export default function consultInput() {
   };
 
   //AP1014_検査結果を登録する
+  const registMutateAsync = useResultRegisterResults().mutateAsync;
   const registerResults = async () => {
-    const { mutateAsync } = useResultRegisterResults();
     let result: AxiosResponse;
     const resultsRequest = makeBody();
     if (!consultnumber) return;
     const postMutateAsync = async () => {
       try {
-        result = await mutateAsync({
+        result = await registMutateAsync({
           version: "1",
           consultNumber: consultnumber,
           data: resultsRequest,
@@ -357,7 +350,7 @@ export default function consultInput() {
           }
         }
         // 共通ダイアログにエラーメッセージを表示
-        setErrorMessage(errorMessage);
+        setCommonMessage(errorMessage);
         openCommon();
       }
     };
@@ -519,14 +512,14 @@ export default function consultInput() {
           message={confirmMessage}
           confirmButtonMessage={"登録する"}
           isOpen={openedConfirm}
-          onCancel={callbackCloseModal}
+          onCancel={closeConfirm}
           onConfirm={callbackRegister}
         />
         <CommonDialog
-          message={errorMessage}
+          message={commonMessage}
           buttonMessage={"確認する"}
           isOpen={openedCommon}
-          onClose={callbackCloseModal}
+          onClose={closeCommon}
         />
         <CommonFooter />
       </AuthWrapper>
