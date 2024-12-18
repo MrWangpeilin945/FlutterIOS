@@ -146,7 +146,7 @@ export default function ExamVision({
         (value) => value === "" || /^\d+(\.\d+)?$/.test(value),
         getErrorMessage(errorMessages.numericString, `${name}は`),
       );
-    
+
     const result = schema.safeParse(value);
 
     if (!result.success) {
@@ -416,8 +416,7 @@ export default function ExamVision({
                   {/* 検査項目明細単位 */}
                   {item.examItemDetails?.map((detail) => {
                     const isDisabled =
-                      // !detail.hasOrder ||
-                      !!detail.cancelReasonId;
+                      !detail.hasOrder || !!detail.cancelReasonId;
 
                     let isBothEyes = false;
                     if (isCorrection) {
