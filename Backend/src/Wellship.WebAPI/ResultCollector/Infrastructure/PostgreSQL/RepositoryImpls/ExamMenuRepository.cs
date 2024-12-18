@@ -135,6 +135,7 @@ public class ExamMenuRepository : IExamMenuRepository
                             MenuNoteId = x.MenuNoteId,
                             Name = x.Name,
                             ExamMenuId = x.ExamMenuId,
+                            Suffix = "", // TODO:
                             ExamItemNotes = noteExamItems.Where(n => n.MenuNoteId == x.MenuNoteId)
                                                          .OrderBy(n => n.OrderNumber)
                                                          .Select(n => new MenuNoteExamItem()
@@ -146,7 +147,7 @@ public class ExamMenuRepository : IExamMenuRepository
                                                      .Select(n => new MenuNoteExamResult()
                                                      {
                                                          SourceType = (SourceType)n.SourceType,
-                                                         ExamItemDetailId = n.ExamItemDetailId
+                                                         ExamItemDetailId = n.ExamItemDetailId,
                                                      })
                         });
     }

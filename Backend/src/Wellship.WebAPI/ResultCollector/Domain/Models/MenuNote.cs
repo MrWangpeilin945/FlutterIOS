@@ -1,7 +1,7 @@
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 /// <summary>
-/// 検査メニュー特記
+/// 検査メニュー特記マスタ
 /// 表示用の設定
 /// </summary>
 public class MenuNote
@@ -20,6 +20,11 @@ public class MenuNote
     /// 検査メニューID
     /// </summary>
     public required int ExamMenuId { get; init; }
+
+    /// <summary>
+    /// 接尾辞
+    /// </summary>
+    public required string Suffix { get; init; }
 
     /// <summary>
     /// 検査メニュー特記と検査項目特記の関連

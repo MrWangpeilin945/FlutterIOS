@@ -1,7 +1,7 @@
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 /// <summary>
-/// 検査メニュー特記_検査項目特記
+/// 検査メニュー特記マスタ_検査項目特記
 /// </summary>
 public class MenuNoteExamItem
 {

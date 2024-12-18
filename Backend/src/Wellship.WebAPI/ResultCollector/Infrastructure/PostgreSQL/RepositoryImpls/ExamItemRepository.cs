@@ -247,4 +247,35 @@ public class ExamItemRepository : IExamItemRepository
                                              })
         });
     }
+
+    /// <summary>
+    /// 検査項目明細とその子要素を取得します。
+    /// </summary>
+    /// <param name="examItemDetailIds">検査項目明細ID</param>
+    public async Task<IEnumerable<ExamItemDetailChild>> GetExamItemDetailChildrenAsync(IEnumerable<int> examItemDetailIds)
+    {
+        // TODO: SQLを書く。
+        return [
+            new ExamItemDetailChild(){
+                ExamItemDetailId = 1,
+                Name = "",
+                PositionNumber = 1,
+                EquipmentLabel = "",
+                Unit = "",
+                Type = ExamItemDetailType.選択,
+                KeyboardType = KeyboardType.選択肢,
+                Keyboards = [],
+                IntegerLength = 0,
+                DecimalLength = 0,
+                DetailOptions = [
+                    new(){
+                        Code = "1",
+                        ExamItemDetailId = 1,
+                        Name = "",
+                        OrderNumber = 1
+                    }
+                ]
+            }
+        ];
+    }
 }
