@@ -10,7 +10,11 @@ import {
   Flex,
 } from "@mantine/core";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
-import type { InputExamItem } from "~/domain/wellship.schemas";
+import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
+import type {
+  InputExamItem,
+  ExamRegistResult,
+} from "~/domain/wellship.schemas";
 import { InputErrorLevel } from "~/domain/enums";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
@@ -67,7 +71,27 @@ export default function ExamFreeInput({
     return item;
   };
 
+  // APIからのエラーメッセージを保存
+  const APIErrors = examItems.map((item) => ({
+    positionNumber: item.positionNumber,
+    examRegistResults: item.examRegistResults || [],
+  }));
+  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  const resetErrorMessages = (item: InputExamItem) => {
+    const targetError = APIErrors.find(
+      (error) => error.positionNumber === item.positionNumber
+    );
+    if (targetError) {
+      item.examRegistResults = targetError.examRegistResults;
+    }
+    return item;
+  };
+
   const validationCheck = (item: InputExamItem) => {
+    // APIエラーメッセージで初期化
+    resetErrorMessages(item);
+    // コールバック判断用のコンポーネントのエラーメッセージ
+    const componentErrorMessage: ExamRegistResult[] = [];
     // 必須チェック行うスキーマ
     const schema = z
       .string()
@@ -78,31 +102,34 @@ export default function ExamFreeInput({
       "";
     const result = schema.safeParse(valueToValidate);
 
-    // エラーメッセージを更新
-    let updatedErrors = item.examRegistResults || [];
-
-    // 必須エラーを削除
-    const errorMessageRequired = getErrorMessage(
-      errorMessages.required,
-      `${item.name}は`
-    );
-    updatedErrors = updatedErrors.filter(
-      (error) => error.description !== errorMessageRequired
-    );
-
     // バリデーションが失敗した場合
     if (!result.success) {
       const error = result.error.errors[0];
-      updatedErrors.push({
+      componentErrorMessage.push({
         description: error.message,
         errorLevel: InputErrorLevel.異常,
       });
     }
-    const validatedItem = {
+    // 基準値によるエラーメッセージを追加
+    componentErrorMessage.push(...setRangesErrorMessage(item));
+    // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
+    const isCallback = !componentErrorMessage.some(
+      (error) => error.errorLevel === 3
+    );
+    // エラーメッセージをexamItemに保存
+    const resultItem: InputExamItem = {
       ...item,
-      examRegistResults: updatedErrors,
+      examRegistResults: item.examRegistResults
+        ? item.examRegistResults.concat(componentErrorMessage)
+        : componentErrorMessage,
     };
-    return handleErrorMessage(validatedItem);
+    // バリデーションチェックを行ったexamItemと、
+    // コールバックを判断するフラグを返す
+    const ValidationResult = {
+      validateResult: handleErrorMessage(resultItem),
+      hasCallback: isCallback,
+    };
+    return ValidationResult;
   };
 
   useEffect(() => {
@@ -111,7 +138,7 @@ export default function ExamFreeInput({
       if (item.positionNumber === 1) {
         let validatedData: InputExamItem = item;
         if (onRegisterPressed) {
-          validatedData = validationCheck(item);
+          validatedData = validationCheck(item).validateResult;
         }
         return validatedData;
       }
@@ -123,33 +150,28 @@ export default function ExamFreeInput({
   // 変更を保存し、コールバックする
   const handleChange = (value: string) => {
     const updatedExamItems = [...examItemsData];
+
+    // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
+    let hasValidationError = true;
+
     for (const item of updatedExamItems) {
       if (item.positionNumber === 1) {
         item.examItemDetails = item.examItemDetails?.map((detail) =>
           detail.positionNumber === 1 ? { ...detail, value: value } : detail
         );
-        const validatedItem = validationCheck(item);
-        Object.assign(item, validatedItem);
+        // バリデーションチェックを実施
+        const { validateResult, hasCallback } = validationCheck(item);
+        if (!hasCallback) {
+          // falseのexamItemがあればコールバックを行わない
+          hasValidationError = false;
+        }
+        Object.assign(item, validateResult);
       }
     }
     // 値の保存
     setExamItemsData(updatedExamItems);
 
-    // 必須エラーの存在を確認
-    const hasValidationError = updatedExamItems.some(
-      (item) =>
-        item.positionNumber === 1 &&
-        item.examRegistResults?.some(
-          (error) =>
-            error.description ===
-            getErrorMessage(
-              errorMessages.required,
-              `${firstPositionExamItem?.name}は`
-            )
-        )
-    );
-
-    // 必須エラーがない場合にのみコールバック
+    // APIエラー以外で異常エラーが無い場合、コールバックを行う
     if (!hasValidationError) {
       onChange(updatedExamItems);
     }
