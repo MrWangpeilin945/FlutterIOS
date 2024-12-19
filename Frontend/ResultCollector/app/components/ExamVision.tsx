@@ -18,7 +18,7 @@ import {
   IconSquareRoundedXFilled,
 } from "@tabler/icons-react";
 import { z } from "zod";
-import { InputErrorLevel } from "~/domain/enums";
+import { InputErrorLevel, KeyboardType } from "~/domain/enums";
 import type {
   ExamItemDetail,
   ExamRegistResult,
@@ -44,6 +44,28 @@ export default function ExamVision({
   if (!examItems || examItems.length === 0) {
     return null;
   }
+  // 定数で定義
+  const 裸眼 = 1;
+  const 矯正 =2;
+  const 特記 = 3;
+  const 両眼 = 3;
+  const 矯正区分_左 = 1;
+  const 矯正区分_右 = 2;
+  const 矯正入力値_左 =3;
+  const 矯正入力値_右 =4;
+  const 矯正入力値_両眼 =5;
+
+  // 必要なpositionNumberがすべて存在するか確認
+  const visionItemPositionNumbers = [裸眼, 矯正, 特記];
+  const missingNumbers = visionItemPositionNumbers.filter(
+    (position) =>
+      !examItems.some((item) => item.positionNumber === position)
+  );
+
+  if (missingNumbers.length > 0) {
+    return null; // 存在しない場合、表示しない。
+  }
+
   const [examItemsData, setExamItemsData] = useState(examItems);
 
   // キーボードの表示状態をオブジェクトで管理
@@ -51,6 +73,17 @@ export default function ExamVision({
     itemNumber: number;
     detailNumber: number;
   } | null>(null);
+
+  useEffect(() => {
+    let newItems = [...examItems];
+    // 登録ボタンフラグがtrueの場合、必須チェック
+    if (onRegisterPressed) {
+      newItems = requiredCheck(newItems);
+    }
+    setExamItemsData(newItems);
+  }, [onRegisterPressed, examItems]);
+
+  // キーボード以外の部分を押下時に非表示
   const closeKeyboard = useClickOutside(() => {
     setActiveKeyboard(null);
   });
@@ -88,7 +121,7 @@ export default function ExamVision({
     return item;
   };
 
-  // 全項目が存在しないかをチェック
+  // 1項目でも入力されているかをチェック
   const requiredCheck = (examItems: InputExamItem[]) => {
     const allEmpty = examItems.every((item) =>
       (item.examItemDetails ?? []).every((detail) => !detail.value),
@@ -99,7 +132,7 @@ export default function ExamVision({
 
       if (allEmpty) {
         // メッセージを追加
-        if (item.positionNumber === 1 || item.positionNumber === 2) {
+        if (item.positionNumber === 裸眼 || item.positionNumber === 矯正) {
           updatedResults.push({
             description: getErrorMessage(errorMessages.required, "視力は"),
             errorLevel: InputErrorLevel.異常,
@@ -124,15 +157,6 @@ export default function ExamVision({
       });
     });
   };
-
-  useEffect(() => {
-    let newItems = [...examItems];
-    // 登録ボタンフラグがtrueの場合、必須チェック
-    if (onRegisterPressed) {
-      newItems = requiredCheck(newItems);
-    }
-    setExamItemsData(newItems);
-  }, [onRegisterPressed, examItems]);
 
   // 半角数字チェック
   const validateNumeric = (
@@ -226,13 +250,13 @@ export default function ExamVision({
 
       // 矯正の値が入力された場合に、矯正区分が選択されているかチェック
       if (
-        item.positionNumber === 2 &&
-        (detail.positionNumber === 3 || detail.positionNumber === 4)
+        item.positionNumber === 矯正 &&
+        (detail.positionNumber === 矯正入力値_左 || detail.positionNumber === 矯正入力値_右)
       ) {
         const targetDetail =
-          detail.positionNumber === 3
-            ? item.examItemDetails?.find((d) => d.positionNumber === 1)
-            : item.examItemDetails?.find((d) => d.positionNumber === 2);
+          detail.positionNumber === 矯正入力値_左
+            ? item.examItemDetails?.find((d) => d.positionNumber === 矯正区分_左)
+            : item.examItemDetails?.find((d) => d.positionNumber === 矯正区分_右);
 
         updatedErrors = collectionCheck(
           detail.value ?? "",
@@ -308,9 +332,9 @@ export default function ExamVision({
     );
 
     // 矯正の入力値の場合、裸眼の入力値に空文字列を設定
-    if (itemNumber === 2 && (detailNumber === 3 || detailNumber === 4)) {
-      const nakedItemNumber = 1;
-      const targetDetailNumber = detailNumber === 3 ? 1 : 2;
+    if (itemNumber === 矯正 && (detailNumber === 矯正入力値_右 || detailNumber === 矯正入力値_左)) {
+      const nakedItemNumber = 裸眼;
+      const targetDetailNumber = detailNumber === 矯正入力値_左 ? 矯正区分_左 : 矯正区分_右;
       const nakedValue = getValueByPositionNumbers(
         updatedExamItems,
         nakedItemNumber,
@@ -386,7 +410,7 @@ export default function ExamVision({
         </Flex>
         {/* 検査項目単位 */}
         {examItemsData.map((item) => {
-          const isCorrection = item.positionNumber === 2;
+          const isCorrection = item.positionNumber === 矯正;
           return (
             <>
               <Group key={item.positionNumber} gap={16} w={1716} mt={16}>
@@ -420,9 +444,9 @@ export default function ExamVision({
 
                     let isBothEyes = false;
                     if (isCorrection) {
-                      isBothEyes = detail.positionNumber === 5;
+                      isBothEyes = detail.positionNumber === 両眼;
                     } else {
-                      isBothEyes = detail.positionNumber === 3;
+                      isBothEyes = detail.positionNumber === 矯正入力値_両眼;
                     }
                     //選択ボタン用
                     const isSelector =
@@ -548,9 +572,9 @@ export default function ExamVision({
                   return (
                     <Group key={index} c={isWarning ? "warning" : "error"}>
                       {isWarning ? (
-                        <IconExclamationCircleFilled size="32px" />
+                        <IconExclamationCircleFilled size={32} />
                       ) : (
-                        <IconSquareRoundedXFilled size="32px" />
+                        <IconSquareRoundedXFilled size={32} />
                       )}
                       <Text size="sm" fw={700}>
                         {error.description}
@@ -588,7 +612,7 @@ export default function ExamVision({
                               : "auto"
                         }
                       >
-                        {detail?.keyboard?.keyboardType === 1 ? (
+                        {detail?.keyboard?.keyboardType === KeyboardType.テンキー ? (
                           <NumericKeyboard
                             value={detail?.value ?? ""}
                             onChange={(newValue) =>
