@@ -50,6 +50,7 @@ export default function ExamNumericLR({
   ) {
     return null;
   }
+
   const [examItemsData, setExamItemsData] = useState(examItems);
 
   // キーボードの表示インデックスを状態として管理する
@@ -108,13 +109,28 @@ export default function ExamNumericLR({
     return item;
   };
 
-  const validationCheck = (item: InputExamItem) => {
-    // エラーメッセージを更新
-    let updatedErrors = item.examRegistResults || [];
+  // APIからのエラーメッセージを保存
+  const APIErrors = examItems.map((item) => ({
+    positionNumber: item.positionNumber,
+    examRegistResults: item.examRegistResults || [],
+  }));
 
+  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  const resetErrorMessages = (item: InputExamItem) => {
+    const targetError = APIErrors.find(
+      (error) => error.positionNumber === item.positionNumber
+    );
+    if (targetError) {
+      item.examRegistResults = targetError.examRegistResults;
+    }
+    return item;
+  };
+
+  const validationCheck = (item: InputExamItem) => {
+    // APIエラーメッセージで初期化
+    resetErrorMessages(item);
     // コールバック判断用のコンポーネントのエラーメッセージ
     const componentErrorMessage: ExamRegistResult[] = [];
-
     // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
     for (const { name, positionNumber, value } of item.examItemDetails ?? []) {
       if (positionNumber !== 1 && positionNumber !== 2) {
@@ -138,24 +154,6 @@ export default function ExamNumericLR({
       const valueToValidate = value;
       const result = schema.safeParse(valueToValidate);
 
-      // 必須エラーを削除　TODO:削除をまとめて共通関数にしてもよいか、APIのエラーメッセージ確定後に確認
-      const errorMessageRequired = getErrorMessage(
-        errorMessages.required,
-        `${item.name}:${name}は`
-      );
-      updatedErrors = updatedErrors.filter(
-        (error) => error.description !== errorMessageRequired
-      );
-
-      // 半角数字エラーを削除
-      const errorMessageNumeric = getErrorMessage(
-        errorMessages.numericString,
-        `${item.name}:${name}は`
-      );
-      updatedErrors = updatedErrors.filter(
-        (error) => error.description !== errorMessageNumeric
-      );
-
       // バリデーションが失敗した場合
       if (!result.success) {
         const error = result.error.errors[0]; // 最初のエラーだけ取得
@@ -165,14 +163,6 @@ export default function ExamNumericLR({
         });
       }
     }
-    // 基準値によるエラーメッセージを削除
-    updatedErrors = updatedErrors.filter((error) => {
-      const description = error.description || "";
-      return !(
-        description === "入力値を確認してください。" ||
-        description === "入力に誤りがあります。"
-      );
-    });
 
     // 基準値によるエラーメッセージを追加
     componentErrorMessage.push(...setRangesErrorMessage(item));
@@ -183,7 +173,9 @@ export default function ExamNumericLR({
     // エラーメッセージをexamItemに保存
     const resultItem: InputExamItem = {
       ...item,
-      examRegistResults: updatedErrors.concat(componentErrorMessage),
+      examRegistResults: item.examRegistResults
+        ? item.examRegistResults.concat(componentErrorMessage)
+        : componentErrorMessage,
     };
     // バリデーションチェックを行ったexamItemと、
     // コールバックを判断するフラグを返す
