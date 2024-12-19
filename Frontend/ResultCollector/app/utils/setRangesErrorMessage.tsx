@@ -13,8 +13,11 @@ const getMaxErrorLevelsByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
       matchExamRanges: ExamNormalValueRange[],
       { value, examNormalValueRanges }
     ) => {
-      const numericValue = Number.parseFloat(value || "");
-      if (numericValue && examNormalValueRanges) {
+      const numericValue =
+        value !== undefined && value !== ""
+          ? Number.parseFloat(value)
+          : Number.NaN;
+      if (!Number.isNaN(numericValue) && examNormalValueRanges) {
         const matchRange = examNormalValueRanges.find(
           ({ minValue, maxValue }) =>
             typeof minValue === "number" &&
@@ -57,7 +60,7 @@ export const setRangesErrorMessage = (inputexamItem: InputExamItem) => {
     return inputexamItem;
   }
   // エラーレベルに応じたエラーメッセージを追加
-  const rangesErrorMessages = matchExamRanges
+  const rangesErrorMessages: ExamRegistResult[] = matchExamRanges
     .filter(({ errorLevel }) => errorLevel === 2 || errorLevel === 3)
     .map(({ errorLevel }) => ({
       description:
@@ -66,8 +69,5 @@ export const setRangesErrorMessage = (inputexamItem: InputExamItem) => {
           : "入力に誤りがあります。",
       errorLevel,
     }));
-
-  inputexamItem.examRegistResults.push(...rangesErrorMessages);
-
-  return inputexamItem;
+  return rangesErrorMessages;
 };
