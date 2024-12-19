@@ -33,7 +33,7 @@ public class Program
         });
 
         builder.Services.AddHealthChecks()
-                        .AddCheck<HealthCheck>("database");
+                        .AddCheck<HealthCheck>("app");
         builder.Services.AddRepositories();
         builder.Services.AddUseCases();
 
