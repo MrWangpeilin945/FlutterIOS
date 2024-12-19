@@ -11,6 +11,8 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// 団体を登録する。
         /// </summary>
         /// <param name="organizations">団体エンティティリスト</param>
-        public Task UpsertOrganaizationsAsync(List<OrganizationEntity> organizations);
+        /// <param name="createdAt">作成日時</param>
+        /// <param name="createdBy">作成者</param>
+        public Task UpsertOrganizationsAsync(List<OrganizationEntity> organizations, DateTime createdAt, string createdBy);
     }
 }

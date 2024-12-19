@@ -40,7 +40,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
             var stopwatch = Stopwatch.StartNew();
 
             var organizationList = Enumerable.Range(101, 10000)
-                .Select(i => new Organization { Code = (i * 10).ToString(), Name = "テスト更新団体" + i.ToString() })
+                .Select(i => new Organization { Code = (i * 10).ToString(), Name = "テスト更新団体" + i.ToString(), InputNote = (i*10).ToString() })
                 .ToList();
 
             stopwatch.Stop();

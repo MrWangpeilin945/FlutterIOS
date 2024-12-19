@@ -28,10 +28,11 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// 団体を登録する。
         /// </summary>
         /// <param name="organizations">団体エンティティリスト</param>
-        public async Task UpsertOrganaizationsAsync(List<OrganizationEntity> organizations)
+        /// <param name="createdAt">作成日時</param>
+        /// <param name="createdBy">作成者</param>
+        public async Task UpsertOrganizationsAsync(List<OrganizationEntity> organizations, DateTime createdAt, string createdBy)
         {
             using var scope = TransactionScopeHelper.GetTransactionScope();
-            try
             {
                 using var connection = await _dbConnectionProvider.GetOrOpenAsync();
                 {
@@ -39,9 +40,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                     string tempTableCreateSql = @"
                         create temp table temp_organizations (
                             organization_code text not null,
-                            name text not null,
-                            created_at timestamp(6) with time zone not null,
-                            created_by text not null
+                            name text not null
                         ) on commit drop;
                     ";
                     await connection.ExecuteAsync(tempTableCreateSql);
@@ -49,10 +48,10 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                     // 一時テーブルへの挿入
                     await BulkInsertHelper.BulkInsert(organizations,
                         organization =>
-                        $"({SqlFormatter.EscapeSqlValue(organization.OrganizationCode)}, " +
-                        $"{SqlFormatter.EscapeSqlValue(organization.Name)}, " +
-                        $"{SqlFormatter.EscapeSqlValue(organization.CreatedAt)}, " +
-                        $"{SqlFormatter.EscapeSqlValue(organization.CreatedBy)})",
+                        $"(" +
+                        $"{SqlFormatter.EscapeSqlValue(organization.OrganizationCode)}, " +
+                        $"{SqlFormatter.EscapeSqlValue(organization.Name)}" +
+                        $")",
                         "temp_organizations",
                         connection);
 
@@ -66,8 +65,8 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                             organization_code,
                             name,
                             max_order.max_number + row_number() over(),
-                            created_at,
-                            created_by
+                            @CreatedAt,
+                            @CreatedBy
                         from temp_organizations
                         cross join max_order_number as max_order
                         on conflict (organization_code)
@@ -76,14 +75,10 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                             created_at = excluded.created_at,
                             created_by = excluded.created_by;
                     ";
-                    await connection.ExecuteAsync(upsertSql);
+                    await connection.ExecuteAsync(upsertSql, new { CreatedAt = createdAt, CreatedBy = createdBy });
                 }
 
                 scope.Complete();
-            }
-            catch (Exception)
-            {
-                throw;
             }
         }
     }

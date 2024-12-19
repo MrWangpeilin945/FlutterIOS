@@ -33,13 +33,11 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
             var organizationEntities = organizations.Select(item =>new OrganizationEntity
             {
                 OrganizationCode = item.Code,
-                Name = item.Name,
-                CreatedAt = DateTime.Now,
-                CreatedBy = "ExternalConnection"
+                Name = item.Name
             }).ToList();
 
             // 団体登録
-            await _organizationRepository.UpsertOrganaizationsAsync(organizationEntities);
+            await _organizationRepository.UpsertOrganizationsAsync(organizationEntities, DateTime.Now, "ExternalConnection");
 
             return _errorObjects;
         }
