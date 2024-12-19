@@ -8,7 +8,7 @@ type BoothNoteProps = {
 
 export default function BoothNote({ relatedExamItems }: BoothNoteProps) {
   // 配列の要素がない時は空を返す
-  if (relatedExamItems?.length === 0) {
+  if (!relatedExamItems || relatedExamItems?.length === 0) {
     return null;
   }
 
