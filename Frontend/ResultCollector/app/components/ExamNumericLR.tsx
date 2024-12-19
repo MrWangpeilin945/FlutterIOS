@@ -1,4 +1,3 @@
-import type React from "react";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import {
@@ -110,10 +109,6 @@ export default function ExamNumericLR({
   };
 
   const validationCheck = (item: InputExamItem) => {
-    // positionNumberが異なる場合、処理を行わない
-    if (item.positionNumber !== 1) {
-      return item;
-    }
     // エラーメッセージを更新
     let updatedErrors = item.examRegistResults || [];
 
@@ -143,7 +138,7 @@ export default function ExamNumericLR({
       const valueToValidate = value;
       const result = schema.safeParse(valueToValidate);
 
-      // 必須エラーを削除
+      // 必須エラーを削除　TODO:削除をまとめて共通関数にしてもよいか、APIのエラーメッセージ確定後に確認
       const errorMessageRequired = getErrorMessage(
         errorMessages.required,
         `${item.name}:${name}は`
@@ -170,23 +165,43 @@ export default function ExamNumericLR({
         });
       }
     }
-    // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
+    // 基準値によるエラーメッセージを削除
+    updatedErrors = updatedErrors.filter((error) => {
+      const description = error.description || "";
+      return !(
+        description === "入力値を確認してください。" ||
+        description === "入力に誤りがあります。"
+      );
+    });
 
-    const prevItem = {
+    // 基準値によるエラーメッセージを追加
+    componentErrorMessage.push(...setRangesErrorMessage(item));
+    // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
+    const isCallback = !componentErrorMessage.some(
+      (error) => error.errorLevel === 3
+    );
+    // エラーメッセージをexamItemに保存
+    const resultItem: InputExamItem = {
       ...item,
       examRegistResults: updatedErrors.concat(componentErrorMessage),
     };
-    const rangesValidatedItem = setRangesErrorMessage(prevItem);
-    return handleErrorMessage(rangesValidatedItem);
+    // バリデーションチェックを行ったexamItemと、
+    // コールバックを判断するフラグを返す
+    const ValidationResult = {
+      validateResult: handleErrorMessage(resultItem),
+      hasCallback: isCallback,
+    };
+    return ValidationResult;
   };
 
   useEffect(() => {
     const updatedItems = examItems.map((item) => {
-      let validatedData: InputExamItem = item;
+      let validatedData = item;
       // onRegisterPressedがtrueの場合のみvalidationCheckを実行
       if (onRegisterPressed) {
-        validatedData = validationCheck(item);
+        validatedData = validationCheck(validatedData).validateResult;
       }
+
       return validatedData;
     });
     setExamItemsData(updatedItems);
@@ -203,6 +218,8 @@ export default function ExamNumericLR({
       return null;
     }
     const updatedExamItems = [...examItemsData];
+    // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
+    let hasValidationError = true;
 
     // 該当するアイテムを更新
     for (const item of updatedExamItems) {
@@ -223,35 +240,30 @@ export default function ExamNumericLR({
         }
       }
       // バリデーションチェックを実施
-      const validatedItem = validationCheck(item);
+      const { validateResult, hasCallback } = validationCheck(item);
+      if (!hasCallback) {
+        // falseのexamItemがあればコールバックを行わない
+        hasValidationError = false;
+      }
       // バリデーション結果を反映
-      Object.assign(item, validatedItem);
+      Object.assign(item, validateResult);
     }
-
     // 更新されたデータをステートに設定
     setExamItemsData(updatedExamItems);
-    // API以外の異常エラーが存在するか確認
-    const isValidatedError = updatedExamItems.some((item) =>
-      item.examRegistResults?.some(
-        (error) =>
-          error.description ===
-            getErrorMessage(errorMessages.required, `${item.name}は`) ||
-          error.description ===
-            getErrorMessage(errorMessages.numericString, `${item.name}は`) ||
-          error.description === "入力に誤りがあります。"
-      )
-    );
 
-    if (!isValidatedError) {
+    if (hasValidationError) {
       onChange(updatedExamItems);
     }
   };
 
+  // positionNumberが1のexamItemを描写
   const firstPositionItem = examItemsData.find(
     (item) => item.positionNumber === 1
   );
   const { positionNumber, examItemDetails, examRegistResults, name } =
     firstPositionItem ?? {};
+
+  // positionNumberが1,2のexamItemDetailを描写
   const targetDetails = examItemDetails?.filter(
     (detail) => detail.positionNumber === 1 || detail.positionNumber === 2
   );
