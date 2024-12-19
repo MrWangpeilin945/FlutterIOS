@@ -193,8 +193,8 @@ export default function ExamFreeInput({
                 : ""
             }`,
           }}
-          w={"524"}
-          radius={"md"}
+          w={524}
+          radius="md"
           size="sm"
           value={firstPositionDetail?.value}
           onChange={(e) => handleChange(e.currentTarget.value)}
@@ -232,7 +232,7 @@ export default function ExamFreeInput({
           key={index}
           c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
         >
-          <IconExclamationCircleFilled size={"1.7rem"} />
+          <IconExclamationCircleFilled size={32} />
           <Text>{error.description}</Text>
         </Group>
       ))}
