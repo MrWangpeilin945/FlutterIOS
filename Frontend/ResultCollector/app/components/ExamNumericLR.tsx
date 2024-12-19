@@ -168,7 +168,7 @@ export default function ExamNumericLR({
     componentErrorMessage.push(...setRangesErrorMessage(item));
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === 3
+      (error) => error.errorLevel === InputErrorLevel.異常
     );
     // エラーメッセージをexamItemに保存
     const resultItem: InputExamItem = {
