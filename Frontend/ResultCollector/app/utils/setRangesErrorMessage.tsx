@@ -4,6 +4,7 @@ import type {
   ExamRegistResult,
   ExamNormalValueRange,
 } from "~/domain/wellship.schemas";
+import { InputErrorLevel } from "~/domain/enums";
 
 // 受け取ったExamItemDetailsから
 // それぞれの最も高いエラーレベルに該当するExamNormalValueRangeを返す
@@ -51,10 +52,14 @@ export const setRangesErrorMessage = (inputexamItem: InputExamItem) => {
   }
   // エラーレベルに応じたエラーメッセージを追加
   const rangesErrorMessages: ExamRegistResult[] = matchExamRanges
-    .filter(({ errorLevel }) => errorLevel === 2 || errorLevel === 3)
+    .filter(
+      ({ errorLevel }) =>
+        errorLevel === InputErrorLevel.警告 ||
+        errorLevel === InputErrorLevel.異常
+    )
     .map(({ errorLevel }) => ({
       description:
-        errorLevel === 2
+        errorLevel === InputErrorLevel.警告
           ? "入力値を確認してください。"
           : "入力に誤りがあります。",
       errorLevel,
