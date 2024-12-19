@@ -176,7 +176,7 @@ list.Count()  <> 0
 *** ErrorObject
 **** Code `10001`
 **** Message `指定されたOrganizationCodeがシステム上に存在しません。Code:[Examinee.Affiliations.OrganizationCode]`
-**** InputNote [Examinee,InputNote]
+**** InputNote `[Examinee.InputNote]`
 
 ==== 処理(Repository)
 
