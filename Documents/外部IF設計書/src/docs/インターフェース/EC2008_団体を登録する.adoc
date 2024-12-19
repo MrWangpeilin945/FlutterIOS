@@ -127,7 +127,11 @@ list.Count()  <> 0
 
 * None
 
-==== 検証
+==== ERROR検証
+
+* None
+
+==== WORNING検証
 
 * None
 
