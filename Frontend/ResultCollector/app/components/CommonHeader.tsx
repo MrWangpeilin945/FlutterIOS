@@ -35,6 +35,7 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
             p={32}
             top={67}
             left={0}
+            pos="fixed"
             style={{ borderBottomLeftRadius: 8, borderBottomRightRadius: 8 }}
             bg="white01"
           >
