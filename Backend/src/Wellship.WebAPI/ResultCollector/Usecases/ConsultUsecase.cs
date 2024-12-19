@@ -117,7 +117,7 @@ public class ConsultUsecase : IConsultUsecase
         // 未受診の検査メニューを取得
         var unexaminedItems = await GetUnexaminedMenusAsync(consultNumber);
         // 同姓同名アラート
-        var sameNameAlert = await _placeScheduleRepository.IsSamename(consultNumber);
+        var sameNameAlert = await _placeScheduleRepository.IsSamenameAsync(consultNumber);
 
         return new ExamContent()
         {

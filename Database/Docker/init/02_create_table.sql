@@ -93,13 +93,6 @@ CREATE TABLE exam_cancels (
   , CONSTRAINT exam_cancels_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
 );
 
-CREATE TABLE exam_decision_rule (
-  id integer NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT exam_decision_rule_PKC PRIMARY KEY (id)
-);
-
 CREATE TABLE exam_item_detail_orders (
   consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
@@ -164,7 +157,7 @@ ALTER TABLE exam_normal_value_range ADD CONSTRAINT exam_normal_value_range_IX1
 CREATE TABLE exam_result_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_id uuid NOT NULL
-  , consult_item_detail_id integer NOT NULL
+  , exam_item_detail_id integer NOT NULL
   , value text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -762,20 +755,6 @@ COMMENT ON COLUMN exam_cancels.cancel_reason_id IS '中止理由';
 COMMENT ON COLUMN exam_cancels.created_at IS '作成日時';
 COMMENT ON COLUMN exam_cancels.created_by IS '作成者';
 
-COMMENT ON TABLE exam_item_detail_options IS '検査項目明細_選択肢';
-COMMENT ON COLUMN exam_item_detail_options.option_id IS '選択肢ID';
-COMMENT ON COLUMN exam_item_detail_options.code IS 'コード';
-COMMENT ON COLUMN exam_item_detail_options.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_item_detail_options.name IS '名称';
-COMMENT ON COLUMN exam_item_detail_options.order_number IS '表示順';
-COMMENT ON COLUMN exam_item_detail_options.created_at IS '作成日時';
-COMMENT ON COLUMN exam_item_detail_options.created_by IS '作成者';
-
-COMMENT ON TABLE exam_decision_rule IS '検査実施判断ルール';
-COMMENT ON COLUMN exam_decision_rule.id IS 'ID';
-COMMENT ON COLUMN exam_decision_rule.created_at IS '作成日時';
-COMMENT ON COLUMN exam_decision_rule.created_by IS '作成者';
-
 COMMENT ON TABLE exam_item_detail_orders IS '検査項目明細依頼';
 COMMENT ON COLUMN exam_item_detail_orders.consult_id IS '受診ID';
 COMMENT ON COLUMN exam_item_detail_orders.exam_item_detail_id IS '検査項目明細ID';
@@ -824,7 +803,7 @@ COMMENT ON COLUMN exam_normal_value_range.created_by IS '作成者';
 COMMENT ON TABLE exam_result_histories IS '検査結果履歴';
 COMMENT ON COLUMN exam_result_histories.id IS 'ID';
 COMMENT ON COLUMN exam_result_histories.consult_id IS '受診ID';
-COMMENT ON COLUMN exam_result_histories.consult_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_result_histories.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_result_histories.value IS '値';
 COMMENT ON COLUMN exam_result_histories.created_at IS '作成日時';
 COMMENT ON COLUMN exam_result_histories.created_by IS '作成者';

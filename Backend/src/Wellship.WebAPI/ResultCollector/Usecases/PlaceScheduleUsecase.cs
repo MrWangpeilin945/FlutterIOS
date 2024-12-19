@@ -96,7 +96,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
             PlaceId = placeSchedule.PlaceId,
             PlaceName = placeSchedule.PlaceName,
             ExamDate =  DateOnly.FromDateTime(placeSchedule.ExamDate),
-            PlaceScheduleLockingStatus = placeSchedule.Status,
+            PlaceScheduleLockingStatus = (int)placeSchedule.Status,
             UpdatedAt = placeSchedule.CreatedAt,
             UpdatedBy = placeSchedule.CreatedBy
         };

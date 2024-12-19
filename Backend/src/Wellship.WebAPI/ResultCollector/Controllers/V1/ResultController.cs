@@ -55,9 +55,9 @@ public class ResultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/results")]
-    public IActionResult RegisterResults([FromRoute][Required] string consultNumber, [FromBody] ResultsRequest results)
+    public async Task<IActionResult> RegisterResults([FromRoute][Required] string consultNumber, [FromBody] ResultsRequest results)
     {
-        _resultUsecase.RegisterResults();
+        await _resultUsecase.RegisterResultsAsync(consultNumber, results);
         return Ok();
     }
 }

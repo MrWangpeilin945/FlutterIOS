@@ -1,4 +1,4 @@
-using Ryobi.Wellship.APIModels.Responses;
+using Ryobi.Wellship.APIModels.Requests;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -15,5 +15,5 @@ public interface IResultUsecase
     /// <summary>
     /// 検査結果を登録する
     /// </summary>
-    public void RegisterResults();
+    public Task RegisterResultsAsync(string consultNumber, ResultsRequest results);
 }

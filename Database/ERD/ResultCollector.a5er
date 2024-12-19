@@ -1057,12 +1057,12 @@ Left=900
 Top=2650
 Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="受診ID","consult_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
-Field="検査項目明細ID","consult_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="値","value","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241127145031
+ModifiedDateTime=20241219132630
 Position="MAIN",900,2650
 ZOrder=60
 
@@ -1736,6 +1736,7 @@ Bar3=432
 TermPos1=R
 TermPos2=R
 ZOrder=99
+
 [Entity]
 PName=prior_exam_menus
 LName=前提検査メニュー
@@ -1803,7 +1804,7 @@ LName=外部検査項目明細
 Comment=
 TableInnerOption=
 TableOption=
-Page=Main
+Page=MAIN
 Left=3100
 Top=2100
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
@@ -1812,7 +1813,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241218133856
-Position="Main",3100,2100
+Position="MAIN",3100,2100
 ZOrder=100
 
 [Relation]
