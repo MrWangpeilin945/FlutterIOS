@@ -13,10 +13,13 @@ import {
   Button,
 } from "@mantine/core";
 import { useClickOutside } from "@mantine/hooks";
-import Keyboard from "~/components/NumericKeyboard";
+import NumericKeyboard from "~/components/NumericKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
-import type { InputExamItem } from "~/domain/wellship.schemas";
+import type {
+  InputExamItem,
+  ExamRegistResult,
+} from "~/domain/wellship.schemas";
 import { InputErrorLevel } from "~/domain/enums";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
@@ -114,6 +117,9 @@ export default function ExamNumericLR({
     // エラーメッセージを更新
     let updatedErrors = item.examRegistResults || [];
 
+    // コールバック判断用のコンポーネントのエラーメッセージ
+    const componentErrorMessage: ExamRegistResult[] = [];
+
     // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
     for (const { name, positionNumber, value } of item.examItemDetails ?? []) {
       if (positionNumber !== 1 && positionNumber !== 2) {
@@ -158,16 +164,17 @@ export default function ExamNumericLR({
       // バリデーションが失敗した場合
       if (!result.success) {
         const error = result.error.errors[0]; // 最初のエラーだけ取得
-        updatedErrors.push({
+        componentErrorMessage.push({
           description: error.message,
           errorLevel: InputErrorLevel.異常,
         });
       }
     }
+    // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
 
     const prevItem = {
       ...item,
-      examRegistResults: updatedErrors,
+      examRegistResults: updatedErrors.concat(componentErrorMessage),
     };
     const rangesValidatedItem = setRangesErrorMessage(prevItem);
     return handleErrorMessage(rangesValidatedItem);
@@ -210,7 +217,7 @@ export default function ExamNumericLR({
           // 該当するdetailの値を更新
           item.examItemDetails = item.examItemDetails?.map((detail) =>
             detail.positionNumber === detailsPositionNumber
-              ? { ...detail, value: value.slice(0, detail.integerLength ?? 3) }
+              ? { ...detail, value: value }
               : detail
           );
         }
@@ -231,7 +238,6 @@ export default function ExamNumericLR({
             getErrorMessage(errorMessages.required, `${item.name}は`) ||
           error.description ===
             getErrorMessage(errorMessages.numericString, `${item.name}は`) ||
-          //TODO:基準値エラーメッセージは未確定（部分一致予定）
           error.description === "入力に誤りがあります。"
       )
     );
@@ -268,71 +274,99 @@ export default function ExamNumericLR({
           </Title>
         </Paper>
         <Group gap={16}>
-          {targetDetails?.map((detail) => (
-            <Stack key={detail.positionNumber}>
-              <Paper
-                w={524}
-                h={51}
-                className={styles["basic-grey"]}
-                radius="itemName"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Title size="lg" fw={700}>
-                  {detail.name}
-                </Title>
-              </Paper>
-              <Group>
-                <TextInput
-                  classNames={{
-                    input: `${styles["input-textbox"]} ${
-                      firstPositionItem?.examRegistResults?.some(
-                        (x) => x.errorLevel === InputErrorLevel.異常
-                      )
-                        ? `${styles["input-error"]}`
-                        : firstPositionItem?.examRegistResults?.some(
-                            (x) => x.errorLevel === InputErrorLevel.警告
-                          )
-                        ? `${styles["input-warning"]}`
-                        : ""
-                    }`,
+          {targetDetails?.map((detail) => {
+            const {
+              hasOrder,
+              positionNumber: detailPositionNumber,
+              name: detailName,
+              value,
+              prevValue,
+              unit,
+              cancelReasonId,
+            } = detail;
+            const isDisabled = !hasOrder || !!cancelReasonId;
+            return (
+              <Stack key={detailPositionNumber}>
+                <Paper
+                  w={524}
+                  h={51}
+                  className={styles["basic-grey"]}
+                  radius="itemName"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
-                  w={"340"}
-                  radius={"md"}
-                  size="inputComponent"
-                  value={detail.value}
-                  onClick={() => toggleKeyboard(detail.positionNumber ?? 0)}
-                  onChange={(e) =>
-                    handleChange(
-                      e.currentTarget.value,
-                      positionNumber ?? 0,
-                      detail.positionNumber ?? 0
-                    )
-                  }
-                />
-                {/* TODO:前回値のマックス横幅設定 */}
-                <Stack gap="0">
-                  <Text size="md" fw="700" maw={"172"}>
-                    {detail.prevValue ? `(前回: ${detail.prevValue})` : ""}
-                  </Text>
-                  <Text size="xs" fw="400">
-                    {detail.unit}
-                  </Text>
-                </Stack>
-              </Group>
-            </Stack>
-          ))}
+                >
+                  <Title size="lg" fw={700}>
+                    {detailName}
+                  </Title>
+                </Paper>
+                <Group>
+                  <TextInput
+                    classNames={{
+                      input: `${styles["input-textbox"]} ${
+                        isDisabled
+                          ? ""
+                          : firstPositionItem?.examRegistResults?.some(
+                              (x) => x.errorLevel === InputErrorLevel.異常
+                            )
+                          ? `${styles["input-error"]}`
+                          : firstPositionItem?.examRegistResults?.some(
+                              (x) => x.errorLevel === InputErrorLevel.警告
+                            )
+                          ? `${styles["input-warning"]}`
+                          : ""
+                      }`,
+                    }}
+                    w={340}
+                    radius="md"
+                    size="inputComponent"
+                    value={value}
+                    onClick={() => toggleKeyboard(detailPositionNumber ?? 0)}
+                    onChange={(e) =>
+                      handleChange(
+                        e.currentTarget.value,
+                        positionNumber ?? 0,
+                        positionNumber ?? 0
+                      )
+                    }
+                    disabled={isDisabled}
+                  />
+                  {/* TODO:前回値のマックス横幅設定 */}
+                  <Stack gap="0">
+                    <Text size="md" fw="700" maw={172}>
+                      {prevValue ? `(前回: ${prevValue})` : ""}
+                    </Text>
+                    <Text size="xs" fw="400">
+                      {unit}
+                    </Text>
+                  </Stack>
+                </Group>
+              </Stack>
+            );
+          })}
         </Group>
+        <Button
+          w={154}
+          h={64}
+          mt={40}
+          ml={914}
+          size="lg"
+          bg={"white"}
+          variant="outline"
+          onClick={() => handleChange("", positionNumber)}
+          tabIndex={-1}
+        >
+          クリア
+        </Button>
         {/* エラーメッセージの表示 */}
         {(examRegistResults || []).map((error, index) => (
           <Group
             key={index}
             c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
           >
-            <IconExclamationCircleFilled size={"1.7rem"} />
+            <IconExclamationCircleFilled size={32} />
             <Text>{error.description}</Text>
           </Group>
         ))}
@@ -344,8 +378,10 @@ export default function ExamNumericLR({
                   detail.positionNumber === 1 ? "left" : "right"
                 ] && (
                   <div ref={closeKeyBoard}>
-                    <Keyboard
+                    <NumericKeyboard
                       value={detail?.value ?? ""}
+                      integerLength={detail.integerLength}
+                      decimalLength={detail.decimalLength}
                       onChange={(newValue) =>
                         handleChange(
                           newValue,
@@ -362,18 +398,6 @@ export default function ExamNumericLR({
           ))}
         </Group>
       </Stack>
-      <Button
-        w={154}
-        h={64}
-        ml={914}
-        size="lg"
-        bg={"white"}
-        variant="outline"
-        onClick={() => handleChange("", positionNumber)}
-        tabIndex={-1}
-      >
-        クリア
-      </Button>
     </Flex>
   );
 }
