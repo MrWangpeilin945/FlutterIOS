@@ -76,7 +76,8 @@ public class MenuNoteResult
 
     private string GetDisplayConsultNoteText()
     {
-        var consultNotes = _menuNote.ConsultNotes.Select(x => _consultNote.SingleOrDefault(c => c.Code == x.Code)).Select(x => x?.Note ?? "");
+        var consultNotes = _menuNote.ConsultNotes.Select(x => _consultNote.SingleOrDefault(c => c.Code == x.Code))
+                                                 .Select(x => x?.Note ?? "");
         var joinText = string.Join("/", consultNotes);
         return $"{joinText}{_menuNote.Suffix}";
     }
@@ -95,7 +96,7 @@ public class MenuNoteResult
         return マスタ.Type switch
         {
             Core.Enums.ExamItemDetailType.入力 => 回答値,
-            Core.Enums.ExamItemDetailType.選択 => マスタ.DetailOptions.SingleOrDefault(x => x.Code == 回答値)?.Name ?? "",
+            Core.Enums.ExamItemDetailType.選択 => マスタ.DetailOptions.SingleOrDefault(x => x.Code == 回答値)?.Name ?? 回答値,
             _ => ""
         };
     }
