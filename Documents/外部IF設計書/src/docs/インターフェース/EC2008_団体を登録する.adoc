@@ -86,12 +86,12 @@ list.Count()  <> 0
 |Code
 |Yes
 |string
-|班コード
+|団体コード
 
 |Name
 |Yes
 |string
-|班名
+|団体名
 
 |InputNote
 |Yes
