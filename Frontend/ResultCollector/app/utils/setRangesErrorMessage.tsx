@@ -35,29 +35,19 @@ const getMaxErrorLevelsByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
   );
 };
 
-// 受け取ったInputexamitemの、examRegistresultsにエラーを追加して
-// Inputexamitemを返す
+// 受け取ったInputexamitemの、該当するExamRegistResult[]を返す
 export const setRangesErrorMessage = (inputexamItem: InputExamItem) => {
   if (!inputexamItem.examItemDetails) {
-    return inputexamItem;
+    return [];
   }
   inputexamItem.examRegistResults = inputexamItem.examRegistResults || [];
   const matchExamRanges = getMaxErrorLevelsByRangeCheck(
     inputexamItem.examItemDetails
   );
-  // 既に存在するExamNormalValueRangeによるエラーメッセージを削除
-  inputexamItem.examRegistResults = inputexamItem.examRegistResults.filter(
-    (error) => {
-      const description = error.description || "";
-      return !(
-        description === "入力値を確認してください。" ||
-        description === "入力に誤りがあります。"
-      );
-    }
-  );
-  // 該当するエラーが無いときはそのまま返す
+
+  // 該当するエラーが無いときは空配列を返す
   if (matchExamRanges.length === 0) {
-    return inputexamItem;
+    return [];
   }
   // エラーレベルに応じたエラーメッセージを追加
   const rangesErrorMessages: ExamRegistResult[] = matchExamRanges
