@@ -61,6 +61,13 @@ public class Program
         builder.Logging.ClearProviders();
         builder.Host.UseNLog();
 
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(builder => builder.AllowAnyOrigin()
+                                                       .AllowAnyMethod()
+                                                       .AllowAnyHeader());
+        });
+
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
@@ -72,6 +79,7 @@ public class Program
             {
                 options.Path = "/redoc";
             });
+            app.UseCors();
         }
 
         app.MapHealthChecks("/healthz");

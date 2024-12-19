@@ -14,5 +14,13 @@ RUN dotnet publish "Wellship.WebAPI/Wellship.WebAPI.csproj" -c Release -o /app -
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app ./
+
+ENV TZ=Asia/Tokyo
 ENV ASPNETCORE_HTTP_PORTS=80
+
+RUN groupadd -r appuser && useradd --no-log-init -r -g appuser appuser
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
 ENTRYPOINT ["dotnet", "Wellship.WebAPI.dll"]
