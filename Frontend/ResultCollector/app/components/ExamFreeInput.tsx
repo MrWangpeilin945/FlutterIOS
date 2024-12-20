@@ -1,14 +1,6 @@
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import {
-  Group,
-  Title,
-  Paper,
-  Text,
-  Textarea,
-  Button,
-  Flex,
-} from "@mantine/core";
+import { Group, Paper, Text, Textarea, Button, Flex } from "@mantine/core";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import type {
@@ -53,7 +45,7 @@ export default function ExamFreeInput({
   );
 
   // エラーメッセージの並び替え
-  const handleErrorMessage = (item: InputExamItem): InputExamItem => {
+  const sortErrorMessage = (item: InputExamItem): InputExamItem => {
     if (item.examRegistResults) {
       // エラーレベルが高い順にソート
       item.examRegistResults.sort((a, b) => {
@@ -61,12 +53,6 @@ export default function ExamFreeInput({
         const levelB = b.errorLevel ?? 0;
         return levelB - levelA;
       });
-
-      // 重複を除外
-      item.examRegistResults = item.examRegistResults.filter(
-        (result, index, self) =>
-          index === self.findIndex((r) => r.description === result.description)
-      );
     }
     return item;
   };
@@ -126,7 +112,7 @@ export default function ExamFreeInput({
     // バリデーションチェックを行ったexamItemと、
     // コールバックを判断するフラグを返す
     const ValidationResult = {
-      validateResult: handleErrorMessage(resultItem),
+      validateResult: sortErrorMessage(resultItem),
       hasCallback: isCallback,
     };
     return ValidationResult;
@@ -195,9 +181,9 @@ export default function ExamFreeInput({
             justifyContent: "center",
           }}
         >
-          <Title size="lg" fw={700}>
+          <Text size="lg" fw={700}>
             {name}
-          </Title>
+          </Text>
         </Paper>
         <Textarea
           classNames={{
@@ -230,7 +216,7 @@ export default function ExamFreeInput({
           h={64}
           ml={48}
           size="lg"
-          bg={"white"}
+          bg="white01"
           variant="outline"
           onClick={() => handleChange("")}
         >
