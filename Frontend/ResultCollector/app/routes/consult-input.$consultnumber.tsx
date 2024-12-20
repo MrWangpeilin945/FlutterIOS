@@ -16,6 +16,7 @@ import type {
   ResultsRequest,
   VerifyExamItems,
 } from "~/domain/wellship.schemas";
+import { InputErrorLevel } from "~/domain/enums";
 import {
   connectionEquipmentState,
   examMenuState,
@@ -51,11 +52,13 @@ export default function consultInput() {
     useDisclosure(false);
   const [commonMessage, setCommonMessage] = useState<string>("");
   const [confirmMessage, setConfirmMessage] = useState<string>("");
+  const [commonButtonMessage,setCommonButtonMessage] = useState<string>("");
   const [visibleRemeasurement, setVisibleRemeasurement] = useState(true);
   const [disabledRemeasurement, setDisabledRemeasurement] = useState(false);
   //機器連携用
+  const localStorageKey = "value"; //TODO:Keyは未確定
   const [value, setValue] = useState<string>(
-    localStorage.getItem("value") || "",
+    localStorage.getItem(localStorageKey) || "",
   ); //TODO:jsonにvalueセット方法どうするか
   const [isWatching, setIsWatching] = useState(false); // 監視状態を管理するフラグ
 
@@ -72,12 +75,14 @@ export default function consultInput() {
     //TODO:仕様変更予定
     if (!consultnumber) {
       setCommonMessage("必要な受診番号がありません");
+      setCommonButtonMessage("閉じる");
       openCommon();
       return;
     }
     //検査メニューIDの受け取り確認
     if (!examMenuId) {
       setCommonMessage("必要な検査メニューIDがありません");
+      setCommonButtonMessage("閉じる");
       open();
       return;
     }
@@ -98,6 +103,7 @@ export default function consultInput() {
         } else if (result.error.status === 500) {
           setCommonMessage(getErrorMessage(errorMessages.serverError));
         }
+        setCommonButtonMessage("閉じる");
         openCommon();
       }
     };
@@ -138,8 +144,8 @@ export default function consultInput() {
 
   //機器連携：監視用
   useEffect(() => {
-    const initialValue = localStorage.getItem("value") || "";
-    setValue(initialValue);
+    const initialValue = localStorage.getItem(localStorageKey || "");
+    setValue(initialValue ?? "");
     // StorageEventの変更を監視する関数
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === "value") {
@@ -233,10 +239,11 @@ export default function consultInput() {
 
   //エラーレベルによる分岐処理
   const errorBranch = (errorLevel?: number) => {
-    if (errorLevel === 3) {
+    if (errorLevel === InputErrorLevel.異常) {
       setCommonMessage("エラーがあります。内容を確認してください"); //改行文字入れるかも
+      setCommonButtonMessage("閉じる");
       openCommon();
-    } else if (errorLevel === 2) {
+    } else if (errorLevel === InputErrorLevel.警告) {
       setConfirmMessage("ワーニングがありますが、登録します。よろしいですか。");
       openConfirm();
     } else {
@@ -285,6 +292,7 @@ export default function consultInput() {
         }
         // 共通ダイアログにエラーメッセージを表示
         setCommonMessage(errorMessage);
+        setCommonButtonMessage("閉じる");
         openCommon();
       }
     };
@@ -351,6 +359,7 @@ export default function consultInput() {
         }
         // 共通ダイアログにエラーメッセージを表示
         setCommonMessage(errorMessage);
+        setCommonButtonMessage("閉じる");
         openCommon();
       }
     };
@@ -527,7 +536,7 @@ export default function consultInput() {
         />
         <CommonDialog
           message={commonMessage}
-          buttonMessage={"確認する"}
+          buttonMessage={commonButtonMessage}
           isOpen={openedCommon}
           onClose={closeCommon}
         />
