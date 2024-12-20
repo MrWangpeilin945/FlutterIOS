@@ -1135,7 +1135,7 @@ ZOrder=65
 
 [Entity]
 PName=exam_normal_value_range
-LName=検査正常値範囲
+LName=検査基準値範囲
 Comment=
 TableInnerOption=
 TableOption=
@@ -1467,7 +1467,7 @@ ZOrder=85
 
 [Entity]
 PName=exam_normal_options
-LName=検査正常値選択肢
+LName=検査基準値選択肢
 Comment=
 TableInnerOption=
 TableOption=
