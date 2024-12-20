@@ -52,7 +52,7 @@ StoreExamNormalValueRangeAsync
 |ExamNormalValueRanges
 |Yes
 |List<ExamNormalValueRange>
-|登録する基準パターンのリスト
+|登録する基準値(範囲)のリスト
 
 |===
 
