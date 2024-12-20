@@ -152,7 +152,7 @@ list.Count()  <> 0
 *** ErrorObject
 **** Code `10001`
 **** Message `指定されたTeamCodeがシステム上に存在しません。Code:[PlaceSchedule.TeamCode]`
-**** InputNote `PlaceSchedule.InputNote`
+**** InputNote `[PlaceSchedule.InputNote]`
 
 ==== 処理(Repository)
 
@@ -169,7 +169,7 @@ list.Count()  <> 0
 * 競合条件
 ** `[DB]PlaceSchedule.place_id(会場ID)` == `[DB]places.place_code` == `PlaceSchedule.PlaceCode` で検索した `[DB]places.place_id` +
 And `[DB]PlaceSchedule.team_id(班ID)` == `[DB]teams.team_code` == `PlaceSchedule.TeamCode` で検索した `[DB]teams.team_id`
-And `[DB]PlaceSchedule.exam_date(健診日)` == DateOnly型にパースした`PlaceSchedule.ExamDate`
+And `[DB]PlaceSchedule.exam_date(健診日)` == `PlaceSchedule.ExamDate` ※DateOnly型にパース
 
 [cols="1,2,2" options="header"]
 |===
