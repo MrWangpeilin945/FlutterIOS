@@ -254,28 +254,67 @@ public class ExamItemRepository : IExamItemRepository
     /// <param name="examItemDetailIds">検査項目明細ID</param>
     public async Task<IEnumerable<ExamItemDetailChild>> GetExamItemDetailChildrenAsync(IEnumerable<int> examItemDetailIds)
     {
-        // TODO: SQLを書く。
-        return [
-            new ExamItemDetailChild(){
-                ExamItemDetailId = 1,
-                Name = "",
-                PositionNumber = 1,
-                EquipmentLabel = "",
-                Unit = "",
-                Type = ExamItemDetailType.選択,
-                KeyboardType = KeyboardType.選択肢,
-                Keyboards = [],
-                IntegerLength = 0,
-                DecimalLength = 0,
-                DetailOptions = [
-                    new(){
-                        Code = "1",
-                        ExamItemDetailId = 1,
-                        Name = "",
-                        OrderNumber = 1
-                    }
-                ]
-            }
-        ];
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select 
+            d.exam_item_detail_id as ExamItemDetailId,
+            d.name as Name,
+            d.position_number as PositionNumber,
+            d.equipment_label as EquipmentLabel,
+            ex.unit as Unit,
+            d.type as Type,
+            d.keyboard_type as KeyboardType,
+            d.integer_length as IntegerLength,
+            d.decimal_length as DecimalLength,
+            kb.option_id as KeyboardId,
+            kb.value as KeyboardValue,
+            op.option_id as OptionId,
+            op.code as OptionCode,
+            op.name as OptionName,
+            op.order_number as OrderNumber
+        from
+            resultcollector.exam_item_details d 
+            left join resultcollector.exam_items ex
+                on d.exam_item_id = ex.exam_item_id
+            left join resultcollector.keyboard_options kb
+                on d.exam_item_detail_id = kb.exam_item_detail_id
+            left join resultcollector.exam_item_detail_options op
+                on d.exam_item_detail_id = op.exam_item_detail_id
+            where
+                d.exam_item_detail_id = any(@ExamItemDetailIds);";        
+        var examItemDetails = await connection.QueryAsync<ExamItemDetailChildrenEntity>(sql, new { ExamItemDetailIds = examItemDetailIds });
+
+        var examItemDetailChilds = examItemDetails
+                                    .GroupBy(d => d.ExamItemDetailId)
+                                    .Select(d => new ExamItemDetailChild
+                                    {
+                                        ExamItemDetailId = d.First().ExamItemDetailId,
+                                        Name = d.First().Name,
+                                        PositionNumber = d.First().PositionNumber,
+                                        EquipmentLabel = d.First().EquipmentLabel,
+                                        Unit = d.First().Unit,
+                                        Type = d.First().Type,
+                                        KeyboardType = d.First().KeyboardType,
+                                        Keyboards = d.Where(kb => kb.ExamItemDetailId == d.First().ExamItemDetailId)
+                                                     .GroupBy(kb => kb.KeyboardId) 
+                                                     .OrderBy(kb => kb.First().KeyboardId)
+                                                     .Select(kb => new Keyboard{
+                                                        OptionId = kb.First().KeyboardId,
+                                                        ExamItemDetailId = kb.First().ExamItemDetailId,
+                                                        Value = kb.First().KeyboardValue
+                                                    }),
+                                        IntegerLength = d.First().IntegerLength,
+                                        DecimalLength = d.First().DecimalLength,
+                                        DetailOptions = d.Where(op => op.ExamItemDetailId == d.First().ExamItemDetailId)
+                                                         .GroupBy(op => op.OptionId) 
+                                                         .OrderBy(op => op.First().OptionId)
+                                                         .Select(op => new ExamItemDetailOption{
+                                                            Code = op.First().OptionCode,
+                                                            ExamItemDetailId = op.First().ExamItemDetailId,
+                                                            Name = op.First().OptionName,
+                                                            OrderNumber = op.First().OrderNumber
+                                                        })
+                                    });
+        return examItemDetailChilds;
     }
 }

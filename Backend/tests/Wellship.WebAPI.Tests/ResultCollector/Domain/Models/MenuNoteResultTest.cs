@@ -57,7 +57,7 @@ public class MenuNoteResultTest
         };
 
         List<ConsultNote> consultNotes = [
-            new ConsultNote(){Code = "撮影番号",Note = "012"}
+            new ConsultNote(){Code = "012",Note = "撮影番号"}
         ];
 
         var menuNoteResult = new MenuNoteResult(menuNote, detailChildren, examResult, previousResult, consultNotes);

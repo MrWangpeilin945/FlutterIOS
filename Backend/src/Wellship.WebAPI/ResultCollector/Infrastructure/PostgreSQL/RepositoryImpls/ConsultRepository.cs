@@ -436,7 +436,7 @@ public class ConsultRepository : IConsultRepository
             n.code as Code
             , n.note as Note 
         from
-            resultcollector.exam_item_notes n 
+            resultcollector.consult_notes n 
         where
             consult_id = @ConsultId;";
 

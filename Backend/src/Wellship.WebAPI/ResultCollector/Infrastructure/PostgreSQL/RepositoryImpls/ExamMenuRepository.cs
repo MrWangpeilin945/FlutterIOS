@@ -84,6 +84,7 @@ public class ExamMenuRepository : IExamMenuRepository
             , n.name as Name
             , n.order_number as OrderNumber
             , n.exam_menu_id as ExamMenuId 
+            , n.suffix as Suffix
         from
             resultcollector.exam_menu_notes n 
         where
@@ -94,10 +95,26 @@ public class ExamMenuRepository : IExamMenuRepository
         // 検査メニュー特記_検査項目テーブル
         const string consultSql = @"
         select
-            n.menu_note_id
-            , nr.exam_item_detail_id
-            , nr.source_type
-            , nr.order_number 
+            n.menu_note_id as MenuNoteId
+            , nc.code as Code
+            , nc.order_number as OrderNumber
+        from
+            resultcollector.exam_menu_notes n 
+            left join resultcollector.exam_menu_note_consults nc 
+                on nc.menu_note_id = n.menu_note_id 
+        where
+            n.exam_menu_id = @ExamMenuId 
+        order by
+            n.order_number
+            , nc.order_number;";
+
+        // 検査メニュー特記_検査結果テーブル
+        const string resultsSql = @"
+        select
+            n.menu_note_id as MenuNoteId
+            , nr.exam_item_detail_id as ExamItemDetailId
+            , nr.source_type as SourceType
+            , nr.order_number as OrderNumber 
         from
             resultcollector.exam_menu_notes n 
             left join resultcollector.exam_menu_note_results nr 
@@ -105,23 +122,7 @@ public class ExamMenuRepository : IExamMenuRepository
         where
             n.exam_menu_id = @ExamMenuId 
         order by
-            n.order_number
-            , nr.order_number;";
-
-
-        // 検査メニュー特記_検査結果テーブル
-        const string resultsSql = @"
-        select
-            n.menu_note_id as MenuNoteId
-            , n.name as Name
-            , n.order_number as OrderNumber
-            , n.exam_menu_id as ExamMenuId 
-        from
-            resultcollector.exam_menu_notes n 
-        where
-            n.exam_menu_id = @ExamMenuId 
-        order by
-            n.order_number;";
+            nr.order_number;";
 
         // SQL実行
         var menuNotes = await connection.QueryAsync<Entities.MenuNoteEntity>(mainSql, new { ExamMenuId = examMenuId });
