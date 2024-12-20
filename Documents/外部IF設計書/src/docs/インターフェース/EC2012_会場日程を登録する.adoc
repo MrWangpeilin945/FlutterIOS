@@ -152,7 +152,7 @@ list.Count()  <> 0
 *** ErrorObject
 **** Code `10001`
 **** Message `指定されたTeamCodeがシステム上に存在しません。Code:[PlaceSchedule.TeamCode]`
-**** InputNote `[PlaceSchedule.InputNote]`
+**** InputNote `PlaceSchedule.InputNote`
 
 ==== 処理(Repository)
 
