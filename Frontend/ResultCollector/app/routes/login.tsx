@@ -7,10 +7,12 @@ import {
   Group,
   Image,
   LoadingOverlay,
+  PasswordInput,
   Space,
   Text,
   TextInput,
 } from "@mantine/core";
+
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
@@ -157,7 +159,7 @@ export default function Login() {
   return (
     <>
       <LoadingOverlay visible={isFetching || isLoading} />
-      <Container fluid>
+      <Container fluid bg="background">
         <Center style={{ flexDirection: "column" }}>
           <Space h={144} />
           <Image src="./wellship-logo.svg" w={566} h={131} />
@@ -165,7 +167,7 @@ export default function Login() {
           <Flex columnGap={16}>
             <Group w="486" justify="flex-end">
               <Text size="sm" c="black01" ta="right">
-                利用者ID
+                職員ID
               </Text>
               <TextInput
                 value={loginId}
@@ -187,15 +189,16 @@ export default function Login() {
               <Text size="sm" c="black01" ta="right">
                 パスワード
               </Text>
-              <TextInput
-                type="password"
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 maxLength={20}
                 styles={{
                   input: {
-                    height: "auto",
+                    height: 68,
                     width: 340,
+                  },
+                  innerInput: {
                     padding: "16px 32px",
                   },
                 }}
@@ -212,7 +215,7 @@ export default function Login() {
               px={32}
               py={16}
             >
-              <Text size="lg" fw={700} c={"white01"}>
+              <Text size="lg" fw={700} c="white01">
                 ログイン
               </Text>
             </Button>
