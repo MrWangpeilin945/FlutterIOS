@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import {
   Group,
   Stack,
-  Title,
   Paper,
   Text,
   TextInput,
@@ -51,6 +50,10 @@ export default function ExamNumericLR({
     return null;
   }
 
+  // 定数で定義
+  const 左 = 1;
+  const 右 = 2;
+
   const [examItemsData, setExamItemsData] = useState(examItems);
 
   // キーボードの表示インデックスを状態として管理する
@@ -66,15 +69,15 @@ export default function ExamNumericLR({
   const toggleKeyboard = (detailPositionNumber: number) => {
     setShowKeyboards((prevKeyboards) => {
       // positionNumberによって切り替えるフラグを制御する
-      if (detailPositionNumber === 1 || detailPositionNumber === 2) {
+      if (detailPositionNumber === 左 || detailPositionNumber === 右) {
         return {
           ...prevKeyboards,
           left:
-            detailPositionNumber === 1
+            detailPositionNumber === 左
               ? !prevKeyboards.left
               : prevKeyboards.left,
           right:
-            detailPositionNumber === 2
+            detailPositionNumber === 右
               ? !prevKeyboards.right
               : prevKeyboards.right,
         };
@@ -90,7 +93,7 @@ export default function ExamNumericLR({
     setShowKeyboards({ left: false, right: false })
   );
 
-  const handleErrorMessage = (item: InputExamItem): InputExamItem => {
+  const sortErrorMessage = (item: InputExamItem): InputExamItem => {
     if (item.examRegistResults) {
       // エラーレベルが高い順にソート
       item.examRegistResults.sort((a, b) => {
@@ -98,14 +101,7 @@ export default function ExamNumericLR({
         const levelB = b.errorLevel ?? 0;
         return levelB - levelA;
       });
-
-      // 重複を除外
-      item.examRegistResults = item.examRegistResults.filter(
-        (result, index, self) =>
-          index === self.findIndex((r) => r.description === result.description)
-      );
     }
-
     return item;
   };
 
@@ -133,7 +129,7 @@ export default function ExamNumericLR({
     const componentErrorMessage: ExamRegistResult[] = [];
     // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
     for (const { name, positionNumber, value } of item.examItemDetails ?? []) {
-      if (positionNumber !== 1 && positionNumber !== 2) {
+      if (positionNumber !== 左 && positionNumber !== 右) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
       }
       // 必須チェックと半角数字チェックを一度に行うスキーマ
@@ -180,7 +176,7 @@ export default function ExamNumericLR({
     // バリデーションチェックを行ったexamItemと、
     // コールバックを判断するフラグを返す
     const ValidationResult = {
-      validateResult: handleErrorMessage(resultItem),
+      validateResult: sortErrorMessage(resultItem),
       hasCallback: isCallback,
     };
     return ValidationResult;
@@ -257,7 +253,7 @@ export default function ExamNumericLR({
 
   // positionNumberが1,2のexamItemDetailを描写
   const targetDetails = examItemDetails?.filter(
-    (detail) => detail.positionNumber === 1 || detail.positionNumber === 2
+    (detail) => detail.positionNumber === 左 || detail.positionNumber === 右
   );
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
@@ -273,9 +269,9 @@ export default function ExamNumericLR({
             justifyContent: "center",
           }}
         >
-          <Title size="lg" fw={700}>
+          <Text size="lg" fw={700}>
             {name}
-          </Title>
+          </Text>
         </Paper>
         <Group gap={16}>
           {targetDetails?.map((detail) => {
@@ -302,9 +298,9 @@ export default function ExamNumericLR({
                     justifyContent: "center",
                   }}
                 >
-                  <Title size="lg" fw={700}>
+                  <Text size="lg" fw={700}>
                     {detailName}
-                  </Title>
+                  </Text>
                 </Paper>
                 <Group>
                   <TextInput
@@ -357,7 +353,7 @@ export default function ExamNumericLR({
           mt={40}
           ml={914}
           size="lg"
-          bg={"white"}
+          bg="white01"
           variant="outline"
           onClick={() => handleChange("", positionNumber)}
           tabIndex={-1}
@@ -379,7 +375,7 @@ export default function ExamNumericLR({
             <Stack key={detail.positionNumber}>
               <Box w={540}>
                 {showKeyboards[
-                  detail.positionNumber === 1 ? "left" : "right"
+                  detail.positionNumber === 左 ? "left" : "right"
                 ] && (
                   <div ref={closeKeyBoard}>
                     <NumericKeyboard
