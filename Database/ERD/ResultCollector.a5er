@@ -1844,7 +1844,7 @@ LName=検査メニュー特記
 Comment=
 TableInnerOption=
 TableOption=
-Page=Main
+Page=MAIN
 Left=3100
 Top=2050
 Field="検査メニュー特記ID","menu_note_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
@@ -1857,7 +1857,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241218195420
-Position="Main",3100,2050,566,161
+Position="MAIN",3100,2050,566,161
 ZOrder=103
 
 [Entity]
@@ -1866,18 +1866,18 @@ LName=検査メニュー特記_検査結果
 Comment=
 TableInnerOption=
 TableOption=
-Page=Main
+Page=MAIN
 Left=3200
 Top=2300
 Field="検査メニュー特記ID","menu_note_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
-Field="データソース種別","source_type","source_type","NOT NULL",2,"","",$FFFFFFFF,""
+Field="データソース種別","source_type","integer","NOT NULL",2,"","",$FFFFFFFF,""
 Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241218195753
-Position="Main",3200,2300
+ModifiedDateTime=20241220092849
+Position="MAIN",3200,2300
 ZOrder=104
 
 [Relation]
@@ -1907,7 +1907,7 @@ LName=検査メニュー特記_受診
 Comment=
 TableInnerOption=
 TableOption=
-Page=Main
+Page=MAIN
 Left=3200
 Top=2500
 Field="検査メニュー特記ID","menu_note_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
@@ -1917,7 +1917,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241218200247
-Position="Main",3200,2500
+Position="MAIN",3200,2500
 ZOrder=106
 
 [Relation]

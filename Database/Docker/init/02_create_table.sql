@@ -122,7 +122,7 @@ CREATE TABLE exam_menu_note_consults (
 CREATE TABLE exam_menu_note_results (
   menu_note_id integer NOT NULL
   , exam_item_detail_id integer NOT NULL
-  , source_type source_type NOT NULL
+  , source_type integer NOT NULL
   , order_number integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
