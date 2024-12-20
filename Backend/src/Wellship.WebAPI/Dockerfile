@@ -14,5 +14,8 @@ RUN dotnet publish "Wellship.WebAPI/Wellship.WebAPI.csproj" -c Release -o /app -
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app ./
+
+ENV TZ=Asia/Tokyo
 ENV ASPNETCORE_HTTP_PORTS=80
+
 ENTRYPOINT ["dotnet", "Wellship.WebAPI.dll"]
