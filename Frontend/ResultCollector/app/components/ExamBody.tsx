@@ -49,12 +49,12 @@ export default function ExamBody({
 
   // 必要なpositionNumberがすべて存在するか確認
   const bodyItemPositionNumbers = [身長, 体重, 体脂肪率, BMI];
-  const missingNumbers = bodyItemPositionNumbers.filter(
-    (position) => !examItems.some((item) => item.positionNumber === position),
+  const allPositionsExist = bodyItemPositionNumbers.every((position) =>
+    examItems.some((item) => item.positionNumber === position),
   );
 
-  if (missingNumbers.length > 0) {
-    return null; // 存在しない場合、表示しない。
+  if (!allPositionsExist) {
+    return null;
   }
 
   const [examItemsData, setExamItemsData] = useState(examItems);
@@ -253,7 +253,7 @@ export default function ExamBody({
           {};
         // グレーアウト表示判定
         const isDisabled = !detail?.hasOrder || !!detail?.cancelReasonId;
-        const isBMI = item.positionNumber === 4;
+        const isBMI = item.positionNumber === BMI;
 
         return (
           <Flex
