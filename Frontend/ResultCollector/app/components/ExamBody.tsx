@@ -10,10 +10,16 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useClickOutside } from "@mantine/hooks";
-import { IconExclamationCircleFilled } from "@tabler/icons-react";
+import {
+  IconExclamationCircleFilled,
+  IconSquareRoundedXFilled,
+} from "@tabler/icons-react";
 import { z } from "zod";
-import { InputErrorLevel } from "~/domain/enums";
-import type { InputExamItem } from "~/domain/wellship.schemas";
+import { InputErrorLevel, KeyboardType } from "~/domain/enums";
+import type {
+  ExamRegistResult,
+  InputExamItem,
+} from "~/domain/wellship.schemas";
 import NumericKeyboard from "./NumericKeyboard";
 import CollectionKeyboard from "./CollectionKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
@@ -35,10 +41,38 @@ export default function ExamBody({
     return null;
   }
 
+  // 定数で定義
+  const 身長 = 1;
+  const 体重 = 2;
+  const 体脂肪率 = 3;
+  const BMI = 4;
+
+  // 必要なpositionNumberがすべて存在するか確認
+  const bodyItemPositionNumbers = [身長, 体重, 体脂肪率, BMI];
+  const missingNumbers = bodyItemPositionNumbers.filter(
+    (position) => !examItems.some((item) => item.positionNumber === position),
+  );
+
+  if (missingNumbers.length > 0) {
+    return null; // 存在しない場合、表示しない。
+  }
+
   const [examItemsData, setExamItemsData] = useState(examItems);
 
   // キーボードの表示インデックスを状態として管理する
   const [activeKeyboard, setActiveKeyboard] = useState<number | null>(null);
+
+  useEffect(() => {
+    const updatedItems = examItems.map((item) => {
+      let validatedData: InputExamItem = item;
+      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
+      if (onRegisterPressed) {
+        validatedData = validationCheck(item).validateResult;
+      }
+      return validatedData;
+    });
+    setExamItemsData(updatedItems);
+  }, [onRegisterPressed, examItems]);
 
   // キーボードの表示/非表示をトグルする関数
   const toggleKeyboard = (positionNumber: number) => {
@@ -59,20 +93,35 @@ export default function ExamBody({
         const levelB = b.errorLevel ?? 0;
         return levelB - levelA;
       });
-
-      // 重複を除外
-      item.examRegistResults = item.examRegistResults.filter(
-        (result, index, self) =>
-          index === self.findIndex((r) => r.description === result.description),
-      );
     }
 
     return item;
   };
 
+  // APIからのエラーメッセージを保存
+  const APIErrors = examItems.map((item) => ({
+    positionNumber: item.positionNumber,
+    examRegistResults: item.examRegistResults || [],
+  }));
+  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  const resetErrorMessages = (item: InputExamItem) => {
+    const targetError = APIErrors.find(
+      (error) => error.positionNumber === item.positionNumber,
+    );
+    if (targetError) {
+      item.examRegistResults = targetError.examRegistResults;
+    }
+    return item;
+  };
+
   const validationCheck = (item: InputExamItem) => {
+    // APIエラーメッセージで初期化
+    resetErrorMessages(item);
+    // コールバック判断用のコンポーネントのエラーメッセージ
+    const componentErrorMessage: ExamRegistResult[] = [];
     // BMIはバリデーションチェックを実施しない
-    if (item.positionNumber === 4) return item;
+    if (item.positionNumber === BMI)
+      return { validateResult: item, hasCallback: true };
     // 必須チェックと半角数字チェックを一度に行うスキーマ
     const schema = z
       .string()
@@ -82,63 +131,54 @@ export default function ExamBody({
       });
 
     // バリデーション対象データを取得
-    const valueToValidate = item.examItemDetails?.[0]?.value || "";
+    const valueToValidate =
+      item.examItemDetails?.find((item) => item.positionNumber === 1)?.value ||
+      "";
     const result = schema.safeParse(valueToValidate);
-
-    // エラーメッセージを更新
-    let updatedErrors = item.examRegistResults || [];
-
-    // 必須エラーを削除
-    const errorMessageRequired = getErrorMessage(
-      errorMessages.required,
-      `${item.name}は`,
-    );
-    updatedErrors = updatedErrors.filter(
-      (error) => error.description !== errorMessageRequired,
-    );
-
-    // 半角数字エラーを削除
-    const errorMessageNumeric = getErrorMessage(
-      errorMessages.numericString,
-      `${item.name}は`,
-    );
-    updatedErrors = updatedErrors.filter(
-      (error) => error.description !== errorMessageNumeric,
-    );
 
     // バリデーションが失敗した場合
     if (!result.success) {
       const error = result.error.errors[0]; // 最初のエラーだけ取得
-      updatedErrors.push({
+      componentErrorMessage.push({
         description: error.message,
         errorLevel: InputErrorLevel.異常,
       });
     }
 
-    const prevItem = {
+    // 基準値によるエラーメッセージを追加
+    componentErrorMessage.push(...(setRangesErrorMessage(item) ?? []));
+    // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
+    const isCallback = !componentErrorMessage.some(
+      (error) => error.errorLevel === InputErrorLevel.異常,
+    );
+    // エラーメッセージをexamItemに保存
+    const resultItem: InputExamItem = {
       ...item,
-      examRegistResults: updatedErrors,
+      examRegistResults: item.examRegistResults
+        ? item.examRegistResults.concat(componentErrorMessage)
+        : componentErrorMessage,
     };
-    const rangesValidatedItem = setRangesErrorMessage(prevItem);
-    return handleErrorMessage(rangesValidatedItem);
+    // バリデーションチェックを行ったexamItemと、
+    // コールバックを判断するフラグを返す
+    const ValidationResult = {
+      validateResult: handleErrorMessage(resultItem),
+      hasCallback: isCallback,
+    };
+    return ValidationResult;
   };
-
-  useEffect(() => {
-    const updatedItems = examItems.map((item) => {
-      let validatedData: InputExamItem = item;
-      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-      if (onRegisterPressed) {
-        validatedData = validationCheck(item);
-      }
-      return validatedData;
-    });
-    setExamItemsData(updatedItems);
-  }, [onRegisterPressed, examItems]);
 
   // BMI計算処理
   const setBMIValue = (updatedExamItems: InputExamItem[]): InputExamItem[] => {
-    const heightValue = updatedExamItems[0].examItemDetails?.[0].value ?? "0";
-    const weightValue = updatedExamItems[1].examItemDetails?.[0].value ?? "0";
+    const heightValue =
+      examItems
+        .find((item) => item.positionNumber === 身長)
+        ?.examItemDetails?.find((detail) => detail.positionNumber === 1)
+        ?.value ?? "0";
+    const weightValue =
+      examItems
+        .find((item) => item.positionNumber === 体重)
+        ?.examItemDetails?.find((detail) => detail.positionNumber === 1)
+        ?.value ?? "0";
 
     // BMIの計算
     const height = Number.parseFloat(heightValue) / 100;
@@ -147,13 +187,13 @@ export default function ExamBody({
     const bmiString = String(bmi);
 
     return updatedExamItems.map((item) => {
-      if (item.positionNumber === 4) {
-        item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
+      if (item.positionNumber === BMI) {
+        item.examItemDetails = item.examItemDetails?.map((detail) => {
           const decimalLength = detail.decimalLength ?? 0;
           const integerLength = detail.integerLength ?? 0;
           const maxDigits = decimalLength + integerLength + 1;
 
-          if (idx === 0) {
+          if (detail.positionNumber === 1) {
             if (detail.integerLength) {
               return { ...detail, value: bmiString.slice(0, maxDigits) };
             }
@@ -169,13 +209,15 @@ export default function ExamBody({
   //変更イベント
   const handleChange = (positionNumber: number | undefined, value: string) => {
     const updatedExamItems = [...examItemsData];
+    // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
+    let hasValidationError = true;
 
     // 該当するアイテムを更新
     for (const item of updatedExamItems) {
       if (item.positionNumber === positionNumber) {
         // 該当するexamItemDetailsの最初のvalueを更新
-        item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
-          if (idx === 0) {
+        item.examItemDetails = item.examItemDetails?.map((detail) => {
+          if (detail.positionNumber === 1) {
             return { ...detail, value: value };
           }
           return detail;
@@ -183,29 +225,21 @@ export default function ExamBody({
       }
 
       // バリデーションチェックを実施
-      const validatedItem = validationCheck(item);
+      const { validateResult, hasCallback } = validationCheck(item);
+      if (!hasCallback) {
+        // falseのexamItemがあればコールバックを行わない
+        hasValidationError = false;
+      }
       // バリデーション結果を反映
-      Object.assign(item, validatedItem);
+      Object.assign(item, validateResult);
     }
 
     // BMIの計算と設定処理
     const bmiUpdatedExamItems = setBMIValue(updatedExamItems);
     // 更新されたデータをステートに設定
     setExamItemsData(bmiUpdatedExamItems);
-    // 3つのエラーが存在するか確認
-    const isValidatedError = bmiUpdatedExamItems.some((item) =>
-      item.examRegistResults?.some(
-        (error) =>
-          error.description ===
-            getErrorMessage(errorMessages.required, `${item.name}は`) ||
-          error.description ===
-            getErrorMessage(errorMessages.numericString, `${item.name}は`) ||
-          //TODO:基準値エラーメッセージは未確定（部分一致予定）
-          error.description?.includes("正常値ではありません"),
-      ),
-    );
 
-    if (!isValidatedError) {
+    if (hasValidationError) {
       onChange(bmiUpdatedExamItems);
     }
   };
@@ -214,7 +248,9 @@ export default function ExamBody({
     <>
       {examItemsData.map((item) => {
         const { positionNumber, name, examRegistResults = [] } = item;
-        const detail = item.examItemDetails?.[0];
+        const detail =
+          item.examItemDetails?.find((detail) => detail.positionNumber === 1) ??
+          {};
         // グレーアウト表示判定
         const isDisabled = !detail?.hasOrder || !!detail?.cancelReasonId;
         const isBMI = item.positionNumber === 4;
@@ -309,7 +345,11 @@ export default function ExamBody({
               const isWarning = error.errorLevel === InputErrorLevel.警告;
               return (
                 <Group key={idx} c={isWarning ? "warning" : "error"}>
-                  <IconExclamationCircleFilled size={"32px"} />
+                  {isWarning ? (
+                    <IconExclamationCircleFilled size={32} />
+                  ) : (
+                    <IconSquareRoundedXFilled size={32} />
+                  )}
                   <Text size="sm" fw={700}>
                     {error.description}
                   </Text>
@@ -319,7 +359,7 @@ export default function ExamBody({
             {/* キーボード表示 */}
             {activeKeyboard === item.positionNumber && (
               <Box ref={closeKeyBoard} mx="auto">
-                {detail?.keyboard?.keyboardType === 1 ? (
+                {detail?.keyboard?.keyboardType === KeyboardType.テンキー ? (
                   <NumericKeyboard
                     value={detail?.value ?? ""}
                     integerLength={detail?.integerLength}
