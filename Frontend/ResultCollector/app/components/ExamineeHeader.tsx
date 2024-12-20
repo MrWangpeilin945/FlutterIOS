@@ -107,7 +107,7 @@ export default function ExamineeHeader({
                 ? "femaleSecondary"
                 : "green01"
           }
-          leftSection={<IconHomeFilled size={"24px"} />}
+          leftSection={<IconHomeFilled size={24} />}
           onClick={() => navigate("/home")}
         >
           ホーム
