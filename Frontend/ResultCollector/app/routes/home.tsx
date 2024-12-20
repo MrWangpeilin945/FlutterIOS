@@ -123,7 +123,7 @@ export default function Home() {
         radius={48}
       >
         <Text
-          c={disabled ? "gray02" : "black01"}
+          c="black01"
           size="xl"
           fw={700}
           style={{
