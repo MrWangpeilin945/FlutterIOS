@@ -460,10 +460,11 @@ Field="班ID","team_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
 Field="状況","status","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="健診日","exam_date","date","NOT NULL",,"","",$FFFFFFFF,""
 Field="開始時刻","start_time","varchar(4)","NOT NULL",,"","",$FFFFFFFF,""
+Index==2,place_id,team_id,exam_date
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241113095204
+ModifiedDateTime=20241220103543
 Position="MAIN",1600,2100
 ZOrder=25
 

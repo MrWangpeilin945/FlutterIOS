@@ -449,6 +449,9 @@ CREATE TABLE place_schedule (
   , CONSTRAINT place_schedule_PKC PRIMARY KEY (place_schedule_id)
 );
 
+ALTER TABLE place_schedule ADD CONSTRAINT place_schedule_IX1
+  UNIQUE (place_id,team_id,exam_date) ;
+
 CREATE TABLE places (
   place_id uuid DEFAULT gen_random_uuid () NOT NULL
   , place_code text NOT NULL
