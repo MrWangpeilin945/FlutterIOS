@@ -208,11 +208,11 @@ list.Count() <> 0
 ===== Upsert
 
 * 競合条件
-** `[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCd` で検索した `[DB]thresholds.threshold_id`
-And `[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id` +
-And `[DB]exam_normal_value_range(検査基準値範囲).target_sex(対象性別)` == `ExamNormalValueRange.TargetSex` +
-And `[DB]exam_normal_value_range(検査基準値範囲).max_age(対象年齢上限)`  ※左0埋め7桁にそろえる == `ExamNormalValueRange.MaxAge`  ※左0埋め7桁にそろえる +
-And `[DB]exam_normal_value_range(検査基準値範囲).max_value(値上限)` == `ExamNormalValueRange.MaxValue` 
+** `[DB]exam_normal_value_range.threshold_id(基準値パターンID)` == `[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCd` で検索した `[DB]thresholds.threshold_id`
+And `[DB]exam_normal_value_range.exam_item_detail_id(検査項目明細ID)` == `[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id` +
+And `[DB]exam_normal_value_range.max_age(対象年齢上限)`  ※左0埋め7桁にそろえる == `ExamNormalValueRange.MaxAge`  ※左0埋め7桁にそろえる +
+And `[DB]exam_normal_value_range.target_sex(対象性別)` == `ExamNormalValueRange.TargetSex` ※int型にパースする +
+And `[DB]exam_normal_value_range.max_value(値上限)` == `ExamNormalValueRange.MaxValue` 
 
 [cols="1,2,2" options="header"]
 |===
