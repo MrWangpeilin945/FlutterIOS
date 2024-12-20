@@ -26,7 +26,7 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
         <Popover position="bottom">
           <Popover.Target>
             <Button bg="white01" c="primary" h="auto" py={8} px={32}>
-              <IconUserFilled size={"24"} />
+              <IconUserFilled size={24} />
             </Button>
           </Popover.Target>
           <Popover.Dropdown
@@ -78,7 +78,7 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
           px={32}
           onClick={() => navigate("/home")}
         >
-          <IconHomeFilled size={"24"} />
+          <IconHomeFilled size={24} />
           <Text size="xs" fw={700} c="primary" pl={10}>
             ホーム
           </Text>
