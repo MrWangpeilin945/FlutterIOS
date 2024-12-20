@@ -14,7 +14,7 @@ export default function BoothNote({ relatedExamItems }: BoothNoteProps) {
 
   return (
     <>
-      <Flex direction="column">
+      <Flex direction="column" style={{ width: "100%" }}>
         <Flex px={16} wrap="wrap" direction="row" gap={16}>
           {relatedExamItems.map((examItem, index) => (
             <Group key={index} mt={5} style={{ width: "calc(50% - 8px)" }}>
@@ -32,7 +32,11 @@ export default function BoothNote({ relatedExamItems }: BoothNoteProps) {
                     {examItem.examItemName?.slice(0, 8)}
                   </Text>
                 </Paper>
-                <Text size="xs" truncate="end" className={styles["text-wrap"]}>
+                <Text
+                  size="xs"
+                  className={styles["text-wrap"]}
+                  style={{ width: "calc(48vw - 242px)" }}
+                >
                   {examItem.examResult}
                 </Text>
               </Flex>
