@@ -33,6 +33,10 @@ export default function ExamNumericLR({
   onRegisterPressed,
   onChange,
 }: ExamNumericLRProps) {
+  // 定数で定義
+  const 左 = 1;
+  const 右 = 2;
+
   // 引数のチェック
   if (!examItems || examItems.length === 0) {
     return null;
@@ -41,18 +45,14 @@ export default function ExamNumericLR({
 
   if (
     !firstPosition?.examItemDetails?.some(
-      (detail) => detail.positionNumber === 1
+      (detail) => detail.positionNumber === 左
     ) ||
     !firstPosition?.examItemDetails?.some(
-      (detail) => detail.positionNumber === 2
+      (detail) => detail.positionNumber === 右
     )
   ) {
     return null;
   }
-
-  // 定数で定義
-  const 左 = 1;
-  const 右 = 2;
 
   const [examItemsData, setExamItemsData] = useState(examItems);
 
