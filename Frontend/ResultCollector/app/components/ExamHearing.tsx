@@ -140,7 +140,7 @@ export default function ExamHearing({
     return ValidationResult;
   };
 
-  const setNotAbnormal = (value: string, groupIndex: number) => {
+  const setNoFindings = (value: string, groupIndex: number) => {
     // 値を更新
     const updatedExamItem: InputExamItem = {
       ...examItemData,
@@ -175,7 +175,7 @@ export default function ExamHearing({
     }
   };
 
-  const setAbnormal = (value: string, detailNumber: number) => {
+  const setFindings = (value: string, detailNumber: number) => {
     const selectedDetail = examItemData.examItemDetails?.find(
       (detail) => detail.positionNumber === detailNumber,
     );
@@ -247,7 +247,7 @@ export default function ExamHearing({
               !!h4000.cancelReasonId;
             const isGroupSelected =
               getOrderNumber(h1000) === 1 && getOrderNumber(h4000) === 1;
-            const notAbnormalCode = h1000.examItemDetailOptions?.find(
+            const noFindingsCode = h1000.examItemDetailOptions?.find(
               (option) => option.orderNumber === 1, //所見なしの要素を取得
             )?.code;
             return (
@@ -290,19 +290,19 @@ export default function ExamHearing({
                   fw={700}
                   disabled={isGroupDisabled}
                   onClick={() => {
-                    setNotAbnormal(notAbnormalCode ?? "", index);
+                    setNoFindings(noFindingsCode ?? "", index);
                   }}
                 >
                   所見なし
                 </Button>
                 <Stack key={index}>
                   {group.details.map((detail) => {
-                    const abnormalOption = detail.examItemDetailOptions?.find(
+                    const FindingsOption = detail.examItemDetailOptions?.find(
                       (option) => option.orderNumber === 2, //所見ありの要素を取得
                     );
                     const isDisabled =
                       !detail.hasOrder || !!detail.cancelReasonId;
-                    const isSelected = detail.value === abnormalOption?.code;
+                    const isSelected = detail.value === FindingsOption?.code;
                     return (
                       <Button
                         key={detail.positionNumber}
@@ -325,10 +325,10 @@ export default function ExamHearing({
                         }
                         size="xl"
                         fw={700}
-                        value={abnormalOption?.code}
+                        value={FindingsOption?.code}
                         disabled={isDisabled}
                         onClick={(e) =>
-                          setAbnormal(
+                          setFindings(
                             e.currentTarget.value,
                             detail.positionNumber ?? 0,
                           )
