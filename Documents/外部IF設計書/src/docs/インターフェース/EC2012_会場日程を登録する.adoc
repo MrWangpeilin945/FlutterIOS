@@ -50,7 +50,7 @@ StorePlaceSchedulesAsync
 |PlaceSchedules
 |Yes
 |List<PlaceSchedule>
-|登録する団体のリスト
+|登録する会場日程のリスト
 
 |===
 
