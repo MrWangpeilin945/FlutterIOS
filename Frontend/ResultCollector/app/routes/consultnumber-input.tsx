@@ -237,11 +237,10 @@ export default function ConsultNumberInput() {
                     px={32}
                     py={16}
                   >
-                    <Title size="sm" c="white01" ta="center">
+                    <Text size="sm" fw={700} c="white01" ta="center">
                       受診番号
-                    </Title>
+                    </Text>
                   </Paper>
-
                   <TextInput
                     data-autofocus
                     size="xl"
