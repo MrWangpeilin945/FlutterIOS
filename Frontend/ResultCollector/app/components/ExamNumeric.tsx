@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import {
   Group,
   Stack,
-  Title,
   Paper,
   Text,
   TextInput,
@@ -23,23 +22,25 @@ import { InputErrorLevel } from "~/domain/enums";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
 
-type ExamNumericLRProps = {
+type ExamNumericProps = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
   onChange: (newExamItems: InputExamItem[] | undefined) => void;
 };
 
-export default function ExamNumericLR({
+export default function ExamNumeric({
   examItems,
   onRegisterPressed,
   onChange,
-}: ExamNumericLRProps) {
+}: ExamNumericProps) {
   // 引数のチェック
+  // examItemのチェック
   if (!examItems || examItems.length === 0) {
     return null;
   }
   const firstPosition = examItems.find((item) => item.positionNumber === 1);
-
+  // positionNumberが1のexamItemの中に
+  // positionNumberが1のexamItemDetailがあるかチェック
   if (
     !firstPosition?.examItemDetails?.some(
       (detail) => detail.positionNumber === 1
@@ -59,7 +60,7 @@ export default function ExamNumericLR({
   };
   const closeKeyBoard = useClickOutside(() => setShowKeyboards(false));
 
-  const handleErrorMessage = (item: InputExamItem): InputExamItem => {
+  const sortErrorMessage = (item: InputExamItem): InputExamItem => {
     if (item.examRegistResults) {
       // エラーレベルが高い順にソート
       item.examRegistResults.sort((a, b) => {
@@ -67,14 +68,7 @@ export default function ExamNumericLR({
         const levelB = b.errorLevel ?? 0;
         return levelB - levelA;
       });
-
-      // 重複を除外
-      item.examRegistResults = item.examRegistResults.filter(
-        (result, index, self) =>
-          index === self.findIndex((r) => r.description === result.description)
-      );
     }
-
     return item;
   };
 
@@ -100,22 +94,19 @@ export default function ExamNumericLR({
     resetErrorMessages(item);
     // コールバック判断用のコンポーネントのエラーメッセージ
     const componentErrorMessage: ExamRegistResult[] = [];
-    // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
+    // detailsのpositionNumberが1のものについてバリデーションチェックを行う
     for (const { name, positionNumber, value } of item.examItemDetails ?? []) {
-      if (positionNumber !== 1 && positionNumber !== 2) {
+      if (positionNumber !== 1) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
       }
       // 必須チェックと半角数字チェックを一度に行うスキーマ
       const schema = z
         .string()
-        .min(
-          1,
-          getErrorMessage(errorMessages.required, `${item.name}:${name}は`)
-        ) // 必須チェック
+        .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)) // 必須チェック
         .refine((value) => /^\d+(\.\d+)?$/.test(value), {
           message: getErrorMessage(
             errorMessages.numericString,
-            `${item.name}:${name}は`
+            `${item.name}は`
           ),
         });
 
@@ -148,7 +139,7 @@ export default function ExamNumericLR({
     // バリデーションチェックを行ったexamItemと、
     // コールバックを判断するフラグを返す
     const ValidationResult = {
-      validateResult: handleErrorMessage(resultItem),
+      validateResult: sortErrorMessage(resultItem),
       hasCallback: isCallback,
     };
     return ValidationResult;
@@ -249,9 +240,9 @@ export default function ExamNumericLR({
             justifyContent: "center",
           }}
         >
-          <Title size="lg" fw={700}>
+          <Text size="lg" fw={700}>
             {name}
-          </Title>
+          </Text>
         </Paper>
         <TextInput
           classNames={{
@@ -292,7 +283,7 @@ export default function ExamNumericLR({
           w={154}
           h={64}
           size="lg"
-          bg={"white"}
+          bg="white01"
           variant="outline"
           onClick={() => handleChange("", positionNumber)}
         >
