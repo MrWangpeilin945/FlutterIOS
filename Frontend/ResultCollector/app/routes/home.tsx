@@ -6,7 +6,6 @@ import {
   Paper,
   Stack,
   Text,
-  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
@@ -16,7 +15,6 @@ import { useEffect, useState } from "react";
 import { useHomeMenuGetHomeMenuSettings } from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
 import CommonDialog from "~/components/CommonDialog";
-import CommonFooter from "~/components/CommonFooter";
 import CommonHeader from "~/components/CommonHeader";
 import { PlaceScheduleLockingStatus } from "~/domain/enums";
 import type { HomeMenu, HomeMenuGroupList } from "~/domain/wellship.schemas";
@@ -99,24 +97,41 @@ export default function Home() {
     menuName: string;
     disabled: boolean;
     onClick: () => void;
+    marginBottom: number;
   }
   const ButtonComponent = ({
     menuName,
     disabled,
     onClick,
+    marginBottom,
   }: BaseButtonProps) => {
     return (
       <Button
         fullWidth
         justify="flex-start"
         key={menuName}
-        bg="white01"
-        c="black"
-        m={10}
         onClick={onClick}
         disabled={disabled}
+        py={16}
+        px={32}
+        style={{ borderWidth: 2 }}
+        variant="outline"
+        bg="white01"
+        color="gray03"
+        mb={marginBottom}
+        h="auto"
+        radius={48}
       >
-        <Text size="xs" fw="500">
+        <Text
+          c="black01"
+          size="xl"
+          fw={700}
+          style={{
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+          }}
+        >
           {menuName}
         </Text>
       </Button>
@@ -144,80 +159,89 @@ export default function Home() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="ホーム" staffName={staff?.name || ""} />
-        <Container fluid mt={20}>
+        <Container fluid bg="white01" py={32} px={24}>
           {!isFetching && (
             <>
               {homeMenuGroupData?.homeMenuGroups ? (
                 <>
-                  <Stack>
-                    <Box variant="outline" key={team?.id}>
-                      <Paper radius="lg" bg={"white"}>
-                        <Box
-                          style={{
-                            borderTopLeftRadius: "inherit",
-                            borderTopRightRadius: "inherit",
-                          }}
-                          pl="sm"
-                          p="md"
-                          bg="#f8f7f6"
-                        >
-                          {/* 班名ボタン */}
-                          <ButtonComponent
-                            key={team?.id}
-                            menuName={team?.name || "【班を選択してください】"}
-                            disabled={false}
-                            onClick={() => navigate("/team-select")}
-                          />
+                  <Stack pb={24}>
+                    <Box
+                      variant="outline"
+                      bg="background"
+                      py={24}
+                      px={32}
+                      style={{ borderRadius: 16 }}
+                      pb={16}
+                      key={team?.id}
+                    >
+                      {/* 班名ボタン */}
+                      <ButtonComponent
+                        key={team?.id}
+                        menuName={team?.name || "【班を選択してください】"}
+                        disabled={false}
+                        onClick={() => navigate("/team-select")}
+                        marginBottom={16}
+                      />
 
-                          {/* 会場名ボタン */}
-                          <div>
-                            <ButtonComponent
-                              key={placeSchedule?.placeScheduleId}
-                              menuName={
-                                placeSchedule?.placeName ||
-                                "【会場を選択してください】"
-                              }
-                              disabled={!team}
-                              onClick={() => navigate("/place-select")}
-                            />
-                          </div>
-                        </Box>
-                      </Paper>
+                      {/* 会場名ボタン */}
+                      <ButtonComponent
+                        key={placeSchedule?.placeScheduleId}
+                        menuName={
+                          placeSchedule?.placeName ||
+                          "【会場を選択してください】"
+                        }
+                        disabled={!team}
+                        onClick={() => navigate("/place-select")}
+                        marginBottom={0}
+                      />
                     </Box>
                   </Stack>
-                  <Stack>
+                  <Stack gap={24}>
                     {/* ホームメニュー一覧 */}
                     {homeMenuGroupData?.homeMenuGroups?.map((homeMenuGroup) => (
                       <Box variant="outline" key={homeMenuGroup.groupName}>
-                        <Paper radius="lg" bg={"white"}>
-                          <Box
-                            style={{
-                              borderTopLeftRadius: "inherit",
-                              borderTopRightRadius: "inherit",
-                            }}
-                            pl="sm"
-                            p="md"
-                            bg={"gray02"}
-                          >
-                            <Text size="xs" c="white" fw="500">
-                              {homeMenuGroup.groupName || ""}
-                            </Text>
-                          </Box>
-                          <Box pl="sm" p="md" bg="#f8f7f6">
-                            {homeMenuGroup.menus?.map((menus) => (
-                              <ButtonComponent
-                                key={menus.menuName}
-                                menuName={getMenuName(
-                                  menus,
-                                  homeMenuGroupData.placeScheduleLockingStatus ||
-                                    0,
-                                )}
-                                disabled={getDisabled(menus)}
-                                onClick={() => navigate(`/${menus.path}`)}
-                              />
-                            ))}
-                          </Box>
-                        </Paper>
+                        <Box
+                          style={{
+                            borderTopLeftRadius: 16,
+                            borderTopRightRadius: 16,
+                          }}
+                          bg={"gray02"}
+                          py={12}
+                          px={24}
+                        >
+                          <Text c="white01" size="md" fw={700}>
+                            {homeMenuGroup.groupName || ""}
+                          </Text>
+                        </Box>
+                        <Box
+                          bg="background"
+                          py={24}
+                          px={32}
+                          style={{
+                            borderBottomLeftRadius: 16,
+                            borderBottomRightRadius: 16,
+                          }}
+                        >
+                          {homeMenuGroup.menus?.map((menus, index) => (
+                            <ButtonComponent
+                              key={menus.menuName}
+                              menuName={getMenuName(
+                                menus,
+                                homeMenuGroupData.placeScheduleLockingStatus ||
+                                  0,
+                              )}
+                              disabled={getDisabled(menus)}
+                              onClick={() => navigate(`/${menus.path}`)}
+                              marginBottom={
+                                homeMenuGroup.menus
+                                  ? homeMenuGroup.menus.length - 1 === index
+                                    ? 0
+                                    : 16
+                                  : 0
+                              }
+                            />
+                          ))}
+                        </Box>
                       </Box>
                     ))}
                   </Stack>
@@ -225,9 +249,9 @@ export default function Home() {
               ) : (
                 <>
                   {/* エラーメッセージを表示 */}
-                  <Title order={3}>
+                  <Text size="sm" c="black01">
                     使用できるホームメニューの設定がありませんでした。
-                  </Title>
+                  </Text>
                 </>
               )}
               <CommonDialog
@@ -239,7 +263,6 @@ export default function Home() {
             </>
           )}
         </Container>
-        <CommonFooter />
       </AuthWrapper>
     </>
   );
