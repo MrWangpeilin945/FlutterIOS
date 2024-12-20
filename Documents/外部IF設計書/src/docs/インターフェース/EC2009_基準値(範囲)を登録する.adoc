@@ -127,7 +127,7 @@ list.Count() <> 0
 
 |ErrorLevel
 |Yes
-|integer
+|enum<Wellship.Core\Enums\InputErrorLevel>
 |エラーレベル
 
 |InputNote
@@ -256,7 +256,7 @@ And `[DB]exam_normal_value_range.max_value(値上限)` == `ExamNormalValueRange.
 
 |error_level
 |ExamNormalValueRange.ErrorLevel
-|
+|int型にパースする
 
 |created_at
 |system.datetime.now()
