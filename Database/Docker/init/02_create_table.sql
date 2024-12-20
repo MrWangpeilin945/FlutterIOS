@@ -795,7 +795,7 @@ COMMENT ON COLUMN exam_normal_option_details.option_id IS '選択肢ID';
 COMMENT ON COLUMN exam_normal_option_details.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_option_details.created_by IS '作成者';
 
-COMMENT ON TABLE exam_normal_options IS '検査正常値選択肢';
+COMMENT ON TABLE exam_normal_options IS '検査基準値選択肢';
 COMMENT ON COLUMN exam_normal_options.normal_options_id IS '基準値選択肢ID';
 COMMENT ON COLUMN exam_normal_options.name IS '名称';
 COMMENT ON COLUMN exam_normal_options.threshold_id IS '基準値パターンID:0: テナントの基準';
@@ -807,7 +807,7 @@ COMMENT ON COLUMN exam_normal_options.error_level IS 'エラーレベル';
 COMMENT ON COLUMN exam_normal_options.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_options.created_by IS '作成者';
 
-COMMENT ON TABLE exam_normal_value_range IS '検査正常値範囲';
+COMMENT ON TABLE exam_normal_value_range IS '検査基準値範囲';
 COMMENT ON COLUMN exam_normal_value_range.range_id IS '範囲ID';
 COMMENT ON COLUMN exam_normal_value_range.name IS '名称';
 COMMENT ON COLUMN exam_normal_value_range.threshold_id IS '基準値パターンID:0: テナントの基準';
