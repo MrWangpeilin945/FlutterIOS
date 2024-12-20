@@ -12,7 +12,15 @@ export default function PlaceSchedule({
 }: PlaceScheduleProps) {
   return (
     <Stack gap={16}>
-      <Text size="lg" fw={700} c="black01">
+      <Text
+        size="lg"
+        fw={700}
+        c="black01"
+        style={{
+          wordBreak: "break-word",
+          whiteSpace: "pre-wrap",
+        }}
+      >
         {placeName}
       </Text>
       <Text size="sm" c="black01">
