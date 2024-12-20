@@ -188,7 +188,7 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `PlaceSchedule.ExamDate` ※Date
 |`[DB]teams.team_code` == `PlaceSchedule.TeamCode` で検索し、`team_id`を登録する
 
 |status
-|Insert:`11`:準備中, Update:更新しない
+|Insert:`enum<Wellship.Core\Enums\PlaceScheduleLockingStatus.検査中> int型にパースする, Update:更新しない
 |
 
 |exam_date
