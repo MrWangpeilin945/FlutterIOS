@@ -233,12 +233,12 @@ export default function PlaceScheduleLock() {
               ) : (
                 <>
                   {/* エラーメッセージを表示 */}
-                  <Title order={3}>
+                  <Text size="sm" c="black01">
                     {getErrorMessage(
                       errorMessages.notFound,
                       "該当する会場日程",
                     )}
-                  </Title>
+                  </Text>
                 </>
               )}
 
