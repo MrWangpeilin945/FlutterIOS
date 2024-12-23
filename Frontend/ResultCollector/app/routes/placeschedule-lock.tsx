@@ -7,7 +7,6 @@ import {
   LoadingOverlay,
   Space,
   Text,
-  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
@@ -225,7 +224,7 @@ export default function PlaceScheduleLock() {
                             new Date(placeScheduleLock.updatedAt),
                             "yyyy/MM/dd hh:mm",
                           )
-                        : null}
+                        : ""}
                       ）&nbsp;
                     </Text>
                   </Flex>
