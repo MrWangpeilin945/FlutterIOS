@@ -57,7 +57,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=100
-Top=600
+Top=1050
 Field="職員ID","staff_id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="職員コード","staff_code","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="ログインID","login_id","text","NOT NULL",,"","",$FFFFFFFF,""
@@ -72,7 +72,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241127145942
-Position="MAIN",100,600
+Position="MAIN",100,1050
 ZOrder=1
 
 [Entity]
@@ -82,15 +82,15 @@ Comment=
 TableInnerOption=
 TableOption=
 Page=MAIN
-Left=800
-Top=650
+Left=700
+Top=1050
 Field="ロールID","role_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="ロール名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241015162946
-Position="MAIN",800,650,357,71
+Position="MAIN",700,1050,357,71
 ZOrder=2
 
 [Relation]
@@ -102,12 +102,12 @@ Fields1=role_id
 Fields2=role_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,2820,7180,4025,R,R,""
+Position="MAIN",3,5494,7180,4025,R,R,""
 Dependence=0
 Caption=
 PName=
-LineMode=0
-Bar1=282
+LineMode=3
+Bar1=549
 Bar2=718
 Bar3=402
 TermPos1=R
@@ -122,7 +122,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=100
-Top=1000
+Top=1450
 Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="職員ID","staff_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
 Field="ログイン試行日時","login_timestamp","timestamp with time zone","NOT NULL",,"","",$FFFFFFFF,""
@@ -131,7 +131,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241125124821
-Position="MAIN",100,1000
+Position="MAIN",100,1450
 ZOrder=6
 
 [Relation]
@@ -154,84 +154,6 @@ Bar3=350
 TermPos1=R
 TermPos2=R
 ZOrder=7
-
-[Entity]
-PName=functionalities
-LName=機能
-Comment=
-TableInnerOption=
-TableOption=
-Page=MAIN
-Left=1400
-Top=900
-Field="機能ID","functionality_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
-Field="機能名","name","text","NOT NULL",,"","",$FFFFFFFF,""
-EffectMode=None
-Color=$000000
-BkColor=$FFFFFF
-ModifiedDateTime=20241112171402
-Position="MAIN",1400,900
-ZOrder=8
-
-[Entity]
-PName=role_permissions
-LName=ロール機能許可
-Comment=
-TableInnerOption=
-TableOption=
-Page=MAIN
-Left=1350
-Top=650
-Field="機能ID","functionality_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
-Field="ロールID","role_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
-EffectMode=None
-Color=$000000
-BkColor=$FFFFFF
-ModifiedDateTime=20241015162819
-Position="MAIN",1350,650
-ZOrder=9
-
-[Relation]
-Entity1=roles
-Entity2=role_permissions
-RelationType1=2
-RelationType2=3
-Fields1=role_id
-Fields2=role_id
-Cardinarity1=
-Cardinarity2=
-Position="MAIN",0,3805,6195,2279,R,R,""
-Dependence=1
-Caption=
-PName=
-LineMode=0
-Bar1=380
-Bar2=620
-Bar3=228
-TermPos1=R
-TermPos2=R
-ZOrder=10
-
-[Relation]
-Entity1=functionalities
-Entity2=role_permissions
-RelationType1=2
-RelationType2=3
-Fields1=functionality_id
-Fields2=functionality_id
-Cardinarity1=
-Cardinarity2=
-Position="MAIN",0,3805,6195,4486,R,R,""
-Dependence=1
-Caption=
-PName=
-LineMode=0
-Bar1=380
-Bar2=620
-Bar3=449
-TermPos1=R
-TermPos2=R
-ZOrder=11
 
 [Entity]
 PName=examinees
