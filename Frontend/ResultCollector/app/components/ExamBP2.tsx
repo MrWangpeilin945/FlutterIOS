@@ -12,8 +12,11 @@ import {
 import { useClickOutside } from "@mantine/hooks";
 import { IconExclamationCircleFilled } from "@tabler/icons-react";
 import { z } from "zod";
-import { InputErrorLevel } from "~/domain/enums";
-import type { InputExamItem } from "~/domain/wellship.schemas";
+import { InputErrorLevel, KeyboardType } from "~/domain/enums";
+import type {
+  InputExamItem,
+  ExamRegistResult,
+} from "~/domain/wellship.schemas";
 import NumericKeyboard from "./NumericKeyboard";
 import CollectionKeyboard from "./CollectionKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
@@ -32,137 +35,304 @@ export default function ExamBody({
   onRegisterPressed,
   onChange,
 }: BodyProps) {
+  // 定数で定義
+  const 血圧1回目 = 1;
+  const 血圧2回目 = 2;
+  const 平均値 = 3;
+  const 収縮期 = 1;
+  const 拡張期 = 2;
+
+  // 引数のチェック
   if (!examItems || examItems.length === 0) {
     return null;
   }
-
   const [examItemsData, setExamItemsData] = useState(examItems);
-
   // キーボードの表示状態を管理する
-  const [showKeyboards, setShowKeyboards] = useState<boolean[][]>(
-    examItems.map((examItem) => {
-      const { examItemDetails } = examItem;
-      return examItemDetails ? examItemDetails.map(() => false) : [];
-    })
-  );
-  const closeKeyBoard = useClickOutside(() => {
-    setShowKeyboards((prev) => prev.map((row) => row.map(() => false)));
+  const [showKeyboards, setShowKeyboards] = useState<{
+    first: {
+      contraction: boolean;
+      expansion: boolean;
+    };
+    second: {
+      contraction: boolean;
+      expansion: boolean;
+    };
+  }>({
+    first: {
+      contraction: false,
+      expansion: false,
+    },
+    second: {
+      contraction: false,
+      expansion: false,
+    },
   });
+
+  // キーボード外部をクリックした際に非表示にする
+  const closeKeyBoard = useClickOutside(() => {
+    setShowKeyboards({
+      first: {
+        contraction: false,
+        expansion: false,
+      },
+      second: {
+        contraction: false,
+        expansion: false,
+      },
+    });
+  });
+
+  // キーボードの確定ボタン押下時に非表示にする
   const handleConfirm = () => {
-    setShowKeyboards((prev) => prev.map((row) => row.map(() => false)));
+    setShowKeyboards({
+      first: {
+        contraction: false,
+        expansion: false,
+      },
+      second: {
+        contraction: false,
+        expansion: false,
+      },
+    });
   };
-  const toggleKeyboard2 = (index: number, detailIndex: number) => {
+
+  // キーボードの表示/非表示をトグルする関数
+  const toggleKeyboard = (
+    positionNumber: number,
+    detailPositionNumber: number
+  ) => {
     setShowKeyboards((prev) => {
-      const updated = [...prev];
-      updated[index][detailIndex] = true;
+      const updated = { ...prev };
+      if (positionNumber === 血圧1回目) {
+        if (detailPositionNumber === 収縮期) {
+          updated.first = {
+            ...updated.first,
+            contraction: !updated.first.contraction,
+          };
+        } else if (detailPositionNumber === 拡張期) {
+          updated.first = {
+            ...updated.first,
+            expansion: !updated.first.expansion,
+          };
+        }
+      } else if (positionNumber === 血圧2回目) {
+        if (detailPositionNumber === 収縮期) {
+          updated.second = {
+            ...updated.second,
+            contraction: !updated.second.contraction,
+          };
+        } else if (detailPositionNumber === 拡張期) {
+          updated.second = {
+            ...updated.second,
+            expansion: !updated.second.expansion,
+          };
+        }
+      }
       return updated;
     });
   };
-  const handleErrorMessage = (item: InputExamItem): InputExamItem => {
+
+  // エラーメッセージをエラーレベルで並び替え
+  const sortErrorMessage = (item: InputExamItem): InputExamItem => {
     if (item.examRegistResults) {
-      // エラーレベルが高い順にソート
       item.examRegistResults.sort((a, b) => {
         const levelA = a.errorLevel ?? 0;
         const levelB = b.errorLevel ?? 0;
         return levelB - levelA;
       });
-
-      // 重複を除外
-      item.examRegistResults = item.examRegistResults.filter(
-        (result, index, self) =>
-          index === self.findIndex((r) => r.description === result.description)
-      );
     }
-
     return item;
   };
 
+  // APIからのエラーメッセージを保存
+  const APIErrors = examItems.map((item) => ({
+    positionNumber: item.positionNumber,
+    examRegistResults: item.examRegistResults || [],
+  }));
+
+  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  const resetErrorMessages = (item: InputExamItem) => {
+    const targetError = APIErrors.find(
+      (error) => error.positionNumber === item.positionNumber
+    );
+    if (targetError) {
+      item.examRegistResults = targetError.examRegistResults;
+    }
+    return item;
+  };
+
+  // バリデーションチェック
   const validationCheck = (item: InputExamItem) => {
-    // 必須チェックと半角数字チェックを一度に行うスキーマ
-    const schema = z.object({
-      value: z
+    // positionNumberが対象でなければ処理を終える
+    if (
+      item.positionNumber !== 血圧1回目 &&
+      item.positionNumber !== 血圧2回目
+    ) {
+      return { validateResult: item, hasCallback: true };
+    }
+    // APIエラーメッセージで初期化
+    resetErrorMessages(item);
+    // コールバック判断用のコンポーネントのエラーメッセージ
+    const componentErrorMessage: ExamRegistResult[] = [];
+    // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
+    for (const { name, positionNumber, value } of item.examItemDetails ?? []) {
+      if (positionNumber !== 収縮期 && positionNumber !== 拡張期) {
+        continue; // 対象のpositionNumberでない場合、処理をスキップする
+      }
+      // 必須チェックと半角数字チェックを一度に行うスキーマ
+      const schema = z
         .string()
-        .min(1, {
-          message: getErrorMessage(errorMessages.required, `${item.name}は`),
-        }) // 必須チェック
+        .min(
+          1,
+          getErrorMessage(errorMessages.required, `${item.name}:${name}は`)
+        ) // 必須チェック
         .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-          // 半角数字チェック
           message: getErrorMessage(
             errorMessages.numericString,
-            `${item.name}は`
+            `${item.name}:${name}は`
           ),
-        }),
-    });
-    // 基準値によるチェック
-    setRangesErrorMessage(item);
-    // エラーメッセージを更新
-    let updatedErrors = item.examRegistResults || [];
-    // 既に存在するコンポーネントのエラーメッセージを削除
-    const errorMessageRequired = getErrorMessage(
-      errorMessages.required,
-      `${item.name}は`
-    );
-    updatedErrors = updatedErrors.filter(
-      (error) => error.description !== errorMessageRequired
-    );
+        });
 
-    // 半角数字エラーを削除
-    const errorMessageNumeric = getErrorMessage(
-      errorMessages.numericString,
-      `${item.name}は`
-    );
-    updatedErrors = updatedErrors.filter(
-      (error) => error.description !== errorMessageNumeric
-    );
+      // バリデーション対象データを取得
+      const valueToValidate = value;
+      const result = schema.safeParse(valueToValidate);
 
-    // バリデーションチェック
-    for (const detail of item.examItemDetails || []) {
-      const valueToValidate = detail.value || "";
-      const result = schema.safeParse({ value: valueToValidate });
-
-      // エラーメッセージを追加する
+      // バリデーションが失敗した場合
       if (!result.success) {
-        const errorMessage = result.error.errors[0].message;
-        updatedErrors.push({
-          description: errorMessage,
+        const error = result.error.errors[0]; // 最初のエラーだけ取得
+        componentErrorMessage.push({
+          description: error.message,
           errorLevel: InputErrorLevel.異常,
         });
-        break; // この検査項目についてのチェックを終える
       }
     }
 
-    const prevItem = {
+    // 基準値によるエラーメッセージを追加
+    componentErrorMessage.push(...setRangesErrorMessage(item));
+    // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
+    const isCallback = !componentErrorMessage.some(
+      (error) => error.errorLevel === InputErrorLevel.異常
+    );
+    // エラーメッセージをexamItemに保存
+    const resultItem: InputExamItem = {
       ...item,
-      examRegistResults: updatedErrors,
+      examRegistResults: item.examRegistResults
+        ? item.examRegistResults.concat(componentErrorMessage)
+        : componentErrorMessage,
     };
-
-    return handleErrorMessage(prevItem);
+    // バリデーションチェックを行ったexamItemと、
+    // コールバックを判断するフラグを返す
+    const ValidationResult = {
+      validateResult: sortErrorMessage(resultItem),
+      hasCallback: isCallback,
+    };
+    return ValidationResult;
   };
 
   useEffect(() => {
     const updatedItems = examItems.map((item) => {
-      let validatedData: InputExamItem = item;
+      let validatedData = item;
       // onRegisterPressedがtrueの場合のみvalidationCheckを実行
       if (onRegisterPressed) {
-        validatedData = validationCheck(item); // 必須バリデーションを実行
+        validatedData = validationCheck(validatedData).validateResult;
       }
       return validatedData;
     });
     setExamItemsData(updatedItems);
   }, [onRegisterPressed, examItems]);
 
+  // 平均値の計算,保存処理
+  const calculateAverage = (updatedExamItems: InputExamItem[]) => {
+    // 値の取得
+    let bpH_first = 0;
+    let bpL_first = 0;
+    let bpH_second = 0;
+    let bpL_second = 0;
+
+    for (const item of updatedExamItems) {
+      if (item.positionNumber === 血圧1回目) {
+        for (const detail of item.examItemDetails ?? []) {
+          if (detail.positionNumber === 収縮期) {
+            bpH_first =
+              detail.value !== undefined && !Number.isNaN(Number(detail.value))
+                ? Number.parseFloat(detail.value)
+                : 0;
+          } else if (detail.positionNumber === 拡張期) {
+            bpL_first =
+              detail.value !== undefined && !Number.isNaN(Number(detail.value))
+                ? Number.parseFloat(detail.value)
+                : 0;
+          }
+        }
+      } else if (item.positionNumber === 血圧2回目) {
+        for (const detail of item.examItemDetails ?? []) {
+          if (detail.positionNumber === 収縮期) {
+            bpH_second =
+              detail.value !== undefined && !Number.isNaN(Number(detail.value))
+                ? Number.parseFloat(detail.value)
+                : 0;
+          } else if (detail.positionNumber === 拡張期) {
+            bpL_second =
+              detail.value !== undefined && !Number.isNaN(Number(detail.value))
+                ? Number.parseFloat(detail.value)
+                : 0;
+          }
+        }
+      }
+    }
+    // 平均値の計算
+    const bpH_AVE = Math.round((bpH_first + bpH_second) / 2) || 0;
+    const bpL_AVE = Math.round((bpL_first + bpL_second) / 2) || 0;
+    // 平均値の保存
+    return updatedExamItems.map((item) => {
+      if (item.positionNumber === 平均値) {
+        item.examItemDetails = item.examItemDetails?.map((detail) => {
+          const integerLength = detail.integerLength ?? 0;
+          const maxDigits = integerLength; // 平均値では小数点を考慮しない
+
+          if (detail.positionNumber === 収縮期) {
+            if (detail.integerLength) {
+              return {
+                ...detail,
+                value: bpH_AVE.toString().slice(0, maxDigits),
+              };
+            }
+            return { ...detail, value: bpH_AVE.toString() };
+          }
+          if (detail.positionNumber === 拡張期) {
+            if (detail.integerLength) {
+              return {
+                ...detail,
+                value: bpL_AVE.toString().slice(0, maxDigits),
+              };
+            }
+            return { ...detail, value: bpL_AVE.toString() };
+          }
+          return detail;
+        });
+      }
+      return item;
+    });
+  };
+
   //変更イベント
   const handleChange = (
-    positionNumber: number | undefined,
     value: string,
+    positionNumber: number | undefined,
     detailPositionNumber?: number
   ) => {
+    // 対象のpositionNumberか確認
+    if (positionNumber !== 血圧1回目 && positionNumber !== 血圧2回目) {
+      return null;
+    }
     const updatedExamItems = [...examItemsData];
+    // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
+    let hasValidationError = true;
 
     // 該当するitemを更新
     for (const item of updatedExamItems) {
       if (item.positionNumber === positionNumber) {
-        // 該当するitemの全てのdetailの値をvalueに変更
+        // クリアボタン用の処理
         if (detailPositionNumber === undefined) {
           item.examItemDetails = item.examItemDetails?.map((detail) => ({
             ...detail,
@@ -172,100 +342,56 @@ export default function ExamBody({
           // 該当するdetailの値を更新
           item.examItemDetails = item.examItemDetails?.map((detail) =>
             detail.positionNumber === detailPositionNumber
-              ? { ...detail, value: value.slice(0, detail.integerLength ?? 3) }
+              ? { ...detail, value: value }
               : detail
           );
         }
       }
-      // 平均値の計算処理
-      const AVE1 = Math.round(
-        (Number.parseFloat(
-          updatedExamItems[0].examItemDetails?.[0].value ?? ""
-        ) +
-          Number.parseFloat(
-            updatedExamItems[1].examItemDetails?.[0].value ?? ""
-          )) /
-          2
-      );
-      const AVE2 = Math.round(
-        (Number.parseFloat(
-          updatedExamItems[0].examItemDetails?.[1].value ?? ""
-        ) +
-          Number.parseFloat(
-            updatedExamItems[1].examItemDetails?.[1].value ?? ""
-          )) /
-          2
-      );
-      // 平均値の保存処理
-      if (item.positionNumber === 3) {
-        item.examItemDetails = item.examItemDetails?.map((detail, idx) => {
-          const integerLength = detail.integerLength ?? 0; // 血圧なので、小数部分は考慮しない
-          const maxDigits = integerLength + 1;
-          if (idx === 0) {
-            if (AVE1) {
-              if (detail.integerLength) {
-                return {
-                  ...detail,
-                  value: AVE1.toString().slice(0, maxDigits),
-                };
-              }
-              return { ...detail, value: AVE1.toString() };
-            }
-            return { ...detail, value: "" }; // 計算する値が無い場合、空白にする
-          }
-          if (idx === 1) {
-            if (AVE2) {
-              if (detail.integerLength) {
-                return {
-                  ...detail,
-                  value: AVE2.toString().slice(0, maxDigits),
-                };
-              }
-              return { ...detail, value: AVE2.toString() };
-            }
-            return { ...detail, value: "" };
-          }
-          return detail;
-        });
+      // バリデーションチェックを実施
+      const { validateResult, hasCallback } = validationCheck(item);
+      if (!hasCallback) {
+        // falseのexamItemがあればコールバックを行わない
+        hasValidationError = false;
       }
-      // 各アイテムに対してバリデーションを実行
-      const validatedItem = validationCheck(item);
       // バリデーション結果を反映
-      Object.assign(item, validatedItem);
+      Object.assign(item, validateResult);
     }
+
+    // 平均値の処理
+    const addAVEExamItems = calculateAverage(updatedExamItems);
     // 更新されたデータをステートに設定
-    setExamItemsData(updatedExamItems);
-    // 2つのエラーが存在するか確認
-    const isValidatedError = updatedExamItems.some((item) =>
-      item.examRegistResults?.some(
-        (error) =>
-          error.description ===
-            getErrorMessage(errorMessages.required, `${item.name}は`) ||
-          error.description ===
-            getErrorMessage(errorMessages.numericString, `${item.name}は`)
-      )
-    );
-    if (!isValidatedError) {
-      onChange(updatedExamItems);
+    setExamItemsData(addAVEExamItems);
+
+    // 全てのitemでバリデーションチェックが通った場合、コールバックする
+    if (hasValidationError) {
+      onChange(addAVEExamItems);
     }
   };
 
-  // 小数点と先頭の0を除去して数値部分だけを取得する処理
-  // TODO：キーボードのコンポーネントの仕様変更に伴い削除予定
-  const removeDecimalAndLeadingZero = (value: string): string => {
-    // 小数点を取り除く
-    const withoutDecimal = value.replace(".", "");
-    // 先頭の0を除去
-    const withoutLeadingZero = withoutDecimal.replace(/^0+/, "");
-    return withoutLeadingZero || "0"; // 空になった場合は "0" を返す
-  };
+  // 対象のexamItemをpositionNumberから検索
+  const targetExamItems = examItemsData.filter(
+    (item) =>
+      item.positionNumber === 血圧1回目 ||
+      item.positionNumber === 血圧2回目 ||
+      item.positionNumber === 平均値
+  );
 
   return (
     <>
-      {examItemsData.map((item, index) => {
-        const { positionNumber, name, examRegistResults = [] } = item;
-        const details = item.examItemDetails;
-        const isAVE = item.positionNumber === 3;
+      {targetExamItems.map((item) => {
+        const {
+          examItemDetails,
+          positionNumber,
+          name,
+          examRegistResults = [],
+        } = item;
+        const contractionDetail = examItemDetails?.find(
+          (detail) => detail.positionNumber === 収縮期
+        );
+        const expansionDetail = examItemDetails?.find(
+          (detail) => detail.positionNumber === 拡張期
+        );
+        const isAVE = item.positionNumber === 平均値;
 
         return (
           <Flex
@@ -290,14 +416,13 @@ export default function ExamBody({
                   {name}
                 </Text>
               </Paper>
-              {details?.map((detail, detailIndex) => {
+              {examItemDetails?.map((detail) => {
                 // グレーアウト表示判定
                 const isDisabled =
-                  !!details?.[detailIndex]?.cancelReasonId ||
-                  !details?.[detailIndex]?.hasOrder;
+                  !!detail?.cancelReasonId || !detail?.hasOrder;
 
                 return (
-                  <Flex key={detail.positionNumber}>
+                  <Flex key={detail?.positionNumber}>
                     {isAVE ? (
                       <Text
                         w={170}
@@ -318,7 +443,7 @@ export default function ExamBody({
                         }
                         px={32}
                         mt={-8}
-                        ta={"right"}
+                        ta="right"
                       >
                         {detail?.value}
                       </Text>
@@ -339,26 +464,30 @@ export default function ExamBody({
                               : ""
                           }`,
                         }}
-                        w={170}
+                        w={172}
                         radius="md"
                         size="inputComponent"
                         bg={isDisabled ? "gray03" : ""}
                         c={isDisabled ? "gray02" : ""}
                         value={detail?.value}
-                        maxLength={detail?.integerLength ?? 3}
                         onChange={(e) =>
                           handleChange(
-                            positionNumber,
                             e.currentTarget.value,
-                            detail.positionNumber
+                            positionNumber,
+                            detail?.positionNumber
                           )
                         }
-                        onClick={() => toggleKeyboard2(index, detailIndex)}
+                        onClick={() =>
+                          toggleKeyboard(
+                            positionNumber ?? 0,
+                            detail?.positionNumber ?? 0
+                          )
+                        }
                         disabled={isDisabled}
                       />
                     )}
-                    {detailIndex !== details.length - 1 && (
-                      <Text w={30} h={72} ml={16} c={"gray02"} size={"80px"}>
+                    {detail?.positionNumber === 収縮期 && (
+                      <Text w={30} h={72} ml={16} c="gray02" size="80px">
                         /
                       </Text>
                     )}
@@ -366,12 +495,13 @@ export default function ExamBody({
                 );
               })}
               <Stack w={216} gap={4} mt="auto">
-                {details?.[0].prevValue && details?.[1].prevValue && (
+                {contractionDetail?.prevValue && expansionDetail?.prevValue && (
                   <Text fw={700}>
-                    (前回：{details[0].prevValue}/{details[1].prevValue})
+                    (前回：{contractionDetail.prevValue}/
+                    {expansionDetail.prevValue})
                   </Text>
                 )}
-                <Text size="xs">{details?.[0].unit}</Text>
+                <Text size="xs">{contractionDetail?.unit}</Text>
               </Stack>
               {!isAVE && (
                 <Button
@@ -379,9 +509,10 @@ export default function ExamBody({
                   h={64}
                   ml={16}
                   size="lg"
-                  bg={"white"}
+                  bg="white01"
                   variant="outline"
-                  onClick={() => handleChange(positionNumber, "")}
+                  bd={"2px,solid"}
+                  onClick={() => handleChange("", positionNumber)}
                   tabIndex={-1}
                 >
                   クリア
@@ -394,39 +525,52 @@ export default function ExamBody({
               const isWarning = error.errorLevel === InputErrorLevel.警告;
               return (
                 <Group key={idx} c={isWarning ? "warning" : "error"}>
-                  <IconExclamationCircleFilled size={"32px"} />
+                  <IconExclamationCircleFilled size={32} />
                   <Text size="sm" fw={700}>
                     {error.description}
                   </Text>
                 </Group>
               );
             })}
-            {details?.map((detail, detailIndex) => (
-              <React.Fragment key={detail.positionNumber}>
+            {examItemDetails?.map((detail) => (
+              <React.Fragment key={detail?.positionNumber}>
                 {/* キーボード表示 */}
-                {showKeyboards[index][detailIndex] && (
-                  <Box ref={closeKeyBoard} mx="auto">
-                    {detail.keyboard?.keyboardType === 1 ||
-                    !detail.keyboard?.keyboardType ? (
-                      <NumericKeyboard
-                        value={removeDecimalAndLeadingZero(detail?.value ?? "")}
-                        onChange={(newValue) =>
-                          handleChange(
-                            positionNumber,
-                            newValue,
-                            detail.positionNumber
-                          )
-                        }
-                        onConfirm={handleConfirm}
-                      />
-                    ) : (
-                      <CollectionKeyboard
-                        keyboardValues={detail.keyboard?.values ?? []}
-                        onChange={handleConfirm}
-                      />
-                    )}
-                  </Box>
-                )}
+                {positionNumber !== 平均値 &&
+                  showKeyboards[
+                    positionNumber === 血圧1回目 ? "first" : "second"
+                  ][
+                    detail?.positionNumber === 収縮期
+                      ? "contraction"
+                      : "expansion"
+                  ] && (
+                    <Box ref={closeKeyBoard} ml={257}>
+                      {detail?.keyboard?.keyboardType ===
+                      KeyboardType.テンキー ? (
+                        <NumericKeyboard
+                          value={detail?.value ?? ""}
+                          onChange={(newValue) =>
+                            handleChange(
+                              newValue,
+                              positionNumber,
+                              detail?.positionNumber
+                            )
+                          }
+                          onConfirm={handleConfirm}
+                        />
+                      ) : (
+                        <CollectionKeyboard
+                          keyboardValues={detail.keyboard?.values ?? []}
+                          onChange={(newValue) =>
+                            handleChange(
+                              newValue,
+                              positionNumber,
+                              detail.positionNumber
+                            )
+                          }
+                        />
+                      )}
+                    </Box>
+                  )}
               </React.Fragment>
             ))}
           </Flex>
