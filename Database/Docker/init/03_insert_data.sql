@@ -43,7 +43,7 @@ INSERT INTO teams(team_id,team_code,name,order_number,created_at,created_by) VAL
 -- 会場日程
 INSERT INTO place_schedule(place_schedule_id,place_id,team_id,status,exam_date,start_time,created_at,created_by) VALUES 
     ('aceced00-0000-0000-0000-000000000001','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-10-01','0900',CURRENT_TIMESTAMP,'init')
-  , ('aceced00-0000-0000-0000-000000000002','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-10-01','1300',CURRENT_TIMESTAMP,'init')
+  , ('aceced00-0000-0000-0000-000000000002','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-10-02','1300',CURRENT_TIMESTAMP,'init')
   , ('aceced00-0000-0000-0000-000000000003','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000002',21,DATE '2024-11-02','1000',CURRENT_TIMESTAMP,'init')
   , ('20d6daa6-eac7-4ef4-8ea4-0f3b439668a6','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-11-30','1000',CURRENT_TIMESTAMP,'init');
 
@@ -200,11 +200,13 @@ INSERT INTO exam_results(consult_id,exam_item_detail_id,value,created_at,created
   , ('caaaaa00-0000-0000-0000-000000000003',712,'92',CURRENT_TIMESTAMP,'init')
   , ('caaaaa00-0000-0000-0000-000000000004',711,'128',CURRENT_TIMESTAMP,'init')
   , ('caaaaa00-0000-0000-0000-000000000004',712,'92',CURRENT_TIMESTAMP,'init')
-  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',2,'100.5',CURRENT_TIMESTAMP,'init');
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',2,'100.5',CURRENT_TIMESTAMP,'init')
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',1,'175.3',CURRENT_TIMESTAMP,'init');
 
 -- 過去検査結果
 INSERT INTO previous_results(consult_id,exam_date,exam_item_detail_id,value,created_at,created_by) VALUES 
-    ('8dda2a54-5217-425f-bba9-ab821a9647fe', DATE '2023-10-01',2,'70.0',CURRENT_TIMESTAMP,'init');
+    ('8dda2a54-5217-425f-bba9-ab821a9647fe', DATE '2023-10-01',2,'70.0',CURRENT_TIMESTAMP,'init')
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe', DATE '2023-10-1',1,'173.0',CURRENT_TIMESTAMP,'init');
 
 -- 検査中止
 INSERT INTO exam_cancels(consult_id,exam_item_detail_id,cancel_reason_id,created_at,created_by) VALUES 
@@ -238,3 +240,23 @@ INSERT INTO correlation_rule_exam_item_details(correlation_rule_id,variable_numb
   , (2,2,1,712,CURRENT_TIMESTAMP,'init')
   , (2,3,1,721,CURRENT_TIMESTAMP,'init')
   , (2,4,1,722,CURRENT_TIMESTAMP,'init');
+
+-- 検査メニュー特記
+insert into exam_menu_notes(menu_note_id,name,exam_menu_id,order_number,suffix,created_at,created_by) VALUES
+    (1,'身長',1,1,'cm',CURRENT_TIMESTAMP, 'init')
+  , (2,'撮影番号/○○番号',7,2,'番',CURRENT_TIMESTAMP, 'init');
+
+-- 検査メニュー特記_検査結果
+insert into exam_menu_note_results(menu_note_id,exam_item_detail_id,source_type,order_number,created_at,created_by) VALUES
+    (1,1,1,1,CURRENT_TIMESTAMP,'init')
+  , (1,1,2,2,CURRENT_TIMESTAMP,'init');
+
+-- 検査メニュー特記_受診
+insert into exam_menu_note_consults(menu_note_id,code,order_number,created_at,created_by) VALUES
+    (2,'ST01',1,CURRENT_TIMESTAMP,'init')
+  , (2,'ST02',2,CURRENT_TIMESTAMP,'init');
+
+-- 受診特記
+insert into consult_notes(consult_id, code, note, created_at, created_by) VALUES
+    ('8dda2a54-5217-425f-bba9-ab821a9647fe','ST01','01-001',CURRENT_TIMESTAMP,'init')
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe','ST02','02-001',CURRENT_TIMESTAMP,'init');

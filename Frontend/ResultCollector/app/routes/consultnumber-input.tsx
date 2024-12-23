@@ -1,11 +1,13 @@
 import {
   Box,
   Center,
+  Container,
   Group,
   LoadingOverlay,
   Paper,
+  Space,
+  Text,
   TextInput,
-  Title,
 } from "@mantine/core";
 import { useClickOutside, useDisclosure } from "@mantine/hooks";
 import { useFocusTrap } from "@mantine/hooks";
@@ -33,7 +35,7 @@ export const meta: MetaFunction = () => {
   return [{ title: "受診番号入力" }];
 };
 
-export default function consultNumberInput() {
+export default function ConsultNumberInput() {
   const navigate = useNavigate();
   const focusTrapRef = useFocusTrap();
   const [placeSchedule] = useAtom(placeScheduleState);
@@ -45,17 +47,18 @@ export default function consultNumberInput() {
   const [beforeExamName, setBeforeExamName] = useState("");
   const [isBeforeNum, setIsBeforeNum] = useState(false);
   const [menu] = useAtom(examMenuState);
+  const [consultNumber, setConsultNumber] = useState("");
 
   // URLのパスパラメータ
   const [searchParams] = useSearchParams();
-  const [consultNumber, setConsultNumber] = useState(
+  const [consultNumberParam] = useState(
     searchParams.get("consultnumber") || "",
   );
 
   //AP1008呼び出し用(GET系APIの定義)
   const { isFetching, refetch } = useConsultGetUnexaminedMenus(
     "1",
-    consultNumber || "",
+    consultNumberParam || "",
     { query: { enabled: false } },
   );
 
@@ -71,7 +74,7 @@ export default function consultNumberInput() {
 
   useEffect(() => {
     //AP1008_未受診の検査項目を取得する
-    if (consultNumber) {
+    if (consultNumberParam) {
       const fetchUnexaminedItemsSelect = async () => {
         const result = await refetch();
         if (result.data) {
@@ -203,66 +206,88 @@ export default function consultNumberInput() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="受診番号入力" staffName={staff?.name || ""} />
-        {!isFetching && (
-          <>
-            <Group mt={30} ml={50} gap="ms">
-              <Box className={styles["basic-green"]} w={10} h={70} />
-              <Title order={2} fw={550}>
-                {placeSchedule?.placeName || ""}
-              </Title>
-            </Group>
-            <Center>
-              <Group mt={50}>
-                <Paper
-                  className={styles["basic-grey"]}
-                  radius="lg"
-                  px="xl"
-                  py="md"
+        <Container fluid bg="background" py={32} px={24}>
+          {!isFetching && (
+            <>
+              <Group gap={24} wrap="nowrap">
+                <Box className={styles["basic-green"]} w={24} h={41} />
+                <Text
+                  size="md"
+                  fw={700}
+                  w="100%"
+                  style={{
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                  }}
                 >
-                  <Title order={1} fw={500}>
-                    受診番号
-                  </Title>
-                </Paper>
-                <Box>
+                  {placeSchedule?.placeName || ""}
+                </Text>
+              </Group>
+
+              <Space h={184} />
+              <Center>
+                <Group gap={24} wrap="nowrap">
+                  <Paper
+                    h="auto"
+                    miw={168}
+                    radius={8}
+                    bg="gray02"
+                    px={32}
+                    py={16}
+                  >
+                    <Text size="sm" fw={700} c="white01" ta="center">
+                      受診番号
+                    </Text>
+                  </Paper>
                   <TextInput
                     data-autofocus
                     size="xl"
                     value={consultNumber || ""}
                     onFocus={() => setShowKeyboard(true)}
+                    onClick={() => setShowKeyboard(true)}
                     onChange={(e) => handleInputChange(e)}
                     onKeyDown={handleKeyDown}
                     ref={focusTrapRef}
+                    styles={{
+                      input: {
+                        height: "auto",
+                        width: 609,
+                        padding: "16px 32px",
+                      },
+                    }}
+                  />
+                </Group>
+              </Center>
+              {showKeyboard && (
+                <Center>
+                  <div ref={closeKeyBoard}>
+                    <Keyboard
+                      value={consultNumber || ""}
+                      onChange={(e: string) => setConsultNumber(e)}
+                      onConfirm={handleConfirm}
+                    />
+                  </div>
+                </Center>
+              )}
+              <Space h={184} />
+              {isBeforeNum && (
+                <Box>
+                  <IncompliedExam
+                    name={beforeExamName}
+                    incompliedExams={beforeIncompData}
                   />
                 </Box>
-              </Group>
-            </Center>
-            {showKeyboard && (
-              <Center>
-                <div ref={closeKeyBoard}>
-                  <Keyboard
-                    value={consultNumber || ""}
-                    onChange={(e: string) => setConsultNumber(e)}
-                    onConfirm={handleConfirm}
-                  />
-                </div>
-              </Center>
-            )}
-            {isBeforeNum && (
-              <Box mt="50">
-                <IncompliedExam
-                  name={beforeExamName}
-                  incompliedExams={beforeIncompData}
-                />
-              </Box>
-            )}
-            <CommonDialog
-              message={errorMessage || ""}
-              buttonMessage="閉じる"
-              isOpen={opened}
-              onClose={close}
-            />
-          </>
-        )}
+              )}
+              <CommonDialog
+                message={errorMessage || ""}
+                buttonMessage="閉じる"
+                isOpen={opened}
+                onClose={close}
+              />
+            </>
+          )}
+        </Container>
         <CommonFooter items={footerItems} />
       </AuthWrapper>
     </>
