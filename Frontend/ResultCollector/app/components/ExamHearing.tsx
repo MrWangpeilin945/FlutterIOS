@@ -151,6 +151,7 @@ export default function ExamHearing({
     return ValidationResult;
   };
 
+  // 所見なしボタン押下時
   const setNoFindings = (value: string, groupIndex: number) => {
     // 値を更新
     const updatedExamItem: InputExamItem = {
@@ -186,6 +187,7 @@ export default function ExamHearing({
     }
   };
 
+  // 所見ありボタン押下時
   const setFindings = (value: string, detailNumber: number) => {
     const selectedDetail = examItemData.examItemDetails?.find(
       (detail) => detail.positionNumber === detailNumber,
