@@ -30,6 +30,17 @@ export default function ExamHearing({
   if (!firstItem) {
     return null;
   }
+
+  //全要素の存在を確認
+  const hearingItemPositionNumbers = [1,2,3,4];
+  const allPositionsExist = hearingItemPositionNumbers.every((position) =>
+    firstItem.examItemDetails?.some((detail) => detail.positionNumber === position),
+  );
+
+  if (!allPositionsExist) {
+    return null;
+  }
+
   const [examItemData, setExamItemData] = useState<InputExamItem>(firstItem);
 
   useEffect(() => {
