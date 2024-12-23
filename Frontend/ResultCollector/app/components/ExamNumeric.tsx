@@ -285,6 +285,8 @@ export default function ExamNumeric({
           size="lg"
           bg="white01"
           variant="outline"
+          bd={"2px,solid"}
+          tabIndex={-1}
           onClick={() => handleChange("", positionNumber)}
         >
           クリア
