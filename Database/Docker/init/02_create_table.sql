@@ -11,6 +11,15 @@ CREATE TABLE affiliations (
   , CONSTRAINT affiliations_PKC PRIMARY KEY (examinee_id,organization_id)
 );
 
+CREATE TABLE consult_notes (
+  consult_id uuid NOT NULL
+  , code text NOT NULL
+  , note text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT consult_notes_PKC PRIMARY KEY (consult_id,code)
+);
+
 CREATE TABLE consult_thresholds (
   threshold_id uuid NOT NULL
   , consult_id uuid NOT NULL
@@ -93,13 +102,6 @@ CREATE TABLE exam_cancels (
   , CONSTRAINT exam_cancels_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
 );
 
-CREATE TABLE exam_decision_rule (
-  id integer NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT exam_decision_rule_PKC PRIMARY KEY (id)
-);
-
 CREATE TABLE exam_item_detail_orders (
   consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
@@ -108,14 +110,38 @@ CREATE TABLE exam_item_detail_orders (
   , CONSTRAINT exam_item_detail_orders_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
 );
 
-CREATE TABLE exam_item_notes (
-  consult_id uuid NOT NULL
-  , exam_item_id integer NOT NULL
-  , note text NOT NULL
+CREATE TABLE exam_menu_note_consults (
+  menu_note_id integer NOT NULL
+  , code text NOT NULL
+  , order_number integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
-  , CONSTRAINT exam_item_notes_PKC PRIMARY KEY (consult_id,exam_item_id)
+  , CONSTRAINT exam_menu_note_consults_PKC PRIMARY KEY (menu_note_id,code)
 );
+
+CREATE TABLE exam_menu_note_results (
+  menu_note_id integer NOT NULL
+  , exam_item_detail_id integer NOT NULL
+  , source_type integer NOT NULL
+  , order_number integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_menu_note_results_PKC PRIMARY KEY (menu_note_id,exam_item_detail_id,source_type)
+);
+
+CREATE TABLE exam_menu_notes (
+  menu_note_id integer NOT NULL
+  , name text NOT NULL
+  , exam_menu_id integer NOT NULL
+  , order_number integer NOT NULL
+  , suffix text
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_menu_notes_PKC PRIMARY KEY (menu_note_id)
+);
+
+ALTER TABLE exam_menu_notes ADD CONSTRAINT exam_menu_notes_IX1
+  UNIQUE (exam_menu_id,order_number) ;
 
 CREATE TABLE exam_normal_option_details (
   normal_options_id uuid NOT NULL
@@ -188,6 +214,14 @@ CREATE TABLE export_history_details (
   , CONSTRAINT export_history_details_PKC PRIMARY KEY (id,consult_id)
 );
 
+CREATE TABLE external_exam_item_details (
+  exam_item_detail_id integer NOT NULL
+  , external_exam_item_detail_code text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT external_exam_item_details_PKC PRIMARY KEY (exam_item_detail_id,external_exam_item_detail_code)
+);
+
 CREATE TABLE home_menus (
   home_menu_id integer NOT NULL
   , name text NOT NULL
@@ -249,14 +283,6 @@ CREATE TABLE prior_exam_menus (
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT prior_exam_menus_PKC PRIMARY KEY (current_exam_menu_id,prior_exam_menu_id)
-);
-
-CREATE TABLE role_permissions (
-  functionality_id integer NOT NULL
-  , role_id integer NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT role_permissions_PKC PRIMARY KEY (functionality_id,role_id)
 );
 
 CREATE TABLE staff_login_histories (
@@ -412,14 +438,6 @@ CREATE TABLE export_histories (
   , CONSTRAINT export_histories_PKC PRIMARY KEY (id)
 );
 
-CREATE TABLE functionalities (
-  functionality_id integer NOT NULL
-  , name text NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT functionalities_PKC PRIMARY KEY (functionality_id)
-);
-
 CREATE TABLE home_menu_groups (
   home_menu_group_id integer NOT NULL
   , name text NOT NULL
@@ -440,6 +458,9 @@ CREATE TABLE place_schedule (
   , created_by text NOT NULL
   , CONSTRAINT place_schedule_PKC PRIMARY KEY (place_schedule_id)
 );
+
+ALTER TABLE place_schedule ADD CONSTRAINT place_schedule_IX1
+  UNIQUE (place_id,team_id,exam_date) ;
 
 CREATE TABLE places (
   place_id uuid DEFAULT gen_random_uuid () NOT NULL
@@ -520,6 +541,11 @@ ALTER TABLE consult
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE consult_notes
+  ADD CONSTRAINT consult_notes_FK1 FOREIGN KEY (consult_id) REFERENCES consult(consult_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE consult_thresholds
   ADD CONSTRAINT consult_thresholds_FK1 FOREIGN KEY (threshold_id) REFERENCES thresholds(threshold_id)
   ON DELETE RESTRICT
@@ -585,13 +611,28 @@ ALTER TABLE exam_item_groups
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
-ALTER TABLE exam_item_notes
-  ADD CONSTRAINT exam_item_notes_FK1 FOREIGN KEY (consult_id) REFERENCES consult(consult_id)
+ALTER TABLE exam_items
+  ADD CONSTRAINT exam_items_FK1 FOREIGN KEY (exam_item_group_id) REFERENCES exam_item_groups(exam_item_group_id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
-ALTER TABLE exam_items
-  ADD CONSTRAINT exam_items_FK1 FOREIGN KEY (exam_item_group_id) REFERENCES exam_item_groups(exam_item_group_id)
+ALTER TABLE exam_menu_note_consults
+  ADD CONSTRAINT exam_menu_note_consults_FK1 FOREIGN KEY (menu_note_id) REFERENCES exam_menu_notes(menu_note_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE exam_menu_note_results
+  ADD CONSTRAINT exam_menu_note_results_FK1 FOREIGN KEY (menu_note_id) REFERENCES exam_menu_notes(menu_note_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE exam_menu_note_results
+  ADD CONSTRAINT exam_menu_note_results_FK2 FOREIGN KEY (exam_item_detail_id) REFERENCES exam_item_details(exam_item_detail_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE exam_menu_notes
+  ADD CONSTRAINT exam_menu_notes_FK1 FOREIGN KEY (exam_menu_id) REFERENCES exam_menus(exam_menu_id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -660,16 +701,6 @@ ALTER TABLE prior_exam_menus
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
-ALTER TABLE role_permissions
-  ADD CONSTRAINT role_permissions_FK1 FOREIGN KEY (role_id) REFERENCES roles(role_id)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE;
-
-ALTER TABLE role_permissions
-  ADD CONSTRAINT role_permissions_FK2 FOREIGN KEY (functionality_id) REFERENCES functionalities(functionality_id)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE;
-
 ALTER TABLE staff_login_histories
   ADD CONSTRAINT staff_login_histories_FK1 FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
   ON DELETE RESTRICT
@@ -690,6 +721,13 @@ COMMENT ON COLUMN affiliations.examinee_id IS '受診者ID';
 COMMENT ON COLUMN affiliations.organization_id IS '団体ID';
 COMMENT ON COLUMN affiliations.created_at IS '作成日時';
 COMMENT ON COLUMN affiliations.created_by IS '作成者';
+
+COMMENT ON TABLE consult_notes IS '受診特記';
+COMMENT ON COLUMN consult_notes.consult_id IS '受診ID';
+COMMENT ON COLUMN consult_notes.code IS '検査特記コード';
+COMMENT ON COLUMN consult_notes.note IS '特記事項';
+COMMENT ON COLUMN consult_notes.created_at IS '作成日時';
+COMMENT ON COLUMN consult_notes.created_by IS '作成者';
 
 COMMENT ON TABLE consult_thresholds IS '基準値';
 COMMENT ON COLUMN consult_thresholds.threshold_id IS '基準値パターンID';
@@ -754,32 +792,35 @@ COMMENT ON COLUMN exam_cancels.cancel_reason_id IS '中止理由';
 COMMENT ON COLUMN exam_cancels.created_at IS '作成日時';
 COMMENT ON COLUMN exam_cancels.created_by IS '作成者';
 
-COMMENT ON TABLE exam_item_detail_options IS '検査項目明細_選択肢';
-COMMENT ON COLUMN exam_item_detail_options.option_id IS '選択肢ID';
-COMMENT ON COLUMN exam_item_detail_options.code IS 'コード';
-COMMENT ON COLUMN exam_item_detail_options.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_item_detail_options.name IS '名称';
-COMMENT ON COLUMN exam_item_detail_options.order_number IS '表示順';
-COMMENT ON COLUMN exam_item_detail_options.created_at IS '作成日時';
-COMMENT ON COLUMN exam_item_detail_options.created_by IS '作成者';
-
-COMMENT ON TABLE exam_decision_rule IS '検査実施判断ルール';
-COMMENT ON COLUMN exam_decision_rule.id IS 'ID';
-COMMENT ON COLUMN exam_decision_rule.created_at IS '作成日時';
-COMMENT ON COLUMN exam_decision_rule.created_by IS '作成者';
-
 COMMENT ON TABLE exam_item_detail_orders IS '検査項目明細依頼';
 COMMENT ON COLUMN exam_item_detail_orders.consult_id IS '受診ID';
 COMMENT ON COLUMN exam_item_detail_orders.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_item_detail_orders.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_detail_orders.created_by IS '作成者';
 
-COMMENT ON TABLE exam_item_notes IS '検査項目特記';
-COMMENT ON COLUMN exam_item_notes.consult_id IS '受診ID';
-COMMENT ON COLUMN exam_item_notes.exam_item_id IS '検査項目ID';
-COMMENT ON COLUMN exam_item_notes.note IS '特記事項';
-COMMENT ON COLUMN exam_item_notes.created_at IS '作成日時';
-COMMENT ON COLUMN exam_item_notes.created_by IS '作成者';
+COMMENT ON TABLE exam_menu_note_consults IS '検査メニュー特記_受診';
+COMMENT ON COLUMN exam_menu_note_consults.menu_note_id IS '検査メニュー特記ID';
+COMMENT ON COLUMN exam_menu_note_consults.code IS '検査特記コード';
+COMMENT ON COLUMN exam_menu_note_consults.order_number IS '表示順';
+COMMENT ON COLUMN exam_menu_note_consults.created_at IS '作成日時';
+COMMENT ON COLUMN exam_menu_note_consults.created_by IS '作成者';
+
+COMMENT ON TABLE exam_menu_note_results IS '検査メニュー特記_検査結果';
+COMMENT ON COLUMN exam_menu_note_results.menu_note_id IS '検査メニュー特記ID';
+COMMENT ON COLUMN exam_menu_note_results.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_menu_note_results.source_type IS 'データソース種別';
+COMMENT ON COLUMN exam_menu_note_results.order_number IS '表示順';
+COMMENT ON COLUMN exam_menu_note_results.created_at IS '作成日時';
+COMMENT ON COLUMN exam_menu_note_results.created_by IS '作成者';
+
+COMMENT ON TABLE exam_menu_notes IS '検査メニュー特記';
+COMMENT ON COLUMN exam_menu_notes.menu_note_id IS '検査メニュー特記ID';
+COMMENT ON COLUMN exam_menu_notes.name IS '名称';
+COMMENT ON COLUMN exam_menu_notes.exam_menu_id IS '検査メニューID';
+COMMENT ON COLUMN exam_menu_notes.order_number IS '表示順';
+COMMENT ON COLUMN exam_menu_notes.suffix IS '接尾辞';
+COMMENT ON COLUMN exam_menu_notes.created_at IS '作成日時';
+COMMENT ON COLUMN exam_menu_notes.created_by IS '作成者';
 
 COMMENT ON TABLE exam_normal_option_details IS '検査項目明細_選択肢';
 COMMENT ON COLUMN exam_normal_option_details.normal_options_id IS '基準値選択肢ID';
@@ -787,7 +828,7 @@ COMMENT ON COLUMN exam_normal_option_details.option_id IS '選択肢ID';
 COMMENT ON COLUMN exam_normal_option_details.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_option_details.created_by IS '作成者';
 
-COMMENT ON TABLE exam_normal_options IS '検査正常値選択肢';
+COMMENT ON TABLE exam_normal_options IS '検査基準値選択肢';
 COMMENT ON COLUMN exam_normal_options.normal_options_id IS '基準値選択肢ID';
 COMMENT ON COLUMN exam_normal_options.name IS '名称';
 COMMENT ON COLUMN exam_normal_options.threshold_id IS '基準値パターンID:0: テナントの基準';
@@ -799,7 +840,7 @@ COMMENT ON COLUMN exam_normal_options.error_level IS 'エラーレベル';
 COMMENT ON COLUMN exam_normal_options.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_options.created_by IS '作成者';
 
-COMMENT ON TABLE exam_normal_value_range IS '検査正常値範囲';
+COMMENT ON TABLE exam_normal_value_range IS '検査基準値範囲';
 COMMENT ON COLUMN exam_normal_value_range.range_id IS '範囲ID';
 COMMENT ON COLUMN exam_normal_value_range.name IS '名称';
 COMMENT ON COLUMN exam_normal_value_range.threshold_id IS '基準値パターンID:0: テナントの基準';
@@ -833,6 +874,12 @@ COMMENT ON COLUMN export_history_details.id IS 'ID';
 COMMENT ON COLUMN export_history_details.consult_id IS '受診ID';
 COMMENT ON COLUMN export_history_details.created_at IS '作成日時';
 COMMENT ON COLUMN export_history_details.created_by IS '作成者';
+
+COMMENT ON TABLE external_exam_item_details IS '外部検査項目明細';
+COMMENT ON COLUMN external_exam_item_details.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN external_exam_item_details.external_exam_item_detail_code IS '外部コード検査項目明細CD';
+COMMENT ON COLUMN external_exam_item_details.created_at IS '作成日時';
+COMMENT ON COLUMN external_exam_item_details.created_by IS '作成者';
 
 COMMENT ON TABLE home_menus IS 'ホームメニュー';
 COMMENT ON COLUMN home_menus.home_menu_id IS 'ホームメニューID';
@@ -878,12 +925,6 @@ COMMENT ON COLUMN prior_exam_menus.current_exam_menu_id IS '現在検査メニ�
 COMMENT ON COLUMN prior_exam_menus.prior_exam_menu_id IS '前提検査メニューID';
 COMMENT ON COLUMN prior_exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN prior_exam_menus.created_by IS '作成者';
-
-COMMENT ON TABLE role_permissions IS 'ロール機能許可';
-COMMENT ON COLUMN role_permissions.functionality_id IS '機能ID';
-COMMENT ON COLUMN role_permissions.role_id IS 'ロールID';
-COMMENT ON COLUMN role_permissions.created_at IS '作成日時';
-COMMENT ON COLUMN role_permissions.created_by IS '作成者';
 
 COMMENT ON TABLE staff_login_histories IS '職員ログイン履歴';
 COMMENT ON COLUMN staff_login_histories.id IS 'ID';
@@ -998,12 +1039,6 @@ COMMENT ON COLUMN export_histories.exported_at IS '出力日時';
 COMMENT ON COLUMN export_histories.exported_by IS '出力者';
 COMMENT ON COLUMN export_histories.created_at IS '作成日時';
 COMMENT ON COLUMN export_histories.created_by IS '作成者';
-
-COMMENT ON TABLE functionalities IS '機能';
-COMMENT ON COLUMN functionalities.functionality_id IS '機能ID';
-COMMENT ON COLUMN functionalities.name IS '機能名';
-COMMENT ON COLUMN functionalities.created_at IS '作成日時';
-COMMENT ON COLUMN functionalities.created_by IS '作成者';
 
 COMMENT ON TABLE home_menu_groups IS 'ホームメニューグループ';
 COMMENT ON COLUMN home_menu_groups.home_menu_group_id IS 'ホームメニューグループID';

@@ -13,8 +13,8 @@ export default function CommonFooter({ items }: FooterProps) {
   let setItems = [{ label: "戻る", action: () => navigate(-1) }];
   const dummyItem = [{ label: "", action: () => {} }];
 
-  if (items && items.length <= 3) {
-    setItems = setItems.concat(items);
+  if (items && items.length > 0) {
+    setItems = setItems.concat(items.slice(0, 3));
   }
   for (let i = setItems.length; i <= 3; i++) {
     setItems = setItems.concat(dummyItem);
