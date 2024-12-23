@@ -16,6 +16,7 @@
 .button-disabled {
   background-color: #cecece !important;
   color: #9a9a9a !important;
+  border: none !important;
 }
 
 /* LoadingOverlayのデフォルトスタイル */
