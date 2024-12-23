@@ -355,6 +355,7 @@ export default function ExamNumericLR({
           size="lg"
           bg="white01"
           variant="outline"
+          bd={"2px,solid"}
           onClick={() => handleChange("", positionNumber)}
           tabIndex={-1}
         >
