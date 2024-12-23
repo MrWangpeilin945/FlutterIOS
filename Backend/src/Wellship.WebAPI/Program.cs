@@ -131,7 +131,6 @@ public static class IServiceCollectionExtension
         services.AddScoped<IIntegrationUsecase, IntegrationUsecase>();
         services.AddScoped<IProgressUsecase, ProgressUsecase>();
         services.AddScoped<ICancelReasonUsecase, CancelReasonUsecase>();
-        services.AddScoped<IResultUsecase, ResultUsecase>();
         services.AddScoped<ExternalConnection.Usecases.IOrganizationUsecases, ExternalConnection.Usecases.OrganizationUsecases>();
         return services;
     }
