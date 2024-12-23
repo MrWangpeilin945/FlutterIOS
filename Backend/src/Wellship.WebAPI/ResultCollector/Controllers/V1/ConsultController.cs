@@ -59,18 +59,6 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 簡易な受診者情報を取得する
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet]
-    [Route("api/v{version:apiVersion}/consult/{consultNumber}/simple")]
-    public IActionResult GetSimpleExaminee()
-    {
-        _consultUsecase.GetSimpleExaminee();
-        return Ok();
-    }
-
-    /// <summary>
     /// 検査内容を取得する
     /// </summary>
     /// <returns></returns>
@@ -80,10 +68,10 @@ public class ConsultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/examItems")]
-    public IActionResult GetExamItemsExaminee([FromQuery][Required] int examMenuId)
+    public async Task<IActionResult> GetExamItemsExaminee([FromRoute][Required] string consultNumber, [FromQuery][Required] int examMenuId)
     {
-        _consultUsecase.GetExamItemsExaminee();
-        return Ok();
+        var results = await _consultUsecase.GetExamItemsExamineeAsync(consultNumber, examMenuId);
+        return Ok(results);
     }
 
     /// <summary>
@@ -130,4 +118,54 @@ public class ConsultController : ControllerBase
         var results = await _consultUsecase.ValidatePriorExamMenus(consultNumber, currentExamId);
         return Ok(results);
     }
+
+    /// <summary>
+    /// 検査結果相関ルールを検証する（仮：動作確認用）
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [HttpPost]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/correlation")]
+    public async Task<IActionResult> ValidateCorrelationRuleAsync([FromRoute][Required] string consultNumber, [FromBody][Required] ResultsRequest request)
+    {
+        // TODO: 検証ロジックを実装後に削除すること
+        var results = await _consultUsecase.ValidateCorrelationRuleAsync(consultNumber, request);
+        return Ok(results);
+    }
+
+    /// <summary>
+    /// 検査結果を登録する
+    /// </summary>
+    /// <param name="consultNumber">受診番号</param>
+    /// <param name="results">検査結果登録項目</param>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpPost]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/results")]
+    public async Task<IActionResult> RegisterResults([FromRoute][Required] string consultNumber, [FromBody] ResultsRequest results)
+    {
+        await _consultUsecase.RegisterResultsAsync(consultNumber, results);
+        return Ok();
+    }
+
+        /// <summary>
+    /// 検査結果を検証する
+    /// </summary>
+    /// <param name="consultNumber">受診番号</param>
+    /// <param name="results">検査結果検証項目</param>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(VerifyExamItems))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [HttpPost]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/results/verify")]
+    public IActionResult VerifyResults([FromRoute][Required] string consultNumber, [FromBody] ResultsRequest results)
+    {
+        _consultUsecase.VerifyResults();
+        return Ok();
+    }
+
 }

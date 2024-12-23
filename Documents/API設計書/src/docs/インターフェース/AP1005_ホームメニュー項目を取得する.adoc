@@ -8,6 +8,7 @@
 * メニューごとに使用可能条件を設定する。すべての条件を満たすメニューを利用できる。ただし空リストの場合は制限なく使用できる。
 ** `placeScheduleSelected`: 会場日程が選択済みである
 ** `placeScheduleUnlocked`: 会場ロックが解除されている
+* 操作している職員のロール情報をレスポンスに含めて、フロントエンドでの画面制御に使用する
 
 === URI
 
@@ -74,7 +75,8 @@
       ]
     }
   ],
-  "placeScheduleLockingStatus" : 21
+  "placeScheduleLockingStatus" : 21,
+  "staffRole" : 10
 }
 ----
 

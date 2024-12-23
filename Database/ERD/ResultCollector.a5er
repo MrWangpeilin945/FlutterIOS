@@ -57,7 +57,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=100
-Top=600
+Top=1050
 Field="職員ID","staff_id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="職員コード","staff_code","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="ログインID","login_id","text","NOT NULL",,"","",$FFFFFFFF,""
@@ -72,7 +72,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241127145942
-Position="MAIN",100,600
+Position="MAIN",100,1050
 ZOrder=1
 
 [Entity]
@@ -82,15 +82,15 @@ Comment=
 TableInnerOption=
 TableOption=
 Page=MAIN
-Left=800
-Top=650
+Left=700
+Top=1050
 Field="ロールID","role_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="ロール名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241015162946
-Position="MAIN",800,650,357,71
+Position="MAIN",700,1050,357,71
 ZOrder=2
 
 [Relation]
@@ -102,12 +102,12 @@ Fields1=role_id
 Fields2=role_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,2820,7180,4025,R,R,""
+Position="MAIN",3,5494,7180,4025,R,R,""
 Dependence=0
 Caption=
 PName=
-LineMode=0
-Bar1=282
+LineMode=3
+Bar1=549
 Bar2=718
 Bar3=402
 TermPos1=R
@@ -122,7 +122,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=100
-Top=1000
+Top=1450
 Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="職員ID","staff_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
 Field="ログイン試行日時","login_timestamp","timestamp with time zone","NOT NULL",,"","",$FFFFFFFF,""
@@ -131,7 +131,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241125124821
-Position="MAIN",100,1000
+Position="MAIN",100,1450
 ZOrder=6
 
 [Relation]
@@ -154,84 +154,6 @@ Bar3=350
 TermPos1=R
 TermPos2=R
 ZOrder=7
-
-[Entity]
-PName=functionalities
-LName=機能
-Comment=
-TableInnerOption=
-TableOption=
-Page=MAIN
-Left=1400
-Top=900
-Field="機能ID","functionality_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
-Field="機能名","name","text","NOT NULL",,"","",$FFFFFFFF,""
-EffectMode=None
-Color=$000000
-BkColor=$FFFFFF
-ModifiedDateTime=20241112171402
-Position="MAIN",1400,900
-ZOrder=8
-
-[Entity]
-PName=role_permissions
-LName=ロール機能許可
-Comment=
-TableInnerOption=
-TableOption=
-Page=MAIN
-Left=1350
-Top=650
-Field="機能ID","functionality_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
-Field="ロールID","role_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
-EffectMode=None
-Color=$000000
-BkColor=$FFFFFF
-ModifiedDateTime=20241015162819
-Position="MAIN",1350,650
-ZOrder=9
-
-[Relation]
-Entity1=roles
-Entity2=role_permissions
-RelationType1=2
-RelationType2=3
-Fields1=role_id
-Fields2=role_id
-Cardinarity1=
-Cardinarity2=
-Position="MAIN",0,3805,6195,2279,R,R,""
-Dependence=1
-Caption=
-PName=
-LineMode=0
-Bar1=380
-Bar2=620
-Bar3=228
-TermPos1=R
-TermPos2=R
-ZOrder=10
-
-[Relation]
-Entity1=functionalities
-Entity2=role_permissions
-RelationType1=2
-RelationType2=3
-Fields1=functionality_id
-Fields2=functionality_id
-Cardinarity1=
-Cardinarity2=
-Position="MAIN",0,3805,6195,4486,R,R,""
-Dependence=1
-Caption=
-PName=
-LineMode=0
-Bar1=380
-Bar2=620
-Bar3=449
-TermPos1=R
-TermPos2=R
-ZOrder=11
 
 [Entity]
 PName=examinees
@@ -460,10 +382,11 @@ Field="班ID","team_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
 Field="状況","status","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="健診日","exam_date","date","NOT NULL",,"","",$FFFFFFFF,""
 Field="開始時刻","start_time","varchar(4)","NOT NULL",,"","",$FFFFFFFF,""
+Index==2,place_id,team_id,exam_date
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241113095204
+ModifiedDateTime=20241220103543
 Position="MAIN",1600,2100
 ZOrder=25
 
@@ -537,8 +460,8 @@ Comment=
 TableInnerOption=
 TableOption=
 Page=MAIN
-Left=2150
-Top=650
+Left=1050
+Top=850
 Field="検査機器ID","equipment_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査機器名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査メニューID","exam_menu_id","integer","NOT NULL",,"","",$FFFFFFFF,""
@@ -548,7 +471,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241122211733
-Position="MAIN",2150,650
+Position="MAIN",1050,850
 ZOrder=29
 
 [Entity]
@@ -583,10 +506,11 @@ Field="検査項目グループID","exam_item_group_id","integer","NOT NULL",0,"
 Field="検査項目グループ名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査メニューID","exam_menu_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目グループ種別","type","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241112095535
+ModifiedDateTime=20241216093251
 Position="MAIN",2150,1250
 ZOrder=31
 
@@ -604,10 +528,11 @@ Field="検査項目名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目グループID","exam_item_group_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="配置番号","position_number","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="単位","unit","text",,,"","",$FFFFFFFF,""
+Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241128113002
+ModifiedDateTime=20241216093330
 Position="MAIN",2300,1500
 ZOrder=32
 
@@ -809,8 +734,8 @@ TermPos2=R
 ZOrder=41
 
 [Entity]
-PName=exam_item_notes
-LName=検査項目特記
+PName=consult_notes
+LName=受診特記
 Comment=
 TableInnerOption=
 TableOption=
@@ -818,18 +743,18 @@ Page=MAIN
 Left=1600
 Top=2450
 Field="受診ID","consult_id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
-Field="検査項目ID","exam_item_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="検査特記コード","code","text","NOT NULL",1,"","",$FFFFFFFF,""
 Field="特記事項","note","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241127145609
+ModifiedDateTime=20241218145433
 Position="MAIN",1600,2450
 ZOrder=43
 
 [Relation]
 Entity1=consult
-Entity2=exam_item_notes
+Entity2=consult_notes
 RelationType1=2
 RelationType2=3
 Fields1=consult_id
@@ -951,14 +876,14 @@ Fields1=exam_menu_id
 Fields2=exam_menu_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,4231,5769,5443,R,R,""
+Position="MAIN",0,2097,5769,5493,R,R,""
 Dependence=0
 Caption=
 PName=
 LineMode=0
-Bar1=423
+Bar1=210
 Bar2=577
-Bar3=544
+Bar3=549
 TermPos1=R
 TermPos2=R
 ZOrder=54
@@ -971,7 +896,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=3100
-Top=1900
+Top=1500
 Field="ID","option_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="入力値","value","text","NOT NULL",,"","",$FFFFFFFF,""
@@ -979,7 +904,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241204194235
-Position="MAIN",3100,1900,606,99
+Position="MAIN",3100,1500,606,99
 ZOrder=55
 
 [Relation]
@@ -1055,12 +980,12 @@ Left=900
 Top=2650
 Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="受診ID","consult_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
-Field="検査項目明細ID","consult_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="値","value","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241127145031
+ModifiedDateTime=20241219132630
 Position="MAIN",900,2650
 ZOrder=60
 
@@ -1072,7 +997,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=3100
-Top=2100
+Top=1650
 Field="選択肢ID","option_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="コード","code","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
@@ -1082,7 +1007,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241205154756
-Position="MAIN",3100,2100
+Position="MAIN",3100,1650
 ZOrder=62
 
 [Relation]
@@ -1107,25 +1032,33 @@ TermPos2=R
 ZOrder=64
 
 [Entity]
-PName=exam_result_correlation_rules
+PName=correlation_rules
 LName=検査結果相関ルール
 Comment=
 TableInnerOption=
 TableOption=
 Page=MAIN
 Left=2150
-Top=300
-Field="ID","id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Top=600
+Field="検査結果相関ルールID","correlation_rule_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="名称","name","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査メニューID","exam_menu_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="優先度","priority","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="発火条件種別","trigger_type","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="エラーレベル","error_level","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査項目ID_出力用","exam_item_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="出力メッセージ","message","text","NOT NULL",,"","",$FFFFFFFF,""
+Index==2,exam_menu_id,priority
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241112164813
-Position="MAIN",2150,300,313,55
+ModifiedDateTime=20241209154731
+Position="MAIN",2150,600,646,246
 ZOrder=65
 
 [Entity]
 PName=exam_normal_value_range
-LName=検査正常値範囲
+LName=検査基準値範囲
 Comment=
 TableInnerOption=
 TableOption=
@@ -1151,20 +1084,26 @@ Position="MAIN",2900,300
 ZOrder=66
 
 [Entity]
-PName=exam_decision_rule
+PName=decision_rules
 LName=検査実施判断ルール
 Comment=
 TableInnerOption=
 TableOption=
 Page=MAIN
 Left=2150
-Top=400
-Field="ID","id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Top=200
+Field="検査実施判断ルールID","decision_rule_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="名称","name","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査メニューID","exam_menu_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="優先度","priority","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="発火条件種別","trigger_type","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="エラーレベル","error_level","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="出力メッセージ","message","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241112164830
-Position="MAIN",2150,400,311,50
+ModifiedDateTime=20241223145144
+Position="MAIN",2150,200,651,221
 ZOrder=67
 
 [Entity]
@@ -1207,23 +1146,6 @@ Bar3=563
 TermPos1=R
 TermPos2=R
 ZOrder=71
-
-[Comment]
-Comment=以下のルールは具体的な値をあてはめてから検証してから設計します。（田辺）\n・検査実施判断ルール\n・検査結果相関ルール
-FontName=Tahoma
-FontBold=0
-FontItalic=0
-FontUnderline=0
-FontSize=9
-FontColor=$000000
-LineColor=$000000
-BkColor=$FFFFFF
-Page=Main
-Left=2137
-Top=57
-ZOrder=72
-Width=1094
-Height=165
 
 [Relation]
 Entity1=cancel_reasons
@@ -1474,7 +1396,7 @@ ZOrder=85
 
 [Entity]
 PName=exam_normal_options
-LName=検査正常値選択肢
+LName=検査基準値選択肢
 Comment=
 TableInnerOption=
 TableOption=
@@ -1546,14 +1468,14 @@ Fields1=option_id
 Fields2=option_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,10000,5580,8350,R,R,""
+Position="MAIN",4,5699,8968,8350,R,R,""
 Dependence=1
 Caption=
 PName=
 ModifiedDateTime=20241205125633
-LineMode=0
-Bar1=1000
-Bar2=558
+LineMode=4
+Bar1=570
+Bar2=897
 Bar3=835
 TermPos1=R
 TermPos2=R
@@ -1607,16 +1529,142 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=250
-Top=2500
+Top=2450
 Field="ID","id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
-Field="受診ID","consult_id","uuid",,,"","",$FFFFFFFF,""
+Field="受診ID","consult_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
 Field="受付番号","ticket_number","text",,,"","",$FFFFFFFF,""
+Field="操作区分","action_type","varchar(1)","NOT NULL",,"","I:Ins/U:Upd/D:Del",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241205131718
-Position="MAIN",250,2500
+ModifiedDateTime=20241218133516
+Position="MAIN",250,2450,468,124
 ZOrder=93
+
+[Relation]
+Entity1=exam_menus
+Entity2=correlation_rules
+RelationType1=2
+RelationType2=3
+Fields1=exam_menu_id
+Fields2=exam_menu_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,5859,8010,4112,R,R,""
+Dependence=0
+Caption=
+PName=
+LineMode=0
+Bar1=586
+Bar2=801
+Bar3=411
+TermPos1=R
+TermPos2=R
+ZOrder=94
+
+[Entity]
+PName=correlation_rule_exam_item_details
+LName=検査結果相関ルール_検査項目明細
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=1300
+Top=650
+Field="検査結果相関ルール","correlation_rule_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="変数番号","variable_number","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="データソース種別","source_type","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241209132829
+Position="MAIN",1300,650,627,135
+ZOrder=95
+
+[Relation]
+Entity1=correlation_rules
+Entity2=correlation_rule_exam_item_details
+RelationType1=2
+RelationType2=4
+Fields1=correlation_rule_id
+Fields2=correlation_rule_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,3214,5822,4769,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20241209131418
+LineMode=0
+Bar1=321
+Bar2=582
+Bar3=477
+TermPos1=R
+TermPos2=R
+ZOrder=96
+
+[Relation]
+Entity1=exam_item_details
+Entity2=correlation_rule_exam_item_details
+RelationType1=2
+RelationType2=3
+Fields1=exam_item_detail_id
+Fields2=exam_item_detail_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",2,2115,3951,7708,R,R,""
+Dependence=0
+Caption=
+PName=
+LineMode=2
+Bar1=212
+Bar2=395
+Bar3=771
+TermPos1=R
+TermPos2=R
+ZOrder=97
+
+[Entity]
+PName=correlation_rule_evaluations
+LName=検査結果相関ルール_判定値
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=1300
+Top=500
+Field="検査結果相関ルールID","correlation_rule_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="変数番号","variable_number","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="判定値","evaluation_value","text","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241209133540
+Position="MAIN",1300,500
+ZOrder=98
+
+[Relation]
+Entity1=correlation_rules
+Entity2=correlation_rule_evaluations
+RelationType1=2
+RelationType2=4
+Fields1=correlation_rule_id
+Fields2=correlation_rule_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,1053,5694,4319,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20241209133705
+LineMode=0
+Bar1=105
+Bar2=569
+Bar3=432
+TermPos1=R
+TermPos2=R
+ZOrder=99
 
 [Entity]
 PName=prior_exam_menus
@@ -1666,7 +1714,7 @@ Fields1=exam_menu_id
 Fields2=prior_exam_menu_id
 Cardinarity1=
 Cardinarity2=
-Position="MAIN",0,3864,6136,3738,R,R,""
+Position="MAIN",0,3864,6136,4085,R,R,""
 Dependence=1
 Caption=
 PName=
@@ -1674,7 +1722,317 @@ ModifiedDateTime=20241206143905
 LineMode=0
 Bar1=386
 Bar2=614
-Bar3=374
+Bar3=408
 TermPos1=R
 TermPos2=R
 ZOrder=96
+
+[Entity]
+PName=external_exam_item_details
+LName=外部検査項目明細
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=3100
+Top=1900
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="外部コード検査項目明細CD","external_exam_item_detail_code","text","NOT NULL",1,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241218133856
+Position="MAIN",3100,1900
+ZOrder=100
+
+[Relation]
+Entity1=exam_item_details
+Entity2=external_exam_item_details
+RelationType1=3
+RelationType2=3
+Fields1=exam_item_detail_id
+Fields2=exam_item_detail_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,7622,2378,7723,R,R,""
+Dependence=0
+Caption=
+PName=
+ModifiedDateTime=20241218133955
+LineMode=0
+Bar1=762
+Bar2=238
+Bar3=772
+TermPos1=R
+TermPos2=R
+ZOrder=101
+
+[Entity]
+PName=exam_menu_notes
+LName=検査メニュー特記
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=3100
+Top=2050
+Field="検査メニュー特記ID","menu_note_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="名称","name","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査メニューID","exam_menu_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="接尾辞","suffix","text",,,"","",$FFFFFFFF,""
+Index==2,exam_menu_id,order_number
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241218195420
+Position="MAIN",3100,2050,566,161
+ZOrder=103
+
+[Entity]
+PName=exam_menu_note_results
+LName=検査メニュー特記_検査結果
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=3200
+Top=2300
+Field="検査メニュー特記ID","menu_note_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="データソース種別","source_type","integer","NOT NULL",2,"","",$FFFFFFFF,""
+Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241220092849
+Position="MAIN",3200,2300
+ZOrder=104
+
+[Relation]
+Entity1=exam_menu_notes
+Entity2=exam_menu_note_results
+RelationType1=2
+RelationType2=3
+Fields1=menu_note_id
+Fields2=menu_note_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",3,585,4622,9500,R,R,""
+Dependence=1
+Caption=
+PName=
+LineMode=3
+Bar1=58
+Bar2=462
+Bar3=950
+TermPos1=R
+TermPos2=R
+ZOrder=105
+
+[Entity]
+PName=exam_menu_note_consults
+LName=検査メニュー特記_受診
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=3200
+Top=2500
+Field="検査メニュー特記ID","menu_note_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="検査特記コード","code","text","NOT NULL",1,"","",$FFFFFFFF,""
+Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241218200247
+Position="MAIN",3200,2500
+ZOrder=106
+
+[Relation]
+Entity1=exam_menu_notes
+Entity2=exam_menu_note_consults
+RelationType1=2
+RelationType2=3
+Fields1=menu_note_id
+Fields2=menu_note_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",3,974,500,9500,R,R,""
+Dependence=1
+Caption=
+PName=
+LineMode=3
+Bar1=97
+Bar2=50
+Bar3=950
+TermPos1=R
+TermPos2=R
+ZOrder=107
+
+[Relation]
+Entity1=exam_menus
+Entity2=exam_menu_notes
+RelationType1=2
+RelationType2=3
+Fields1=exam_menu_id
+Fields2=exam_menu_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",2,8312,7159,4415,R,R,""
+Dependence=0
+Caption=
+PName=
+LineMode=2
+Bar1=831
+Bar2=716
+Bar3=442
+TermPos1=R
+TermPos2=R
+ZOrder=108
+
+[Relation]
+Entity1=exam_item_details
+Entity2=exam_menu_note_results
+RelationType1=2
+RelationType2=3
+Fields1=exam_item_detail_id
+Fields2=exam_item_detail_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,9500,1448,7785,R,R,""
+Dependence=1
+Caption=
+PName=
+LineMode=0
+Bar1=950
+Bar2=145
+Bar3=778
+TermPos1=R
+TermPos2=R
+ZOrder=109
+
+[Relation]
+Entity1=exam_menus
+Entity2=decision_rules
+RelationType1=2
+RelationType2=3
+Fields1=exam_menu_id
+Fields2=exam_menu_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",5,3585,458,5185,R,R,""
+Dependence=0
+Caption=
+PName=
+LineMode=5
+Bar1=358
+Bar2=46
+Bar3=518
+TermPos1=R
+TermPos2=R
+ZOrder=110
+
+[Entity]
+PName=decision_rule_evaluations
+LName=検査実施判断ルール_判定値
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=1300
+Top=150
+Field="検査実施判断ルールID","decision_rule_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="変数番号","variable_number","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="判定値","evaluation_value","text","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241223145727
+Position="MAIN",1300,150,624,89
+ZOrder=111
+
+[Entity]
+PName=decision_rule_exam_item_details
+LName=検査実施判断ルール_検査項目明細
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=1300
+Top=300
+Field="検査実施判断ルール","decision_rule_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="変数番号","variable_number","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="データソース種別","source_type","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241223145659
+Position="MAIN",1300,300,626,127
+ZOrder=112
+
+[Relation]
+Entity1=decision_rules
+Entity2=decision_rule_evaluations
+RelationType1=2
+RelationType2=4
+Fields1=decision_rule_id
+Fields2=decision_rule_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,3908,5923,5186,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20241223145607
+LineMode=0
+Bar1=391
+Bar2=592
+Bar3=519
+TermPos1=R
+TermPos2=R
+ZOrder=113
+
+[Relation]
+Entity1=decision_rules
+Entity2=decision_rule_exam_item_details
+RelationType1=2
+RelationType2=4
+Fields1=decision_rule_id
+Fields2=decision_rule_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,6373,7815,3216,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20241223145616
+LineMode=0
+Bar1=637
+Bar2=782
+Bar3=322
+TermPos1=R
+TermPos2=R
+ZOrder=114
+
+[Relation]
+Entity1=exam_item_details
+Entity2=decision_rule_exam_item_details
+RelationType1=2
+RelationType2=3
+Fields1=exam_item_detail_id
+Fields2=exam_item_detail_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",2,950,5072,7196,R,R,""
+Dependence=0
+Caption=
+PName=
+LineMode=2
+Bar1=95
+Bar2=507
+Bar3=720
+TermPos1=R
+TermPos2=R
+ZOrder=115

@@ -43,8 +43,9 @@ INSERT INTO teams(team_id,team_code,name,order_number,created_at,created_by) VAL
 -- 会場日程
 INSERT INTO place_schedule(place_schedule_id,place_id,team_id,status,exam_date,start_time,created_at,created_by) VALUES 
     ('aceced00-0000-0000-0000-000000000001','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-10-01','0900',CURRENT_TIMESTAMP,'init')
-  , ('aceced00-0000-0000-0000-000000000002','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-10-01','1300',CURRENT_TIMESTAMP,'init')
-  , ('aceced00-0000-0000-0000-000000000003','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000002',21,DATE '2024-11-02','1000',CURRENT_TIMESTAMP,'init');
+  , ('aceced00-0000-0000-0000-000000000002','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-10-02','1300',CURRENT_TIMESTAMP,'init')
+  , ('aceced00-0000-0000-0000-000000000003','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000002',21,DATE '2024-11-02','1000',CURRENT_TIMESTAMP,'init')
+  , ('20d6daa6-eac7-4ef4-8ea4-0f3b439668a6','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-11-30','1000',CURRENT_TIMESTAMP,'init');
 
 -- 検査メニュー
 INSERT INTO exam_menus(exam_menu_id,name,order_number,created_at,created_by) VALUES 
@@ -59,16 +60,16 @@ INSERT INTO exam_menus(exam_menu_id,name,order_number,created_at,created_by) VAL
   , (9,'握力',9,CURRENT_TIMESTAMP,'init');
 
 -- 検査項目グループ
-INSERT INTO exam_item_groups(exam_item_group_id,name,exam_menu_id,type,created_at,created_by) VALUES 
-    (1,'身体計測',1,1,CURRENT_TIMESTAMP,'init')
-  , (7,'血圧',7,7,CURRENT_TIMESTAMP,'init');
+INSERT INTO exam_item_groups(exam_item_group_id,name,exam_menu_id,type,order_number,created_at,created_by) VALUES 
+    (1,'身体計測',1,1,1,CURRENT_TIMESTAMP,'init')
+  , (7,'血圧',7,7,2,CURRENT_TIMESTAMP,'init');
 
 -- 検査項目
-INSERT INTO exam_items(exam_item_id,name,exam_item_group_id,position_number,unit,created_at,created_by) VALUES 
-    (1,'身長',1,1,'cm',CURRENT_TIMESTAMP,'init')
-  , (2,'体重',1,1,'kg',CURRENT_TIMESTAMP,'init')
-  , (71,'血圧1',7,1,null,CURRENT_TIMESTAMP,'init')
-  , (72,'血圧2',7,2,null,CURRENT_TIMESTAMP,'init');
+INSERT INTO exam_items(exam_item_id,name,exam_item_group_id,position_number,unit,order_number,created_at,created_by) VALUES 
+    (1,'身長',1,1,'cm',1,CURRENT_TIMESTAMP,'init')
+  , (2,'体重',1,1,'kg',2,CURRENT_TIMESTAMP,'init')
+  , (71,'血圧1',7,1,null,1,CURRENT_TIMESTAMP,'init')
+  , (72,'血圧2',7,2,null,2,CURRENT_TIMESTAMP,'init');
 
 -- 検査項目明細
 INSERT INTO exam_item_details(exam_item_detail_id,exam_item_id,name,set_previous_as_default,order_number,position_number,type,keyboard_type,integer_length,decimal_length,equipment_label,created_at,created_by) VALUES 
@@ -98,7 +99,8 @@ INSERT INTO consult(consult_id,consult_number,progress_status,export_status,plac
   , ('caaaaa00-0000-0000-0000-000000000002','0002',41,11,'aceced00-0000-0000-0000-000000000002','','eaee0000-0000-0000-0000-000000000012','10002',CURRENT_TIMESTAMP,'init')
   , ('caaaaa00-0000-0000-0000-000000000003','0003',51,11,'aceced00-0000-0000-0000-000000000001','','eaee0000-0000-0000-0000-000000000018','10003',CURRENT_TIMESTAMP,'init')
   , ('caaaaa00-0000-0000-0000-000000000004','0004',41,21,'aceced00-0000-0000-0000-000000000002','','eaee0000-0000-0000-0000-000000000013','10004',CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000005','0005',41,31,'aceced00-0000-0000-0000-000000000001','','eaee0000-0000-0000-0000-000000000014','10005',CURRENT_TIMESTAMP,'init');
+  , ('caaaaa00-0000-0000-0000-000000000005','0005',41,31,'aceced00-0000-0000-0000-000000000001','','eaee0000-0000-0000-0000-000000000014','10005',CURRENT_TIMESTAMP,'init')
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe','0006',21,11,'20d6daa6-eac7-4ef4-8ea4-0f3b439668a6','定期健康診断','eaee0000-0000-0000-0000-000000000020','1002',CURRENT_TIMESTAMP,'init');
 
 -- ロール
 INSERT INTO roles(role_id,name,created_at,created_by) VALUES 
@@ -197,7 +199,14 @@ INSERT INTO exam_results(consult_id,exam_item_detail_id,value,created_at,created
   , ('caaaaa00-0000-0000-0000-000000000003',711,'128',CURRENT_TIMESTAMP,'init')
   , ('caaaaa00-0000-0000-0000-000000000003',712,'92',CURRENT_TIMESTAMP,'init')
   , ('caaaaa00-0000-0000-0000-000000000004',711,'128',CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',712,'92',CURRENT_TIMESTAMP,'init');
+  , ('caaaaa00-0000-0000-0000-000000000004',712,'92',CURRENT_TIMESTAMP,'init')
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',2,'100.5',CURRENT_TIMESTAMP,'init')
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',1,'175.3',CURRENT_TIMESTAMP,'init');
+
+-- 過去検査結果
+INSERT INTO previous_results(consult_id,exam_date,exam_item_detail_id,value,created_at,created_by) VALUES 
+    ('8dda2a54-5217-425f-bba9-ab821a9647fe', DATE '2023-10-01',2,'70.0',CURRENT_TIMESTAMP,'init')
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe', DATE '2023-10-1',1,'173.0',CURRENT_TIMESTAMP,'init');
 
 -- 検査中止
 INSERT INTO exam_cancels(consult_id,exam_item_detail_id,cancel_reason_id,created_at,created_by) VALUES 
@@ -213,3 +222,41 @@ INSERT INTO resultcollector.prior_exam_menus(current_exam_menu_id,prior_exam_men
   , (6,1,CURRENT_TIMESTAMP,'init')
   , (6,2,CURRENT_TIMESTAMP,'init')
   , (7,8,CURRENT_TIMESTAMP,'init');
+
+-- 検査結果相関ルール
+INSERT INTO correlation_rules(correlation_rule_id,name,exam_menu_id,priority,trigger_type,error_level,exam_item_id, message,created_at,created_by) VALUES 
+    (1,'腹囲_前回差20cm以上',1,1,1,2,2,'腹囲の前回差が20cm以上です。',CURRENT_TIMESTAMP,'init')
+  , (2,'値が一部でも異なる場合はエラー',1,2,2,3,7,'登録する値が異なります。',CURRENT_TIMESTAMP,'init');
+
+-- 検査結果相関ルール_判定値
+INSERT INTO correlation_rule_evaluations(correlation_rule_id,variable_number,evaluation_value,created_at,created_by) VALUES 
+    (1,1,'20.0',CURRENT_TIMESTAMP,'init');
+
+-- 検査結果相関ルール_検査項目明細
+INSERT INTO correlation_rule_exam_item_details(correlation_rule_id,variable_number,source_type,exam_item_detail_id,created_at,created_by) VALUES
+    (1,1,1,2,CURRENT_TIMESTAMP,'init')
+  , (1,2,2,2,CURRENT_TIMESTAMP,'init')
+  , (2,1,1,711,CURRENT_TIMESTAMP,'init')
+  , (2,2,1,712,CURRENT_TIMESTAMP,'init')
+  , (2,3,1,721,CURRENT_TIMESTAMP,'init')
+  , (2,4,1,722,CURRENT_TIMESTAMP,'init');
+
+-- 検査メニュー特記
+insert into exam_menu_notes(menu_note_id,name,exam_menu_id,order_number,suffix,created_at,created_by) VALUES
+    (1,'身長',1,1,'cm',CURRENT_TIMESTAMP, 'init')
+  , (2,'撮影番号/○○番号',7,2,'番',CURRENT_TIMESTAMP, 'init');
+
+-- 検査メニュー特記_検査結果
+insert into exam_menu_note_results(menu_note_id,exam_item_detail_id,source_type,order_number,created_at,created_by) VALUES
+    (1,1,1,1,CURRENT_TIMESTAMP,'init')
+  , (1,1,2,2,CURRENT_TIMESTAMP,'init');
+
+-- 検査メニュー特記_受診
+insert into exam_menu_note_consults(menu_note_id,code,order_number,created_at,created_by) VALUES
+    (2,'ST01',1,CURRENT_TIMESTAMP,'init')
+  , (2,'ST02',2,CURRENT_TIMESTAMP,'init');
+
+-- 受診特記
+insert into consult_notes(consult_id, code, note, created_at, created_by) VALUES
+    ('8dda2a54-5217-425f-bba9-ab821a9647fe','ST01','01-001',CURRENT_TIMESTAMP,'init')
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe','ST02','02-001',CURRENT_TIMESTAMP,'init');

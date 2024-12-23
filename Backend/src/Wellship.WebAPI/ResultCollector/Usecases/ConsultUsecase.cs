@@ -1,7 +1,10 @@
 using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.APIModels.Responses;
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models.Triggers;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -15,6 +18,7 @@ public class ConsultUsecase : IConsultUsecase
     private readonly IExamMenuRepository _examMenuRepository;
     private readonly IExamItemRepository _examItemRepository;
     private readonly IPlaceScheduleRepository _placeScheduleRepository;
+    private readonly IResultRepository _resultRepository;
 
     /// <summary>
     /// コンストラクタ
@@ -25,13 +29,14 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="examItemRepository">検査項目リポジトリ</param>
     /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
     public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamMenuRepository examMenuRepository,
-                          IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository)
+                          IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository, IResultRepository resultRepository)
     {
         _consultRepository = consultRepository;
         _examineeRepository = examineeRepository;
         _examMenuRepository = examMenuRepository;
         _examItemRepository = examItemRepository;
         _placeScheduleRepository = placeScheduleRepository;
+        _resultRepository = resultRepository;
     }
 
     /// <summary>
@@ -84,7 +89,7 @@ public class ConsultUsecase : IConsultUsecase
             ConsultId = unexaminedConsult.ConsultId,
             ExamineeId = examinee.ExamineeId,
             ExamineeName = examinee.Name,
-            UnexaminedMenus = unexaminedConsult.UnexaminedExamMenus.Select(x => new ExamMenu()
+            UnexaminedMenus = unexaminedConsult.UnexaminedExamMenus.Select(x => new APIModels.Responses.ExamMenu()
             {
                 ExamMenuId = x.ExamMenuId,
                 ExamMenuName = x.ExamMenuName
@@ -93,19 +98,89 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 簡易な受診者情報を取得する
-    /// </summary>
-    public void GetSimpleExaminee()
-    {
-
-    }
-
-    /// <summary>
     /// 検査内容を取得する
     /// </summary>
-    public void GetExamItemsExaminee()
+    public async Task<ExamContent> GetExamItemsExamineeAsync(string consultNumber, int examMenuId)
     {
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
+        // 会場日程IDを指定して会場日程を取得する
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
+        // 健診日
+        DateOnly examDate = placeSchedule.ExamDate;
+        // 受診日の年齢
+        // NOTE: 年齢加算日は暫定で前日年齢加算
+        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 検査メニューに関連した検査項目情報を取得
+        var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
+        // 検査中止を取得
+        var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
+        // 検査依頼を取得
+        var examOrders = await _consultRepository.GetExamOrdersAsync(consult.ConsultId);
+        // 未受診の検査メニューを取得
+        var unexaminedItems = await GetUnexaminedMenusAsync(consultNumber);
+        // 同姓同名アラート
+        var sameNameAlert = await _placeScheduleRepository.IsSamenameAsync(consultNumber);
 
+        // 検査項目明細IDを取得
+        var examItemDetailIds = examItemGroups.SelectMany(group => group.ExamItems)
+                                              .SelectMany(item => item.ExamItemDetails)
+                                              .Select(detail => detail.ExamItemDetailId)
+                                              .ToArray();
+        // 受診特記一覧を取得
+        var consultNotes = await _consultRepository.GetConsultNotesAsync(consult.ConsultId);
+        // 検査項目明細マスタ一覧を取得
+        var examItemDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(examItemDetailIds);
+        // 過去検査結果を取得
+        var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
+        // 検査メニュー特記一覧を取得
+        var menuNotes  = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
+        var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
+        var examNoteResults = menuNotes .Select(x => new Domain.Models.MenuNoteResult(x, examItemDetailChildren, examResults, previousResults, consultNotes)).ToArray();
+        // 関連検査項目を取得
+        var relatedExamItems = examNoteResults.Select(x => new RelatedExamItem()
+        {
+            ExamItemName = x.MenuNoteName,
+            ExamResult = x.GetDisplayText()
+        }).ToArray();
+
+        return new ExamContent()
+        {
+            ConsultNumber = consultNumber,
+            ConsultName = consult.Note,
+            Examinee = new Examinee()
+            {
+                TicketNumber = consult.TicketNumber,
+                Name = examinee.Name,
+                KanaName = examinee.KanaName,
+                Birthdate = examinee.Birthdate.Value,
+                Sex = (int)examinee.Sex,
+                Organizations = examinee.Affiliations.OrderBy(x => x.OrderNumber)
+                                                     .Select(x => x.OrganizationName).ToArray(),
+                SameNameAlert = sameNameAlert,
+                ExamDateAge = examAge.Years
+            },
+            IsComplete = true,              // TODO: 検査実施判断    後方作業へ
+            RelatedExamItems = relatedExamItems,
+            ExamItems = examItemGroups.OrderBy(group => group.ExamItemGroupId)
+                                      .SelectMany(group => group.ExamItems)
+                                      .OrderBy(Item => Item.PositionNumber)
+                                      .Select(item => new ExamDetail
+                                      {
+                                          ExamItemId = item.ExamItemId,
+                                          ExamItemName = item.Name,
+                                          HasOrder = examOrders.ExamItemDetailOrders
+                                                             .Any(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId)),
+                                          CancelReasonId = examCancels.ExamItemDetailCancels
+                                                                    .SingleOrDefault(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId))?.CancelReasonId
+                                      }).ToArray(),
+            ExamDecisionResult = [],        // TODO: 検査実施判断結果    後方作業へ
+            UnexaminedItems = unexaminedItems.UnexaminedMenus.Select(x => new ExamMenu
+            {
+                ExamMenuId = x.ExamMenuId,
+                ExamMenuName = x.ExamMenuName
+            }).ToArray(),
+        };
     }
 
     /// <summary>
@@ -214,7 +289,7 @@ public class ConsultUsecase : IConsultUsecase
         var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
         // 検査正常値範囲を取得
         IEnumerable<Domain.Models.ExamNormalValueRange> examNormalValueRanges = [];
-        if(thresholds.Any())
+        if (thresholds.Any())
         {
             examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
         }
@@ -226,27 +301,41 @@ public class ConsultUsecase : IConsultUsecase
         var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
         // 過去検査結果を取得
         var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
+        // 受診特記一覧を取得
+        var consultNotes = await _consultRepository.GetConsultNotesAsync(consult.ConsultId);
+        // 検査項目明細マスタ一覧を取得
+        var examItemDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(examItemDetailIds);
+        // 検査メニュー特記一覧を取得
+        var menuNotes = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
+        var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, examItemDetailChildren, examResults, previousResults, consultNotes)).ToArray();
+        // 関連検査項目を取得
+        var relatedExamItems = examNoteResults.Select(x => new RelatedExamItem()
+        {
+            ExamItemName = x.MenuNoteName,
+            ExamResult = x.GetDisplayText()
+        }).ToArray();
 
         return new InputExamItems()
         {
             ConsultNumber = consultNumber,
-            Examinee = new InputExamExaminee(){
+            Examinee = new InputExamExaminee()
+            {
                 TicketNumber = consult.TicketNumber,
                 KanaName = examinee.KanaName,
                 Sex = (int)examinee.Sex,
                 ExamDateAge = examAge.Years
             },
-            RelatedExamItems = [],                  // TODO: 関連検査項目 後方作業へ
-            ExamItemGroups = 
-                examItemGroups.Select(eg => new ExamItemGroup
+            RelatedExamItems = relatedExamItems,
+            ExamItemGroups =
+                examItemGroups.Select(eg => new APIModels.Responses.ExamItemGroup
                 {
                     Type = (int)eg.Type,
-                    ExamItems = eg.ExamItems.Select(ei => new InputExamItem 
+                    ExamItems = eg.ExamItems.Select(ei => new InputExamItem
                     {
                         PositionNumber = ei.PositionNumber,
                         ExamItemId = ei.ExamItemId,
                         Name = ei.Name,
-                        ExamItemDetails = ei.ExamItemDetails.Select(ed => new ExamItemDetail
+                        ExamItemDetails = ei.ExamItemDetails.Select(ed => new APIModels.Responses.ExamItemDetail
                         {
                             PositionNumber = ed.PositionNumber,
                             ExamItemDetailId = ed.ExamItemDetailId,
@@ -261,7 +350,8 @@ public class ConsultUsecase : IConsultUsecase
                             IntegerLength = ed.IntegerLength,
                             DecimalLength = ed.DecimalLength,
                             // キーボード入力
-                            Keyboard = new Keyboard{
+                            Keyboard = new APIModels.Responses.Keyboard
+                            {
                                 KeyboardType = (int)ed.KeyboardType,
                                 Values = Keyboards.Where(kb => kb.ExamItemDetailId == ed.ExamItemDetailId)
                                                   .OrderBy(kb => kb.OptionId)
@@ -269,29 +359,127 @@ public class ConsultUsecase : IConsultUsecase
                                                   .ToArray()
                             },
                             // 選択肢
-                            ExamItemDetailOptions = 
+                            ExamItemDetailOptions =
                                 examItemDetailOptions.Where(op => op.ExamItemDetailId == ed.ExamItemDetailId)
-                                                     .OrderBy(op => op.OrderNumber)         
-                                                     .Select(op => new ExamItemDetailOption
-                                                        {
-                                                            OrderNumber = op.OrderNumber,
-                                                            Code = op.Code,
-                                                            Name = op.Name
-                                                        }).ToArray(),
+                                                     .OrderBy(op => op.OrderNumber)
+                                                     .Select(op => new APIModels.Responses.ExamItemDetailOption
+                                                     {
+                                                         OrderNumber = op.OrderNumber,
+                                                         Code = op.Code,
+                                                         Name = op.Name
+                                                     }).ToArray(),
                             // 検査正常値範囲
-                            ExamNormalValueRanges = 
+                            ExamNormalValueRanges =
                                 examNormalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
                                                      .OrderBy(r => r.ErrorLevel)
-                                                     .Select(r => new ExamNormalValueRange
-                                                        {
-                                                            ErrorLevel = (int)r.ErrorLevel,
-                                                            MaxValue = r.MaxValue,
-                                                            MinValue = r.MinValue
-                                                        }).ToArray()
+                                                     .Select(r => new APIModels.Responses.ExamNormalValueRange
+                                                     {
+                                                         ErrorLevel = (int)r.ErrorLevel,
+                                                         MaxValue = r.MaxValue,
+                                                         MinValue = r.MinValue
+                                                     }).ToArray()
                         }).ToArray(),
                         ExamRegistResults = []      // TODO: 検査結果登録エラー 後方作業へ
                     }).ToArray()
                 }).ToArray()
         };
+    }
+
+    /// <summary>
+    /// 検査結果相関ルールで検証します。
+    /// </summary>
+    public async Task<IEnumerable<Domain.Models.RuleError>> ValidateCorrelationRuleAsync(string consultNumber, ResultsRequest result)
+    {
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
+
+        var examMenuId = result.ExamMenuId;
+
+        // 検査結果相関ルールマスタを取得する
+        var ruleList = await _examItemRepository.GetCorrelationRulesAsync(examMenuId);
+
+        // DBから前回値と今回値を取得する
+        var dbCurrentResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
+        var dbPreResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, placeSchedule.ExamDate);
+        var currentResults = dbCurrentResults.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+        var preResults = dbPreResults.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+
+        // リクエスト値を取得する
+        var currentRequestResults = result.ExamResults.SelectMany(x => x.ExamItemDetails)
+                                                      .ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+
+        // DBの今回値とリクエスト値と合成する（リクエスト値を優先する）
+        var concatenatedCurrentResults = currentResults.Where(x => !currentRequestResults.ContainsKey(x.Key))
+                                                       .Concat(currentRequestResults)
+                                                       .ToDictionary(x => x.Key, x => x.Value);
+
+        // トリガーをセットアップして検証する
+        var errors = new List<Domain.Models.RuleError>();
+        foreach (var rule in ruleList)
+        {
+            var triggerType = rule.TriggerType;
+            var errorLevel = rule.ErrorLevel;
+            var conditionValues = rule.Evaluations.OrderBy(x => x.VariableNumber)
+                                                  .Select(x => x.EvaluationValue)
+                                                  .ToList();
+
+            var inputValues = rule.ExamItemDetails.OrderBy(x => x.VariableNumber)
+                                                  .Select(x => x.SourceType switch
+                                                  {
+                                                      SourceType.今回値 => concatenatedCurrentResults.TryGetValue(x.ExamItemDetailId, out var currVal) ? currVal : "",
+                                                      SourceType.前回値 => preResults.TryGetValue(x.ExamItemDetailId, out var prevVal) ? prevVal : "",
+                                                      _ => throw new NotSupportedException(nameof(x.SourceType))
+                                                  }).ToList();
+
+            var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues, conditionValues, errorLevel);
+
+            // トリガーの条件に一致すればエラーに追加する
+            if (trigger.IsMatch())
+            {
+                errors.Add(new Domain.Models.RuleError()
+                {
+                    ErrorLevel = trigger.GetErrorLevel(),
+                    Message = rule.Message,
+                    Priority = rule.Priority,
+                    ExamItemId = rule.ExamItemId
+                });
+            }
+        }
+
+        // 条件に一致したトリガーのうち、エラーレベルが警告と異常の結果のみ返す
+        var errorLevels = new List<InputErrorLevel>() { InputErrorLevel.警告, InputErrorLevel.異常 };
+        return errors.Where(x => errorLevels.Contains(x.ErrorLevel))
+                     .OrderBy(x => x.Priority);
+    }
+
+    /// <summary>
+    /// 検査結果を登録する
+    /// </summary>
+    public async Task RegisterResultsAsync(string consultNumber, ResultsRequest results)
+    {
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        // 会場のロック中かを確認
+        // TODO: 管理者のみ更新可能 後方作業へ
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync(consult.PlaceScheduleId);
+        if (placeSchedule?.Status == PlaceScheduleLockingStatus.検査完了)
+        {
+            // 会場ロック中
+            throw new PlaceScheduleLockedException();
+        }
+        var resultList = results.ExamResults.SelectMany(exam => exam.ExamItemDetails)
+                                            .Select(detail => new ExamResultRegisteEntity{
+                                                ExamItemDetailId = detail.ExamItemDetailId,
+                                                Value = detail.Value
+                                            })
+                                            .ToArray();
+        await _resultRepository.RegisterResultsAsync(consult.ConsultId, resultList);
+    }
+
+    /// <summary>
+    /// 検査結果を検証する
+    /// </summary>
+    public void VerifyResults()
+    {
+
     }
 }

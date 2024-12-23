@@ -33,7 +33,7 @@ public class Program
         });
 
         builder.Services.AddHealthChecks()
-                        .AddCheck<HealthCheck>("database");
+                        .AddCheck<HealthCheck>("app");
         builder.Services.AddRepositories();
         builder.Services.AddUseCases();
 
@@ -61,6 +61,13 @@ public class Program
         builder.Logging.ClearProviders();
         builder.Host.UseNLog();
 
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(builder => builder.AllowAnyOrigin()
+                                                       .AllowAnyMethod()
+                                                       .AllowAnyHeader());
+        });
+
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
@@ -72,6 +79,7 @@ public class Program
             {
                 options.Path = "/redoc";
             });
+            app.UseCors();
         }
 
         app.MapHealthChecks("/healthz");
@@ -102,8 +110,11 @@ public static class IServiceCollectionExtension
         services.AddScoped<IEquipmentRepository, EquipmentRepository>();
         services.AddScoped<IIntegrationRepository, IntegrationRepository>();
         services.AddScoped<IExamineeRepository, ExamineeRepository>();
+        services.AddScoped<IProgressRepository, ProgressRepository>();
         services.AddScoped<ICancelReasonRepository, CancelReasonRepository>();
         services.AddScoped<IExamItemRepository, ExamItemRepository>();
+        services.AddScoped<IResultRepository, ResultRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IOrganizationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.OrganizationRepository>();
         return services;
     }
     /// <summary>
@@ -118,7 +129,9 @@ public static class IServiceCollectionExtension
         services.AddScoped<IExamMenuUsecase, ExamMenuUsecase>();
         services.AddScoped<IEquipmentUsecase, EquipmentUsecase>();
         services.AddScoped<IIntegrationUsecase, IntegrationUsecase>();
+        services.AddScoped<IProgressUsecase, ProgressUsecase>();
         services.AddScoped<ICancelReasonUsecase, CancelReasonUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.IOrganizationUsecases, ExternalConnection.Usecases.OrganizationUsecases>();
         return services;
     }
     /// <summary>
