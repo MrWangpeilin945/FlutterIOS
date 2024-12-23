@@ -6,6 +6,8 @@ import {
   Switch,
   colorsTuple,
   LoadingOverlay,
+  getSize,
+  getThemeColor,
 } from "@mantine/core";
 
 import styles from "./styles/theme.module.css";
@@ -90,7 +92,7 @@ export const customTheme = createTheme({
     }),
     Divider: Divider.extend({
       vars: (theme) => {
-        return { root: { "--divider-color": theme.colors.gray03[1] } };
+        return { root: { "--divider-color": getThemeColor("gray03", theme) } };
       },
       defaultProps: {
         color: "var(--divider-color)",
@@ -102,12 +104,12 @@ export const customTheme = createTheme({
         if (props.size === "xxl") {
           return {
             root: {
-              "--switch-height": rem(40),
-              "--switch-label-font-size": rem(22),
-              "--switch-thumb-size": rem(35),
+              "--switch-height": rem(60),
+              "--switch-label-font-size": getSize("lg"),
+              "--switch-thumb-size": rem(54),
               "--switch-track-label-padding": rem(1),
-              "--switch-width": rem(120),
-              "--switch-color": theme.colors.green01[1],
+              "--switch-width": rem(188),
+              "--switch-color": getThemeColor("green01", theme),
             },
           };
         }
