@@ -8,7 +8,6 @@ import {
   Space,
   Text,
   TextInput,
-  Title,
 } from "@mantine/core";
 import { useClickOutside, useDisclosure } from "@mantine/hooks";
 import { useFocusTrap } from "@mantine/hooks";
@@ -228,7 +227,7 @@ export default function ConsultNumberInput() {
 
               <Space h={184} />
               <Center>
-                <Group gap={16} wrap="nowrap">
+                <Group gap={24} wrap="nowrap">
                   <Paper
                     h="auto"
                     miw={168}
@@ -246,6 +245,7 @@ export default function ConsultNumberInput() {
                     size="xl"
                     value={consultNumber || ""}
                     onFocus={() => setShowKeyboard(true)}
+                    onClick={() => setShowKeyboard(true)}
                     onChange={(e) => handleInputChange(e)}
                     onKeyDown={handleKeyDown}
                     ref={focusTrapRef}
