@@ -110,13 +110,13 @@ public class ConsultUsecaseTests
         _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3")))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
-                                ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
-                                ExamineeCode = "10001",
-                                Name = "両備　太郎",
-                                KanaName = "リョウビ　タロウ",
-                                Sex = Sex.男,
-                                Birthdate = new Birthdate("19991129"),
-                                Affiliations = [new Affiliations
+                              ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
+                              ExamineeCode = "10001",
+                              Name = "両備　太郎",
+                              KanaName = "リョウビ　タロウ",
+                              Sex = Sex.男,
+                              Birthdate = new Birthdate("19991129"),
+                              Affiliations = [new Affiliations
                                 {
                                     OrganizationId = Guid.Parse("7bf76a3d-8bb4-41f5-8bd5-3b8fc8482511"),
                                     OrganizationCode = "0001",
@@ -156,13 +156,13 @@ public class ConsultUsecaseTests
         _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df")))
                           .ReturnsAsync(new WebAPI.ResultCollector.Domain.Models.Examinee
                           {
-                                ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
-                                ExamineeCode = "10001",
-                                Name = "両備　太郎",
-                                KanaName = "リョウビ　タロウ",
-                                Sex = Sex.男,
-                                Birthdate = new Birthdate("19991129"),
-                                Affiliations = [new Affiliations
+                              ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
+                              ExamineeCode = "10001",
+                              Name = "両備　太郎",
+                              KanaName = "リョウビ　タロウ",
+                              Sex = Sex.男,
+                              Birthdate = new Birthdate("19991129"),
+                              Affiliations = [new Affiliations
                                 {
                                     OrganizationId = Guid.Parse("7bf76a3d-8bb4-41f5-8bd5-3b8fc8482511"),
                                     OrganizationCode = "0001",
