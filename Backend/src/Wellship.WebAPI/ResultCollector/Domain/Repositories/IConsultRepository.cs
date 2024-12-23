@@ -65,4 +65,8 @@ public interface IConsultRepository
     /// </summary>
     public Task<PreviousResult> GetPreviousResultsAsync(Guid consultId, DateOnly examDate);
 
+    /// <summary>
+    /// 受診を指定して検査項目特記を取得します。
+    /// </summary>
+    public Task<IEnumerable<ConsultNote>> GetConsultNotesAsync(Guid consultId);
 }

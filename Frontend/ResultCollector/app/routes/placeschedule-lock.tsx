@@ -2,9 +2,11 @@ import {
   Box,
   Button,
   Center,
+  Container,
+  Flex,
   LoadingOverlay,
-  Stack,
-  Title,
+  Space,
+  Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
@@ -154,95 +156,114 @@ export default function PlaceScheduleLock() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching || isLoading} />
         <CommonHeader screenName="会場ロック" staffName={staff?.name || ""} />
-        {!isFetching && (
-          <>
-            <PlaceSchedule
-              placeName={placeSchedule?.placeName || ""}
-              examDate={targetDate}
-            />
-            {placeScheduleLock ? (
-              <>
-                <Center>
-                  <Stack>
-                    {statusButton?.map((button) => (
-                      <Button
-                        variant="outline"
-                        bg={
-                          placeScheduleLock.placeScheduleLockingStatus ===
-                          button.placeScheduleLockingStatus
-                            ? "green03"
-                            : "white"
-                        }
-                        color={
-                          placeScheduleLock.placeScheduleLockingStatus ===
-                          button.placeScheduleLockingStatus
-                            ? "primary"
-                            : "gray03"
-                        }
-                        w={700}
-                        m={10}
-                        key={button.placeScheduleLockingStatus}
-                        onClick={() =>
-                          handleButtonClick(button.placeScheduleLockingStatus)
-                        }
-                      >
-                        <Title order={2}>{button.buttonName}</Title>
-                      </Button>
-                    ))}
-                  </Stack>
-                </Center>
-
-                <br />
-                <br />
-                <br />
-
-                <div>
-                  <Box>
-                    <span style={{ float: "right", display: "flex" }}>
-                      最終更新者：{placeScheduleLock.updatedBy}&nbsp;（
+        <Container fluid>
+          {!isFetching && (
+            <>
+              <PlaceSchedule
+                placeName={placeSchedule?.placeName || ""}
+                examDate={targetDate}
+              />
+              {placeScheduleLock ? (
+                <>
+                  <Space h={40} />
+                  <Center>
+                    <Box ta="center">
+                      {statusButton?.map((button) => (
+                        <Button
+                          w={860}
+                          h={75}
+                          px={32}
+                          py={16}
+                          style={{ borderWidth: 2 }}
+                          variant="outline"
+                          bg={
+                            placeScheduleLock.placeScheduleLockingStatus ===
+                            button.placeScheduleLockingStatus
+                              ? "green03"
+                              : "white"
+                          }
+                          color={
+                            placeScheduleLock.placeScheduleLockingStatus ===
+                            button.placeScheduleLockingStatus
+                              ? "primary"
+                              : "gray03"
+                          }
+                          key={button.placeScheduleLockingStatus}
+                          onClick={() =>
+                            handleButtonClick(button.placeScheduleLockingStatus)
+                          }
+                          mb={
+                            button.placeScheduleLockingStatus ===
+                            PlaceScheduleLockingStatus.検査完了
+                              ? 32
+                              : 0
+                          }
+                        >
+                          <Text
+                            size="xl"
+                            fw={700}
+                            c={
+                              placeScheduleLock.placeScheduleLockingStatus ===
+                              button.placeScheduleLockingStatus
+                                ? "primary"
+                                : "black01"
+                            }
+                          >
+                            {button.buttonName}
+                          </Text>
+                        </Button>
+                      ))}
+                    </Box>
+                  </Center>
+                  <Space h={300} />
+                  <Flex justify="flex-end">
+                    <Text size="xs" c="black01" ta="right">
+                      最終更新者：{placeScheduleLock.updatedBy}（
                       {placeScheduleLock.updatedAt
                         ? format(
                             new Date(placeScheduleLock.updatedAt),
                             "yyyy/MM/dd hh:mm",
                           )
-                        : null}
+                        : ""}
                       ）&nbsp;
-                    </span>
-                  </Box>
-                </div>
-              </>
-            ) : (
-              <>
-                {/* エラーメッセージを表示 */}
-                <Title order={3}>
-                  {getErrorMessage(errorMessages.notFound, "該当する会場日程")}
-                </Title>
-              </>
-            )}
+                    </Text>
+                  </Flex>
+                </>
+              ) : (
+                <>
+                  {/* エラーメッセージを表示 */}
+                  <Text size="sm" c="black01">
+                    {getErrorMessage(
+                      errorMessages.notFound,
+                      "該当する会場日程",
+                    )}
+                  </Text>
+                </>
+              )}
 
-            <CommonDialog
-              message={message || ""}
-              buttonMessage="閉じる"
-              isOpen={opened}
-              onClose={close}
-            />
-
-            <div>
-              <ConfirmDialog
+              <CommonDialog
                 message={message || ""}
-                cancelButtonMessage="キャンセル"
-                confirmButtonMessage="OK"
-                isOpen={openedConfirm}
-                onCancel={closeConfirm}
-                onConfirm={() => {
-                  closeConfirm();
-                  fetchUpdateLockingStatus();
-                }}
+                buttonMessage="閉じる"
+                isOpen={opened}
+                onClose={close}
               />
-            </div>
-          </>
-        )}
 
+              <div>
+                <ConfirmDialog
+                  message={message || ""}
+                  cancelButtonMessage="キャンセル"
+                  confirmButtonMessage="OK"
+                  isOpen={openedConfirm}
+                  onCancel={closeConfirm}
+                  onConfirm={() => {
+                    closeConfirm();
+                    fetchUpdateLockingStatus();
+                  }}
+                />
+              </div>
+            </>
+          )}
+        </Container>
         <CommonFooter />
       </AuthWrapper>
     </>

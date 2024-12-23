@@ -98,9 +98,9 @@ public class EnvironmentVariableConnectionStringProvider() : IConnectionStringPr
     /// <returns>接続文字列</returns>
     private Task<string> GetConnectionStringAsync(string key)
     {
-        var userId = Environment.GetEnvironmentVariable("RDS_USER_ID", EnvironmentVariableTarget.Machine) ?? throw new ArgumentNullException("環境変数にDB接続情報が設定されていません。");
-        var password = Environment.GetEnvironmentVariable("RDS_USER_PASS", EnvironmentVariableTarget.Machine) ?? throw new ArgumentNullException("環境変数にDB接続情報が設定されていません。");
-        var endpoint = Environment.GetEnvironmentVariable("RDS_ENDPOINT", EnvironmentVariableTarget.Machine) ?? throw new ArgumentNullException("環境変数にDB接続情報が設定されていません。");
+        var userId = Environment.GetEnvironmentVariable("RDS_USER_ID", EnvironmentVariableTarget.Process) ?? throw new ArgumentNullException("環境変数にDB接続情報が設定されていません。");
+        var password = Environment.GetEnvironmentVariable("RDS_USER_PASS", EnvironmentVariableTarget.Process) ?? throw new ArgumentNullException("環境変数にDB接続情報が設定されていません。");
+        var endpoint = Environment.GetEnvironmentVariable("RDS_ENDPOINT", EnvironmentVariableTarget.Process) ?? throw new ArgumentNullException("環境変数にDB接続情報が設定されていません。");
 
         // endpointは以下形式の文字列で設定するのでバラす
         // 例：Host=localhost;Port=15433;Database=dev01;

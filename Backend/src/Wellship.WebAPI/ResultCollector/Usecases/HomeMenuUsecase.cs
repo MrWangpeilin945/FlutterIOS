@@ -1,4 +1,5 @@
 using Ryobi.Wellship.APIModels.Responses;
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -34,6 +35,9 @@ public class HomeMenuUsecase : IHomeMenuUsecase
             not null => (int)(await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync((Guid)placeScheduleId)).Status
         };
 
+        // TODO: JWTから操作した職員のロールを取得する。あるいはDBにSELECTする
+        Role staffRole = Role.一般; // TODO
+
         // 機能ごとの利用可能条件の設定
         var homeMenuSettings = new Domain.Models.HomeMenuSettings();
 
@@ -43,6 +47,7 @@ public class HomeMenuUsecase : IHomeMenuUsecase
         var result = new HomeMenuGroupList()
         {
             PlaceScheduleLockingStatus = status,
+            StaffRole = (int)staffRole,
             HomeMenuGroups = repoResults.Select(x => new HomeMenuGroup()
             {
                 GroupName = x.GroupName,

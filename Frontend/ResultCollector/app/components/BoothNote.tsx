@@ -8,36 +8,43 @@ type BoothNoteProps = {
 
 export default function BoothNote({ relatedExamItems }: BoothNoteProps) {
   // 配列の要素がない時は空を返す
-  if (relatedExamItems?.length === 0) {
+  if (!relatedExamItems || relatedExamItems?.length === 0) {
     return null;
   }
 
   return (
     <>
-      <Flex px={10} wrap="wrap" direction="row">
-        {relatedExamItems.map((examItem, index) => (
-          <Group key={index} mt={5} style={{ width: "calc(50% - 8px)" }}>
-            <Flex gap="xs" align="flex-start" wrap="nowrap">
-              <Paper
-                bg="gray03"
-                c="gray01"
-                radius="md"
-                px={3}
-                w={210}
-                miw={210}
-              >
-                <Text size="xs" fw={700} ta="center">
-                  {examItem.examItemName?.slice(0, 8)}
+      <Flex direction="column" style={{ width: "100%" }}>
+        <Flex px={16} wrap="wrap" direction="row" gap={16}>
+          {relatedExamItems.map((examItem, index) => (
+            <Group key={index} mt={5} style={{ width: "calc(50% - 8px)" }}>
+              <Flex gap={16} align="center" wrap="nowrap">
+                <Paper
+                  bg="gray03"
+                  c="gray01"
+                  radius="md"
+                  w={210}
+                  miw={210}
+                  h={51}
+                  py={8}
+                >
+                  <Text size="xs" fw={700} ta="center">
+                    {examItem.examItemName?.slice(0, 8)}
+                  </Text>
+                </Paper>
+                <Text
+                  size="xs"
+                  className={styles["text-wrap"]}
+                  style={{ width: "calc(48vw - 242px)" }}
+                >
+                  {examItem.examResult}
                 </Text>
-              </Paper>
-              <Text size="xs" truncate="end" className={styles["text-wrap"]}>
-                {examItem.examResult}
-              </Text>
-            </Flex>
-          </Group>
-        ))}
+              </Flex>
+            </Group>
+          ))}
+        </Flex>
+        <Divider mt={16} />
       </Flex>
-      <Divider mt={5} mx={5} />
     </>
   );
 }
