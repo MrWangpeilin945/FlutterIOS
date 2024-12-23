@@ -24,13 +24,15 @@ flowchart TD
     F[[Repository]] --> G[BEGIN]
     G --> H["Update(一括):[DB]consult(受診)"]
     H --> I["Upsert(一括):[DB]tickets(受付)"]
-    I --> J["Insert(一括):[DB]tickets_histories(受付履歴)"]
-    J --> K[Commit]
+    I --> J["Dalete(一括):[DB]tickets(受付)"]
+    J --> K["Insert(一括):[DB]tickets_histories(受付履歴)"]
+    K --> L[Commit]
     H -.Exception.-> ROLLBACK[ROLLBACK]
     G -.Exception.-> ROLLBACK
     I -.Exception.-> ROLLBACK
     J -.Exception.-> ROLLBACK
-    K --> RepositoryEND[[END]]
+    K -.Exception.-> ROLLBACK
+    L --> RepositoryEND[[END]]
     ROLLBACK .-> RepositoryEND
 ----
 
@@ -98,9 +100,9 @@ list.Count()  <> 0
 |string
 |連携キー（重複あり）
 
-|ConnectionMode
+|ActionType
 |Yes
-|string
+|enum<Wellship.WebAPI\ExternalConnection\Enums\ActionType>
 |連携モード
 
 |TicketNumber
@@ -140,7 +142,23 @@ list.Count()  <> 0
 
 ==== 列挙型
 
-* None
+===== ActionType
+
+namespace : `Wellship.WebAPI.ExternalConnection.Enums`
+
+[cols="1,1,2" options="header"]
+|===
+|名称|値|説明
+
+|登録
+|0
+|データを登録する
+
+|削除
+|1
+|データを削除する
+
+|===
 
 ==== ERROR検証
 
@@ -149,66 +167,44 @@ list.Count()  <> 0
 ==== WORNING検証
 
 * 連携キーの取得に失敗
-** `[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCode` が存在しない
+** `[DB]consult(受診).external_connection_code(外部連携キー)` == `Ticket.ConnectionCode` が存在しない
+*** Ticketの単位で該当を取り除く
 *** ErrorObject
-*** Code `10002`
-**** Message `指定されたConnectionCodeシステム上に存在しません。Code:[Consult.external_connection_code]` 
-**** InputNote [Ticket.InputNote]
+*** Code `10001`
+**** Message `指定されたConnectionCodeがシステム上に存在しません。Code:[Ticket.ConnectionCode]` 
+**** InputNote `Ticket.InputNote`
 
 === 処理(Repository)
 
-==== ワークテーブル登録
+* `Ticket.ConnectionCode` でグループ化し、 `Ticket.SortNo` が最大のレコードでを処理対象とする
+** ただし、`[DB]tickets_histories(受付履歴)` は全レコード追加(履歴として管理するため)
 
-* `Ticket` をワークテーブルに登録する。
-* `Ticket.ConnectionCode` でグループ化し、 `Ticket.SortNo` が最大のレコードで `[DB]consult(受診)` と `[DB]tickets(受付)` の更新処理を行う。
-
+* 下記の登録値は、呼びもとで指定する
+** `created_at` に登録する `system.datetime.now()`
+** `created_by` に登録する `'ExternalConnection'`
 
 ==== 登録処理
 
-*  `[DB]tickets_histories(受付履歴)` は全レコード更新を行う。
+* 条件
+** `Ticket.ActionType` == `ActionType.登録` And +
+`Ticket.ConnectionCode` でグループ化し、 `Ticket.SortNo` が最大のレコード
 
-* 条件①
-** `Ticket.ConnectionMode  == 追加`
+===== Table
 
 * [DB]consult(受診)
-** Update
-*** `Ticket.ConnectionCode == [DB]consult(受診).external_connection_code(外部連携キー)` のレコード
+
+===== Update
+
+* 更新条件
+** `[DB]consult.external_connection_code` == `Ticket.ConnectionCode` のレコード
 
 [cols="1,2,2" options="header"]
 |===
 |列|登録値|処理・変換
 
-|consult_id
-|
-|更新対象外
-
-|consult_number
-|
-|更新対象外
-
 |progress_status
-|`'21'`（検査中）
-|
-
-|export_status
-|
-|更新対象外
-
-|place_schedule_id
-|
-|更新対象外
-
-|note
-|
-|更新対象外
-
-|examinee_id
-|
-|更新対象外
-
-|external_connection_code
-|
-|更新対象外
+|`enum<Wellship.Core\Enums\ConsultProgressStatus.検査中>`
+|int型にパースする
 
 |created_at
 |system.datetime.now()
@@ -218,12 +214,18 @@ list.Count()  <> 0
 |`ExternalConnection`
 |
 
-
 |===
 
+更新対象列のみ記載
+
+===== Table
+
 * [DB]tickets(受付)
-** Upsert
-*** `Ticket.ConnectionCode == [DB]consult(受診).external_connection_code(外部連携キー)` で検索して取得した `[DB]consult(受診).consult_id(受診ID) == [DB]tickets(受付).consult_id(受診ID)` のレコード
+
+===== Upsert
+
+* 競合条件
+*** `[DB]consult.external_connection_code` == `Ticket.ConnectionCode` で検索して取得した `[DB]consult.consult_id(受診ID)` == `[DB]tickets.consult_id(受診ID)`
 
 [cols="1,2,2" options="header"]
 |===
@@ -231,7 +233,7 @@ list.Count()  <> 0
 
 |consult_id
 |`[DB]consult.consult_id`
-|[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCodeで検索して取得
+|`[DB]consult(受診).external_connection_code(外部連携キー)` == `Ticket.ConnectionCode` で検索して取得
 
 |ticket_number
 |`Ticket.TicketNumber`
@@ -239,185 +241,95 @@ list.Count()  <> 0
 
 |===
 
-* [DB]tickets_histories(受付履歴)
-** Insert
+==== 削除処理
 
-[cols="1,2,2" options="header"]
-|===
-|列|登録値|処理・変換
+* 条件
+** `Ticket.ActionType` == `ActionType.削除` And +
+`Ticket.ConnectionCode` でグループ化し、 `Ticket.SortNo` が最大のレコード
 
-|id
-|UUID自動付番
-|
-
-|consult_id
-|`[DB]consult.consult_id(受診ID)`
-|[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCodeで検索して取得
-
-|ticket_number
-|`Ticket.TicketNumber`
-|
-
-|action_type
-|`'追加'`
-|
-
-|===
-
-* 条件②
-** `Ticket.ConnectionMode  == 削除` AND `[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCodeで検索して取得した[DB]consult(受診).consult_id(受診ID) == [DB]tickets(受付).consult_id(受診ID)が存在する`
+===== Table
 
 * [DB]consult(受診)
-** Update
-*** `Ticket.ConnectionCode == [DB]consult(受診).external_connection_code(外部連携キー)` のレコード
+
+===== Update
+
+* 更新条件
+** `[DB]consult.external_connection_code` == `Ticket.ConnectionCode` のレコード
 
 [cols="1,2,2" options="header"]
 |===
 |列|登録値|処理・変換
 
-|consult_id
-|
-|更新対象外
-
-|consult_number
-|
-|更新対象外
-
 |progress_status
-|`'11'`（来場待）
+|`enum<Wellship.Core\Enums\ConsultProgressStatus.来場待ち>`
+|int型にパースする
+
+|created_at
+|system.datetime.now()
 |
 
-|export_status
+|created_by
+|`ExternalConnection`
 |
-|更新対象外
-
-|place_schedule_id
-|
-|更新対象外
-
-|note
-|
-|更新対象外
-
-|examinee_id
-|
-|更新対象外
-
-|external_connection_code
-|
-|更新対象外
 
 |===
+
+更新対象列のみ記載
+
+===== Table
 
 * [DB]tickets(受付)
-** Delete
-*** `Ticket.ConnectionCode == [DB]consult(受診).external_connection_code(外部連携キー)` で検索して取得した `[DB]consult(受診).consult_id(受診ID) == [DB]tickets(受付).consult_id(受診ID)` のレコード
 
-[cols="1,2,2" options="header"]
-|===
-|列|登録値|処理・変換
+===== Delete
 
-|consult_id
-|
-|
+* 削除条件
+*** `[DB]consult.external_connection_code` == `Ticket.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]tickets.consult_id`
+**** 削除対象レコードが存在しない場合でも、エラーとしない
 
-|ticket_number
-|
-|
+==== 履歴登録処理
 
-|===
+* 条件
+** NONE
+*** `[DB]tickets_histories(受付履歴)` には `Ticket.SortNo` が最大でないをレコード含めて追加する(履歴として管理するため)
+
+===== Table
 
 * [DB]tickets_histories(受付履歴)
-** Insert
+
+===== Insert
 
 [cols="1,2,2" options="header"]
 |===
 |列|登録値|処理・変換
 
 |id
-|UUID自動付番
 |
+|DB:DEFAULT
 
 |consult_id
-|`[DB]consult(受診).consult_id(受診ID)`
-|`[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCode` で検索して取得
+|`[DB]consult.consult_id`
+|`[DB]consult.external_connection_code` == `Ticket.ConnectionCode` で検索して取得
 
 |ticket_number
-|`Ticket.TicketNumber`
+|ActionType.登録 : `Ticket.TicketNumber` / ActionType.削除 : `''(空値)`
 |
 
 |action_type
-|`'削除'`
+|登録処理対象 かつ `[DB]consult` にInsert : `'I'` / +
+登録処理対象 かつ `[DB]consult` をUpdate : `'U'` / +
+削除処理対象 : `'D'`
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`ExternalConnection`
 |
 
 |===
 
-* 条件③
-** `Ticket.ConnectionMode  == 削除` AND `[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCodeで検索して取得した[DB]consult(受診).consult_id(受診ID) == [DB]tickets(受付).consult_id(受診ID)が存在しない`
+=== レビュー履歴
 
-* [DB]consult(受診)
-** Update
-*** `Ticket.ConnectionCode == [DB]consult(受診).external_connection_code(外部連携キー)` のレコード
-
-[cols="1,2,2" options="header"]
-|===
-|列|登録値|処理・変換
-
-|consult_id
-|
-|更新対象外
-
-|consult_number
-|
-|更新対象外
-
-|progress_status
-|`'11'`（来場待）
-|
-
-|export_status
-|
-|更新対象外
-
-|place_schedule_id
-|
-|更新対象外
-
-|note
-|
-|更新対象外
-
-|examinee_id
-|
-|更新対象外
-
-|external_connection_code
-|
-|更新対象外
-
-|===
-
-* [DB]tickets_histories(受付履歴)
-** Insert
-
-[cols="1,2,2" options="header"]
-|===
-|列|登録値|処理・変換
-
-|id
-|UUID自動付番
-|
-
-|consult_id
-|`[DB]consult(受診).consult_id(受診ID)`
-|`[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCode` で検索して取得
-
-|ticket_number
-|`空文字`
-|
-
-|追加削除
-|`'削除'`
-|
-
-|===
+WELLSHIP_DEV-873 [外部IF_設計]EC2002_受付を更新する レビュー・リワーク
