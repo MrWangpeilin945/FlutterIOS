@@ -32,7 +32,7 @@ public class HomeMenuUsecase : IHomeMenuUsecase
         int? status = placeScheduleId switch
         {
             null => null,
-            not null => (await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync((Guid)placeScheduleId)).Status
+            not null => (int)(await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync((Guid)placeScheduleId)).Status
         };
 
         // TODO: JWTから操作した職員のロールを取得する。あるいはDBにSELECTする

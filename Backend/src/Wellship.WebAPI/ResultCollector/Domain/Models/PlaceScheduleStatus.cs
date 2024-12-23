@@ -1,3 +1,5 @@
+using Ryobi.Wellship.Core.Enums;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 /// <summary>
@@ -28,7 +30,7 @@ public class PlaceScheduleStatus
     /// <summary>
     /// 状況
     /// </summary>
-    public required int Status { get; init; }
+    public required PlaceScheduleLockingStatus Status { get; init; }
 
     /// <summary>
     /// 作成日時

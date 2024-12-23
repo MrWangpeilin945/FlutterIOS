@@ -216,7 +216,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
     /// <summary>
     /// 会場日程での同姓同名の有無を判定する
     /// </summary>
-    public async Task<bool> IsSamename(string consultNumber)
+    public async Task<bool> IsSamenameAsync(string consultNumber)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"

@@ -49,4 +49,14 @@ public interface IConsultUsecase
     /// 検査正常値を検証する
     /// </summary>
     public Task<IEnumerable<Domain.Models.RangeError>> ValidateNormalValueRangeAsync(string consultNumber, ResultsRequest result);
+
+    /// <summary>
+    /// 検査結果を登録する
+    /// </summary>
+    public Task RegisterResultsAsync(string consultNumber, ResultsRequest results);    
+
+    /// <summary>
+    /// 検査結果を検証する
+    /// </summary>
+    public void VerifyResults();
 }

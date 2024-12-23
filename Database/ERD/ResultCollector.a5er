@@ -980,12 +980,12 @@ Left=900
 Top=2650
 Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="受診ID","consult_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
-Field="検査項目明細ID","consult_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="値","value","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241127145031
+ModifiedDateTime=20241219132630
 Position="MAIN",900,2650
 ZOrder=60
 
