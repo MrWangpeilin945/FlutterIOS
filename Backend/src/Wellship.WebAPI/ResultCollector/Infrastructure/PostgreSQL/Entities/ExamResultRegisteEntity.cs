@@ -1,20 +1,10 @@
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 /// <summary>
-/// 検査結果のエンティティ
+/// 検査結果登録のエンティティ
 /// </summary>
-public class ExamResultEntity
+public class ExamResultRegisteEntity
 {
-    /// <summary>
-    /// 受診ID
-    /// </summary>
-    public required Guid ConsultId { get; set; }
-
-    /// <summary>
-    /// 検査項目ID
-    /// </summary>
-    public required int ExamItemId { get; set; }
-
     /// <summary>
     /// 検査項目明細ID
     /// </summary>

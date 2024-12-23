@@ -200,7 +200,7 @@ public class PlaceScheduleUsecaseTests
             PlaceId = Guid.Parse("d60abfaa-fa22-4d37-9dcd-edf9fe5bd336"), 
             PlaceName = "会場A",
             ExamDate = DateTime.Parse("2024-10-01"),
-            Status = 21,
+            Status = PlaceScheduleLockingStatus.検査中,
             CreatedAt = DateTime.Parse("2024-11-27 14:42:50"),
             CreatedBy = "tester"
         };

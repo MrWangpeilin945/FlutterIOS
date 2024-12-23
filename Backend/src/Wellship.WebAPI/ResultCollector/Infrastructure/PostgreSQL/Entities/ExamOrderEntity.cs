@@ -1,4 +1,4 @@
-namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 /// <summary>
 /// 検査依頼のエンティティ
