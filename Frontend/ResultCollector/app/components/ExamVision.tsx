@@ -46,27 +46,30 @@ export default function ExamVision({
   }
   // 定数で定義
   const 裸眼 = 1;
-  const 矯正 =2;
+  const 矯正 = 2;
   const 特記 = 3;
   const 両眼 = 3;
   const 矯正区分_左 = 1;
   const 矯正区分_右 = 2;
-  const 矯正入力値_左 =3;
-  const 矯正入力値_右 =4;
-  const 矯正入力値_両眼 =5;
+  const 矯正入力値_左 = 3;
+  const 矯正入力値_右 = 4;
+  const 矯正入力値_両眼 = 5;
 
-  // 必要なpositionNumberがすべて存在するか確認
+  // 必要な検査項目がすべて存在しない場合を確認
   const visionItemPositionNumbers = [裸眼, 矯正, 特記];
-  const missingNumbers = visionItemPositionNumbers.filter(
-    (position) =>
-      !examItems.some((item) => item.positionNumber === position)
+  const allMissing = visionItemPositionNumbers.every(
+    (position) => !examItems.some((item) => item.positionNumber === position),
   );
 
-  if (missingNumbers.length > 0) {
-    return null; // 存在しない場合、表示しない。
+  if (allMissing) {
+    return null; // 存在しない場合、表示しない
   }
 
   const [examItemsData, setExamItemsData] = useState(examItems);
+  // 必須チェック用フラグ
+  const [showRequiredError, setShowRequiredError] = useState(false);
+  // 半角数字、矯正区分チェック用フラグ
+  let hasValidationError = true;
 
   // キーボードの表示状態をオブジェクトで管理
   const [activeKeyboard, setActiveKeyboard] = useState<{
@@ -75,12 +78,11 @@ export default function ExamVision({
   } | null>(null);
 
   useEffect(() => {
-    let newItems = [...examItems];
     // 登録ボタンフラグがtrueの場合、必須チェック
     if (onRegisterPressed) {
-      newItems = requiredCheck(newItems);
+      requiredCheck(examItems);
     }
-    setExamItemsData(newItems);
+    setExamItemsData(examItems);
   }, [onRegisterPressed, examItems]);
 
   // キーボード以外の部分を押下時に非表示
@@ -112,11 +114,6 @@ export default function ExamVision({
         const levelB = b.errorLevel ?? 0;
         return levelB - levelA;
       });
-      // 重複メッセージを削除
-      item.examRegistResults = item.examRegistResults.filter(
-        (result, index, self) =>
-          index === self.findIndex((r) => r.description === result.description),
-      );
     }
     return item;
   };
@@ -126,44 +123,18 @@ export default function ExamVision({
     const allEmpty = examItems.every((item) =>
       (item.examItemDetails ?? []).every((detail) => !detail.value),
     );
-
-    return examItems.map((item) => {
-      const updatedResults = item.examRegistResults || [];
-
-      if (allEmpty) {
-        // メッセージを追加
-        if (item.positionNumber === 裸眼 || item.positionNumber === 矯正) {
-          updatedResults.push({
-            description: getErrorMessage(errorMessages.required, "視力は"),
-            errorLevel: InputErrorLevel.異常,
-          });
-        }
-      } else {
-        // allEmpty が false の場合、メッセージを削除
-        const filteredResults = updatedResults.filter(
-          (result) =>
-            result.description !==
-            getErrorMessage(errorMessages.required, "視力は"),
-        );
-        return handleErrorMessage({
-          ...item,
-          examRegistResults: filteredResults,
-        });
-      }
-
-      return handleErrorMessage({
-        ...item,
-        examRegistResults: updatedResults,
-      });
-    });
+    if (allEmpty) {
+      setShowRequiredError(true);
+    } else {
+      setShowRequiredError(false);
+    }
   };
 
   // 半角数字チェック
   const validateNumeric = (
     value: string,
     name: string,
-    errors: ExamRegistResult[],
-  ) => {
+  ): ExamRegistResult | undefined => {
     const schema = z
       .string()
       .refine(
@@ -176,29 +147,19 @@ export default function ExamVision({
     if (!result.success) {
       // メッセージを追加
       const error = result.error.errors[0];
-      errors.push({
+      return {
         description: error.message,
         errorLevel: InputErrorLevel.異常,
-      });
-    } else {
-      // メッセージを削除
-      const errorMessageNumeric = getErrorMessage(
-        errorMessages.numericString,
-        `${name}は`,
-      );
-      return errors.filter(
-        (error) => error.description !== errorMessageNumeric,
-      );
+      };
     }
-    return errors;
+    return undefined;
   };
 
   // 矯正区分が選択されているかチェック
   const collectionCheck = (
     value: string,
     targetDetail: ExamItemDetail,
-    errors: ExamRegistResult[],
-  ) => {
+  ): ExamRegistResult | undefined => {
     const collectionSchema = z
       .string()
       .min(
@@ -206,32 +167,42 @@ export default function ExamVision({
         getErrorMessage(errorMessages.required, `${targetDetail?.name}は`),
       );
 
-    const errorMessage = getErrorMessage(
-      errorMessages.required,
-      `${targetDetail?.name}は`,
-    );
-
-    const filteredErrors = errors.filter(
-      (error) => error.description !== errorMessage,
-    );
-
     // 矯正の入力値が存在する場合、矯正区分を必須チェック
     if (value) {
       const result = collectionSchema.safeParse(targetDetail?.value);
       if (!result.success) {
         const error = result.error.errors[0];
-        filteredErrors.push({
+        return {
           description: error.message,
           errorLevel: InputErrorLevel.異常,
-        });
+        };
       }
     }
-    return filteredErrors;
+    return undefined;
+  };
+
+  // APIからのエラーメッセージを保存
+  const APIErrors = examItems.map((item) => ({
+    positionNumber: item.positionNumber,
+    examRegistResults: item.examRegistResults || [],
+  }));
+  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  const resetErrorMessages = (item: InputExamItem) => {
+    const targetError = APIErrors.find(
+      (error) => error.positionNumber === item.positionNumber,
+    );
+    if (targetError) {
+      item.examRegistResults = targetError.examRegistResults;
+    }
+    return item;
   };
 
   // バリデーションチェック
   const validationCheck = (item: InputExamItem) => {
-    let updatedErrors = item.examRegistResults || [];
+    resetErrorMessages(item);
+
+    // コールバック判断用のコンポーネントのエラーメッセージ
+    const componentErrorMessage: ExamRegistResult[] = [];
     // detailsをエラーチェック
     for (const detail of item.examItemDetails || []) {
       // 選択系の場合はバリデーションチェックをスキップ
@@ -242,37 +213,53 @@ export default function ExamVision({
 
       // 半角数字チェック
       const valueToValidate = detail.value || "";
-      updatedErrors = validateNumeric(
-        valueToValidate,
-        detail.name ?? "",
-        updatedErrors,
-      );
+      const result = validateNumeric(valueToValidate, detail.name ?? "");
+      if (result !== undefined) {
+        componentErrorMessage.push(result);
+      }
 
       // 矯正の値が入力された場合に、矯正区分が選択されているかチェック
       if (
         item.positionNumber === 矯正 &&
-        (detail.positionNumber === 矯正入力値_左 || detail.positionNumber === 矯正入力値_右)
+        (detail.positionNumber === 矯正入力値_左 ||
+          detail.positionNumber === 矯正入力値_右)
       ) {
         const targetDetail =
           detail.positionNumber === 矯正入力値_左
-            ? item.examItemDetails?.find((d) => d.positionNumber === 矯正区分_左)
-            : item.examItemDetails?.find((d) => d.positionNumber === 矯正区分_右);
+            ? item.examItemDetails?.find(
+                (d) => d.positionNumber === 矯正区分_左,
+              )
+            : item.examItemDetails?.find(
+                (d) => d.positionNumber === 矯正区分_右,
+              );
 
-        updatedErrors = collectionCheck(
-          detail.value ?? "",
-          targetDetail ?? {},
-          updatedErrors,
-        );
+        const result = collectionCheck(valueToValidate, targetDetail ?? {});
+        if (result !== undefined) {
+          componentErrorMessage.push(result);
+        }
       }
     }
 
-    const prevItem = {
+    // 基準値によるエラーメッセージを追加
+    componentErrorMessage.push(...(setRangesErrorMessage(item) ?? []));
+    // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
+    const isCallback = !componentErrorMessage.some(
+      (error) => error.errorLevel === InputErrorLevel.異常,
+    );
+    // エラーメッセージをexamItemに保存
+    const resultItem: InputExamItem = {
       ...item,
-      examRegistResults: updatedErrors,
+      examRegistResults: item.examRegistResults
+        ? item.examRegistResults.concat(componentErrorMessage)
+        : componentErrorMessage,
     };
-    // 基準値チェック
-    const rangesValidatedItem = setRangesErrorMessage(prevItem);
-    return handleErrorMessage(rangesValidatedItem);
+    // バリデーションチェックを行ったexamItemと、
+    // コールバックを判断するフラグを返す
+    const ValidationResult = {
+      validateResult: handleErrorMessage(resultItem),
+      hasCallback: isCallback,
+    };
+    return ValidationResult;
   };
 
   // 値取得用
@@ -285,7 +272,7 @@ export default function ExamVision({
       .find((item) => item.positionNumber === itemNumber) // 指定された item を探す
       ?.examItemDetails?.find(
         (detail) => detail.positionNumber === detailNumber,
-      )?.value; // 指定された detail を探す // value を取得
+      )?.value; // 指定された detail を探して、value を取得
   };
 
   // 値設定用
@@ -295,18 +282,28 @@ export default function ExamVision({
     detailNumber: number,
     newValue: string,
   ): typeof examItems =>
-    examItems.map((item) =>
-      item.positionNumber === itemNumber
-        ? validationCheck({
-            ...item,
-            examItemDetails: item.examItemDetails?.map((detail) =>
-              detail.positionNumber === detailNumber
-                ? { ...detail, value: newValue } // value を更新
-                : detail,
-            ),
-          })
-        : item,
-    );
+    examItems.map((item) => {
+      if (item.positionNumber === itemNumber) {
+        // validationCheckの結果を取得
+        const { validateResult, hasCallback } = validationCheck({
+          ...item,
+          examItemDetails: item.examItemDetails?.map((detail) =>
+            detail.positionNumber === detailNumber
+              ? { ...detail, value: newValue } // value を更新
+              : detail,
+          ),
+        });
+
+        // エラーがあった場合セット
+        if (!hasCallback) {
+          hasValidationError = hasCallback;
+        }
+
+        // validateResultを返す
+        return validateResult;
+      }
+      return item;
+    });
 
   // 各項目の値変更時
   const handleChange = (
@@ -315,6 +312,8 @@ export default function ExamVision({
     detailNumber: number,
     isSelector?: boolean,
   ) => {
+    hasValidationError = true;
+
     // 選択/未選択切替処理
     const checkedValue =
       isSelector &&
@@ -331,52 +330,11 @@ export default function ExamVision({
       checkedValue,
     );
 
-    // 矯正の入力値の場合、裸眼の入力値に空文字列を設定
-    if (itemNumber === 矯正 && (detailNumber === 矯正入力値_右 || detailNumber === 矯正入力値_左)) {
-      const nakedItemNumber = 裸眼;
-      const targetDetailNumber = detailNumber === 矯正入力値_左 ? 矯正区分_左 : 矯正区分_右;
-      const nakedValue = getValueByPositionNumbers(
-        updatedExamItems,
-        nakedItemNumber,
-        targetDetailNumber,
-      );
-      if (!nakedValue) {
-        setValueByPositionNumbers(
-          updatedExamItems,
-          itemNumber,
-          targetDetailNumber,
-          "",
-        );
-      }
-    }
     setExamItemsData(updatedExamItems);
-
-    // 3つのエラーが存在するか確認
-    const isValidatedError = updatedExamItems.some((item) => {
-      // item.examRegistResults が null でない場合のみ処理を行う
-      return item.examRegistResults?.some((error) => {
-        // 必須エラーの判定
-        const isRequired =
-          error.description ===
-          getErrorMessage(errorMessages.required, "視力は");
-
-        // 半角数字エラーの判定
-        const isNumericError =
-          error.description ===
-          getErrorMessage(errorMessages.numericString, `${item.name}は`);
-
-        // TODO:範囲エラーの判定
-        const isRangeError = error.description?.includes(
-          "正常値ではありません",
-        );
-
-        // 対象のエラーがあれば true を返す
-        return isRequired || isNumericError || isRangeError;
-      });
-    });
+    requiredCheck(updatedExamItems);
 
     // エラーが存在しない場合のみ onChange を実行
-    if (!isValidatedError) {
+    if (hasValidationError && !showRequiredError) {
       onChange(updatedExamItems);
     }
   };
@@ -396,7 +354,7 @@ export default function ExamVision({
           {detailNames.map((name, index) => (
             <Paper
               key={index}
-              w={index === 2 ? 373 : 592}
+              w={index === 両眼 - 1 ? 373 : 592}
               h={51}
               bg="gray02"
               c="white"
@@ -444,9 +402,9 @@ export default function ExamVision({
 
                     let isBothEyes = false;
                     if (isCorrection) {
-                      isBothEyes = detail.positionNumber === 両眼;
-                    } else {
                       isBothEyes = detail.positionNumber === 矯正入力値_両眼;
+                    } else {
+                      isBothEyes = detail.positionNumber === 両眼;
                     }
                     //選択ボタン用
                     const isSelector =
@@ -523,7 +481,7 @@ export default function ExamVision({
                                     item.examRegistResults?.some(
                                       (x) =>
                                         x.errorLevel === InputErrorLevel.異常,
-                                    )
+                                    ) || showRequiredError
                                       ? `${styles["input-error"]}`
                                       : item.examRegistResults?.some(
                                             (x) =>
@@ -567,6 +525,16 @@ export default function ExamVision({
               </Group>
               {/* エラーメッセージ */}
               <Stack key={item.positionNumber} gap={0}>
+                {(item.positionNumber === 裸眼 ||
+                  item.positionNumber === 矯正) &&
+                  showRequiredError && (
+                    <Group c="error">
+                      <IconSquareRoundedXFilled size={32} />
+                      <Text size="sm" fw={700}>
+                        {getErrorMessage(errorMessages.required, "視力は")}
+                      </Text>
+                    </Group>
+                  )}
                 {item.examRegistResults?.map((error, index) => {
                   const isWarning = error.errorLevel === InputErrorLevel.警告;
                   return (
@@ -612,7 +580,8 @@ export default function ExamVision({
                               : "auto"
                         }
                       >
-                        {detail?.keyboard?.keyboardType === KeyboardType.テンキー ? (
+                        {detail?.keyboard?.keyboardType ===
+                        KeyboardType.テンキー ? (
                           <NumericKeyboard
                             value={detail?.value ?? ""}
                             onChange={(newValue) =>
