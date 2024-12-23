@@ -284,7 +284,7 @@ public class ExamItemRepository : IExamItemRepository
                 d.exam_item_detail_id = any(@ExamItemDetailIds);";        
         var examItemDetails = await connection.QueryAsync<ExamItemDetailChildrenEntity>(sql, new { ExamItemDetailIds = examItemDetailIds });
 
-        var examItemDetailChilds = examItemDetails
+        var examItemDetailChildren = examItemDetails
                                     .GroupBy(d => d.ExamItemDetailId)
                                     .Select(d => new ExamItemDetailChild
                                     {
@@ -315,6 +315,6 @@ public class ExamItemRepository : IExamItemRepository
                                                             OrderNumber = op.First().OrderNumber
                                                         })
                                     });
-        return examItemDetailChilds;
+        return examItemDetailChildren;
     }
 }
