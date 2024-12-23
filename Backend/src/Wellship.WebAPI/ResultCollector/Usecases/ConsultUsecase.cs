@@ -531,8 +531,12 @@ public class ConsultUsecase : IConsultUsecase
     /// <summary>
     /// 検査結果を検証する
     /// </summary>
-    public void VerifyResults()
+    public async Task<IEnumerable<VerifyExamItems>> VerifyResults(string consultNumber, ResultsRequest results)
     {
-        
+        // 検査正常値を検証する
+        var status = await ValidateNormalValueRangeAsync(consultNumber, results);
+        var verifyExamItems = new List<VerifyExamItems>();
+
+        return verifyExamItems;
     }
 }

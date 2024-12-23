@@ -58,5 +58,5 @@ public interface IConsultUsecase
     /// <summary>
     /// 検査結果を検証する
     /// </summary>
-    public void VerifyResults();
+    public Task<IEnumerable<VerifyExamItems>> VerifyResults(string consultNumber, ResultsRequest results);
 }
