@@ -8,24 +8,15 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class RelatedExamItem
 {
     /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public RelatedExamItem(string examItemName, string examResult)
-    {
-        ExamItemName = examItemName;
-        ExamResult = examResult;
-    }
-
-    /// <summary>
     /// 検査項目名
     /// </summary>
     [JsonPropertyName("examItemName")]
-    public string ExamItemName { get; }
+    public required string ExamItemName { get; init; }
 
     /// <summary>
     /// 検査結果
     /// </summary>
     [JsonPropertyName("examResult")]
-    public string ExamResult { get; }
+    public required string ExamResult { get; init; }
 
 }
