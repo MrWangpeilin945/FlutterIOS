@@ -42,7 +42,17 @@ export default function ExamineeInfo({
       style={{ borderBottomLeftRadius: 16, borderBottomRightRadius: 16 }}
     >
       <Group display="table">
-        <Text size="lg" fw={700} c="black01" display="table-cell" ta="left">
+        <Text
+          size="lg"
+          fw={700}
+          c="black01"
+          display="table-cell"
+          ta="left"
+          style={{
+            wordBreak: "break-word",
+            whiteSpace: "pre-wrap",
+          }}
+        >
           {name}
         </Text>
         {namesake && (
@@ -53,7 +63,12 @@ export default function ExamineeInfo({
                 fill={getThemeColor("warning", theme)}
                 color={getThemeColor("white01", theme)}
               />
-              <Text size="sm" fw={700} c="warning">
+              <Text
+                size="sm"
+                fw={700}
+                c="warning"
+                style={{ textWrap: "nowrap" }}
+              >
                 同姓同名の受診者がいます
               </Text>
             </Group>
@@ -93,6 +108,10 @@ export default function ExamineeInfo({
             arrowPosition="side"
             arrowOffset={20}
             position="top-end"
+            style={{
+              wordBreak: "break-word",
+              whiteSpace: "pre-wrap",
+            }}
           >
             <Text
               size="sm"
@@ -125,6 +144,10 @@ export default function ExamineeInfo({
           arrowPosition="side"
           arrowOffset={20}
           position="top-end"
+          style={{
+            wordBreak: "break-word",
+            whiteSpace: "pre-wrap",
+          }}
         >
           <Text
             size="sm"

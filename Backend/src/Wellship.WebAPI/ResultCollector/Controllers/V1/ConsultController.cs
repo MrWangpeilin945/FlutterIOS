@@ -59,18 +59,6 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 簡易な受診者情報を取得する
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet]
-    [Route("api/v{version:apiVersion}/consult/{consultNumber}/simple")]
-    public IActionResult GetSimpleExaminee()
-    {
-        _consultUsecase.GetSimpleExaminee();
-        return Ok();
-    }
-
-    /// <summary>
     /// 検査内容を取得する
     /// </summary>
     /// <returns></returns>

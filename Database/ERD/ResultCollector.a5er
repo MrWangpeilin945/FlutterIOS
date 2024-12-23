@@ -460,10 +460,11 @@ Field="班ID","team_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
 Field="状況","status","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="健診日","exam_date","date","NOT NULL",,"","",$FFFFFFFF,""
 Field="開始時刻","start_time","varchar(4)","NOT NULL",,"","",$FFFFFFFF,""
+Index==2,place_id,team_id,exam_date
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241113095204
+ModifiedDateTime=20241220103543
 Position="MAIN",1600,2100
 ZOrder=25
 
@@ -973,7 +974,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=3100
-Top=1900
+Top=1700
 Field="ID","option_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="入力値","value","text","NOT NULL",,"","",$FFFFFFFF,""
@@ -981,7 +982,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241204194235
-Position="MAIN",3100,1900,606,99
+Position="MAIN",3100,1700,606,99
 ZOrder=55
 
 [Relation]
@@ -1074,7 +1075,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=3100
-Top=2100
+Top=1850
 Field="選択肢ID","option_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="コード","code","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
@@ -1084,7 +1085,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241205154756
-Position="MAIN",3100,2100
+Position="MAIN",3100,1850
 ZOrder=62
 
 [Relation]
@@ -1135,7 +1136,7 @@ ZOrder=65
 
 [Entity]
 PName=exam_normal_value_range
-LName=検査正常値範囲
+LName=検査基準値範囲
 Comment=
 TableInnerOption=
 TableOption=
@@ -1467,7 +1468,7 @@ ZOrder=85
 
 [Entity]
 PName=exam_normal_options
-LName=検査正常値選択肢
+LName=検査基準値選択肢
 Comment=
 TableInnerOption=
 TableOption=
@@ -1600,15 +1601,16 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=250
-Top=2500
+Top=2450
 Field="ID","id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
-Field="受診ID","consult_id","uuid",,,"","",$FFFFFFFF,""
+Field="受診ID","consult_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
 Field="受付番号","ticket_number","text",,,"","",$FFFFFFFF,""
+Field="操作区分","action_type","varchar(1)","NOT NULL",,"","I:Ins/U:Upd/D:Del",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241205131718
-Position="MAIN",250,2500
+ModifiedDateTime=20241218133516
+Position="MAIN",250,2450,468,124
 ZOrder=93
 
 [Relation]
@@ -1795,3 +1797,43 @@ Bar3=374
 TermPos1=R
 TermPos2=R
 ZOrder=96
+
+[Entity]
+PName=external_exam_item_details
+LName=外部検査項目明細
+Comment=
+TableInnerOption=
+TableOption=
+Page=Main
+Left=3100
+Top=2100
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="外部コード検査項目明細CD","external_exam_item_detail_code","text","NOT NULL",1,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20241218133856
+Position="Main",3100,2100
+ZOrder=100
+
+[Relation]
+Entity1=exam_item_details
+Entity2=external_exam_item_details
+RelationType1=3
+RelationType2=3
+Fields1=exam_item_detail_id
+Fields2=exam_item_detail_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,7622,2378,7723,R,R,""
+Dependence=0
+Caption=
+PName=
+ModifiedDateTime=20241218133955
+LineMode=0
+Bar1=762
+Bar2=238
+Bar3=772
+TermPos1=R
+TermPos2=R
+ZOrder=101

@@ -188,6 +188,14 @@ CREATE TABLE export_history_details (
   , CONSTRAINT export_history_details_PKC PRIMARY KEY (id,consult_id)
 );
 
+CREATE TABLE external_exam_item_details (
+  exam_item_detail_id integer NOT NULL
+  , external_exam_item_detail_code text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT external_exam_item_details_PKC PRIMARY KEY (exam_item_detail_id,external_exam_item_detail_code)
+);
+
 CREATE TABLE home_menus (
   home_menu_id integer NOT NULL
   , name text NOT NULL
@@ -309,8 +317,9 @@ CREATE TABLE tickets (
 
 CREATE TABLE tickets_histories (
   id uuid NOT NULL
-  , consult_id uuid
+  , consult_id uuid NOT NULL
   , ticket_number text
+  , action_type varchar(1) NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT tickets_histories_PKC PRIMARY KEY (id)
@@ -439,6 +448,9 @@ CREATE TABLE place_schedule (
   , created_by text NOT NULL
   , CONSTRAINT place_schedule_PKC PRIMARY KEY (place_schedule_id)
 );
+
+ALTER TABLE place_schedule ADD CONSTRAINT place_schedule_IX1
+  UNIQUE (place_id,team_id,exam_date) ;
 
 CREATE TABLE places (
   place_id uuid DEFAULT gen_random_uuid () NOT NULL
@@ -786,7 +798,7 @@ COMMENT ON COLUMN exam_normal_option_details.option_id IS '選択肢ID';
 COMMENT ON COLUMN exam_normal_option_details.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_option_details.created_by IS '作成者';
 
-COMMENT ON TABLE exam_normal_options IS '検査正常値選択肢';
+COMMENT ON TABLE exam_normal_options IS '検査基準値選択肢';
 COMMENT ON COLUMN exam_normal_options.normal_options_id IS '基準値選択肢ID';
 COMMENT ON COLUMN exam_normal_options.name IS '名称';
 COMMENT ON COLUMN exam_normal_options.threshold_id IS '基準値パターンID:0: テナントの基準';
@@ -798,7 +810,7 @@ COMMENT ON COLUMN exam_normal_options.error_level IS 'エラーレベル';
 COMMENT ON COLUMN exam_normal_options.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_options.created_by IS '作成者';
 
-COMMENT ON TABLE exam_normal_value_range IS '検査正常値範囲';
+COMMENT ON TABLE exam_normal_value_range IS '検査基準値範囲';
 COMMENT ON COLUMN exam_normal_value_range.range_id IS '範囲ID';
 COMMENT ON COLUMN exam_normal_value_range.name IS '名称';
 COMMENT ON COLUMN exam_normal_value_range.threshold_id IS '基準値パターンID:0: テナントの基準';
@@ -832,6 +844,12 @@ COMMENT ON COLUMN export_history_details.id IS 'ID';
 COMMENT ON COLUMN export_history_details.consult_id IS '受診ID';
 COMMENT ON COLUMN export_history_details.created_at IS '作成日時';
 COMMENT ON COLUMN export_history_details.created_by IS '作成者';
+
+COMMENT ON TABLE external_exam_item_details IS '外部検査項目明細';
+COMMENT ON COLUMN external_exam_item_details.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN external_exam_item_details.external_exam_item_detail_code IS '外部コード検査項目明細CD';
+COMMENT ON COLUMN external_exam_item_details.created_at IS '作成日時';
+COMMENT ON COLUMN external_exam_item_details.created_by IS '作成者';
 
 COMMENT ON TABLE home_menus IS 'ホームメニュー';
 COMMENT ON COLUMN home_menus.home_menu_id IS 'ホームメニューID';
@@ -922,6 +940,7 @@ COMMENT ON TABLE tickets_histories IS '受付履歴';
 COMMENT ON COLUMN tickets_histories.id IS 'ID';
 COMMENT ON COLUMN tickets_histories.consult_id IS '受診ID';
 COMMENT ON COLUMN tickets_histories.ticket_number IS '受付番号';
+COMMENT ON COLUMN tickets_histories.action_type IS '操作区分:I:Ins/U:Upd/D:Del';
 COMMENT ON COLUMN tickets_histories.created_at IS '作成日時';
 COMMENT ON COLUMN tickets_histories.created_by IS '作成者';
 
