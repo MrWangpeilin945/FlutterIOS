@@ -65,8 +65,33 @@ CREATE TABLE correlation_rules (
 ALTER TABLE correlation_rules ADD CONSTRAINT correlation_rules_IX1
   UNIQUE (exam_menu_id,priority) ;
 
+CREATE TABLE decision_rule_evaluations (
+  decision_rule_id integer NOT NULL
+  , variable_number integer NOT NULL
+  , evaluation_value text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT decision_rule_evaluations_PKC PRIMARY KEY (decision_rule_id,variable_number)
+);
+
+CREATE TABLE decision_rule_exam_item_details (
+  decision_rule_id integer NOT NULL
+  , variable_number integer NOT NULL
+  , source_type integer NOT NULL
+  , exam_item_detail_id integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT decision_rule_exam_item_details_PKC PRIMARY KEY (decision_rule_id,variable_number)
+);
+
 CREATE TABLE decision_rules (
   decision_rule_id integer NOT NULL
+  , name text NOT NULL
+  , exam_menu_id integer NOT NULL
+  , priority integer NOT NULL
+  , trigger_type integer NOT NULL
+  , error_level integer NOT NULL
+  , message text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT decision_rules_PKC PRIMARY KEY (decision_rule_id)
@@ -285,14 +310,6 @@ CREATE TABLE prior_exam_menus (
   , CONSTRAINT prior_exam_menus_PKC PRIMARY KEY (current_exam_menu_id,prior_exam_menu_id)
 );
 
-CREATE TABLE role_permissions (
-  functionality_id integer NOT NULL
-  , role_id integer NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT role_permissions_PKC PRIMARY KEY (functionality_id,role_id)
-);
-
 CREATE TABLE staff_login_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , staff_id uuid NOT NULL
@@ -446,14 +463,6 @@ CREATE TABLE export_histories (
   , CONSTRAINT export_histories_PKC PRIMARY KEY (id)
 );
 
-CREATE TABLE functionalities (
-  functionality_id integer NOT NULL
-  , name text NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT functionalities_PKC PRIMARY KEY (functionality_id)
-);
-
 CREATE TABLE home_menu_groups (
   home_menu_group_id integer NOT NULL
   , name text NOT NULL
@@ -592,6 +601,26 @@ ALTER TABLE correlation_rules
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE decision_rule_evaluations
+  ADD CONSTRAINT decision_rule_evaluations_FK1 FOREIGN KEY (decision_rule_id) REFERENCES decision_rules(decision_rule_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE decision_rule_exam_item_details
+  ADD CONSTRAINT decision_rule_exam_item_details_FK1 FOREIGN KEY (decision_rule_id) REFERENCES decision_rules(decision_rule_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE decision_rule_exam_item_details
+  ADD CONSTRAINT decision_rule_exam_item_details_FK2 FOREIGN KEY (exam_item_detail_id) REFERENCES exam_item_details(exam_item_detail_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE decision_rules
+  ADD CONSTRAINT decision_rules_FK1 FOREIGN KEY (exam_menu_id) REFERENCES exam_menus(exam_menu_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE equipments
   ADD CONSTRAINT equipments_FK1 FOREIGN KEY (exam_menu_id) REFERENCES exam_menus(exam_menu_id)
   ON DELETE RESTRICT
@@ -717,16 +746,6 @@ ALTER TABLE prior_exam_menus
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
-ALTER TABLE role_permissions
-  ADD CONSTRAINT role_permissions_FK1 FOREIGN KEY (role_id) REFERENCES roles(role_id)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE;
-
-ALTER TABLE role_permissions
-  ADD CONSTRAINT role_permissions_FK2 FOREIGN KEY (functionality_id) REFERENCES functionalities(functionality_id)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE;
-
 ALTER TABLE staff_login_histories
   ADD CONSTRAINT staff_login_histories_FK1 FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
   ON DELETE RESTRICT
@@ -789,8 +808,29 @@ COMMENT ON COLUMN correlation_rules.message IS '出力メッセージ';
 COMMENT ON COLUMN correlation_rules.created_at IS '作成日時';
 COMMENT ON COLUMN correlation_rules.created_by IS '作成者';
 
+COMMENT ON TABLE decision_rule_evaluations IS '検査実施判断ルール_判定値';
+COMMENT ON COLUMN decision_rule_evaluations.decision_rule_id IS '検査実施判断ルールID';
+COMMENT ON COLUMN decision_rule_evaluations.variable_number IS '変数番号';
+COMMENT ON COLUMN decision_rule_evaluations.evaluation_value IS '判定値';
+COMMENT ON COLUMN decision_rule_evaluations.created_at IS '作成日時';
+COMMENT ON COLUMN decision_rule_evaluations.created_by IS '作成者';
+
+COMMENT ON TABLE decision_rule_exam_item_details IS '検査実施判断ルール_検査項目明細';
+COMMENT ON COLUMN decision_rule_exam_item_details.decision_rule_id IS '検査実施判断ルール';
+COMMENT ON COLUMN decision_rule_exam_item_details.variable_number IS '変数番号';
+COMMENT ON COLUMN decision_rule_exam_item_details.source_type IS 'データソース種別';
+COMMENT ON COLUMN decision_rule_exam_item_details.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN decision_rule_exam_item_details.created_at IS '作成日時';
+COMMENT ON COLUMN decision_rule_exam_item_details.created_by IS '作成者';
+
 COMMENT ON TABLE decision_rules IS '検査実施判断ルール';
 COMMENT ON COLUMN decision_rules.decision_rule_id IS '検査実施判断ルールID';
+COMMENT ON COLUMN decision_rules.name IS '名称';
+COMMENT ON COLUMN decision_rules.exam_menu_id IS '検査メニューID';
+COMMENT ON COLUMN decision_rules.priority IS '優先度';
+COMMENT ON COLUMN decision_rules.trigger_type IS '発火条件種別';
+COMMENT ON COLUMN decision_rules.error_level IS 'エラーレベル';
+COMMENT ON COLUMN decision_rules.message IS '出力メッセージ';
 COMMENT ON COLUMN decision_rules.created_at IS '作成日時';
 COMMENT ON COLUMN decision_rules.created_by IS '作成者';
 
@@ -952,12 +992,6 @@ COMMENT ON COLUMN prior_exam_menus.prior_exam_menu_id IS '前提検査メニュ�
 COMMENT ON COLUMN prior_exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN prior_exam_menus.created_by IS '作成者';
 
-COMMENT ON TABLE role_permissions IS 'ロール機能許可';
-COMMENT ON COLUMN role_permissions.functionality_id IS '機能ID';
-COMMENT ON COLUMN role_permissions.role_id IS 'ロールID';
-COMMENT ON COLUMN role_permissions.created_at IS '作成日時';
-COMMENT ON COLUMN role_permissions.created_by IS '作成者';
-
 COMMENT ON TABLE staff_login_histories IS '職員ログイン履歴';
 COMMENT ON COLUMN staff_login_histories.id IS 'ID';
 COMMENT ON COLUMN staff_login_histories.staff_id IS '職員ID';
@@ -1071,12 +1105,6 @@ COMMENT ON COLUMN export_histories.exported_at IS '出力日時';
 COMMENT ON COLUMN export_histories.exported_by IS '出力者';
 COMMENT ON COLUMN export_histories.created_at IS '作成日時';
 COMMENT ON COLUMN export_histories.created_by IS '作成者';
-
-COMMENT ON TABLE functionalities IS '機能';
-COMMENT ON COLUMN functionalities.functionality_id IS '機能ID';
-COMMENT ON COLUMN functionalities.name IS '機能名';
-COMMENT ON COLUMN functionalities.created_at IS '作成日時';
-COMMENT ON COLUMN functionalities.created_by IS '作成者';
 
 COMMENT ON TABLE home_menu_groups IS 'ホームメニューグループ';
 COMMENT ON COLUMN home_menu_groups.home_menu_group_id IS 'ホームメニューグループID';
