@@ -331,7 +331,7 @@ export default function ExamBody({
                   size="lg"
                   bg={"white"}
                   variant="outline"
-                  bd={2}
+                  bd={"2px,solid"}
                   onClick={() => handleChange(positionNumber, "")}
                   ml={49}
                   tabIndex={-1}
