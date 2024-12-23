@@ -108,6 +108,11 @@ list.Count()  <> 0
 |string
 |受付番号
 
+|InputNote
+|Yes
+|string
+|エラーオブジェクトに登録する入力項目Noなど
+
 |===
 
 ==== ErrorObject
@@ -139,23 +144,28 @@ list.Count()  <> 0
 
 ==== ERROR検証
 
-* 連携キーの取得に失敗
-** `[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCode` が存在しない
-*** Code `10001` : Message `該当する連携キーが見つかりません。` InputNote [Ticket,InputNote]
+* None
 
 ==== WORNING検証
 
-* None
+* 連携キーの取得に失敗
+** `[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCode` が存在しない
+*** ErrorObject
+*** Code `10002`
+**** Message `指定されたConnectionCodeシステム上に存在しません。Code:[Consult.external_connection_code]` 
+**** InputNote [Ticket.InputNote]
 
 === 処理(Repository)
 
 ==== ワークテーブル登録
 
 * `Ticket` をワークテーブルに登録する。
-* `Ticket.ConnectionCode` でグループ化し、 `Ticket.SortNo` が大きいレコードで `[DB]consult(受診)` と `[DB]tickets(受付)` の更新処理を行う。
-*  `[DB]tickets_histories(受付履歴)` は全レコード更新を行う。
+* `Ticket.ConnectionCode` でグループ化し、 `Ticket.SortNo` が最大のレコードで `[DB]consult(受診)` と `[DB]tickets(受付)` の更新処理を行う。
 
-==== 更新処理
+
+==== 登録処理
+
+*  `[DB]tickets_histories(受付履歴)` は全レコード更新を行う。
 
 * 条件①
 ** `Ticket.ConnectionMode  == 追加`
@@ -200,6 +210,15 @@ list.Count()  <> 0
 |
 |更新対象外
 
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`ExternalConnection`
+|
+
+
 |===
 
 * [DB]tickets(受付)
@@ -211,11 +230,11 @@ list.Count()  <> 0
 |列|登録値|処理・変換
 
 |consult_id
-|`'[DB]consult.consult_id'`
+|`[DB]consult.consult_id`
 |[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCodeで検索して取得
 
 |ticket_number
-|`'Ticket.TicketNumber'`
+|`Ticket.TicketNumber`
 |
 
 |===
@@ -232,14 +251,14 @@ list.Count()  <> 0
 |
 
 |consult_id
-|`'[DB]consult.consult_id(受診ID)'`
+|`[DB]consult.consult_id(受診ID)`
 |[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCodeで検索して取得
 
 |ticket_number
-|`'Ticket.TicketNumber'`
+|`Ticket.TicketNumber`
 |
 
-|追加削除
+|action_type
 |`'追加'`
 |
 
@@ -320,14 +339,14 @@ list.Count()  <> 0
 |
 
 |consult_id
-|`'[DB]consult(受診).consult_id(受診ID)'`
+|`[DB]consult(受診).consult_id(受診ID)`
 |`[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCode` で検索して取得
 
 |ticket_number
-|`'Ticket.TicketNumber'`
+|`Ticket.TicketNumber`
 |
 
-|追加削除
+|action_type
 |`'削除'`
 |
 
@@ -390,7 +409,7 @@ list.Count()  <> 0
 |
 
 |consult_id
-|`'[DB]consult(受診).consult_id(受診ID)'`
+|`[DB]consult(受診).consult_id(受診ID)`
 |`[DB]consult(受診).external_connection_code(外部連携キー) == Ticket.ConnectionCode` で検索して取得
 
 |ticket_number
