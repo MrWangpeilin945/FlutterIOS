@@ -201,16 +201,12 @@ INSERT INTO exam_results(consult_id,exam_item_detail_id,value,created_at,created
   , ('caaaaa00-0000-0000-0000-000000000004',711,'128',CURRENT_TIMESTAMP,'init')
   , ('caaaaa00-0000-0000-0000-000000000004',712,'92',CURRENT_TIMESTAMP,'init')
   , ('8dda2a54-5217-425f-bba9-ab821a9647fe',2,'100.5',CURRENT_TIMESTAMP,'init')
-  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',1,'175.3',CURRENT_TIMESTAMP,'init')
-  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',711,'01-001',CURRENT_TIMESTAMP,'init')
-  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',712,'02-001',CURRENT_TIMESTAMP,'init');
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',1,'175.3',CURRENT_TIMESTAMP,'init');
 
 -- 過去検査結果
 INSERT INTO previous_results(consult_id,exam_date,exam_item_detail_id,value,created_at,created_by) VALUES 
     ('8dda2a54-5217-425f-bba9-ab821a9647fe', DATE '2023-10-01',2,'70.0',CURRENT_TIMESTAMP,'init')
-  , ('8dda2a54-5217-425f-bba9-ab821a9647fe', DATE '2023-10-1',1,'173.0',CURRENT_TIMESTAMP,'init')
-  , ('8dda2a54-5217-425f-bba9-ab821a9647fe', DATE '2023-10-1',711,'01-999',CURRENT_TIMESTAMP,'init')
-  , ('8dda2a54-5217-425f-bba9-ab821a9647fe', DATE '2023-10-1',712,'02-999',CURRENT_TIMESTAMP,'init');
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe', DATE '2023-10-1',1,'173.0',CURRENT_TIMESTAMP,'init');
 
 -- 検査中止
 INSERT INTO exam_cancels(consult_id,exam_item_detail_id,cancel_reason_id,created_at,created_by) VALUES 
@@ -262,6 +258,5 @@ insert into exam_menu_note_consults(menu_note_id,code,order_number,created_at,cr
 
 -- 受診特記
 insert into consult_notes(consult_id, code, note, created_at, created_by) VALUES
-    ('8dda2a54-5217-425f-bba9-ab821a9647fe','012','撮影番号',CURRENT_TIMESTAMP,'init')
-  , ('8dda2a54-5217-425f-bba9-ab821a9647fe','ST01','01-001',CURRENT_TIMESTAMP,'init')
+    ('8dda2a54-5217-425f-bba9-ab821a9647fe','ST01','01-001',CURRENT_TIMESTAMP,'init')
   , ('8dda2a54-5217-425f-bba9-ab821a9647fe','ST02','02-001',CURRENT_TIMESTAMP,'init');
