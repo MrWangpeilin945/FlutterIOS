@@ -92,16 +92,16 @@ public class ExamMenuRepository : IExamMenuRepository
         order by
             n.order_number;";
 
-        // 検査メニュー特記_検査項目テーブル
+        // 検査メニュー特記_受診テーブル
         const string consultSql = @"
         select
             n.menu_note_id as MenuNoteId
             , nc.code as Code
             , nc.order_number as OrderNumber
         from
-            resultcollector.exam_menu_notes n 
-            left join resultcollector.exam_menu_note_consults nc 
-                on nc.menu_note_id = n.menu_note_id 
+            resultcollector.exam_menu_note_consults nc
+            left join resultcollector.exam_menu_notes n 
+                on n.menu_note_id = nc.menu_note_id 
         where
             n.exam_menu_id = @ExamMenuId 
         order by
@@ -116,9 +116,9 @@ public class ExamMenuRepository : IExamMenuRepository
             , nr.source_type as SourceType
             , nr.order_number as OrderNumber 
         from
-            resultcollector.exam_menu_notes n 
-            left join resultcollector.exam_menu_note_results nr 
-                on nr.menu_note_id = n.menu_note_id 
+            resultcollector.exam_menu_note_results nr 
+            left join resultcollector.exam_menu_notes n 
+                on n.menu_note_id = nr.menu_note_id 
         where
             n.exam_menu_id = @ExamMenuId 
         order by

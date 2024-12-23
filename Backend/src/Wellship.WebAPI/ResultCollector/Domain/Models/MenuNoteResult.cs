@@ -61,17 +61,22 @@ public class MenuNoteResult
     }
 
     private string GetDisplayResultText()
-    {
-        var 今回値の明細IDs = _menuNote.ExamResults.Where(x => x.SourceType == Core.Enums.SourceType.今回値).Select(x => x.ExamItemDetailId).ToArray();
-        var 前回値の明細IDs = _menuNote.ExamResults.Where(x => x.SourceType == Core.Enums.SourceType.前回値).Select(x => x.ExamItemDetailId).ToArray();
+    {   // 今回値の明細IDs
+        var currentDetailIds = _menuNote.ExamResults.Where(x => x.SourceType == Core.Enums.SourceType.今回値).Select(x => x.ExamItemDetailId).ToArray();
+        // 前回値の明細IDs
+        var previousDetailIds = _menuNote.ExamResults.Where(x => x.SourceType == Core.Enums.SourceType.前回値).Select(x => x.ExamItemDetailId).ToArray();
 
-        var 表示用今回値リスト = 今回値の明細IDs.Select(x => Get表示用値(x, _currentResults));
-        var 表示用前回値リスト = 前回値の明細IDs.Select(x => Get表示用値(x, _previousResults));
+        // 表示用今回値リスト
+        var displayCurrentList = currentDetailIds.Select(x => GetDisplayValue(x, _currentResults));
+        // 表示用前回値リスト
+        var displatPreviousList = previousDetailIds.Select(x => GetDisplayValue(x, _previousResults));
 
-        var 今回値テキスト = string.Join("/", 表示用今回値リスト);
-        var 前回値テキスト = string.Join("/", 表示用前回値リスト);
+        // 今回値テキスト
+        var currentText = string.Join("/", displayCurrentList);
+        // 前回値テキスト
+        var previousText = string.Join("/", displatPreviousList);
 
-        return $"{今回値テキスト}({前回値テキスト}){_menuNote.Suffix}";
+        return $"{currentText}({previousText}){_menuNote.Suffix}";
     }
 
     private string GetDisplayConsultNoteText()
@@ -82,21 +87,21 @@ public class MenuNoteResult
         return $"{joinText}{_menuNote.Suffix}";
     }
 
-    private string Get表示用値(int 明細ID, IEnumerable<ExamItemDetailResult> 回答リスト)
+    private string GetDisplayValue(int detailId, IEnumerable<ExamItemDetailResult> answerList)
     {
-        var マスタ = _detailChildren.SingleOrDefault(x => x.ExamItemDetailId == 明細ID);
+        var master = _detailChildren.SingleOrDefault(x => x.ExamItemDetailId == detailId);
 
-        if (マスタ is null)
+        if (master is null)
         {
             return "";
         }
 
-        var 回答値 = 回答リスト.SingleOrDefault(x => x.ExamItemDetailId == 明細ID)?.Value ?? "";
+        var answerValue = answerList.SingleOrDefault(x => x.ExamItemDetailId == detailId)?.Value ?? "";
 
-        return マスタ.Type switch
+        return master.Type switch
         {
-            Core.Enums.ExamItemDetailType.入力 => 回答値,
-            Core.Enums.ExamItemDetailType.選択 => マスタ.DetailOptions.SingleOrDefault(x => x.Code == 回答値)?.Name ?? 回答値,
+            Core.Enums.ExamItemDetailType.入力 => answerValue,
+            Core.Enums.ExamItemDetailType.選択 => master.DetailOptions.SingleOrDefault(x => x.Code == answerValue)?.Name ?? answerValue,
             _ => ""
         };
     }

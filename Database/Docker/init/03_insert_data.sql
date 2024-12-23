@@ -253,16 +253,11 @@ insert into exam_menu_notes(menu_note_id,name,exam_menu_id,order_number,suffix,c
 -- 検査メニュー特記_検査結果
 insert into exam_menu_note_results(menu_note_id,exam_item_detail_id,source_type,order_number,created_at,created_by) VALUES
     (1,1,1,1,CURRENT_TIMESTAMP,'init')
-  , (1,1,2,2,CURRENT_TIMESTAMP,'init')
-  , (2,711,1,1,CURRENT_TIMESTAMP,'init')
-  , (2,711,2,1,CURRENT_TIMESTAMP, 'init')
-  , (2,712,1,2,CURRENT_TIMESTAMP,'init')
-  , (2,712,2,2,CURRENT_TIMESTAMP,'init');
+  , (1,1,2,2,CURRENT_TIMESTAMP,'init');
 
 -- 検査メニュー特記_受診
 insert into exam_menu_note_consults(menu_note_id,code,order_number,created_at,created_by) VALUES
-    (1,'012',1,CURRENT_TIMESTAMP,'init')
-  , (2,'ST01',1,CURRENT_TIMESTAMP,'init')
+    (2,'ST01',1,CURRENT_TIMESTAMP,'init')
   , (2,'ST02',2,CURRENT_TIMESTAMP,'init');
 
 -- 受診特記
