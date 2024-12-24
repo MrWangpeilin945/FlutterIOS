@@ -36,4 +36,17 @@ public class AuthenticationController : ControllerBase
         var response = new StaffLoginResponse { Token = accessToken };
         return Ok(response);
     }
+
+    /// <summary>
+    /// アクセストークンをリフレッシュする
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StaffLoginResponse))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [HttpPost]
+    [Route("api/v{version:apiVersion}/staff/login/refresh")]
+    public IActionResult RefreshAsync([FromBody] AccessTokenRefreshRequest request)
+    {
+        var refreshToken = Request.Cookies.SingleOrDefault(x => x.Key == "refreshToken");
+        return Ok();
+    }
 }

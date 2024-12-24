@@ -45,7 +45,7 @@
         {
           "examItemDetailId": 1,
           "value" : "120"
-        }.
+        },
         {
           "examItemDetailId": 2,
           "value" : ""

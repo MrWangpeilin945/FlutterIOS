@@ -403,10 +403,10 @@ public class ConsultRepository : IConsultRepository
         order by
             p.exam_date desc;";
 
-        var response = await connection.QueryAsync<PreviousResultEntity>(sql, new { ConsultId = consultId, ExamDate = examDate.ToString("yyyy-MM-dd")});
+        var response = await connection.QueryAsync<PreviousResultEntity>(sql, new { ConsultId = consultId, ExamDate = examDate.ToString("yyyy-MM-dd") });
         // 受診日の直近日
         var previousDate = DateTime.Parse(examDate.ToString("yyyy-MM-dd"));
-        if(response.Any())
+        if (response.Any())
         {
             previousDate = response.Select(x => x.ExamDate).ElementAt(0);
         }
@@ -417,12 +417,30 @@ public class ConsultRepository : IConsultRepository
             // 受診日の直近日の過去検査結果のみ返す
             ExamItemDetailResults = response.Where(x => x.ExamDate == previousDate)
                                             .Select(x => new ExamItemDetailResult()
-            {
-                ExamItemId = x.ExamItemId,
-                ExamItemDetailId = x.ExamItemDetailId,
-                Value = x.Value
-            })
+                                            {
+                                                ExamItemId = x.ExamItemId,
+                                                ExamItemDetailId = x.ExamItemDetailId,
+                                                Value = x.Value
+                                            })
         };
     }
 
+    /// <summary>
+    /// 受診を指定して検査項目特記を取得します。
+    /// </summary>
+    public async Task<IEnumerable<ConsultNote>> GetConsultNotesAsync(Guid consultId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            n.code as Code
+            , n.note as Note 
+        from
+            resultcollector.consult_notes n 
+        where
+            consult_id = @ConsultId;";
+
+        var response = await connection.QueryAsync<ConsultNote>(sql, new { ConsultId = consultId });
+        return response;
+    }
 }
