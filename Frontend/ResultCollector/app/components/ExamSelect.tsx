@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Group, Text, Flex, Paper, Center } from "@mantine/core";
+import { Button, Group, Text, Flex, Paper } from "@mantine/core";
 import {
   IconExclamationCircleFilled,
   IconSquareRoundedXFilled,
