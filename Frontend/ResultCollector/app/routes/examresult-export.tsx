@@ -233,7 +233,7 @@ export default function ExamresultExport() {
 
   // 結果出力確認ダイアログを表示する
   const showResultsOutputConfirmDialog = useCallback(
-    async (placeScheduleId: number) => {
+    async (placeScheduleId: string) => {
       // 結果出力確認ダイアログの結果を取得する
       const confirmResult = await ref.current?.resultsOutputConfirm();
       if (confirmResult) {
@@ -278,7 +278,7 @@ export default function ExamresultExport() {
   );
 
   const handleClick = (
-    placeScheduleId?: number,
+    placeScheduleId?: string,
     examDate?: string,
     placeName?: string,
   ) => {
@@ -288,7 +288,7 @@ export default function ExamresultExport() {
     };
     setResultsOutputConfirmDialog(resultsOutputConfirmDialogData);
     // 結果出力確認ダイアログを表示する
-    showResultsOutputConfirmDialog(placeScheduleId || 0);
+    showResultsOutputConfirmDialog(placeScheduleId || "");
   };
 
   return (

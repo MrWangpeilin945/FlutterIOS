@@ -43,7 +43,10 @@ import {
   examMenuState,
   staffState,
 } from "~/store/store";
-import type { ConnectionEquipment, NamedEntity } from "~/interfaces/interfaces";
+import type {
+  ConnectionEquipment,
+  NumberIdNamedEntity,
+} from "~/interfaces/interfaces";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 import {
   useCancelReasonGetCancelReasons,
@@ -406,7 +409,7 @@ export default function ExamOrderConfirm() {
     // 今の検査メニューをスキップして次の検査メニューに遷移する
     const selectedExamMenu = selectedExamMenuState?.filter(
       Boolean,
-    ) as NamedEntity[];
+    ) as NumberIdNamedEntity[];
 
     const examMenuIndex = selectedExamMenu?.findIndex(
       (x) => x.id === examMenuId,
@@ -712,9 +715,8 @@ export default function ExamOrderConfirm() {
             <>
               {/* 検査内容が取得できている時は画面を表示する */}
               {/* 受診者ヘッダー */}
-              {/* todo examineeId→ticketNumber型が… */}
               <ExamineeHeader
-                managerId={examContent?.examinee?.ticketNumber ?? ""}
+                managerNo={examContent?.examinee?.ticketNumber ?? ""}
                 staffName={staff?.name ?? ""}
                 name={examContent?.examinee?.kanaName ?? ""}
                 gender={examContent?.examinee?.sex ?? 0}

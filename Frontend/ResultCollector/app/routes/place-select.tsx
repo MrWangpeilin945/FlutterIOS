@@ -63,9 +63,9 @@ export default function PlaceSelect() {
   // jotaiに健診日、会場ID、会場名、会場日程ID、開始時刻を保存して遷移
   const callbackClick = (
     examDate?: string,
-    placeId?: number,
+    placeId?: string,
     placeName?: string,
-    placeScheduleId?: number,
+    placeScheduleId?: string,
     startTime?: string,
   ) => {
     if (examDate) {

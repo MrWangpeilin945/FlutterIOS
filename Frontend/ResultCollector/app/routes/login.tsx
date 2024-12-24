@@ -22,8 +22,9 @@ import { useState } from "react";
 import { z } from "zod";
 import { useAuthenticationLogin, useStaffGetStaff } from "~/api/wellship";
 import CommonDialog from "~/components/CommonDialog";
-import type { NamedEntity } from "~/interfaces/interfaces";
-import { staffState } from "~/store/store";
+import type { StringIdNamedEntity } from "~/interfaces/interfaces";
+import { serverTimeOffsetState, staffState } from "~/store/store";
+import { authUtil } from "~/utils/authUtil";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
 export const meta: MetaFunction = () => {
@@ -38,6 +39,7 @@ export default function Login() {
   const [opened, { open, close }] = useDisclosure(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [, setStaff] = useAtom(staffState);
+  const [, setServerTimeOffset] = useAtom(serverTimeOffsetState);
 
   //AP1001呼び出し用(POST系APIの定義)
   const { mutateAsync } = useAuthenticationLogin();
@@ -99,6 +101,12 @@ export default function Login() {
         });
         if (result.status === 200) {
           // 成功時の処理
+          // 取得したアクセストークンとサーバー時間との差を保存する
+          const responseToken = result.data.token ?? "";
+          authUtil.setAccessToken(responseToken);
+          const offset = authUtil.calculateTimeOffset(responseToken);
+          setServerTimeOffset(offset);
+
           await fetchStaff();
         }
       } catch (error) {
@@ -124,7 +132,7 @@ export default function Login() {
     if (result.data) {
       // 成功時
       // サーバから取得した情報.staffId、staffNameを設定する
-      const jotaiData: NamedEntity = {
+      const jotaiData: StringIdNamedEntity = {
         id: result.data.data.staffId,
         name: result.data.data.staffName,
       };

@@ -53,7 +53,7 @@ export default function Teams() {
   }, []);
 
   //jotaiに班idと班名を保存して遷移
-  const callbackClick = (teamId?: number, teamName?: string) => {
+  const callbackClick = (teamId?: string, teamName?: string) => {
     if (teamId !== undefined && teamName) {
       const teamData = { id: teamId, name: teamName };
       setTeam(teamData);
