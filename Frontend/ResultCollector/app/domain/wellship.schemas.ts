@@ -326,6 +326,7 @@ export interface HomeMenuGroupList {
    * @nullable
    */
   placeScheduleLockingStatus?: number | null;
+  staffRole?:number;
 }
 
 /**
