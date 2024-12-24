@@ -82,6 +82,7 @@ export default function ExamineeHeader({
                 onClick={() => navigate("/login")}
                 size="xs"
                 fw={700}
+                bd="2px,solid"
               >
                 ログアウト
               </Button>
