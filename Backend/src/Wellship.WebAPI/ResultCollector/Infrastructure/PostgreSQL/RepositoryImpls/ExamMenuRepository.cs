@@ -1,6 +1,7 @@
 
 using Dapper;
 
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
@@ -67,5 +68,88 @@ public class ExamMenuRepository : IExamMenuRepository
 
         var priorMenuIds = results.Select(x => x.PriorExamMenuId);
         return new PriorExamMenu(currentExamMenuId, priorMenuIds);
+    }
+
+    /// <summary>
+    /// 検査メニュー特記の設定一覧を取得します。
+    /// </summary>
+    public async Task<IEnumerable<MenuNote>> GetMenuNotesAsync(int examMenuId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+
+        // メインテーブル
+        const string mainSql = @"
+        select
+            n.menu_note_id as MenuNoteId
+            , n.name as Name
+            , n.order_number as OrderNumber
+            , n.exam_menu_id as ExamMenuId 
+            , n.suffix as Suffix
+        from
+            resultcollector.exam_menu_notes n 
+        where
+            n.exam_menu_id = @ExamMenuId 
+        order by
+            n.order_number;";
+
+        // 検査メニュー特記_受診テーブル
+        const string consultSql = @"
+        select
+            n.menu_note_id as MenuNoteId
+            , nc.code as Code
+            , nc.order_number as OrderNumber
+        from
+            resultcollector.exam_menu_note_consults nc
+            left join resultcollector.exam_menu_notes n 
+                on n.menu_note_id = nc.menu_note_id 
+        where
+            n.exam_menu_id = @ExamMenuId 
+        order by
+            n.order_number
+            , nc.order_number;";
+
+        // 検査メニュー特記_検査結果テーブル
+        const string resultsSql = @"
+        select
+            n.menu_note_id as MenuNoteId
+            , nr.exam_item_detail_id as ExamItemDetailId
+            , nr.source_type as SourceType
+            , nr.order_number as OrderNumber 
+        from
+            resultcollector.exam_menu_note_results nr 
+            left join resultcollector.exam_menu_notes n 
+                on n.menu_note_id = nr.menu_note_id 
+        where
+            n.exam_menu_id = @ExamMenuId 
+        order by
+            nr.order_number;";
+
+        // SQL実行
+        var menuNotes = await connection.QueryAsync<Entities.MenuNoteEntity>(mainSql, new { ExamMenuId = examMenuId });
+        var noteExamItems = await connection.QueryAsync<Entities.MenuNoteConsultEntity>(consultSql, new { ExamMenuId = examMenuId });
+        var noteResults = await connection.QueryAsync<Entities.MenuNoteExamResultEntity>(resultsSql, new { ExamMenuId = examMenuId });
+
+        // ドメインモデルにマッピング
+        return menuNotes.OrderBy(x => x.OrderNumber)
+                        .Select(x => new MenuNote()
+                        {
+                            MenuNoteId = x.MenuNoteId,
+                            Name = x.Name,
+                            ExamMenuId = x.ExamMenuId,
+                            Suffix = x.Suffix ?? "",
+                            ConsultNotes = noteExamItems.Where(n => n.MenuNoteId == x.MenuNoteId)
+                                                         .OrderBy(n => n.OrderNumber)
+                                                         .Select(n => new MenuNoteConsult()
+                                                         {
+                                                             Code = n.Code
+                                                         }),
+                            ExamResults = noteResults.Where(n => n.MenuNoteId == x.MenuNoteId)
+                                                     .OrderBy(n => n.OrderNumber)
+                                                     .Select(n => new MenuNoteExamResult()
+                                                     {
+                                                         SourceType = (SourceType)n.SourceType,
+                                                         ExamItemDetailId = n.ExamItemDetailId,
+                                                     })
+                        });
     }
 }

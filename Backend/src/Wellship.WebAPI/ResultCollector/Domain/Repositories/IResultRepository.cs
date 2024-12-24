@@ -1,3 +1,5 @@
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 /// <summary>
@@ -5,4 +7,9 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 /// </summary>
 public interface IResultRepository
 {
+    /// <summary>
+    /// 検査結果を登録する
+    /// </summary>
+    public Task RegisterResultsAsync(Guid consultId, ExamResultRegisteEntity[] results);
+
 }
