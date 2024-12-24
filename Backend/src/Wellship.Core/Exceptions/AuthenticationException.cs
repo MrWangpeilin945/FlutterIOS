@@ -4,12 +4,12 @@ namespace Ryobi.Wellship.Core.Exceptions;
 /// <summary>
 /// 認証情報に関する検証に失敗した場合の例外です
 /// </summary>
-public class AuthenticationException : WellshipException
+public class WellshipAuthenticationException : WellshipException
 {
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public AuthenticationException()
+    public WellshipAuthenticationException()
     {
     }
     /// <summary>

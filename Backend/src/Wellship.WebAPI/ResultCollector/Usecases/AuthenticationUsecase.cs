@@ -29,6 +29,6 @@ public class AuthenticationUsecase : IAuthenticationUsecase
     public async ValueTask<string> LoginStaffAsync(string identifier, string password)
     {
         var staff = await _staffRepository.GetStaffByLoginIdAsync(identifier);
-        return staff.Enabled && staff.VerifyPassword(password) ? _authService.GenerateAccessToken(staff) : throw new AuthenticationException();
+        return staff.Enabled && staff.VerifyPassword(password) ? _authService.GenerateAccessToken(staff) : throw new WellshipAuthenticationException();
     }
 }

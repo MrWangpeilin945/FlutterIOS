@@ -27,7 +27,7 @@ public class AuthenticationController : ControllerBase
     /// ログインする
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StaffLoginResponse))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/staff/login")]
     public async Task<IActionResult> LoginAsync([FromBody] StaffLoginRequest request)
