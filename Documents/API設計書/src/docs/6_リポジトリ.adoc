@@ -106,3 +106,15 @@ class IntegrationRepository {
   + GetExportHistory()
 }
 ----
+
+== リフレッシュトークンリポジトリ
+
+[mermaid,Integration-r-cd,png]
+----
+classDiagram
+class RefreshTokenRepository {
+  + GetRefreshToken()
+  + UpdateRefreshToken()
+  + ExpireRefreshToken()
+}
+----

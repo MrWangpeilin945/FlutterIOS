@@ -27,12 +27,26 @@ public class AuthenticationController : ControllerBase
     /// ログインする
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StaffLoginResponse))]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/staff/login")]
-    public IActionResult Login([FromBody] StaffLoginRequest request)
+    public async Task<IActionResult> LoginAsync([FromBody] StaffLoginRequest request)
     {
-        _authenticationUsecase.Login();
+        var accessToken = await _authenticationUsecase.LoginStaffAsync(request.LoginId, request.Password);
+        var response = new StaffLoginResponse { Token = accessToken };
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// アクセストークンをリフレッシュする
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StaffLoginResponse))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [HttpPost]
+    [Route("api/v{version:apiVersion}/staff/login/refresh")]
+    public IActionResult RefreshAsync([FromBody] AccessTokenRefreshRequest request)
+    {
+        var refreshToken = Request.Cookies.SingleOrDefault(x => x.Key == "refreshToken");
         return Ok();
     }
 }
