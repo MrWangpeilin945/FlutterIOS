@@ -150,7 +150,7 @@ public class ConsultController : ControllerBase
         return Ok();
     }
 
-        /// <summary>
+    /// <summary>
     /// 検査結果を検証する
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
