@@ -501,11 +501,6 @@ public class ConsultUsecase : IConsultUsecase
         var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, results.ExamMenuId, results, examItemGroup,examResults, previousResults);
         return new VerifyExamItems
         {
-            // 検査基準値のエラーレベルの最大値
-            ErrorLevel = (int)examItemGroups.SelectMany(group => group.ExamItems)
-                                            .SelectMany(item => item.ExamItemDetails)
-                                            .SelectMany(range => range.ExamNormalValueRanges)
-                                            .Max(err => err.ErrorLevel),
             // 検査項目グループ情報を取得する
             ExamItemGroups = examItemGroups.ToArray()
         };
