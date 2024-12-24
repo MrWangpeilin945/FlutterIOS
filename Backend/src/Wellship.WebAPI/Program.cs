@@ -53,6 +53,7 @@ public class Program
                             .AddPostgreSqlServices();
         }
         builder.Services.AddScoped<IDbConnectionProvider, DbConnectionProvider>();
+        builder.Services.AddSingleton(TimeProvider.System);
 
         builder.Services.AddOpenApiDocument(options =>
         {
@@ -72,9 +73,10 @@ public class Program
 
         builder.Services.AddCors(options =>
         {
-            options.AddDefaultPolicy(builder => builder.AllowAnyOrigin()
+            options.AddDefaultPolicy(builder => builder.SetIsOriginAllowed(_ => true)
                                                        .AllowAnyMethod()
-                                                       .AllowAnyHeader());
+                                                       .AllowAnyHeader()
+                                                       .AllowCredentials());
         });
 
         var app = builder.Build();
@@ -125,6 +127,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IExamItemRepository, ExamItemRepository>();
         services.AddScoped<IResultRepository, ResultRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IOrganizationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.OrganizationRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         return services;
     }
     /// <summary>
@@ -180,7 +183,8 @@ public static class IServiceCollectionExtension
         // TODO: 設定の場所が決まるまでの仮置きです。設定ができ次第移植すること。
         var authSettings = new AuthSettings()
         {
-            Lifetime = TimeSpan.FromMinutes(3),
+            AccessTokenLifetime = TimeSpan.FromMinutes(3),
+            RefreshTokenLifeTime = TimeSpan.FromHours(12),
             SecretKey = "secret key length required 128 bit"
         };
         services.AddSingleton(x => authSettings);

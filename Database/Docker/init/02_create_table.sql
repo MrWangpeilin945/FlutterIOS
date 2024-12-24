@@ -310,6 +310,15 @@ CREATE TABLE prior_exam_menus (
   , CONSTRAINT prior_exam_menus_PKC PRIMARY KEY (current_exam_menu_id,prior_exam_menu_id)
 );
 
+CREATE TABLE refresh_tokens (
+  staff_id uuid NOT NULL
+  , token text NOT NULL
+  , expires_at timestamp with time zone NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT refresh_tokens_PKC PRIMARY KEY (staff_id)
+);
+
 CREATE TABLE staff_login_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , staff_id uuid NOT NULL
@@ -746,6 +755,11 @@ ALTER TABLE prior_exam_menus
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE refresh_tokens
+  ADD CONSTRAINT refresh_tokens_FK1 FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE staff_login_histories
   ADD CONSTRAINT staff_login_histories_FK1 FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
   ON DELETE RESTRICT
@@ -991,6 +1005,13 @@ COMMENT ON COLUMN prior_exam_menus.current_exam_menu_id IS '現在検査メニ�
 COMMENT ON COLUMN prior_exam_menus.prior_exam_menu_id IS '前提検査メニューID';
 COMMENT ON COLUMN prior_exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN prior_exam_menus.created_by IS '作成者';
+
+COMMENT ON TABLE refresh_tokens IS 'リフレッシュトークン';
+COMMENT ON COLUMN refresh_tokens.staff_id IS '職員ID';
+COMMENT ON COLUMN refresh_tokens.token IS 'リフレッシュトークン';
+COMMENT ON COLUMN refresh_tokens.expires_at IS '有効期限';
+COMMENT ON COLUMN refresh_tokens.created_at IS '作成日時';
+COMMENT ON COLUMN refresh_tokens.created_by IS '作成者';
 
 COMMENT ON TABLE staff_login_histories IS '職員ログイン履歴';
 COMMENT ON COLUMN staff_login_histories.id IS 'ID';
