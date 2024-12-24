@@ -192,7 +192,7 @@ export default function ExamMenuSelect() {
                         onClick={() => callbackConfirm()}
                       >
                         <Text size="lg" fw={700} c={"white01"}>
-                          開始
+                          開始する
                         </Text>
                       </Button>
                     </Box>
