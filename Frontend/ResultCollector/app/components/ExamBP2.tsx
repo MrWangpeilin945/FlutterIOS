@@ -15,6 +15,7 @@ import { z } from "zod";
 import { InputErrorLevel, KeyboardType } from "~/domain/enums";
 import type {
   InputExamItem,
+  ExamItemDetail,
   ExamRegistResult,
 } from "~/domain/wellship.schemas";
 import NumericKeyboard from "./NumericKeyboard";
@@ -47,33 +48,45 @@ export default function ExamBP2({
     return null;
   }
   // positionNumberが1のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
-  const hasPosition1 = examItems.find((item) => item.positionNumber === 1);
-  const hasContractionDetail1 = hasPosition1?.examItemDetails?.some(
+  const hasBPfirst = examItems.find((item) => item.positionNumber === 1);
+  const hasContractionDetail1 = hasBPfirst?.examItemDetails?.some(
     (detail) => detail.positionNumber === 収縮期
   );
-  const hasExpansionDetail1 = hasPosition1?.examItemDetails?.some(
+  const hasExpansionDetail1 = hasBPfirst?.examItemDetails?.some(
     (detail) => detail.positionNumber === 拡張期
   );
-  const isValidPosition1 =
-    hasPosition1 && hasContractionDetail1 && hasExpansionDetail1;
+  const isValidBPfirst =
+    hasBPfirst && hasContractionDetail1 && hasExpansionDetail1;
 
   // positionNumberが2のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
-  const hasPosition2 = examItems.find(
+  const hasBPsecond = examItems.find(
     (item) => item.positionNumber === 血圧2回目
   );
-  const hasContractionDetail2 = hasPosition2?.examItemDetails?.some(
+  const hasContractionDetail2 = hasBPsecond?.examItemDetails?.some(
     (detail) => detail.positionNumber === 収縮期
   );
-  const hasExpansionDetail2 = hasPosition2?.examItemDetails?.some(
+  const hasExpansionDetail2 = hasBPsecond?.examItemDetails?.some(
     (detail) => detail.positionNumber === 拡張期
   );
-  const isValidPosition2 =
-    hasPosition2 && hasContractionDetail2 && hasExpansionDetail2;
+  const isValidBPsecond =
+    hasBPsecond && hasContractionDetail2 && hasExpansionDetail2;
 
   // 両方を満たさない時、nullを返す
-  if (!isValidPosition1 && !isValidPosition2) {
+  if (!isValidBPfirst && !isValidBPsecond) {
     return null;
   }
+
+  // positionNumberが3のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
+  const hasAVE = examItems.find((item) => item.positionNumber === 平均値);
+  const hasContractionDetail3 = hasAVE?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 収縮期
+  );
+  const hasExpansionDetail3 = hasAVE?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 拡張期
+  );
+  const isValidAVE = hasAVE && hasContractionDetail3 && hasExpansionDetail3;
+
+  // examItemの管理
   const [examItemsData, setExamItemsData] = useState(examItems);
   // キーボードの表示状態を管理する
   const [showKeyboards, setShowKeyboards] = useState<{
@@ -188,6 +201,26 @@ export default function ExamBP2({
     }
     return item;
   };
+  // 血圧の上下の値が適正かのチェック
+  const validateBPValues = (item: InputExamItem) => {
+    const bpH_value =
+      item.examItemDetails?.find((detail) => detail.positionNumber === 収縮期)
+        ?.value ?? null;
+    const bpL_value =
+      item.examItemDetails?.find((detail) => detail.positionNumber === 拡張期)
+        ?.value ?? null;
+    if (
+      bpH_value &&
+      bpL_value &&
+      Number.parseFloat(bpH_value) <= Number.parseFloat(bpL_value)
+    ) {
+      const BPErrorMessage: ExamRegistResult = {
+        description: "入力個所を確認してください",
+        errorLevel: InputErrorLevel.警告,
+      };
+      return BPErrorMessage;
+    }
+  };
 
   // バリデーションチェック
   const validationCheck = (item: InputExamItem) => {
@@ -234,7 +267,11 @@ export default function ExamBP2({
         });
       }
     }
-
+    // 血圧の上下の値が逆転していないかのチェック
+    const BPError = validateBPValues(item);
+    if (BPError) {
+      componentErrorMessage.push(BPError);
+    }
     // 基準値によるエラーメッセージを追加
     componentErrorMessage.push(...setRangesErrorMessage(item));
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
@@ -271,6 +308,10 @@ export default function ExamBP2({
 
   // 平均値の計算,保存処理
   const calculateAverage = (updatedExamItems: InputExamItem[]) => {
+    // 引数に平均値のexamItemが無いときは計算しない
+    if (!hasAVE) {
+      return updatedExamItems;
+    }
     const bpH_values: number[] = [];
     const bpL_values: number[] = [];
 
@@ -367,7 +408,9 @@ export default function ExamBP2({
         if (detailPositionNumber === undefined) {
           item.examItemDetails = item.examItemDetails?.map((detail) => ({
             ...detail,
-            value: value,
+            // disableのexamItemDetailのvalueを消去しない
+            value:
+              detail.hasOrder && !detail.cancelReasonId ? value : detail.value,
           }));
         } else {
           // 該当するdetailの値を更新
@@ -399,13 +442,40 @@ export default function ExamBP2({
     }
   };
 
-  // 対象のexamItemをpositionNumberから検索
-  const targetExamItems = examItemsData.filter(
-    (item) =>
-      item.positionNumber === 血圧1回目 ||
-      item.positionNumber === 血圧2回目 ||
-      item.positionNumber === 平均値
-  );
+  // 血圧1回目のexamItem
+  let BPfirstItem: InputExamItem = {
+    positionNumber: 血圧1回目,
+    name: "血圧1",
+    examItemDetails: [{ positionNumber: 収縮期 }, { positionNumber: 拡張期 }],
+  };
+  if (isValidBPfirst) {
+    BPfirstItem =
+      examItemsData.find((item) => item.positionNumber === 血圧1回目) ||
+      BPfirstItem;
+  }
+  // 血圧2回目のexamItem
+  let BPsecondItem: InputExamItem = {
+    positionNumber: 血圧2回目,
+    name: "血圧2",
+    examItemDetails: [{ positionNumber: 収縮期 }, { positionNumber: 拡張期 }],
+  };
+  if (isValidBPsecond) {
+    BPsecondItem =
+      examItemsData.find((item) => item.positionNumber === 血圧2回目) ||
+      BPsecondItem;
+  }
+  // 平均値のexamItem
+  let AVEItem: InputExamItem = {
+    positionNumber: 平均値,
+    name: "平均",
+    examItemDetails: [{ positionNumber: 収縮期 }, { positionNumber: 拡張期 }],
+  };
+  if (isValidAVE) {
+    AVEItem =
+      examItemsData.find((item) => item.positionNumber === 平均値) ||
+      BPsecondItem;
+  }
+  const targetExamItems = [BPfirstItem, BPsecondItem, AVEItem];
 
   return (
     <>
@@ -417,12 +487,14 @@ export default function ExamBP2({
           examRegistResults = [],
         } = item;
         const contractionDetail = examItemDetails?.find(
-          (detail) => detail.positionNumber === 収縮期
+          (detail: ExamItemDetail) =>
+            detail.positionNumber === 収縮期 ? detail : []
         );
         const expansionDetail = examItemDetails?.find(
-          (detail) => detail.positionNumber === 拡張期
+          (detail: ExamItemDetail) =>
+            detail.positionNumber === 拡張期 ? detail : []
         );
-        const isAVE = item.positionNumber === 平均値;
+        const isAVE = item?.positionNumber === 平均値;
 
         return (
           <Flex
@@ -434,7 +506,6 @@ export default function ExamBP2({
           >
             <Flex align="center" gap="md">
               <Paper
-                key={positionNumber}
                 w={274}
                 h={80}
                 bg={isAVE ? "white" : "gray02"}
