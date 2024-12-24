@@ -4,6 +4,7 @@ using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models.Triggers;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -17,6 +18,7 @@ public class ConsultUsecase : IConsultUsecase
     private readonly IExamMenuRepository _examMenuRepository;
     private readonly IExamItemRepository _examItemRepository;
     private readonly IPlaceScheduleRepository _placeScheduleRepository;
+    private readonly IResultRepository _resultRepository;
 
     /// <summary>
     /// コンストラクタ
@@ -27,13 +29,14 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="examItemRepository">検査項目リポジトリ</param>
     /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
     public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamMenuRepository examMenuRepository,
-                          IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository)
+                          IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository, IResultRepository resultRepository)
     {
         _consultRepository = consultRepository;
         _examineeRepository = examineeRepository;
         _examMenuRepository = examMenuRepository;
         _examItemRepository = examItemRepository;
         _placeScheduleRepository = placeScheduleRepository;
+        _resultRepository = resultRepository;
     }
 
     /// <summary>
@@ -117,7 +120,7 @@ public class ConsultUsecase : IConsultUsecase
         // 未受診の検査メニューを取得
         var unexaminedItems = await GetUnexaminedMenusAsync(consultNumber);
         // 同姓同名アラート
-        var sameNameAlert = await _placeScheduleRepository.IsSamename(consultNumber);
+        var sameNameAlert = await _placeScheduleRepository.IsSamenameAsync(consultNumber);
 
         // 検査項目明細IDを取得
         var examItemDetailIds = examItemGroups.SelectMany(group => group.ExamItems)
@@ -508,5 +511,37 @@ public class ConsultUsecase : IConsultUsecase
         var errorLevels = new List<InputErrorLevel>() { InputErrorLevel.警告, InputErrorLevel.異常 };
         return errors.Where(x => errorLevels.Contains(x.ErrorLevel))
                      .OrderBy(x => x.Priority);
+    }
+
+    /// <summary>
+    /// 検査結果を登録する
+    /// </summary>
+    public async Task RegisterResultsAsync(string consultNumber, ResultsRequest results)
+    {
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        // 会場のロック中かを確認
+        // TODO: 管理者のみ更新可能 後方作業へ
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync(consult.PlaceScheduleId);
+        if (placeSchedule?.Status == PlaceScheduleLockingStatus.検査完了)
+        {
+            // 会場ロック中
+            throw new PlaceScheduleLockedException();
+        }
+        var resultList = results.ExamResults.SelectMany(exam => exam.ExamItemDetails)
+                                            .Select(detail => new ExamResultRegisteEntity
+                                            {
+                                                ExamItemDetailId = detail.ExamItemDetailId,
+                                                Value = detail.Value
+                                            })
+                                            .ToArray();
+        await _resultRepository.RegisterResultsAsync(consult.ConsultId, resultList);
+    }
+
+    /// <summary>
+    /// 検査結果を検証する
+    /// </summary>
+    public void VerifyResults()
+    {
+
     }
 }

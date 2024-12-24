@@ -135,7 +135,7 @@ export default function Login() {
     } else if (result.error) {
       if (result.error.status === 404) {
         setErrorMessage(
-          getErrorMessage(errorMessages.noData, "該当IDの職員情報"),
+          getErrorMessage(errorMessages.notFound, "該当IDの職員情報"),
         );
       } else if (result.error.status === 500) {
         setErrorMessage(getErrorMessage(errorMessages.serverError));
