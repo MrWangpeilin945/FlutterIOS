@@ -26,87 +26,164 @@ export default function ExamSelect({
   if (!examItems || examItems.length === 0) {
     return null;
   }
-  const examItem = examItems[0];
-  if (!examItem.examItemDetails?.length) {
+
+  const [examItemsData, setExamItemsData] = useState(examItems);
+  const examItem = examItemsData.find((item) => item.positionNumber === 1);
+  if (!examItem?.examItemDetails?.length) {
     return null; // examItemDetailsが空の場合は何も表示しない
   }
 
-  const examItemDetail = examItem.examItemDetails[0];
+  const examItemDetail = examItem.examItemDetails.find(
+    (detail) => detail.positionNumber === 1,
+  );
   if (!examItemDetail) {
     return null; // examItemDetailがundefinedの場合は何も表示しない
   }
 
-  const [errMessages, setErrMessages] = useState<
-    ExamRegistResult[] | undefined
-  >(examItem.examRegistResults);
   const [selected, setSelected] = useState(
     examItemDetail.value || examItemDetail.prevValue || undefined,
   );
 
-  const handleErrorMessage = () => {
-    const initialMessages = examItem.examRegistResults || [];
-    let updatedMessages = [...initialMessages];
-
-    //必須チェック
-    const errorMessage: ExamRegistResult = {
-      description: getErrorMessage(
-        errorMessages.required,
-        `${examItem.name}は`,
-      ),
-      errorLevel: InputErrorLevel.異常,
-    };
-
-    if (onRegisterPressed && selected === "") {
-      //メッセージを追加
-      updatedMessages.push(errorMessage);
-    } else {
-      //重複メッセージを削除
-      updatedMessages = updatedMessages.filter(
-        (message) => message.description !== errorMessage.description,
-      );
+  const sortErrorMessage = (item: InputExamItem): InputExamItem => {
+    if (item.examRegistResults) {
+      // エラーレベルが高い順にソート
+      item.examRegistResults.sort((a, b) => {
+        const levelA = a.errorLevel ?? 0;
+        const levelB = b.errorLevel ?? 0;
+        return levelB - levelA;
+      });
     }
-
-    //メッセージをソート
-    updatedMessages.sort((a, b) => (b.errorLevel ?? 0) - (a.errorLevel ?? 0));
-    setErrMessages(updatedMessages);
+    return item;
   };
 
-  useEffect(handleErrorMessage, [
-    examItem.examRegistResults,
-    examItem.name,
-    onRegisterPressed,
-    selected,
-  ]);
+  // APIからのエラーメッセージを保存
+  const APIErrors = examItems.map((item) => ({
+    positionNumber: item.positionNumber,
+    examRegistResults: item.examRegistResults || [],
+  }));
+  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  const resetErrorMessages = (item: InputExamItem) => {
+    const targetError = APIErrors.find(
+      (error) => error.positionNumber === item.positionNumber,
+    );
+    if (targetError) {
+      item.examRegistResults = targetError.examRegistResults;
+    }
+    return item;
+  };
 
+  const validationCheck = (item: InputExamItem) => {
+    // APIエラーメッセージで初期化
+    resetErrorMessages(item);
+    // コールバック判断用のコンポーネントのエラーメッセージ
+    const componentErrorMessage: ExamRegistResult[] = [];
+    // detailsのpositionNumberが1のものについてバリデーションチェックを行う
+    for (const { positionNumber, value } of item.examItemDetails ?? []) {
+      if (positionNumber !== 1) {
+        continue; // 対象のpositionNumberでない場合、処理をスキップする
+      }
+
+      const requiredMessage = getErrorMessage(
+        errorMessages.required,
+        `${item.name}は`,
+      );
+
+      // バリデーションが失敗した場合
+      if (!value) {
+        componentErrorMessage.push({
+          description: requiredMessage,
+          errorLevel: InputErrorLevel.異常,
+        });
+      }
+    }
+    // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
+    const isCallback = !componentErrorMessage.some(
+      (error) => error.errorLevel === InputErrorLevel.異常,
+    );
+    // エラーメッセージをexamItemに保存
+    const resultItem: InputExamItem = {
+      ...item,
+      examRegistResults: item.examRegistResults
+        ? item.examRegistResults.concat(componentErrorMessage)
+        : componentErrorMessage,
+    };
+    // バリデーションチェックを行ったexamItemと、
+    // コールバックを判断するフラグを返す
+    const ValidationResult = {
+      validateResult: sortErrorMessage(resultItem),
+      hasCallback: isCallback,
+    };
+    return ValidationResult;
+  };
+
+  useEffect(() => {
+    const updatedItems = examItems.map((item) => {
+      let validatedData = item;
+      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
+      if (onRegisterPressed) {
+        validatedData = validationCheck(validatedData)?.validateResult;
+      }
+
+      return validatedData;
+    });
+    setExamItemsData(updatedItems);
+  }, [onRegisterPressed, examItems]);
+
+  // 選択ボタン押下時
   const onSelect = (selector: ExamItemDetailOption) => {
     const newSelected = selected === selector.code ? "" : selector.code;
 
     setSelected(newSelected);
 
-    //examItemsのvalueを更新
-    const updatedExamItems: InputExamItem[] = examItems.map((item, index) =>
-      index === 0
-        ? {
-            ...item,
-            examItemDetails: item.examItemDetails?.map((detail, i) =>
-              i === 0
-                ? {
-                    ...detail,
-                    value: newSelected,
-                  }
-                : detail,
-            ),
-          }
-        : item,
-    );
-    onClick(updatedExamItems);
+    // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
+    let hasValidationError = true;
+
+    // examItemsのvalueを更新
+    const updatedExamItems: InputExamItem[] = examItems.map((item) => {
+      if (item.positionNumber === 1) {
+        // 値を更新
+        const updatedExamItem = {
+          ...item,
+          examItemDetails: item.examItemDetails?.map((detail) =>
+            detail.positionNumber === 1
+              ? {
+                  ...detail,
+                  value: newSelected,
+                }
+              : detail,
+          ),
+        };
+
+        // バリデーションチェックを実施
+        const { validateResult, hasCallback } =
+          validationCheck(updatedExamItem);
+        if (!hasCallback) {
+          // falseのexamItemがあればコールバックを行わない
+          hasValidationError = false;
+        }
+
+        // バリデーション結果を反映
+        return {
+          ...updatedExamItem,
+          ...validateResult,
+        };
+      }
+
+      return item;
+    });
+    // 更新されたデータをステートに設定
+    setExamItemsData(updatedExamItems);
+
+    if (hasValidationError) {
+      onClick(updatedExamItems);
+    }
   };
 
   const selectors = examItemDetail.examItemDetailOptions || [];
 
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
-      <Flex mb={16}>
+      <Flex mb={16} gap={16}>
         <Paper
           w={274}
           h={80}
@@ -116,11 +193,9 @@ export default function ExamSelect({
           px={32}
           py={16}
         >
-          <Center>
-            <Text size="lg" fw={700}>
-              {examItem.name}
-            </Text>
-          </Center>
+          <Text size="lg" fw={700} ta="center">
+            {examItem.name}
+          </Text>
         </Paper>
         {examItemDetail.prevValue && (
           <Text ml="auto" fw={700} maw={271}>
@@ -145,6 +220,7 @@ export default function ExamSelect({
               key={selector.orderNumber}
               onClick={() => onSelect(selector)}
               variant="outline"
+              bd="2px,solid"
               bg={isDisabled ? "gray03" : isSelected ? "green03" : "white"}
               color={isDisabled ? "gray02" : isSelected ? "primary" : "gray02"}
               disabled={isDisabled}
@@ -155,14 +231,14 @@ export default function ExamSelect({
         })}
       </Group>
 
-      {(errMessages || []).map((error, index) => {
+      {(examItem.examRegistResults || []).map((error, index) => {
         const isWarning = error.errorLevel === InputErrorLevel.警告;
         return (
           <Group key={index} c={isWarning ? "warning" : "error"}>
             {isWarning ? (
-              <IconExclamationCircleFilled size="32px" />
+              <IconExclamationCircleFilled size={32} />
             ) : (
-              <IconSquareRoundedXFilled size="32px" />
+              <IconSquareRoundedXFilled size={32} />
             )}
             <Text size="sm" fw={700}>
               {error.description}
