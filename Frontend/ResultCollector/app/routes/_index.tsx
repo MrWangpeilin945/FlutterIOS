@@ -17,7 +17,7 @@ export default function Index() {
         受診番号入力
       </Button>
       <Button onClick={() => navigate("/progress")}>進捗</Button>
-      <Button onClick={() => navigate("/consult-input/1")}>検査結果入力</Button>
+      <Button onClick={() => navigate("/consult-input/1?exammenuid=1")}>検査結果入力</Button>
     </div>
   );
 }
