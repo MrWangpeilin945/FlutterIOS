@@ -33,7 +33,7 @@ import ExamSelect from "~/components/ExamSelect";
 import ExamSelectLR from "~/components/ExamSelectLR";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
-export default function consultInput() {
+export default function ConsultInput() {
   const navigate = useNavigate();
   const [examData, setExamData] = useState<InputExamItems>();
   // パスパラメータの取得
