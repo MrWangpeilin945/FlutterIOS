@@ -1,9 +1,7 @@
-import { date } from "zod";
 import CommonFooter from "~/components/CommonFooter";
 import ExamineeHeader from "~/components/ExamineeHeader";
 import ExamNumeric from "~/components/ExamNumeric";
 import ExamSelect from "~/components/ExamSelect";
-import type { InputExamItem } from "~/domain/wellship.schemas";
 import { errorMessages } from "~/utils/getErrorMessage";
 
 export default function consultInput() {
