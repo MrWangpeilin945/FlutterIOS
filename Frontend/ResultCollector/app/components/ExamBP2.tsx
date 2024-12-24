@@ -24,17 +24,17 @@ import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import styles from "~/styles/common.module.css";
 import React from "react";
 
-type BodyProps = {
+type BP2Props = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
   onChange: (updatedExamItem: InputExamItem[] | undefined) => void;
 };
 
-export default function ExamBody({
+export default function ExamBP2({
   examItems,
   onRegisterPressed,
   onChange,
-}: BodyProps) {
+}: BP2Props) {
   // 定数で定義
   const 血圧1回目 = 1;
   const 血圧2回目 = 2;
@@ -44,6 +44,34 @@ export default function ExamBody({
 
   // 引数のチェック
   if (!examItems || examItems.length === 0) {
+    return null;
+  }
+  // positionNumberが1のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
+  const hasPosition1 = examItems.find((item) => item.positionNumber === 1);
+  const hasContractionDetail1 = hasPosition1?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 収縮期
+  );
+  const hasExpansionDetail1 = hasPosition1?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 拡張期
+  );
+  const isValidPosition1 =
+    hasPosition1 && hasContractionDetail1 && hasExpansionDetail1;
+
+  // positionNumberが2のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
+  const hasPosition2 = examItems.find(
+    (item) => item.positionNumber === 血圧2回目
+  );
+  const hasContractionDetail2 = hasPosition2?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 収縮期
+  );
+  const hasExpansionDetail2 = hasPosition2?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 拡張期
+  );
+  const isValidPosition2 =
+    hasPosition2 && hasContractionDetail2 && hasExpansionDetail2;
+
+  // 両方を満たさない時、nullを返す
+  if (!isValidPosition1 && !isValidPosition2) {
     return null;
   }
   const [examItemsData, setExamItemsData] = useState(examItems);
@@ -243,46 +271,55 @@ export default function ExamBody({
 
   // 平均値の計算,保存処理
   const calculateAverage = (updatedExamItems: InputExamItem[]) => {
-    // 値の取得
-    let bpH_first = 0;
-    let bpL_first = 0;
-    let bpH_second = 0;
-    let bpL_second = 0;
+    const bpH_values: number[] = [];
+    const bpL_values: number[] = [];
 
     for (const item of updatedExamItems) {
-      if (item.positionNumber === 血圧1回目) {
-        for (const detail of item.examItemDetails ?? []) {
+      for (const detail of item.examItemDetails ?? []) {
+        if (item.positionNumber === 血圧1回目) {
           if (detail.positionNumber === 収縮期) {
-            bpH_first =
-              detail.value !== undefined && !Number.isNaN(Number(detail.value))
-                ? Number.parseFloat(detail.value)
-                : 0;
+            if (detail.value !== undefined) {
+              const parsedValue = Number.parseFloat(detail.value);
+              if (!Number.isNaN(parsedValue)) {
+                bpH_values.push(parsedValue);
+              }
+            }
           } else if (detail.positionNumber === 拡張期) {
-            bpL_first =
-              detail.value !== undefined && !Number.isNaN(Number(detail.value))
-                ? Number.parseFloat(detail.value)
-                : 0;
+            if (detail.value !== undefined) {
+              const parsedValue = Number.parseFloat(detail.value);
+              if (!Number.isNaN(parsedValue)) {
+                bpL_values.push(parsedValue);
+              }
+            }
           }
-        }
-      } else if (item.positionNumber === 血圧2回目) {
-        for (const detail of item.examItemDetails ?? []) {
+        } else if (item.positionNumber === 血圧2回目) {
           if (detail.positionNumber === 収縮期) {
-            bpH_second =
-              detail.value !== undefined && !Number.isNaN(Number(detail.value))
-                ? Number.parseFloat(detail.value)
-                : 0;
+            if (detail.value !== undefined) {
+              const parsedValue = Number.parseFloat(detail.value);
+              if (!Number.isNaN(parsedValue)) {
+                bpH_values.push(parsedValue);
+              }
+            }
           } else if (detail.positionNumber === 拡張期) {
-            bpL_second =
-              detail.value !== undefined && !Number.isNaN(Number(detail.value))
-                ? Number.parseFloat(detail.value)
-                : 0;
+            if (detail.value !== undefined) {
+              const parsedValue = Number.parseFloat(detail.value);
+              if (!Number.isNaN(parsedValue)) {
+                bpL_values.push(parsedValue);
+              }
+            }
           }
         }
       }
     }
+
     // 平均値の計算
-    const bpH_AVE = Math.round((bpH_first + bpH_second) / 2) || 0;
-    const bpL_AVE = Math.round((bpL_first + bpL_second) / 2) || 0;
+    const bpH_AVE =
+      Math.round(bpH_values.reduce((a, b) => a + b, 0) / bpH_values.length) ||
+      0;
+    const bpL_AVE =
+      Math.round(bpL_values.reduce((a, b) => a + b, 0) / bpL_values.length) ||
+      0;
+
     // 平均値の保存
     return updatedExamItems.map((item) => {
       if (item.positionNumber === 平均値) {
@@ -291,22 +328,16 @@ export default function ExamBody({
           const maxDigits = integerLength; // 平均値では小数点を考慮しない
 
           if (detail.positionNumber === 収縮期) {
-            if (detail.integerLength) {
-              return {
-                ...detail,
-                value: bpH_AVE.toString().slice(0, maxDigits),
-              };
-            }
-            return { ...detail, value: bpH_AVE.toString() };
+            return {
+              ...detail,
+              value: bpH_AVE.toString().slice(0, maxDigits),
+            };
           }
           if (detail.positionNumber === 拡張期) {
-            if (detail.integerLength) {
-              return {
-                ...detail,
-                value: bpL_AVE.toString().slice(0, maxDigits),
-              };
-            }
-            return { ...detail, value: bpL_AVE.toString() };
+            return {
+              ...detail,
+              value: bpL_AVE.toString().slice(0, maxDigits),
+            };
           }
           return detail;
         });
@@ -429,11 +460,9 @@ export default function ExamBody({
                         h={80}
                         size="inputComponent"
                         c={
-                          isDisabled
-                            ? "gray"
-                            : examRegistResults?.some(
-                                (x) => x.errorLevel === InputErrorLevel.異常
-                              )
+                          examRegistResults?.some(
+                            (x) => x.errorLevel === InputErrorLevel.異常
+                          )
                             ? "error"
                             : examRegistResults?.some(
                                 (x) => x.errorLevel === InputErrorLevel.警告
@@ -452,7 +481,7 @@ export default function ExamBody({
                         classNames={{
                           input: `${styles["input-textbox"]} ${
                             isDisabled
-                              ? `${styles["input-textbox"]}`
+                              ? ""
                               : examRegistResults?.some(
                                   (x) => x.errorLevel === InputErrorLevel.異常
                                 )
