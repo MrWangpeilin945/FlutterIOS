@@ -1,21 +1,46 @@
-using System.ComponentModel;
-using System.Text;
 
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
+using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
+using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
 {
-    public class PlaceUsecases
+    /// <summary>
+    /// 会場を登録するUsecase層
+    /// </summary>
+    public class PlaceUsecases : IPlaceUsecases
     {
+        private readonly List<ErrorObject> _errorObjects;
+        private readonly IPlaceRepository _placeRepository;
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="placeRepository"></param>
+        public PlaceUsecases(IPlaceRepository placeRepository)
+        {
+            _placeRepository = placeRepository;
+            _errorObjects = new List<ErrorObject>();
+        }
+
         /// <summary>
         /// EC2007_会場を登録する
         /// </summary>
-        /// <param name="Places"></param>
-        /// <returns></returns>
-        public async Task<List<ErrorObject>> StorePlacesAsync(List<Place> Places)
+        /// <param name="places">会場</param>
+        /// <returns>エラーリスト</returns>
+        public async Task<List<ErrorObject>> StorePlacesAsync(List<Place> places)
         {
-            return new List<ErrorObject> { };
+            // エンティティリスト生成
+            List<PlaceEntity> placeEntities = places.Select(item =>new PlaceEntity
+            {
+                placeCode = item.Code,
+                name = item.Name
+            }).ToList();
 
+            // Repository処理
+            await _placeRepository.UpsertPlacesAsync(placeEntities, DateTime.Now, "ExternalConnection");
+
+            return _errorObjects;
         }
     }
 
