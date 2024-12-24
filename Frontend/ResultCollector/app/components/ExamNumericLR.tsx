@@ -218,7 +218,8 @@ export default function ExamNumericLR({
         if (detailsPositionNumber === undefined) {
           item.examItemDetails = item.examItemDetails?.map((detail) => ({
             ...detail,
-            value: value,
+            value:
+              detail.hasOrder && !detail.cancelReasonId ? value : detail.value,
           }));
         } else {
           // 該当するdetailの値を更新
