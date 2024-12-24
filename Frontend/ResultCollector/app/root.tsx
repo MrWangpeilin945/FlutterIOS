@@ -13,18 +13,21 @@ import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { customTheme } from "~/customTheme";
 import { setupAxiosInterceptors } from "~/utils/axiosInstance";
+import { authUtil } from "./utils/authUtil";
 
 const queryClient = new QueryClient();
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
-  const redirectToLogin = () => {
-    navigate("/login");
+  const handleLogout = () => {
+    authUtil.logout(() => {
+      navigate("/login");
+    });
   };
   useEffect(() => {
-    // API呼び出し時に401が返ってきたらログイン画面に遷移する処理をaxiosInstanceに引き渡す
-    setupAxiosInterceptors(redirectToLogin);
+    // API呼び出し時に401が返ってきたらログアウトするための関数をaxiosInstanceに引き渡す
+    setupAxiosInterceptors(handleLogout);
   }, []);
 
   return (
