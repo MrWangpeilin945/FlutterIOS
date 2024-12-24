@@ -41,12 +41,14 @@ export default function ExamNumericLR({
   if (!examItems || examItems.length === 0) {
     return null;
   }
+  // positionNumberが1のexamItemの、examItemDetailsの中に
+  // positionNumberが1か2のexamItemDetailが存在することをチェック
   const firstPosition = examItems.find((item) => item.positionNumber === 1);
 
   if (
     !firstPosition?.examItemDetails?.some(
       (detail) => detail.positionNumber === 左
-    ) ||
+    ) &&
     !firstPosition?.examItemDetails?.some(
       (detail) => detail.positionNumber === 右
     )
@@ -85,7 +87,7 @@ export default function ExamNumericLR({
       return prevKeyboards;
     });
   };
-  // キーボードのACボタン押下時にキーボードを非表示にする
+  // キーボードの確定ボタン押下時にキーボードを非表示にする
   const handleConfirm = () => {
     setShowKeyboards({ left: false, right: false });
   };
@@ -244,17 +246,35 @@ export default function ExamNumericLR({
     }
   };
 
-  // positionNumberが1のexamItemを描写
+  // positionNumberが1のexamItem
   const firstPositionItem = examItemsData.find(
     (item) => item.positionNumber === 1
   );
   const { positionNumber, examItemDetails, examRegistResults, name } =
     firstPositionItem ?? {};
 
-  // positionNumberが1,2のexamItemDetailを描写
-  const targetDetails = examItemDetails?.filter(
-    (detail) => detail.positionNumber === 左 || detail.positionNumber === 右
+  // 対象のexamItemの中の、positionNumberが1のexamItemDetail
+  let leftItemDetail = examItemDetails?.find(
+    (detail) => detail.positionNumber === 左
   );
+  if (!leftItemDetail) {
+    leftItemDetail = {
+      positionNumber: 左,
+      name: "左",
+    };
+  }
+  //  対象のexamItemの中の、positionNumberが2のexamItemDetail
+  let rightItemDetail = examItemDetails?.find(
+    (detail) => detail.positionNumber === 右
+  );
+  if (!rightItemDetail) {
+    rightItemDetail = {
+      positionNumber: 右,
+      name: "右",
+    };
+  }
+  const targetDetails = [leftItemDetail, rightItemDetail];
+
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Stack>
@@ -333,7 +353,6 @@ export default function ExamNumericLR({
                     }
                     disabled={isDisabled}
                   />
-                  {/* TODO:前回値のマックス横幅設定 */}
                   <Stack gap="0">
                     <Text size="md" fw="700" maw={172}>
                       {prevValue ? `(前回: ${prevValue})` : ""}
