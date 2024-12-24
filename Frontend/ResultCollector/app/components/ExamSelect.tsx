@@ -220,9 +220,9 @@ export default function ExamSelect({
               key={selector.orderNumber}
               onClick={() => onSelect(selector)}
               variant="outline"
-              bd="2px,solid"
+              bd={`2px solid ${isDisabled ? "" : isSelected ? "primary" : "gray03"}`}
               bg={isDisabled ? "gray03" : isSelected ? "green03" : "white"}
-              color={isDisabled ? "gray02" : isSelected ? "primary" : "gray02"}
+              c={isDisabled ? "gray02" : isSelected ? "primary" : "gray02"}
               disabled={isDisabled}
             >
               {selector.name}
