@@ -315,9 +315,11 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 |
 
 |action_type
-|登録処理対象 かつ `[DB]consult` にInsert : `'I'` / +
-登録処理対象 かつ `[DB]consult` をUpdate : `'U'` / +
-削除処理対象 : `'D'`
+|ActionType.登録 : `'I'` / ActionType.削除 : `'D'`
+|
+
+|order
+|`Ticket.SortNo`
 |
 
 |created_at
