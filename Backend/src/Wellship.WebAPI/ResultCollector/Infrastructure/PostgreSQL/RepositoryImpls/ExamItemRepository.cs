@@ -249,6 +249,87 @@ public class ExamItemRepository : IExamItemRepository
     }
 
     /// <summary>
+    /// 検査実施判断ルールを取得します。
+    /// </summary>
+    /// <param name="examMenuId">検査メニューID</param>
+    public async Task<IEnumerable<DecisionRule>> GetDecisionRulesAsync(int examMenuId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+
+        // 検査実施判断ルール_メインテーブル
+        const string mainSql = @"
+        select
+            r.decision_rule_id as DecisionRuleId
+            , r.name as Name
+            , r.exam_menu_id as ExamMenuId
+            , r.priority as Priority
+            , r.trigger_type as TriggerType
+            , r.error_level as ErrorLevel
+            , r.message as Message 
+        from
+            resultcollector.decision_rules r
+        where
+            r.exam_menu_id = @ExamMenuId;";
+
+        var decisionRules = await connection.QueryAsync<DecisionRuleEntity>(mainSql, new { ExamMenuId = examMenuId });
+
+        // 検査実施判断ルール_判定値テーブル
+        const string evaluationSql = @"
+        select
+            r.decision_rule_id as DecisionRuleId
+            , e.variable_number as VariableNumber
+            , e.evaluation_value as EvaluationValue 
+        from
+            resultcollector.decision_rules r 
+            left join resultcollector.decision_rule_evaluations e 
+                on r.decision_rule_id = e.decision_rule_id
+        where
+            r.exam_menu_id = @ExamMenuId;";
+
+        var evaluations = await connection.QueryAsync<DecisionRuleEvaluationEntity>(evaluationSql, new { ExamMenuId = examMenuId });
+
+        // 検査実施判断ルール_検査項目明細テーブル
+        const string examItemDetailSql = @"
+        select
+            r.decision_rule_id as DecisionRuleId
+            , d.variable_number as VariableNumber
+            , d.source_type as SourceType
+            , d.exam_item_detail_id as ExamItemDetailId 
+        from
+            resultcollector.decision_rules r 
+            left join resultcollector.decision_rule_exam_item_details d 
+                on r.decision_rule_id = d.decision_rule_id
+        where
+            r.exam_menu_id = @ExamMenuId;";
+
+        var examItemDetails = await connection.QueryAsync<DecisionRuleExamItemDetailEntity>(examItemDetailSql, new { ExamMenuId = examMenuId });
+
+        return decisionRules.Select(x => new DecisionRule()
+        {
+            DecisionRuleId = x.DecisionRuleId,
+            Name = x.Name,
+            ExamMenuId = x.ExamMenuId,
+            Priority = x.Priority,
+            TriggerType = (RuleTriggerType)x.TriggerType,
+            ErrorLevel = (InputErrorLevel)x.ErrorLevel,
+            Message = x.Message,
+            Evaluations = evaluations.Where(ev => ev.DecisionRuleId == x.DecisionRuleId)
+                                     .Select(ev => new DecisionRuleEvaluation()
+                                     {
+                                         VariableNumber = ev.VariableNumber,
+                                         EvaluationValue = ev.EvaluationValue
+                                     }),
+            ExamItemDetails = examItemDetails.Where(ei => ei.DecisionRuleId == x.DecisionRuleId)
+                                             .Select(ei => new DecisionRuleExamItemDetail()
+                                             {
+                                                 VariableNumber = ei.VariableNumber,
+                                                 SourceType = (SourceType)ei.SourceType,
+                                                 ExamItemDetailId = ei.ExamItemDetailId
+                                             })
+        });
+    }
+
+    /// <summary>
     /// 検査項目明細とその子要素を取得します。
     /// </summary>
     /// <param name="examItemDetailIds">検査項目明細ID</param>
@@ -281,7 +362,7 @@ public class ExamItemRepository : IExamItemRepository
             left join resultcollector.exam_item_detail_options op
                 on d.exam_item_detail_id = op.exam_item_detail_id
             where
-                d.exam_item_detail_id = any(@ExamItemDetailIds);";        
+                d.exam_item_detail_id = any(@ExamItemDetailIds);";
         var examItemDetails = await connection.QueryAsync<ExamItemDetailChildrenEntity>(sql, new { ExamItemDetailIds = examItemDetailIds });
 
         var examItemDetailChildren = examItemDetails
@@ -296,24 +377,26 @@ public class ExamItemRepository : IExamItemRepository
                                         Type = d.First().Type,
                                         KeyboardType = d.First().KeyboardType,
                                         Keyboards = d.Where(kb => kb.ExamItemDetailId == d.First().ExamItemDetailId)
-                                                     .GroupBy(kb => kb.KeyboardId) 
+                                                     .GroupBy(kb => kb.KeyboardId)
                                                      .OrderBy(kb => kb.First().KeyboardId)
-                                                     .Select(kb => new Keyboard{
-                                                        OptionId = kb.First().KeyboardId,
-                                                        ExamItemDetailId = kb.First().ExamItemDetailId,
-                                                        Value = kb.First().KeyboardValue
-                                                    }),
+                                                     .Select(kb => new Keyboard
+                                                     {
+                                                         OptionId = kb.First().KeyboardId,
+                                                         ExamItemDetailId = kb.First().ExamItemDetailId,
+                                                         Value = kb.First().KeyboardValue
+                                                     }),
                                         IntegerLength = d.First().IntegerLength,
                                         DecimalLength = d.First().DecimalLength,
                                         DetailOptions = d.Where(op => op.ExamItemDetailId == d.First().ExamItemDetailId)
-                                                         .GroupBy(op => op.OptionId) 
+                                                         .GroupBy(op => op.OptionId)
                                                          .OrderBy(op => op.First().OptionId)
-                                                         .Select(op => new ExamItemDetailOption{
-                                                            Code = op.First().OptionCode,
-                                                            ExamItemDetailId = op.First().ExamItemDetailId,
-                                                            Name = op.First().OptionName,
-                                                            OrderNumber = op.First().OrderNumber
-                                                        })
+                                                         .Select(op => new ExamItemDetailOption
+                                                         {
+                                                             Code = op.First().OptionCode,
+                                                             ExamItemDetailId = op.First().ExamItemDetailId,
+                                                             Name = op.First().OptionName,
+                                                             OrderNumber = op.First().OrderNumber
+                                                         })
                                     });
         return examItemDetailChildren;
     }

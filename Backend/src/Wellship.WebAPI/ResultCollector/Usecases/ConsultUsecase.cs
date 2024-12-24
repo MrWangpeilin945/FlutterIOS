@@ -131,15 +131,24 @@ public class ConsultUsecase : IConsultUsecase
         // 過去検査結果を取得
         var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
         // 検査メニュー特記一覧を取得
-        var menuNotes  = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
+        var menuNotes = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
         var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
-        var examNoteResults = menuNotes .Select(x => new Domain.Models.MenuNoteResult(x, examItemDetailChildren, examResults, previousResults, consultNotes)).ToArray();
+        var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, examItemDetailChildren, examResults, previousResults, consultNotes)).ToArray();
         // 関連検査項目を取得
         var relatedExamItems = examNoteResults.Select(x => new RelatedExamItem()
         {
             ExamItemName = x.MenuNoteName,
             ExamResult = x.GetDisplayText()
         }).ToArray();
+
+        // 検査実施判断ルールで検証する
+        var decisionRules = await ValidateDecisionRuleAsync(examMenuId, examResults, previousResults);
+        var examDecisionResults = decisionRules.OrderBy(x => x.ErrorLevel)
+                                               .Select(x => new ExamDecisionResult()
+                                               {
+                                                   ErrorLevel = (int)x.ErrorLevel,
+                                                   Description = x.Message
+                                               }).ToArray();
 
         return new ExamContent()
         {
@@ -171,7 +180,7 @@ public class ConsultUsecase : IConsultUsecase
                                           CancelReasonId = examCancels.ExamItemDetailCancels
                                                                     .SingleOrDefault(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId))?.CancelReasonId
                                       }).ToArray(),
-            ExamDecisionResult = [],        // TODO: 検査実施判断結果    後方作業へ
+            ExamDecisionResults = examDecisionResults.ToArray(),
             UnexaminedItems = unexaminedItems.UnexaminedMenus.Select(x => new ExamMenu
             {
                 ExamMenuId = x.ExamMenuId,
@@ -439,6 +448,58 @@ public class ConsultUsecase : IConsultUsecase
                     Message = rule.Message,
                     Priority = rule.Priority,
                     ExamItemId = rule.ExamItemId
+                });
+            }
+        }
+
+        // 条件に一致したトリガーのうち、エラーレベルが警告と異常の結果のみ返す
+        var errorLevels = new List<InputErrorLevel>() { InputErrorLevel.警告, InputErrorLevel.異常 };
+        return errors.Where(x => errorLevels.Contains(x.ErrorLevel))
+                     .OrderBy(x => x.Priority);
+    }
+
+    /// <summary>
+    /// 検査実施判断ルールで検証します。
+    /// </summary>
+    public async Task<IEnumerable<Domain.Models.RuleError>> ValidateDecisionRuleAsync(int examMenuId,
+                                                                                      Domain.Models.ExamResult currentResult,
+                                                                                      Domain.Models.PreviousResult previousResult)
+    {
+        // 検査実施判断ルールマスタを取得する
+        var ruleList = await _examItemRepository.GetDecisionRulesAsync(examMenuId);
+
+        // DBから前回値と今回値を取得する
+        var currentResults = currentResult.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+        var preResults = previousResult.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+
+        // トリガーをセットアップして検証する
+        var errors = new List<Domain.Models.RuleError>();
+        foreach (var rule in ruleList)
+        {
+            var triggerType = rule.TriggerType;
+            var errorLevel = rule.ErrorLevel;
+            var conditionValues = rule.Evaluations.OrderBy(x => x.VariableNumber)
+                                                  .Select(x => x.EvaluationValue)
+                                                  .ToList();
+
+            var inputValues = rule.ExamItemDetails.OrderBy(x => x.VariableNumber)
+                                                  .Select(x => x.SourceType switch
+                                                  {
+                                                      SourceType.今回値 => currentResults.TryGetValue(x.ExamItemDetailId, out var currVal) ? currVal : "",
+                                                      SourceType.前回値 => preResults.TryGetValue(x.ExamItemDetailId, out var prevVal) ? prevVal : "",
+                                                      _ => throw new NotSupportedException(nameof(x.SourceType))
+                                                  }).ToList();
+
+            var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues, conditionValues, errorLevel);
+
+            // トリガーの条件に一致すればエラーに追加する
+            if (trigger.IsMatch())
+            {
+                errors.Add(new Domain.Models.RuleError()
+                {
+                    ErrorLevel = trigger.GetErrorLevel(),
+                    Message = rule.Message,
+                    Priority = rule.Priority
                 });
             }
         }
