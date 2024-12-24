@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
 import { useState } from "react";
+import { dateUtil } from "~/utils/dateUtil";
 
 type ExamineeInfoProps = {
   name: string;
@@ -83,7 +84,7 @@ export default function ExamineeInfo({
             </Text>
           </Paper>
           <Text size="sm" c="black01" style={{ whiteSpace: "nowrap" }}>
-            {birthday}
+            {dateUtil.formatDateWithJapaneseEra(birthday)}
           </Text>
         </Group>
         <Group
