@@ -122,7 +122,10 @@ export default function ExamMenuSelect() {
     <>
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
-        <CommonHeader screenName="検査メニュー" staffName={staff?.name || ""} />
+        <CommonHeader
+          screenName="検査メニュー選択"
+          staffName={staff?.name || ""}
+        />
         <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
