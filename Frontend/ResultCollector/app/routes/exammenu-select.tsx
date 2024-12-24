@@ -122,7 +122,10 @@ export default function ExamMenuSelect() {
     <>
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
-        <CommonHeader screenName="検査メニュー" staffName={staff?.name || ""} />
+        <CommonHeader
+          screenName="検査メニュー選択"
+          staffName={staff?.name || ""}
+        />
         <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
@@ -189,7 +192,7 @@ export default function ExamMenuSelect() {
                         onClick={() => callbackConfirm()}
                       >
                         <Text size="lg" fw={700} c={"white01"}>
-                          開始する
+                          開始
                         </Text>
                       </Button>
                     </Box>
