@@ -285,6 +285,7 @@ export default function ExamHearing({
                   h={78}
                   mb={16}
                   variant="outline"
+                  bd="2px,solid"
                   bg={
                     isGroupDisabled
                       ? "gray03"
@@ -322,6 +323,7 @@ export default function ExamHearing({
                         w={524}
                         h={78}
                         variant="outline"
+                        bd="2px,solid"
                         bg={
                           isDisabled
                             ? "gray03"
