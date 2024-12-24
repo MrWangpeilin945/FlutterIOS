@@ -95,8 +95,8 @@ public class Program
 
         app.MapHealthChecks("/healthz");
         app.UseMiddleware<ExceptionHandlingMiddleware>();
-        app.UseAuthorization();
         app.UseAuthentication();
+        app.UseAuthorization();
         app.MapControllers();
 
         app.Run();
@@ -194,6 +194,8 @@ public static class IServiceCollectionExtension
         services.AddAuthentication()
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, x =>
                 {
+                    // JWTのクレーム名を自動でマッピングしない設定です。
+                    x.MapInboundClaims = false;
                     // NOTE: Issはアクセスされたホスト名を使用したいためカスタム検証で検証します
                     x.TokenValidationParameters.ValidateIssuer = false;
                     // NOTE: Audはアクセスされたホスト名を使用したいためカスタム検証で検証します
