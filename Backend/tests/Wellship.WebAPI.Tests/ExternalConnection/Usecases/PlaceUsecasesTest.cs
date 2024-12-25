@@ -30,8 +30,8 @@ public class PlaceUsecasesTest
         // エンティティリスト生成
         List<PlaceEntity> placeEntities = inputPlaces.Select(item =>new PlaceEntity
         {
-            placeCode = item.Code,
-            name = item.Name
+            PlaceCode = item.Code,
+            Name = item.Name
         }).ToList();
 
         // モックのセットアップ
@@ -47,10 +47,10 @@ public class PlaceUsecasesTest
         mockRepo.Verify(repo =>
             repo.UpsertPlacesAsync(It.Is<List<PlaceEntity>>(placeEntities =>
                 placeEntities.Count == inputPlaces.Count &&
-                placeEntities[0].placeCode == inputPlaces[0].Code &&
-                placeEntities[0].name == inputPlaces[0].Name &&
-                placeEntities[1].placeCode == inputPlaces[1].Code &&
-                placeEntities[1].name == inputPlaces[1].Name
+                placeEntities[0].PlaceCode == inputPlaces[0].Code &&
+                placeEntities[0].Name == inputPlaces[0].Name &&
+                placeEntities[1].PlaceCode == inputPlaces[1].Code &&
+                placeEntities[1].Name == inputPlaces[1].Name
             ), It.IsAny<DateTime>(), "ExternalConnection"), Times.Once);
 
         // 戻り値のエラーリストについて

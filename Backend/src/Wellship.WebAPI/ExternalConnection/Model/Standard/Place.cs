@@ -1,22 +1,22 @@
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard
 {
     /// <summary>
-    /// ‰ïê
+    /// ä¼šå ´
     /// </summary>
     public class Place
     {
         /// <summary>
-        /// ‰ïêƒR[ƒh
+        /// ä¼šå ´ã‚³ãƒ¼ãƒ‰
         /// </summary>
         public required string Code { get; init; }
 
         /// <summary>
-        /// ‰ïê–¼
+        /// ä¼šå ´å
         /// </summary>
         public required string Name { get; init; }
 
         /// <summary>
-        /// ƒGƒ‰[ƒIƒuƒWƒFƒNƒg‚É“o˜^‚·‚é“ü—Í€–ÚNo‚È‚Ç
+        /// ã‚¨ãƒ©ãƒ¼ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ç™»éŒ²ã™ã‚‹å…¥åŠ›é …ç›®Noãªã©
         /// </summary>
         public required string InputNote { get; init; }
     }

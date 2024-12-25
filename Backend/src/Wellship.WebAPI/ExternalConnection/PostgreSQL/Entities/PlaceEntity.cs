@@ -1,18 +1,18 @@
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
 {
     /// <summary>
-    /// ‰ïê
+    /// ä¼šå ´
     /// </summary>
     public class PlaceEntity
     {
         /// <summary>
-        /// ‰ïêƒR[ƒh
+        /// ä¼šå ´ã‚³ãƒ¼ãƒ‰
         /// </summary>
-        public required string placeCode { get; init; }
+        public required string PlaceCode { get; init; }
 
         /// <summary>
-        /// ‰ïê–¼
+        /// ä¼šå ´å
         /// </summary>
-        public required string name { get; init; }
+        public required string Name { get; init; }
     }
 }
