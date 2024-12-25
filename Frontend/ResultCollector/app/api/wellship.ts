@@ -19,6 +19,7 @@ import type {
   UseQueryResult,
 } from "@tanstack/react-query";
 import type {
+  AccessTokenRefreshRequest,
   CancelReasonList,
   ConsultGetExamItemsExamineeParams,
   ConsultGetInputExamItemsExamineeParams,
@@ -123,6 +124,81 @@ export const useAuthenticationLogin = <
   TContext
 > => {
   const mutationOptions = getAuthenticationLoginMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+/**
+ * @summary アクセストークンをリフレッシュする
+ */
+export const authenticationRefresh = (
+  version: string,
+  accessTokenRefreshRequest: AccessTokenRefreshRequest,
+) => {
+  return axiosInstance<StaffLoginResponse>({
+    url: `/api/v${version}/staff/login/refresh`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: accessTokenRefreshRequest,
+  });
+};
+
+export const getAuthenticationRefreshMutationOptions = <
+  TError = ProblemDetails,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof authenticationRefresh>>,
+    TError,
+    { version: string; data: AccessTokenRefreshRequest },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof authenticationRefresh>>,
+  TError,
+  { version: string; data: AccessTokenRefreshRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof authenticationRefresh>>,
+    { version: string; data: AccessTokenRefreshRequest }
+  > = (props) => {
+    const { version, data } = props ?? {};
+
+    return authenticationRefresh(version, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AuthenticationRefreshMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authenticationRefresh>>
+>;
+export type AuthenticationRefreshMutationBody = AccessTokenRefreshRequest;
+export type AuthenticationRefreshMutationError = ProblemDetails;
+
+/**
+ * @summary アクセストークンをリフレッシュする
+ */
+export const useAuthenticationRefresh = <
+  TError = ProblemDetails,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof authenticationRefresh>>,
+    TError,
+    { version: string; data: AccessTokenRefreshRequest },
+    TContext
+  >;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof authenticationRefresh>>,
+  TError,
+  { version: string; data: AccessTokenRefreshRequest },
+  TContext
+> => {
+  const mutationOptions = getAuthenticationRefreshMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
@@ -520,171 +596,6 @@ export function useConsultGetUnexaminedMenus<
 }
 
 /**
- * @summary 簡易な受診者情報を取得する
- */
-export const consultGetSimpleExaminee = (
-  version: string,
-  consultNumber: string,
-  signal?: AbortSignal,
-) => {
-  return axiosInstance<Blob>({
-    url: `/api/v${version}/consult/${consultNumber}/simple`,
-    method: "GET",
-    responseType: "blob",
-    signal,
-  });
-};
-
-export const getConsultGetSimpleExamineeQueryKey = (
-  version: string,
-  consultNumber: string,
-) => {
-  return [`/api/v${version}/consult/${consultNumber}/simple`] as const;
-};
-
-export const getConsultGetSimpleExamineeQueryOptions = <
-  TData = Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-  TError = unknown,
->(
-  version: string,
-  consultNumber: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-        TError,
-        TData
-      >
-    >;
-  },
-) => {
-  const { query: queryOptions } = options ?? {};
-
-  const queryKey =
-    queryOptions?.queryKey ??
-    getConsultGetSimpleExamineeQueryKey(version, consultNumber);
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof consultGetSimpleExaminee>>
-  > = ({ signal }) => consultGetSimpleExaminee(version, consultNumber, signal);
-
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!(version && consultNumber),
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type ConsultGetSimpleExamineeQueryResult = NonNullable<
-  Awaited<ReturnType<typeof consultGetSimpleExaminee>>
->;
-export type ConsultGetSimpleExamineeQueryError = unknown;
-
-export function useConsultGetSimpleExaminee<
-  TData = Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-  TError = unknown,
->(
-  version: string,
-  consultNumber: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-          TError,
-          TData
-        >,
-        "initialData"
-      >;
-  },
-): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useConsultGetSimpleExaminee<
-  TData = Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-  TError = unknown,
->(
-  version: string,
-  consultNumber: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-          TError,
-          TData
-        >,
-        "initialData"
-      >;
-  },
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useConsultGetSimpleExaminee<
-  TData = Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-  TError = unknown,
->(
-  version: string,
-  consultNumber: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-        TError,
-        TData
-      >
-    >;
-  },
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-/**
- * @summary 簡易な受診者情報を取得する
- */
-
-export function useConsultGetSimpleExaminee<
-  TData = Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-  TError = unknown,
->(
-  version: string,
-  consultNumber: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof consultGetSimpleExaminee>>,
-        TError,
-        TData
-      >
-    >;
-  },
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getConsultGetSimpleExamineeQueryOptions(
-    version,
-    consultNumber,
-    options,
-  );
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-/**
  * @summary 検査内容を取得する
  */
 export const consultGetExamItemsExaminee = (
@@ -942,7 +853,7 @@ export const useConsultRegisterExecutions = <
  */
 export const consultGetInputExamItemsExaminee = (
   version: string,
-  consultNumber: number,
+  consultNumber: string,
   params?: ConsultGetInputExamItemsExamineeParams,
   signal?: AbortSignal,
 ) => {
@@ -956,7 +867,7 @@ export const consultGetInputExamItemsExaminee = (
 
 export const getConsultGetInputExamItemsExamineeQueryKey = (
   version: string,
-  consultNumber: number,
+  consultNumber: string,
   params?: ConsultGetInputExamItemsExamineeParams,
 ) => {
   return [
@@ -970,7 +881,7 @@ export const getConsultGetInputExamItemsExamineeQueryOptions = <
   TError = ProblemDetails,
 >(
   version: string,
-  consultNumber: number,
+  consultNumber: string,
   params?: ConsultGetInputExamItemsExamineeParams,
   options?: {
     query?: Partial<
@@ -1015,7 +926,7 @@ export function useConsultGetInputExamItemsExaminee<
   TError = ProblemDetails,
 >(
   version: string,
-  consultNumber: number,
+  consultNumber: string,
   params: undefined | ConsultGetInputExamItemsExamineeParams,
   options: {
     query: Partial<
@@ -1040,7 +951,7 @@ export function useConsultGetInputExamItemsExaminee<
   TError = ProblemDetails,
 >(
   version: string,
-  consultNumber: number,
+  consultNumber: string,
   params?: ConsultGetInputExamItemsExamineeParams,
   options?: {
     query?: Partial<
@@ -1065,7 +976,7 @@ export function useConsultGetInputExamItemsExaminee<
   TError = ProblemDetails,
 >(
   version: string,
-  consultNumber: number,
+  consultNumber: string,
   params?: ConsultGetInputExamItemsExamineeParams,
   options?: {
     query?: Partial<
@@ -1086,7 +997,7 @@ export function useConsultGetInputExamItemsExaminee<
   TError = ProblemDetails,
 >(
   version: string,
-  consultNumber: number,
+  consultNumber: string,
   params?: ConsultGetInputExamItemsExamineeParams,
   options?: {
     query?: Partial<
@@ -1113,6 +1024,419 @@ export function useConsultGetInputExamItemsExaminee<
 
   return query;
 }
+
+/**
+ * @summary 前提検査メニューを検証する（仮：動作確認用）
+ */
+export const consultValidatePriorExamMenus = (
+  version: string,
+  consultNumber: string,
+  currentExamId: number,
+  signal?: AbortSignal,
+) => {
+  return axiosInstance<InputExamItems>({
+    url: `/api/v${version}/consult/${consultNumber}/prior/${currentExamId}`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getConsultValidatePriorExamMenusQueryKey = (
+  version: string,
+  consultNumber: string,
+  currentExamId: number,
+) => {
+  return [
+    `/api/v${version}/consult/${consultNumber}/prior/${currentExamId}`,
+  ] as const;
+};
+
+export const getConsultValidatePriorExamMenusQueryOptions = <
+  TData = Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+  TError = unknown,
+>(
+  version: string,
+  consultNumber: string,
+  currentExamId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getConsultValidatePriorExamMenusQueryKey(
+      version,
+      consultNumber,
+      currentExamId,
+    );
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof consultValidatePriorExamMenus>>
+  > = ({ signal }) =>
+    consultValidatePriorExamMenus(
+      version,
+      consultNumber,
+      currentExamId,
+      signal,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(version && consultNumber && currentExamId),
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ConsultValidatePriorExamMenusQueryResult = NonNullable<
+  Awaited<ReturnType<typeof consultValidatePriorExamMenus>>
+>;
+export type ConsultValidatePriorExamMenusQueryError = unknown;
+
+export function useConsultValidatePriorExamMenus<
+  TData = Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+  TError = unknown,
+>(
+  version: string,
+  consultNumber: string,
+  currentExamId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useConsultValidatePriorExamMenus<
+  TData = Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+  TError = unknown,
+>(
+  version: string,
+  consultNumber: string,
+  currentExamId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useConsultValidatePriorExamMenus<
+  TData = Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+  TError = unknown,
+>(
+  version: string,
+  consultNumber: string,
+  currentExamId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary 前提検査メニューを検証する（仮：動作確認用）
+ */
+
+export function useConsultValidatePriorExamMenus<
+  TData = Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+  TError = unknown,
+>(
+  version: string,
+  consultNumber: string,
+  currentExamId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof consultValidatePriorExamMenus>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getConsultValidatePriorExamMenusQueryOptions(
+    version,
+    consultNumber,
+    currentExamId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary 検査結果相関ルールを検証する（仮：動作確認用）
+ */
+export const consultValidateCorrelationRule = (
+  version: string,
+  consultNumber: string,
+  resultsRequest: ResultsRequest,
+) => {
+  return axiosInstance<void>({
+    url: `/api/v${version}/consult/${consultNumber}/correlation`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: resultsRequest,
+  });
+};
+
+export const getConsultValidateCorrelationRuleMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof consultValidateCorrelationRule>>,
+    TError,
+    { version: string; consultNumber: string; data: ResultsRequest },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof consultValidateCorrelationRule>>,
+  TError,
+  { version: string; consultNumber: string; data: ResultsRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof consultValidateCorrelationRule>>,
+    { version: string; consultNumber: string; data: ResultsRequest }
+  > = (props) => {
+    const { version, consultNumber, data } = props ?? {};
+
+    return consultValidateCorrelationRule(version, consultNumber, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ConsultValidateCorrelationRuleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof consultValidateCorrelationRule>>
+>;
+export type ConsultValidateCorrelationRuleMutationBody = ResultsRequest;
+export type ConsultValidateCorrelationRuleMutationError = unknown;
+
+/**
+ * @summary 検査結果相関ルールを検証する（仮：動作確認用）
+ */
+export const useConsultValidateCorrelationRule = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof consultValidateCorrelationRule>>,
+    TError,
+    { version: string; consultNumber: string; data: ResultsRequest },
+    TContext
+  >;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof consultValidateCorrelationRule>>,
+  TError,
+  { version: string; consultNumber: string; data: ResultsRequest },
+  TContext
+> => {
+  const mutationOptions =
+    getConsultValidateCorrelationRuleMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+/**
+ * @summary 検査結果を登録する
+ */
+export const consultRegisterResults = (
+  version: string,
+  consultNumber: string,
+  resultsRequest: ResultsRequest,
+) => {
+  return axiosInstance<void>({
+    url: `/api/v${version}/consult/${consultNumber}/results`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: resultsRequest,
+  });
+};
+
+export const getConsultRegisterResultsMutationOptions = <
+  TError = ProblemDetails,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof consultRegisterResults>>,
+    TError,
+    { version: string; consultNumber: string; data: ResultsRequest },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof consultRegisterResults>>,
+  TError,
+  { version: string; consultNumber: string; data: ResultsRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof consultRegisterResults>>,
+    { version: string; consultNumber: string; data: ResultsRequest }
+  > = (props) => {
+    const { version, consultNumber, data } = props ?? {};
+
+    return consultRegisterResults(version, consultNumber, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ConsultRegisterResultsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof consultRegisterResults>>
+>;
+export type ConsultRegisterResultsMutationBody = ResultsRequest;
+export type ConsultRegisterResultsMutationError = ProblemDetails;
+
+/**
+ * @summary 検査結果を登録する
+ */
+export const useConsultRegisterResults = <
+  TError = ProblemDetails,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof consultRegisterResults>>,
+    TError,
+    { version: string; consultNumber: string; data: ResultsRequest },
+    TContext
+  >;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof consultRegisterResults>>,
+  TError,
+  { version: string; consultNumber: string; data: ResultsRequest },
+  TContext
+> => {
+  const mutationOptions = getConsultRegisterResultsMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+/**
+ * @summary 検査結果を検証する
+ */
+export const consultVerifyResults = (
+  version: string,
+  consultNumber: string,
+  resultsRequest: ResultsRequest,
+) => {
+  return axiosInstance<VerifyExamItems>({
+    url: `/api/v${version}/consult/${consultNumber}/results/verify`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: resultsRequest,
+  });
+};
+
+export const getConsultVerifyResultsMutationOptions = <
+  TError = ProblemDetails,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof consultVerifyResults>>,
+    TError,
+    { version: string; consultNumber: string; data: ResultsRequest },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof consultVerifyResults>>,
+  TError,
+  { version: string; consultNumber: string; data: ResultsRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof consultVerifyResults>>,
+    { version: string; consultNumber: string; data: ResultsRequest }
+  > = (props) => {
+    const { version, consultNumber, data } = props ?? {};
+
+    return consultVerifyResults(version, consultNumber, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ConsultVerifyResultsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof consultVerifyResults>>
+>;
+export type ConsultVerifyResultsMutationBody = ResultsRequest;
+export type ConsultVerifyResultsMutationError = ProblemDetails;
+
+/**
+ * @summary 検査結果を検証する
+ */
+export const useConsultVerifyResults = <
+  TError = ProblemDetails,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof consultVerifyResults>>,
+    TError,
+    { version: string; consultNumber: string; data: ResultsRequest },
+    TContext
+  >;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof consultVerifyResults>>,
+  TError,
+  { version: string; consultNumber: string; data: ResultsRequest },
+  TContext
+> => {
+  const mutationOptions = getConsultVerifyResultsMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
 
 /**
  * @summary 検査機器一覧を取得する
@@ -1416,6 +1740,306 @@ export function useExamMenuGetExamMenus<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getExamMenuGetExamMenusQueryOptions(version, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary アプリケーション起動の正常性を確認する。
+ */
+export const healthCheckGetHealth = (version: string, signal?: AbortSignal) => {
+  return axiosInstance<void>({
+    url: `/api/v${version}/health/app`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getHealthCheckGetHealthQueryKey = (version: string) => {
+  return [`/api/v${version}/health/app`] as const;
+};
+
+export const getHealthCheckGetHealthQueryOptions = <
+  TData = Awaited<ReturnType<typeof healthCheckGetHealth>>,
+  TError = unknown,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof healthCheckGetHealth>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getHealthCheckGetHealthQueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof healthCheckGetHealth>>
+  > = ({ signal }) => healthCheckGetHealth(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof healthCheckGetHealth>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type HealthCheckGetHealthQueryResult = NonNullable<
+  Awaited<ReturnType<typeof healthCheckGetHealth>>
+>;
+export type HealthCheckGetHealthQueryError = unknown;
+
+export function useHealthCheckGetHealth<
+  TData = Awaited<ReturnType<typeof healthCheckGetHealth>>,
+  TError = unknown,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof healthCheckGetHealth>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof healthCheckGetHealth>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useHealthCheckGetHealth<
+  TData = Awaited<ReturnType<typeof healthCheckGetHealth>>,
+  TError = unknown,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof healthCheckGetHealth>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof healthCheckGetHealth>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useHealthCheckGetHealth<
+  TData = Awaited<ReturnType<typeof healthCheckGetHealth>>,
+  TError = unknown,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof healthCheckGetHealth>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary アプリケーション起動の正常性を確認する。
+ */
+
+export function useHealthCheckGetHealth<
+  TData = Awaited<ReturnType<typeof healthCheckGetHealth>>,
+  TError = unknown,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof healthCheckGetHealth>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getHealthCheckGetHealthQueryOptions(version, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary データベース接続の正常性を確認する。
+ */
+export const healthCheckGetDeepHealth = (
+  version: string,
+  signal?: AbortSignal,
+) => {
+  return axiosInstance<void>({
+    url: `/api/v${version}/health/database`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getHealthCheckGetDeepHealthQueryKey = (version: string) => {
+  return [`/api/v${version}/health/database`] as const;
+};
+
+export const getHealthCheckGetDeepHealthQueryOptions = <
+  TData = Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getHealthCheckGetDeepHealthQueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof healthCheckGetDeepHealth>>
+  > = ({ signal }) => healthCheckGetDeepHealth(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type HealthCheckGetDeepHealthQueryResult = NonNullable<
+  Awaited<ReturnType<typeof healthCheckGetDeepHealth>>
+>;
+export type HealthCheckGetDeepHealthQueryError = void;
+
+export function useHealthCheckGetDeepHealth<
+  TData = Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+  TError = void,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useHealthCheckGetDeepHealth<
+  TData = Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useHealthCheckGetDeepHealth<
+  TData = Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary データベース接続の正常性を確認する。
+ */
+
+export function useHealthCheckGetDeepHealth<
+  TData = Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof healthCheckGetDeepHealth>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getHealthCheckGetDeepHealthQueryOptions(
+    version,
+    options,
+  );
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;
@@ -1752,7 +2376,7 @@ export function useIntegrationGetIntegrationResults<
  */
 export const integrationExportResults = (
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   resultExportRequest: ResultExportRequest,
 ) => {
   return axiosInstance<void>({
@@ -1770,20 +2394,20 @@ export const getIntegrationExportResultsMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof integrationExportResults>>,
     TError,
-    { version: string; placeScheduleId: number; data: ResultExportRequest },
+    { version: string; placeScheduleId: string; data: ResultExportRequest },
     TContext
   >;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof integrationExportResults>>,
   TError,
-  { version: string; placeScheduleId: number; data: ResultExportRequest },
+  { version: string; placeScheduleId: string; data: ResultExportRequest },
   TContext
 > => {
   const { mutation: mutationOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof integrationExportResults>>,
-    { version: string; placeScheduleId: number; data: ResultExportRequest }
+    { version: string; placeScheduleId: string; data: ResultExportRequest }
   > = (props) => {
     const { version, placeScheduleId, data } = props ?? {};
 
@@ -1809,13 +2433,13 @@ export const useIntegrationExportResults = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof integrationExportResults>>,
     TError,
-    { version: string; placeScheduleId: number; data: ResultExportRequest },
+    { version: string; placeScheduleId: string; data: ResultExportRequest },
     TContext
   >;
 }): UseMutationResult<
   Awaited<ReturnType<typeof integrationExportResults>>,
   TError,
-  { version: string; placeScheduleId: number; data: ResultExportRequest },
+  { version: string; placeScheduleId: string; data: ResultExportRequest },
   TContext
 > => {
   const mutationOptions = getIntegrationExportResultsMutationOptions(options);
@@ -2394,7 +3018,7 @@ export function usePlaceScheduleGetTeamPlaceSchedules<
  */
 export const placeScheduleGetPlaceScheduleLockingStatus = (
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   signal?: AbortSignal,
 ) => {
   return axiosInstance<PlaceScheduleLocking>({
@@ -2406,7 +3030,7 @@ export const placeScheduleGetPlaceScheduleLockingStatus = (
 
 export const getPlaceScheduleGetPlaceScheduleLockingStatusQueryKey = (
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
 ) => {
   return [
     `/api/v${version}/placeSchedules/${placeScheduleId}/placeScheduleLockingStatus`,
@@ -2420,7 +3044,7 @@ export const getPlaceScheduleGetPlaceScheduleLockingStatusQueryOptions = <
   TError = ProblemDetails,
 >(
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -2474,7 +3098,7 @@ export function usePlaceScheduleGetPlaceScheduleLockingStatus<
   TError = ProblemDetails,
 >(
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -2502,7 +3126,7 @@ export function usePlaceScheduleGetPlaceScheduleLockingStatus<
   TError = ProblemDetails,
 >(
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -2530,7 +3154,7 @@ export function usePlaceScheduleGetPlaceScheduleLockingStatus<
   TError = ProblemDetails,
 >(
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -2552,7 +3176,7 @@ export function usePlaceScheduleGetPlaceScheduleLockingStatus<
   TError = ProblemDetails,
 >(
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -2584,7 +3208,7 @@ export function usePlaceScheduleGetPlaceScheduleLockingStatus<
  */
 export const placeScheduleUpdatePlaceScheduleLockingStatus = (
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   placeScheduleLockingRequest: PlaceScheduleLockingRequest,
 ) => {
   return axiosInstance<void>({
@@ -2604,7 +3228,7 @@ export const getPlaceScheduleUpdatePlaceScheduleLockingStatusMutationOptions = <
     TError,
     {
       version: string;
-      placeScheduleId: number;
+      placeScheduleId: string;
       data: PlaceScheduleLockingRequest;
     },
     TContext
@@ -2614,7 +3238,7 @@ export const getPlaceScheduleUpdatePlaceScheduleLockingStatusMutationOptions = <
   TError,
   {
     version: string;
-    placeScheduleId: number;
+    placeScheduleId: string;
     data: PlaceScheduleLockingRequest;
   },
   TContext
@@ -2625,7 +3249,7 @@ export const getPlaceScheduleUpdatePlaceScheduleLockingStatusMutationOptions = <
     Awaited<ReturnType<typeof placeScheduleUpdatePlaceScheduleLockingStatus>>,
     {
       version: string;
-      placeScheduleId: number;
+      placeScheduleId: string;
       data: PlaceScheduleLockingRequest;
     }
   > = (props) => {
@@ -2662,7 +3286,7 @@ export const usePlaceScheduleUpdatePlaceScheduleLockingStatus = <
     TError,
     {
       version: string;
-      placeScheduleId: number;
+      placeScheduleId: string;
       data: PlaceScheduleLockingRequest;
     },
     TContext
@@ -2672,7 +3296,7 @@ export const usePlaceScheduleUpdatePlaceScheduleLockingStatus = <
   TError,
   {
     version: string;
-    placeScheduleId: number;
+    placeScheduleId: string;
     data: PlaceScheduleLockingRequest;
   },
   TContext
@@ -2688,7 +3312,7 @@ export const usePlaceScheduleUpdatePlaceScheduleLockingStatus = <
  */
 export const progressGetProgress = (
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   signal?: AbortSignal,
 ) => {
   return axiosInstance<PlaceScheduleProgress>({
@@ -2700,7 +3324,7 @@ export const progressGetProgress = (
 
 export const getProgressGetProgressQueryKey = (
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
 ) => {
   return [`/api/v${version}/progress/${placeScheduleId}`] as const;
 };
@@ -2710,7 +3334,7 @@ export const getProgressGetProgressQueryOptions = <
   TError = ProblemDetails,
 >(
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -2753,7 +3377,7 @@ export function useProgressGetProgress<
   TError = ProblemDetails,
 >(
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -2777,7 +3401,7 @@ export function useProgressGetProgress<
   TError = ProblemDetails,
 >(
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -2801,7 +3425,7 @@ export function useProgressGetProgress<
   TError = ProblemDetails,
 >(
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -2821,7 +3445,7 @@ export function useProgressGetProgress<
   TError = ProblemDetails,
 >(
   version: string,
-  placeScheduleId: number,
+  placeScheduleId: string,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -2846,158 +3470,6 @@ export function useProgressGetProgress<
 
   return query;
 }
-
-/**
- * @summary 検査結果を検証する
- */
-export const resultVerifyResults = (
-  version: string,
-  consultNumber: string,
-  resultsRequest: ResultsRequest,
-) => {
-  return axiosInstance<VerifyExamItems>({
-    url: `/api/v${version}/consult/${consultNumber}/results/verify`,
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    data: resultsRequest,
-  });
-};
-
-export const getResultVerifyResultsMutationOptions = <
-  TError = ProblemDetails,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof resultVerifyResults>>,
-    TError,
-    { version: string; consultNumber: string; data: ResultsRequest },
-    TContext
-  >;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof resultVerifyResults>>,
-  TError,
-  { version: string; consultNumber: string; data: ResultsRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof resultVerifyResults>>,
-    { version: string; consultNumber: string; data: ResultsRequest }
-  > = (props) => {
-    const { version, consultNumber, data } = props ?? {};
-
-    return resultVerifyResults(version, consultNumber, data);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type ResultVerifyResultsMutationResult = NonNullable<
-  Awaited<ReturnType<typeof resultVerifyResults>>
->;
-export type ResultVerifyResultsMutationBody = ResultsRequest;
-export type ResultVerifyResultsMutationError = ProblemDetails;
-
-/**
- * @summary 検査結果を検証する
- */
-export const useResultVerifyResults = <
-  TError = ProblemDetails,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof resultVerifyResults>>,
-    TError,
-    { version: string; consultNumber: string; data: ResultsRequest },
-    TContext
-  >;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof resultVerifyResults>>,
-  TError,
-  { version: string; consultNumber: string; data: ResultsRequest },
-  TContext
-> => {
-  const mutationOptions = getResultVerifyResultsMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-/**
- * @summary 検査結果を登録する
- */
-export const resultRegisterResults = (
-  version: string,
-  consultNumber: string,
-  resultsRequest: ResultsRequest,
-) => {
-  return axiosInstance<void>({
-    url: `/api/v${version}/consult/${consultNumber}/results`,
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    data: resultsRequest,
-  });
-};
-
-export const getResultRegisterResultsMutationOptions = <
-  TError = ProblemDetails,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof resultRegisterResults>>,
-    TError,
-    { version: string; consultNumber: string; data: ResultsRequest },
-    TContext
-  >;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof resultRegisterResults>>,
-  TError,
-  { version: string; consultNumber: string; data: ResultsRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof resultRegisterResults>>,
-    { version: string; consultNumber: string; data: ResultsRequest }
-  > = (props) => {
-    const { version, consultNumber, data } = props ?? {};
-
-    return resultRegisterResults(version, consultNumber, data);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type ResultRegisterResultsMutationResult = NonNullable<
-  Awaited<ReturnType<typeof resultRegisterResults>>
->;
-export type ResultRegisterResultsMutationBody = ResultsRequest;
-export type ResultRegisterResultsMutationError = ProblemDetails;
-
-/**
- * @summary 検査結果を登録する
- */
-export const useResultRegisterResults = <
-  TError = ProblemDetails,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof resultRegisterResults>>,
-    TError,
-    { version: string; consultNumber: string; data: ResultsRequest },
-    TContext
-  >;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof resultRegisterResults>>,
-  TError,
-  { version: string; consultNumber: string; data: ResultsRequest },
-  TContext
-> => {
-  const mutationOptions = getResultRegisterResultsMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
 
 /**
  * @summary 職員の情報を取得する
@@ -3115,6 +3587,162 @@ export function useStaffGetStaff<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getStaffGetStaffQueryOptions(version, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary 団体を登録する
+ */
+export const organizationTestInsertOrganization = (
+  version: string,
+  signal?: AbortSignal,
+) => {
+  return axiosInstance<void>({
+    url: `/api/v${version}/organization/insert`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getOrganizationTestInsertOrganizationQueryKey = (
+  version: string,
+) => {
+  return [`/api/v${version}/organization/insert`] as const;
+};
+
+export const getOrganizationTestInsertOrganizationQueryOptions = <
+  TData = Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getOrganizationTestInsertOrganizationQueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof organizationTestInsertOrganization>>
+  > = ({ signal }) => organizationTestInsertOrganization(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type OrganizationTestInsertOrganizationQueryResult = NonNullable<
+  Awaited<ReturnType<typeof organizationTestInsertOrganization>>
+>;
+export type OrganizationTestInsertOrganizationQueryError = ProblemDetails;
+
+export function useOrganizationTestInsertOrganization<
+  TData = Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useOrganizationTestInsertOrganization<
+  TData = Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useOrganizationTestInsertOrganization<
+  TData = Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary 団体を登録する
+ */
+
+export function useOrganizationTestInsertOrganization<
+  TData = Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof organizationTestInsertOrganization>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getOrganizationTestInsertOrganizationQueryOptions(
+    version,
+    options,
+  );
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

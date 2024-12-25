@@ -22,7 +22,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { useAuthenticationLogin, useStaffGetStaff } from "~/api/wellship";
 import CommonDialog from "~/components/CommonDialog";
-import type { NamedEntity } from "~/interfaces/interfaces";
+import type { StringIdNamedEntity } from "~/interfaces/interfaces";
 import { serverTimeOffsetState, staffState } from "~/store/store";
 import { authUtil } from "~/utils/authUtil";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
@@ -132,7 +132,7 @@ export default function Login() {
     if (result.data) {
       // 成功時
       // サーバから取得した情報.staffId、staffNameを設定する
-      const jotaiData: NamedEntity = {
+      const jotaiData: StringIdNamedEntity = {
         id: result.data.data.staffId,
         name: result.data.data.staffName,
       };
