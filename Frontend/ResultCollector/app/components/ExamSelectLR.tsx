@@ -133,7 +133,7 @@ export default function ExamSelectLR({
       targetDetail.value === selector.code ? "" : selector.code;
 
     // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
-    let hasValidationError = true;
+    let hasValidationError = false;
 
     // examItemsのvalueを更新
     const updatedExamItems: InputExamItem[] = examItemsData.map((item) => {
@@ -156,7 +156,7 @@ export default function ExamSelectLR({
           validationCheck(updatedExamItem);
         if (!hasCallback) {
           // falseのexamItemがあればコールバックを行わない
-          hasValidationError = false;
+          hasValidationError = true;
         }
 
         // バリデーション結果を反映
@@ -172,7 +172,7 @@ export default function ExamSelectLR({
     // 更新されたデータをステートに設定
     setExamItemsData(updatedExamItems);
 
-    if (hasValidationError) {
+    if (!hasValidationError) {
       onClick(updatedExamItems);
     }
   };
