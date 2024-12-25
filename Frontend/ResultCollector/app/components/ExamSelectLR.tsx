@@ -228,11 +228,18 @@ export default function ExamSelectLR({
                   {detail.name}
                 </Text>
               </Paper>
-              {detail.prevValue && (
-                <Text ml="auto" fw={700} maw={271}>
-                  (前回：{detail.prevValue})
-                </Text>
-              )}
+              {detail.prevValue &&
+                (() => {
+                  const prevName =
+                    detail.examItemDetailOptions?.find(
+                      (option) => option.code === detail.prevValue,
+                    )?.name || ""; //TODO:見つからなかった時どうするか
+                  return (
+                    <Text ml="auto" fw={700} maw={271}>
+                      (前回：{prevName})
+                    </Text>
+                  );
+                })()}
               <Stack>
                 {detail.examItemDetailOptions?.map(
                   (selector: ExamItemDetailOption) => {
