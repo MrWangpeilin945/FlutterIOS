@@ -144,14 +144,6 @@ CREATE TABLE exam_menu_note_consults (
   , CONSTRAINT exam_menu_note_consults_PKC PRIMARY KEY (menu_note_id,code)
 );
 
-CREATE TABLE exam_menu_note_details (
-  code text NOT NULL
-  , name text NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT exam_menu_note_details_PKC PRIMARY KEY (code)
-);
-
 CREATE TABLE exam_menu_note_results (
   menu_note_id integer NOT NULL
   , exam_item_detail_id integer NOT NULL
@@ -450,6 +442,14 @@ CREATE TABLE exam_items (
   , CONSTRAINT exam_items_PKC PRIMARY KEY (exam_item_id)
 );
 
+CREATE TABLE exam_menu_note_codes (
+  code text NOT NULL
+  , name text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_menu_note_codes_PKC PRIMARY KEY (code)
+);
+
 CREATE TABLE examinees (
   examinee_id uuid DEFAULT gen_random_uuid () NOT NULL
   , examinee_code text NOT NULL
@@ -580,6 +580,11 @@ ALTER TABLE consult
 
 ALTER TABLE consult_notes
   ADD CONSTRAINT consult_notes_FK1 FOREIGN KEY (consult_id) REFERENCES consult(consult_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE consult_notes
+  ADD CONSTRAINT consult_notes_FK2 FOREIGN KEY (code) REFERENCES exam_menu_note_codes(code)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -888,12 +893,6 @@ COMMENT ON COLUMN exam_menu_note_consults.order_number IS '表示順';
 COMMENT ON COLUMN exam_menu_note_consults.created_at IS '作成日時';
 COMMENT ON COLUMN exam_menu_note_consults.created_by IS '作成者';
 
-COMMENT ON TABLE exam_menu_note_codes IS '検査メニュー特記_コード';
-COMMENT ON COLUMN exam_menu_note_codes.code IS '検査特記コード';
-COMMENT ON COLUMN exam_menu_note_codes.name IS '検査特記名';
-COMMENT ON COLUMN exam_menu_note_codes.created_at IS '作成日時';
-COMMENT ON COLUMN exam_menu_note_codes.created_by IS '作成者';
-
 COMMENT ON TABLE exam_menu_note_results IS '検査メニュー特記_検査結果';
 COMMENT ON COLUMN exam_menu_note_results.menu_note_id IS '検査メニュー特記ID';
 COMMENT ON COLUMN exam_menu_note_results.exam_item_detail_id IS '検査項目明細ID';
@@ -1111,6 +1110,12 @@ COMMENT ON COLUMN exam_items.unit IS '単位';
 COMMENT ON COLUMN exam_items.order_number IS '表示順';
 COMMENT ON COLUMN exam_items.created_at IS '作成日時';
 COMMENT ON COLUMN exam_items.created_by IS '作成者';
+
+COMMENT ON TABLE exam_menu_note_codes IS '検査メニュー特記_コード';
+COMMENT ON COLUMN exam_menu_note_codes.code IS '検査特記コード';
+COMMENT ON COLUMN exam_menu_note_codes.name IS '検査特記名';
+COMMENT ON COLUMN exam_menu_note_codes.created_at IS '作成日時';
+COMMENT ON COLUMN exam_menu_note_codes.created_by IS '作成者';
 
 COMMENT ON TABLE examinees IS '受診者';
 COMMENT ON COLUMN examinees.examinee_id IS '受診者ID';
