@@ -48,26 +48,23 @@ export default function ExamBP2({
     return null;
   }
   // positionNumberが1のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
-  const hasBPfirst = examItems.find((item) => item.positionNumber === 1);
-  const hasHighDetail1 = hasBPfirst?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 上
+  const isValidBPfirst = examItems.some(
+    (item) =>
+      item.positionNumber === 血圧1回目 &&
+      item.examItemDetails?.some(
+        (detail) =>
+          detail.positionNumber === 上 &&
+          item.examItemDetails?.some((detail) => detail.positionNumber === 下)
+      )
   );
-  const hasLowDetail1 = hasBPfirst?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 下
-  );
-  const isValidBPfirst = hasBPfirst && hasHighDetail1 && hasLowDetail1;
 
   // positionNumberが2のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
-  const hasBPsecond = examItems.find(
-    (item) => item.positionNumber === 血圧2回目
+  const isValidBPsecond = examItems.some(
+    (item) =>
+      item.positionNumber === 血圧2回目 &&
+      item.examItemDetails?.some((detail) => detail.positionNumber === 上) &&
+      item.examItemDetails?.some((detail) => detail.positionNumber === 下)
   );
-  const hasHighDetail2 = hasBPsecond?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 上
-  );
-  const hasLowDetail2 = hasBPsecond?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 下
-  );
-  const isValidBPsecond = hasBPsecond && hasHighDetail2 && hasLowDetail2;
 
   // 両方を満たさない時、nullを返す
   if (!isValidBPfirst && !isValidBPsecond) {
@@ -75,14 +72,12 @@ export default function ExamBP2({
   }
 
   // positionNumberが3のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
-  const hasAVE = examItems.find((item) => item.positionNumber === 平均値);
-  const hasHighDetail3 = hasAVE?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 上
+  const isValidAVE = examItems.some(
+    (item) =>
+      item.positionNumber === 平均値 &&
+      item.examItemDetails?.some((detail) => detail.positionNumber === 上) &&
+      item.examItemDetails?.some((detail) => detail.positionNumber === 下)
   );
-  const hasLowDetail3 = hasAVE?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 下
-  );
-  const isValidAVE = hasAVE && hasHighDetail3 && hasLowDetail3;
 
   // examItemの管理
   const [examItemsData, setExamItemsData] = useState(examItems);
@@ -307,7 +302,7 @@ export default function ExamBP2({
   // 平均値の計算,保存処理
   const calculateAverage = (updatedExamItems: InputExamItem[]) => {
     // 引数に平均値のexamItemが無いときは計算しない
-    if (!hasAVE) {
+    if (!isValidAVE) {
       return updatedExamItems;
     }
     const bpH_values: number[] = [];
