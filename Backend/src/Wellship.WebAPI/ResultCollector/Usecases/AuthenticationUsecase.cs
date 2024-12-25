@@ -1,6 +1,6 @@
-using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -9,22 +9,26 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 /// </summary>
 public class AuthenticationUsecase : IAuthenticationUsecase
 {
-    private readonly IAuthenticationRepository _authenticationRepository;
+    private readonly IAuthService _authService;
+    private readonly IStaffRepository _staffRepository;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="authenticationRepository">認証リポジトリ</param>
-    public AuthenticationUsecase(IAuthenticationRepository authenticationRepository)
+    public AuthenticationUsecase(IAuthService authService, IStaffRepository staffRepository)
     {
-        _authenticationRepository = authenticationRepository;
+        _authService = authService;
+        _staffRepository = staffRepository;
     }
 
     /// <summary>
     /// ログインする
     /// </summary>
-    public void Login()
+    /// <param name="identifier"></param>
+    /// <param name="password"></param>
+    public async ValueTask<string> LoginStaffAsync(string identifier, string password)
     {
-
+        var staff = await _staffRepository.GetStaffByLoginIdAsync(identifier);
+        return staff.Enabled && staff.VerifyPassword(password) ? _authService.GenerateAccessToken(staff) : throw new WellshipAuthenticationException();
     }
 }

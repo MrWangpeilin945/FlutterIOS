@@ -150,7 +150,7 @@ public class ConsultController : ControllerBase
         return Ok();
     }
 
-        /// <summary>
+    /// <summary>
     /// 検査結果を検証する
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
@@ -162,10 +162,10 @@ public class ConsultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/results/verify")]
-    public IActionResult VerifyResults([FromRoute][Required] string consultNumber, [FromBody] ResultsRequest results)
+    public async Task<IActionResult> VerifyResults([FromRoute][Required] string consultNumber, [FromBody] ResultsRequest results)
     {
-        _consultUsecase.VerifyResults();
-        return Ok();
+        var response = await _consultUsecase.VerifyResults(consultNumber, results);
+        return Ok(response);
     }
 
 }

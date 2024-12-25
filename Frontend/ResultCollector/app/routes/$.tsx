@@ -1,6 +1,7 @@
 import { Button, Center, Image, Space, Text } from "@mantine/core";
 import { useNavigate } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/react";
+import { authUtil } from "~/utils/authUtil";
 
 export const meta: MetaFunction = () => {
   return [{ title: "お探しのページは見つかりませんでした" }];
@@ -21,7 +22,12 @@ export default function NotFound404() {
           お探しのページは見つかりませんでした。
         </Text>
         <Space h={64} />
-        <Button size="xl" w={924} h={78} onClick={() => navigate("/login")}>
+        <Button
+          size="xl"
+          w={924}
+          h={78}
+          onClick={() => authUtil.logout(() => navigate("/login"))}
+        >
           ログイン画面へ
         </Button>
       </Center>
