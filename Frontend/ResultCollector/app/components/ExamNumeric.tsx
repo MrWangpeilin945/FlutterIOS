@@ -174,7 +174,7 @@ export default function ExamNumeric({
     }
     const updatedExamItems = [...examItemsData];
     // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
-    let hasValidationError = true;
+    let hasValidationError = false;
 
     // 該当するアイテムを更新
     for (const item of updatedExamItems) {
@@ -198,7 +198,7 @@ export default function ExamNumeric({
       const { validateResult, hasCallback } = validationCheck(item);
       if (!hasCallback) {
         // falseのexamItemがあればコールバックを行わない
-        hasValidationError = false;
+        hasValidationError = true;
       }
       // バリデーション結果を反映
       Object.assign(item, validateResult);
@@ -206,7 +206,7 @@ export default function ExamNumeric({
     // 更新されたデータをステートに設定
     setExamItemsData(updatedExamItems);
 
-    if (hasValidationError) {
+    if (!hasValidationError) {
       onChange(updatedExamItems);
     }
   };
@@ -316,7 +316,8 @@ export default function ExamNumeric({
       <Box ml={220} mt={50}>
         {showKeyboards && (
           <div ref={closeKeyBoard}>
-            {keyboard?.keyboardType === KeyboardType.テンキー ? (
+            {keyboard?.keyboardType === KeyboardType.テンキー ||
+            keyboard?.keyboardType === undefined ? (
               <NumericKeyboard
                 value={value ?? ""}
                 integerLength={integerLength}
