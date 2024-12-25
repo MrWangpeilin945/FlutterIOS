@@ -309,35 +309,17 @@ export default function ExamBP2({
     const bpL_values: number[] = [];
 
     for (const item of updatedExamItems) {
-      for (const detail of item.examItemDetails ?? []) {
-        if (item.positionNumber === 血圧1回目) {
-          if (detail.positionNumber === 上) {
-            if (detail.value !== undefined) {
-              const parsedValue = Number.parseFloat(detail.value);
-              if (!Number.isNaN(parsedValue)) {
+      if (
+        item.positionNumber === 血圧1回目 ||
+        item.positionNumber === 血圧2回目
+      ) {
+        for (const detail of item.examItemDetails ?? []) {
+          if (detail.value !== undefined) {
+            const parsedValue = Number.parseFloat(detail.value);
+            if (!Number.isNaN(parsedValue)) {
+              if (detail.positionNumber === 上) {
                 bpH_values.push(parsedValue);
-              }
-            }
-          } else if (detail.positionNumber === 下) {
-            if (detail.value !== undefined) {
-              const parsedValue = Number.parseFloat(detail.value);
-              if (!Number.isNaN(parsedValue)) {
-                bpL_values.push(parsedValue);
-              }
-            }
-          }
-        } else if (item.positionNumber === 血圧2回目) {
-          if (detail.positionNumber === 上) {
-            if (detail.value !== undefined) {
-              const parsedValue = Number.parseFloat(detail.value);
-              if (!Number.isNaN(parsedValue)) {
-                bpH_values.push(parsedValue);
-              }
-            }
-          } else if (detail.positionNumber === 下) {
-            if (detail.value !== undefined) {
-              const parsedValue = Number.parseFloat(detail.value);
-              if (!Number.isNaN(parsedValue)) {
+              } else if (detail.positionNumber === 下) {
                 bpL_values.push(parsedValue);
               }
             }
@@ -345,14 +327,15 @@ export default function ExamBP2({
         }
       }
     }
-
     // 平均値の計算
     const bpH_AVE =
-      Math.round(bpH_values.reduce((a, b) => a + b, 0) / bpH_values.length) ||
-      0;
+      bpH_values.length > 0
+        ? Math.round(bpH_values.reduce((a, b) => a + b, 0) / bpH_values.length)
+        : 0;
     const bpL_AVE =
-      Math.round(bpL_values.reduce((a, b) => a + b, 0) / bpL_values.length) ||
-      0;
+      bpL_values.length > 0
+        ? Math.round(bpL_values.reduce((a, b) => a + b, 0) / bpL_values.length)
+        : 0;
 
     // 平均値の保存
     return updatedExamItems.map((item) => {
