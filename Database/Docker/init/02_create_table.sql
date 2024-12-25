@@ -130,6 +130,7 @@ CREATE TABLE exam_cancels (
 CREATE TABLE exam_item_detail_orders (
   consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
+  , external_exam_item_detail_code text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_item_detail_orders_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
@@ -366,7 +367,7 @@ CREATE TABLE tickets_histories (
   , consult_id uuid NOT NULL
   , ticket_number text
   , action_type varchar(1) NOT NULL
-  , order integer NOT NULL
+  , order_number integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT tickets_histories_PKC PRIMARY KEY (id)
@@ -440,6 +441,14 @@ CREATE TABLE exam_items (
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_items_PKC PRIMARY KEY (exam_item_id)
+);
+
+CREATE TABLE exam_menu_note_codes (
+  code text NOT NULL
+  , name text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_menu_note_codes_PKC PRIMARY KEY (code)
 );
 
 CREATE TABLE examinees (
@@ -575,6 +584,11 @@ ALTER TABLE consult_notes
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE consult_notes
+  ADD CONSTRAINT consult_notes_FK2 FOREIGN KEY (code) REFERENCES exam_menu_note_codes(code)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE consult_thresholds
   ADD CONSTRAINT consult_thresholds_FK1 FOREIGN KEY (threshold_id) REFERENCES thresholds(threshold_id)
   ON DELETE RESTRICT
@@ -667,6 +681,11 @@ ALTER TABLE exam_items
 
 ALTER TABLE exam_menu_note_consults
   ADD CONSTRAINT exam_menu_note_consults_FK1 FOREIGN KEY (menu_note_id) REFERENCES exam_menu_notes(menu_note_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE exam_menu_note_consults
+  ADD CONSTRAINT exam_menu_note_consults_FK2 FOREIGN KEY (code) REFERENCES exam_menu_note_codes(code)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -781,7 +800,7 @@ COMMENT ON COLUMN consult_notes.created_by IS '作成者';
 COMMENT ON TABLE consult_thresholds IS '基準値';
 COMMENT ON COLUMN consult_thresholds.threshold_id IS '基準値パターンID';
 COMMENT ON COLUMN consult_thresholds.consult_id IS '受診ID';
-COMMENT ON COLUMN consult_thresholds.priority IS '優先度';
+COMMENT ON COLUMN consult_thresholds.priority IS '優先度:小さいものが優先して使用される';
 COMMENT ON COLUMN consult_thresholds.created_at IS '作成日時';
 COMMENT ON COLUMN consult_thresholds.created_by IS '作成者';
 
@@ -865,6 +884,7 @@ COMMENT ON COLUMN exam_cancels.created_by IS '作成者';
 COMMENT ON TABLE exam_item_detail_orders IS '検査項目明細依頼';
 COMMENT ON COLUMN exam_item_detail_orders.consult_id IS '受診ID';
 COMMENT ON COLUMN exam_item_detail_orders.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_item_detail_orders.external_exam_item_detail_code IS '外部コード検査項目明細CD';
 COMMENT ON COLUMN exam_item_detail_orders.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_detail_orders.created_by IS '作成者';
 
@@ -1035,7 +1055,7 @@ COMMENT ON COLUMN tickets_histories.id IS 'ID';
 COMMENT ON COLUMN tickets_histories.consult_id IS '受診ID';
 COMMENT ON COLUMN tickets_histories.ticket_number IS '受付番号';
 COMMENT ON COLUMN tickets_histories.action_type IS '操作区分:I:Ins/U:Upd/D:Del';
-COMMENT ON COLUMN tickets_histories.order IS '登録順:一括処理時';
+COMMENT ON COLUMN tickets_histories.order_number IS '登録順:一括処理時';
 COMMENT ON COLUMN tickets_histories.created_at IS '作成日時';
 COMMENT ON COLUMN tickets_histories.created_by IS '作成者';
 
@@ -1092,6 +1112,12 @@ COMMENT ON COLUMN exam_items.unit IS '単位';
 COMMENT ON COLUMN exam_items.order_number IS '表示順';
 COMMENT ON COLUMN exam_items.created_at IS '作成日時';
 COMMENT ON COLUMN exam_items.created_by IS '作成者';
+
+COMMENT ON TABLE exam_menu_note_codes IS '検査メニュー特記_コード';
+COMMENT ON COLUMN exam_menu_note_codes.code IS '検査特記コード';
+COMMENT ON COLUMN exam_menu_note_codes.name IS '検査特記名';
+COMMENT ON COLUMN exam_menu_note_codes.created_at IS '作成日時';
+COMMENT ON COLUMN exam_menu_note_codes.created_by IS '作成者';
 
 COMMENT ON TABLE examinees IS '受診者';
 COMMENT ON COLUMN examinees.examinee_id IS '受診者ID';
