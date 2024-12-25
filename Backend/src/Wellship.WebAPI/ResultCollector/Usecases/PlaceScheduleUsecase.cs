@@ -21,7 +21,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     }
 
     /// <summary>
-    /// 班リストを取得する
+    /// AP1003_班リストを取得する
     /// </summary>
     /// <param name="date">健診日</param>
     public async Task<PlaceScheduleTeams> GetTeamsAsync(DateOnly date)
@@ -53,7 +53,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     }
 
     /// <summary>
-    /// 班を指定して会場日程を取得する
+    /// AP1004_班を指定して会場日程を取得する
     /// </summary>
     public async Task<PlaceSchedulePlaces> GetTeamPlaceSchedulesAsync(DateOnly examDate, Guid teamId)
     {
@@ -85,7 +85,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     }
 
     /// <summary>
-    /// 会場ロック状態を取得する
+    /// AP1016_会場ロック状態を取得する
     /// </summary>
     public async Task<PlaceScheduleLocking> GetPlaceScheduleLockingStatusAsync(Guid placeScheduleId)
     {
@@ -103,7 +103,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     }
 
     /// <summary>
-    /// 会場ロック状態を更新する
+    /// AP1017_会場ロック状態を更新する
     /// </summary>
     public async Task UpdatePlaceScheduleLockingStatusAsync(Guid placeScheduleId, PlaceScheduleLockingStatus status)
     {

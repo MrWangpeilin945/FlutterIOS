@@ -8,7 +8,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 public interface ICancelReasonUsecase
 {
     /// <summary>
-    /// 中止理由を取得する
+    /// AP1011_中止理由を取得する
     /// </summary>
     public Task<CancelReasonList> GetCancelReasonsAsync();
 }

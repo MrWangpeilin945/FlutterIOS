@@ -22,7 +22,7 @@ public class AuthenticationUsecase : IAuthenticationUsecase
     }
 
     /// <summary>
-    /// ログインする
+    /// AP1001_ログインする
     /// </summary>
     /// <param name="identifier"></param>
     /// <param name="password"></param>

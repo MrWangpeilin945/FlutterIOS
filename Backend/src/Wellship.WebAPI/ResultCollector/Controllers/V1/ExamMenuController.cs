@@ -24,7 +24,7 @@ public class ExamMenuController : ControllerBase
     }
 
     /// <summary>
-    /// 検査メニュー一覧を取得する
+    /// AP1006_検査メニュー一覧を取得する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExamMenuList))]

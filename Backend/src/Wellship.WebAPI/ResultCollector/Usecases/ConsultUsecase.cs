@@ -40,7 +40,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 受診番号の受診が存在するか確認する
+    /// AP1007_受診番号の受診が存在するか確認する
     /// </summary>
     /// <param name="consultNumberRequest">受診番号リクエスト</param>
     /// <returns>受診が存在するか</returns>
@@ -56,7 +56,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 未受診の検査メニューを取得する
+    /// AP1008_未受診の検査メニューを取得する
     /// </summary>
     public async Task<UnexaminedMenuList> GetUnexaminedMenusAsync(string consultNumber)
     {
@@ -98,7 +98,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 検査内容を取得する
+    /// AP1010_検査内容を取得する
     /// </summary>
     public async Task<ExamContent> GetExamItemsExamineeAsync(string consultNumber, int examMenuId)
     {
@@ -193,7 +193,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 検査の実施有無と中止理由を登録する
+    /// AP1022_検査の実施有無と中止理由を登録する
     /// </summary>
     public async Task RegisterExecutionsAsync(string consultNumber, ExecutionsRequest request)
     {
@@ -270,7 +270,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 検査結果入力情報を取得する
+    /// AP1009_検査結果入力情報を取得する
     /// </summary>
     public async Task<InputExamItems> GetInputExamItemsExamineeAsync(string consultNumber, int examMenuId)
     {
@@ -515,7 +515,7 @@ public class ConsultUsecase : IConsultUsecase
                      .OrderByDescending(x => x.ErrorLevel);
     }
     /// <summary>
-    /// 検査結果を登録する
+    /// AP1014_検査結果を登録する
     /// </summary>
     public async Task RegisterResultsAsync(string consultNumber, ResultsRequest results)
     {
@@ -539,7 +539,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 検査結果を検証する
+    /// AP1013_検査結果を検証する
     /// </summary>
     public async Task<VerifyExamItems> VerifyResults(string consultNumber, ResultsRequest results)
     {

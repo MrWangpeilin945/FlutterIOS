@@ -26,7 +26,7 @@ public class ProgressController : ControllerBase
     }
 
     /// <summary>
-    /// 進捗状況を取得する
+    /// AP1015_進捗状況を取得する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceScheduleProgress))]
