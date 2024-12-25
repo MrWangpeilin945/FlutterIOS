@@ -130,6 +130,7 @@ CREATE TABLE exam_cancels (
 CREATE TABLE exam_item_detail_orders (
   consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
+  , external_exam_item_detail_code text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_item_detail_orders_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
@@ -883,6 +884,7 @@ COMMENT ON COLUMN exam_cancels.created_by IS '作成者';
 COMMENT ON TABLE exam_item_detail_orders IS '検査項目明細依頼';
 COMMENT ON COLUMN exam_item_detail_orders.consult_id IS '受診ID';
 COMMENT ON COLUMN exam_item_detail_orders.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_item_detail_orders.external_exam_item_detail_code IS '外部コード検査項目明細CD';
 COMMENT ON COLUMN exam_item_detail_orders.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_detail_orders.created_by IS '作成者';
 

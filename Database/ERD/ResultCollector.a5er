@@ -784,10 +784,11 @@ Left=1600
 Top=2650
 Field="受診ID","consult_id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="外部コード検査項目明細CD","external_exam_item_detail_code","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241015170905
+ModifiedDateTime=20241225163023
 Position="MAIN",1600,2650
 ZOrder=45
 
