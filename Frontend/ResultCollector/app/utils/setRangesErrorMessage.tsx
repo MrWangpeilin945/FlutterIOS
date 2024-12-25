@@ -24,7 +24,7 @@ const getMaxErrorLevelsByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
             typeof minValue === "number" &&
             typeof maxValue === "number" &&
             numericValue >= minValue &&
-            numericValue <= maxValue
+            numericValue < maxValue
         );
         if (matchRange) {
           matchExamRanges.push(matchRange);
