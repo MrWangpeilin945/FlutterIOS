@@ -6,8 +6,8 @@ import { useAtom } from "jotai";
 import { type AxiosResponse, isAxiosError } from "axios";
 import {
   useConsultGetInputExamItemsExaminee,
-  useResultRegisterResults,
-  useResultVerifyResults,
+  useConsultRegisterResults,
+  useConsultVerifyResults,
 } from "~/api/wellship";
 import type {
   ExamItemGroup,
@@ -16,7 +16,7 @@ import type {
   ResultsRequest,
   VerifyExamItems,
 } from "~/domain/wellship.schemas";
-import { InputErrorLevel } from "~/domain/enums";
+import { InputErrorLevel, ExamItemGroupType } from "~/domain/enums";
 import {
   connectionEquipmentState,
   examMenuState,
@@ -37,11 +37,12 @@ export default function ConsultInput() {
   const navigate = useNavigate();
   const [examData, setExamData] = useState<InputExamItems>();
   // パスパラメータの取得
-  const { consultnumber } = useParams();
-  const [consultNumber] = useState(Number(consultnumber));
+  const consultNumber = useParams().cousultnumber ?? undefined;
   // クエリパラメータの取得
   const [searchParams] = useSearchParams();
   const examMenuId = Number(searchParams.get("exammenuid"));
+  //APIのバージョン
+  const apiVersion = "1";
   const [staffData] = useAtom(staffState);
   const [examMenus] = useAtom(examMenuState);
   const [ConnectionEquipment] = useAtom(connectionEquipmentState);
@@ -52,7 +53,7 @@ export default function ConsultInput() {
     useDisclosure(false);
   const [commonMessage, setCommonMessage] = useState<string>("");
   const [confirmMessage, setConfirmMessage] = useState<string>("");
-  const [commonButtonMessage,setCommonButtonMessage] = useState<string>("");
+  const [commonButtonMessage, setCommonButtonMessage] = useState<string>("");
   const [visibleRemeasurement, setVisibleRemeasurement] = useState(true);
   const [disabledRemeasurement, setDisabledRemeasurement] = useState(false);
   //機器連携用
@@ -64,16 +65,15 @@ export default function ConsultInput() {
 
   //AP1009呼び出し用(GET系APIの定義)
   const { refetch } = useConsultGetInputExamItemsExaminee(
-    "1",
-    consultNumber, //stringになるかも
+    apiVersion,
+    consultNumber ?? "",
     { examMenuId: examMenuId },
     { query: { enabled: false } },
   );
 
   useEffect(() => {
     //受診番号の受け取り確認
-    //TODO:仕様変更予定
-    if (!consultnumber) {
+    if (!consultNumber) {
       setCommonMessage("必要な受診番号がありません");
       setCommonButtonMessage("閉じる");
       openCommon();
@@ -110,7 +110,7 @@ export default function ConsultInput() {
 
     inputExamItems();
     setIsLoading(false);
-  }, [consultnumber, examMenuId]);
+  }, [consultNumber, examMenuId]);
 
   useEffect(() => {
     if (!examData) return;
@@ -252,17 +252,17 @@ export default function ConsultInput() {
   };
 
   //AP1013_検査結果を検証する
-  const verifyMutateAsync = useResultVerifyResults().mutateAsync;
+  const verifyMutateAsync = useConsultVerifyResults().mutateAsync;
   const verifyResults = async () => {
     let result: AxiosResponse<VerifyExamItems>;
     const resultsRequest = makeBody();
-    if (!consultnumber) return;
+    if (!consultNumber) return;
 
     const postMutateAsync = async () => {
       try {
         result = await verifyMutateAsync({
-          version: "1",
-          consultNumber: consultnumber,
+          version: apiVersion,
+          consultNumber: consultNumber,
           data: resultsRequest,
         });
         if (result.status === 200) {
@@ -312,23 +312,23 @@ export default function ConsultInput() {
     const currentIndex = examMenus.findIndex((menu) => menu === examMenuId);
     if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
       const nextExam = examMenus[currentIndex + 1];
-      navigate(`/examorder-confirm/${consultnumber}?exammenuid=${nextExam}`);
+      navigate(`/examorder-confirm/${consultNumber}?exammenuid=${nextExam}`);
     } else {
-      navigate(`/consultnumber-input?consultnumber=${consultnumber}`);
+      navigate(`/consultnumber-input?consultnumber=${consultNumber}`);
     }
   };
 
   //AP1014_検査結果を登録する
-  const registMutateAsync = useResultRegisterResults().mutateAsync;
+  const registMutateAsync = useConsultRegisterResults().mutateAsync;
   const registerResults = async () => {
     let result: AxiosResponse;
     const resultsRequest = makeBody();
-    if (!consultnumber) return;
+    if (!consultNumber) return;
     const postMutateAsync = async () => {
       try {
         result = await registMutateAsync({
-          version: "1",
-          consultNumber: consultnumber,
+          version: apiVersion,
+          consultNumber: consultNumber,
           data: resultsRequest,
         });
         if (result.status === 200) {
@@ -391,10 +391,9 @@ export default function ConsultInput() {
     const handleChange = (updatedExamItem: InputExamItem[] | undefined) =>
       callbackChangeValue(updatedExamItem, groupIndex);
 
-    // TODO:enum参照予定
     // typeによるコンポーネントの切り替え
     switch (type) {
-      case 1:
+      case ExamItemGroupType.数値:
         return (
           <ExamNumeric
             key={groupIndex}
@@ -403,7 +402,7 @@ export default function ConsultInput() {
             onChange={handleChange}
           />
         );
-      case 2:
+      case ExamItemGroupType.選択:
         return (
           <ExamSelect
             key={groupIndex}
@@ -412,7 +411,7 @@ export default function ConsultInput() {
             onClick={handleChange}
           />
         );
-      case 3:
+      case ExamItemGroupType.血圧2回:
         return (
           <ExamBP2
             key={groupIndex}
@@ -421,7 +420,7 @@ export default function ConsultInput() {
             onChange={handleChange}
           />
         );
-      case 4:
+      case ExamItemGroupType.自由入力:
         return (
           <ExamFreeInput
             key={groupIndex}
@@ -430,7 +429,7 @@ export default function ConsultInput() {
             onChange={handleChange}
           />
         );
-      case 5:
+      case ExamItemGroupType.数値_左右:
         return (
           <ExamNumericLR
             key={groupIndex}
@@ -439,7 +438,7 @@ export default function ConsultInput() {
             onChange={handleChange}
           />
         );
-      case 6:
+      case ExamItemGroupType.選択_左右:
         return (
           <ExamSelectLR
             key={groupIndex}
@@ -448,7 +447,7 @@ export default function ConsultInput() {
             onClick={handleChange}
           />
         );
-      case 7:
+      case ExamItemGroupType.身体計測:
         return (
           <ExamBody
             key={groupIndex}
@@ -457,7 +456,7 @@ export default function ConsultInput() {
             onChange={handleChange}
           />
         );
-      case 8:
+      case ExamItemGroupType.視力:
         return (
           <ExamVision
             key={groupIndex}
@@ -466,7 +465,7 @@ export default function ConsultInput() {
             onChange={handleChange}
           />
         );
-      case 9:
+      case ExamItemGroupType.聴力:
         return (
           <ExamHearing
             key={groupIndex}
@@ -489,7 +488,7 @@ export default function ConsultInput() {
         <LoadingOverlay visible={isLoading} />
         <ExamineeHeader
           staffName={staffData?.name ?? ""}
-          managerId={staffData?.id ?? 0}
+          managerNo={staffData?.id ?? ""}
           name={examData?.examinee?.kanaName ?? ""}
           gender={examData?.examinee?.sex ?? 0}
           age={examData?.examinee?.examDateAge ?? 0}
