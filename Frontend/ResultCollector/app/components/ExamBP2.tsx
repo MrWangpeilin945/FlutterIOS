@@ -375,7 +375,7 @@ export default function ExamBP2({
     }
     const updatedExamItems = [...examItemsData];
     // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
-    let hasValidationError = true;
+    let hasValidationError = false;
 
     // 該当するitemを更新
     for (const item of updatedExamItems) {
@@ -401,7 +401,7 @@ export default function ExamBP2({
       const { validateResult, hasCallback } = validationCheck(item);
       if (!hasCallback) {
         // falseのexamItemがあればコールバックを行わない
-        hasValidationError = false;
+        hasValidationError = true;
       }
       // バリデーション結果を反映
       Object.assign(item, validateResult);
@@ -413,7 +413,7 @@ export default function ExamBP2({
     setExamItemsData(addAVEExamItems);
 
     // 全てのitemでバリデーションチェックが通った場合、コールバックする
-    if (hasValidationError) {
+    if (!hasValidationError) {
       onChange(addAVEExamItems);
     }
   };
