@@ -104,7 +104,7 @@ public class AuthService(AuthSettings authSettings,
             ValidateAudience = true,
             IssuerSigningKey = _authSettings.JwtSigningKey,
             ValidateIssuerSigningKey = true,
-
+            ValidateLifetime = false,
         };
 
         var tokenHandler = new JwtSecurityTokenHandler()
