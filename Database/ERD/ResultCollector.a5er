@@ -2040,8 +2040,8 @@ TermPos2=R
 ZOrder=115
 
 [Entity]
-PName=exam_menu_note_details
-LName=検査特記明細
+PName=exam_menu_note_codes
+LName=検査メニュー特記_コード
 Comment=
 TableInnerOption=
 TableOption=
@@ -2058,7 +2058,7 @@ Position="Main",3750,2650
 ZOrder=116
 
 [Relation]
-Entity1=exam_menu_note_details
+Entity1=exam_menu_note_codes
 Entity2=exam_menu_note_consults
 RelationType1=2
 RelationType2=3

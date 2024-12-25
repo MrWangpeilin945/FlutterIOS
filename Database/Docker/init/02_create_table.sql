@@ -679,7 +679,7 @@ ALTER TABLE exam_menu_note_consults
   ON UPDATE CASCADE;
 
 ALTER TABLE exam_menu_note_consults
-  ADD CONSTRAINT exam_menu_note_consults_FK2 FOREIGN KEY (code) REFERENCES exam_menu_note_details(code)
+  ADD CONSTRAINT exam_menu_note_consults_FK2 FOREIGN KEY (code) REFERENCES exam_menu_note_codes(code)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -888,11 +888,11 @@ COMMENT ON COLUMN exam_menu_note_consults.order_number IS '表示順';
 COMMENT ON COLUMN exam_menu_note_consults.created_at IS '作成日時';
 COMMENT ON COLUMN exam_menu_note_consults.created_by IS '作成者';
 
-COMMENT ON TABLE exam_menu_note_details IS '検査特記明細';
-COMMENT ON COLUMN exam_menu_note_details.code IS '検査特記コード';
-COMMENT ON COLUMN exam_menu_note_details.name IS '検査特記名';
-COMMENT ON COLUMN exam_menu_note_details.created_at IS '作成日時';
-COMMENT ON COLUMN exam_menu_note_details.created_by IS '作成者';
+COMMENT ON TABLE exam_menu_note_codes IS '検査メニュー特記_コード';
+COMMENT ON COLUMN exam_menu_note_codes.code IS '検査特記コード';
+COMMENT ON COLUMN exam_menu_note_codes.name IS '検査特記名';
+COMMENT ON COLUMN exam_menu_note_codes.created_at IS '作成日時';
+COMMENT ON COLUMN exam_menu_note_codes.created_by IS '作成者';
 
 COMMENT ON TABLE exam_menu_note_results IS '検査メニュー特記_検査結果';
 COMMENT ON COLUMN exam_menu_note_results.menu_note_id IS '検査メニュー特記ID';
