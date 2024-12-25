@@ -12,14 +12,18 @@ import {
 } from "@mantine/core";
 import { useClickOutside } from "@mantine/hooks";
 import NumericKeyboard from "~/components/NumericKeyboard";
+import CollectionKeyboard from "./CollectionKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import type {
   InputExamItem,
   ExamRegistResult,
 } from "~/domain/wellship.schemas";
-import { InputErrorLevel } from "~/domain/enums";
-import { IconExclamationCircleFilled } from "@tabler/icons-react";
+import { InputErrorLevel, KeyboardType } from "~/domain/enums";
+import {
+  IconExclamationCircleFilled,
+  IconSquareRoundedXFilled,
+} from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
 
 type ExamNumericProps = {
@@ -225,6 +229,7 @@ export default function ExamNumeric({
     value,
     integerLength,
     decimalLength,
+    keyboard,
   } = targetDetails ?? {};
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
@@ -293,31 +298,46 @@ export default function ExamNumeric({
         </Button>
       </Group>
       {/* エラーメッセージを表示する。 */}
-      {(examRegistResults || []).map((error, index) => (
-        <Group
-          key={index}
-          c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
-        >
-          <IconExclamationCircleFilled size={32} />
-          <Text>{error.description}</Text>
-        </Group>
-      ))}
+      {(examRegistResults || []).map((error, index) => {
+        const isWarning = error.errorLevel === InputErrorLevel.警告;
+        return (
+          <Group key={index} c={isWarning ? "warning" : "error"}>
+            {isWarning ? (
+              <IconExclamationCircleFilled size={32} />
+            ) : (
+              <IconSquareRoundedXFilled size={32} />
+            )}
+            <Text size="sm" fw={700}>
+              {error.description}
+            </Text>
+          </Group>
+        );
+      })}
       <Box ml={220} mt={50}>
         {showKeyboards && (
           <div ref={closeKeyBoard}>
-            <NumericKeyboard
-              value={value ?? ""}
-              integerLength={integerLength}
-              decimalLength={decimalLength}
-              onChange={(newValue) =>
-                handleChange(
-                  newValue,
-                  positionNumber ?? 0,
-                  detailPositionNumber ?? 0
-                )
-              }
-              onConfirm={handleConfirm}
-            />
+            {keyboard?.keyboardType === KeyboardType.テンキー ? (
+              <NumericKeyboard
+                value={value ?? ""}
+                integerLength={integerLength}
+                decimalLength={decimalLength}
+                onChange={(newValue) =>
+                  handleChange(
+                    newValue,
+                    positionNumber ?? 0,
+                    detailPositionNumber ?? 0
+                  )
+                }
+                onConfirm={handleConfirm}
+              />
+            ) : (
+              <CollectionKeyboard
+                keyboardValues={keyboard?.values ?? []}
+                onChange={(newValue) =>
+                  handleChange(newValue, positionNumber, detailPositionNumber)
+                }
+              />
+            )}
           </div>
         )}
       </Box>
