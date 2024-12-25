@@ -144,6 +144,14 @@ CREATE TABLE exam_menu_note_consults (
   , CONSTRAINT exam_menu_note_consults_PKC PRIMARY KEY (menu_note_id,code)
 );
 
+CREATE TABLE exam_menu_note_details (
+  code text NOT NULL
+  , name text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_menu_note_details_PKC PRIMARY KEY (code)
+);
+
 CREATE TABLE exam_menu_note_results (
   menu_note_id integer NOT NULL
   , exam_item_detail_id integer NOT NULL
@@ -670,6 +678,11 @@ ALTER TABLE exam_menu_note_consults
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE exam_menu_note_consults
+  ADD CONSTRAINT exam_menu_note_consults_FK2 FOREIGN KEY (code) REFERENCES exam_menu_note_details(code)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE exam_menu_note_results
   ADD CONSTRAINT exam_menu_note_results_FK1 FOREIGN KEY (menu_note_id) REFERENCES exam_menu_notes(menu_note_id)
   ON DELETE RESTRICT
@@ -874,6 +887,12 @@ COMMENT ON COLUMN exam_menu_note_consults.code IS '検査特記コード';
 COMMENT ON COLUMN exam_menu_note_consults.order_number IS '表示順';
 COMMENT ON COLUMN exam_menu_note_consults.created_at IS '作成日時';
 COMMENT ON COLUMN exam_menu_note_consults.created_by IS '作成者';
+
+COMMENT ON TABLE exam_menu_note_details IS '検査特記明細';
+COMMENT ON COLUMN exam_menu_note_details.code IS '検査特記コード';
+COMMENT ON COLUMN exam_menu_note_details.name IS '検査特記名';
+COMMENT ON COLUMN exam_menu_note_details.created_at IS '作成日時';
+COMMENT ON COLUMN exam_menu_note_details.created_by IS '作成者';
 
 COMMENT ON TABLE exam_menu_note_results IS '検査メニュー特記_検査結果';
 COMMENT ON COLUMN exam_menu_note_results.menu_note_id IS '検査メニュー特記ID';
