@@ -81,5 +81,25 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                 scope.Complete();
             }
         }
+
+        /// <summary>
+        /// 存在する団体コードを取得する。
+        /// </summary>
+        /// <param name="organizationCodes">団体コードリスト</param>
+        /// <returns>存在する団体コードリスト</returns>
+        public async Task<List<string>> GetOrganizationsByCodesAsync(List<string> organizationCodes)
+        {
+            var connection = await _dbConnectionProvider.GetOrOpenAsync();
+            var sql = @"
+                    select
+                        organization_code
+                    from
+                        resultcollector.organizations
+                    where
+                        organization_code = any(@OrganizationCodes);";
+
+            var result = await connection.QueryAsync<string>(sql, new { OrganizationCodes = organizationCodes.ToArray() });
+            return result.ToList();
+        }
     }
 }
