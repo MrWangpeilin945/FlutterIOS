@@ -40,8 +40,8 @@ export default function ExamBP2({
   const 血圧1回目 = 1;
   const 血圧2回目 = 2;
   const 平均値 = 3;
-  const 収縮期 = 1;
-  const 拡張期 = 2;
+  const 上 = 1;
+  const 下 = 2;
 
   // 引数のチェック
   if (!examItems || examItems.length === 0) {
@@ -49,27 +49,25 @@ export default function ExamBP2({
   }
   // positionNumberが1のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
   const hasBPfirst = examItems.find((item) => item.positionNumber === 1);
-  const hasContractionDetail1 = hasBPfirst?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 収縮期
+  const hasHighDetail1 = hasBPfirst?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 上
   );
-  const hasExpansionDetail1 = hasBPfirst?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 拡張期
+  const hasLowDetail1 = hasBPfirst?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 下
   );
-  const isValidBPfirst =
-    hasBPfirst && hasContractionDetail1 && hasExpansionDetail1;
+  const isValidBPfirst = hasBPfirst && hasHighDetail1 && hasLowDetail1;
 
   // positionNumberが2のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
   const hasBPsecond = examItems.find(
     (item) => item.positionNumber === 血圧2回目
   );
-  const hasContractionDetail2 = hasBPsecond?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 収縮期
+  const hasHighDetail2 = hasBPsecond?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 上
   );
-  const hasExpansionDetail2 = hasBPsecond?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 拡張期
+  const hasLowDetail2 = hasBPsecond?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 下
   );
-  const isValidBPsecond =
-    hasBPsecond && hasContractionDetail2 && hasExpansionDetail2;
+  const isValidBPsecond = hasBPsecond && hasHighDetail2 && hasLowDetail2;
 
   // 両方を満たさない時、nullを返す
   if (!isValidBPfirst && !isValidBPsecond) {
@@ -78,34 +76,34 @@ export default function ExamBP2({
 
   // positionNumberが3のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
   const hasAVE = examItems.find((item) => item.positionNumber === 平均値);
-  const hasContractionDetail3 = hasAVE?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 収縮期
+  const hasHighDetail3 = hasAVE?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 上
   );
-  const hasExpansionDetail3 = hasAVE?.examItemDetails?.some(
-    (detail) => detail.positionNumber === 拡張期
+  const hasLowDetail3 = hasAVE?.examItemDetails?.some(
+    (detail) => detail.positionNumber === 下
   );
-  const isValidAVE = hasAVE && hasContractionDetail3 && hasExpansionDetail3;
+  const isValidAVE = hasAVE && hasHighDetail3 && hasLowDetail3;
 
   // examItemの管理
   const [examItemsData, setExamItemsData] = useState(examItems);
   // キーボードの表示状態を管理する
   const [showKeyboards, setShowKeyboards] = useState<{
     first: {
-      contraction: boolean;
-      expansion: boolean;
+      high: boolean;
+      low: boolean;
     };
     second: {
-      contraction: boolean;
-      expansion: boolean;
+      high: boolean;
+      low: boolean;
     };
   }>({
     first: {
-      contraction: false,
-      expansion: false,
+      high: false,
+      low: false,
     },
     second: {
-      contraction: false,
-      expansion: false,
+      high: false,
+      low: false,
     },
   });
 
@@ -113,12 +111,12 @@ export default function ExamBP2({
   const closeKeyBoard = useClickOutside(() => {
     setShowKeyboards({
       first: {
-        contraction: false,
-        expansion: false,
+        high: false,
+        low: false,
       },
       second: {
-        contraction: false,
-        expansion: false,
+        high: false,
+        low: false,
       },
     });
   });
@@ -127,12 +125,12 @@ export default function ExamBP2({
   const handleConfirm = () => {
     setShowKeyboards({
       first: {
-        contraction: false,
-        expansion: false,
+        high: false,
+        low: false,
       },
       second: {
-        contraction: false,
-        expansion: false,
+        high: false,
+        low: false,
       },
     });
   };
@@ -145,27 +143,27 @@ export default function ExamBP2({
     setShowKeyboards((prev) => {
       const updated = { ...prev };
       if (positionNumber === 血圧1回目) {
-        if (detailPositionNumber === 収縮期) {
+        if (detailPositionNumber === 上) {
           updated.first = {
             ...updated.first,
-            contraction: !updated.first.contraction,
+            high: !updated.first.high,
           };
-        } else if (detailPositionNumber === 拡張期) {
+        } else if (detailPositionNumber === 下) {
           updated.first = {
             ...updated.first,
-            expansion: !updated.first.expansion,
+            low: !updated.first.low,
           };
         }
       } else if (positionNumber === 血圧2回目) {
-        if (detailPositionNumber === 収縮期) {
+        if (detailPositionNumber === 上) {
           updated.second = {
             ...updated.second,
-            contraction: !updated.second.contraction,
+            high: !updated.second.high,
           };
-        } else if (detailPositionNumber === 拡張期) {
+        } else if (detailPositionNumber === 下) {
           updated.second = {
             ...updated.second,
-            expansion: !updated.second.expansion,
+            low: !updated.second.low,
           };
         }
       }
@@ -203,19 +201,19 @@ export default function ExamBP2({
   };
   // 血圧の上下の値が適正かのチェック
   const validateBPValues = (item: InputExamItem) => {
-    const bpH_value =
-      item.examItemDetails?.find((detail) => detail.positionNumber === 収縮期)
+    const bpHValue =
+      item.examItemDetails?.find((detail) => detail.positionNumber === 上)
         ?.value ?? null;
-    const bpL_value =
-      item.examItemDetails?.find((detail) => detail.positionNumber === 拡張期)
+    const bpLValue =
+      item.examItemDetails?.find((detail) => detail.positionNumber === 下)
         ?.value ?? null;
     if (
-      bpH_value &&
-      bpL_value &&
-      Number.parseFloat(bpH_value) <= Number.parseFloat(bpL_value)
+      bpHValue &&
+      bpLValue &&
+      Number.parseFloat(bpHValue) <= Number.parseFloat(bpLValue)
     ) {
       const BPErrorMessage: ExamRegistResult = {
-        description: "入力個所を確認してください",
+        description: "血圧の値が逆転しています。",
         errorLevel: InputErrorLevel.警告,
       };
       return BPErrorMessage;
@@ -237,7 +235,7 @@ export default function ExamBP2({
     const componentErrorMessage: ExamRegistResult[] = [];
     // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
     for (const { name, positionNumber, value } of item.examItemDetails ?? []) {
-      if (positionNumber !== 収縮期 && positionNumber !== 拡張期) {
+      if (positionNumber !== 上 && positionNumber !== 下) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
       }
       // 必須チェックと半角数字チェックを一度に行うスキーマ
@@ -318,14 +316,14 @@ export default function ExamBP2({
     for (const item of updatedExamItems) {
       for (const detail of item.examItemDetails ?? []) {
         if (item.positionNumber === 血圧1回目) {
-          if (detail.positionNumber === 収縮期) {
+          if (detail.positionNumber === 上) {
             if (detail.value !== undefined) {
               const parsedValue = Number.parseFloat(detail.value);
               if (!Number.isNaN(parsedValue)) {
                 bpH_values.push(parsedValue);
               }
             }
-          } else if (detail.positionNumber === 拡張期) {
+          } else if (detail.positionNumber === 下) {
             if (detail.value !== undefined) {
               const parsedValue = Number.parseFloat(detail.value);
               if (!Number.isNaN(parsedValue)) {
@@ -334,14 +332,14 @@ export default function ExamBP2({
             }
           }
         } else if (item.positionNumber === 血圧2回目) {
-          if (detail.positionNumber === 収縮期) {
+          if (detail.positionNumber === 上) {
             if (detail.value !== undefined) {
               const parsedValue = Number.parseFloat(detail.value);
               if (!Number.isNaN(parsedValue)) {
                 bpH_values.push(parsedValue);
               }
             }
-          } else if (detail.positionNumber === 拡張期) {
+          } else if (detail.positionNumber === 下) {
             if (detail.value !== undefined) {
               const parsedValue = Number.parseFloat(detail.value);
               if (!Number.isNaN(parsedValue)) {
@@ -368,13 +366,13 @@ export default function ExamBP2({
           const integerLength = detail.integerLength ?? 0;
           const maxDigits = integerLength; // 平均値では小数点を考慮しない
 
-          if (detail.positionNumber === 収縮期) {
+          if (detail.positionNumber === 上) {
             return {
               ...detail,
               value: bpH_AVE.toString().slice(0, maxDigits),
             };
           }
-          if (detail.positionNumber === 拡張期) {
+          if (detail.positionNumber === 下) {
             return {
               ...detail,
               value: bpL_AVE.toString().slice(0, maxDigits),
@@ -446,7 +444,7 @@ export default function ExamBP2({
   let BPfirstItem: InputExamItem = {
     positionNumber: 血圧1回目,
     name: "血圧1",
-    examItemDetails: [{ positionNumber: 収縮期 }, { positionNumber: 拡張期 }],
+    examItemDetails: [{ positionNumber: 上 }, { positionNumber: 下 }],
   };
   if (isValidBPfirst) {
     BPfirstItem =
@@ -457,7 +455,7 @@ export default function ExamBP2({
   let BPsecondItem: InputExamItem = {
     positionNumber: 血圧2回目,
     name: "血圧2",
-    examItemDetails: [{ positionNumber: 収縮期 }, { positionNumber: 拡張期 }],
+    examItemDetails: [{ positionNumber: 上 }, { positionNumber: 下 }],
   };
   if (isValidBPsecond) {
     BPsecondItem =
@@ -468,7 +466,7 @@ export default function ExamBP2({
   let AVEItem: InputExamItem = {
     positionNumber: 平均値,
     name: "平均",
-    examItemDetails: [{ positionNumber: 収縮期 }, { positionNumber: 拡張期 }],
+    examItemDetails: [{ positionNumber: 上 }, { positionNumber: 下 }],
   };
   if (isValidAVE) {
     AVEItem =
@@ -486,13 +484,11 @@ export default function ExamBP2({
           name,
           examRegistResults = [],
         } = item;
-        const contractionDetail = examItemDetails?.find(
-          (detail: ExamItemDetail) =>
-            detail.positionNumber === 収縮期 ? detail : []
+        const highDetail = examItemDetails?.find((detail: ExamItemDetail) =>
+          detail.positionNumber === 上 ? detail : []
         );
-        const expansionDetail = examItemDetails?.find(
-          (detail: ExamItemDetail) =>
-            detail.positionNumber === 拡張期 ? detail : []
+        const lowDetail = examItemDetails?.find((detail: ExamItemDetail) =>
+          detail.positionNumber === 下 ? detail : []
         );
         const isAVE = item?.positionNumber === 平均値;
 
@@ -586,7 +582,7 @@ export default function ExamBP2({
                         disabled={isDisabled}
                       />
                     )}
-                    {detail?.positionNumber === 収縮期 && (
+                    {detail?.positionNumber === 上 && (
                       <Text w={30} h={72} ml={16} c="gray02" size="80px">
                         /
                       </Text>
@@ -595,13 +591,12 @@ export default function ExamBP2({
                 );
               })}
               <Stack w={216} gap={4} mt="auto">
-                {contractionDetail?.prevValue && expansionDetail?.prevValue && (
+                {highDetail?.prevValue && lowDetail?.prevValue && (
                   <Text fw={700}>
-                    (前回：{contractionDetail.prevValue}/
-                    {expansionDetail.prevValue})
+                    (前回：{highDetail.prevValue}/{lowDetail.prevValue})
                   </Text>
                 )}
-                <Text size="xs">{contractionDetail?.unit}</Text>
+                <Text size="xs">{highDetail?.unit}</Text>
               </Stack>
               {!isAVE && (
                 <Button
@@ -638,11 +633,7 @@ export default function ExamBP2({
                 {positionNumber !== 平均値 &&
                   showKeyboards[
                     positionNumber === 血圧1回目 ? "first" : "second"
-                  ][
-                    detail?.positionNumber === 収縮期
-                      ? "contraction"
-                      : "expansion"
-                  ] && (
+                  ][detail?.positionNumber === 上 ? "high" : "low"] && (
                     <Box ref={closeKeyBoard} ml={257}>
                       {detail?.keyboard?.keyboardType ===
                       KeyboardType.テンキー ? (
