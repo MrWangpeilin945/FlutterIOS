@@ -3,7 +3,6 @@ import {
   Button,
   Container,
   LoadingOverlay,
-  Paper,
   Stack,
   Text,
 } from "@mantine/core";
@@ -16,7 +15,7 @@ import { useHomeMenuGetHomeMenuSettings } from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
 import CommonDialog from "~/components/CommonDialog";
 import CommonHeader from "~/components/CommonHeader";
-import { PlaceScheduleLockingStatus } from "~/domain/enums";
+import { PlaceScheduleLockingStatus, Role } from "~/domain/enums";
 import type { HomeMenu, HomeMenuGroupList } from "~/domain/wellship.schemas";
 import { placeScheduleState, staffState, teamState } from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
@@ -55,14 +54,11 @@ export default function Home() {
   //ホームメニューボタンの名称を取得
   const getMenuName = (menus: HomeMenu, placeSchedulelocking: number) => {
     let name = "";
-    if (!team || !placeSchedule) {
-      //jotaiの班、会場のどちらかがない場合
-      name = `${menus.menuName}【班と会場を選択してください】`;
-    } else if (
+    if (
       isPlaceSelected(menus?.availableConditions || []) &&
-      !placeSchedule
+      (!team || !placeSchedule)
     ) {
-      //availableConditions[placeScheduleSelected]有りで、jotaiのplaceScheduleStateに値がない場合
+      //availableConditions[placeScheduleSelected]有りで、jotaiの班／jotaiの会場 のどれか値がない場合
       name = `${menus.menuName}【班と会場を選択してください】`;
     } else if (
       isPlaceUnlocked(menus?.availableConditions || []) &&
@@ -77,16 +73,24 @@ export default function Home() {
   };
 
   //ホームメニューボタンのdisabled(押下可能/不可)を取得
-  const getDisabled = (menus: HomeMenu) => {
+  const getDisabled = (
+    menus: HomeMenu,
+    placeSchedulelocking: number,
+    staffRole: number,
+  ) => {
     let disabled = false;
-    if (!team || !placeSchedule) {
-      //jotaiの班、会場のどちらかがない場合
+    if (
+      isPlaceSelected(menus?.availableConditions || []) &&
+      (!team || !placeSchedule)
+    ) {
+      //availableConditions[placeScheduleSelected]有りで、jotaiの班／jotaiの会場 のどれか値がない場合
       disabled = true;
     } else if (
-      isPlaceSelected(menus?.availableConditions || []) &&
-      !placeSchedule
+      isPlaceUnlocked(menus?.availableConditions || []) &&
+      placeSchedulelocking === PlaceScheduleLockingStatus.検査完了 &&
+      staffRole === Role.一般
     ) {
-      //availableConditions[placeScheduleSelected]有りで、jotaiのplaceScheduleStateに値がない場合
+      //availableConditions[placeScheduleUnlocked]有りで、placeSchedulelockingStatusの値が(検査完了)で、権限なし(一般)の場合
       disabled = true;
     }
     return disabled;
@@ -230,7 +234,12 @@ export default function Home() {
                                 homeMenuGroupData.placeScheduleLockingStatus ||
                                   0,
                               )}
-                              disabled={getDisabled(menus)}
+                              disabled={getDisabled(
+                                menus,
+                                homeMenuGroupData.placeScheduleLockingStatus ||
+                                  0,
+                                homeMenuGroupData.staffRole || 0,
+                              )}
                               onClick={() => navigate(`/${menus.path}`)}
                               marginBottom={
                                 homeMenuGroup.menus
