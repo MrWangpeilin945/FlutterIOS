@@ -1536,11 +1536,11 @@ Field="ID","id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
 Field="受診ID","consult_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
 Field="受付番号","ticket_number","text",,,"","",$FFFFFFFF,""
 Field="操作区分","action_type","varchar(1)","NOT NULL",,"","I:Ins/U:Upd/D:Del",$FFFFFFFF,""
-Field="登録順","order","integer","NOT NULL",,"","一括処理時",$FFFFFFFF,""
+Field="登録順","order_number","integer","NOT NULL",,"","一括処理時",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241224095341
+ModifiedDateTime=20241225171306
 Position="MAIN",250,2450,468,167
 ZOrder=93
 
