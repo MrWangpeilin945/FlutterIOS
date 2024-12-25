@@ -133,6 +133,11 @@ public class AuthService(AuthSettings authSettings,
         {
             return (false, null);
         }
+        // 職員が無効になっている場合は更新させません
+        if (!staff.Enabled)
+        {
+            return (false, null);
+        }
         // リフレッシュトークンをチェックします
         var storedRefreshToken = await _refreshTokenRepository.GetRefreshTokenOrNullAsync(staffId);
         if (storedRefreshToken is null || storedRefreshToken.Token != refreshToken || storedRefreshToken.ExpiresAt < _timeProvider.GetUtcNow())
