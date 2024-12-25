@@ -286,5 +286,17 @@ insert into exam_normal_value_range(name, threshold_id, exam_item_detail_id, max
     , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',711,'9999999','00000',3,9999,301,3,CURRENT_TIMESTAMP,'init')
     , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init')
     , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',721,'9999999','00000',3,9999,301,3,CURRENT_TIMESTAMP,'init')
-    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init'); 
+    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init');
 
+-- 検査実施判定ルール
+insert into decision_rules(decision_rule_id,name,exam_menu_id,priority,trigger_type,error_level,message,created_at,created_by) VALUES 
+    (1,'体重差が前年より20kgオーバー',7,1,1,3,'体重の計測ミスのため実施できません。',CURRENT_TIMESTAMP,'init');
+
+-- 検査実施判断ルール_判定値
+insert into decision_rule_evaluations(decision_rule_id,variable_number,evaluation_value,created_at,created_by) VALUES 
+    (1,1,30.0,CURRENT_TIMESTAMP,'init');
+
+-- 検査実施判断ルール_検査項目明細
+insert into decision_rule_exam_item_details(decision_rule_id,variable_number,source_type,exam_item_detail_id,created_at,created_by) VALUES
+    (1,1,1,2,CURRENT_TIMESTAMP,'init')
+  , (1,2,2,2,CURRENT_TIMESTAMP,'init');
