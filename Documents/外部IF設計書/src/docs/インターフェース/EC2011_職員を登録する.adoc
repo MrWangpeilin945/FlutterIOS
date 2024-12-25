@@ -103,10 +103,15 @@ list.Count()  <> 0
 |string
 |パスワード
 
+|Enabled
+|Yes
+|boolean
+|有効
+
 |Role
 |Yes
 |enum<Wellship.Core\Enums\Role>
-|パスワード
+|ロール
 
 |InputNote
 |Yes
@@ -196,6 +201,10 @@ list.Count()  <> 0
 |password_salt
 |Staff.Password
 |`※TODO` 計算結果を格納
+
+|enabled
+|Staff.Enabled
+|
 
 |role_id
 |Staff.Role
