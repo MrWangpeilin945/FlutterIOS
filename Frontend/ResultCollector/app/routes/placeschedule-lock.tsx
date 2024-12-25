@@ -58,7 +58,7 @@ export default function PlaceScheduleLock() {
     },
     {
       placeScheduleLockingStatus: PlaceScheduleLockingStatus.検査中,
-      buttonName: "ロック解除",
+      buttonName: "会場ロック解除",
     },
   ];
 
@@ -94,7 +94,7 @@ export default function PlaceScheduleLock() {
     fetchGetPlaceScheduleLocking();
   }, []);
 
-  // ボタン(会場ロック, ロック解除)クリック
+  // ボタン(会場ロック, 会場ロック解除)クリック
   const handleButtonClick = async (
     lockingStatus: PlaceScheduleLockingStatus,
   ) => {
