@@ -196,6 +196,8 @@ public static class IServiceCollectionExtension
                 {
                     // JWTのクレーム名を自動でマッピングしない設定です。
                     x.MapInboundClaims = false;
+                    x.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Sub;
+                    x.TokenValidationParameters.RoleClaimType = CustomClaimTypes.Role;
                     // NOTE: Issはアクセスされたホスト名を使用したいためカスタム検証で検証します
                     x.TokenValidationParameters.ValidateIssuer = false;
                     // NOTE: Audはアクセスされたホスト名を使用したいためカスタム検証で検証します
