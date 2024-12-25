@@ -284,28 +284,12 @@ public class ConsultUsecase : IConsultUsecase
         // NOTE: 年齢加算日は暫定で前日年齢加算
         Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
         // 検査メニューに関連した検査項目情報を取得
-        var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
+        var examItemGroup = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
         // 検査項目明細IDを取得
-        var examItemDetailIds = examItemGroups.SelectMany(group => group.ExamItems)
+        var examItemDetailIds = examItemGroup.SelectMany(group => group.ExamItems)
                                               .SelectMany(item => item.ExamItemDetails)
                                               .Select(detail => detail.ExamItemDetailId)
                                               .ToArray();
-        // キーボード入力値リスト
-        var Keyboards = await _examItemRepository.GetKeyboardOptionssAsync(examItemDetailIds);
-        // 検査項目明細選択肢
-        var examItemDetailOptions = await _examItemRepository.GetExamItemDetailOptionsAsync(examItemDetailIds);
-        // 基準値パターンIDを取得
-        var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
-        // 検査正常値範囲を取得
-        IEnumerable<Domain.Models.ExamNormalValueRange> examNormalValueRanges = [];
-        if (thresholds.Any())
-        {
-            examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
-        }
-        // 検査中止を取得
-        var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
-        // 検査依頼を取得
-        var examOrders = await _consultRepository.GetExamOrdersAsync(consult.ConsultId);
         // 検査結果を取得
         var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
         // 過去検査結果を取得
@@ -323,6 +307,25 @@ public class ConsultUsecase : IConsultUsecase
             ExamItemName = x.MenuNoteName,
             ExamResult = x.GetDisplayText()
         }).ToArray();
+        // リクエストの検査結果を組み立てる
+        var results = new ResultsRequest
+        {
+            ExamMenuId = examMenuId,
+            ExamResults = 
+                examItemGroup.SelectMany(group => group.ExamItems)
+                                .Select(item => new ResultRequest 
+                                {
+                                    ExamItemId = item.ExamItemId,
+                                    ExamItemDetails = item.ExamItemDetails.Select(detail => new ExamItemDetailRequest
+                                    {
+                                        ExamItemDetailId = detail.ExamItemDetailId,
+                                        Value = examResults.ExamItemDetailResults.Where(result => result.ExamItemDetailId == detail.ExamItemDetailId)
+                                                                                    .SingleOrDefault()?.Value ?? ""
+                                    }).ToArray()
+                                }).ToArray()
+        };
+        // 検査項目グループ情報を取得する
+        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, examMenuId, results, examItemGroup, examResults, previousResults);
 
         return new InputExamItems()
         {
@@ -335,62 +338,7 @@ public class ConsultUsecase : IConsultUsecase
                 ExamDateAge = examAge.Years
             },
             RelatedExamItems = relatedExamItems,
-            ExamItemGroups =
-                examItemGroups.Select(eg => new APIModels.Responses.ExamItemGroup
-                {
-                    Type = (int)eg.Type,
-                    ExamItems = eg.ExamItems.Select(ei => new InputExamItem
-                    {
-                        PositionNumber = ei.PositionNumber,
-                        ExamItemId = ei.ExamItemId,
-                        Name = ei.Name,
-                        ExamItemDetails = ei.ExamItemDetails.Select(ed => new APIModels.Responses.ExamItemDetail
-                        {
-                            PositionNumber = ed.PositionNumber,
-                            ExamItemDetailId = ed.ExamItemDetailId,
-                            EquipmentLabel = ed.EquipmentLabel,
-                            Name = ed.Name,
-                            HasOrder = examOrders.ExamItemDetailOrders.Any(x => x.ExamItemDetailId == ed.ExamItemDetailId),
-                            CancelReasonId = examCancels.ExamItemDetailCancels.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.CancelReasonId,
-                            Value = examResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
-                            PrevValue = previousResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
-                            Unit = ed.Unit,
-                            Type = (int)ed.Type,
-                            IntegerLength = ed.IntegerLength,
-                            DecimalLength = ed.DecimalLength,
-                            // キーボード入力
-                            Keyboard = new APIModels.Responses.Keyboard
-                            {
-                                KeyboardType = (int)ed.KeyboardType,
-                                Values = Keyboards.Where(kb => kb.ExamItemDetailId == ed.ExamItemDetailId)
-                                                  .OrderBy(kb => kb.OptionId)
-                                                  .Select(kb => kb.Value)
-                                                  .ToArray()
-                            },
-                            // 選択肢
-                            ExamItemDetailOptions =
-                                examItemDetailOptions.Where(op => op.ExamItemDetailId == ed.ExamItemDetailId)
-                                                     .OrderBy(op => op.OrderNumber)
-                                                     .Select(op => new APIModels.Responses.ExamItemDetailOption
-                                                     {
-                                                         OrderNumber = op.OrderNumber,
-                                                         Code = op.Code,
-                                                         Name = op.Name
-                                                     }).ToArray(),
-                            // 検査正常値範囲
-                            ExamNormalValueRanges =
-                                examNormalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
-                                                     .OrderBy(r => r.ErrorLevel)
-                                                     .Select(r => new APIModels.Responses.ExamNormalValueRange
-                                                     {
-                                                         ErrorLevel = (int)r.ErrorLevel,
-                                                         MaxValue = r.MaxValue,
-                                                         MinValue = r.MinValue
-                                                     }).ToArray()
-                        }).ToArray(),
-                        ExamRegistResults = []      // TODO: 検査結果登録エラー 後方作業へ
-                    }).ToArray()
-                }).ToArray()
+            ExamItemGroups = examItemGroups.ToArray()
         };
     }
 
@@ -514,6 +462,59 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
+    /// 検査基準値を検証する
+    /// </summary>
+    public async Task<IEnumerable<Domain.Models.RangeError>> ValidateNormalValueRangeAsync(string consultNumber, ResultsRequest result)
+    {
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
+        var examDate = placeSchedule.ExamDate;
+        // 受診日の年齢
+        // NOTE: 年齢加算日は暫定で前日年齢加算
+        var examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+
+        // DBとリクエスト値から今回値を取得して合成する（リクエスト値を優先する）
+        var dbCurrentResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
+        var dbCurrentMap = dbCurrentResults.ExamItemDetailResults.ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+        var requestMap = result.ExamResults.SelectMany(x => x.ExamItemDetails).ToDictionary(x => x.ExamItemDetailId, x => x.Value);
+        var currentMap = requestMap.Concat(dbCurrentMap.Where(x => !requestMap.ContainsKey(x.Key)))
+                                   .ToDictionary(x => x.Key, x => x.Value);
+
+        var examItemDetailIds = currentMap.Select(x => x.Key).ToArray();
+
+        // 検査基準値範囲を取得（年齢と性別による絞り込み）
+        var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
+        var ranges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
+
+        // 今回値に対して範囲チェック
+        var errors = new List<Domain.Models.RangeError>();
+        foreach (var current in currentMap)
+        {
+            // 検査結果がMin以上Max未満に当てはまる範囲の設定を取得する
+            var range = ranges.Where(x => x.ExamItemDetailId == current.Key && x.ValueInRange(current.Value))
+                              .OrderBy(x => x.Priority)
+                              .FirstOrDefault();
+
+            if (range is not null)
+            {
+                errors.Add(new Domain.Models.RangeError()
+                {
+                    Name = range.Name,
+                    ExamItemDetailId = range.ExamItemDetailId,
+                    MinValue = range.MinValue,
+                    MaxValue = range.MaxValue,
+                    ErrorLevel = range.ErrorLevel
+                });
+            }
+        }
+
+        // 条件に一致した範囲のうち、エラーレベルが警告と異常の結果のみ返す
+        var errorLevels = new List<InputErrorLevel>() { InputErrorLevel.警告, InputErrorLevel.異常 };
+        return errors.Where(x => errorLevels.Contains(x.ErrorLevel))
+                     .OrderByDescending(x => x.ErrorLevel);
+    }
+    /// <summary>
     /// 検査結果を登録する
     /// </summary>
     public async Task RegisterResultsAsync(string consultNumber, ResultsRequest results)
@@ -540,8 +541,125 @@ public class ConsultUsecase : IConsultUsecase
     /// <summary>
     /// 検査結果を検証する
     /// </summary>
-    public void VerifyResults()
+    public async Task<VerifyExamItems> VerifyResults(string consultNumber, ResultsRequest results)
     {
+        // 受診を取得
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
+        // 会場日程IDを指定して会場日程を取得する
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
+        // 健診日
+        DateOnly examDate = placeSchedule.ExamDate;
+        // 受診日の年齢
+        // NOTE: 年齢加算日は暫定で前日年齢加算
+        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 検査結果を取得
+        var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
+        // 過去検査結果を取得
+        var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
+        // 検査メニューに関連した検査項目情報を取得
+        var examItemGroup = await _examItemRepository.GetExamItemGroupsAsync(results.ExamMenuId);
+        // 検査項目グループ情報を取得する
+        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, results.ExamMenuId, results, examItemGroup,examResults, previousResults);
+        return new VerifyExamItems
+        {
+            // 検査項目グループ情報を取得する
+            ExamItemGroups = examItemGroups.ToArray()
+        };
+    }
 
+    /// <summary>
+    /// 検査項目グループ情報を取得する
+    /// </summary>
+    private async Task<IEnumerable<APIModels.Responses.ExamItemGroup>> GetExamItemGroups(string consultNumber, Guid consultId, Domain.Models.Age examAge, Sex sex, int examMenuId,
+                                                                                         ResultsRequest results, IEnumerable<Domain.Models.ExamItemGroup> examItemGroup, 
+                                                                                         Domain.Models.ExamResult examResults, Domain.Models.PreviousResult previousResults)
+    {
+        // 検査項目明細IDを取得
+        var examItemDetailIds = examItemGroup.SelectMany(group => group.ExamItems)
+                                              .SelectMany(item => item.ExamItemDetails)
+                                              .Select(detail => detail.ExamItemDetailId)
+                                              .ToArray();
+        // キーボード入力値リスト
+        var Keyboards = await _examItemRepository.GetKeyboardOptionssAsync(examItemDetailIds);
+        // 検査項目明細選択肢
+        var examItemDetailOptions = await _examItemRepository.GetExamItemDetailOptionsAsync(examItemDetailIds);
+        // 基準値パターンIDを取得
+        var thresholds = await _consultRepository.GetConsultThresholds(consultId);
+        // 検査基準値範囲を取得
+        IEnumerable<Domain.Models.ExamNormalValueRange> examNormalValueRanges = [];
+        if (thresholds.Any())
+        {
+            examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, sex);
+        }
+        // 検査中止を取得
+        var examCancels = await _consultRepository.GetExamCancelsAsync(consultId);
+        // 検査依頼を取得
+        var examOrders = await _consultRepository.GetExamOrdersAsync(consultId);
+        // 検査基準値を検証する
+        var rangeErrors = await ValidateNormalValueRangeAsync(consultNumber, results);
+
+        return examItemGroup.Select(eg => new APIModels.Responses.ExamItemGroup
+            {
+                Type = (int)eg.Type,
+                ExamItems = eg.ExamItems.Select(ei => new InputExamItem
+                {
+                    PositionNumber = ei.PositionNumber,
+                    ExamItemId = ei.ExamItemId,
+                    Name = ei.Name,
+                    ExamItemDetails = ei.ExamItemDetails.Select(ed => new APIModels.Responses.ExamItemDetail
+                    {
+                        PositionNumber = ed.PositionNumber,
+                        ExamItemDetailId = ed.ExamItemDetailId,
+                        EquipmentLabel = ed.EquipmentLabel,
+                        Name = ed.Name,
+                        HasOrder = examOrders.ExamItemDetailOrders.Any(x => x.ExamItemDetailId == ed.ExamItemDetailId),
+                        CancelReasonId = examCancels.ExamItemDetailCancels.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.CancelReasonId,
+                        Value = examResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
+                        PrevValue = previousResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
+                        Unit = ed.Unit,
+                        Type = (int)ed.Type,
+                        IntegerLength = ed.IntegerLength,
+                        DecimalLength = ed.DecimalLength,
+                        // キーボード入力
+                        Keyboard = new APIModels.Responses.Keyboard
+                        {
+                            KeyboardType = (int)ed.KeyboardType,
+                            Values = Keyboards.Where(kb => kb.ExamItemDetailId == ed.ExamItemDetailId)
+                                                .OrderBy(kb => kb.OptionId)
+                                                .Select(kb => kb.Value)
+                                                .ToArray()
+                        },
+                        // 選択肢
+                        ExamItemDetailOptions =
+                            examItemDetailOptions.Where(op => op.ExamItemDetailId == ed.ExamItemDetailId)
+                                                    .OrderBy(op => op.OrderNumber)
+                                                    .Select(op => new APIModels.Responses.ExamItemDetailOption
+                                                    {
+                                                        OrderNumber = op.OrderNumber,
+                                                        Code = op.Code,
+                                                        Name = op.Name
+                                                    }).ToArray(),
+                        // 検査基準値範囲
+                        ExamNormalValueRanges =
+                            examNormalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
+                                                    .OrderBy(r => r.ErrorLevel)
+                                                    .Select(r => new APIModels.Responses.ExamNormalValueRange
+                                                    {
+                                                        ErrorLevel = (int)r.ErrorLevel,
+                                                        MaxValue = r.MaxValue,
+                                                        MinValue = r.MinValue
+                                                    }).ToArray()
+                    }).ToArray(),
+                    // 検査基準値エラー
+                    ExamRegistResults = 
+                        rangeErrors.Where(err => ei.ExamItemDetails.Select(ed => ed.ExamItemDetailId).Contains(err.ExamItemDetailId))
+                                   .Select(err => new ExamRegistResult
+                                    {
+                                        ErrorLevel = (int)err.ErrorLevel,
+                                        Description = err.Name 
+                                    }).ToArray()
+                }).ToArray()
+            }).ToArray();        
     }
 }
