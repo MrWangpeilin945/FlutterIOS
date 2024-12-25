@@ -62,7 +62,6 @@
 [source,json]
 ----
 {
-  "errorLevel" : 3,
   "examItemGroups" :[
     {
       "type" : 1,

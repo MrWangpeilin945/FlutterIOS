@@ -262,3 +262,29 @@ insert into exam_menu_note_consults(menu_note_id,code,order_number,created_at,cr
 insert into consult_notes(consult_id, code, note, created_at, created_by) VALUES
     ('8dda2a54-5217-425f-bba9-ab821a9647fe','ST01','01-001',CURRENT_TIMESTAMP,'init')
   , ('8dda2a54-5217-425f-bba9-ab821a9647fe','ST02','02-001',CURRENT_TIMESTAMP,'init');
+
+-- 基準値パターン
+insert into thresholds(threshold_id, threshold_code, name, order_number, created_at, created_by) VALUES
+    ('aa114e6d-c63e-4f44-96fa-42989129147a','701','収縮期血圧',1,CURRENT_TIMESTAMP,'init')
+  , ('a71b27d3-4cd6-46ce-a99c-d998574029f1','702','拡張期血圧',2,CURRENT_TIMESTAMP,'init');
+
+-- 基準値
+insert into consult_thresholds(threshold_id, consult_id, priority, created_at, created_by) VALUES
+    ('aa114e6d-c63e-4f44-96fa-42989129147a','8dda2a54-5217-425f-bba9-ab821a9647fe',1,CURRENT_TIMESTAMP,'init')
+  , ('a71b27d3-4cd6-46ce-a99c-d998574029f1','8dda2a54-5217-425f-bba9-ab821a9647fe',1,CURRENT_TIMESTAMP,'init');
+
+-- 検査基準値範囲
+insert into exam_normal_value_range(name, threshold_id, exam_item_detail_id, max_age, min_age, target_sex, max_value, min_value, error_level, created_at, created_by) VALUES
+    ('収縮期（50以上300以下）正常範囲',  'aa114e6d-c63e-4f44-96fa-42989129147a',711,'9999999','00000',3,300,50,1,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10以上200以下）正常範囲','a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'9999999','00000',3,200,10,1,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（50以上300以下）正常範囲','aa114e6d-c63e-4f44-96fa-42989129147a',721,'9999999','00000',3,300,50,1,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10以上200以下）正常範囲','a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,200,10,1,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（50未満）下限警告',       'aa114e6d-c63e-4f44-96fa-42989129147a',711,'9999999','00000',3,49,0,2,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10未満）下限警告',       'a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'9999999','00000',3,9,0,2,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（50未満）下限警告',       'aa114e6d-c63e-4f44-96fa-42989129147a',721,'9999999','00000',3,49,0,2,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10未満）下限警告',       'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,9,0,2,CURRENT_TIMESTAMP,'init')              
+    , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',711,'9999999','00000',3,9999,301,3,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',721,'9999999','00000',3,9999,301,3,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init'); 
+
