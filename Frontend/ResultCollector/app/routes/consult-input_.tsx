@@ -13,7 +13,7 @@ export const meta: MetaFunction = () => {
   return [{ title: "検査結果入力" }];
 };
 
-/** 検査内容確認画面に必須のパスパラメータの$consultnumberが渡ってこない場合のエラー処理用ファイル */
+/** 検査結果入力画面に必須のパスパラメータの$consultnumberが渡ってこない場合のエラー処理用ファイル */
 export default function ConsultInput() {
   const navigate = useNavigate();
   // エラーメッセージ
