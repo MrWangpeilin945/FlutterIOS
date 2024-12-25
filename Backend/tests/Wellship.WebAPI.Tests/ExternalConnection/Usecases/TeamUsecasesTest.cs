@@ -30,8 +30,8 @@ public class TeamUsecasesTest
         // エンティティリスト生成
         List<TeamEntity> teamEntities = inputTeams.Select(item =>new TeamEntity
         {
-            teamCode = item.Code,
-            name = item.Name
+            TeamCode = item.Code,
+            Name = item.Name
         }).ToList();
 
         // モックのセットアップ
@@ -47,10 +47,10 @@ public class TeamUsecasesTest
         mockRepo.Verify(repo =>
             repo.UpsertTeamsAsync(It.Is<List<TeamEntity>>(teamEntities =>
                 teamEntities.Count == inputTeams.Count &&
-                teamEntities[0].teamCode == inputTeams[0].Code &&
-                teamEntities[0].name == inputTeams[0].Name &&
-                teamEntities[1].teamCode == inputTeams[1].Code &&
-                teamEntities[1].name == inputTeams[1].Name
+                teamEntities[0].TeamCode == inputTeams[0].Code &&
+                teamEntities[0].Name == inputTeams[0].Name &&
+                teamEntities[1].TeamCode == inputTeams[1].Code &&
+                teamEntities[1].Name == inputTeams[1].Name
             ), It.IsAny<DateTime>(), "ExternalConnection"), Times.Once);
 
         // 戻り値のエラーリストについて

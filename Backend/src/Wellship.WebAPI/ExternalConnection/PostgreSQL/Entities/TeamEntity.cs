@@ -8,11 +8,11 @@
         /// <summary>
         /// 班コード
         /// </summary>
-        public required string teamCode { get; init; }
+        public required string TeamCode { get; init; }
 
         /// <summary>
         /// 班名
         /// </summary>
-        public required string name { get; init; }
+        public required string Name { get; init; }
     }
 }

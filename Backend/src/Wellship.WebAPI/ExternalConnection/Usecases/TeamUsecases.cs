@@ -33,8 +33,8 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
             // エンティティリスト生成
             List<TeamEntity> teamEntities = teams.Select(item =>new TeamEntity
             {
-                teamCode = item.Code,
-                name = item.Name
+                TeamCode = item.Code,
+                Name = item.Name
             }).ToList();
 
             // Repository処理

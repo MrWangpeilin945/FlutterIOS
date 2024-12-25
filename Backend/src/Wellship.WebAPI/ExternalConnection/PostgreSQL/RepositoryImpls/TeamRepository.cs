@@ -9,14 +9,14 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Transaction;
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
 {
     /// <summary>
-    /// ”Ç‚ğ“o˜^‚·‚éRepository‘w
+    /// ç­ã‚’ç™»éŒ²ã™ã‚‹Repositoryå±¤
     /// </summary>
     public class TeamRepository : ITeamRepository
     {
         private readonly IDbConnectionProvider _dbConnectionProvider;
 
         /// <summary>
-        /// ƒŠƒ|ƒWƒgƒŠ‚ğ¶¬‚µ‚Ü‚·B
+        /// ãƒªãƒã‚¸ãƒˆãƒªã‚’ç”Ÿæˆã—ã¾ã™ã€‚
         /// </summary>
         /// <param name="dbConnectionProvider">dbConnectionProvider</param>
         public TeamRepository(IDbConnectionProvider dbConnectionProvider)
@@ -25,38 +25,38 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         }
 
         /// <summary>
-        /// ”Ç‚ğ“o˜^‚·‚éRepository‘w
+        /// ç­ã‚’ç™»éŒ²ã™ã‚‹Repositoryå±¤
         /// </summary>
-        /// <param name="teams">”Ç</param>
-        /// <param name="createdAt">ì¬“ú</param>
-        /// <param name="createdBy">ì¬Ò</param>
+        /// <param name="teams">ç­</param>
+        /// <param name="createdAt">ä½œæˆæ—¥æ™‚</param>
+        /// <param name="createdBy">ä½œæˆè€…</param>
         public async Task UpsertTeamsAsync(List<TeamEntity> teams, DateTime createdAt, string createdBy)
         {
             using var scope = TransactionScopeHelper.GetTransactionScope();
             {
                 using var connection = await _dbConnectionProvider.GetOrOpenAsync();
                 {
-                    // ˆêƒe[ƒuƒ‹ì¬
+                    // ä¸€æ™‚ãƒ†ãƒ¼ãƒ–ãƒ«ä½œæˆ
                     string sqlCreateTempTable = @"
                         create temp table tmp_teams(
                             team_code text not null
                             , name text not null
                         ) on commit drop;";
-                    // ˆêƒe[ƒuƒ‹ì¬ SQLÀs
+                    // ä¸€æ™‚ãƒ†ãƒ¼ãƒ–ãƒ«ä½œæˆ SQLå®Ÿè¡Œ
                     await connection.ExecuteAsync(sqlCreateTempTable);
 
-                    // ˆêƒe[ƒuƒ‹‚ÉINSERT
+                    // ä¸€æ™‚ãƒ†ãƒ¼ãƒ–ãƒ«ã«INSERT
                     await BulkInsertHelper.BulkInsert(teams,
                         team =>
                         $"(" +
-                        $"{SqlFormatter.EscapeSqlValue(team.teamCode)}, " +
-                        $"{SqlFormatter.EscapeSqlValue(team.name)}" +
+                        $"{SqlFormatter.EscapeSqlValue(team.TeamCode)}, " +
+                        $"{SqlFormatter.EscapeSqlValue(team.Name)}" +
                         $")",
                         "tmp_teams",
                         connection);
 
 
-                    // UPSERTˆ—
+                    // UPSERTå‡¦ç†
                     string upsertSql = @"   
                         with max_order_number as (
                             select coalesce(max(order_number), 0) as max_number from resultcollector.teams
@@ -76,7 +76,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                             created_at = excluded.created_at,
                             created_by = excluded.created_by;
                     ";
-                    // UPSERTˆ— SQLÀs
+                    // UPSERTå‡¦ç† SQLå®Ÿè¡Œ
                     await connection.ExecuteAsync(upsertSql, new { CreatedAt = createdAt, CreatedBy = createdBy });
                 }
 
