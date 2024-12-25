@@ -30,6 +30,7 @@ public class AuthenticationUsecase(IAuthService authService,
         var staff = await _staffRepository.GetStaffByLoginIdAsync(identifier);
         var accessToken = staff.Enabled && staff.VerifyPassword(password) ? _authService.GenerateAccessToken(staff) : throw new WellshipAuthenticationException();
         var refreshToken = RefreshToken.Create(_timeProvider.GetUtcNow().Add(_authSettings.RefreshTokenLifeTime));
+        await _refreshTokenRepository.ExpireRefreshTokenAsync(staff.StaffId);
         await _refreshTokenRepository.UpdateRefreshTokenAsync(staff.StaffId, refreshToken);
         return (accessToken, refreshToken.Token);
     }
