@@ -350,6 +350,9 @@ CREATE TABLE thresholds (
   , CONSTRAINT thresholds_PKC PRIMARY KEY (threshold_id)
 );
 
+CREATE UNIQUE INDEX thresholds_IX1
+  ON thresholds(threshold_code);
+
 CREATE TABLE tickets (
   consult_id uuid NOT NULL
   , ticket_number text
