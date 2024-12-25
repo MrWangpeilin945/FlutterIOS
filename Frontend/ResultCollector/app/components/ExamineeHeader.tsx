@@ -2,6 +2,7 @@ import { Box, Button, Flex, Popover, Text } from "@mantine/core";
 import { useNavigate } from "@remix-run/react";
 import { IconHomeFilled, IconUserFilled } from "@tabler/icons-react";
 import { Sex } from "~/domain/enums";
+import { authUtil } from "~/utils/authUtil";
 
 type HeaderProps = {
   staffName: string;
@@ -79,7 +80,7 @@ export default function ExamineeHeader({
                 style={{ borderWidth: 2 }}
                 py={8}
                 px={32}
-                onClick={() => navigate("/login")}
+                onClick={() => authUtil.logout(() => navigate("/login"))}
                 size="xs"
                 fw={700}
                 bd="2px,solid"

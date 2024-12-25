@@ -1,6 +1,7 @@
 import { Box, Button, Center, Flex, Popover, Text } from "@mantine/core";
 import { useNavigate } from "@remix-run/react";
 import { IconHomeFilled, IconUserFilled } from "@tabler/icons-react";
+import { authUtil } from "~/utils/authUtil";
 
 type HeaderProps = {
   screenName: string;
@@ -52,7 +53,7 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
                 style={{ borderWidth: 2 }}
                 py={8}
                 px={32}
-                onClick={() => navigate("/login")}
+                onClick={() => authUtil.logout(() => navigate("/login"))}
               >
                 <Text size="xs" fw={700} c="primary">
                   ログアウト
