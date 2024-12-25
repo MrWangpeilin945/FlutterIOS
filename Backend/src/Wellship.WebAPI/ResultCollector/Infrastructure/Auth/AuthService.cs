@@ -60,6 +60,8 @@ public class AuthService(AuthSettings authSettings,
             claims: [
                 // JWTによる認証の対象となるユーザーの識別子
                 new(JwtRegisteredClaimNames.Sub, staff.StaffId.ToString()),
+                // StaffコードをJWTに含めます。登録者表示等の用途で使用することを想定しています。
+                new(JwtRegisteredClaimNames.UniqueName, staff.StaffCode),
                 // 発行時点のサーバー時刻(UnixTime)
                 new(JwtRegisteredClaimNames.Iat, utcNow.ToUnixTimeSeconds().ToString()),
                 // 認証したユーザーのロール
