@@ -1343,10 +1343,11 @@ Field="基準値パターンID","threshold_id","uuid","NOT NULL",0,"gen_random_u
 Field="基準値パターンコード","threshold_code","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="基準値パターン名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+Index==1,threshold_code
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241211105515
+ModifiedDateTime=20241225105646
 Position="MAIN",100,1950
 ZOrder=81
 
