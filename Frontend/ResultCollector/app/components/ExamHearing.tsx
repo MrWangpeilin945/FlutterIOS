@@ -31,13 +31,20 @@ export default function ExamHearing({
     return null;
   }
 
-  //全要素の存在を確認
-  const hearingItemPositionNumbers = [1,2,3,4];
-  const allPositionsExist = hearingItemPositionNumbers.every((position) =>
-    firstItem.examItemDetails?.some((detail) => detail.positionNumber === position),
+  const 左1000Hz = 1;
+  const 左4000Hz = 2;
+  const 右1000Hz = 3;
+  const 右4000Hz = 4;
+
+  // 要素が1つも存在しない場合に return
+  const hearingItemPositionNumbers = [左1000Hz, 左4000Hz, 右1000Hz, 右4000Hz];
+  const noPositionExists = hearingItemPositionNumbers.every((position) =>
+    firstItem.examItemDetails?.every(
+      (detail) => detail.positionNumber !== position,
+    ),
   );
 
-  if (!allPositionsExist) {
+  if (noPositionExists) {
     return null;
   }
 
@@ -55,17 +62,6 @@ export default function ExamHearing({
     // 状態を更新
     setExamItemData(validatedData); // 配列にラップして1つだけセット
   }, [onRegisterPressed, examItems]);
-
-  // valueからorderNumberを取得する
-  const getOrderNumber = ({
-    value,
-    examItemDetailOptions,
-  }: ExamItemDetail): number | undefined => {
-    const matchingOption = examItemDetailOptions?.find(
-      (option) => option.code === value,
-    );
-    return matchingOption?.orderNumber;
-  };
 
   const handleErrorMessage = (item: InputExamItem): InputExamItem => {
     if (item.examRegistResults) {
@@ -109,11 +105,16 @@ export default function ExamHearing({
     };
     const left1000 = item.examItemDetails?.find(
       (detail) => detail.positionNumber === 1,
-    )?.value;
+    );
     const left4000 = item.examItemDetails?.find(
       (detail) => detail.positionNumber === 2,
-    )?.value;
-    if (!left1000 && !left4000) {
+    );
+    const isLeft1000Disabled = checkDisabled(left1000);
+    const isLeft4000Disabled = checkDisabled(left4000);
+    if (
+      (!isLeft1000Disabled && !left1000?.value) || // 有効な left1000 が空
+      (!isLeft4000Disabled && !left4000?.value) // 有効な left4000 が空
+    ) {
       componentErrorMessage.push(leftErrorMessage);
     }
 
@@ -123,11 +124,16 @@ export default function ExamHearing({
     };
     const right1000 = item.examItemDetails?.find(
       (detail) => detail.positionNumber === 3,
-    )?.value;
+    );
     const right4000 = item.examItemDetails?.find(
       (detail) => detail.positionNumber === 4,
-    )?.value;
-    if (!right1000 && !right4000) {
+    );
+    const isRight1000Disabled = checkDisabled(right1000);
+    const isRight4000Disabled = checkDisabled(right4000);
+    if (
+      (!isRight1000Disabled && !right1000?.value) || // 有効な right1000 が空
+      (!isRight4000Disabled && !right4000?.value) // 有効な right4000 が空
+    ) {
       componentErrorMessage.push(rightErrorMessage);
     }
 
@@ -152,14 +158,14 @@ export default function ExamHearing({
   };
 
   // 所見なしボタン押下時
-  const setNoFindings = (value: string, groupIndex: number) => {
+  const setNoFindings = (value: string, isGroup: string) => {
     // 値を更新
     const updatedExamItem: InputExamItem = {
       ...examItemData,
       examItemDetails: examItemData.examItemDetails?.map((detail) => {
         // 左の要素に値を設定
         if (
-          groupIndex === 0 &&
+          isGroup === "左" &&
           (detail.positionNumber === 1 || detail.positionNumber === 2)
         ) {
           return {
@@ -169,7 +175,7 @@ export default function ExamHearing({
         }
         // 右の要素に値を設定
         if (
-          groupIndex === 1 &&
+          isGroup === "右" &&
           (detail.positionNumber === 3 || detail.positionNumber === 4)
         ) {
           return {
@@ -207,6 +213,7 @@ export default function ExamHearing({
           : detail,
       ),
     };
+
     const { validateResult, hasCallback } = validationCheck(updatedExamItem);
     setExamItemData(validateResult);
     if (hasCallback) {
@@ -214,23 +221,53 @@ export default function ExamHearing({
     }
   };
 
-  // detailを左右で振り分け、[{ name, details[] }]の形式に変換
-  const groupedArray = examItemData.examItemDetails?.reduce<
-    { name: string; details: ExamItemDetail[] }[]
-  >((acc, curr, index) => {
-    const groupIndex = Math.floor(index / 2); // 左右でグループを分けるインデックス
+  const details = examItemData.examItemDetails ?? [];
+  const left1000Detail = details.find(
+    (detail) => detail.positionNumber === 左1000Hz,
+  );
+  const left4000Detail = details.find(
+    (detail) => detail.positionNumber === 左4000Hz,
+  );
+  const right1000Detail = details.find(
+    (detail) => detail.positionNumber === 右1000Hz,
+  );
+  const right4000Detail = details.find(
+    (detail) => detail.positionNumber === 右4000Hz,
+  );
+  // 左右で配列を作成
+  const groupDetails = [
+    [left1000Detail, left4000Detail],
+    [right1000Detail, right4000Detail],
+  ];
 
-    if (!acc[groupIndex]) {
-      acc[groupIndex] = {
-        name: `${groupIndex === 0 ? "左" : "右"}`,
-        details: [curr],
-      }; // 新しいグループを作成
-    } else {
-      acc[groupIndex].details.push(curr); // 既存のグループに追加
-    }
+  // disabled判定
+  const checkDisabled = (detail: ExamItemDetail | undefined) => {
+    return !detail || !detail.hasOrder || !!detail.cancelReasonId;
+  };
 
-    return acc;
-  }, []);
+  //指定したorderNumberのvalueを取得
+  const getOptionCode = (detail: ExamItemDetail, orderNumber: number) => {
+    return (
+      detail.examItemDetailOptions?.find(
+        (option) => option.orderNumber === orderNumber,
+      )?.code ?? ""
+    );
+  };
+
+  //選択済み判定
+  const checkSelected = (detail: ExamItemDetail, orderNumber: number) => {
+    return detail.value === getOptionCode(detail, orderNumber);
+  };
+
+  // 所見ありの前回値が存在するかを判定
+  const checkPrev = (detail: ExamItemDetail | undefined) => {
+    if (!detail) return false;
+    const matchingOption = detail.examItemDetailOptions?.find(
+      (option) => option.orderNumber === 2,
+    );
+    return matchingOption?.code === detail.prevValue;
+  };
+
   return (
     <>
       <Flex justify="flex-start" align="flex-start" direction="column">
@@ -250,36 +287,34 @@ export default function ExamHearing({
           </Paper>
         </Box>
         <Group gap={40}>
-          {groupedArray?.map((group, index) => {
-            const h1000 = group.details[0];
-            const h4000 = group.details[1];
+          {groupDetails?.map((group, index) => {
+            const h1000 = group[0];
+            const h4000 = group[1];
             const isGroupDisabled =
-              !h1000.hasOrder ||
-              !!h1000.cancelReasonId ||
-              !h4000.hasOrder ||
-              !!h4000.cancelReasonId;
+              checkDisabled(h1000) && checkDisabled(h4000);
             const isGroupSelected =
-              getOrderNumber(h1000) === 1 && getOrderNumber(h4000) === 1;
-            const noFindingsCode = h1000.examItemDetailOptions?.find(
-              (option) => option.orderNumber === 1, //所見なしの要素を取得
-            )?.code;
+              (checkDisabled(h1000) || checkSelected(h1000 ?? {}, 1)) &&
+              (checkDisabled(h4000) || checkSelected(h4000 ?? {}, 1));
             return (
               <Stack key={index} gap={0}>
                 <Paper w={524} bg="gray02" c="white" radius="itemName">
                   <Text size="lg" fw={700} ta="center">
-                    {group.name}
+                    {index === 0 ? "左" : "右"}
                   </Text>
                 </Paper>
-                {(h1000.prevValue || h4000.prevValue) && (
-                  <Text ml="auto" fw={700} maw={271}>
-                    (前回：{h1000.prevValue}
-                    {(h1000.prevValue && !h4000.prevValue) ||
-                    (!h1000.prevValue && h4000.prevValue)
-                      ? ""
-                      : "/"}
-                    {h4000.prevValue})
-                  </Text>
-                )}
+                <Box ml="auto" h={43.4}>
+                  {(h1000?.prevValue || h4000?.prevValue) && (
+                    <Text fw={700} maw={500}>
+                      (前回：
+                      {checkPrev(h1000) ? "1000Hz" : ""}
+                      {(h1000?.prevValue && !h4000?.prevValue) ||
+                      (!h1000?.prevValue && h4000?.prevValue)
+                        ? ""
+                        : "/"}
+                      {checkPrev(h4000) ? "4000Hz" : ""})
+                    </Text>
+                  )}
+                </Box>
                 <Button
                   w={524}
                   h={78}
@@ -304,55 +339,82 @@ export default function ExamHearing({
                   fw={700}
                   disabled={isGroupDisabled}
                   onClick={() => {
-                    setNoFindings(noFindingsCode ?? "", index);
+                    setNoFindings(
+                      getOptionCode(h1000 ?? h4000 ?? {}, 1),
+                      index === 0 ? "左" : "右",
+                    );
                   }}
                 >
                   所見なし
                 </Button>
-                <Stack key={index}>
-                  {group.details.map((detail) => {
-                    const FindingsOption = detail.examItemDetailOptions?.find(
-                      (option) => option.orderNumber === 2, //所見ありの要素を取得
-                    );
-                    const isDisabled =
-                      !detail.hasOrder || !!detail.cancelReasonId;
-                    const isSelected = detail.value === FindingsOption?.code;
-                    return (
-                      <Button
-                        key={detail.positionNumber}
-                        w={524}
-                        h={78}
-                        variant="outline"
-                        bd="2px,solid"
-                        bg={
-                          isDisabled
-                            ? "gray03"
-                            : isSelected
-                              ? "green03"
-                              : "white"
-                        }
-                        color={
-                          isDisabled
-                            ? "gray02"
-                            : isSelected
-                              ? "primary"
-                              : "gray02"
-                        }
-                        size="xl"
-                        fw={700}
-                        value={FindingsOption?.code}
-                        disabled={isDisabled}
-                        onClick={(e) =>
-                          setFindings(
-                            e.currentTarget.value,
-                            detail.positionNumber ?? 0,
-                          )
-                        }
-                      >
-                        {detail.name}
-                      </Button>
-                    );
-                  })}
+                <Stack>
+                  {/* 1000Hz */}
+                  <Button
+                    w={524}
+                    h={78}
+                    variant="outline"
+                    bd="2px,solid"
+                    bg={
+                      checkDisabled(h1000)
+                        ? "gray03"
+                        : checkSelected(h1000 ?? {}, 2)
+                          ? "green03"
+                          : "white"
+                    }
+                    color={
+                      checkDisabled(h1000)
+                        ? "gray02"
+                        : checkSelected(h1000 ?? {}, 2)
+                          ? "primary"
+                          : "gray02"
+                    }
+                    size="xl"
+                    fw={700}
+                    value={getOptionCode(h1000 ?? {}, 2)}
+                    disabled={checkDisabled(h1000)}
+                    onClick={(e) =>
+                      setFindings(
+                        e.currentTarget.value,
+                        index === 0 ? 左1000Hz : 右1000Hz,
+                      )
+                    }
+                  >
+                    1000Hz
+                  </Button>
+
+                  {/* 4000Hz */}
+                  <Button
+                    w={524}
+                    h={78}
+                    variant="outline"
+                    bd="2px,solid"
+                    bg={
+                      checkDisabled(h4000)
+                        ? "gray03"
+                        : checkSelected(h4000 ?? {}, 2)
+                          ? "green03"
+                          : "white"
+                    }
+                    color={
+                      checkDisabled(h4000)
+                        ? "gray02"
+                        : checkSelected(h4000 ?? {}, 2)
+                          ? "primary"
+                          : "gray02"
+                    }
+                    size="xl"
+                    fw={700}
+                    value={getOptionCode(h4000 ?? {}, 2)}
+                    disabled={checkDisabled(h4000)}
+                    onClick={(e) =>
+                      setFindings(
+                        e.currentTarget.value,
+                        index === 0 ? 左4000Hz : 右4000Hz,
+                      )
+                    }
+                  >
+                    4000Hz
+                  </Button>
                 </Stack>
               </Stack>
             );
