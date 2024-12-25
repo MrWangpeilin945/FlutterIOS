@@ -1323,11 +1323,11 @@ Left=100
 Top=2150
 Field="基準値パターンID","threshold_id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
 Field="受診ID","consult_id","uuid","NOT NULL",1,"","",$FFFFFFFF,""
-Field="優先度","priority","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="優先度","priority","integer","NOT NULL",,"","小さいものが優先して使用される",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241205113619
+ModifiedDateTime=20241225164511
 Position="MAIN",100,2150
 ZOrder=80
 

@@ -800,7 +800,7 @@ COMMENT ON COLUMN consult_notes.created_by IS '作成者';
 COMMENT ON TABLE consult_thresholds IS '基準値';
 COMMENT ON COLUMN consult_thresholds.threshold_id IS '基準値パターンID';
 COMMENT ON COLUMN consult_thresholds.consult_id IS '受診ID';
-COMMENT ON COLUMN consult_thresholds.priority IS '優先度';
+COMMENT ON COLUMN consult_thresholds.priority IS '優先度:小さいものが優先して使用される';
 COMMENT ON COLUMN consult_thresholds.created_at IS '作成日時';
 COMMENT ON COLUMN consult_thresholds.created_by IS '作成者';
 
