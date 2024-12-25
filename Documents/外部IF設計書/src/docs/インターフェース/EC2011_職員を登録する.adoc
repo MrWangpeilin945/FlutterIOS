@@ -23,7 +23,7 @@ flowchart TD
 
     F[[Repository]] --> G[BEGIN]
     G --> H1["Upsert(一括):[DB]staffs(職員)"]
-    H2 --> K[Commit]
+    H1 --> K[Commit]
     H1 -.Exception.-> ROOLBACK[ROOLBACK]
     K --> RepositoryEND[[END]]
     ROOLBACK .-> RepositoryEND
