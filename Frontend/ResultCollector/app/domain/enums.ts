@@ -100,6 +100,7 @@ export enum ExamItemGroupType {
   血圧2回 = 51,
   視力 = 61,
   聴力 = 71,
+  通過 = 81,
 }
 
 /**
