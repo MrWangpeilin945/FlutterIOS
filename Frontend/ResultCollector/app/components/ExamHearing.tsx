@@ -104,10 +104,10 @@ export default function ExamHearing({
       errorLevel: InputErrorLevel.異常,
     };
     const left1000 = item.examItemDetails?.find(
-      (detail) => detail.positionNumber === 1,
+      (detail) => detail.positionNumber === 左1000Hz,
     );
     const left4000 = item.examItemDetails?.find(
-      (detail) => detail.positionNumber === 2,
+      (detail) => detail.positionNumber === 左4000Hz,
     );
     const isLeft1000Disabled = checkDisabled(left1000);
     const isLeft4000Disabled = checkDisabled(left4000);
@@ -123,10 +123,10 @@ export default function ExamHearing({
       errorLevel: InputErrorLevel.異常,
     };
     const right1000 = item.examItemDetails?.find(
-      (detail) => detail.positionNumber === 3,
+      (detail) => detail.positionNumber === 右1000Hz,
     );
     const right4000 = item.examItemDetails?.find(
-      (detail) => detail.positionNumber === 4,
+      (detail) => detail.positionNumber === 右4000Hz,
     );
     const isRight1000Disabled = checkDisabled(right1000);
     const isRight4000Disabled = checkDisabled(right4000);
@@ -166,7 +166,7 @@ export default function ExamHearing({
         // 左の要素に値を設定
         if (
           isGroup === "左" &&
-          (detail.positionNumber === 1 || detail.positionNumber === 2)
+          (detail.positionNumber === 左1000Hz || detail.positionNumber === 左4000Hz)
         ) {
           return {
             ...detail,
@@ -176,7 +176,7 @@ export default function ExamHearing({
         // 右の要素に値を設定
         if (
           isGroup === "右" &&
-          (detail.positionNumber === 3 || detail.positionNumber === 4)
+          (detail.positionNumber === 右1000Hz || detail.positionNumber === 右4000Hz)
         ) {
           return {
             ...detail,
