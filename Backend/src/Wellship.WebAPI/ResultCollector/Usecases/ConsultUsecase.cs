@@ -169,7 +169,7 @@ public class ConsultUsecase : IConsultUsecase
                 SameNameAlert = sameNameAlert,
                 ExamDateAge = examAge.Years
             },
-            IsComplete = true,              // TODO: 検査実施判断    後方作業へ
+            IsComplete = !unexaminedItems.UnexaminedMenus.Any(),
             RelatedExamItems = relatedExamItems,
             ExamItems = examItemGroups.OrderBy(group => group.ExamItemGroupId)
                                       .SelectMany(group => group.ExamItems)
@@ -540,7 +540,7 @@ public class ConsultUsecase : IConsultUsecase
 
     /// <summary>
     /// AP1013_検査結果を検証する
-    /// </summary>
+                                                                                   /// </summary>
     public async Task<VerifyExamItems> VerifyResults(string consultNumber, ResultsRequest results)
     {
         // 受診を取得
