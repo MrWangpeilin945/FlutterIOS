@@ -532,7 +532,7 @@ export default function ExamBP2({
                         size="inputComponent"
                         bg={isDisabled ? "gray03" : ""}
                         c={isDisabled ? "gray02" : ""}
-                        value={detail?.value}
+                        value={isDisabled ? "" : detail?.value}
                         onChange={(e) =>
                           handleChange(
                             e.currentTarget.value,
