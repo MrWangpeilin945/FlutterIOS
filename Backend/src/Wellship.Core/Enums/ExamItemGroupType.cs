@@ -7,57 +7,52 @@ namespace Ryobi.Wellship.Core.Enums;
 public enum ExamItemGroupType
 {
     /// <summary>
-    /// 単一数値
+    /// 自由入力
     /// </summary>
-    単一数値,
+    自由入力 = 11,
 
     /// <summary>
-    /// 単一選択
+    /// 数値
     /// </summary>
-    単一選択,
+    数値 = 21,
 
     /// <summary>
-    /// 左右数値
+    /// 数値_左右
     /// </summary>
-    左右数値,
+    数値_左右 = 22,
 
     /// <summary>
-    /// 左右選択
+    /// 選択
     /// </summary>
-    左右選択,
+    選択 = 31,
+
+    /// <summary>
+    /// 選択_左右
+    /// </summary>
+    選択_左右 = 32,
 
     /// <summary>
     /// 身体計測
     /// </summary>
-    身体計測,
+    身体計測 = 41,
 
     /// <summary>
-    /// 血圧1
+    /// 血圧2回
     /// </summary>
-    血圧1,
-
-    /// <summary>
-    /// 血圧2
-    /// </summary>
-    血圧2,
-
-    /// <summary>
-    /// 血圧3
-    /// </summary>
-    血圧3,
+    血圧2回 = 51,
 
     /// <summary>
     /// 視力
     /// </summary>
-    視力,
+    視力 = 61,
 
     /// <summary>
     /// 聴力
     /// </summary>
-    聴力,
+    聴力 = 71,
 
     /// <summary>
     /// 通過
     /// </summary>
-    通過
+    通過 = 81
 }
