@@ -173,7 +173,7 @@ list.Count()  <> 0
 |InputNote
 |No
 |string
-|入力項目Noなど
+|エラーオブジェクトに登録する入力項目Noなど
 
 |===
 
