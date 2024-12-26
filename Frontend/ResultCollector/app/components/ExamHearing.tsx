@@ -320,7 +320,7 @@ export default function ExamHearing({
                   h={78}
                   mb={16}
                   variant="outline"
-                  bd="2px,solid"
+                  bd={`2px solid ${isGroupDisabled ? "" : isGroupSelected ? "primary" : "gray03"}`}
                   bg={
                     isGroupDisabled
                       ? "gray03"
@@ -328,12 +328,12 @@ export default function ExamHearing({
                         ? "green03"
                         : "white"
                   }
-                  color={
+                  c={
                     isGroupDisabled
                       ? "gray02"
                       : isGroupSelected
                         ? "primary"
-                        : "gray02"
+                        : "black"
                   }
                   size="xl"
                   fw={700}
@@ -349,72 +349,88 @@ export default function ExamHearing({
                 </Button>
                 <Stack>
                   {/* 1000Hz */}
-                  <Button
-                    w={524}
-                    h={78}
-                    variant="outline"
-                    bd="2px,solid"
-                    bg={
-                      checkDisabled(h1000)
-                        ? "gray03"
-                        : checkSelected(h1000 ?? {}, 2)
-                          ? "green03"
-                          : "white"
-                    }
-                    color={
-                      checkDisabled(h1000)
-                        ? "gray02"
-                        : checkSelected(h1000 ?? {}, 2)
-                          ? "primary"
-                          : "gray02"
-                    }
-                    size="xl"
-                    fw={700}
-                    value={getOptionCode(h1000 ?? {}, 2)}
-                    disabled={checkDisabled(h1000)}
-                    onClick={(e) =>
-                      setFindings(
-                        e.currentTarget.value,
-                        index === 0 ? 左1000Hz : 右1000Hz,
-                      )
-                    }
-                  >
-                    1000Hz
-                  </Button>
+                  {(() => {
+                    const isDisabled = checkDisabled(h1000);
+                    const isSelected = checkSelected(h1000 ?? {}, 2);
+                    const buttonValue = getOptionCode(h1000 ?? {}, 2);
+
+                    return (
+                      <Button
+                        w={524}
+                        h={78}
+                        variant="outline"
+                        bd={`2px solid ${isDisabled ? "" : isSelected ? "primary" : "gray03"}`}
+                        bg={
+                          isDisabled
+                            ? "gray03"
+                            : isSelected
+                              ? "green03"
+                              : "white"
+                        }
+                        c={
+                          isDisabled
+                            ? "gray02"
+                            : isSelected
+                              ? "primary"
+                              : "black"
+                        }
+                        size="xl"
+                        fw={700}
+                        value={buttonValue}
+                        disabled={isDisabled}
+                        onClick={(e) =>
+                          setFindings(
+                            e.currentTarget.value,
+                            index === 0 ? 左1000Hz : 右1000Hz,
+                          )
+                        }
+                      >
+                        1000Hz
+                      </Button>
+                    );
+                  })()}
 
                   {/* 4000Hz */}
-                  <Button
-                    w={524}
-                    h={78}
-                    variant="outline"
-                    bd="2px,solid"
-                    bg={
-                      checkDisabled(h4000)
-                        ? "gray03"
-                        : checkSelected(h4000 ?? {}, 2)
-                          ? "green03"
-                          : "white"
-                    }
-                    color={
-                      checkDisabled(h4000)
-                        ? "gray02"
-                        : checkSelected(h4000 ?? {}, 2)
-                          ? "primary"
-                          : "gray02"
-                    }
-                    size="xl"
-                    fw={700}
-                    value={getOptionCode(h4000 ?? {}, 2)}
-                    disabled={checkDisabled(h4000)}
-                    onClick={(e) =>
-                      setFindings(
-                        e.currentTarget.value,
-                        index === 0 ? 左4000Hz : 右4000Hz,
-                      )
-                    }
-                  >
-                    4000Hz
-                  </Button>
+                  {(() => {
+                    const isDisabled = checkDisabled(h4000);
+                    const isSelected = checkSelected(h4000 ?? {}, 2);
+                    const buttonValue = getOptionCode(h4000 ?? {}, 2);
+
+                    return (
+                      <Button
+                        w={524}
+                        h={78}
+                        variant="outline"
+                        bd={`2px solid ${isDisabled ? "" : isSelected ? "primary" : "gray03"}`}
+                        bg={
+                          isDisabled
+                            ? "gray03"
+                            : isSelected
+                              ? "green03"
+                              : "white"
+                        }
+                        c={
+                          isDisabled
+                            ? "gray02"
+                            : isSelected
+                              ? "primary"
+                              : "black"
+                        }
+                        size="xl"
+                        fw={700}
+                        value={buttonValue}
+                        disabled={isDisabled}
+                        onClick={(e) =>
+                          setFindings(
+                            e.currentTarget.value,
+                            index === 0 ? 左4000Hz : 右4000Hz,
+                          )
+                        }
+                      >
+                        4000Hz
+                      </Button>
+                    );
+                  })()}
                 </Stack>
               </Stack>
             );
