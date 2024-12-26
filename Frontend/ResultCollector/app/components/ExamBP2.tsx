@@ -102,22 +102,8 @@ export default function ExamBP2({
     },
   });
 
-  // キーボード外部をクリックした際に非表示にする
-  const closeKeyBoard = useClickOutside(() => {
-    setShowKeyboards({
-      first: {
-        high: false,
-        low: false,
-      },
-      second: {
-        high: false,
-        low: false,
-      },
-    });
-  });
-
-  // キーボードの確定ボタン押下時に非表示にする
-  const handleConfirm = () => {
+  // キーボードを非表示にする
+  const resetKeyboards = () => {
     setShowKeyboards({
       first: {
         high: false,
@@ -129,6 +115,9 @@ export default function ExamBP2({
       },
     });
   };
+
+  // キーボード外部をクリックした際に非表示にする
+  const closeKeyBoard = useClickOutside(resetKeyboards);
 
   // キーボードの表示/非表示をトグルする関数
   const toggleKeyboard = (
@@ -205,7 +194,7 @@ export default function ExamBP2({
     if (
       bpHValue &&
       bpLValue &&
-      Number.parseFloat(bpHValue) <= Number.parseFloat(bpLValue)
+      Number.parseFloat(bpHValue) < Number.parseFloat(bpLValue)
     ) {
       const BPErrorMessage: ExamRegistResult = {
         description: "血圧の値が逆転しています。",
@@ -305,8 +294,8 @@ export default function ExamBP2({
     if (!isValidAVE) {
       return updatedExamItems;
     }
-    const bpH_values: number[] = [];
-    const bpL_values: number[] = [];
+    const bpHValues: number[] = [];
+    const bpLValues: number[] = [];
 
     for (const item of updatedExamItems) {
       if (
@@ -318,9 +307,9 @@ export default function ExamBP2({
             const parsedValue = Number.parseFloat(detail.value);
             if (!Number.isNaN(parsedValue)) {
               if (detail.positionNumber === 上) {
-                bpH_values.push(parsedValue);
+                bpHValues.push(parsedValue);
               } else if (detail.positionNumber === 下) {
-                bpL_values.push(parsedValue);
+                bpLValues.push(parsedValue);
               }
             }
           }
@@ -328,13 +317,13 @@ export default function ExamBP2({
       }
     }
     // 平均値の計算
-    const bpH_AVE =
-      bpH_values.length > 0
-        ? Math.round(bpH_values.reduce((a, b) => a + b, 0) / bpH_values.length)
+    const bpHAVE =
+      bpHValues.length > 0
+        ? Math.round(bpHValues.reduce((a, b) => a + b, 0) / bpHValues.length)
         : 0;
-    const bpL_AVE =
-      bpL_values.length > 0
-        ? Math.round(bpL_values.reduce((a, b) => a + b, 0) / bpL_values.length)
+    const bpLAVE =
+      bpLValues.length > 0
+        ? Math.round(bpLValues.reduce((a, b) => a + b, 0) / bpLValues.length)
         : 0;
 
     // 平均値の保存
@@ -347,13 +336,13 @@ export default function ExamBP2({
           if (detail.positionNumber === 上) {
             return {
               ...detail,
-              value: bpH_AVE.toString().slice(0, maxDigits),
+              value: bpHAVE.toString().slice(0, maxDigits),
             };
           }
           if (detail.positionNumber === 下) {
             return {
               ...detail,
-              value: bpL_AVE.toString().slice(0, maxDigits),
+              value: bpLAVE.toString().slice(0, maxDigits),
             };
           }
           return detail;
@@ -624,7 +613,7 @@ export default function ExamBP2({
                               detail?.positionNumber
                             )
                           }
-                          onConfirm={handleConfirm}
+                          onConfirm={resetKeyboards}
                         />
                       ) : (
                         <CollectionKeyboard
