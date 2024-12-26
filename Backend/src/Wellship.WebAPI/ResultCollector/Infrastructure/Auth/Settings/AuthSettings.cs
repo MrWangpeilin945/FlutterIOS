@@ -10,9 +10,13 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth.Settings;
 public class AuthSettings
 {
     /// <summary>
-    /// JWTの寿命
+    /// アクセストークンの寿命
     /// </summary>
-    public required TimeSpan Lifetime { get; init; }
+    public required TimeSpan AccessTokenLifetime { get; init; }
+    /// <summary>
+    /// リフレッシュトークンの寿命
+    /// </summary>
+    public required TimeSpan RefreshTokenLifeTime { get; init; }
     /// <summary>
     /// JWT署名鍵（文字列）
     /// </summary>
@@ -24,5 +28,6 @@ public class AuthSettings
     /// JWT署名鍵（Binary）
     /// </summary>
     public SecurityKey JwtSigningKey => _jwtSigningKey ??= new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
+
     private SecurityKey? _jwtSigningKey;
 }
