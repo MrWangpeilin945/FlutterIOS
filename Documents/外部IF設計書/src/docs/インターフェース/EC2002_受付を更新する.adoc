@@ -232,7 +232,8 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 |列|登録値|処理・変換
 
 |consult_id
-|`[DB]consult.consult_id`
+|Insert: `[DB]consult.consult_id` + 
+Update: 更新しない
 |`[DB]consult(受診).external_connection_code(外部連携キー)` == `Ticket.ConnectionCode` で検索して取得
 
 |ticket_number
