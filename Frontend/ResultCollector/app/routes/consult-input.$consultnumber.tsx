@@ -476,6 +476,7 @@ export default function ConsultInput() {
         );
       case ExamItemGroupType.通過:
         setConfirmMessage("実施済みです。取消してよろしいですか。");
+        openConfirm();
         return null; // UIのレンダリングをスキップ
       default:
         return <Text>未対応のタイプ: {type}</Text>;
