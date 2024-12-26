@@ -78,7 +78,12 @@ export default function ExamSelect({
     // コールバック判断用のコンポーネントのエラーメッセージ
     const componentErrorMessage: ExamRegistResult[] = [];
     // detailsのpositionNumberが1のものについてバリデーションチェックを行う
-    for (const { positionNumber, value } of item.examItemDetails ?? []) {
+    for (const {
+      positionNumber,
+      value,
+      hasOrder,
+      cancelReasonId,
+    } of item.examItemDetails ?? []) {
       if (positionNumber !== 1) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
       }
@@ -89,7 +94,7 @@ export default function ExamSelect({
       );
 
       // バリデーションが失敗した場合
-      if (!value) {
+      if (hasOrder && !cancelReasonId && !value) {
         componentErrorMessage.push({
           description: requiredMessage,
           errorLevel: InputErrorLevel.異常,
@@ -136,7 +141,7 @@ export default function ExamSelect({
     setSelected(newSelected);
 
     // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
-    let hasValidationError = true;
+    let hasValidationError = false;
 
     // examItemsのvalueを更新
     const updatedExamItems: InputExamItem[] = examItems.map((item) => {
@@ -159,7 +164,7 @@ export default function ExamSelect({
           validationCheck(updatedExamItem);
         if (!hasCallback) {
           // falseのexamItemがあればコールバックを行わない
-          hasValidationError = false;
+          hasValidationError = true;
         }
 
         // バリデーション結果を反映
@@ -174,7 +179,7 @@ export default function ExamSelect({
     // 更新されたデータをステートに設定
     setExamItemsData(updatedExamItems);
 
-    if (hasValidationError) {
+    if (!hasValidationError) {
       onClick(updatedExamItems);
     }
   };
@@ -197,11 +202,18 @@ export default function ExamSelect({
             {examItem.name}
           </Text>
         </Paper>
-        {examItemDetail.prevValue && (
-          <Text ml="auto" fw={700} maw={271}>
-            (前回：{examItemDetail.prevValue})
-          </Text>
-        )}
+        {examItemDetail.prevValue &&
+          (() => {
+            const prevName =
+              examItemDetail.examItemDetailOptions?.find(
+                (option) => option.code === examItemDetail.prevValue,
+              )?.name || examItemDetail.prevValue;
+            return (
+              <Text ml="auto" fw={700} maw={271}>
+                (前回：{prevName})
+              </Text>
+            );
+          })()}
       </Flex>
 
       <Group>
