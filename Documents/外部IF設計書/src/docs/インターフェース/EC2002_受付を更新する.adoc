@@ -183,6 +183,49 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 ** `created_at` に登録する `system.datetime.now()`
 ** `created_by` に登録する `'ExternalConnection'`
 
+==== 登録イメージ
+
+[cols="1,1,1,1,2,2" options="header"]
+|===
+|SortNo|ConnectionCode|ActionType|TicketNumber|[DB]tickets|[DB]tickets_histories
+
+|1
+|C001
+|登録
+|1000
+|
+|Insert
+
+|2
+|C001
+|削除
+|
+|
+|Insert
+
+|3
+|C001
+|登録
+|2000
+|Insert
+|Insert
+
+|4
+|C002
+|登録
+|1001
+|
+|Insert
+
+|5
+|C002
+|削除
+|
+|Delete
+|Insert
+
+|===
+
 ==== 登録処理
 
 * 条件
