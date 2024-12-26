@@ -12,11 +12,11 @@
 flowchart TD
     A[UseCase] --> ERROR{ERROR検証}
     ERROR -- エラーあり --> C(ErrorObject生成、追加)
-    ERROR -- エラー無 --> WORNING{WORNING検証}    
-    WORNING -- ワーニングあり --> DROP(WORNINGレコードDrop)
-    DROP(WORNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
+    ERROR -- エラー無 --> WARNING{WARNING検証}    
+    WARNING -- ワーニングあり --> DROP(WARNINGレコードDrop)
+    DROP(WARNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
     DROP_REC --> D[[Repository]]
-    WORNING -- ワーニング無 --> D
+    WARNING -- ワーニング無 --> D
     C --> E(返却)
     D --> E
     E --> UseCaseEND(END)
@@ -164,7 +164,7 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 
 * None
 
-==== WORNING検証
+==== WARNING検証
 
 * 連携キーの取得に失敗
 ** `[DB]consult(受診).external_connection_code(外部連携キー)` == `Ticket.ConnectionCode` が存在しない
