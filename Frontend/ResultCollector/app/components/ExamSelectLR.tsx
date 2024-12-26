@@ -238,7 +238,7 @@ export default function ExamSelectLR({
                   const prevName =
                     detail.examItemDetailOptions?.find(
                       (option) => option.code === detail.prevValue,
-                    )?.name || ""; //TODO:見つからなかった時どうするか
+                    )?.name || detail.prevValue;
                   return (
                     <Text ml="auto" fw={700} maw={271}>
                       (前回：{prevName})
