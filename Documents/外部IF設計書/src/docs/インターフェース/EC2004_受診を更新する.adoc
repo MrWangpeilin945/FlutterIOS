@@ -365,7 +365,7 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
-**** Message `キー項目が重複しています。Code:[Consult.PreviousResults.ExamItemDetailCd]`
+**** Message `キー項目が重複しています。Code:ExamItemDetailCd:[Consult.PreviousResults.ExamItemDetailCd]`
 **** InputNote `Consult.InputNote`
 
 * 検査項目明細IDが取得できない(ExamItemDetail)
@@ -384,7 +384,7 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
-**** Message `キー項目が重複しています。Code:[Consult.PreviousResults.ExamItemDetailCd]/[Consult.PreviousResults.ExamDate]`
+**** Message `キー項目が重複しています。Code:ExamItemDetailCd:[Consult.PreviousResults.ExamItemDetailCd]/ExamDate:[Consult.PreviousResults.ExamDate]`
 **** InputNote `Consult.InputNote`
 
 ===== `Consult.ActionType` == `ActionType.削除`
@@ -675,6 +675,7 @@ Update : 更新しない
 * 条件
 ** `Ticket.ActionType` == `ActionType.削除` And +
 `Consult.ConnectionCode` でグループ化し、 `Consult.SortNo` が最大のレコード
+* exam_results(検査結果)/tickets(受付) は操作しない
 
 ===== Table
 
