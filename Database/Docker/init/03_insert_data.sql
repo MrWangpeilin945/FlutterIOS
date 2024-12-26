@@ -253,6 +253,11 @@ insert into exam_menu_note_results(menu_note_id,exam_item_detail_id,source_type,
     (1,1,1,1,CURRENT_TIMESTAMP,'init')
   , (1,1,2,2,CURRENT_TIMESTAMP,'init');
 
+-- 検査メニュー特記_コード
+insert into exam_menu_note_codes(code,name,created_at,created_by) VALUES
+    ('ST01','撮影番号',CURRENT_TIMESTAMP,'init')
+  , ('ST02','○○番号',CURRENT_TIMESTAMP,'init');
+
 -- 検査メニュー特記_受診
 insert into exam_menu_note_consults(menu_note_id,code,order_number,created_at,created_by) VALUES
     (2,'ST01',1,CURRENT_TIMESTAMP,'init')
