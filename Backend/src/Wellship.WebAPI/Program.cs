@@ -128,6 +128,11 @@ public static class IServiceCollectionExtension
         services.AddScoped<IResultRepository, ResultRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IOrganizationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.OrganizationRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExamineeRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExamineeRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IAffiliationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.AffiliationRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.ITeamRepository, ExternalConnection.PostgreSQL.RepositoryImpls.TeamRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IPlaceRepository, ExternalConnection.PostgreSQL.RepositoryImpls.PlaceRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IThresholdRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ThresholdRepository>();
         return services;
     }
     /// <summary>
@@ -146,6 +151,10 @@ public static class IServiceCollectionExtension
         services.AddScoped<IProgressUsecase, ProgressUsecase>();
         services.AddScoped<ICancelReasonUsecase, CancelReasonUsecase>();
         services.AddScoped<ExternalConnection.Usecases.IOrganizationUsecases, ExternalConnection.Usecases.OrganizationUsecases>();
+        services.AddScoped<ExternalConnection.Usecases.IExamineeUsecases, ExternalConnection.Usecases.ExamineeUsecases>();
+        services.AddScoped<ExternalConnection.Usecases.ITeamUsecases, ExternalConnection.Usecases.TeamUsecases>();
+        services.AddScoped<ExternalConnection.Usecases.IPlaceUsecases, ExternalConnection.Usecases.PlaceUsecases>();
+        services.AddScoped<ExternalConnection.Usecases.IThresholdUsecases, ExternalConnection.Usecases.ThresholdUsecases>();
         return services;
     }
     /// <summary>
