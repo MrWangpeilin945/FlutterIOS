@@ -72,7 +72,12 @@ export default function ExamSelectLR({
     // コールバック判断用のコンポーネントのエラーメッセージ
     const componentErrorMessage: ExamRegistResult[] = [];
     // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
-    for (const { positionNumber, value } of item.examItemDetails ?? []) {
+    for (const {
+      positionNumber,
+      value,
+      hasOrder,
+      cancelReasonId,
+    } of item.examItemDetails ?? []) {
       if (positionNumber !== 1 && positionNumber !== 2) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
       }
@@ -83,7 +88,7 @@ export default function ExamSelectLR({
       );
 
       // バリデーションが失敗した場合
-      if (!value) {
+      if (hasOrder && !cancelReasonId && !value) {
         componentErrorMessage.push({
           description: requiredMessage,
           errorLevel: InputErrorLevel.異常,
