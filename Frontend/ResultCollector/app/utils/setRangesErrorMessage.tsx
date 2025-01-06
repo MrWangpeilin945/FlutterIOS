@@ -12,12 +12,16 @@ const getMaxErrorLevelsByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
   return examItemDetails.reduce(
     (
       matchExamRanges: ExamNormalValueRange[],
-      { value, examNormalValueRanges }
+      { value, examNormalValueRanges, hasOrder, cancelReasonId }
     ) => {
+      const isDisable = !hasOrder || !!cancelReasonId;
       const numericValue =
         value !== undefined && value !== ""
           ? Number.parseFloat(value)
           : Number.NaN;
+      if (isDisable) {
+        return matchExamRanges; // isDisable の場合は処理をスキップ
+      }
       if (!Number.isNaN(numericValue) && examNormalValueRanges) {
         const matchRange = examNormalValueRanges.find(
           ({ minValue, maxValue }) =>
