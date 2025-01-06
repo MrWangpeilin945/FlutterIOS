@@ -130,6 +130,7 @@ CREATE TABLE exam_cancels (
 CREATE TABLE exam_item_detail_orders (
   consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
+  , external_exam_item_detail_code text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_item_detail_orders_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
@@ -310,6 +311,15 @@ CREATE TABLE prior_exam_menus (
   , CONSTRAINT prior_exam_menus_PKC PRIMARY KEY (current_exam_menu_id,prior_exam_menu_id)
 );
 
+CREATE TABLE refresh_tokens (
+  staff_id uuid NOT NULL
+  , token text NOT NULL
+  , expires_at timestamp with time zone NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT refresh_tokens_PKC PRIMARY KEY (staff_id)
+);
+
 CREATE TABLE staff_login_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , staff_id uuid NOT NULL
@@ -350,6 +360,9 @@ CREATE TABLE thresholds (
   , CONSTRAINT thresholds_PKC PRIMARY KEY (threshold_id)
 );
 
+CREATE UNIQUE INDEX thresholds_IX1
+  ON thresholds(threshold_code);
+
 CREATE TABLE tickets (
   consult_id uuid NOT NULL
   , ticket_number text
@@ -363,7 +376,7 @@ CREATE TABLE tickets_histories (
   , consult_id uuid NOT NULL
   , ticket_number text
   , action_type varchar(1) NOT NULL
-  , order integer NOT NULL
+  , order_number integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT tickets_histories_PKC PRIMARY KEY (id)
@@ -437,6 +450,14 @@ CREATE TABLE exam_items (
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_items_PKC PRIMARY KEY (exam_item_id)
+);
+
+CREATE TABLE exam_menu_note_codes (
+  code text NOT NULL
+  , name text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_menu_note_codes_PKC PRIMARY KEY (code)
 );
 
 CREATE TABLE examinees (
@@ -608,6 +629,11 @@ ALTER TABLE consult_notes
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE consult_notes
+  ADD CONSTRAINT consult_notes_FK2 FOREIGN KEY (code) REFERENCES exam_menu_note_codes(code)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE consult_thresholds
   ADD CONSTRAINT consult_thresholds_FK1 FOREIGN KEY (threshold_id) REFERENCES thresholds(threshold_id)
   ON DELETE RESTRICT
@@ -703,6 +729,11 @@ ALTER TABLE exam_menu_note_consults
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE exam_menu_note_consults
+  ADD CONSTRAINT exam_menu_note_consults_FK2 FOREIGN KEY (code) REFERENCES exam_menu_note_codes(code)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE exam_menu_note_results
   ADD CONSTRAINT exam_menu_note_results_FK1 FOREIGN KEY (menu_note_id) REFERENCES exam_menu_notes(menu_note_id)
   ON DELETE RESTRICT
@@ -783,6 +814,11 @@ ALTER TABLE prior_exam_menus
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE refresh_tokens
+  ADD CONSTRAINT refresh_tokens_FK1 FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE staff_login_histories
   ADD CONSTRAINT staff_login_histories_FK1 FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
   ON DELETE RESTRICT
@@ -828,7 +864,7 @@ COMMENT ON COLUMN consult_threshold_view.error_level IS 'エラーレベル';
 COMMENT ON TABLE consult_thresholds IS '基準値';
 COMMENT ON COLUMN consult_thresholds.threshold_id IS '基準値パターンID';
 COMMENT ON COLUMN consult_thresholds.consult_id IS '受診ID';
-COMMENT ON COLUMN consult_thresholds.priority IS '優先度';
+COMMENT ON COLUMN consult_thresholds.priority IS '優先度:小さいものが優先して使用される';
 COMMENT ON COLUMN consult_thresholds.created_at IS '作成日時';
 COMMENT ON COLUMN consult_thresholds.created_by IS '作成者';
 
@@ -912,6 +948,7 @@ COMMENT ON COLUMN exam_cancels.created_by IS '作成者';
 COMMENT ON TABLE exam_item_detail_orders IS '検査項目明細依頼';
 COMMENT ON COLUMN exam_item_detail_orders.consult_id IS '受診ID';
 COMMENT ON COLUMN exam_item_detail_orders.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_item_detail_orders.external_exam_item_detail_code IS '外部コード検査項目明細CD';
 COMMENT ON COLUMN exam_item_detail_orders.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_detail_orders.created_by IS '作成者';
 
@@ -1043,6 +1080,13 @@ COMMENT ON COLUMN prior_exam_menus.prior_exam_menu_id IS '前提検査メニュ�
 COMMENT ON COLUMN prior_exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN prior_exam_menus.created_by IS '作成者';
 
+COMMENT ON TABLE refresh_tokens IS 'リフレッシュトークン';
+COMMENT ON COLUMN refresh_tokens.staff_id IS '職員ID';
+COMMENT ON COLUMN refresh_tokens.token IS 'リフレッシュトークン';
+COMMENT ON COLUMN refresh_tokens.expires_at IS '有効期限';
+COMMENT ON COLUMN refresh_tokens.created_at IS '作成日時';
+COMMENT ON COLUMN refresh_tokens.created_by IS '作成者';
+
 COMMENT ON TABLE staff_login_histories IS '職員ログイン履歴';
 COMMENT ON COLUMN staff_login_histories.id IS 'ID';
 COMMENT ON COLUMN staff_login_histories.staff_id IS '職員ID';
@@ -1082,7 +1126,7 @@ COMMENT ON COLUMN tickets_histories.id IS 'ID';
 COMMENT ON COLUMN tickets_histories.consult_id IS '受診ID';
 COMMENT ON COLUMN tickets_histories.ticket_number IS '受付番号';
 COMMENT ON COLUMN tickets_histories.action_type IS '操作区分:I:Ins/U:Upd/D:Del';
-COMMENT ON COLUMN tickets_histories.order IS '登録順:一括処理時';
+COMMENT ON COLUMN tickets_histories.order_number IS '登録順:一括処理時';
 COMMENT ON COLUMN tickets_histories.created_at IS '作成日時';
 COMMENT ON COLUMN tickets_histories.created_by IS '作成者';
 
@@ -1139,6 +1183,12 @@ COMMENT ON COLUMN exam_items.unit IS '単位';
 COMMENT ON COLUMN exam_items.order_number IS '表示順';
 COMMENT ON COLUMN exam_items.created_at IS '作成日時';
 COMMENT ON COLUMN exam_items.created_by IS '作成者';
+
+COMMENT ON TABLE exam_menu_note_codes IS '検査メニュー特記_コード';
+COMMENT ON COLUMN exam_menu_note_codes.code IS '検査特記コード';
+COMMENT ON COLUMN exam_menu_note_codes.name IS '検査特記名';
+COMMENT ON COLUMN exam_menu_note_codes.created_at IS '作成日時';
+COMMENT ON COLUMN exam_menu_note_codes.created_by IS '作成者';
 
 COMMENT ON TABLE examinees IS '受診者';
 COMMENT ON COLUMN examinees.examinee_id IS '受診者ID';

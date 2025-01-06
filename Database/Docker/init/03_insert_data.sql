@@ -147,29 +147,29 @@ INSERT INTO export_history_details(id,consult_id,created_at,created_by) VALUES
   , ('8f2edd5a-9ad3-4445-96a8-1b2129f60929','caaaaa00-0000-0000-0000-000000000005',CURRENT_TIMESTAMP,'init');
 
 -- 検査項目明細依頼
-INSERT INTO exam_item_detail_orders(consult_id,exam_item_detail_id,created_at,created_by) VALUES 
-    ('caaaaa00-0000-0000-0000-000000000001',1,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000001',2,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000001',711,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000001',712,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000001',721,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000001',722,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',1,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',2,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',711,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',712,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',721,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',722,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000003',1,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000003',2,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000003',711,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000003',712,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',1,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',2,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',711,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',712,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',721,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',722,CURRENT_TIMESTAMP,'init');
+INSERT INTO exam_item_detail_orders(consult_id,exam_item_detail_id,external_exam_item_detail_code,created_at,created_by) VALUES 
+    ('caaaaa00-0000-0000-0000-000000000001',1,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000001',2,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000001',711,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000001',712,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000001',721,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000001',722,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',1,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',2,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',711,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',712,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',721,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',722,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000003',1,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000003',2,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000003',711,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000003',712,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',1,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',2,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',711,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',712,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',721,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',722,'',CURRENT_TIMESTAMP,'init');
 
 -- 中止理由
 INSERT INTO cancel_reasons(cancel_reason_id,name,exam_item_id,order_number,created_at,created_by) VALUES 
@@ -253,6 +253,11 @@ insert into exam_menu_note_results(menu_note_id,exam_item_detail_id,source_type,
     (1,1,1,1,CURRENT_TIMESTAMP,'init')
   , (1,1,2,2,CURRENT_TIMESTAMP,'init');
 
+-- 検査メニュー特記_コード
+insert into exam_menu_note_codes(code,name,created_at,created_by) VALUES
+    ('ST01','撮影番号',CURRENT_TIMESTAMP,'init')
+  , ('ST02','○○番号',CURRENT_TIMESTAMP,'init');
+
 -- 検査メニュー特記_受診
 insert into exam_menu_note_consults(menu_note_id,code,order_number,created_at,created_by) VALUES
     (2,'ST01',1,CURRENT_TIMESTAMP,'init')
@@ -286,7 +291,7 @@ insert into exam_normal_value_range(name, threshold_id, exam_item_detail_id, max
     , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',711,'9999999','00000',3,9999,301,3,CURRENT_TIMESTAMP,'init')
     , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init')
     , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',721,'9999999','00000',3,9999,301,3,CURRENT_TIMESTAMP,'init')
-    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init'); 
+    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init');
 
 INSERT INTO resultcollector.thresholds(threshold_id,threshold_code,name,order_number,created_by) VALUES 
     ('36853b96-be4b-419b-a9c4-01ab0714eef3','common','共通',2,'init')
@@ -315,3 +320,15 @@ INSERT INTO resultcollector.exam_normal_value_range(range_id,name,threshold_id,e
 INSERT INTO resultcollector.consult_thresholds(threshold_id,consult_id,priority,created_by) VALUES 
     ('d5ae9e47-c9b3-410a-8963-669966daf9fc','caaaaa00-0000-0000-0000-000000000001',1,'init')
   , ('36853b96-be4b-419b-a9c4-01ab0714eef3','caaaaa00-0000-0000-0000-000000000001',2,'init');
+-- 検査実施判定ルール
+insert into decision_rules(decision_rule_id,name,exam_menu_id,priority,trigger_type,error_level,message,created_at,created_by) VALUES 
+    (1,'体重差が前年より20kgオーバー',7,1,1,3,'体重の計測ミスのため実施できません。',CURRENT_TIMESTAMP,'init');
+
+-- 検査実施判断ルール_判定値
+insert into decision_rule_evaluations(decision_rule_id,variable_number,evaluation_value,created_at,created_by) VALUES 
+    (1,1,30.0,CURRENT_TIMESTAMP,'init');
+
+-- 検査実施判断ルール_検査項目明細
+insert into decision_rule_exam_item_details(decision_rule_id,variable_number,source_type,exam_item_detail_id,created_at,created_by) VALUES
+    (1,1,1,2,CURRENT_TIMESTAMP,'init')
+  , (1,2,2,2,CURRENT_TIMESTAMP,'init');

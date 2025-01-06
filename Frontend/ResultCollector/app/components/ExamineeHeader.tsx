@@ -6,7 +6,7 @@ import { authUtil } from "~/utils/authUtil";
 
 type HeaderProps = {
   staffName: string;
-  managerNo: number;
+  managerNo: string;
   name: string;
   age: number;
   gender: number;

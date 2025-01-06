@@ -42,6 +42,12 @@ public interface IExamItemRepository
     Task<IEnumerable<Models.CorrelationRule>> GetCorrelationRulesAsync(int examMenuId);
 
     /// <summary>
+    /// 検査実施判断ルールを取得します。
+    /// </summary>
+    /// <param name="examMenuId">検査メニューID</param>
+    Task<IEnumerable<Models.DecisionRule>> GetDecisionRulesAsync(int examMenuId);
+
+    /// <summary>
     /// 検査項目明細とその子要素を取得します。
     /// </summary>
     /// <param name="examItemDetailIds">検査項目明細ID</param>

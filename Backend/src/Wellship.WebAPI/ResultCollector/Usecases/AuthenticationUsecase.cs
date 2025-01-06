@@ -1,34 +1,46 @@
 using Ryobi.Wellship.Core.Exceptions;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth.Settings;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 /// <summary>
 /// 認証ユースケース
 /// </summary>
-public class AuthenticationUsecase : IAuthenticationUsecase
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+public class AuthenticationUsecase(IAuthService authService,
+                                   AuthSettings authSettings,
+                                   IStaffRepository staffRepository,
+                                   IRefreshTokenRepository refreshTokenRepository,
+                                   TimeProvider timeProvider) : IAuthenticationUsecase
 {
-    private readonly IAuthService _authService;
-    private readonly IStaffRepository _staffRepository;
+    private readonly IAuthService _authService = authService;
+    private readonly AuthSettings _authSettings = authSettings;
+    private readonly IStaffRepository _staffRepository = staffRepository;
+    private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
+    private readonly TimeProvider _timeProvider = timeProvider;
 
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    public AuthenticationUsecase(IAuthService authService, IStaffRepository staffRepository)
-    {
-        _authService = authService;
-        _staffRepository = staffRepository;
-    }
-
-    /// <summary>
-    /// ログインする
-    /// </summary>
-    /// <param name="identifier"></param>
-    /// <param name="password"></param>
-    public async ValueTask<string> LoginStaffAsync(string identifier, string password)
+    ///<inheritdoc/>
+    public async ValueTask<(string accessToken, string refreshToken)> LoginStaffAsync(string identifier, string password)
     {
         var staff = await _staffRepository.GetStaffByLoginIdAsync(identifier);
-        return staff.Enabled && staff.VerifyPassword(password) ? _authService.GenerateAccessToken(staff) : throw new WellshipAuthenticationException();
+        var accessToken = staff.Enabled && staff.VerifyPassword(password) ? _authService.GenerateAccessToken(staff) : throw new WellshipAuthenticationException();
+        var refreshToken = RefreshToken.Create(_timeProvider.GetUtcNow().Add(_authSettings.RefreshTokenLifeTime));
+        await _refreshTokenRepository.ExpireRefreshTokenAsync(staff.StaffId);
+        await _refreshTokenRepository.UpdateRefreshTokenAsync(staff.StaffId, refreshToken);
+        return (accessToken, refreshToken.Token);
+    }
+
+    ///<inheritdoc/>
+    public async ValueTask<(string accessToken, string refreshToken)> RefreshAccessTokenAsync(string accessToken, string refreshToken)
+    {
+        var (staff, newAccessToken) = await _authService.RefreshAccessTokenAsync(accessToken, refreshToken);
+        var newRefreshToken = RefreshToken.Create(_timeProvider.GetUtcNow().Add(_authSettings.RefreshTokenLifeTime));
+        await _refreshTokenRepository.UpdateRefreshTokenAsync(staff.StaffId, newRefreshToken);
+        return (newAccessToken, newRefreshToken.Token);
     }
 }

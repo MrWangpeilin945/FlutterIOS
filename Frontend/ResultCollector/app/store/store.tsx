@@ -1,12 +1,16 @@
 import { atom } from "jotai";
-import type { NamedEntity, ConnectionEquipment } from "~/interfaces/interfaces";
+import type {
+  StringIdNamedEntity,
+  NumberIdNamedEntity,
+  ConnectionEquipment,
+} from "~/interfaces/interfaces";
 import type { PlaceSchedule } from "~/domain/wellship.schemas";
 
-export const teamState = atom<NamedEntity | null>(null);
+export const teamState = atom<StringIdNamedEntity | null>(null);
 export const placeScheduleState = atom<PlaceSchedule | null>(null);
 export const examDateState = atom<Date | null>(null);
-export const staffState = atom<NamedEntity | null>(null);
-export const examMenuState = atom<NamedEntity[] | null>(null);
+export const staffState = atom<StringIdNamedEntity | null>(null);
+export const examMenuState = atom<NumberIdNamedEntity[] | null>(null);
 export const connectionEquipmentState = atom<ConnectionEquipment[] | null>(
   null,
 );
