@@ -376,7 +376,7 @@ export default function ExamVision({
             positionNumber === 裸眼
               ? "裸眼"
               : positionNumber === 矯正
-                ? "両眼"
+                ? "矯正"
                 : "特記",
           examItemDetails: [],
           examRegistResults: [],
