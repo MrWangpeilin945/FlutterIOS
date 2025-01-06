@@ -296,23 +296,25 @@ export default function ExamBP2({
     }
     const bpHValues: number[] = [];
     const bpLValues: number[] = [];
-
     for (const item of updatedExamItems) {
       if (
-        item.positionNumber === 血圧1回目 ||
-        item.positionNumber === 血圧2回目
+        item.positionNumber !== 血圧1回目 &&
+        item.positionNumber !== 血圧2回目
       ) {
-        for (const detail of item.examItemDetails ?? []) {
-          if (detail.value !== undefined) {
-            const parsedValue = Number.parseFloat(detail.value);
-            if (!Number.isNaN(parsedValue)) {
-              if (detail.positionNumber === 上) {
-                bpHValues.push(parsedValue);
-              } else if (detail.positionNumber === 下) {
-                bpLValues.push(parsedValue);
-              }
-            }
-          }
+        continue;
+      }
+      for (const detail of item.examItemDetails ?? []) {
+        if (detail.value === undefined) {
+          continue;
+        }
+        const parsedValue = Number.parseFloat(detail.value);
+        if (Number.isNaN(parsedValue)) {
+          continue;
+        }
+        if (detail.positionNumber === 上) {
+          bpHValues.push(parsedValue);
+        } else if (detail.positionNumber === 下) {
+          bpLValues.push(parsedValue);
         }
       }
     }
@@ -451,13 +453,19 @@ export default function ExamBP2({
           name,
           examRegistResults = [],
         } = item;
+
         const highDetail = examItemDetails?.find((detail: ExamItemDetail) =>
-          detail.positionNumber === 上 ? detail : []
+          detail.positionNumber === 1 ? detail : null
         );
         const lowDetail = examItemDetails?.find((detail: ExamItemDetail) =>
-          detail.positionNumber === 下 ? detail : []
+          detail.positionNumber === 2 ? detail : null
         );
         const isAVE = item?.positionNumber === 平均値;
+        const isDisableItem =
+          !highDetail?.hasOrder ||
+          !!highDetail.cancelReasonId ||
+          !lowDetail?.hasOrder ||
+          !!lowDetail.cancelReasonId;
 
         return (
           <Flex
@@ -483,8 +491,6 @@ export default function ExamBP2({
               </Paper>
               {examItemDetails?.map((detail) => {
                 // グレーアウト表示判定
-                const isDisabled =
-                  !!detail?.cancelReasonId || !detail?.hasOrder;
 
                 return (
                   <Flex key={detail?.positionNumber}>
@@ -514,8 +520,8 @@ export default function ExamBP2({
                       <TextInput
                         classNames={{
                           input: `${styles["input-textbox"]} ${
-                            isDisabled
-                              ? ""
+                            isDisableItem
+                              ? `${styles["input-disabled"]}`
                               : examRegistResults?.some(
                                   (x) => x.errorLevel === InputErrorLevel.異常
                                 )
@@ -530,9 +536,9 @@ export default function ExamBP2({
                         w={172}
                         radius="md"
                         size="inputComponent"
-                        bg={isDisabled ? "gray03" : ""}
-                        c={isDisabled ? "gray02" : ""}
-                        value={isDisabled ? "" : detail?.value}
+                        bg={isDisableItem ? "gray03" : ""}
+                        c={isDisableItem ? "gray02" : ""}
+                        value={isDisableItem ? "" : detail?.value}
                         onChange={(e) =>
                           handleChange(
                             e.currentTarget.value,
@@ -546,7 +552,7 @@ export default function ExamBP2({
                             detail?.positionNumber ?? 0
                           )
                         }
-                        disabled={isDisabled}
+                        disabled={isDisableItem}
                       />
                     )}
                     {detail?.positionNumber === 上 && (
