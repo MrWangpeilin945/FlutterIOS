@@ -1,17 +1,21 @@
-import { axiosInstance } from "./axiosInstance";
 import { getDefaultStore } from "jotai/vanilla";
 import CryptoJS from "crypto-js";
 import { clearAllState, serverTimeOffsetState } from "~/store/store";
+import { authenticationRefresh } from "~/api/wellship";
 
 const accessTokenName = "resultCollectorAccessToken";
 // 暗号化のキー
 const encryptionKey = "RyobiSystems1965";
+// APIのバージョン
+const apiVersion = "1";
 
 // JWTのペイロードを格納するインターフェース
 interface JwtPayload {
   iat: number;
   exp: number;
 }
+
+let refreshTokenPromise: Promise<boolean> | null = null;
 
 // 認証周りの共通処理を定義
 export const authUtil = {
@@ -46,16 +50,22 @@ export const authUtil = {
 
   // アクセストークンを再取得する
   refreshAccessToken: async (): Promise<boolean> => {
-    try {
-      // todo まだAPIがないためコメントアウト
-      // 共通関数はReactのフックを使用できないのと、この処理にキャッシュは不要と思われる
-      // Orvalが出力したAPI実行するほうの関数を呼ぶようにしたい
-      // const response = await axiosInstance.post("/auth/refresh");
-      // authUtil.setAccessToken(response.data);
-      return true;
-    } catch (error) {
-      return false;
+    if (!refreshTokenPromise) {
+      refreshTokenPromise = (async () => {
+        try {
+          // キャッシュを使用せず直接アクセストークンリフレッシュのAPIを呼び出す
+          const accessToken = authUtil.getAccessToken();
+          const response = await authenticationRefresh(apiVersion, {
+            token: accessToken ?? "",
+          });
+          authUtil.setAccessToken(response.data.token ?? "");
+          return true;
+        } catch (error) {
+          return false;
+        }
+      })();
     }
+    return refreshTokenPromise;
   },
 
   // ログアウト処理
@@ -111,12 +121,12 @@ export const authUtil = {
     return clientCurrentTime - decoded.iat;
   },
 
-  // 暗号化
+  // 暗号化を行う
   encrypt: (data: string): string => {
     return CryptoJS.AES.encrypt(data, encryptionKey).toString();
   },
 
-  // 復号化
+  // 復号化を行う
   decrypt: (ciphertext: string): string => {
     const bytes = CryptoJS.AES.decrypt(ciphertext, encryptionKey);
     return bytes.toString(CryptoJS.enc.Utf8);
