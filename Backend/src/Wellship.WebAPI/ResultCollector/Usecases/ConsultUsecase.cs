@@ -533,6 +533,23 @@ public class ConsultUsecase : IConsultUsecase
             // 会場ロック中
             throw new PlaceScheduleLockedException();
         }
+        var examItemIds = results.ExamResults.Select(x => x.ExamItemId);
+        // 検査結果相関ルールを検証する
+        var ruleErrors = await ValidateCorrelationRuleAsync(consultNumber, results);
+        if (ruleErrors.Any())
+        {
+            var errors = ruleErrors.Where(x => examItemIds.Contains(x.ExamItemId ?? -1));
+            if (errors.Any())
+            {
+                throw new ExamResultRegistrationErrorException();
+            }
+        }
+        // 検査基準値を検証する
+        var rangeErrors = await ValidateNormalValueRangeAsync(consultNumber, results);
+        if (rangeErrors.Any())
+        {
+            throw new ExamResultRegistrationErrorException();
+        }
         var resultList = results.ExamResults.SelectMany(exam => exam.ExamItemDetails)
                                             .Select(detail => new ExamResultRegisteEntity
                                             {
@@ -658,14 +675,24 @@ public class ConsultUsecase : IConsultUsecase
                                                         MinValue = r.MinValue
                                                     }).ToArray()
                     }).ToArray(),
-                    // 検査基準値エラー
+                    // 検査基準値エラーと相関ルールをマージする
                     ExamRegistResults = 
-                        rangeErrors.Where(err => ei.ExamItemDetails.Select(ed => ed.ExamItemDetailId).Contains(err.ExamItemDetailId))
-                                   .Select(err => new ExamRegistResult
+                        rangeErrors.Where(range => ei.ExamItemDetails.Select(ed => ed.ExamItemDetailId).Contains(range.ExamItemDetailId))
+                                   .Select(range => new ExamRegistResult
                                     {
-                                        ErrorLevel = (int)err.ErrorLevel,
-                                        Description = err.Name 
-                                    }).ToArray()
+                                        ErrorLevel = (int)range.ErrorLevel,
+                                        Description = range.Name 
+                                    })
+                                   .Concat(
+                                        ruleErrors.Where(rule => ei.ExamItemId == rule.ExamItemId)
+                                                  .Select(rule => new ExamRegistResult
+                                                  {
+                                                    ErrorLevel = (int)rule.ErrorLevel,
+                                                    Description = rule.Message
+                                                  })
+                                   )
+                                   .OrderBy(x => x.ErrorLevel)
+                                   .ToArray()
                 }).ToArray()
             }).ToArray();        
     }
