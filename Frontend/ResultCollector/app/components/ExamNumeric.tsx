@@ -99,10 +99,11 @@ export default function ExamNumeric({
     // コールバック判断用のコンポーネントのエラーメッセージ
     const componentErrorMessage: ExamRegistResult[] = [];
     // detailsのpositionNumberが1のものについてバリデーションチェックを行う
-    for (const { name, positionNumber, value } of item.examItemDetails ?? []) {
+    for (const { positionNumber, value } of item.examItemDetails ?? []) {
       if (positionNumber !== 1) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
       }
+
       // 必須チェックと半角数字チェックを一度に行うスキーマ
       const schema = z
         .string()
@@ -227,10 +228,13 @@ export default function ExamNumeric({
     prevValue,
     unit,
     value,
+    hasOrder,
+    cancelReasonId,
     integerLength,
     decimalLength,
     keyboard,
   } = targetDetails ?? {};
+  const isDisabled = !hasOrder || !!cancelReasonId;
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Group w="11168" gap={16}>
@@ -251,22 +255,26 @@ export default function ExamNumeric({
         </Paper>
         <TextInput
           classNames={{
-            input: `${styles["input-textbox"]} ${
-              examRegistResults?.some(
-                (x) => x.errorLevel === InputErrorLevel.異常
-              )
-                ? `${styles["input-error"]}`
-                : examRegistResults?.some(
-                    (x) => x.errorLevel === InputErrorLevel.警告
-                  )
-                ? `${styles["input-warning"]}`
-                : ""
-            }`,
+            input: `${styles["input-textbox"]}
+             ${
+               isDisabled
+                 ? ""
+                 : examRegistResults?.some(
+                     (x) => x.errorLevel === InputErrorLevel.異常
+                   )
+                 ? `${styles["input-error"]}`
+                 : examRegistResults?.some(
+                     (x) => x.errorLevel === InputErrorLevel.警告
+                   )
+                 ? `${styles["input-warning"]}`
+                 : ""
+             }`,
           }}
           w={340}
           radius="md"
           size="inputComponent"
           value={value}
+          disabled={isDisabled}
           onClick={() => setShowKeyboards(true)}
           onChange={(e) =>
             handleChange(
@@ -291,6 +299,7 @@ export default function ExamNumeric({
           bg="white01"
           variant="outline"
           bd={"2px,solid"}
+          disabled={isDisabled}
           tabIndex={-1}
           onClick={() => handleChange("", positionNumber)}
         >
