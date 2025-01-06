@@ -58,7 +58,7 @@ export default function ExamVision({
   const 矯正入力値_右 = 4;
   const 矯正入力値_両眼 = 5;
 
-  // 必要な検査項目がすべて存在しない場合を確認
+  // 必要な検査項目が1つも存在しない場合は表示しない
   const visionItemPositionNumbers = [裸眼, 矯正, 特記];
   const allMissing = visionItemPositionNumbers.every(
     (position) => !examItems.some((item) => item.positionNumber === position),
