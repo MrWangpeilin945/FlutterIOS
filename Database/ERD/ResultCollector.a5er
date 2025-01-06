@@ -2037,3 +2037,17 @@ Bar3=720
 TermPos1=R
 TermPos2=R
 ZOrder=115
+
+[View]
+PName=consult_threshold_view
+LName=受診_基準値
+Comment=
+Query=select\n    c.consult_id                                -- 受診番号\n    , c.consult_number                          -- 受診番号\n    , o.exam_item_detail_id                     -- 検査項目明細ID\n    , ct.priority                               -- 優先度\n    , th.name as \Qthreshold_name\Q               -- 基準値名\n    , vr.name as \Qrange_name\Q                   -- 基準値範囲名\n    , vr.min_age                                -- 対象年齢下限\n    , vr.max_age                                -- 対象年齢上限\n    , vr.target_sex                             -- 対象性別\n    , vr.min_value                              -- 値下限\n    , vr.max_value                              -- 値上限\n    , vr.error_level                            -- エラーレベル\nfrom\n    resultcollector.consult c \n    inner join resultcollector.exam_item_detail_orders o \n        on c.consult_id = o.consult_id \n    left join resultcollector.exam_normal_value_range vr \n        on o.exam_item_detail_id = vr.exam_item_detail_id \n    inner join resultcollector.consult_thresholds ct \n        on vr.threshold_id = ct.threshold_id \n        and c.consult_id = ct.consult_id \n    left join resultcollector.thresholds th \n        on ct.threshold_id = th.threshold_id \norder by\n    c.consult_number\n    , o.exam_item_detail_id\n    , ct.priority\n    , vr.target_sex\n    , vr.min_age\n    , vr.min_value\n    , vr.error_level desc;\n
+LNameByComment=1
+Color=$000000
+BkColor=$FFFFFF
+Position="Main",3550,200,468,356
+ZOrder=116
+Page=Main
+Left=3550
+Top=200

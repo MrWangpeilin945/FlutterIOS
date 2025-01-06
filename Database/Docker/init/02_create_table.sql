@@ -542,6 +542,42 @@ CREATE TABLE exam_menus (
   , CONSTRAINT exam_menus_PKC PRIMARY KEY (exam_menu_id)
 );
 
+CREATE VIEW consult_threshold_view AS 
+select
+    c.consult_id                                -- 受診番号
+    , c.consult_number                          -- 受診番号
+    , o.exam_item_detail_id                     -- 検査項目明細ID
+    , ct.priority                               -- 優先度
+    , th.name as "threshold_name"               -- 基準値名
+    , vr.name as "range_name"                   -- 基準値範囲名
+    , vr.min_age                                -- 対象年齢下限
+    , vr.max_age                                -- 対象年齢上限
+    , vr.target_sex                             -- 対象性別
+    , vr.min_value                              -- 値下限
+    , vr.max_value                              -- 値上限
+    , vr.error_level                            -- エラーレベル
+from
+    resultcollector.consult c 
+    inner join resultcollector.exam_item_detail_orders o 
+        on c.consult_id = o.consult_id 
+    left join resultcollector.exam_normal_value_range vr 
+        on o.exam_item_detail_id = vr.exam_item_detail_id 
+    inner join resultcollector.consult_thresholds ct 
+        on vr.threshold_id = ct.threshold_id 
+        and c.consult_id = ct.consult_id 
+    left join resultcollector.thresholds th 
+        on ct.threshold_id = th.threshold_id 
+order by
+    c.consult_number
+    , o.exam_item_detail_id
+    , ct.priority
+    , vr.target_sex
+    , vr.min_age
+    , vr.min_value
+    , vr.error_level desc;
+
+;
+
 ALTER TABLE affiliations
   ADD CONSTRAINT affiliations_FK1 FOREIGN KEY (examinee_id) REFERENCES examinees(examinee_id)
   ON DELETE RESTRICT
@@ -774,6 +810,20 @@ COMMENT ON COLUMN consult_notes.code IS '検査特記コード';
 COMMENT ON COLUMN consult_notes.note IS '特記事項';
 COMMENT ON COLUMN consult_notes.created_at IS '作成日時';
 COMMENT ON COLUMN consult_notes.created_by IS '作成者';
+
+COMMENT ON VIEW consult_threshold_view IS '受診_基準値';
+COMMENT ON COLUMN consult_threshold_view.consult_id IS '受診番号';
+COMMENT ON COLUMN consult_threshold_view.consult_number IS '受診番号';
+COMMENT ON COLUMN consult_threshold_view.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN consult_threshold_view.priority IS '優先度';
+COMMENT ON COLUMN consult_threshold_view.threshold_name IS '基準値名';
+COMMENT ON COLUMN consult_threshold_view.range_name IS '基準値範囲名';
+COMMENT ON COLUMN consult_threshold_view.min_age IS '対象年齢下限';
+COMMENT ON COLUMN consult_threshold_view.max_age IS '対象年齢上限';
+COMMENT ON COLUMN consult_threshold_view.target_sex IS '対象性別';
+COMMENT ON COLUMN consult_threshold_view.min_value IS '値下限';
+COMMENT ON COLUMN consult_threshold_view.max_value IS '値上限';
+COMMENT ON COLUMN consult_threshold_view.error_level IS 'エラーレベル';
 
 COMMENT ON TABLE consult_thresholds IS '基準値';
 COMMENT ON COLUMN consult_thresholds.threshold_id IS '基準値パターンID';
