@@ -36,5 +36,5 @@ public interface IPlaceScheduleRepository
     /// <summary>
     /// 会場日程での同姓同名の有無を判定する
     /// </summary>
-    public Task<bool> IsSamename(string consultNumber);
+    public Task<bool> IsSamenameAsync(string consultNumber);
 }

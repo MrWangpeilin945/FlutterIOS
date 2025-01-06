@@ -32,6 +32,22 @@
 }
 ----
 
+=== レスポンスヘッダ
+
+==== Cookie
+
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|refreshToken
+|Yes
+|string
+|リフレッシュトークン(HTTPOnly)
+|`1234567890abcdef...`
+
+|===
+
 === レスポンスボディ
 
 [source,json]
@@ -45,6 +61,6 @@
 === ステータスコード
 
 * 200 OK
-* 403 Forbidden
+* 401 Unauthorized
 ** ログインが拒否された場合
 

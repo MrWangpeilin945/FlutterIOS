@@ -11,6 +11,7 @@ using FluentAssertions;
 
 using Moq;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
+using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
@@ -27,10 +28,16 @@ namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
             var organizationRepositoryMock = new Mock<IOrganizationRepository>();
             var organizations = new List<Organization>
             {
-                new Organization { Code = "1", Name = "団体1" },
-                new Organization { Code = "2", Name = "団体2" }
+                new Organization { Code = "1", Name = "団体1", InputNote = "1" },
+                new Organization { Code = "2", Name = "団体2", InputNote = "2" }
             };
-            organizationRepositoryMock.Setup(r => r.UpsertOrganaizationsAsync(organizations));
+            var organizationEntities = organizations.Select(item => new OrganizationEntity
+            {
+                OrganizationCode = item.Code,
+                Name = item.Name
+            }).ToList();
+
+            organizationRepositoryMock.Setup(r => r.UpsertOrganizationsAsync(organizationEntities, DateTime.Now, "ExternalConnection"));
 
             var usecases = new OrganizationUsecases(organizationRepositoryMock.Object);
 

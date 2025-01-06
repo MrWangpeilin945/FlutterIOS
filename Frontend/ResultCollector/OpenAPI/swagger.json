@@ -66,6 +66,60 @@
         }
       }
     },
+    "/api/v{version}/staff/login/refresh": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "アクセストークンをリフレッシュする",
+        "operationId": "Authentication_Refresh",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccessTokenRefreshRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffLoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v{version}/cancelReasons": {
       "get": {
         "tags": [
@@ -238,48 +292,6 @@
         }
       }
     },
-    "/api/v{version}/consult/{consultNumber}/simple": {
-      "get": {
-        "tags": [
-          "Consult"
-        ],
-        "summary": "簡易な受診者情報を取得する",
-        "operationId": "Consult_GetSimpleExaminee",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "consultNumber",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v{version}/consult/{consultNumber}/examItems": {
       "get": {
         "tags": [
@@ -289,25 +301,25 @@
         "operationId": "Consult_GetExamItemsExaminee",
         "parameters": [
           {
+            "name": "consultNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
             "name": "examMenuId",
             "in": "query",
             "schema": {
               "type": "integer",
               "format": "int32"
             },
-            "x-position": 1
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
             "x-position": 2
           },
           {
-            "name": "consultNumber",
+            "name": "version",
             "in": "path",
             "required": true,
             "schema": {
@@ -450,8 +462,7 @@
             "required": true,
             "description": "受診番号",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             },
             "x-position": 1
           },
@@ -507,6 +518,286 @@
             }
           },
           "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v{version}/consult/{consultNumber}/prior/{currentExamId}": {
+      "get": {
+        "tags": [
+          "Consult"
+        ],
+        "summary": "前提検査メニューを検証する（仮：動作確認用）",
+        "operationId": "Consult_ValidatePriorExamMenus",
+        "parameters": [
+          {
+            "name": "consultNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "currentExamId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InputExamItems"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v{version}/consult/{consultNumber}/correlation": {
+      "post": {
+        "tags": [
+          "Consult"
+        ],
+        "summary": "検査結果相関ルールを検証する（仮：動作確認用）",
+        "operationId": "Consult_ValidateCorrelationRule",
+        "parameters": [
+          {
+            "name": "consultNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 3
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResultsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v{version}/consult/{consultNumber}/results": {
+      "post": {
+        "tags": [
+          "Consult"
+        ],
+        "summary": "検査結果を登録する",
+        "operationId": "Consult_RegisterResults",
+        "parameters": [
+          {
+            "name": "consultNumber",
+            "in": "path",
+            "required": true,
+            "description": "受診番号",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 3
+          }
+        ],
+        "requestBody": {
+          "x-name": "results",
+          "description": "検査結果登録項目",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResultsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v{version}/consult/{consultNumber}/results/verify": {
+      "post": {
+        "tags": [
+          "Consult"
+        ],
+        "summary": "検査結果を検証する",
+        "operationId": "Consult_VerifyResults",
+        "parameters": [
+          {
+            "name": "consultNumber",
+            "in": "path",
+            "required": true,
+            "description": "受診番号",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 3
+          }
+        ],
+        "requestBody": {
+          "x-name": "results",
+          "description": "検査結果検証項目",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResultsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyExamItems"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -622,6 +913,59 @@
         }
       }
     },
+    "/api/v{version}/health/app": {
+      "get": {
+        "tags": [
+          "HealthCheck"
+        ],
+        "summary": "アプリケーション起動の正常性を確認する。",
+        "operationId": "HealthCheck_GetHealth",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v{version}/health/database": {
+      "get": {
+        "tags": [
+          "HealthCheck"
+        ],
+        "summary": "データベース接続の正常性を確認する。",
+        "operationId": "HealthCheck_GetDeepHealth",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "503": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v{version}/homeMenus": {
       "get": {
         "tags": [
@@ -634,8 +978,8 @@
             "name": "placeScheduleId",
             "in": "query",
             "schema": {
-              "type": "integer",
-              "format": "int32",
+              "type": "string",
+              "format": "guid",
               "nullable": true
             },
             "x-position": 1
@@ -739,8 +1083,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "guid"
             },
             "x-position": 1
           },
@@ -982,8 +1326,8 @@
             "name": "teamId",
             "in": "query",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "guid"
             },
             "x-position": 2
           },
@@ -1054,8 +1398,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "guid"
             },
             "x-position": 1
           },
@@ -1124,8 +1468,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "guid"
             },
             "x-position": 1
           },
@@ -1201,8 +1545,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "guid"
             },
             "x-position": 1
           },
@@ -1228,189 +1572,6 @@
             }
           },
           "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v{version}/consult/{consultNumber}/results/verify": {
-      "post": {
-        "tags": [
-          "Result"
-        ],
-        "summary": "検査結果を検証する",
-        "operationId": "Result_VerifyResults",
-        "parameters": [
-          {
-            "name": "consultNumber",
-            "in": "path",
-            "required": true,
-            "description": "受診番号",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 3
-          }
-        ],
-        "requestBody": {
-          "x-name": "results",
-          "description": "検査結果検証項目",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResultsRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerifyExamItems"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v{version}/consult/{consultNumber}/results": {
-      "post": {
-        "tags": [
-          "Result"
-        ],
-        "summary": "検査結果を登録する",
-        "operationId": "Result_RegisterResults",
-        "parameters": [
-          {
-            "name": "consultNumber",
-            "in": "path",
-            "required": true,
-            "description": "受診番号",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 3
-          }
-        ],
-        "requestBody": {
-          "x-name": "results",
-          "description": "検査結果登録項目",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResultsRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
             "description": "",
             "content": {
               "application/json": {
@@ -1451,6 +1612,51 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v{version}/organization/insert": {
+      "get": {
+        "tags": [
+          "OrganizationTest"
+        ],
+        "summary": "団体を登録する",
+        "operationId": "OrganizationTest_InsertOrganization",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
           },
           "401": {
             "description": "",
@@ -1533,6 +1739,17 @@
           }
         }
       },
+      "AccessTokenRefreshRequest": {
+        "type": "object",
+        "description": "アクセストークンをリフレッシュするためのリクエスト",
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "アクセストークン"
+          }
+        }
+      },
       "CancelReasonList": {
         "type": "object",
         "description": "中止理由リスト",
@@ -1585,14 +1802,14 @@
         "additionalProperties": false,
         "properties": {
           "consultId": {
-            "type": "integer",
+            "type": "string",
             "description": "受診ID",
-            "format": "int32"
+            "format": "guid"
           },
           "examineeId": {
-            "type": "integer",
+            "type": "string",
             "description": "受診者ID",
-            "format": "int32"
+            "format": "guid"
           },
           "examineeName": {
             "type": "string",
@@ -1631,6 +1848,10 @@
           "consultNumber": {
             "type": "string",
             "description": "受診番号"
+          },
+          "consultName": {
+            "type": "string",
+            "description": "特記事項"
           },
           "examinee": {
             "description": "受診者情報",
@@ -1679,10 +1900,9 @@
         "description": "受診者情報",
         "additionalProperties": false,
         "properties": {
-          "examineeId": {
-            "type": "integer",
-            "description": "受診者ID",
-            "format": "int32"
+          "ticketNumber": {
+            "type": "string",
+            "description": "受付番号"
           },
           "name": {
             "type": "string",
@@ -1756,7 +1976,8 @@
           "cancelReasonId": {
             "type": "integer",
             "description": "中止理由ID",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           }
         }
       },
@@ -1834,10 +2055,9 @@
         "description": "検査結果入力画面 受診者情報",
         "additionalProperties": false,
         "properties": {
-          "receptionNumber": {
-            "type": "integer",
-            "description": "受付番号",
-            "format": "int32"
+          "ticketNumber": {
+            "type": "string",
+            "description": "受付番号"
           },
           "kanaName": {
             "type": "string",
@@ -1939,7 +2159,8 @@
           "cancelReasonId": {
             "type": "integer",
             "description": "中止理由ID",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "value": {
             "type": "string",
@@ -2069,6 +2290,79 @@
           }
         }
       },
+      "ResultsRequest": {
+        "type": "object",
+        "description": "検査結果の登録のリクエストモデル",
+        "additionalProperties": false,
+        "properties": {
+          "examMenuId": {
+            "type": "integer",
+            "description": "検査メニューID",
+            "format": "int32"
+          },
+          "examResults": {
+            "type": "array",
+            "description": "検査項目",
+            "items": {
+              "$ref": "#/components/schemas/ResultRequest"
+            }
+          }
+        }
+      },
+      "ResultRequest": {
+        "type": "object",
+        "description": "検査結果の登録の検査項目リクエストモデル",
+        "additionalProperties": false,
+        "properties": {
+          "examItemId": {
+            "type": "integer",
+            "description": "検査項目ID",
+            "format": "int32"
+          },
+          "examItemDetails": {
+            "type": "array",
+            "description": "検査項目明細",
+            "items": {
+              "$ref": "#/components/schemas/ExamItemDetailRequest"
+            }
+          }
+        }
+      },
+      "ExamItemDetailRequest": {
+        "type": "object",
+        "description": "検査結果の登録の検査項目明細リクエストモデル",
+        "additionalProperties": false,
+        "properties": {
+          "examItemDetailId": {
+            "type": "integer",
+            "description": "検査項目明細ID",
+            "format": "int32"
+          },
+          "value": {
+            "type": "string",
+            "description": "値"
+          }
+        }
+      },
+      "VerifyExamItems": {
+        "type": "object",
+        "description": "検査結果検証結果情報",
+        "additionalProperties": false,
+        "properties": {
+          "errorLevel": {
+            "type": "integer",
+            "description": "エラーレベル",
+            "format": "int32"
+          },
+          "examItemGroups": {
+            "type": "array",
+            "description": "検査結果入力項目グループ",
+            "items": {
+              "$ref": "#/components/schemas/ExamItemGroup"
+            }
+          }
+        }
+      },
       "EquipmentList": {
         "type": "object",
         "description": "検査機器リスト",
@@ -2138,6 +2432,11 @@
             "description": "会場日程状況",
             "format": "int32",
             "nullable": true
+          },
+          "staffRole": {
+            "type": "integer",
+            "description": "職員のロール",
+            "format": "int32"
           }
         }
       },
@@ -2201,9 +2500,9 @@
         "additionalProperties": false,
         "properties": {
           "placeScheduleId": {
-            "type": "integer",
+            "type": "string",
             "description": "会場日程ID",
-            "format": "int32"
+            "format": "guid"
           },
           "placeName": {
             "type": "string",
@@ -2259,9 +2558,9 @@
         "additionalProperties": false,
         "properties": {
           "placeScheduleId": {
-            "type": "integer",
+            "type": "string",
             "description": "会場日程ID",
-            "format": "int32"
+            "format": "guid"
           }
         }
       },
@@ -2290,9 +2589,9 @@
             "format": "guid"
           },
           "placeScheduleId": {
-            "type": "integer",
+            "type": "string",
             "description": "会場日程ID",
-            "format": "int32"
+            "format": "guid"
           },
           "placeName": {
             "type": "string",
@@ -2356,9 +2655,9 @@
         "additionalProperties": false,
         "properties": {
           "teamId": {
-            "type": "integer",
+            "type": "string",
             "description": "班ID",
-            "format": "int32"
+            "format": "guid"
           },
           "teamName": {
             "type": "string",
@@ -2379,9 +2678,9 @@
         "additionalProperties": false,
         "properties": {
           "placeId": {
-            "type": "integer",
+            "type": "string",
             "description": "会場ID",
-            "format": "int32"
+            "format": "guid"
           },
           "placeName": {
             "type": "string",
@@ -2395,9 +2694,9 @@
         "additionalProperties": false,
         "properties": {
           "teamId": {
-            "type": "integer",
+            "type": "string",
             "description": "班ID",
-            "format": "int32"
+            "format": "guid"
           },
           "teamName": {
             "type": "string",
@@ -2423,14 +2722,14 @@
         "additionalProperties": false,
         "properties": {
           "placeScheduleId": {
-            "type": "integer",
+            "type": "string",
             "description": "会場日程ID",
-            "format": "int32"
+            "format": "guid"
           },
           "placeId": {
-            "type": "integer",
+            "type": "string",
             "description": "会場ID",
-            "format": "int32"
+            "format": "guid"
           },
           "placeName": {
             "type": "string",
@@ -2448,14 +2747,14 @@
         "additionalProperties": false,
         "properties": {
           "placeScheduleId": {
-            "type": "integer",
+            "type": "string",
             "description": "会場日程ID",
-            "format": "int32"
+            "format": "guid"
           },
           "placeId": {
-            "type": "integer",
+            "type": "string",
             "description": "会場ID",
-            "format": "int32"
+            "format": "guid"
           },
           "placeName": {
             "type": "string",
@@ -2488,9 +2787,9 @@
         "additionalProperties": false,
         "properties": {
           "placeScheduleId": {
-            "type": "integer",
+            "type": "string",
             "description": "会場日程ID",
-            "format": "int32"
+            "format": "guid"
           },
           "placeScheduleLockingStatus": {
             "type": "integer",
@@ -2505,9 +2804,9 @@
         "additionalProperties": false,
         "properties": {
           "placeScheduleId": {
-            "type": "integer",
+            "type": "string",
             "description": "会場日程ID",
-            "format": "int32"
+            "format": "guid"
           },
           "placeName": {
             "type": "string",
@@ -2571,88 +2870,15 @@
           }
         }
       },
-      "VerifyExamItems": {
-        "type": "object",
-        "description": "検査結果検証結果情報",
-        "additionalProperties": false,
-        "properties": {
-          "errorLevel": {
-            "type": "integer",
-            "description": "エラーレベル",
-            "format": "int32"
-          },
-          "examItemGroups": {
-            "type": "array",
-            "description": "検査結果入力項目グループ",
-            "items": {
-              "$ref": "#/components/schemas/ExamItemGroup"
-            }
-          }
-        }
-      },
-      "ResultsRequest": {
-        "type": "object",
-        "description": "検査結果の登録のリクエストモデル",
-        "additionalProperties": false,
-        "properties": {
-          "examMenuId": {
-            "type": "integer",
-            "description": "検査メニューID",
-            "format": "int32"
-          },
-          "examResults": {
-            "type": "array",
-            "description": "検査項目",
-            "items": {
-              "$ref": "#/components/schemas/ResultRequest"
-            }
-          }
-        }
-      },
-      "ResultRequest": {
-        "type": "object",
-        "description": "検査結果の登録の検査項目リクエストモデル",
-        "additionalProperties": false,
-        "properties": {
-          "examItemId": {
-            "type": "integer",
-            "description": "検査項目ID",
-            "format": "int32"
-          },
-          "examItemDetails": {
-            "type": "array",
-            "description": "検査項目明細",
-            "items": {
-              "$ref": "#/components/schemas/ExamItemDetailRequest"
-            }
-          }
-        }
-      },
-      "ExamItemDetailRequest": {
-        "type": "object",
-        "description": "検査結果の登録の検査項目明細リクエストモデル",
-        "additionalProperties": false,
-        "properties": {
-          "examItemDetailId": {
-            "type": "integer",
-            "description": "検査項目明細ID",
-            "format": "int32"
-          },
-          "value": {
-            "type": "string",
-            "description": "値"
-          }
-        }
-      },
       "Staff": {
         "type": "object",
         "description": "職員",
         "additionalProperties": false,
         "properties": {
           "staffId": {
-            "type": "integer",
+            "type": "string",
             "description": "職員ID",
-            "format": "int32"
+            "format": "guid"
           },
           "staffName": {
             "type": "string",

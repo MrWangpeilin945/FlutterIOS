@@ -43,7 +43,7 @@ INSERT INTO teams(team_id,team_code,name,order_number,created_at,created_by) VAL
 -- 会場日程
 INSERT INTO place_schedule(place_schedule_id,place_id,team_id,status,exam_date,start_time,created_at,created_by) VALUES 
     ('aceced00-0000-0000-0000-000000000001','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-10-01','0900',CURRENT_TIMESTAMP,'init')
-  , ('aceced00-0000-0000-0000-000000000002','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-10-01','1300',CURRENT_TIMESTAMP,'init')
+  , ('aceced00-0000-0000-0000-000000000002','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-10-02','1300',CURRENT_TIMESTAMP,'init')
   , ('aceced00-0000-0000-0000-000000000003','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000002',21,DATE '2024-11-02','1000',CURRENT_TIMESTAMP,'init')
   , ('20d6daa6-eac7-4ef4-8ea4-0f3b439668a6','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-11-30','1000',CURRENT_TIMESTAMP,'init');
 
@@ -109,8 +109,10 @@ INSERT INTO roles(role_id,name,created_at,created_by) VALUES
 
 -- 職員
 INSERT INTO staffs(staff_id,staff_code,login_id,name,password_hash,password_salt,enabled,role_id,created_at,created_by) VALUES 
-    ('affd0000-0000-0000-0000-000000000001','S001','S001','職員A',DECODE('cndlYnJ0MzU2Nzh0ZXNuZXNydHNlbXRhM3c0YW0zNGF3NG1hdzM0bWE0cWEzNG1yNzg=', 'base64'),DECODE('d3JhT1VZSVJUVDRFNXJld3J0', 'base64'),True,10,CURRENT_TIMESTAMP,'init')
-  , ('affd0000-0000-0000-0000-000000000002','S002','S002','職員B',DECODE('bWh0anV1ZHI1dXlzZXJ5', 'base64'),DECODE('ZXdiNWFxMzRyYmdlbnN5cmVtc2VyeQ==', 'base64'),True,20,CURRENT_TIMESTAMP,'init');
+    -- 職員Aパスワード：syokuinA
+    ('affd0000-0000-0000-0000-000000000001','S001','S001','職員A',DECODE('TX+Y1tzM7x6bfFxQob8oVpkSfY+avT+MJpGRzzJ54yilcsTx1T987plGIUW7ORJhfcPAPqreEzyyjzq2ufsw+w==', 'base64'),DECODE('NaGPpMzTwdKiSWC8zWjj84nKm8WlXvlZSwIJ4o7kjo9/j4Hllkk61/8Vz14JVAx/KGt3GMGNE0Z/LmEb7Qfe4fAjf+aVMNkyuAywRBzwT7hUbzivt3NHohOVgIg3tYnVdLn+M4sORWIiYmq5kot9zWc02rRFeSraF4jORxQXucQ=', 'base64'),True,10,CURRENT_TIMESTAMP,'init')
+    -- 職員Bパスワード：syokuinB
+  , ('affd0000-0000-0000-0000-000000000002','S002','S002','職員B',DECODE('yQTwvk3Ikc+VmAq6nFXfoXeDbNR1RGOnuK62e5NLz6quuPp/5mtxBFZLxDLqngERjYu7AyPAO2FhW/R0e7oxyw==', 'base64'),DECODE('q0T+ID2EsZ5blalDOD1Jweorjd/z+g4f1yChM/2+OcEBdvZikMyVYIDURkklt5W3JtCP41bpb6rWl6MnL+R6naTj0a4CqRkToVU6GXhhMNlAHbei8RBDHSWi9fSX5+c68pJaYflvndTCaUQAO/0jDpwW9rzE0jBzlx7H2kZzPMc=', 'base64'),True,20,CURRENT_TIMESTAMP,'init');
 
 -- 団体
 INSERT INTO organizations(organization_id,organization_code,name,order_number,created_at,created_by) VALUES 
@@ -145,29 +147,29 @@ INSERT INTO export_history_details(id,consult_id,created_at,created_by) VALUES
   , ('8f2edd5a-9ad3-4445-96a8-1b2129f60929','caaaaa00-0000-0000-0000-000000000005',CURRENT_TIMESTAMP,'init');
 
 -- 検査項目明細依頼
-INSERT INTO exam_item_detail_orders(consult_id,exam_item_detail_id,created_at,created_by) VALUES 
-    ('caaaaa00-0000-0000-0000-000000000001',1,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000001',2,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000001',711,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000001',712,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000001',721,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000001',722,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',1,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',2,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',711,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',712,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',721,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000002',722,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000003',1,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000003',2,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000003',711,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000003',712,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',1,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',2,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',711,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',712,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',721,CURRENT_TIMESTAMP,'init')
-  , ('caaaaa00-0000-0000-0000-000000000004',722,CURRENT_TIMESTAMP,'init');
+INSERT INTO exam_item_detail_orders(consult_id,exam_item_detail_id,external_exam_item_detail_code,created_at,created_by) VALUES 
+    ('caaaaa00-0000-0000-0000-000000000001',1,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000001',2,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000001',711,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000001',712,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000001',721,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000001',722,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',1,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',2,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',711,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',712,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',721,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000002',722,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000003',1,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000003',2,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000003',711,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000003',712,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',1,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',2,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',711,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',712,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',721,'',CURRENT_TIMESTAMP,'init')
+  , ('caaaaa00-0000-0000-0000-000000000004',722,'',CURRENT_TIMESTAMP,'init');
 
 -- 中止理由
 INSERT INTO cancel_reasons(cancel_reason_id,name,exam_item_id,order_number,created_at,created_by) VALUES 
@@ -251,6 +253,11 @@ insert into exam_menu_note_results(menu_note_id,exam_item_detail_id,source_type,
     (1,1,1,1,CURRENT_TIMESTAMP,'init')
   , (1,1,2,2,CURRENT_TIMESTAMP,'init');
 
+-- 検査メニュー特記_コード
+insert into exam_menu_note_codes(code,name,created_at,created_by) VALUES
+    ('ST01','撮影番号',CURRENT_TIMESTAMP,'init')
+  , ('ST02','○○番号',CURRENT_TIMESTAMP,'init');
+
 -- 検査メニュー特記_受診
 insert into exam_menu_note_consults(menu_note_id,code,order_number,created_at,created_by) VALUES
     (2,'ST01',1,CURRENT_TIMESTAMP,'init')
@@ -260,3 +267,41 @@ insert into exam_menu_note_consults(menu_note_id,code,order_number,created_at,cr
 insert into consult_notes(consult_id, code, note, created_at, created_by) VALUES
     ('8dda2a54-5217-425f-bba9-ab821a9647fe','ST01','01-001',CURRENT_TIMESTAMP,'init')
   , ('8dda2a54-5217-425f-bba9-ab821a9647fe','ST02','02-001',CURRENT_TIMESTAMP,'init');
+
+-- 基準値パターン
+insert into thresholds(threshold_id, threshold_code, name, order_number, created_at, created_by) VALUES
+    ('aa114e6d-c63e-4f44-96fa-42989129147a','701','収縮期血圧',1,CURRENT_TIMESTAMP,'init')
+  , ('a71b27d3-4cd6-46ce-a99c-d998574029f1','702','拡張期血圧',2,CURRENT_TIMESTAMP,'init');
+
+-- 基準値
+insert into consult_thresholds(threshold_id, consult_id, priority, created_at, created_by) VALUES
+    ('aa114e6d-c63e-4f44-96fa-42989129147a','8dda2a54-5217-425f-bba9-ab821a9647fe',1,CURRENT_TIMESTAMP,'init')
+  , ('a71b27d3-4cd6-46ce-a99c-d998574029f1','8dda2a54-5217-425f-bba9-ab821a9647fe',1,CURRENT_TIMESTAMP,'init');
+
+-- 検査基準値範囲
+insert into exam_normal_value_range(name, threshold_id, exam_item_detail_id, max_age, min_age, target_sex, max_value, min_value, error_level, created_at, created_by) VALUES
+    ('収縮期（50以上300以下）正常範囲',  'aa114e6d-c63e-4f44-96fa-42989129147a',711,'9999999','00000',3,300,50,1,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10以上200以下）正常範囲','a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'9999999','00000',3,200,10,1,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（50以上300以下）正常範囲','aa114e6d-c63e-4f44-96fa-42989129147a',721,'9999999','00000',3,300,50,1,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10以上200以下）正常範囲','a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,200,10,1,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（50未満）下限警告',       'aa114e6d-c63e-4f44-96fa-42989129147a',711,'9999999','00000',3,49,0,2,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10未満）下限警告',       'a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'9999999','00000',3,9,0,2,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（50未満）下限警告',       'aa114e6d-c63e-4f44-96fa-42989129147a',721,'9999999','00000',3,49,0,2,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10未満）下限警告',       'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,9,0,2,CURRENT_TIMESTAMP,'init')              
+    , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',711,'9999999','00000',3,9999,301,3,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',721,'9999999','00000',3,9999,301,3,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init');
+
+-- 検査実施判定ルール
+insert into decision_rules(decision_rule_id,name,exam_menu_id,priority,trigger_type,error_level,message,created_at,created_by) VALUES 
+    (1,'体重差が前年より20kgオーバー',7,1,1,3,'体重の計測ミスのため実施できません。',CURRENT_TIMESTAMP,'init');
+
+-- 検査実施判断ルール_判定値
+insert into decision_rule_evaluations(decision_rule_id,variable_number,evaluation_value,created_at,created_by) VALUES 
+    (1,1,30.0,CURRENT_TIMESTAMP,'init');
+
+-- 検査実施判断ルール_検査項目明細
+insert into decision_rule_exam_item_details(decision_rule_id,variable_number,source_type,exam_item_detail_id,created_at,created_by) VALUES
+    (1,1,1,2,CURRENT_TIMESTAMP,'init')
+  , (1,2,2,2,CURRENT_TIMESTAMP,'init');

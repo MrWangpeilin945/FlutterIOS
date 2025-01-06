@@ -117,6 +117,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
       title={title}
       closeOnClickOutside={false} // modalの外クリックしても消えないように
       withCloseButton={false} // closeボタンを消す
+      centered
       styles={{
         header: {
           height: 75,
@@ -232,7 +233,7 @@ export default function ExamresultExport() {
 
   // 結果出力確認ダイアログを表示する
   const showResultsOutputConfirmDialog = useCallback(
-    async (placeScheduleId: number) => {
+    async (placeScheduleId: string) => {
       // 結果出力確認ダイアログの結果を取得する
       const confirmResult = await ref.current?.resultsOutputConfirm();
       if (confirmResult) {
@@ -277,7 +278,7 @@ export default function ExamresultExport() {
   );
 
   const handleClick = (
-    placeScheduleId?: number,
+    placeScheduleId?: string,
     examDate?: string,
     placeName?: string,
   ) => {
@@ -287,7 +288,7 @@ export default function ExamresultExport() {
     };
     setResultsOutputConfirmDialog(resultsOutputConfirmDialogData);
     // 結果出力確認ダイアログを表示する
-    showResultsOutputConfirmDialog(placeScheduleId || 0);
+    showResultsOutputConfirmDialog(placeScheduleId || "");
   };
 
   return (
@@ -327,7 +328,15 @@ export default function ExamresultExport() {
                               "yyyy/MM/dd",
                             )}
                         </Table.Td>
-                        <Table.Td w={297}>{ed.placeName}</Table.Td>
+                        <Table.Td
+                          w={297}
+                          style={{
+                            wordBreak: "break-word",
+                            whiteSpace: "pre-wrap",
+                          }}
+                        >
+                          {ed.placeName}
+                        </Table.Td>
                         <Table.Td ta="center">
                           <Button
                             variant="outline"
@@ -461,7 +470,15 @@ export default function ExamresultExport() {
                     <Text size="lg" c="black01">
                       会場：
                     </Text>
-                    <Text w={646} size="lg" c="black01">
+                    <Text
+                      w={646}
+                      size="lg"
+                      c="black01"
+                      style={{
+                        wordBreak: "break-word",
+                        whiteSpace: "pre-wrap",
+                      }}
+                    >
                       {resultsOutputConfirmDialog?.placeName}
                     </Text>
                   </Group>

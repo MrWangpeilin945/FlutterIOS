@@ -46,8 +46,8 @@ public class ExamContent
     /// <summary>
     /// 検査実施判断結果
     /// </summary>
-    [JsonPropertyName("examDecisionResult")]
-    public required string[] ExamDecisionResult { get; init; }
+    [JsonPropertyName("examDecisionResults")]
+    public required ExamDecisionResult[] ExamDecisionResults { get; init; }
 
     /// <summary>
     /// 未実施検査項目

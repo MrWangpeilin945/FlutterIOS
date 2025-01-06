@@ -1,5 +1,3 @@
-using Ryobi.Wellship.APIModels.Responses;
-
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 /// <summary>
@@ -10,5 +8,13 @@ public interface IAuthenticationUsecase
     /// <summary>
     /// ログインする
     /// </summary>
-    public void Login();
+    /// <param name="identifier">ログインID</param>
+    /// <param name="password">パスワード</param>
+    public ValueTask<(string accessToken, string refreshToken)> LoginStaffAsync(string identifier, string password);
+    /// <summary>
+    /// アクセストークンをリフレッシュする
+    /// </summary>
+    /// <param name="accessToken">古くなったアクセストークン</param>
+    /// <param name="refreshToken">リフレッシュトークン</param>
+    public ValueTask<(string accessToken, string refreshToken)> RefreshAccessTokenAsync(string accessToken, string refreshToken);
 }

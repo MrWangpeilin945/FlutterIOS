@@ -29,7 +29,7 @@ export default function Progress() {
   const [targetDate] = useState(examDate ? format(examDate, "yyyy-MM-dd") : "");
   const { isFetching, refetch } = useProgressGetProgress(
     "1",
-    placeSchedule?.placeScheduleId || 0,
+    placeSchedule?.placeScheduleId || "",
     {
       query: { enabled: false },
     },

@@ -26,5 +26,5 @@ public class RuleError
     /// 検査項目ID_出力用
     /// フロントエンドでエラーメッセージを出す場所として渡します
     /// </summary>
-    public required int ExamItemId { get; init; }
+    public int? ExamItemId { get; set; }
 }
