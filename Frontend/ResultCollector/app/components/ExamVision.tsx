@@ -21,6 +21,7 @@ import { z } from "zod";
 import { InputErrorLevel, KeyboardType } from "~/domain/enums";
 import type {
   ExamItemDetail,
+  ExamItemDetailOption,
   ExamRegistResult,
   InputExamItem,
 } from "~/domain/wellship.schemas";
@@ -48,6 +49,8 @@ export default function ExamVision({
   const 裸眼 = 1;
   const 矯正 = 2;
   const 特記 = 3;
+  const 左眼 = 1;
+  const 右眼 = 2;
   const 両眼 = 3;
   const 矯正区分_左 = 1;
   const 矯正区分_右 = 2;
@@ -69,7 +72,7 @@ export default function ExamVision({
   // 必須チェック用フラグ
   const [showRequiredError, setShowRequiredError] = useState(false);
   // 半角数字、矯正区分チェック用フラグ
-  let hasValidationError = true;
+  let hasValidationError = false;
 
   // キーボードの表示状態をオブジェクトで管理
   const [activeKeyboard, setActiveKeyboard] = useState<{
@@ -120,29 +123,22 @@ export default function ExamVision({
 
   // 1項目でも入力されているかをチェック
   const requiredCheck = (examItems: InputExamItem[]) => {
-    const allEmpty = examItems.every((item) =>
-      (item.examItemDetails ?? []).every((detail) => !detail.value),
+    const anyFilled = examItems.some((item) =>
+      (item.examItemDetails ?? []).some((detail) => detail.value),
     );
-    if (allEmpty) {
-      setShowRequiredError(true);
-    } else {
-      setShowRequiredError(false);
-    }
+    setShowRequiredError(!anyFilled);
   };
 
   // 半角数字チェック
-  const validateNumeric = (
-    value: string,
-    name: string,
-  ): ExamRegistResult | undefined => {
+  const validateNumeric = (detail: ExamItemDetail) => {
     const schema = z
       .string()
       .refine(
         (value) => value === "" || /^\d+(\.\d+)?$/.test(value),
-        getErrorMessage(errorMessages.numericString, `${name}は`),
+        getErrorMessage(errorMessages.numericString, `${detail.name}は`),
       );
 
-    const result = schema.safeParse(value);
+    const result = schema.safeParse(detail.value);
 
     if (!result.success) {
       // メッセージを追加
@@ -211,11 +207,13 @@ export default function ExamVision({
         detail.examItemDetailOptions.length > 0;
       if (isSelector) continue;
 
-      // 半角数字チェック
-      const valueToValidate = detail.value || "";
-      const result = validateNumeric(valueToValidate, detail.name ?? "");
-      if (result !== undefined) {
-        componentErrorMessage.push(result);
+      // オーダーが存在するかつ中止理由が存在しない場合
+      if (detail.hasOrder && !detail.cancelReasonId) {
+        // 半角数字チェック
+        const result = validateNumeric(detail);
+        if (result !== undefined) {
+          componentErrorMessage.push(result);
+        }
       }
 
       // 矯正の値が入力された場合に、矯正区分が選択されているかチェック
@@ -233,9 +231,16 @@ export default function ExamVision({
                 (d) => d.positionNumber === 矯正区分_右,
               );
 
-        const result = collectionCheck(valueToValidate, targetDetail ?? {});
-        if (result !== undefined) {
-          componentErrorMessage.push(result);
+        // 対象の矯正区分のオーダーが存在するかつ中止理由が存在しない場合
+        if (targetDetail?.hasOrder && !targetDetail.cancelReasonId) {
+          // 矯正区分チェック
+          const result = collectionCheck(
+            detail.value ?? "",
+            targetDetail ?? {},
+          );
+          if (result !== undefined) {
+            componentErrorMessage.push(result);
+          }
         }
       }
     }
@@ -243,7 +248,7 @@ export default function ExamVision({
     // 基準値によるエラーメッセージを追加
     componentErrorMessage.push(...(setRangesErrorMessage(item) ?? []));
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
-    const isCallback = !componentErrorMessage.some(
+    const hasError = componentErrorMessage.some(
       (error) => error.errorLevel === InputErrorLevel.異常,
     );
     // エラーメッセージをexamItemに保存
@@ -257,7 +262,7 @@ export default function ExamVision({
     // コールバックを判断するフラグを返す
     const ValidationResult = {
       validateResult: handleErrorMessage(resultItem),
-      hasCallback: isCallback,
+      hasError: hasError,
     };
     return ValidationResult;
   };
@@ -285,7 +290,7 @@ export default function ExamVision({
     examItems.map((item) => {
       if (item.positionNumber === itemNumber) {
         // validationCheckの結果を取得
-        const { validateResult, hasCallback } = validationCheck({
+        const { validateResult, hasError } = validationCheck({
           ...item,
           examItemDetails: item.examItemDetails?.map((detail) =>
             detail.positionNumber === detailNumber
@@ -295,8 +300,8 @@ export default function ExamVision({
         });
 
         // エラーがあった場合セット
-        if (!hasCallback) {
-          hasValidationError = hasCallback;
+        if (hasError) {
+          hasValidationError = hasError;
         }
 
         // validateResultを返す
@@ -312,7 +317,7 @@ export default function ExamVision({
     detailNumber: number,
     isSelector?: boolean,
   ) => {
-    hasValidationError = true;
+    hasValidationError = false;
 
     // 選択/未選択切替処理
     const checkedValue =
@@ -331,13 +336,97 @@ export default function ExamVision({
     );
 
     setExamItemsData(updatedExamItems);
+    // 必須チェック
     requiredCheck(updatedExamItems);
 
     // エラーが存在しない場合のみ onChange を実行
-    if (hasValidationError && !showRequiredError) {
+    if (!hasValidationError && !showRequiredError) {
       onChange(updatedExamItems);
     }
   };
+
+  // 必要なpositionNumberのリスト
+  const requiredPositions = [裸眼, 矯正, 特記];
+
+  // データ処理
+  const targetExamItems: InputExamItem[] = requiredPositions.map(
+    (positionNumber) => {
+      const detailRequiredPositions =
+        positionNumber === 裸眼
+          ? [左眼, 右眼, 両眼]
+          : positionNumber === 矯正
+            ? [
+                矯正区分_左,
+                矯正区分_右,
+                矯正入力値_左,
+                矯正入力値_右,
+                矯正入力値_両眼,
+              ]
+            : [左眼, 右眼]; //特記
+      // 該当するexamItemを検索
+      let examItem = examItemsData.find(
+        (item) => item.positionNumber === positionNumber,
+      );
+
+      // 該当するexamItemがなければデフォルトを設定
+      if (!examItem) {
+        examItem = {
+          positionNumber,
+          name:
+            positionNumber === 裸眼
+              ? "裸眼"
+              : positionNumber === 矯正
+                ? "両眼"
+                : "特記",
+          examItemDetails: [],
+          examRegistResults: [],
+        };
+      }
+
+      // examItemDetailsを処理
+      const examItemDetails = examItem.examItemDetails ?? [];
+      const { name, examRegistResults } = examItem;
+
+      // 各examItemDetailsの中で必要なpositionNumberを補完
+      const details = detailRequiredPositions.map((detailPosition) => {
+        const detail = examItemDetails.find(
+          (detail) => detail.positionNumber === detailPosition,
+        );
+
+        //選択系補完用の選択肢データ
+        let detailOptions: ExamItemDetailOption[] = [];
+        if (
+          positionNumber === 矯正 &&
+          (detailPosition === 矯正区分_左 || detailPosition === 矯正区分_右)
+        ) {
+          detailOptions = [
+            { orderNumber: 1, name: "メガネ" },
+            { orderNumber: 2, name: "コンタクト" },
+          ];
+        } else if (positionNumber === 特記) {
+          detailOptions = [
+            { orderNumber: 1, name: "メガネ不要" },
+            { orderNumber: 2, name: "コンタクト不要" },
+          ];
+        }
+
+        // 該当するdetailがなければデフォルトを設定
+        return (
+          detail || {
+            positionNumber: detailPosition,
+            examItemDetailOptions: detailOptions,
+          }
+        );
+      });
+
+      return {
+        positionNumber: positionNumber,
+        name: name,
+        examItemDetails: details,
+        examRegistResults: examRegistResults,
+      };
+    },
+  );
 
   const detailNames = ["視力　左", "視力　右", "両眼"];
   return (
@@ -367,7 +456,7 @@ export default function ExamVision({
           ))}
         </Flex>
         {/* 検査項目単位 */}
-        {examItemsData.map((item) => {
+        {targetExamItems.map((item) => {
           const isCorrection = item.positionNumber === 矯正;
           return (
             <>
@@ -406,82 +495,78 @@ export default function ExamVision({
                     } else {
                       isBothEyes = detail.positionNumber === 両眼;
                     }
-                    //選択ボタン用
+                    // 選択ボタン用
                     const isSelector =
                       Array.isArray(detail.examItemDetailOptions) &&
                       detail.examItemDetailOptions.length > 0;
 
                     return (
-                      <>
-                        <GridCol
-                          span={isBothEyes ? 3 : 4.5}
-                          key={detail.positionNumber}
-                        >
-                          {isSelector ? (
-                            // 選択ボタン
-                            <Group key={detail.positionNumber} h={78}>
-                              {detail.examItemDetailOptions?.map((option) => {
-                                const isSelected =
-                                  getValueByPositionNumbers(
-                                    examItemsData,
-                                    item.positionNumber ?? 0,
-                                    detail.positionNumber ?? 0,
-                                  ) === option.code;
-                                return (
-                                  <Button
-                                    key={option.orderNumber}
-                                    w={278}
-                                    h={78}
-                                    variant="outline"
-                                    bg={
-                                      isDisabled
-                                        ? "gray03"
-                                        : isSelected
-                                          ? "green03"
-                                          : "white"
-                                    }
-                                    color={
-                                      isDisabled
-                                        ? "gray02"
-                                        : isSelected
-                                          ? "primary"
-                                          : "gray02"
-                                    }
-                                    c={
-                                      isDisabled
-                                        ? "gray02"
-                                        : isSelected
-                                          ? "primary"
-                                          : "black"
-                                    }
-                                    size="xl"
-                                    fw={700}
-                                    value={option.code}
-                                    disabled={isDisabled}
-                                    onClick={(e) =>
-                                      handleChange(
-                                        e.currentTarget.value,
-                                        item.positionNumber ?? 0,
-                                        detail.positionNumber ?? 0,
-                                        true,
-                                      )
-                                    }
-                                  >
-                                    {option.name}
-                                  </Button>
-                                );
-                              })}
-                            </Group>
-                          ) : (
-                            // テキストボックス
-                            <Group>
-                              <TextInput
-                                classNames={{
-                                  input: `${styles["input-textbox"]} ${
-                                    item.examRegistResults?.some(
-                                      (x) =>
-                                        x.errorLevel === InputErrorLevel.異常,
-                                    ) || showRequiredError
+                      <GridCol
+                        span={isBothEyes ? 3 : 4.5}
+                        key={detail.positionNumber}
+                      >
+                        {isSelector ? (
+                          // 選択ボタン
+                          <Group key={detail.positionNumber} h={78}>
+                            {detail.examItemDetailOptions?.map((option) => {
+                              const isSelected =
+                                getValueByPositionNumbers(
+                                  examItemsData,
+                                  item.positionNumber ?? 0,
+                                  detail.positionNumber ?? 0,
+                                ) === option.code;
+                              return (
+                                <Button
+                                  key={option.orderNumber}
+                                  w={288}
+                                  h={78}
+                                  variant="outline"
+                                  bd={`2px solid ${isDisabled ? "" : isSelected ? "primary" : "gray03"}`}
+                                  bg={
+                                    isDisabled
+                                      ? "gray03"
+                                      : isSelected
+                                        ? "green03"
+                                        : "white"
+                                  }
+                                  c={
+                                    isDisabled
+                                      ? "gray02"
+                                      : isSelected
+                                        ? "primary"
+                                        : "black"
+                                  }
+                                  size="xl"
+                                  fw={700}
+                                  value={option.code}
+                                  disabled={isDisabled}
+                                  onClick={(e) =>
+                                    handleChange(
+                                      e.currentTarget.value,
+                                      item.positionNumber ?? 0,
+                                      detail.positionNumber ?? 0,
+                                      true,
+                                    )
+                                  }
+                                >
+                                  {option.name}
+                                </Button>
+                              );
+                            })}
+                          </Group>
+                        ) : (
+                          // テキストボックス
+                          <Group>
+                            <TextInput
+                              classNames={{
+                                input: `${styles["input-textbox"]} ${
+                                  isDisabled
+                                    ? ""
+                                    : item.examRegistResults?.some(
+                                          (x) =>
+                                            x.errorLevel ===
+                                            InputErrorLevel.異常,
+                                        ) || showRequiredError
                                       ? `${styles["input-error"]}`
                                       : item.examRegistResults?.some(
                                             (x) =>
@@ -490,35 +575,37 @@ export default function ExamVision({
                                           )
                                         ? `${styles["input-warning"]}`
                                         : ""
-                                  }`,
-                                }}
-                                w={isBothEyes ? 192 : 398}
-                                h={78}
-                                size="inputComponent"
-                                value={detail.value}
-                                ml={isBothEyes ? 0 : 8}
-                                onClick={() =>
-                                  toggleKeyboard(
-                                    item.positionNumber ?? 0,
-                                    detail.positionNumber ?? 0,
-                                  )
-                                }
-                                onChange={(e) =>
-                                  handleChange(
-                                    e.currentTarget.value,
-                                    item.positionNumber ?? 0,
-                                    detail.positionNumber ?? 0,
-                                  )
-                                }
-                                disabled={isDisabled}
-                              />
+                                }`,
+                              }}
+                              bg={isDisabled ? "gray03" : "white"}
+                              w={isBothEyes ? 192 : 398}
+                              h={78}
+                              size="inputComponent"
+                              value={detail.value}
+                              ml={isBothEyes ? 0 : 8}
+                              onClick={() =>
+                                toggleKeyboard(
+                                  item.positionNumber ?? 0,
+                                  detail.positionNumber ?? 0,
+                                )
+                              }
+                              onChange={(e) =>
+                                handleChange(
+                                  e.currentTarget.value,
+                                  item.positionNumber ?? 0,
+                                  detail.positionNumber ?? 0,
+                                )
+                              }
+                              disabled={isDisabled}
+                            />
+                            {detail.prevValue && (
                               <Text w={170} size="lg" fw={700}>
                                 (前回：{detail.prevValue})
                               </Text>
-                            </Group>
-                          )}
-                        </GridCol>
-                      </>
+                            )}
+                          </Group>
+                        )}
+                      </GridCol>
                     );
                   })}
                 </Grid>
