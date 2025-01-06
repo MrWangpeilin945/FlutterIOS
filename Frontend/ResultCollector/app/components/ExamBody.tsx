@@ -293,23 +293,12 @@ export default function ExamBody({
                 : positionNumber === 体脂肪率
                   ? "体脂肪率"
                   : "BMI",
-          examItemDetails: [],
+          examItemDetails: [{ positionNumber: 1 }],
           examRegistResults: [],
         };
       }
 
-      // examItemDetailsを処理
-      const examItemDetails = examItem.examItemDetails ?? [
-        { positionNumber: 1 },
-      ];
-      const { name, examRegistResults } = examItem;
-
-      return {
-        positionNumber: positionNumber,
-        name: name,
-        examItemDetails: examItemDetails,
-        examRegistResults: examRegistResults,
-      };
+      return examItem;
     },
   );
 
