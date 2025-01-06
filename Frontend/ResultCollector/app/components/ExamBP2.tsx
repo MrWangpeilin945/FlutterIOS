@@ -319,11 +319,11 @@ export default function ExamBP2({
       }
     }
     // 平均値の計算
-    const bpHAVE =
+    const averageBpHigh =
       bpHValues.length > 0
         ? Math.round(bpHValues.reduce((a, b) => a + b, 0) / bpHValues.length)
         : 0;
-    const bpLAVE =
+    const averageBpLow =
       bpLValues.length > 0
         ? Math.round(bpLValues.reduce((a, b) => a + b, 0) / bpLValues.length)
         : 0;
@@ -338,13 +338,13 @@ export default function ExamBP2({
           if (detail.positionNumber === 上) {
             return {
               ...detail,
-              value: bpHAVE.toString().slice(0, maxDigits),
+              value: averageBpHigh.toString().slice(0, maxDigits),
             };
           }
           if (detail.positionNumber === 下) {
             return {
               ...detail,
-              value: bpLAVE.toString().slice(0, maxDigits),
+              value: averageBpLow.toString().slice(0, maxDigits),
             };
           }
           return detail;
