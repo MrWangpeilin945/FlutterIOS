@@ -1,14 +1,14 @@
 # syntax=docker/dockerfile:1
 
 # build stage
-FROM node:22 AS build
+FROM public.ecr.aws/docker/library/node:22 AS build
 WORKDIR /source
 COPY Frontend/ResultCollector ./ResultCollector
 WORKDIR /source/ResultCollector
 RUN npm install && npm run build
 
 # final stage
-FROM nginx:1.27 AS nginx
+FROM public.ecr.aws/docker/library/nginx:1.27 AS nginx
 ENV TZ=Asia/Tokyo
 VOLUME /etc/nginx
 VOLUME /var/run

@@ -1,0 +1,214 @@
+== EC2012_会場日程を登録する
+
+=== 概要
+
+* 外部連携で使用する
+* 引数の会場日程をDBに登録する
+
+=== 処理フロー
+
+[mermaid]
+----
+flowchart TD
+    A[UseCase] --> ERROR{ERROR検証}
+    ERROR -- エラーあり --> C(ErrorObject生成、追加)
+    ERROR -- エラー無 --> WARNING{WARNING検証}    
+    WARNING -- ワーニングあり --> DROP(WARNINGレコードDrop)
+    DROP(WARNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
+    DROP_REC --> D[[Repository]]
+    WARNING -- ワーニング無 --> D
+    C --> E(返却)
+    D --> E
+    E --> UseCaseEND(END)
+
+    F[[Repository]] --> G[BEGIN]
+    G --> H1["Upsert(一括):[DB]place_schedule(会場日程)"]
+    H1 --> K[Commit]
+    H1 -.Exception.-> ROLLBACK[ROLLBACK]
+    K --> RepositoryEND[[END]]
+    ROLLBACK .-> RepositoryEND
+----
+
+=== 非機能
+
+* 1万レコードの登録を10秒以内に完了する
+* DB登録に失敗した場合、全てロールバックする
+
+=== UseCase
+
+[source]
+----
+StorePlaceSchedulesAsync
+----
+
+==== 引数
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|PlaceSchedules
+|Yes
+|List<PlaceSchedule>
+|登録する会場日程のリスト
+
+|===
+
+==== 戻り値
+
+[source]
+----
+list<ErrorObject>
+----
+
+===== 正常登録
+
+[source]
+----
+list.Count() == 0
+----
+
+===== 異常有り
+
+[source]
+----
+list.Count()  <> 0
+----
+
+==== クラス
+
+===== PlaceSchedule
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|TeamCode
+|Yes
+|string
+|班コード
+
+|PlaceCode
+|Yes
+|string
+|会場コード
+
+|ExamDate
+|Yes
+|Date
+|健診日/開始時刻
+
+|InputNote
+|Yes
+|string
+|エラーオブジェクトに登録する入力項目Noなど
+
+|===
+
+==== ErrorObject
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|エラーコード
+
+|Message
+|Yes
+|string
+|エラーメッセージ
+
+|InputNote
+|Yes
+|string
+|入力項目Noなど
+
+|===
+
+==== 列挙型
+
+* None
+
+==== ERROR検証
+
+* None
+
+==== WARNING検証
+
+* 会場IDが取得できない
+** `[DB]places(会場).place_code(会場コード)` == `PlaceSchedule.PlaceCode` が存在しない
+*** PlaceScheduleの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたPlaceCodeがシステム上に存在しません。Code:[PlaceSchedule.PlaceCode]`
+**** InputNote `PlaceSchedule.InputNote`
+
+* 班IDが取得できない
+** `[DB]teams(班).team_code(班コード)` == `PlaceSchedule.TeamCode` が存在しない
+*** PlaceScheduleの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたTeamCodeがシステム上に存在しません。Code:[PlaceSchedule.TeamCode]`
+**** InputNote `PlaceSchedule.InputNote`
+
+==== 処理(Repository)
+
+* 下記の登録値は、呼びもとで指定する
+** `created_at` に登録する `system.datetime.now()`
+** `created_by` に登録する `'ExternalConnection'`
+
+===== Table
+
+* [DB]PlaceSchedule(会場日程)
+
+===== Upsert
+
+* 競合条件
+** `[DB]PlaceSchedule.place_id(会場ID)` == `[DB]places.place_code` == `PlaceSchedule.PlaceCode` で検索した `[DB]places.place_id` +
+And `[DB]PlaceSchedule.team_id(班ID)` == `[DB]teams.team_code` == `PlaceSchedule.TeamCode` で検索した `[DB]teams.team_id`
+And `[DB]PlaceSchedule.exam_date(健診日)` == `PlaceSchedule.ExamDate` ※DateOnly型にパース
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|place_schedule_id
+|
+|DB:DEFAULT
+
+|place_id
+|`[DB]places.place_id`
+|`[DB]places.place_code` == `PlaceSchedule.PlaceCode` で検索し、`place_id`を登録する
+
+|team_id
+|`[DB]teams.team_id`
+|`[DB]teams.team_code` == `PlaceSchedule.TeamCode` で検索し、`team_id`を登録する
+
+|status
+|Insert:`enum<Wellship.Core\Enums\PlaceScheduleLockingStatus.検査中> int型にパースする, Update:更新しない
+|
+
+|exam_date
+|PlaceSchedule.ExamDate
+|DateOnly型にパースする
+
+|start_time
+|PlaceSchedule.ExamDate
+|ToString(`HHmm`)の形式で登録する
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+=== レビュー履歴
+
+WELLSHIP_DEV-943 [外部IF_設計]EC2012_会場日程を登録する レビュー・リワーク
