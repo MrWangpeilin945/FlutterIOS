@@ -311,9 +311,9 @@ public class ConsultUsecase : IConsultUsecase
         var results = new ResultsRequest
         {
             ExamMenuId = examMenuId,
-            ExamResults = 
+            ExamResults =
                 examItemGroup.SelectMany(group => group.ExamItems)
-                                .Select(item => new ResultRequest 
+                                .Select(item => new ResultRequest
                                 {
                                     ExamItemId = item.ExamItemId,
                                     ExamItemDetails = item.ExamItemDetails.Select(detail => new ExamItemDetailRequest
@@ -329,7 +329,7 @@ public class ConsultUsecase : IConsultUsecase
         // 検査基準値を検証する
         var rangeErrors = await ValidateNormalValueRangeAsync(consultNumber, results);
         // 検査項目グループ情報を取得する
-        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, examMenuId, results, examItemGroup, 
+        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, examMenuId, results, examItemGroup,
                                                      examResults, previousResults, ruleErrors, rangeErrors);
 
         return new InputExamItems()
@@ -584,8 +584,8 @@ public class ConsultUsecase : IConsultUsecase
         // 検査結果相関ルールを検証する
         var ruleErrors = await ValidateCorrelationRuleAsync(consultNumber, results);
         // 検査項目グループ情報を取得する
-        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, results.ExamMenuId, results, 
-                                                     examItemGroup,examResults, previousResults, ruleErrors, []);
+        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, results.ExamMenuId, results,
+                                                     examItemGroup, examResults, previousResults, ruleErrors, []);
         return new VerifyExamItems
         {
             // 検査項目グループ情報を取得する
@@ -597,8 +597,8 @@ public class ConsultUsecase : IConsultUsecase
     /// 検査項目グループ情報を取得する
     /// </summary>
     private async Task<IEnumerable<APIModels.Responses.ExamItemGroup>> GetExamItemGroups(string consultNumber, Guid consultId, Domain.Models.Age examAge, Sex sex, int examMenuId,
-                                                                                         ResultsRequest results, IEnumerable<Domain.Models.ExamItemGroup> examItemGroup, 
-                                                                                         Domain.Models.ExamResult examResults, Domain.Models.PreviousResult previousResults, 
+                                                                                         ResultsRequest results, IEnumerable<Domain.Models.ExamItemGroup> examItemGroup,
+                                                                                         Domain.Models.ExamResult examResults, Domain.Models.PreviousResult previousResults,
                                                                                          IEnumerable<Domain.Models.RuleError> ruleErrors, IEnumerable<Domain.Models.RangeError> rangeErrors)
     {
         // 検査項目明細IDを取得
@@ -624,76 +624,76 @@ public class ConsultUsecase : IConsultUsecase
         var examOrders = await _consultRepository.GetExamOrdersAsync(consultId);
 
         return examItemGroup.Select(eg => new APIModels.Responses.ExamItemGroup
+        {
+            Type = (int)eg.Type,
+            ExamItems = eg.ExamItems.Select(ei => new InputExamItem
             {
-                Type = (int)eg.Type,
-                ExamItems = eg.ExamItems.Select(ei => new InputExamItem
+                PositionNumber = ei.PositionNumber,
+                ExamItemId = ei.ExamItemId,
+                Name = ei.Name,
+                ExamItemDetails = ei.ExamItemDetails.Select(ed => new APIModels.Responses.ExamItemDetail
                 {
-                    PositionNumber = ei.PositionNumber,
-                    ExamItemId = ei.ExamItemId,
-                    Name = ei.Name,
-                    ExamItemDetails = ei.ExamItemDetails.Select(ed => new APIModels.Responses.ExamItemDetail
+                    PositionNumber = ed.PositionNumber,
+                    ExamItemDetailId = ed.ExamItemDetailId,
+                    EquipmentLabel = ed.EquipmentLabel,
+                    Name = ed.Name,
+                    HasOrder = examOrders.ExamItemDetailOrders.Any(x => x.ExamItemDetailId == ed.ExamItemDetailId),
+                    CancelReasonId = examCancels.ExamItemDetailCancels.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.CancelReasonId,
+                    Value = examResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
+                    PrevValue = previousResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
+                    Unit = ed.Unit,
+                    Type = (int)ed.Type,
+                    IntegerLength = ed.IntegerLength,
+                    DecimalLength = ed.DecimalLength,
+                    // キーボード入力
+                    Keyboard = new APIModels.Responses.Keyboard
                     {
-                        PositionNumber = ed.PositionNumber,
-                        ExamItemDetailId = ed.ExamItemDetailId,
-                        EquipmentLabel = ed.EquipmentLabel,
-                        Name = ed.Name,
-                        HasOrder = examOrders.ExamItemDetailOrders.Any(x => x.ExamItemDetailId == ed.ExamItemDetailId),
-                        CancelReasonId = examCancels.ExamItemDetailCancels.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.CancelReasonId,
-                        Value = examResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
-                        PrevValue = previousResults.ExamItemDetailResults.SingleOrDefault(x => x.ExamItemDetailId == ed.ExamItemDetailId)?.Value ?? "",
-                        Unit = ed.Unit,
-                        Type = (int)ed.Type,
-                        IntegerLength = ed.IntegerLength,
-                        DecimalLength = ed.DecimalLength,
-                        // キーボード入力
-                        Keyboard = new APIModels.Responses.Keyboard
-                        {
-                            KeyboardType = (int)ed.KeyboardType,
-                            Values = Keyboards.Where(kb => kb.ExamItemDetailId == ed.ExamItemDetailId)
-                                                .OrderBy(kb => kb.OptionId)
-                                                .Select(kb => kb.Value)
-                                                .ToArray()
-                        },
-                        // 選択肢
-                        ExamItemDetailOptions =
-                            examItemDetailOptions.Where(op => op.ExamItemDetailId == ed.ExamItemDetailId)
-                                                    .OrderBy(op => op.OrderNumber)
-                                                    .Select(op => new APIModels.Responses.ExamItemDetailOption
-                                                    {
-                                                        OrderNumber = op.OrderNumber,
-                                                        Code = op.Code,
-                                                        Name = op.Name
-                                                    }).ToArray(),
-                        // 検査基準値範囲
-                        ExamNormalValueRanges =
-                            examNormalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
-                                                    .OrderBy(r => r.ErrorLevel)
-                                                    .Select(r => new APIModels.Responses.ExamNormalValueRange
-                                                    {
-                                                        ErrorLevel = (int)r.ErrorLevel,
-                                                        MaxValue = r.MaxValue,
-                                                        MinValue = r.MinValue
-                                                    }).ToArray()
-                    }).ToArray(),
-                    // 検査基準値エラーと相関ルールをマージする
-                    ExamRegistResults = 
-                        rangeErrors.Where(range => ei.ExamItemDetails.Select(ed => ed.ExamItemDetailId).Contains(range.ExamItemDetailId))
-                                   .Select(range => new ExamRegistResult
-                                    {
-                                        ErrorLevel = (int)range.ErrorLevel,
-                                        Description = range.Name 
-                                    })
-                                   .Concat(
-                                        ruleErrors.Where(rule => ei.ExamItemId == rule.ExamItemId)
-                                                  .Select(rule => new ExamRegistResult
-                                                  {
-                                                    ErrorLevel = (int)rule.ErrorLevel,
-                                                    Description = rule.Message
-                                                  })
-                                   )
-                                   .OrderByDescending(x => x.ErrorLevel)
-                                   .ToArray()
-                }).ToArray()
-            }).ToArray();        
+                        KeyboardType = (int)ed.KeyboardType,
+                        Values = Keyboards.Where(kb => kb.ExamItemDetailId == ed.ExamItemDetailId)
+                                            .OrderBy(kb => kb.OptionId)
+                                            .Select(kb => kb.Value)
+                                            .ToArray()
+                    },
+                    // 選択肢
+                    ExamItemDetailOptions =
+                        examItemDetailOptions.Where(op => op.ExamItemDetailId == ed.ExamItemDetailId)
+                                                .OrderBy(op => op.OrderNumber)
+                                                .Select(op => new APIModels.Responses.ExamItemDetailOption
+                                                {
+                                                    OrderNumber = op.OrderNumber,
+                                                    Code = op.Code,
+                                                    Name = op.Name
+                                                }).ToArray(),
+                    // 検査基準値範囲
+                    ExamNormalValueRanges =
+                        examNormalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
+                                                .OrderBy(r => r.ErrorLevel)
+                                                .Select(r => new APIModels.Responses.ExamNormalValueRange
+                                                {
+                                                    ErrorLevel = (int)r.ErrorLevel,
+                                                    MaxValue = r.MaxValue,
+                                                    MinValue = r.MinValue
+                                                }).ToArray()
+                }).ToArray(),
+                // 検査基準値エラーと相関ルールをマージする
+                ExamRegistResults =
+                    rangeErrors.Where(range => ei.ExamItemDetails.Select(ed => ed.ExamItemDetailId).Contains(range.ExamItemDetailId))
+                               .Select(range => new ExamRegistResult
+                               {
+                                   ErrorLevel = (int)range.ErrorLevel,
+                                   Description = range.Name
+                               })
+                               .Concat(
+                                    ruleErrors.Where(rule => ei.ExamItemId == rule.ExamItemId)
+                                              .Select(rule => new ExamRegistResult
+                                              {
+                                                  ErrorLevel = (int)rule.ErrorLevel,
+                                                  Description = rule.Message
+                                              })
+                               )
+                               .OrderByDescending(x => x.ErrorLevel)
+                               .ToArray()
+            }).ToArray()
+        }).ToArray();
     }
 }
