@@ -297,7 +297,7 @@ INSERT INTO resultcollector.thresholds(threshold_id,threshold_code,name,order_nu
     ('36853b96-be4b-419b-a9c4-01ab0714eef3','common','共通',2,'init')
   , ('d5ae9e47-c9b3-410a-8963-669966daf9fc','ryobi','両備ドック',1,'init');
 
-INSERT INTO resultcollector.exam_normal_value_range(range_id,name,threshold_id,exam_item_detail_id,max_age,min_age,target_sex,max_value,min_value,error_level,created_by) VALUES 
+INSERT INTO resultcollector.exam_normal_value_range(range_id,name,threshold_id,exam_item_detail_id,min_age,max_age,target_sex,max_value,min_value,error_level,created_by) VALUES 
     ('012c2d8a-82cb-487c-a45a-dc78de90c0c7','共通_血圧_下_警告2','36853b96-be4b-419b-a9c4-01ab0714eef3',712,'0000000','9999999',3,999,90,2,'init')
   , ('159a5871-c6d1-4b5f-9637-6faae4983633','両備ドック_男_血圧_下_警告1','d5ae9e47-c9b3-410a-8963-669966daf9fc',712,'0000000','9999999',1,50,0.0,2,'init')
   , ('3915b419-3314-48ab-88e0-d54b2c44efcc','両備ドック_女_血圧_下_警告2','d5ae9e47-c9b3-410a-8963-669966daf9fc',712,'0000000','9999999',2,999,90,2,'init')
