@@ -22,6 +22,7 @@ export default function ExamineeHeader({
   const navigate = useNavigate();
 
   const displayableName = name.length > 14 ? `${name.slice(0, 13)}…` : name;
+  const isAgeNumber: boolean = typeof age === "number";
 
   return (
     <>
@@ -93,7 +94,8 @@ export default function ExamineeHeader({
 
         {/* 受付番号、受診者名、年齢 */}
         <Text size="lg" fw={700}>
-          {managerNo} {displayableName}({age})
+          {managerNo} {displayableName}
+          {isAgeNumber && `(${age})`}
         </Text>
         {/* ホームボタン */}
         <Button
