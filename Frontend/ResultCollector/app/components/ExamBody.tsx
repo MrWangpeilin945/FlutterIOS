@@ -47,17 +47,34 @@ export default function ExamBody({
   const 体脂肪率 = 3;
   const BMI = 4;
 
-  // 必要なpositionNumberがすべて存在するか確認
-  const bodyItemPositionNumbers = [身長, 体重, 体脂肪率, BMI];
-  const allPositionsExist = bodyItemPositionNumbers.every((position) =>
-    examItems.some((item) => item.positionNumber === position),
+  // 必要な検査項目が1つも存在しない場合は表示しない
+  const bodyItemPositionNumbers = [身長, 体重, 体脂肪率];
+  const hasValidDetail = examItems.some(
+    (item) =>
+      bodyItemPositionNumbers.includes(item.positionNumber ?? 0) &&
+      item.examItemDetails?.some((detail) => detail.positionNumber === 1),
   );
 
-  if (!allPositionsExist) {
+  if (!hasValidDetail) {
     return null;
   }
 
   const [examItemsData, setExamItemsData] = useState(examItems);
+
+  // BMI計算処理に必要な要素が存在するかを確認
+  const bmiItemPositionNumbers = [身長, 体重, BMI];
+  const existBMI = bmiItemPositionNumbers.every((position) =>
+    examItems.some(
+      (item) =>
+        item.positionNumber === position &&
+        (item.examItemDetails ?? []).some(
+          (detail) =>
+            detail.positionNumber === 1 &&
+            detail.hasOrder === true &&
+            !detail.cancelReasonId,
+        ),
+    ),
+  );
 
   // キーボードの表示インデックスを状態として管理する
   const [activeKeyboard, setActiveKeyboard] = useState<number | null>(null);
@@ -131,13 +148,17 @@ export default function ExamBody({
       });
 
     // バリデーション対象データを取得
-    const valueToValidate =
-      item.examItemDetails?.find((item) => item.positionNumber === 1)?.value ||
-      "";
-    const result = schema.safeParse(valueToValidate);
+    const targetDetail = item.examItemDetails?.find(
+      (item) => item.positionNumber === 1,
+    );
+    const result = schema.safeParse(targetDetail?.value);
 
     // バリデーションが失敗した場合
-    if (!result.success) {
+    if (
+      !result.success &&
+      targetDetail?.hasOrder &&
+      !targetDetail.cancelReasonId
+    ) {
       const error = result.error.errors[0]; // 最初のエラーだけ取得
       componentErrorMessage.push({
         description: error.message,
@@ -169,6 +190,9 @@ export default function ExamBody({
 
   // BMI計算処理
   const setBMIValue = (updatedExamItems: InputExamItem[]): InputExamItem[] => {
+    // 身長、体重、BMIの明細が存在しない場合はそのまま返す
+    if (!existBMI) return updatedExamItems;
+
     const heightValue =
       examItems
         .find((item) => item.positionNumber === 身長)
@@ -183,7 +207,7 @@ export default function ExamBody({
     // BMIの計算
     const height = Number.parseFloat(heightValue) / 100;
     const weight = Number.parseFloat(weightValue);
-    const bmi = Number.isNaN(weight / height ** 2) ? 0 : weight / height ** 2;
+    const bmi = height ? weight / height ** 2 : "";
     const bmiString = String(bmi);
 
     return updatedExamItems.map((item) => {
@@ -210,7 +234,7 @@ export default function ExamBody({
   const handleChange = (positionNumber: number | undefined, value: string) => {
     const updatedExamItems = [...examItemsData];
     // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
-    let hasValidationError = true;
+    let hasValidationError = false;
 
     // 該当するアイテムを更新
     for (const item of updatedExamItems) {
@@ -228,7 +252,7 @@ export default function ExamBody({
       const { validateResult, hasCallback } = validationCheck(item);
       if (!hasCallback) {
         // falseのexamItemがあればコールバックを行わない
-        hasValidationError = false;
+        hasValidationError = true;
       }
       // バリデーション結果を反映
       Object.assign(item, validateResult);
@@ -239,14 +263,46 @@ export default function ExamBody({
     // 更新されたデータをステートに設定
     setExamItemsData(bmiUpdatedExamItems);
 
-    if (hasValidationError) {
+    if (!hasValidationError) {
       onChange(bmiUpdatedExamItems);
     }
   };
 
+  // 必要なpositionNumberのリスト
+  const requiredPositions = [身長, 体重, 体脂肪率, BMI];
+
+  // データ処理
+  const targetExamItems: InputExamItem[] = requiredPositions.map(
+    (positionNumber) => {
+      // 該当するexamItemを検索
+      let examItem = examItemsData.find(
+        (item) => item.positionNumber === positionNumber,
+      );
+
+      // 該当するexamItemがなければデフォルトを設定
+      if (!examItem) {
+        examItem = {
+          positionNumber,
+          name:
+            positionNumber === 身長
+              ? "身長"
+              : positionNumber === 体重
+                ? "体重"
+                : positionNumber === 体脂肪率
+                  ? "体脂肪率"
+                  : "BMI",
+          examItemDetails: [{ positionNumber: 1 }],
+          examRegistResults: [],
+        };
+      }
+
+      return examItem;
+    },
+  );
+
   return (
     <>
-      {examItemsData.map((item) => {
+      {targetExamItems.map((item) => {
         const { positionNumber, name, examRegistResults = [] } = item;
         const detail =
           item.examItemDetails?.find((detail) => detail.positionNumber === 1) ??
@@ -322,7 +378,7 @@ export default function ExamBody({
                 {detail?.prevValue && (
                   <Text fw={700}>(前回：{detail.prevValue})</Text>
                 )}
-                <Text size="xs">{detail?.unit}</Text>
+                {!isBMI && <Text size="xs">{detail?.unit}</Text>}
               </Stack>
               {!isBMI && (
                 <Button
@@ -332,7 +388,11 @@ export default function ExamBody({
                   bg={"white"}
                   variant="outline"
                   bd={"2px,solid"}
-                  onClick={() => handleChange(positionNumber, "")}
+                  onClick={() => {
+                    if (!isDisabled) {
+                      handleChange(positionNumber, "");
+                    }
+                  }}
                   ml={49}
                   tabIndex={-1}
                 >
