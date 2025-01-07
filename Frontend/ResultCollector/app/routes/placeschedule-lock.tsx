@@ -58,14 +58,14 @@ export default function PlaceScheduleLock() {
     },
     {
       placeScheduleLockingStatus: PlaceScheduleLockingStatus.検査中,
-      buttonName: "ロック解除",
+      buttonName: "会場ロック解除",
     },
   ];
 
   //AP1016呼び出し用(GET系APIの定義)
   const { isFetching, refetch } = usePlaceScheduleGetPlaceScheduleLockingStatus(
     "1",
-    placeSchedule?.placeScheduleId || 0,
+    placeSchedule?.placeScheduleId || "",
     { query: { enabled: false } },
   );
 
@@ -94,7 +94,7 @@ export default function PlaceScheduleLock() {
     fetchGetPlaceScheduleLocking();
   }, []);
 
-  // ボタン(会場ロック, ロック解除)クリック
+  // ボタン(会場ロック, 会場ロック解除)クリック
   const handleButtonClick = async (
     lockingStatus: PlaceScheduleLockingStatus,
   ) => {
@@ -113,7 +113,7 @@ export default function PlaceScheduleLock() {
   const fetchUpdateLockingStatus = async () => {
     // POST時のリクエストボディを生成する
     const body: PlaceScheduleLockingRequest = {
-      placeScheduleId: placeSchedule?.placeScheduleId || 0,
+      placeScheduleId: placeSchedule?.placeScheduleId || "",
       placeScheduleLockingStatus: processStatus || 0,
     };
 
@@ -122,7 +122,7 @@ export default function PlaceScheduleLock() {
       try {
         const result = await mutateAsync({
           version: "1",
-          placeScheduleId: placeSchedule?.placeScheduleId || 0,
+          placeScheduleId: placeSchedule?.placeScheduleId || "",
           data: body,
         });
         if (result.status === 200) {

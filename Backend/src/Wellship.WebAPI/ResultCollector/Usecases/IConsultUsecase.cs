@@ -46,6 +46,11 @@ public interface IConsultUsecase
     public Task<IEnumerable<Domain.Models.RuleError>> ValidateCorrelationRuleAsync(string consultNumber, ResultsRequest result);
 
     /// <summary>
+    /// 検査正常値を検証する
+    /// </summary>
+    public Task<IEnumerable<Domain.Models.RangeError>> ValidateNormalValueRangeAsync(string consultNumber, ResultsRequest result);
+
+    /// <summary>
     /// 検査結果を登録する
     /// </summary>
     public Task RegisterResultsAsync(string consultNumber, ResultsRequest results);    
@@ -53,5 +58,5 @@ public interface IConsultUsecase
     /// <summary>
     /// 検査結果を検証する
     /// </summary>
-    public void VerifyResults();
+    public Task<VerifyExamItems> VerifyResults(string consultNumber, ResultsRequest results);
 }

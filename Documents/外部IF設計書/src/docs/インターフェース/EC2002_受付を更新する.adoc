@@ -1,0 +1,381 @@
+== EC2002_受付を更新する
+
+=== 概要
+
+* 外部連携で使用する
+* 引数の受付をDBに登録する
+
+=== 処理フロー
+
+[mermaid]
+----
+flowchart TD
+    A[UseCase] --> ERROR{ERROR検証}
+    ERROR -- エラーあり --> C(ErrorObject生成、追加)
+    ERROR -- エラー無 --> WARNING{WARNING検証}    
+    WARNING -- ワーニングあり --> DROP(WARNINGレコードDrop)
+    DROP(WARNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
+    DROP_REC --> D[[Repository]]
+    WARNING -- ワーニング無 --> D
+    C --> E(返却)
+    D --> E
+    E --> UseCaseEND(END)
+
+    F[[Repository]] --> G[BEGIN]
+    G --> H["Update(一括):[DB]consult(受診)"]
+    H --> I["Upsert(一括):[DB]tickets(受付)"]
+    I --> J["Dalete(一括):[DB]tickets(受付)"]
+    J --> K["Insert(一括):[DB]tickets_histories(受付履歴)"]
+    K --> L[Commit]
+    H -.Exception.-> ROLLBACK[ROLLBACK]
+    G -.Exception.-> ROLLBACK
+    I -.Exception.-> ROLLBACK
+    J -.Exception.-> ROLLBACK
+    K -.Exception.-> ROLLBACK
+    L --> RepositoryEND[[END]]
+    ROLLBACK .-> RepositoryEND
+----
+
+=== 非機能
+
+* 1万レコードの登録を10秒以内に完了する
+* 検証・DB登録に失敗した場合、全てロールバックする
+
+=== UseCase
+
+[source]
+----
+StoreTicketsAsync
+----
+
+==== 引数
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Tickets
+|Yes
+|List<Ticket>
+|登録する受付のリスト
+
+|===
+
+==== 戻り値
+
+[source]
+----
+list<ErrorObject>
+----
+
+===== 正常登録
+
+[source]
+----
+list.Count() == 0
+----
+
+===== 異常有り
+
+[source]
+----
+list.Count()  <> 0
+----
+
+==== クラス
+
+===== Ticket
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|SortNo
+|Yes
+|num
+|処理順
+
+|ConnectionCode
+|Yes
+|string
+|連携キー（重複あり）
+
+|ActionType
+|Yes
+|enum<Wellship.WebAPI\ExternalConnection\Enums\ActionType>
+|連携モード
+
+|TicketNumber
+|No
+|string
+|受付番号
+
+|InputNote
+|Yes
+|string
+|エラーオブジェクトに登録する入力項目Noなど
+
+|===
+
+==== ErrorObject
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|エラーコード
+
+|Message
+|Yes
+|string
+|エラーメッセージ
+
+|InputNote
+|Yes
+|string
+|入力項目Noなど
+
+|===
+
+==== 列挙型
+
+===== ActionType
+
+namespace : `Wellship.WebAPI.ExternalConnection.Enums`
+
+[cols="1,1,2" options="header"]
+|===
+|名称|値|説明
+
+|登録
+|0
+|データを登録する
+
+|削除
+|1
+|データを削除する
+
+|===
+
+==== ERROR検証
+
+* None
+
+==== WARNING検証
+
+* 連携キーの取得に失敗
+** `[DB]consult(受診).external_connection_code(外部連携キー)` == `Ticket.ConnectionCode` が存在しない
+*** Ticketの単位で該当を取り除く
+*** ErrorObject
+*** Code `10001`
+**** Message `指定されたConnectionCodeがシステム上に存在しません。Code:[Ticket.ConnectionCode]` 
+**** InputNote `Ticket.InputNote`
+
+=== 処理(Repository)
+
+* `Ticket.ConnectionCode` でグループ化し、 `Ticket.SortNo` が最大のレコードでを処理対象とする
+** ただし、`[DB]tickets_histories(受付履歴)` は全レコード追加(履歴として管理するため)
+
+* 下記の登録値は、呼びもとで指定する
+** `created_at` に登録する `system.datetime.now()`
+** `created_by` に登録する `'ExternalConnection'`
+
+==== 登録イメージ
+
+[cols="1,1,1,1,2,2" options="header"]
+|===
+|SortNo|ConnectionCode|ActionType|TicketNumber|[DB]tickets|[DB]tickets_histories
+
+|1
+|C001
+|登録
+|1000
+|
+|Insert
+
+|2
+|C001
+|削除
+|
+|
+|Insert
+
+|3
+|C001
+|登録
+|2000
+|Insert
+|Insert
+
+|4
+|C002
+|登録
+|1001
+|
+|Insert
+
+|5
+|C002
+|削除
+|
+|Delete
+|Insert
+
+|===
+
+==== 登録処理
+
+* 条件
+** `Ticket.ActionType` == `ActionType.登録` And +
+`Ticket.ConnectionCode` でグループ化し、 `Ticket.SortNo` が最大のレコード
+
+===== Table
+
+* [DB]consult(受診)
+
+===== Update
+
+* 更新条件
+** `[DB]consult.external_connection_code` == `Ticket.ConnectionCode` のレコード
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|progress_status
+|`enum<Wellship.Core\Enums\ConsultProgressStatus.検査中>`
+|int型にパースする
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`ExternalConnection`
+|
+
+|===
+
+更新対象列のみ記載
+
+===== Table
+
+* [DB]tickets(受付)
+
+===== Upsert
+
+* 競合条件
+*** `[DB]consult.external_connection_code` == `Ticket.ConnectionCode` で検索して取得した `[DB]consult.consult_id(受診ID)` == `[DB]tickets.consult_id(受診ID)`
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|Insert: `[DB]consult.consult_id` + 
+Update: 更新しない
+|`[DB]consult(受診).external_connection_code(外部連携キー)` == `Ticket.ConnectionCode` で検索して取得
+
+|ticket_number
+|`Ticket.TicketNumber`
+|
+
+|===
+
+==== 削除処理
+
+* 条件
+** `Ticket.ActionType` == `ActionType.削除` And +
+`Ticket.ConnectionCode` でグループ化し、 `Ticket.SortNo` が最大のレコード
+
+===== Table
+
+* [DB]consult(受診)
+
+===== Update
+
+* 更新条件
+** `[DB]consult.external_connection_code` == `Ticket.ConnectionCode` のレコード
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|progress_status
+|`enum<Wellship.Core\Enums\ConsultProgressStatus.来場待ち>`
+|int型にパースする
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`ExternalConnection`
+|
+
+|===
+
+更新対象列のみ記載
+
+===== Table
+
+* [DB]tickets(受付)
+
+===== Delete
+
+* 削除条件
+*** `[DB]consult.external_connection_code` == `Ticket.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]tickets.consult_id`
+**** 削除対象レコードが存在しない場合でも、エラーとしない
+
+==== 履歴登録処理
+
+* 条件
+** NONE
+*** `[DB]tickets_histories(受付履歴)` には `Ticket.SortNo` が最大でないをレコード含めて追加する(履歴として管理するため)
+
+===== Table
+
+* [DB]tickets_histories(受付履歴)
+
+===== Insert
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|id
+|
+|DB:DEFAULT
+
+|consult_id
+|`[DB]consult.consult_id`
+|`[DB]consult.external_connection_code` == `Ticket.ConnectionCode` で検索して取得
+
+|ticket_number
+|ActionType.登録 : `Ticket.TicketNumber` / ActionType.削除 : `''(空値)`
+|
+
+|action_type
+|ActionType.登録 : `'I'` / ActionType.削除 : `'D'`
+|
+
+|order
+|`Ticket.SortNo`
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`ExternalConnection`
+|
+
+|===
+
+=== レビュー履歴
+
+WELLSHIP_DEV-873 [外部IF_設計]EC2002_受付を更新する レビュー・リワーク

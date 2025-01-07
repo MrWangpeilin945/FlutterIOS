@@ -17,4 +17,9 @@
 |ConsultNumberNotFound
 |`404`
 
+|`WellshipAuthenticationException`
+|認証情報に異常があり認証できない
+|WellshipAuthenticationException
+|`401`
+
 |===

@@ -36,7 +36,7 @@ public class HomeMenuUsecase : IHomeMenuUsecase
         };
 
         // TODO: JWTから操作した職員のロールを取得する。あるいはDBにSELECTする
-        Role staffRole = Role.一般; // TODO
+        Role staffRole = Role.User; // TODO
 
         // 機能ごとの利用可能条件の設定
         var homeMenuSettings = new Domain.Models.HomeMenuSettings();

@@ -40,12 +40,12 @@ public class ExamNormalValueRange
     /// <summary>
     /// 最大値
     /// </summary>
-    public required int MaxValue { get; init; }
+    public required decimal MaxValue { get; init; }
 
     /// <summary>
     /// 最小値
     /// </summary>
-    public required int MinValue { get; init; }
+    public required decimal MinValue { get; init; }
 
     /// <summary>
     /// エラーレベル
@@ -62,20 +62,22 @@ public class ExamNormalValueRange
     /// </summary>
     public bool IsTargetAge(Age age)
     {
-        if(string.IsNullOrWhiteSpace(MinAge) || string.IsNullOrWhiteSpace(MaxAge) || 
-           MinAge.Length < 5 || MinAge.Length > 7 || MaxAge.Length < 5 || MaxAge.Length > 7 )
+        if (string.IsNullOrWhiteSpace(MinAge) || string.IsNullOrWhiteSpace(MaxAge) ||
+           MinAge.Length < 5 || MinAge.Length > 7 || MaxAge.Length < 5 || MaxAge.Length > 7)
         {
             throw new SystemException("年齢設定に不備があります。");
         }
         string minText = MinAge.PadLeft(7, '0');
         string maxText = MaxAge.PadLeft(7, '0');
         // AGEクラスに変換する
-        Age minAgeEntity = new Age{
+        Age minAgeEntity = new Age
+        {
             Years = int.Parse(minText.Substring(0, 3)),
             Months = int.Parse(minText.Substring(3, 2)),
             Days = int.Parse(minText.Substring(5, 2))
         };
-        Age maxAgeEntity = new Age{
+        Age maxAgeEntity = new Age
+        {
             Years = int.Parse(maxText.Substring(0, 3)),
             Months = int.Parse(maxText.Substring(3, 2)),
             Days = int.Parse(maxText.Substring(5, 2))
@@ -106,5 +108,19 @@ public class ExamNormalValueRange
             (TargetSex.女, Sex.女) => true,
             _ => false
         };
-    }    
+    }
+
+    /// <summary>
+    /// 検査結果値が設定範囲内かどうか判定する
+    /// </summary>
+    /// <param name="resultText">検査結果値</param>
+    public bool ValueInRange(string resultText)
+    {
+        if (!decimal.TryParse(resultText, out var result))
+        {
+            return false;
+        }
+
+        return MinValue <= result && result < MaxValue;
+    }
 }

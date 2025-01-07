@@ -42,6 +42,33 @@ sequenceDiagram
   end
 ----
 
+=== Refresh
+
+* 受け取ったアクセストークン・リフレッシュトークンの有効性確認を実施する
+** 受け取ったアクセストークンが正しいことを確認する
+** 受け取ったリフレッシュトークンと該当職員に紐づけて保存されているリフレッシュトークンが一致することを確認する
+** リフレッシュトークンが有効期限内であることを確認する
+* リフレッシュ可能な場合は新しいアクセストークンを返却する
+
+[mermaid,Login-u-seq,png]
+----
+sequenceDiagram
+  participant con as Controller
+  participant uc as Usecase
+  participant repo as Repository
+
+  con->>uc: アクセストークン・リフレッシュトークン
+  uc->>uc: アクセストークンの検証
+  uc->>repo: GetStaff()
+  alt 有効な職員が存在しない
+    repo ->>repo: カスタム例外を投げる
+  end
+  uc->>repo: GetRefreshToken()
+  repo-->>uc: 保存されたリフレッシュトークン
+  uc->>uc: リフレッシュトークンの検証
+  uc->>con: アクセストークン
+----
+
 <<<
 == 職員ユースケース
 

@@ -1,5 +1,4 @@
 import { Box, Button, Group, Text } from "@mantine/core";
-import styles from "~/styles/common.module.css";
 
 interface HeadlineButtonProps {
   title: string;
@@ -23,32 +22,36 @@ export default function HeadlineButton({
         radius={24}
         bg={selected ? "green03" : "white01"}
         color={selected ? "primary" : "gray03"}
-        pt={16}
-        pb={16}
-        pl={32}
-        pr={32}
+        py={16}
+        px={32}
         variant="outline"
         justify="flex-start"
         onClick={onClick}
       >
         <Box>
           <Text
-            className={styles["text-multiline"]}
             size="md"
             fw={700}
             c={selected ? "primary" : "black01"}
             ta="left"
+            style={{
+              wordBreak: "break-word",
+              whiteSpace: "pre-wrap",
+            }}
           >
             {title}
           </Text>
           {elements?.map((elem, index) => (
             <Text
-              className={styles["text-multiline"]}
               key={index}
               size="sm"
               c={selected ? "primary" : "black01"}
               pt={index === 0 ? 16 : 8}
               ta="left"
+              style={{
+                wordBreak: "break-word",
+                whiteSpace: "pre-wrap",
+              }}
             >
               {elem}
             </Text>

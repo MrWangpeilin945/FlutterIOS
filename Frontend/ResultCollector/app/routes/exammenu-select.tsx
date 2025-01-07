@@ -19,7 +19,7 @@ import CommonDialog from "~/components/CommonDialog";
 import CommonFooter from "~/components/CommonFooter";
 import CommonHeader from "~/components/CommonHeader";
 import type { ExamMenu, ExamMenuList } from "~/domain/wellship.schemas";
-import type { NamedEntity } from "~/interfaces/interfaces";
+import type { NumberIdNamedEntity } from "~/interfaces/interfaces";
 import { examMenuState, staffState } from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
@@ -100,7 +100,7 @@ export default function ExamMenuSelect() {
   // 開始ボタン押下時処理：選択された検査項目ID、検査項目名のリストをjotaiに保存して次画面へ遷移
   const callbackConfirm = () => {
     if (selectExamMenuList.length > 0) {
-      const selectedMenuList: NamedEntity[] = selectExamMenuList.map(
+      const selectedMenuList: NumberIdNamedEntity[] = selectExamMenuList.map(
         (examMenu) => ({
           id: examMenu.examMenuId,
           name: examMenu.examMenuName,
@@ -122,7 +122,10 @@ export default function ExamMenuSelect() {
     <>
       <AuthWrapper>
         <LoadingOverlay visible={isFetching} />
-        <CommonHeader screenName="検査メニュー" staffName={staff?.name || ""} />
+        <CommonHeader
+          screenName="検査メニュー選択"
+          staffName={staff?.name || ""}
+        />
         <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>

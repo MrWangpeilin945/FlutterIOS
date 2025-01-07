@@ -8,10 +8,10 @@ public enum Role
     /// <summary>
     /// 一般
     /// </summary>
-    一般 = 10,
+    User = 10,
 
     /// <summary>
     /// 管理者
     /// </summary>
-    管理者 = 20
+    Admin = 20
 }

@@ -1,3 +1,6 @@
+using System.Security.Cryptography;
+using System.Text;
+
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
@@ -62,7 +65,13 @@ public class Staff
     /// <param name="password">検証するパスワード</param>
     public bool VerifyPassword(string password)
     {
-        // TODO: 入力されたパスワード文字列をハッシュ化して比較、検証結果を返す
-        throw new NotImplementedException();
+        if (password == "" || _passwordHash.Length != 64 || _passwordSalt.Length != 128)
+        {
+            return false;
+        }
+        using var hmac = new HMACSHA512(_passwordSalt);
+        // NOTE: ストレッチングの要否は要件を確認した上で判断します
+        var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        return hash.SequenceEqual(_passwordHash);
     }
 }

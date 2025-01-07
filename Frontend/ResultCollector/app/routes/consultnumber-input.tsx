@@ -9,8 +9,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { useClickOutside, useDisclosure } from "@mantine/hooks";
-import { useFocusTrap } from "@mantine/hooks";
+import { useClickOutside, useDisclosure, useFocusTrap } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
 import { isAxiosError } from "axios";
@@ -19,8 +18,10 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { z } from "zod";
-import { useConsultGetUnexaminedMenus } from "~/api/wellship";
-import { useConsultVerifyConsultNumber } from "~/api/wellship";
+import {
+  useConsultGetUnexaminedMenus,
+  useConsultVerifyConsultNumber,
+} from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
 import CommonDialog from "~/components/CommonDialog";
 import CommonFooter from "~/components/CommonFooter";
@@ -28,7 +29,6 @@ import CommonHeader from "~/components/CommonHeader";
 import IncompliedExam from "~/components/IncompliedExam";
 import Keyboard from "~/components/NumericKeyboard";
 import { examMenuState, placeScheduleState, staffState } from "~/store/store";
-import styles from "~/styles/common.module.css";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
 export const meta: MetaFunction = () => {
@@ -97,7 +97,7 @@ export default function ConsultNumberInput() {
             setErrorMessage(getErrorMessage(errorMessages.invalid, "受診番号"));
           } else if (result.error.status === 404) {
             setErrorMessage(
-              getErrorMessage(errorMessages.noData, "該当の受診番号のデータ"),
+              getErrorMessage(errorMessages.notFound, "該当の受診番号のデータ"),
             );
           } else if (result.error.status === 500) {
             setErrorMessage(getErrorMessage(errorMessages.serverError));
@@ -175,7 +175,7 @@ export default function ConsultNumberInput() {
             setErrorMessage(getErrorMessage(errorMessages.invalid, "受診番号"));
           } else if (error.response.status === 404) {
             setErrorMessage(
-              getErrorMessage(errorMessages.noData, "該当の受診番号のデータ"),
+              getErrorMessage(errorMessages.notFound, "該当の受診番号のデータ"),
             );
           } else if (error.response.status === 500) {
             setErrorMessage(getErrorMessage(errorMessages.serverError));
@@ -210,7 +210,7 @@ export default function ConsultNumberInput() {
           {!isFetching && (
             <>
               <Group gap={24} wrap="nowrap">
-                <Box className={styles["basic-green"]} w={24} h={41} />
+                <Box w={24} h={41} bg="green02" />
                 <Text
                   size="md"
                   fw={700}
