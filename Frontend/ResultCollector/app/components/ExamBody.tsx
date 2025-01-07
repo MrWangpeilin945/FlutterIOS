@@ -49,12 +49,10 @@ export default function ExamBody({
 
   // 必要な検査項目が1つも存在しない場合は表示しない
   const bodyItemPositionNumbers = [身長, 体重, 体脂肪率];
-  const hasValidDetail = bodyItemPositionNumbers.some((position) =>
-    examItems.some(
-      (item) =>
-        item.positionNumber === position &&
-        item.examItemDetails?.some((detail) => detail.positionNumber === 1),
-    ),
+  const hasValidDetail = examItems.some(
+    (item) =>
+      bodyItemPositionNumbers.includes(item.positionNumber ?? 0) &&
+      item.examItemDetails?.some((detail) => detail.positionNumber === 1),
   );
 
   if (!hasValidDetail) {
