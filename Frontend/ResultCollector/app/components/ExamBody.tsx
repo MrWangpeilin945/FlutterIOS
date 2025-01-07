@@ -372,6 +372,7 @@ export default function ExamBody({
                   />
                 ) : (
                   <CollectionKeyboard
+                    value={detail.value ?? ""}
                     keyboardValues={detail?.keyboard?.values ?? []}
                     onChange={(newValue) =>
                       handleChange(positionNumber, newValue)

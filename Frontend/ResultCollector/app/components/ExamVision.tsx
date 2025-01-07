@@ -682,6 +682,7 @@ export default function ExamVision({
                           />
                         ) : (
                           <CollectionKeyboard
+                            value={detail.value ?? ""}
                             keyboardValues={detail.keyboard?.values ?? []}
                             onChange={(newValue) =>
                               handleChange(
