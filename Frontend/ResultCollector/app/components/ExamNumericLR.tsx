@@ -382,43 +382,47 @@ export default function ExamNumericLR({
           クリア
         </Button>
         {/* エラーメッセージの表示 */}
-        {(examRegistResults || []).map((error, index) => (
-          <Group
-            key={index}
-            c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
-          >
-            <IconExclamationCircleFilled size={32} />
-            <Text>{error.description}</Text>
-          </Group>
-        ))}
-        <Group>
-          {targetDetails?.map((detail) => (
-            <Stack key={detail.positionNumber}>
-              <Box w={540}>
-                {showKeyboards[
-                  detail.positionNumber === 左 ? "left" : "right"
-                ] && (
-                  <div ref={closeKeyBoard}>
-                    <NumericKeyboard
-                      value={detail?.value ?? ""}
-                      integerLength={detail.integerLength}
-                      decimalLength={detail.decimalLength}
-                      onChange={(newValue) =>
-                        handleChange(
-                          newValue,
-                          positionNumber ?? 0,
-                          detail.positionNumber ?? 0
-                        )
-                      }
-                      onConfirm={handleConfirm}
-                    />
-                  </div>
-                )}
-              </Box>
-            </Stack>
+        <Stack gap={0}>
+          {(examRegistResults || []).map((error, index) => (
+            <Group
+              key={index}
+              c={
+                error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"
+              }
+            >
+              <IconExclamationCircleFilled size={32} />
+              <Text>{error.description}</Text>
+            </Group>
           ))}
-        </Group>
+        </Stack>
       </Stack>
+      <Group>
+        {targetDetails?.map((detail) => (
+          <Stack key={detail.positionNumber} gap={0}>
+            <Box w={540}>
+              {showKeyboards[
+                detail.positionNumber === 左 ? "left" : "right"
+              ] && (
+                <div ref={closeKeyBoard}>
+                  <NumericKeyboard
+                    value={detail?.value ?? ""}
+                    integerLength={detail.integerLength}
+                    decimalLength={detail.decimalLength}
+                    onChange={(newValue) =>
+                      handleChange(
+                        newValue,
+                        positionNumber ?? 0,
+                        detail.positionNumber ?? 0
+                      )
+                    }
+                    onConfirm={handleConfirm}
+                  />
+                </div>
+              )}
+            </Box>
+          </Stack>
+        ))}
+      </Group>
     </Flex>
   );
 }
