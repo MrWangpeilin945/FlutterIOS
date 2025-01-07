@@ -569,7 +569,10 @@ select
     , c.consult_number                          -- 受診番号
     , o.exam_item_detail_id                     -- 検査項目明細ID
     , ct.priority                               -- 優先度
-    , th.name as "threshold_name"               -- 基準値名
+    , th.threshold_id                           -- 基準値パターンID
+    , th.threshold_code                         -- 基準値パターンコード
+    , th.name as "threshold_name"               -- 基準値パターン名
+    , vr.range_id                               -- 基準値範囲ID
     , vr.name as "range_name"                   -- 基準値範囲名
     , vr.min_age                                -- 対象年齢下限
     , vr.max_age                                -- 対象年齢上限
@@ -852,7 +855,10 @@ COMMENT ON COLUMN consult_threshold_view.consult_id IS '受診番号';
 COMMENT ON COLUMN consult_threshold_view.consult_number IS '受診番号';
 COMMENT ON COLUMN consult_threshold_view.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN consult_threshold_view.priority IS '優先度';
-COMMENT ON COLUMN consult_threshold_view.threshold_name IS '基準値名';
+COMMENT ON COLUMN consult_threshold_view.threshold_id IS '基準値パターンID';
+COMMENT ON COLUMN consult_threshold_view.threshold_code IS '基準値パターンコード';
+COMMENT ON COLUMN consult_threshold_view.threshold_name IS '基準値パターン名';
+COMMENT ON COLUMN consult_threshold_view.range_id IS '基準値範囲ID';
 COMMENT ON COLUMN consult_threshold_view.range_name IS '基準値範囲名';
 COMMENT ON COLUMN consult_threshold_view.min_age IS '対象年齢下限';
 COMMENT ON COLUMN consult_threshold_view.max_age IS '対象年齢上限';
