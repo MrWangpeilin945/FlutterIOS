@@ -14,7 +14,7 @@ export default function AuthWrapper({
       // todo 認証チェックを行う
       // 一旦処理は実装したがコメントアウトしておく
 
-      // // アクセストークンがない時はログイン画面に遷移する
+      // // アクセストークンがない時はログアウト処理を行う
       // const accessToken = authUtil.getAccessToken();
       // if (!accessToken) {
       //   authUtil.logout(() => {
@@ -25,7 +25,7 @@ export default function AuthWrapper({
       // if (authUtil.isAccessTokenExpired(accessToken)) {
       //   // アクセストークンが期限切れの時はアクセストークンを再取得する
       //   if (!(await authUtil.refreshAccessToken())) {
-      //     // アクセストークンが再取得できなかった時はログイン画面に遷移する
+      //     // アクセストークンが再取得できなかった時はログアウト処理を行う
       //     authUtil.logout(() => {
       //       navigate("/login");
       //     });
