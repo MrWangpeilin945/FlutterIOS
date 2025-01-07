@@ -295,7 +295,7 @@ insert into exam_normal_value_range(name, threshold_id, exam_item_detail_id, max
 
 -- 検査実施判定ルール
 insert into decision_rules(decision_rule_id,name,exam_menu_id,priority,trigger_type,error_level,message,created_at,created_by) VALUES 
-    (1,'体重差が前年より20kgオーバー',7,1,1,3,'体重の計測ミスのため実施できません。',CURRENT_TIMESTAMP,'init');
+    (1,'体重差が前年より30kgオーバー',7,1,1,3,'体重の計測ミスのため実施できません。',CURRENT_TIMESTAMP,'init');
 
 -- 検査実施判断ルール_判定値
 insert into decision_rule_evaluations(decision_rule_id,variable_number,evaluation_value,created_at,created_by) VALUES 
