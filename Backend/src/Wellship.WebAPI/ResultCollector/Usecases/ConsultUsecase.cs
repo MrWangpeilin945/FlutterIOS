@@ -691,7 +691,7 @@ public class ConsultUsecase : IConsultUsecase
                                                     Description = rule.Message
                                                   })
                                    )
-                                   .OrderBy(x => x.ErrorLevel)
+                                   .OrderByDescending(x => x.ErrorLevel)
                                    .ToArray()
                 }).ToArray()
             }).ToArray();        

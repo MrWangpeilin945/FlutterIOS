@@ -202,7 +202,7 @@ INSERT INTO exam_results(consult_id,exam_item_detail_id,value,created_at,created
   , ('caaaaa00-0000-0000-0000-000000000003',712,'92',CURRENT_TIMESTAMP,'init')
   , ('caaaaa00-0000-0000-0000-000000000004',711,'128',CURRENT_TIMESTAMP,'init')
   , ('caaaaa00-0000-0000-0000-000000000004',712,'92',CURRENT_TIMESTAMP,'init')
-  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',2,'100.5',CURRENT_TIMESTAMP,'init')
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',2,'160.5',CURRENT_TIMESTAMP,'init')
   , ('8dda2a54-5217-425f-bba9-ab821a9647fe',1,'175.3',CURRENT_TIMESTAMP,'init');
 
 -- 過去検査結果
@@ -227,7 +227,7 @@ INSERT INTO resultcollector.prior_exam_menus(current_exam_menu_id,prior_exam_men
 
 -- 検査結果相関ルール
 INSERT INTO correlation_rules(correlation_rule_id,name,exam_menu_id,priority,trigger_type,error_level,exam_item_id, message,created_at,created_by) VALUES 
-    (1,'腹囲_前回差20cm以上',1,1,1,2,2,'腹囲の前回差が20cm以上です。',CURRENT_TIMESTAMP,'init')
+    (1,'体重_前回差20kg以上',1,1,1,2,2,'体重の前回差が20kg以上です。',CURRENT_TIMESTAMP,'init')
   , (2,'値が一部でも異なる場合はエラー',1,2,2,3,7,'登録する値が異なります。',CURRENT_TIMESTAMP,'init');
 
 -- 検査結果相関ルール_判定値
