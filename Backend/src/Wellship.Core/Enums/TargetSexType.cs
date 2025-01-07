@@ -4,7 +4,7 @@ namespace Ryobi.Wellship.Core.Enums;
 /// 対象性別
 /// 基準値などの設定に使用します。
 /// </summary>
-public enum TargetSex
+public enum TargetSexType
 {
     /// <summary>
     /// 男性
