@@ -5,17 +5,15 @@ export function decode(base64UrlString) {
   const records = rawText.split("\x1e");
 
   const extract = (s) => {
+    if (s == null) return null;
     const result = s?.substring(1, 4);
-    return result?.replaceAll(" ", "");
+    return Number(result);
   };
 
-  const sys = extract(records[5]);
-  const dia = extract(records[7]);
-  const pul = extract(records[8]);
-
   return {
-    sys: sys,
-    dia: dia,
-    pul: pul,
+    systolicBP: extract(records[5]),
+    meanBP: extract(records[6]),
+    diastolicBP: extract(records[7]),
+    pulseRate: extract(records[8]),
   };
 }
