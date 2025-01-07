@@ -207,7 +207,7 @@ export default function ExamBody({
     // BMIの計算
     const height = Number.parseFloat(heightValue) / 100;
     const weight = Number.parseFloat(weightValue);
-    const bmi = height ? weight / height ** 2 : 0;
+    const bmi = height ? weight / height ** 2 : "";
     const bmiString = String(bmi);
 
     return updatedExamItems.map((item) => {
