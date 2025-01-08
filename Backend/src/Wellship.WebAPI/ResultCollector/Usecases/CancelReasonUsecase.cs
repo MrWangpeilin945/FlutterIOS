@@ -20,7 +20,7 @@ public class CancelReasonUsecase : ICancelReasonUsecase
     }
 
     /// <summary>
-    /// 中止理由を取得する
+    /// AP1011_中止理由を取得する
     /// </summary>
     public async Task<CancelReasonList> GetCancelReasonsAsync()
     {

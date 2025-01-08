@@ -28,7 +28,7 @@ public class PlaceScheduleController : ControllerBase
     }
 
     /// <summary>
-    /// 日付を指定して班と会場のリストを取得する
+    /// AP1003_日付を指定して班と会場のリストを取得する
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceScheduleTeams))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -48,7 +48,7 @@ public class PlaceScheduleController : ControllerBase
     }
 
     /// <summary>
-    /// 班を指定して会場日程を取得する
+    /// AP1004_班を指定して会場日程を取得する
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceSchedulePlaces))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -68,7 +68,7 @@ public class PlaceScheduleController : ControllerBase
     }
 
     /// <summary>
-    /// 会場ロック状態を取得する
+    /// AP1016_会場ロック状態を取得する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceScheduleLocking))]
@@ -84,7 +84,7 @@ public class PlaceScheduleController : ControllerBase
     }
 
     /// <summary>
-    /// 会場ロック状態を更新する
+    /// AP1017_会場ロック状態を更新する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK)]

@@ -300,23 +300,6 @@ public class ConsultRepository : IConsultRepository
     }
 
     /// <summary>
-    /// 基準値の基準値パターンIDを取得する
-    /// </summary>
-    /// <param name="consultId">受診ID</param>
-    public async Task<IEnumerable<Guid>> GetConsultThresholds(Guid consultId)
-    {
-        var connection = await _dbConnectionProvider.GetOrOpenAsync();
-        const string sql = @"
-        select
-            threshold_id
-        from
-            resultcollector.consult_thresholds
-        where
-            consult_id = @ConsultId;";
-        return await connection.QueryAsync<Guid>(sql, new { ConsultId = consultId });
-    }
-
-    /// <summary>
     /// 受診を指定して検査依頼を取得します。
     /// </summary>
     public async Task<ExamOrder> GetExamOrdersAsync(Guid consultId)
@@ -442,5 +425,41 @@ public class ConsultRepository : IConsultRepository
 
         var response = await connection.QueryAsync<ConsultNote>(sql, new { ConsultId = consultId });
         return response;
+    }
+
+    /// <summary>
+    /// 検査基準値範囲を取得します。
+    /// 受診に紐づく検査依頼に対して基準値を結合します。
+    /// </summary>
+    /// <param name="consultId">受診ID</param>
+    /// <param name="examItemDetailIds">検査項目明細ID</param>
+    public async Task<IEnumerable<ExamNormalValueRange>> GetExamNormalValueRangesAsync(Guid consultId, int[] examItemDetailIds)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            consult_id as ConsultId
+            , consult_number as ConsultNumber
+            , exam_item_detail_id as ExamItemDetailId
+            , priority as Priority
+            , threshold_id as ThresholdId
+            , threshold_code as ThresholdCode
+            , threshold_name as ThresholdName
+            , range_id as RangeId
+            , range_name as RangeName
+            , min_age as MinAge
+            , max_age as MaxAge
+            , target_sex as TargetSex
+            , min_value as MinValue
+            , max_value as MaxValue
+            , error_level as ErrorLevel 
+        from
+            resultcollector.consult_threshold_view 
+        where
+            consult_id = @ConsultId 
+            and exam_item_detail_id = any(@ExamItemDetailIds);";
+
+        var response = await connection.QueryAsync<ExamNormalValueRangeEntity>(sql, new { ConsultId = consultId, ExamItemDetailIds = examItemDetailIds });
+        return response.Select(x => new ExamNormalValueRange(x));
     }
 }

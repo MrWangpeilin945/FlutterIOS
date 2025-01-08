@@ -1,0 +1,225 @@
+== EC2011_職員を登録する
+
+=== 概要
+
+* 外部連携で使用する
+* 引数の職員をDBに登録する
+
+=== 処理フロー
+
+[mermaid]
+----
+flowchart TD
+    A[UseCase] --> ERROR{ERROR検証}
+    ERROR -- エラーあり --> C(ErrorObject生成、追加)
+    ERROR -- エラー無 --> WARNING{WARNING検証}    
+    WARNING -- ワーニングあり --> DROP(WARNINGレコードDrop)
+    DROP(WARNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
+    DROP_REC --> D[[Repository]]
+    WARNING -- ワーニング無 --> D
+    C --> E(返却)
+    D --> E
+    E --> UseCaseEND(END)
+
+    F[[Repository]] --> G[BEGIN]
+    G --> H1["Upsert(一括):[DB]staffs(職員)"]
+    H1 --> K[Commit]
+    H1 -.Exception.-> ROLLBACK[ROLLBACK]
+    K --> RepositoryEND[[END]]
+    ROLLBACK .-> RepositoryEND
+----
+
+=== 非機能
+
+* 1万レコードの登録を10秒以内に完了する
+* DB登録に失敗した場合、全てロールバックする
+
+=== UseCase
+
+[source]
+----
+StoreStaffsAsync
+----
+
+==== 引数
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Staffs
+|Yes
+|List<Staff>
+|登録する職員のリスト
+
+|===
+
+==== 戻り値
+
+[source]
+----
+list<ErrorObject>
+----
+
+===== 正常登録
+
+[source]
+----
+list.Count() == 0
+----
+
+===== 異常有り
+
+[source]
+----
+list.Count()  <> 0
+----
+
+==== クラス
+
+===== Staff
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|StaffCode
+|Yes
+|string
+|職員コード
+
+|LoginId
+|Yes
+|string
+|ログインID
+
+|Name
+|Yes
+|string
+|職員名
+
+|Password
+|Yes
+|string
+|パスワード
+
+|Enabled
+|Yes
+|boolean
+|有効
+
+|Role
+|Yes
+|enum<Wellship.Core\Enums\Role>
+|ロール
+
+|InputNote
+|Yes
+|string
+|エラーオブジェクトに登録する入力項目Noなど
+
+|===
+
+==== ErrorObject
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|エラーコード
+
+|Message
+|Yes
+|string
+|エラーメッセージ
+
+|InputNote
+|Yes
+|string
+|入力項目Noなど
+
+|===
+
+==== 列挙型
+
+* None
+
+==== ERROR検証
+
+* None
+
+==== WARNING検証
+
+* None
+
+==== 処理(Repository)
+
+* 下記の登録値は、呼びもとで指定する
+** `created_at` に登録する `system.datetime.now()`
+** `created_by` に登録する `'ExternalConnection'`
+
+===== Table
+
+* [DB]staffs(職員)
+
+===== Upsert
+
+* 競合条件
+** `[DB]staffs.staff_code(職員コード)` == `Staff.StaffCode`
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|staff_id
+|
+|DB:DEFAULT
+
+|staff_code
+|Staff.StaffCode
+|
+
+|login_id
+|Staff.LoginId
+|
+
+|name
+|Staff.Name
+|
+
+|login_id
+|Staff.StaffCode
+|
+
+|password_hash
+|Staff.Password
+|`※TODO` 計算結果を格納
+
+|password_salt
+|Staff.Password
+|`※TODO` 計算結果を格納
+
+|enabled
+|Staff.Enabled
+|
+
+|role_id
+|Staff.Role
+|int型にパースする
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+=== レビュー履歴
+
+WELLSHIP_DEV-936 [外部IF_設計]EC2011_職員を登録する レビュー・リワーク

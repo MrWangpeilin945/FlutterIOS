@@ -2,14 +2,16 @@ import { useEffect, useState } from "react";
 import { GridCol, Button, Grid, Box } from "@mantine/core";
 
 type KeyboardProps = {
-  value?: string;
+  value: string;
   keyboardValues: string[];
   onChange: (newValue: string) => void;
 };
 
 export default function CollectionKeyboard(props: KeyboardProps) {
+  if (!props.keyboardValues.length) return null;
+
   const [value, setValue] = useState(props.value);
-  const [buttons,setButtons] = useState(props.keyboardValues);
+  const [buttons, setButtons] = useState(props.keyboardValues);
 
   useEffect(() => {
     setValue(props.value);
@@ -17,10 +19,9 @@ export default function CollectionKeyboard(props: KeyboardProps) {
 
   //ACを配列の最後に結合
   useEffect(() => {
-    const newKeyboardValues = [...props.keyboardValues, "AC"] 
+    const newKeyboardValues = [...props.keyboardValues, "AC"];
     setButtons(newKeyboardValues);
   }, [props.keyboardValues]);
-
 
   //押下時処理
   const handlerKeyboardClick = (keyboardValue: string) => {
@@ -47,10 +48,11 @@ export default function CollectionKeyboard(props: KeyboardProps) {
       >
         <Grid gutter={8}>
           {buttons.map((keyValue, index) => {
+            const buttonValue = String(keyValue);
             return (
               <GridCol
-                span={keyValue === "AC" ? "auto" : 3}
-                style={keyValue === "AC" ? { textAlign: "right" } : {}} // 最後のボタンを右端に配置
+                span={buttonValue === "AC" ? "auto" : 3}
+                style={buttonValue === "AC" ? { textAlign: "right" } : {}} // 最後のボタンを右端に配置
                 key={index}
               >
                 <Button
@@ -59,25 +61,25 @@ export default function CollectionKeyboard(props: KeyboardProps) {
                   size="keyboard"
                   radius="md"
                   variant={
-                    keyValue === "AC"
+                    buttonValue === "AC"
                       ? "filled"
-                      : keyValue === value //選択済みか判定
+                      : buttonValue === value //選択済みか判定
                         ? "outline"
                         : "white"
                   }
                   color={
-                    keyValue === "AC"
+                    buttonValue === "AC"
                       ? "gray01"
-                      : keyValue === value //選択済みか判定
+                      : buttonValue === value //選択済みか判定
                         ? "primary"
                         : "black"
                   }
-                  bg={keyValue === value ? "green03" : ""} //選択済みか判定
-                  value={keyValue}
+                  bg={buttonValue === value ? "green03" : ""} //選択済みか判定
+                  value={buttonValue}
                   onClick={(e) => handlerKeyboardClick(e.currentTarget.value)}
                   tabIndex={-1}
                 >
-                  {keyValue}
+                  {buttonValue}
                 </Button>
               </GridCol>
             );

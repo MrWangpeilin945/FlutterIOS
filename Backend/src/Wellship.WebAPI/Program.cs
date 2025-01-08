@@ -53,6 +53,7 @@ public class Program
                             .AddPostgreSqlServices();
         }
         builder.Services.AddScoped<IDbConnectionProvider, DbConnectionProvider>();
+        builder.Services.AddSingleton(TimeProvider.System);
 
         builder.Services.AddOpenApiDocument(options =>
         {
@@ -72,9 +73,10 @@ public class Program
 
         builder.Services.AddCors(options =>
         {
-            options.AddDefaultPolicy(builder => builder.AllowAnyOrigin()
+            options.AddDefaultPolicy(builder => builder.SetIsOriginAllowed(_ => true)
                                                        .AllowAnyMethod()
-                                                       .AllowAnyHeader());
+                                                       .AllowAnyHeader()
+                                                       .AllowCredentials());
         });
 
         var app = builder.Build();
@@ -93,8 +95,8 @@ public class Program
 
         app.MapHealthChecks("/healthz");
         app.UseMiddleware<ExceptionHandlingMiddleware>();
-        app.UseAuthorization();
         app.UseAuthentication();
+        app.UseAuthorization();
         app.MapControllers();
 
         app.Run();
@@ -125,6 +127,12 @@ public static class IServiceCollectionExtension
         services.AddScoped<IExamItemRepository, ExamItemRepository>();
         services.AddScoped<IResultRepository, ResultRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IOrganizationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.OrganizationRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExamineeRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExamineeRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IAffiliationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.AffiliationRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.ITeamRepository, ExternalConnection.PostgreSQL.RepositoryImpls.TeamRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IPlaceRepository, ExternalConnection.PostgreSQL.RepositoryImpls.PlaceRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IThresholdRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ThresholdRepository>();
         return services;
     }
     /// <summary>
@@ -142,7 +150,11 @@ public static class IServiceCollectionExtension
         services.AddScoped<IIntegrationUsecase, IntegrationUsecase>();
         services.AddScoped<IProgressUsecase, ProgressUsecase>();
         services.AddScoped<ICancelReasonUsecase, CancelReasonUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.IOrganizationUsecases, ExternalConnection.Usecases.OrganizationUsecases>();
+        services.AddScoped<ExternalConnection.Usecases.IOrganizationUsecase, ExternalConnection.Usecases.OrganizationUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.IExamineeUsecase, ExternalConnection.Usecases.ExamineeUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.ITeamUsecase, ExternalConnection.Usecases.TeamUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.IPlaceUsecase, ExternalConnection.Usecases.PlaceUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.IThresholdUsecase, ExternalConnection.Usecases.ThresholdUsecase>();
         return services;
     }
     /// <summary>
@@ -180,7 +192,8 @@ public static class IServiceCollectionExtension
         // TODO: 設定の場所が決まるまでの仮置きです。設定ができ次第移植すること。
         var authSettings = new AuthSettings()
         {
-            Lifetime = TimeSpan.FromMinutes(3),
+            AccessTokenLifetime = TimeSpan.FromMinutes(3),
+            RefreshTokenLifeTime = TimeSpan.FromHours(12),
             SecretKey = "secret key length required 128 bit"
         };
         services.AddSingleton(x => authSettings);
@@ -190,6 +203,10 @@ public static class IServiceCollectionExtension
         services.AddAuthentication()
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, x =>
                 {
+                    // JWTのクレーム名を自動でマッピングしない設定です。
+                    x.MapInboundClaims = false;
+                    x.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Sub;
+                    x.TokenValidationParameters.RoleClaimType = CustomClaimTypes.Role;
                     // NOTE: Issはアクセスされたホスト名を使用したいためカスタム検証で検証します
                     x.TokenValidationParameters.ValidateIssuer = false;
                     // NOTE: Audはアクセスされたホスト名を使用したいためカスタム検証で検証します

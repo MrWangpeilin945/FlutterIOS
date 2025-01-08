@@ -26,7 +26,7 @@ public class EquipmentController : ControllerBase
     }
 
     /// <summary>
-    /// 検査機器一覧を取得する
+    /// AP1012_検査機器一覧を取得する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EquipmentList))]

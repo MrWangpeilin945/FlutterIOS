@@ -12,11 +12,11 @@
 flowchart TD
     A[UseCase] --> ERROR{ERROR検証}
     ERROR -- エラーあり --> C(ErrorObject生成、追加)
-    ERROR -- エラー無 --> WORNING{WORNING検証}    
-    WORNING -- ワーニングあり --> DROP(WORNINGレコードDrop)
-    DROP(WORNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
+    ERROR -- エラー無 --> WARNING{WARNING検証}    
+    WARNING -- ワーニングあり --> DROP(WARNINGレコードDrop)
+    DROP(WARNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
     DROP_REC --> D[[Repository]]
-    WORNING -- ワーニング無 --> D
+    WARNING -- ワーニング無 --> D
     C --> E(返却)
     D --> E
     E --> UseCaseEND(END)
@@ -26,11 +26,11 @@ flowchart TD
     H --> I["Delete(一括):[DB]affiliations(所属)"]
     I --> J["Insert(一括):[DB]affiliations(所属)"]
     J --> K[Commit]
-    H -.Exception.-> ROOLBACK[ROOLBACK]
-    G -.Exception.-> ROOLBACK
-    J -.Exception.-> ROOLBACK
+    H -.Exception.-> ROLLBACK[ROLLBACK]
+    G -.Exception.-> ROLLBACK
+    J -.Exception.-> ROLLBACK
     K --> RepositoryEND[[END]]
-    ROOLBACK .-> RepositoryEND
+    ROLLBACK .-> RepositoryEND
 ----
 
 === 非機能
@@ -168,7 +168,7 @@ list.Count()  <> 0
 
 * None
 
-==== WORNING検証
+==== WARNING検証
 
 * 団体が取得できない
 ** `[DB]organizations(団体).organization_code(団体コード) == Examinee.Affiliations.OrganizationCode` が存在しない

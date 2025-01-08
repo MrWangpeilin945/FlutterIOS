@@ -27,7 +27,7 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 受診番号の存在を確認する
+    /// AP1007_受診番号の存在を確認する
     /// </summary>
     /// <param name="consultNumberRequest">受診番号リクエスト</param>
     /// <returns>存在するか</returns>
@@ -44,7 +44,7 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 未受診の検査メニューを取得する
+    /// AP1008_未受診の検査メニューを取得する
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UnexaminedMenuList))]
@@ -59,7 +59,7 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 検査内容を取得する
+    /// AP1010_検査内容を取得する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExamContent))]
@@ -75,7 +75,7 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 検査の実施有無と中止理由を登録する
+    /// AP1022_検査の実施有無と中止理由を登録する
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -90,7 +90,7 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 検査結果入力情報を取得する
+    /// AP1009_検査結果入力情報を取得する
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
     /// <param name="examMenuId">検査メニューID</param>
@@ -133,7 +133,7 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 検査結果を登録する
+    /// AP1014_検査結果を登録する
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
     /// <param name="results">検査結果登録項目</param>
@@ -151,7 +151,7 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 検査結果を検証する
+    /// AP1013_検査結果を検証する
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
     /// <param name="results">検査結果検証項目</param>

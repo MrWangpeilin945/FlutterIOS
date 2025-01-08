@@ -127,6 +127,17 @@ CREATE TABLE exam_cancels (
   , CONSTRAINT exam_cancels_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
 );
 
+CREATE TABLE exam_item_detail_options (
+  option_id integer NOT NULL
+  , code text NOT NULL
+  , exam_item_detail_id integer NOT NULL
+  , name text NOT NULL
+  , order_number integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_item_detail_options_PKC PRIMARY KEY (option_id)
+);
+
 CREATE TABLE exam_item_detail_orders (
   consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
@@ -169,41 +180,16 @@ CREATE TABLE exam_menu_notes (
 ALTER TABLE exam_menu_notes ADD CONSTRAINT exam_menu_notes_IX1
   UNIQUE (exam_menu_id,order_number) ;
 
-CREATE TABLE exam_normal_option_details (
-  normal_options_id uuid NOT NULL
-  , option_id integer NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT exam_normal_option_details_PKC PRIMARY KEY (normal_options_id,option_id)
-);
-
-CREATE TABLE exam_normal_options (
-  normal_options_id uuid DEFAULT gen_random_uuid () NOT NULL
-  , name text NOT NULL
-  , threshold_id uuid NOT NULL
-  , exam_item_detail_id integer NOT NULL
-  , max_age varchar(7) NOT NULL
-  , min_age varchar(7) NOT NULL
-  , target_sex integer NOT NULL
-  , error_level integer NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT exam_normal_options_PKC PRIMARY KEY (normal_options_id)
-);
-
-ALTER TABLE exam_normal_options ADD CONSTRAINT exam_normal_options_IX1
-  UNIQUE (threshold_id,exam_item_detail_id,max_age,target_sex,error_level) ;
-
 CREATE TABLE exam_normal_value_range (
   range_id uuid DEFAULT gen_random_uuid () NOT NULL
   , name text NOT NULL
   , threshold_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
-  , max_age varchar(7) NOT NULL
   , min_age varchar(7) NOT NULL
+  , max_age varchar(7) NOT NULL
   , target_sex integer NOT NULL
-  , max_value decimal NOT NULL
   , min_value decimal NOT NULL
+  , max_value decimal NOT NULL
   , error_level integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -311,6 +297,15 @@ CREATE TABLE prior_exam_menus (
   , CONSTRAINT prior_exam_menus_PKC PRIMARY KEY (current_exam_menu_id,prior_exam_menu_id)
 );
 
+CREATE TABLE refresh_tokens (
+  staff_id uuid NOT NULL
+  , token text NOT NULL
+  , expires_at timestamp with time zone NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT refresh_tokens_PKC PRIMARY KEY (staff_id)
+);
+
 CREATE TABLE staff_login_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , staff_id uuid NOT NULL
@@ -402,17 +397,6 @@ ALTER TABLE consult ADD CONSTRAINT consult_IX1
 
 CREATE UNIQUE INDEX consult_IX2
   ON consult(external_connection_code);
-
-CREATE TABLE exam_item_detail_options (
-  option_id integer NOT NULL
-  , code text NOT NULL
-  , exam_item_detail_id integer NOT NULL
-  , name text NOT NULL
-  , order_number integer NOT NULL
-  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , created_by text NOT NULL
-  , CONSTRAINT exam_item_detail_options_PKC PRIMARY KEY (option_id)
-);
 
 CREATE TABLE exam_item_details (
   exam_item_detail_id integer NOT NULL
@@ -553,6 +537,45 @@ CREATE TABLE exam_menus (
   , created_by text NOT NULL
   , CONSTRAINT exam_menus_PKC PRIMARY KEY (exam_menu_id)
 );
+
+CREATE VIEW consult_threshold_view AS 
+select
+    c.consult_id                                -- 受診番号
+    , c.consult_number                          -- 受診番号
+    , o.exam_item_detail_id                     -- 検査項目明細ID
+    , ct.priority                               -- 優先度
+    , th.threshold_id                           -- 基準値パターンID
+    , th.threshold_code                         -- 基準値パターンコード
+    , th.name as "threshold_name"               -- 基準値パターン名
+    , vr.range_id                               -- 基準値範囲ID
+    , vr.name as "range_name"                   -- 基準値範囲名
+    , vr.min_age                                -- 対象年齢下限
+    , vr.max_age                                -- 対象年齢上限
+    , vr.target_sex                             -- 対象性別
+    , vr.min_value                              -- 値下限
+    , vr.max_value                              -- 値上限
+    , vr.error_level                            -- エラーレベル
+from
+    resultcollector.consult c 
+    inner join resultcollector.exam_item_detail_orders o 
+        on c.consult_id = o.consult_id 
+    left join resultcollector.exam_normal_value_range vr 
+        on o.exam_item_detail_id = vr.exam_item_detail_id 
+    inner join resultcollector.consult_thresholds ct 
+        on vr.threshold_id = ct.threshold_id 
+        and c.consult_id = ct.consult_id 
+    left join resultcollector.thresholds th 
+        on ct.threshold_id = th.threshold_id 
+order by
+    c.consult_number
+    , o.exam_item_detail_id
+    , ct.priority
+    , vr.target_sex
+    , vr.min_age
+    , vr.min_value
+    , vr.error_level desc;
+
+;
 
 ALTER TABLE affiliations
   ADD CONSTRAINT affiliations_FK1 FOREIGN KEY (examinee_id) REFERENCES examinees(examinee_id)
@@ -704,13 +727,8 @@ ALTER TABLE exam_menu_notes
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
-ALTER TABLE exam_normal_option_details
-  ADD CONSTRAINT exam_normal_option_details_FK1 FOREIGN KEY (normal_options_id) REFERENCES exam_normal_options(normal_options_id)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE;
-
-ALTER TABLE exam_normal_option_details
-  ADD CONSTRAINT exam_normal_option_details_FK2 FOREIGN KEY (option_id) REFERENCES exam_item_detail_options(option_id)
+ALTER TABLE exam_normal_value_range
+  ADD CONSTRAINT exam_normal_value_range_FK1 FOREIGN KEY (threshold_id) REFERENCES thresholds(threshold_id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -769,6 +787,11 @@ ALTER TABLE prior_exam_menus
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE refresh_tokens
+  ADD CONSTRAINT refresh_tokens_FK1 FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE staff_login_histories
   ADD CONSTRAINT staff_login_histories_FK1 FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
   ON DELETE RESTRICT
@@ -796,6 +819,23 @@ COMMENT ON COLUMN consult_notes.code IS '検査特記コード';
 COMMENT ON COLUMN consult_notes.note IS '特記事項';
 COMMENT ON COLUMN consult_notes.created_at IS '作成日時';
 COMMENT ON COLUMN consult_notes.created_by IS '作成者';
+
+COMMENT ON VIEW consult_threshold_view IS '受診_基準値';
+COMMENT ON COLUMN consult_threshold_view.consult_id IS '受診番号';
+COMMENT ON COLUMN consult_threshold_view.consult_number IS '受診番号';
+COMMENT ON COLUMN consult_threshold_view.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN consult_threshold_view.priority IS '優先度';
+COMMENT ON COLUMN consult_threshold_view.threshold_id IS '基準値パターンID';
+COMMENT ON COLUMN consult_threshold_view.threshold_code IS '基準値パターンコード';
+COMMENT ON COLUMN consult_threshold_view.threshold_name IS '基準値パターン名';
+COMMENT ON COLUMN consult_threshold_view.range_id IS '基準値範囲ID';
+COMMENT ON COLUMN consult_threshold_view.range_name IS '基準値範囲名';
+COMMENT ON COLUMN consult_threshold_view.min_age IS '対象年齢下限';
+COMMENT ON COLUMN consult_threshold_view.max_age IS '対象年齢上限';
+COMMENT ON COLUMN consult_threshold_view.target_sex IS '対象性別';
+COMMENT ON COLUMN consult_threshold_view.min_value IS '値下限';
+COMMENT ON COLUMN consult_threshold_view.max_value IS '値上限';
+COMMENT ON COLUMN consult_threshold_view.error_level IS 'エラーレベル';
 
 COMMENT ON TABLE consult_thresholds IS '基準値';
 COMMENT ON COLUMN consult_thresholds.threshold_id IS '基準値パターンID';
@@ -881,6 +921,15 @@ COMMENT ON COLUMN exam_cancels.cancel_reason_id IS '中止理由';
 COMMENT ON COLUMN exam_cancels.created_at IS '作成日時';
 COMMENT ON COLUMN exam_cancels.created_by IS '作成者';
 
+COMMENT ON TABLE exam_item_detail_options IS '検査項目明細_選択肢';
+COMMENT ON COLUMN exam_item_detail_options.option_id IS '選択肢ID';
+COMMENT ON COLUMN exam_item_detail_options.code IS 'コード';
+COMMENT ON COLUMN exam_item_detail_options.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_item_detail_options.name IS '名称';
+COMMENT ON COLUMN exam_item_detail_options.order_number IS '表示順';
+COMMENT ON COLUMN exam_item_detail_options.created_at IS '作成日時';
+COMMENT ON COLUMN exam_item_detail_options.created_by IS '作成者';
+
 COMMENT ON TABLE exam_item_detail_orders IS '検査項目明細依頼';
 COMMENT ON COLUMN exam_item_detail_orders.consult_id IS '受診ID';
 COMMENT ON COLUMN exam_item_detail_orders.exam_item_detail_id IS '検査項目明細ID';
@@ -912,34 +961,16 @@ COMMENT ON COLUMN exam_menu_notes.suffix IS '接尾辞';
 COMMENT ON COLUMN exam_menu_notes.created_at IS '作成日時';
 COMMENT ON COLUMN exam_menu_notes.created_by IS '作成者';
 
-COMMENT ON TABLE exam_normal_option_details IS '検査項目明細_選択肢';
-COMMENT ON COLUMN exam_normal_option_details.normal_options_id IS '基準値選択肢ID';
-COMMENT ON COLUMN exam_normal_option_details.option_id IS '選択肢ID';
-COMMENT ON COLUMN exam_normal_option_details.created_at IS '作成日時';
-COMMENT ON COLUMN exam_normal_option_details.created_by IS '作成者';
-
-COMMENT ON TABLE exam_normal_options IS '検査基準値選択肢';
-COMMENT ON COLUMN exam_normal_options.normal_options_id IS '基準値選択肢ID';
-COMMENT ON COLUMN exam_normal_options.name IS '名称';
-COMMENT ON COLUMN exam_normal_options.threshold_id IS '基準値パターンID:0: テナントの基準';
-COMMENT ON COLUMN exam_normal_options.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_normal_options.max_age IS '対象年齢上限';
-COMMENT ON COLUMN exam_normal_options.min_age IS '対象年齢下限';
-COMMENT ON COLUMN exam_normal_options.target_sex IS '対象性別';
-COMMENT ON COLUMN exam_normal_options.error_level IS 'エラーレベル';
-COMMENT ON COLUMN exam_normal_options.created_at IS '作成日時';
-COMMENT ON COLUMN exam_normal_options.created_by IS '作成者';
-
 COMMENT ON TABLE exam_normal_value_range IS '検査基準値範囲';
 COMMENT ON COLUMN exam_normal_value_range.range_id IS '範囲ID';
 COMMENT ON COLUMN exam_normal_value_range.name IS '名称';
-COMMENT ON COLUMN exam_normal_value_range.threshold_id IS '基準値パターンID:0: テナントの基準';
+COMMENT ON COLUMN exam_normal_value_range.threshold_id IS '基準値パターンID';
 COMMENT ON COLUMN exam_normal_value_range.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_normal_value_range.max_age IS '対象年齢上限';
 COMMENT ON COLUMN exam_normal_value_range.min_age IS '対象年齢下限';
+COMMENT ON COLUMN exam_normal_value_range.max_age IS '対象年齢上限';
 COMMENT ON COLUMN exam_normal_value_range.target_sex IS '対象性別';
-COMMENT ON COLUMN exam_normal_value_range.max_value IS '値上限';
 COMMENT ON COLUMN exam_normal_value_range.min_value IS '値下限';
+COMMENT ON COLUMN exam_normal_value_range.max_value IS '値上限';
 COMMENT ON COLUMN exam_normal_value_range.error_level IS 'エラーレベル';
 COMMENT ON COLUMN exam_normal_value_range.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_value_range.created_by IS '作成者';
@@ -1016,6 +1047,13 @@ COMMENT ON COLUMN prior_exam_menus.prior_exam_menu_id IS '前提検査メニュ�
 COMMENT ON COLUMN prior_exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN prior_exam_menus.created_by IS '作成者';
 
+COMMENT ON TABLE refresh_tokens IS 'リフレッシュトークン';
+COMMENT ON COLUMN refresh_tokens.staff_id IS '職員ID';
+COMMENT ON COLUMN refresh_tokens.token IS 'リフレッシュトークン';
+COMMENT ON COLUMN refresh_tokens.expires_at IS '有効期限';
+COMMENT ON COLUMN refresh_tokens.created_at IS '作成日時';
+COMMENT ON COLUMN refresh_tokens.created_by IS '作成者';
+
 COMMENT ON TABLE staff_login_histories IS '職員ログイン履歴';
 COMMENT ON COLUMN staff_login_histories.id IS 'ID';
 COMMENT ON COLUMN staff_login_histories.staff_id IS '職員ID';
@@ -1078,15 +1116,6 @@ COMMENT ON COLUMN consult.examinee_id IS '受診者ID';
 COMMENT ON COLUMN consult.external_connection_code IS '外部連携キー';
 COMMENT ON COLUMN consult.created_at IS '作成日時';
 COMMENT ON COLUMN consult.created_by IS '作成者';
-
-COMMENT ON TABLE exam_item_detail_options IS '検査項目明細_選択肢';
-COMMENT ON COLUMN exam_item_detail_options.option_id IS '選択肢ID';
-COMMENT ON COLUMN exam_item_detail_options.code IS 'コード';
-COMMENT ON COLUMN exam_item_detail_options.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_item_detail_options.name IS '名称';
-COMMENT ON COLUMN exam_item_detail_options.order_number IS '表示順';
-COMMENT ON COLUMN exam_item_detail_options.created_at IS '作成日時';
-COMMENT ON COLUMN exam_item_detail_options.created_by IS '作成者';
 
 COMMENT ON TABLE exam_item_details IS '検査項目明細';
 COMMENT ON COLUMN exam_item_details.exam_item_detail_id IS '検査項目明細ID';
