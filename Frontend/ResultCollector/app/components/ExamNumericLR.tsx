@@ -19,7 +19,10 @@ import type {
   ExamRegistResult,
 } from "~/domain/wellship.schemas";
 import { InputErrorLevel } from "~/domain/enums";
-import { IconExclamationCircleFilled } from "@tabler/icons-react";
+import {
+  IconExclamationCircleFilled,
+  IconSquareRoundedXFilled,
+} from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
 
 type ExamNumericLRProps = {
@@ -130,9 +133,18 @@ export default function ExamNumericLR({
     // コールバック判断用のコンポーネントのエラーメッセージ
     const componentErrorMessage: ExamRegistResult[] = [];
     // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
-    for (const { name, positionNumber, value } of item.examItemDetails ?? []) {
+    for (const {
+      name,
+      positionNumber,
+      value,
+      hasOrder,
+      cancelReasonId,
+    } of item.examItemDetails ?? []) {
       if (positionNumber !== 左 && positionNumber !== 右) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
+      }
+      if (!hasOrder || !!cancelReasonId) {
+        continue; // disableの場合、処理をスキップする
       }
       // 必須チェックと半角数字チェックを一度に行うスキーマ
       const schema = z
@@ -160,6 +172,7 @@ export default function ExamNumericLR({
           errorLevel: InputErrorLevel.異常,
         });
       }
+      console.log(componentErrorMessage);
     }
 
     // 基準値によるエラーメッセージを追加
@@ -383,22 +396,26 @@ export default function ExamNumericLR({
         </Button>
         {/* エラーメッセージの表示 */}
         <Stack gap={0}>
-          {(examRegistResults || []).map((error, index) => (
-            <Group
-              key={index}
-              c={
-                error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"
-              }
-            >
-              <IconExclamationCircleFilled size={32} />
-              <Text>{error.description}</Text>
-            </Group>
-          ))}
+          {(examRegistResults || []).map((error, index) => {
+            const isWarning = error.errorLevel === InputErrorLevel.警告;
+            return (
+              <Group key={index} c={isWarning ? "warning" : "error"}>
+                {isWarning ? (
+                  <IconExclamationCircleFilled size={32} />
+                ) : (
+                  <IconSquareRoundedXFilled size={32} />
+                )}
+                <Text size="sm" fw={700}>
+                  {error.description}
+                </Text>
+              </Group>
+            );
+          })}
         </Stack>
       </Stack>
       <Group>
         {targetDetails?.map((detail) => (
-          <Stack key={detail.positionNumber} gap={0}>
+          <Stack key={detail.positionNumber}>
             <Box w={540}>
               {showKeyboards[
                 detail.positionNumber === 左 ? "left" : "right"
