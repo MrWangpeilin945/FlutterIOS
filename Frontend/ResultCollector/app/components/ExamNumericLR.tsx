@@ -31,6 +31,11 @@ type ExamNumericLRProps = {
   onChange: (newExamItems: InputExamItem[] | undefined) => void;
 };
 
+interface BackendValidation {
+  itemPositionNumber: number;
+  examRegistResults: ExamRegistResult[];
+}
+
 export default function ExamNumericLR({
   examItems,
   onRegisterPressed,
@@ -58,8 +63,12 @@ export default function ExamNumericLR({
   ) {
     return null;
   }
-
   const [examItemsData, setExamItemsData] = useState(examItems);
+
+  // APIからのエラーメッセージを保存する
+  const [backendValidation, setBackendValidation] = useState<
+    BackendValidation[]
+  >([]);
 
   // キーボードの表示インデックスを状態として管理する
   const [showKeyboards, setShowKeyboards] = useState<{
@@ -110,16 +119,19 @@ export default function ExamNumericLR({
     return item;
   };
 
-  // APIからのエラーメッセージを保存
-  const APIErrors = examItems.map((item) => ({
-    positionNumber: item.positionNumber,
-    examRegistResults: item.examRegistResults || [],
-  }));
+  // 初回読み込み時にAPIのエラーメッセージを保存する
+  useEffect(() => {
+    const backendErrorMessages: BackendValidation[] = examItems.map((item) => ({
+      itemPositionNumber: item.positionNumber ?? 0,
+      examRegistResults: item.examRegistResults ?? [],
+    }));
+    setBackendValidation(backendErrorMessages);
+  }, []);
 
-  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  // APIのエラーメッセージ以外を削除する
   const resetErrorMessages = (item: InputExamItem) => {
-    const targetError = APIErrors.find(
-      (error) => error.positionNumber === item.positionNumber
+    const targetError = backendValidation.find(
+      (error) => error.itemPositionNumber === item.positionNumber
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -128,7 +140,7 @@ export default function ExamNumericLR({
   };
 
   const validationCheck = (item: InputExamItem) => {
-    // APIエラーメッセージで初期化
+    // コンポーネント由来のエラーメッセージを削除
     resetErrorMessages(item);
     // コールバック判断用のコンポーネントのエラーメッセージ
     const componentErrorMessage: ExamRegistResult[] = [];
@@ -172,7 +184,6 @@ export default function ExamNumericLR({
           errorLevel: InputErrorLevel.異常,
         });
       }
-      console.log(componentErrorMessage);
     }
 
     // 基準値によるエラーメッセージを追加
@@ -200,11 +211,11 @@ export default function ExamNumericLR({
   useEffect(() => {
     const updatedItems = examItems.map((item) => {
       let validatedData = item;
+
       // onRegisterPressedがtrueの場合のみvalidationCheckを実行
       if (onRegisterPressed) {
         validatedData = validationCheck(validatedData).validateResult;
       }
-
       return validatedData;
     });
     setExamItemsData(updatedItems);
