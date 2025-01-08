@@ -37,7 +37,7 @@ public class PlaceUsecasesTest
         // モックのセットアップ
         mockRepo.Setup(repo => repo.UpsertPlacesAsync(It.IsAny<List<PlaceEntity>>(), It.IsAny<DateTime>(), "ExternalConnection"));
 
-        PlaceUsecases usecases = new PlaceUsecases(mockRepo.Object);
+        PlaceUsecase usecases = new PlaceUsecase(mockRepo.Object);
 
         // Act
         List<ErrorObject> result = await usecases.StorePlacesAsync(inputPlaces);

@@ -37,7 +37,7 @@ public class TeamUsecasesTest
         // モックのセットアップ
         mockRepo.Setup(repo => repo.UpsertTeamsAsync(It.IsAny<List<TeamEntity>>(), It.IsAny<DateTime>(), "ExternalConnection"));
 
-        TeamUsecases usecases = new TeamUsecases(mockRepo.Object);
+        TeamUsecase usecases = new TeamUsecase(mockRepo.Object);
 
         // Act
         List<ErrorObject> result = await usecases.StoreTeamsAsync(inputTeams);

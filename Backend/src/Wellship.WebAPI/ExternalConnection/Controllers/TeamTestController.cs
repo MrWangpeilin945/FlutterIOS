@@ -10,13 +10,13 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
     /// </summary>
     public class TeamTestController : ControllerBase
     {
-        private readonly ITeamUsecases _administratorUsecase;
+        private readonly ITeamUsecase _administratorUsecase;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="teamUsecaseUsecase">班ユースケース</param>
-        public TeamTestController(ITeamUsecases teamUsecaseUsecase)
+        public TeamTestController(ITeamUsecase teamUsecaseUsecase)
         {
             _administratorUsecase = teamUsecaseUsecase;
         }

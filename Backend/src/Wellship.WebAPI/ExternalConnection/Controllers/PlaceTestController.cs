@@ -10,13 +10,13 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
     /// </summary>
     public class PlaceTestController : ControllerBase
     {
-        private readonly IPlaceUsecases _administratorUsecase;
+        private readonly IPlaceUsecase _administratorUsecase;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="placeUsecaseUsecase">会場ユースケース</param>
-        public PlaceTestController(IPlaceUsecases placeUsecaseUsecase)
+        public PlaceTestController(IPlaceUsecase placeUsecaseUsecase)
         {
             _administratorUsecase = placeUsecaseUsecase;
         }

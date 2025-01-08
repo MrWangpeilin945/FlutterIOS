@@ -14,13 +14,13 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
     [ApiVersion("1")]
     public class OrganizationTestController : ControllerBase
     {
-        private readonly IOrganizationUsecases _organizationUsecases;
+        private readonly IOrganizationUsecase _organizationUsecases;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="organizationUsecases"></param>
-        public OrganizationTestController(IOrganizationUsecases organizationUsecases)
+        public OrganizationTestController(IOrganizationUsecase organizationUsecases)
         {
             _organizationUsecases = organizationUsecases;
         }
