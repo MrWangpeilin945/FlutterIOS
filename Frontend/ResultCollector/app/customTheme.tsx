@@ -94,7 +94,7 @@ export const customTheme = createTheme({
     }),
     Textarea: Textarea.extend({
       classNames: (theme, props) => ({
-        // Texatareaコンポーネントが使用不可の時に適用するスタイルを設定
+        // TexatInputコンポーネントが使用不可の時に適用するスタイルを設定
         root: props.disabled ? styles["textarea-disabled"] : "",
       }),
     }),
