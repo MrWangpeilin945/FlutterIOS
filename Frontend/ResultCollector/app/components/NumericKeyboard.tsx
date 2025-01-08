@@ -57,7 +57,7 @@ export default function NumericKeyboard(props: KeyboardProps) {
     const integerPart = paddedValue.slice(0, integerLength);
     const decimalPart = paddedValue.slice(integerLength, totalLength);
     let formattedValue = `${integerPart?integerPart:0}.${decimalPart}`;
-    // 整数部が1未満の場合、整数部に0を付ける
+    // 整数部が1未満の場合、整数部に0を1つ付ける
     if (Number.parseInt(formattedValue) < 1) {
       formattedValue = `0.${decimalPart}`;
     } else {
