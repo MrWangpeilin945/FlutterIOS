@@ -23,7 +23,7 @@ public class IntegrationUsecase : IIntegrationUsecase
     }
 
     /// <summary>
-    /// 連携対象の検査結果を取得する
+    /// AP1018_連携対象の検査結果を取得する
     /// </summary>
     public async Task<ExportDataList> GetExportTargetResultsAsync()
     {
@@ -71,7 +71,7 @@ public class IntegrationUsecase : IIntegrationUsecase
     }
 
     /// <summary>
-    /// 連携用に検査結果を出力する
+    /// AP1019_連携用に検査結果を出力する
     /// </summary>
     public async Task ExportResultsAsync(Guid placeScheduleId)
     {
@@ -80,7 +80,7 @@ public class IntegrationUsecase : IIntegrationUsecase
     }
 
     /// <summary>
-    /// 検査結果の出力履歴を取得する
+    /// AP1020_検査結果の出力履歴を取得する
     /// </summary>
     public async Task<ExportHistoryList> GetExportHistoryAsync()
     {
@@ -115,7 +115,7 @@ public class IntegrationUsecase : IIntegrationUsecase
     }
 
     /// <summary>
-    /// 出力した結果を未出力に戻す
+    /// AP1021_出力した結果を未出力に戻す
     /// </summary>
     public async Task UndoExportStatusAsync(Guid exportId)
     {

@@ -23,7 +23,7 @@ public class EquipmentUsecase : IEquipmentUsecase
     }
 
     /// <summary>
-    /// 機器連携設定を取得する
+    /// AP1012_機器連携設定を取得する
     /// </summary>
     public async Task<EquipmentList> GetEquipmentsAsync(int examMenuId)
     {

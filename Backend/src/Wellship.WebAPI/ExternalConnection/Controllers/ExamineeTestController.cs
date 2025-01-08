@@ -15,13 +15,13 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
     [ApiVersion("1")]
     public class ExamineeTestController : ControllerBase
     {
-        private readonly IExamineeUsecases _examineeUsecases;
+        private readonly IExamineeUsecase _examineeUsecases;
 
         /// <summary>
         /// コントローラーを生成します。
         /// </summary>
         /// <param name="examineeUsecases">受診者ユースケース</param>
-        public ExamineeTestController(IExamineeUsecases examineeUsecases)
+        public ExamineeTestController(IExamineeUsecase examineeUsecases)
         {
             _examineeUsecases = examineeUsecases;
         }

@@ -8,7 +8,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 public interface IStaffUsecase
 {
     /// <summary>
-    /// 職員の情報を取得する
+    /// AP1002_職員の情報を取得する
     /// </summary>
     public Task<Staff> GetStaffAsync(Guid staffId);
 }

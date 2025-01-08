@@ -19,7 +19,7 @@ export default function IncompliedExam({
     let count = 0;
     for (const item of items) {
       const newCount = count + item.length + 1;
-      if (newCount > 38) {
+      if (newCount > 37) {
         result += "\n";
         count = 0;
       }

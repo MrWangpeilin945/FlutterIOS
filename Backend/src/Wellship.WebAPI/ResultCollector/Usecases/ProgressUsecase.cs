@@ -24,7 +24,7 @@ public class ProgressUsecase : IProgressUsecase
     }
 
     /// <summary>
-    /// 会場日程IDを指定して進捗状況を取得する
+    /// AP1015_会場日程IDを指定して進捗状況を取得する
     /// </summary>
     public async Task<PlaceScheduleProgress> GetProgressAsync(Guid placeScheduleId)
     {

@@ -41,7 +41,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 受診番号の受診が存在するか確認する
+    /// AP1007_受診番号の受診が存在するか確認する
     /// </summary>
     /// <param name="consultNumberRequest">受診番号リクエスト</param>
     /// <returns>受診が存在するか</returns>
@@ -57,7 +57,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 未受診の検査メニューを取得する
+    /// AP1008_未受診の検査メニューを取得する
     /// </summary>
     public async Task<UnexaminedMenuList> GetUnexaminedMenusAsync(string consultNumber)
     {
@@ -99,7 +99,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 検査内容を取得する
+    /// AP1010_検査内容を取得する
     /// </summary>
     public async Task<ExamContent> GetExamItemsExamineeAsync(string consultNumber, int examMenuId)
     {
@@ -170,7 +170,7 @@ public class ConsultUsecase : IConsultUsecase
                 SameNameAlert = sameNameAlert,
                 ExamDateAge = examAge.Years
             },
-            IsComplete = true,              // TODO: 検査実施判断    後方作業へ
+            IsComplete = !unexaminedItems.UnexaminedMenus.Any(),
             RelatedExamItems = relatedExamItems,
             ExamItems = examItemGroups.OrderBy(group => group.ExamItemGroupId)
                                       .SelectMany(group => group.ExamItems)
@@ -194,7 +194,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 検査の実施有無と中止理由を登録する
+    /// AP1022_検査の実施有無と中止理由を登録する
     /// </summary>
     public async Task RegisterExecutionsAsync(string consultNumber, ExecutionsRequest request)
     {
@@ -271,7 +271,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 検査結果入力情報を取得する
+    /// AP1009_検査結果入力情報を取得する
     /// </summary>
     public async Task<InputExamItems> GetInputExamItemsExamineeAsync(string consultNumber, int examMenuId)
     {
@@ -325,8 +325,13 @@ public class ConsultUsecase : IConsultUsecase
                                     }).ToArray()
                                 }).ToArray()
         };
+        // 検査結果相関ルールを検証する
+        var ruleErrors = await ValidateCorrelationRuleAsync(consultNumber, results);
+        // 検査基準値を検証する
+        var rangeErrors = await ValidateNormalValueRangeAsync(consultNumber, results);
         // 検査項目グループ情報を取得する
-        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, examMenuId, results, examItemGroup, examResults, previousResults);
+        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, examMenuId, results, examItemGroup,
+                                                     examResults, previousResults, ruleErrors, rangeErrors);
 
         return new InputExamItems()
         {
@@ -516,7 +521,7 @@ public class ConsultUsecase : IConsultUsecase
                      .OrderByDescending(x => x.ErrorLevel);
     }
     /// <summary>
-    /// 検査結果を登録する
+    /// AP1014_検査結果を登録する
     /// </summary>
     public async Task RegisterResultsAsync(string consultNumber, ResultsRequest results)
     {
@@ -529,6 +534,25 @@ public class ConsultUsecase : IConsultUsecase
             // 会場ロック中
             throw new PlaceScheduleLockedException();
         }
+        var examItemIds = results.ExamResults.Select(x => x.ExamItemId);
+
+        // 検査結果相関ルールを検証する
+        var ruleErrors = await ValidateCorrelationRuleAsync(consultNumber, results);
+        // NOTE: リクエストに含まれる検査項目IDで相関ルールエラーをチェックする
+        var registrationDeniedRuleError = ruleErrors.Where(x => examItemIds.Contains(x.ExamItemId ?? -1))
+                                                    .Where(x => x.ErrorLevel == InputErrorLevel.異常);
+        if (registrationDeniedRuleError.Any())
+        {
+            throw new ExamResultRegistrationErrorException();
+        }
+
+        // 検査基準値を検証する
+        var rangeErrors = await ValidateNormalValueRangeAsync(consultNumber, results);
+        var registrationDeniedRangeError = rangeErrors.Where(x => x.ErrorLevel == InputErrorLevel.異常);
+        if (registrationDeniedRangeError.Any())
+        {
+            throw new ExamResultRegistrationErrorException();
+        }
         var resultList = results.ExamResults.SelectMany(exam => exam.ExamItemDetails)
                                             .Select(detail => new ExamResultRegisteEntity
                                             {
@@ -540,7 +564,7 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
-    /// 検査結果を検証する
+    /// AP1013_検査結果を検証する
     /// </summary>
     public async Task<VerifyExamItems> VerifyResults(string consultNumber, ResultsRequest results)
     {
@@ -560,8 +584,11 @@ public class ConsultUsecase : IConsultUsecase
         var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
         // 検査メニューに関連した検査項目情報を取得
         var examItemGroup = await _examItemRepository.GetExamItemGroupsAsync(results.ExamMenuId);
+        // 検査結果相関ルールを検証する
+        var ruleErrors = await ValidateCorrelationRuleAsync(consultNumber, results);
         // 検査項目グループ情報を取得する
-        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, results.ExamMenuId, results, examItemGroup, examResults, previousResults);
+        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, results.ExamMenuId, results,
+                                                     examItemGroup, examResults, previousResults, ruleErrors, []);
         return new VerifyExamItems
         {
             // 検査項目グループ情報を取得する
@@ -574,7 +601,8 @@ public class ConsultUsecase : IConsultUsecase
     /// </summary>
     private async Task<IEnumerable<APIModels.Responses.ExamItemGroup>> GetExamItemGroups(string consultNumber, Guid consultId, Domain.Models.Age examAge, Sex sex, int examMenuId,
                                                                                          ResultsRequest results, IEnumerable<Domain.Models.ExamItemGroup> examItemGroup,
-                                                                                         Domain.Models.ExamResult examResults, Domain.Models.PreviousResult previousResults)
+                                                                                         Domain.Models.ExamResult examResults, Domain.Models.PreviousResult previousResults,
+                                                                                         IEnumerable<Domain.Models.RuleError> ruleErrors, IEnumerable<Domain.Models.RangeError> rangeErrors)
     {
         // 検査項目明細IDを取得
         var examItemDetailIds = examItemGroup.SelectMany(group => group.ExamItems)
@@ -596,8 +624,6 @@ public class ConsultUsecase : IConsultUsecase
         var examCancels = await _consultRepository.GetExamCancelsAsync(consultId);
         // 検査依頼を取得
         var examOrders = await _consultRepository.GetExamOrdersAsync(consultId);
-        // 検査基準値を検証する
-        var rangeErrors = await ValidateNormalValueRangeAsync(consultNumber, results);
 
         return examItemGroup.Select(eg => new APIModels.Responses.ExamItemGroup
         {
@@ -641,26 +667,36 @@ public class ConsultUsecase : IConsultUsecase
                                                     Name = op.Name
                                                 }).ToArray(),
                     // 検査基準値範囲
-                    // 優先順位が若い方が優先、エラーレベルが高い方が上に
+                    // 優先順位が若い方が優先、次にエラーレベルが高い方が上に
                     ExamNormalValueRanges =
                         filteredRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
-                                                .OrderBy(r => r.Priority)
-                                                .ThenByDescending(r => r.ErrorLevel)
-                                                .Select(r => new APIModels.Responses.ExamNormalValueRange
-                                                {
-                                                    ErrorLevel = (int)r.ErrorLevel,
-                                                    MaxValue = r.ValueRange.MaxValue,
-                                                    MinValue = r.ValueRange.MinValue
-                                                }).ToArray()
+                                      .OrderBy(r => r.Priority)
+                                      .ThenByDescending(r => r.ErrorLevel)
+                                      .Select(r => new APIModels.Responses.ExamNormalValueRange
+                                      {
+                                          ErrorLevel = (int)r.ErrorLevel,
+                                          MaxValue = r.ValueRange.MaxValue,
+                                          MinValue = r.ValueRange.MinValue
+                                      }).ToArray()
                 }).ToArray(),
-                // 検査基準値エラー
+                // 検査基準値エラーと相関ルールをマージする
                 ExamRegistResults =
-                    rangeErrors.Where(err => ei.ExamItemDetails.Select(ed => ed.ExamItemDetailId).Contains(err.ExamItemDetailId))
-                               .Select(err => new ExamRegistResult
+                    rangeErrors.Where(range => ei.ExamItemDetails.Select(ed => ed.ExamItemDetailId).Contains(range.ExamItemDetailId))
+                               .Select(range => new ExamRegistResult
                                {
-                                   ErrorLevel = (int)err.ErrorLevel,
-                                   Description = err.Name
-                               }).ToArray()
+                                   ErrorLevel = (int)range.ErrorLevel,
+                                   Description = range.Message
+                               })
+                               .Concat(
+                                    ruleErrors.Where(rule => ei.ExamItemId == rule.ExamItemId)
+                                              .Select(rule => new ExamRegistResult
+                                              {
+                                                  ErrorLevel = (int)rule.ErrorLevel,
+                                                  Description = rule.Message
+                                              })
+                               )
+                               .OrderByDescending(x => x.ErrorLevel)
+                               .ToArray()
             }).ToArray()
         }).ToArray();
     }

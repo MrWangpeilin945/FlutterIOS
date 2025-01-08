@@ -111,7 +111,7 @@ export default function Login() {
         }
       } catch (error) {
         if (isAxiosError(error) && error.response) {
-          if (error.response.status === 403) {
+          if (error.response.status === 401) {
             setErrorMessage(getErrorMessage(errorMessages.accessDenied));
           } else if (error.response.status === 500) {
             setErrorMessage(getErrorMessage(errorMessages.serverError));
