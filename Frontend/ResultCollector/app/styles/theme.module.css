@@ -15,21 +15,21 @@
 /* Buttonがdisableの時に適用するCSS */
 .button-disabled {
   background-color: #cecece !important;
-  color: #9a9a9a !important;
+  color: #949494 !important;
   border: none !important;
 }
 
 /* Textareaがdisableの時に適用するCSS */
 .textarea-disabled {
   background-color: #cecece !important;
-  color: #9a9a9a !important;
+  color: #949494 !important;
   border-radius: 8px;
 }
 
 /* TextInputがdisableの時に適用するCSS */
 .textinput-disabled {
   background-color: #cecece !important;
-  color: #9a9a9a !important;
+  color: #949494 !important;
   border-radius: 8px;
 }
 
