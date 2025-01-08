@@ -28,6 +28,7 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="examMenuRepository">検査メニューリポジトリ</param>
     /// <param name="examItemRepository">検査項目リポジトリ</param>
     /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
+    /// <param name="resultRepository">検査結果リポジトリ</param>
     public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamMenuRepository examMenuRepository,
                           IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository, IResultRepository resultRepository)
     {
@@ -534,19 +535,21 @@ public class ConsultUsecase : IConsultUsecase
             throw new PlaceScheduleLockedException();
         }
         var examItemIds = results.ExamResults.Select(x => x.ExamItemId);
+
         // 検査結果相関ルールを検証する
         var ruleErrors = await ValidateCorrelationRuleAsync(consultNumber, results);
-        if (ruleErrors.Any())
+        // NOTE: リクエストに含まれる検査項目IDで相関ルールエラーをチェックする
+        var registrationDeniedRuleError = ruleErrors.Where(x => examItemIds.Contains(x.ExamItemId ?? -1))
+                                                    .Where(x => x.ErrorLevel == InputErrorLevel.異常);
+        if (registrationDeniedRuleError.Any())
         {
-            var errors = ruleErrors.Where(x => examItemIds.Contains(x.ExamItemId ?? -1));
-            if (errors.Any())
-            {
-                throw new ExamResultRegistrationErrorException();
-            }
+            throw new ExamResultRegistrationErrorException();
         }
+
         // 検査基準値を検証する
         var rangeErrors = await ValidateNormalValueRangeAsync(consultNumber, results);
-        if (rangeErrors.Any())
+        var registrationDeniedRangeError = rangeErrors.Where(x => x.ErrorLevel == InputErrorLevel.異常);
+        if (registrationDeniedRangeError.Any())
         {
             throw new ExamResultRegistrationErrorException();
         }
@@ -681,7 +684,7 @@ public class ConsultUsecase : IConsultUsecase
                                .Select(range => new ExamRegistResult
                                {
                                    ErrorLevel = (int)range.ErrorLevel,
-                                   Description = range.Name
+                                   Description = range.Message
                                })
                                .Concat(
                                     ruleErrors.Where(rule => ei.ExamItemId == rule.ExamItemId)

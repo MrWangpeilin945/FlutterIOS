@@ -708,18 +708,68 @@ public class ConsultUsecaseTests
     {
         // Arrange
         var consultNumber = "0006";
-        _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber))
-                         .ReturnsAsync(new Consult
-                         {
-                             ConsultId = Guid.Parse("8d670eb8-d9f2-40b2-bfa6-cef6403be53d"),
-                             ConsultNumber = "0006",
-                             ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
-                             ProgressStatus = ConsultProgressStatus.検査中,
-                             Note = "定期健康診断",
-                             ExportStatus = ConsultResultExportStatus.未出力,
-                             PlaceScheduleId = Guid.Parse("531eb00c-1850-4d5e-9561-f24cdfd9a250"),
-                             TicketNumber = "1029"
-                         });
+        var consultId = Guid.Parse("8d670eb8-d9f2-40b2-bfa6-cef6403be53d");
+        var examDate = new DateOnly(2025, 1, 10);
+
+        // 会場日程
+        var placeSchedule = new WebAPI.ResultCollector.Domain.Models.PlaceSchedule()
+        {
+            Id = Guid.Parse("531eb00c-1850-4d5e-9561-f24cdfd9a250"),
+            Place = new WebAPI.ResultCollector.Domain.Models.Place() { Id = Guid.Parse("45449e64-5632-4fcb-9261-5c136531a86a"), Code = "001", Name = "会場1", OrderNumber = 1 },
+            Team = new Team() { Id = Guid.Parse("1eb0a120-a76c-49d7-a2da-47fccf5bef44"), Code = "001", Name = "1班", OrderNumber = 1 },
+            ExamDate = examDate,
+            StartTime = "1000",
+            PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査中
+        };
+
+        // 受診者
+        var examinee = new WebAPI.ResultCollector.Domain.Models.Examinee()
+        {
+            ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
+            ExamineeCode = "10001",
+            Name = "両備　太郎",
+            KanaName = "リョウビ　タロウ",
+            Sex = Sex.男,
+            Birthdate = new Birthdate(new DateOnly(1999, 11, 29)),
+            Affiliations = [new Affiliations { OrganizationId = Guid.Parse("7bf76a3d-8bb4-41f5-8bd5-3b8fc8482511"), OrganizationCode = "0001", OrganizationName = "", OrderNumber = 1 }]
+        };
+
+        // 受診
+        var consult = new WebAPI.ResultCollector.Domain.Models.Consult()
+        {
+            ConsultId = consultId,
+            ConsultNumber = consultNumber,
+            ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
+            ProgressStatus = ConsultProgressStatus.検査中,
+            Note = "定期健康診断",
+            ExportStatus = ConsultResultExportStatus.未出力,
+            PlaceScheduleId = Guid.Parse("531eb00c-1850-4d5e-9561-f24cdfd9a250"),
+            TicketNumber = "1029"
+        };
+        _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(consult);
+
+        // DBの今回値
+        var examResult = new ExamResult()
+        {
+            ConsultId = consultId,
+            ExamItemDetailResults = []
+        };
+
+        // DBの前回値
+        var previousResult = new PreviousResult()
+        {
+            ConsultId = consultId,
+            ExamDate = new DateOnly(2024, 4, 1),
+            ExamItemDetailResults = []
+        };
+
+
+
+        _consultRepositoryMock.Setup(x => x.GetExamResultsAsync(consultId)).ReturnsAsync(examResult);
+        _consultRepositoryMock.Setup(x => x.GetPreviousResultsAsync(consultId, examDate)).ReturnsAsync(previousResult);
+        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleAsync(Guid.Parse("531eb00c-1850-4d5e-9561-f24cdfd9a250"))).ReturnsAsync(placeSchedule);
+        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"))).ReturnsAsync(examinee);
+
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
                                          _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
         var results = new ResultsRequest
@@ -729,16 +779,16 @@ public class ConsultUsecaseTests
                 new ResultRequest()
                 {
                     ExamItemId = 71
-                    , ExamItemDetails = 
-                    [ 
+                    , ExamItemDetails =
+                    [
                         new ExamItemDetailRequest(){ExamItemDetailId = 711, Value = "100"},
                         new ExamItemDetailRequest(){ExamItemDetailId = 712, Value = "80"}
                     ]
                 },
                 new ResultRequest() {
                     ExamItemId = 72
-                    , ExamItemDetails = 
-                    [ 
+                    , ExamItemDetails =
+                    [
                         new ExamItemDetailRequest(){ExamItemDetailId = 721, Value = "110"},
                         new ExamItemDetailRequest(){ExamItemDetailId = 722, Value = "95"}
                     ]
@@ -776,7 +826,7 @@ public class ConsultUsecaseTests
                                         Status = PlaceScheduleLockingStatus.検査完了,
                                         CreatedAt = DateTime.Now,
                                         CreatedBy = "admin"
-                                    });     
+                                    });
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
                                          _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
         var results = new ResultsRequest
@@ -786,16 +836,16 @@ public class ConsultUsecaseTests
                 new ResultRequest()
                 {
                     ExamItemId = 71
-                    , ExamItemDetails = 
-                    [ 
+                    , ExamItemDetails =
+                    [
                         new ExamItemDetailRequest(){ExamItemDetailId = 711, Value = "100"},
                         new ExamItemDetailRequest(){ExamItemDetailId = 712, Value = "80"}
                     ]
                 },
                 new ResultRequest() {
                     ExamItemId = 72
-                    , ExamItemDetails = 
-                    [ 
+                    , ExamItemDetails =
+                    [
                         new ExamItemDetailRequest(){ExamItemDetailId = 721, Value = "110"},
                         new ExamItemDetailRequest(){ExamItemDetailId = 722, Value = "95"}
                     ]
