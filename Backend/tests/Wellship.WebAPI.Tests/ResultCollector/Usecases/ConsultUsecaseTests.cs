@@ -796,7 +796,8 @@ public class ConsultUsecaseTests
             ]
         };
         // Act & Assert
-        await usecase.RegisterResultsAsync(consultNumber, results);
+        await usecase.Invoking(x => x.RegisterResultsAsync(consultNumber, results))
+                     .Should().NotThrowAsync();
     }
     [Fact]
     public async Task 会場ロック状態で検査結果を登録する()
