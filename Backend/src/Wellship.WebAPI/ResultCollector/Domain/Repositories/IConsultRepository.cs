@@ -45,12 +45,6 @@ public interface IConsultRepository
     public Task SaveExamCancelsAsync(Guid consultId, IEnumerable<ExamItemCancel> examItemCancels);
 
     /// <summary>
-    /// 基準値の基準値パターンIDを取得する
-    /// </summary>
-    /// <param name="consultId">受診ID</param>
-    public Task<IEnumerable<Guid>> GetConsultThresholds(Guid consultId);
-
-    /// <summary>
     /// 受診を指定して検査依頼を取得します。
     /// </summary>
     public Task<ExamOrder> GetExamOrdersAsync(Guid consultId);
@@ -69,4 +63,12 @@ public interface IConsultRepository
     /// 受診を指定して検査項目特記を取得します。
     /// </summary>
     public Task<IEnumerable<ConsultNote>> GetConsultNotesAsync(Guid consultId);
+
+    /// <summary>
+    /// 検査基準値範囲を取得します。
+    /// 受診に紐づく検査依頼に対して基準値を結合します。
+    /// </summary>
+    /// <param name="consultId">受診ID</param>
+    /// <param name="examItemDetailIds">検査項目明細ID</param>
+    Task<IEnumerable<ExamNormalValueRange>> GetExamNormalValueRangesAsync(Guid consultId, int[] examItemDetailIds);
 }

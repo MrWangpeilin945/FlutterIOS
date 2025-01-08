@@ -134,38 +134,6 @@ public class ExamItemRepository : IExamItemRepository
     }
 
     /// <summary>
-    /// 検査正常値範囲を取得します。
-    /// </summary>
-    /// <param name="thresholdIds">基準値パターンID</param>
-    /// <param name="examItemDetailIds">検査項目明細ID</param>
-    /// <param name="age">受診者の健診時の年齢</param>
-    /// <param name="sex">受診者の性別</param>
-    public async Task<IEnumerable<ExamNormalValueRange>> GetExamNormalValueRangesAsync(Guid[] thresholdIds, int[] examItemDetailIds, Age age, Sex sex)
-    {
-        var connection = await _dbConnectionProvider.GetOrOpenAsync();
-        const string sql = @"
-        select 
-            r.name as Name
-            , r.threshold_id as ThresholdId
-            , r.exam_item_detail_id as ExamItemDetailId
-            , r.min_age as MinAge
-            , r.max_age as MaxAge
-            , r.target_sex as TargetSex
-            , r.max_value as MaxValue
-            , r.min_value as MinValue
-            , r.error_level as ErrorLevel
-            , ct.priority as Priority
-        from resultcollector.exam_normal_value_range r
-        left join resultcollector.consult_thresholds ct 
-            on r.threshold_id = ct.threshold_id
-        where r.threshold_id = any(@ThresholdIds)
-        and r.exam_item_detail_id = any(@ExamItemDetailIds);";
-        var normalValueRanges = await connection.QueryAsync<ExamNormalValueRange>(sql,
-                                        new { ThresholdIds = thresholdIds, ExamItemDetailIds = examItemDetailIds });
-        return normalValueRanges.Where(x => x.IsTargetAge(age) && x.IsTargetSex(sex));
-    }
-
-    /// <summary>
     /// 検査結果相関ルールを取得します。
     /// </summary>
     /// <param name="examMenuId">検査メニューID</param>

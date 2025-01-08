@@ -489,16 +489,16 @@ public class ConsultUsecase : IConsultUsecase
 
         var examItemDetailIds = currentMap.Select(x => x.Key).ToArray();
 
-        // 検査基準値範囲を取得（年齢と性別による絞り込み）
-        var thresholds = await _consultRepository.GetConsultThresholds(consult.ConsultId);
-        var ranges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, examinee.Sex);
+        // 検査基準値範囲を取得
+        var ranges = await _consultRepository.GetExamNormalValueRangesAsync(consult.ConsultId, examItemDetailIds);
 
         // 今回値に対して範囲チェック
         var errors = new List<Domain.Models.RangeError>();
         foreach (var current in currentMap)
         {
             // 検査結果がMin以上Max未満に当てはまる範囲の設定を取得する
-            var range = ranges.Where(x => x.ExamItemDetailId == current.Key && x.ValueInRange(current.Value))
+            // 優先度の昇順でソートして先頭の基準値範囲を採用する
+            var range = ranges.Where(x => x.ExamItemDetailId == current.Key && x.ValueRange.InRange(current.Value))
                               .OrderBy(x => x.Priority)
                               .FirstOrDefault();
 
@@ -508,8 +508,8 @@ public class ConsultUsecase : IConsultUsecase
                 {
                     Name = range.Name,
                     ExamItemDetailId = range.ExamItemDetailId,
-                    MinValue = range.MinValue,
-                    MaxValue = range.MaxValue,
+                    MinValue = range.ValueRange.MinValue,
+                    MaxValue = range.ValueRange.MaxValue,
                     ErrorLevel = range.ErrorLevel
                 });
             }
@@ -613,14 +613,13 @@ public class ConsultUsecase : IConsultUsecase
         var Keyboards = await _examItemRepository.GetKeyboardOptionssAsync(examItemDetailIds);
         // 検査項目明細選択肢
         var examItemDetailOptions = await _examItemRepository.GetExamItemDetailOptionsAsync(examItemDetailIds);
-        // 基準値パターンIDを取得
-        var thresholds = await _consultRepository.GetConsultThresholds(consultId);
+
         // 検査基準値範囲を取得
-        IEnumerable<Domain.Models.ExamNormalValueRange> examNormalValueRanges = [];
-        if (thresholds.Any())
-        {
-            examNormalValueRanges = await _examItemRepository.GetExamNormalValueRangesAsync(thresholds.ToArray(), examItemDetailIds, examAge, sex);
-        }
+        var examNormalValueRanges = await _consultRepository.GetExamNormalValueRangesAsync(consultId, examItemDetailIds);
+        var filteredRanges = examNormalValueRanges.Where(x => x.TargetAge.IsMatch(examAge))
+                                                  .Where(x => x.TargetSex.IsMatch(sex));
+
+
         // 検査中止を取得
         var examCancels = await _consultRepository.GetExamCancelsAsync(consultId);
         // 検査依頼を取得
@@ -668,15 +667,17 @@ public class ConsultUsecase : IConsultUsecase
                                                     Name = op.Name
                                                 }).ToArray(),
                     // 検査基準値範囲
+                    // 優先順位が若い方が優先、次にエラーレベルが高い方が上に
                     ExamNormalValueRanges =
-                        examNormalValueRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
-                                                .OrderBy(r => r.ErrorLevel)
-                                                .Select(r => new APIModels.Responses.ExamNormalValueRange
-                                                {
-                                                    ErrorLevel = (int)r.ErrorLevel,
-                                                    MaxValue = r.MaxValue,
-                                                    MinValue = r.MinValue
-                                                }).ToArray()
+                        filteredRanges.Where(r => r.ExamItemDetailId == ed.ExamItemDetailId)
+                                      .OrderBy(r => r.Priority)
+                                      .ThenByDescending(r => r.ErrorLevel)
+                                      .Select(r => new APIModels.Responses.ExamNormalValueRange
+                                      {
+                                          ErrorLevel = (int)r.ErrorLevel,
+                                          MaxValue = r.ValueRange.MaxValue,
+                                          MinValue = r.ValueRange.MinValue
+                                      }).ToArray()
                 }).ToArray(),
                 // 検査基準値エラーと相関ルールをマージする
                 ExamRegistResults =
