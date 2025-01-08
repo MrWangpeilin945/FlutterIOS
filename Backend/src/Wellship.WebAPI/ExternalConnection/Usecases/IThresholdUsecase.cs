@@ -5,7 +5,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
     /// <summary>
     /// 基準パターンを登録するUsecase層
     /// </summary>
-    public interface IThresholdUsecases
+    public interface IThresholdUsecase
     {
         /// <summary>
         /// EC2014_基準パターンを登録する

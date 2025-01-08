@@ -39,7 +39,7 @@ namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
 
             organizationRepositoryMock.Setup(r => r.UpsertOrganizationsAsync(organizationEntities, DateTime.Now, "ExternalConnection"));
 
-            var usecases = new OrganizationUsecases(organizationRepositoryMock.Object);
+            var usecases = new OrganizationUsecase(organizationRepositoryMock.Object);
 
             // Act & Assert
             await usecases.Invoking(x => x.StoreOrganizationsAsync(organizations))
