@@ -47,7 +47,7 @@ export const customTheme = createTheme({
     blue04: colorsTuple("#009DE6"),
     // 灰系の色
     gray01: colorsTuple("#6A6A6A"),
-    gray02: colorsTuple("#9A9A9A"),
+    gray02: colorsTuple("#949494"),
     gray03: colorsTuple("#CECECE"),
     gray04: colorsTuple("#EAEAEA"),
     // オレンジ系の色
@@ -85,7 +85,7 @@ export const customTheme = createTheme({
       defaultProps: {
         radius: "50",
       },
-      classNames: (theme, props, ctx) => ({
+      classNames: (theme, props) => ({
         // Buttonコンポーネントが使用不可の時に適用するスタイルを設定
         root: props.disabled ? styles["button-disabled"] : "",
       }),
@@ -115,7 +115,7 @@ export const customTheme = createTheme({
         }
         return { root: {} };
       },
-      classNames: (theme, props, ctx) => ({
+      classNames: (theme, props) => ({
         // Switchコンポーネントがオフの時に適用するスタイルを設定
         root: !props.checked
           ? `${styles["switch-off"]} ${styles["switch-padding"]}`
@@ -126,7 +126,7 @@ export const customTheme = createTheme({
       defaultProps: {
         loaderProps: { size: "xxl" },
       },
-      classNames: (theme, props, ctx) => ({
+      classNames: (theme, props) => ({
         root: props.loaderProps?.size === "xxl" ? styles["loading-large"] : "",
       }),
     }),
