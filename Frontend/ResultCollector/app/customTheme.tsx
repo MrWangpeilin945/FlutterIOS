@@ -1,6 +1,8 @@
 import {
   rem,
   Button,
+  Textarea,
+  TextInput,
   createTheme,
   Divider,
   Switch,
@@ -88,6 +90,18 @@ export const customTheme = createTheme({
       classNames: (theme, props) => ({
         // Buttonコンポーネントが使用不可の時に適用するスタイルを設定
         root: props.disabled ? styles["button-disabled"] : "",
+      }),
+    }),
+    Textarea: Textarea.extend({
+      classNames: (theme, props) => ({
+        // Textareaコンポーネントが使用不可の時に適用するスタイルを設定
+        root: props.disabled ? styles["textarea-disabled"] : "",
+      }),
+    }),
+    TextInput: TextInput.extend({
+      classNames: (theme, props) => ({
+        // TextInputコンポーネントが使用不可の時に適用するスタイルを設定
+        root: props.disabled ? styles["textinput-disabled"] : "",
       }),
     }),
     Divider: Divider.extend({
