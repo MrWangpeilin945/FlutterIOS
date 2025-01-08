@@ -10,21 +10,6 @@ public class ExamNormalValueRange
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public ExamNormalValueRange(ExamNormalValueRangeEntity entity)
-    {
-        Name = entity.RangeName;
-        ThresholdId = entity.ThresholdId;
-        ExamItemDetailId = entity.ExamItemDetailId;
-        TargetAge = new TargetAge(entity.MinAge, entity.MaxAge);
-        TargetSex = new TargetSex((TargetSexType)entity.TargetSex);
-        ValueRange = new ValueRange(entity.MinValue, entity.MaxValue);
-        ErrorLevel = (InputErrorLevel)entity.ErrorLevel;
-        Priority = entity.Priority;
-    }
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
     public ExamNormalValueRange(string name,
                                 Guid thresholdId,
                                 int examItemDetailId,

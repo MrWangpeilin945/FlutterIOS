@@ -43,7 +43,7 @@ public class TargetAge
     /// 年齢文字列をAgeオブジェクトに変換する
     /// </summary>
     /// <param name="ageString">年齢文字列</param>
-    private Age ConvertToAge(string ageString)
+    private static Age ConvertToAge(string ageString)
     {
         if (string.IsNullOrWhiteSpace(ageString))
         {
