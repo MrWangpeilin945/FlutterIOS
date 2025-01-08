@@ -5,7 +5,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
     /// <summary>
     /// 班を登録するUsecase層
     /// </summary>
-    public interface ITeamUsecases
+    public interface ITeamUsecase
     {
         /// <summary>
         /// EC2006_班を登録する

@@ -37,7 +37,7 @@ public class ThresholdUsecasesTest
         // モックのセットアップ
         mockRepo.Setup(repo => repo.UpsertThresholdsAsync(It.IsAny<List<ThresholdEntity>>(), It.IsAny<DateTime>(), "ExternalConnection"));
 
-        ThresholdUsecases usecases = new ThresholdUsecases(mockRepo.Object);
+        ThresholdUsecase usecases = new ThresholdUsecase(mockRepo.Object);
 
         // Act
         List<ErrorObject> result = await usecases.StoreThresholdsAsync(inputThresholds);

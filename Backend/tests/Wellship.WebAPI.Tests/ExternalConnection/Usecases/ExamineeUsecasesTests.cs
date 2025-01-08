@@ -16,7 +16,7 @@ namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
 {
     public class ExamineeUsecasesTests
     {
-        private readonly ExamineeUsecases _usecases;
+        private readonly ExamineeUsecase _usecases;
 
         public ExamineeUsecasesTests()
         {
@@ -31,7 +31,7 @@ namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
             examineeRepository.Setup(x => x.UpsertExamineesAsync(It.IsAny<List<ExamineeEntity>>(), It.IsAny<DateTime>(), It.IsAny<string>())).Returns(Task.CompletedTask);
             affiliationRepository.Setup(x => x.InsertAffiliationsAsync(It.IsAny<List<Examinee>>(), It.IsAny<DateTime>(), It.IsAny<string>())).Returns(Task.CompletedTask);
 
-            _usecases = new ExamineeUsecases(dbConnectionProvider.Object, organizationRepository.Object, examineeRepository.Object, affiliationRepository.Object);
+            _usecases = new ExamineeUsecase(dbConnectionProvider.Object, organizationRepository.Object, examineeRepository.Object, affiliationRepository.Object);
         }
 
         [Fact]

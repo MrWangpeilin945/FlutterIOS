@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+import { atomWithStorage, RESET } from "jotai/utils";
 import type {
   StringIdNamedEntity,
   NumberIdNamedEntity,
@@ -6,23 +7,42 @@ import type {
 } from "~/interfaces/interfaces";
 import type { PlaceSchedule } from "~/domain/wellship.schemas";
 
-export const teamState = atom<StringIdNamedEntity | null>(null);
-export const placeScheduleState = atom<PlaceSchedule | null>(null);
-export const examDateState = atom<Date | null>(null);
-export const staffState = atom<StringIdNamedEntity | null>(null);
-export const examMenuState = atom<NumberIdNamedEntity[] | null>(null);
-export const connectionEquipmentState = atom<ConnectionEquipment[] | null>(
+// 状態管理はすべてlocalStorageに保存する(atomWithStorage)
+export const teamState = atomWithStorage<StringIdNamedEntity | null>(
+  "teamState",
   null,
 );
-export const serverTimeOffsetState = atom<number | null>(null);
+export const placeScheduleState = atomWithStorage<PlaceSchedule | null>(
+  "placeScheduleState",
+  null,
+);
+export const examDateState = atomWithStorage<Date | null>(
+  "examDateState",
+  null,
+);
+export const staffState = atomWithStorage<StringIdNamedEntity | null>(
+  "staffState",
+  null,
+);
+export const examMenuState = atomWithStorage<NumberIdNamedEntity[] | null>(
+  "examMenuState",
+  null,
+);
+export const connectionEquipmentState = atomWithStorage<
+  ConnectionEquipment[] | null
+>("connectionEquipmentState", null);
+export const serverTimeOffsetState = atomWithStorage<number | null>(
+  "serverTimeOffsetState",
+  null,
+);
 
 // 状態管理をクリアする(ログアウト処理で使用)
 export const clearAllState = atom(null, (_get, set) => {
-  set(teamState, null);
-  set(placeScheduleState, null);
-  set(examDateState, null);
-  set(staffState, null);
-  set(examMenuState, null);
-  set(connectionEquipmentState, null);
-  set(serverTimeOffsetState, null);
+  set(teamState, RESET);
+  set(placeScheduleState, RESET);
+  set(examDateState, RESET);
+  set(staffState, RESET);
+  set(examMenuState, RESET);
+  set(connectionEquipmentState, RESET);
+  set(serverTimeOffsetState, RESET);
 });

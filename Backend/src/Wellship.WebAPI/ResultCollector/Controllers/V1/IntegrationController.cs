@@ -28,7 +28,7 @@ public class IntegrationController : ControllerBase
     }
 
     /// <summary>
-    /// 連携対象の検査結果を取得する
+    /// AP1018_連携対象の検査結果を取得する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExportDataList))]
@@ -42,7 +42,7 @@ public class IntegrationController : ControllerBase
     }
 
     /// <summary>
-    /// 連携用に検査結果を出力する
+    /// AP1019_連携用に検査結果を出力する
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -62,7 +62,7 @@ public class IntegrationController : ControllerBase
     }
 
     /// <summary>
-    /// 検査結果の出力履歴を取得する
+    /// AP1020_検査結果の出力履歴を取得する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExportHistoryList))]
@@ -76,7 +76,7 @@ public class IntegrationController : ControllerBase
     }
 
     /// <summary>
-    /// 出力した結果を未出力に戻す
+    /// AP1021_出力した結果を未出力に戻す
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

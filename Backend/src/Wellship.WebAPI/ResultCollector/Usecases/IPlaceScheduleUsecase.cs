@@ -9,23 +9,23 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 public interface IPlaceScheduleUsecase
 {
     /// <summary>
-    /// 班リストを取得する
+    /// AP1003_班リストを取得する
     /// </summary>
     /// <param name="date">健診日</param>
     public Task<PlaceScheduleTeams> GetTeamsAsync(DateOnly date);
 
     /// <summary>
-    /// 班を指定して会場日程を取得する
+    /// AP1004_班を指定して会場日程を取得する
     /// </summary>
     public Task<PlaceSchedulePlaces> GetTeamPlaceSchedulesAsync(DateOnly examDate, Guid teamId);
 
     /// <summary>
-    /// 会場ロック状態を取得する
+    /// AP1016_会場ロック状態を取得する
     /// </summary>
     public Task<PlaceScheduleLocking> GetPlaceScheduleLockingStatusAsync(Guid placeScheduleId);
 
     /// <summary>
-    /// 会場ロック状態を更新する
+    /// AP1017_会場ロック状態を更新する
     /// </summary>
     public Task UpdatePlaceScheduleLockingStatusAsync(Guid placeScheduleId, PlaceScheduleLockingStatus status);
 }
