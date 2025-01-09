@@ -223,7 +223,7 @@ export default function ExamOrderConfirm() {
           // エラー内容を判別する
           const errorMessage =
             result.error.status === 400
-              ? getErrorMessage(errorMessages.invalid, "検査項目ID")
+              ? getErrorMessage(errorMessages.invalid, "受診番号")
               : result.error.status === 404
                 ? getErrorMessage(errorMessages.notFound, "該当する受診番号")
                 : result.error.status === 500
@@ -468,7 +468,7 @@ export default function ExamOrderConfirm() {
             // 「実施する」が選択されている検査項目がある時
             // 検査結果入力画面に遷移する
             navigate(
-              `/examresult-input/${paramConsultNumber}?exammenuid=${paramExamMenuId}`,
+              `/consult-input/${paramConsultNumber}?exammenuid=${paramExamMenuId}`,
             );
           } else {
             // 「実施する」が選択されている検査項目がない時
@@ -592,7 +592,7 @@ export default function ExamOrderConfirm() {
         // 存在する場合は上書きする
         return connectionEquipmentList
           .map((connectionEquipment, index) => ({
-            examMenuId: examMenuId,
+            examMenuId: connectionEquipment.examMenuId,
             equipment:
               index === connectionEquipmentIndex
                 ? selectedEquipment
