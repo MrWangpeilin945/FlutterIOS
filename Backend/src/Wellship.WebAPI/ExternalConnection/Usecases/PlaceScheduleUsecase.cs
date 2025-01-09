@@ -42,19 +42,21 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
         public async Task<List<ErrorObject>> StorePlaceSchedulesAsync(List<PlaceSchedule> placeSchedules)
         {
             // 既存会場コードの確認
-            var insertPlaceSchedules = await GetCheckedPlaceCodes(placeSchedules);
+            var insertPlaceSchedulesByPlaces = await GetCheckedPlaceCodes(placeSchedules);
 
             // 既存班コードの確認
-            insertPlaceSchedules = await GetCheckedTeamCodes(placeSchedules);
+            var insertPlaceSchedulesByTeams = await GetCheckedTeamCodes(placeSchedules);
+
+            var commonInsertPlaceSchedules = insertPlaceSchedulesByPlaces.Intersect(insertPlaceSchedulesByTeams).ToList();
 
             // 会場IDの取得
-            var places = await _placeRepository.GetPlaceInfoAsync(insertPlaceSchedules.Select(p => p.PlaceCode).ToList());
+            var places = await _placeRepository.GetPlaceInfoAsync(commonInsertPlaceSchedules.Select(p => p.PlaceCode).ToList());
 
             // 班IDの取得
-            var teams = await _teamRepository.GetTeamInfoAsync(insertPlaceSchedules.Select(t => t.TeamCode).ToList());
+            var teams = await _teamRepository.GetTeamInfoAsync(commonInsertPlaceSchedules.Select(t => t.TeamCode).ToList());
 
             // 会場日程エンティティリストを生成
-            var placeScheduleEntities = insertPlaceSchedules.Select(placeSchedule => new PlaceScheduleEntity
+            var placeScheduleEntities = commonInsertPlaceSchedules.Select(placeSchedule => new PlaceScheduleEntity
             {
                 PlaceId = places.Where(p => p.PlaceCode == placeSchedule.PlaceCode).Select(p => p.PlaceId).FirstOrDefault(),
                 TeamId = teams.Where(t => t.TeamCode == placeSchedule.TeamCode).Select(t => t.TeamId).FirstOrDefault(),
@@ -88,7 +90,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
             if (errorPlaceCodes.Count > 0)
             {
                 // 返却用エラーオブジェクトに追加
-                AddErrorObjects(placeSchedules, errorPlaceCodes);
+                AddPlaceErrorObjects(placeSchedules, errorPlaceCodes);
                 // 会場コードが存在する会場日程のみ抽出
                 results = placeSchedules
                     .Where(placeSchedule => !errorPlaceCodes.Contains(placeSchedule.PlaceCode))
@@ -117,10 +119,10 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
             if (errorTeamCodes.Count > 0)
             {
                 // 返却用エラーオブジェクトに追加
-                AddErrorObjects(placeSchedules, errorTeamCodes);
-                // 会場コードが存在する会場日程のみ抽出
+                AddTeamErrorObjects(placeSchedules, errorTeamCodes);
+                // 班コードが存在する会場日程のみ抽出
                 results = placeSchedules
-                    .Where(placeSchedule => !errorTeamCodes.Contains(placeSchedule.PlaceCode))
+                    .Where(placeSchedule => !errorTeamCodes.Contains(placeSchedule.TeamCode))
                     .ToList();
             }
             else
@@ -147,7 +149,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
 
             // 会場コードを基に会場情報を取得する
             var existPlaceCodes = await _placeRepository.GetPlacesByCodesAsync(placeCodes);
-            // 存在しない団体コードを取得する
+            // 存在しない会場コードを取得する
             results = placeCodes.Except(existPlaceCodes).ToList();
 
             return results;
@@ -170,7 +172,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
 
             // 班コードを基に会場情報を取得する
             var existTeamCodes = await _teamRepository.GetTeamsByCodesAsync(teamCodes);
-            // 存在しない団体コードを取得する
+            // 存在しない班コードを取得する
             results = teamCodes.Except(existTeamCodes).ToList();
 
             return results;
