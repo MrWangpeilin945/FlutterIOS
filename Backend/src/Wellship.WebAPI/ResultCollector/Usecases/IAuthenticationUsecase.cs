@@ -6,7 +6,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 public interface IAuthenticationUsecase
 {
     /// <summary>
-    /// ログインする
+    /// AP1001_ログインする
     /// </summary>
     /// <param name="identifier">ログインID</param>
     /// <param name="password">パスワード</param>

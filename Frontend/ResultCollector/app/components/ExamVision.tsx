@@ -671,6 +671,8 @@ export default function ExamVision({
                         KeyboardType.テンキー ? (
                           <NumericKeyboard
                             value={detail?.value ?? ""}
+                            integerLength={detail.integerLength}
+                            decimalLength={detail.decimalLength}
                             onChange={(newValue) =>
                               handleChange(
                                 newValue,
@@ -682,6 +684,7 @@ export default function ExamVision({
                           />
                         ) : (
                           <CollectionKeyboard
+                            value={detail.value ?? ""}
                             keyboardValues={detail.keyboard?.values ?? []}
                             onChange={(newValue) =>
                               handleChange(

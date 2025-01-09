@@ -24,7 +24,7 @@ public class StaffController : ControllerBase
     }
 
     /// <summary>
-    /// 職員の情報を取得する
+    /// AP1002_職員の情報を取得する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Staff))]

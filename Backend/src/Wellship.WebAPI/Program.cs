@@ -118,6 +118,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IPlaceScheduleRepository, PlaceScheduleRepository>();
         services.AddScoped<IHomeMenuRepository, HomeMenuRepository>();
         services.AddScoped<IStaffRepository, StaffRepository>();
+        services.AddScoped<IStaffLoginHistoryRepository, StaffLoginHistoryRepository>();
         services.AddScoped<IExamMenuRepository, ExamMenuRepository>();
         services.AddScoped<IEquipmentRepository, EquipmentRepository>();
         services.AddScoped<IIntegrationRepository, IntegrationRepository>();

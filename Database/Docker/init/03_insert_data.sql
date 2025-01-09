@@ -202,7 +202,7 @@ INSERT INTO exam_results(consult_id,exam_item_detail_id,value,created_at,created
   , ('caaaaa00-0000-0000-0000-000000000003',712,'92',CURRENT_TIMESTAMP,'init')
   , ('caaaaa00-0000-0000-0000-000000000004',711,'128',CURRENT_TIMESTAMP,'init')
   , ('caaaaa00-0000-0000-0000-000000000004',712,'92',CURRENT_TIMESTAMP,'init')
-  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',2,'100.5',CURRENT_TIMESTAMP,'init')
+  , ('8dda2a54-5217-425f-bba9-ab821a9647fe',2,'160.5',CURRENT_TIMESTAMP,'init')
   , ('8dda2a54-5217-425f-bba9-ab821a9647fe',1,'175.3',CURRENT_TIMESTAMP,'init');
 
 -- 過去検査結果
@@ -227,7 +227,7 @@ INSERT INTO resultcollector.prior_exam_menus(current_exam_menu_id,prior_exam_men
 
 -- 検査結果相関ルール
 INSERT INTO correlation_rules(correlation_rule_id,name,exam_menu_id,priority,trigger_type,error_level,exam_item_id, message,created_at,created_by) VALUES 
-    (1,'腹囲_前回差20cm以上',1,1,1,2,2,'腹囲の前回差が20cm以上です。',CURRENT_TIMESTAMP,'init')
+    (1,'体重_前回差20kg以上',1,1,1,2,2,'体重の前回差が20kg以上です。',CURRENT_TIMESTAMP,'init')
   , (2,'値が一部でも異なる場合はエラー',1,2,2,3,7,'登録する値が異なります。',CURRENT_TIMESTAMP,'init');
 
 -- 検査結果相関ルール_判定値
@@ -279,23 +279,50 @@ insert into consult_thresholds(threshold_id, consult_id, priority, created_at, c
   , ('a71b27d3-4cd6-46ce-a99c-d998574029f1','8dda2a54-5217-425f-bba9-ab821a9647fe',1,CURRENT_TIMESTAMP,'init');
 
 -- 検査基準値範囲
-insert into exam_normal_value_range(name, threshold_id, exam_item_detail_id, max_age, min_age, target_sex, max_value, min_value, error_level, created_at, created_by) VALUES
-    ('収縮期（50以上300以下）正常範囲',  'aa114e6d-c63e-4f44-96fa-42989129147a',711,'9999999','00000',3,300,50,1,CURRENT_TIMESTAMP,'init')
-    , ('拡張期（10以上200以下）正常範囲','a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'9999999','00000',3,200,10,1,CURRENT_TIMESTAMP,'init')
-    , ('収縮期（50以上300以下）正常範囲','aa114e6d-c63e-4f44-96fa-42989129147a',721,'9999999','00000',3,300,50,1,CURRENT_TIMESTAMP,'init')
-    , ('拡張期（10以上200以下）正常範囲','a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,200,10,1,CURRENT_TIMESTAMP,'init')
-    , ('収縮期（50未満）下限警告',       'aa114e6d-c63e-4f44-96fa-42989129147a',711,'9999999','00000',3,49,0,2,CURRENT_TIMESTAMP,'init')
-    , ('拡張期（10未満）下限警告',       'a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'9999999','00000',3,9,0,2,CURRENT_TIMESTAMP,'init')
-    , ('収縮期（50未満）下限警告',       'aa114e6d-c63e-4f44-96fa-42989129147a',721,'9999999','00000',3,49,0,2,CURRENT_TIMESTAMP,'init')
-    , ('拡張期（10未満）下限警告',       'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,9,0,2,CURRENT_TIMESTAMP,'init')              
-    , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',711,'9999999','00000',3,9999,301,3,CURRENT_TIMESTAMP,'init')
-    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init')
-    , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',721,'9999999','00000',3,9999,301,3,CURRENT_TIMESTAMP,'init')
-    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'9999999','00000',3,9999,201,3,CURRENT_TIMESTAMP,'init');
+insert into exam_normal_value_range(name, threshold_id, exam_item_detail_id, min_age, max_age, target_sex, min_value, max_value, error_level, created_at, created_by) VALUES
+    ('収縮期（50以上300以下）正常範囲',  'aa114e6d-c63e-4f44-96fa-42989129147a',711,'00000','9999999',3,50,300,1,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10以上200以下）正常範囲','a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'00000','9999999',3,10,200,1,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（50以上300以下）正常範囲','aa114e6d-c63e-4f44-96fa-42989129147a',721,'00000','9999999',3,50,300,1,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10以上200以下）正常範囲','a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'00000','9999999',3,10,200,1,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（50未満）下限警告',       'aa114e6d-c63e-4f44-96fa-42989129147a',711,'00000','9999999',3,0,49,2,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10未満）下限警告',       'a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'00000','9999999',3,0,9,2,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（50未満）下限警告',       'aa114e6d-c63e-4f44-96fa-42989129147a',721,'00000','9999999',3,0,49,2,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（10未満）下限警告',       'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'00000','9999999',3,0,9,2,CURRENT_TIMESTAMP,'init')              
+    , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',711,'00000','9999999',3,301,9999,3,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',712,'00000','9999999',3,201,9999,3,CURRENT_TIMESTAMP,'init')
+    , ('収縮期（300以上）上限異常',      'aa114e6d-c63e-4f44-96fa-42989129147a',721,'00000','9999999',3,301,9999,3,CURRENT_TIMESTAMP,'init')
+    , ('拡張期（200以上）上限異常',      'a71b27d3-4cd6-46ce-a99c-d998574029f1',722,'00000','9999999',3,201,9999,3,CURRENT_TIMESTAMP,'init');
 
+INSERT INTO resultcollector.thresholds(threshold_id,threshold_code,name,order_number,created_by) VALUES 
+    ('36853b96-be4b-419b-a9c4-01ab0714eef3','common','共通',2,'init')
+  , ('d5ae9e47-c9b3-410a-8963-669966daf9fc','ryobi','両備ドック',1,'init');
+
+INSERT INTO resultcollector.exam_normal_value_range(range_id,name,threshold_id,exam_item_detail_id,min_age,max_age,target_sex,min_value,max_value,error_level,created_by) VALUES 
+    ('012c2d8a-82cb-487c-a45a-dc78de90c0c7','共通_血圧_下_警告2','36853b96-be4b-419b-a9c4-01ab0714eef3',712,'0000000','9999999',3,90,999,2,'init')
+  , ('159a5871-c6d1-4b5f-9637-6faae4983633','両備ドック_男_血圧_下_警告1','d5ae9e47-c9b3-410a-8963-669966daf9fc',712,'0000000','9999999',1,0.0,50,2,'init')
+  , ('3915b419-3314-48ab-88e0-d54b2c44efcc','両備ドック_女_血圧_下_警告2','d5ae9e47-c9b3-410a-8963-669966daf9fc',712,'0000000','9999999',2,90,999,2,'init')
+  , ('406766b6-9c83-48bb-9819-b95a4a7e7742','両備ドック_男_血圧_下_正常域','d5ae9e47-c9b3-410a-8963-669966daf9fc',712,'0000000','9999999',1,50,90,1,'init')
+  , ('4bed6a27-c84a-44a1-bd29-81c9e5d72c11','両備ドック_男_血圧_上_警告2','d5ae9e47-c9b3-410a-8963-669966daf9fc',711,'0000000','9999999',1,140,999,2,'init')
+  , ('4c4d2161-259d-4821-b394-f6412721eec4','両備ドック_女_血圧_下_正常域','d5ae9e47-c9b3-410a-8963-669966daf9fc',712,'0000000','9999999',2,50,90,1,'init')
+  , ('4e1a276e-2c95-437a-81d0-d4af7076f086','共通_血圧_上_警告2','36853b96-be4b-419b-a9c4-01ab0714eef3',711,'0000000','9999999',3,140,999,2,'init')
+  , ('67cf19b9-6425-4b7d-abb0-fe7bc9ea0af1','共通_血圧_下_警告1','36853b96-be4b-419b-a9c4-01ab0714eef3',712,'0000000','9999999',3,0.0,50,2,'init')
+  , ('77cc6d96-4113-449b-b6d0-10c9331a3ddc','両備ドック_女_血圧_上_警告1','d5ae9e47-c9b3-410a-8963-669966daf9fc',711,'0000000','9999999',2,0.0,100,2,'init')
+  , ('911042ed-08b9-42d5-af12-5157849dcdb5','共通_血圧_下_正常域','36853b96-be4b-419b-a9c4-01ab0714eef3',712,'0000000','9999999',3,50,90,1,'init')
+  , ('98af16cd-6a5d-4add-85a6-4767dd4b50fe','両備ドック_男_血圧_上_警告1','d5ae9e47-c9b3-410a-8963-669966daf9fc',711,'0000000','9999999',1,0.0,100,2,'init')
+  , ('aa8a2f66-dd5d-4807-93b2-9e841b0f990c','両備ドック_男_血圧_下_警告2','d5ae9e47-c9b3-410a-8963-669966daf9fc',712,'0000000','9999999',1,90,999,2,'init')
+  , ('c950cc2a-ceb6-482a-8635-3482d39eed18','両備ドック_女_血圧_上_正常域','d5ae9e47-c9b3-410a-8963-669966daf9fc',711,'0000000','9999999',2,100,140,1,'init')
+  , ('d45c70c3-9714-4f51-a7b7-f749173b0eea','両備ドック_男_血圧_上_正常域','d5ae9e47-c9b3-410a-8963-669966daf9fc',711,'0000000','9999999',1,100,140,1,'init')
+  , ('dce76a0c-3136-45b7-b2a7-2a6fe4117b99','両備ドック_女_血圧_下_警告1','d5ae9e47-c9b3-410a-8963-669966daf9fc',712,'0000000','9999999',2,0.0,50,2,'init')
+  , ('f34a642f-ba7b-44c0-95d1-8011e904ce7b','共通_血圧_上_警告1','36853b96-be4b-419b-a9c4-01ab0714eef3',711,'0000000','9999999',3,0.0,100,2,'init')
+  , ('f85a50df-5c43-448d-bbbf-c8dfc026ff65','両備ドック_女_血圧_上_警告2','d5ae9e47-c9b3-410a-8963-669966daf9fc',711,'0000000','9999999',2,140,999,2,'init')
+  , ('fcc036b7-28b5-402d-b42b-df060fb733af','共通_血圧_上_正常域','36853b96-be4b-419b-a9c4-01ab0714eef3',711,'0000000','9999999',3,100,140,1,'init');
+
+INSERT INTO resultcollector.consult_thresholds(threshold_id,consult_id,priority,created_by) VALUES 
+    ('d5ae9e47-c9b3-410a-8963-669966daf9fc','caaaaa00-0000-0000-0000-000000000001',1,'init')
+  , ('36853b96-be4b-419b-a9c4-01ab0714eef3','caaaaa00-0000-0000-0000-000000000001',2,'init');
 -- 検査実施判定ルール
 insert into decision_rules(decision_rule_id,name,exam_menu_id,priority,trigger_type,error_level,message,created_at,created_by) VALUES 
-    (1,'体重差が前年より20kgオーバー',7,1,1,3,'体重の計測ミスのため実施できません。',CURRENT_TIMESTAMP,'init');
+    (1,'体重差が前年より30kgオーバー',7,1,1,3,'体重の計測ミスのため実施できません。',CURRENT_TIMESTAMP,'init');
 
 -- 検査実施判断ルール_判定値
 insert into decision_rule_evaluations(decision_rule_id,variable_number,evaluation_value,created_at,created_by) VALUES 

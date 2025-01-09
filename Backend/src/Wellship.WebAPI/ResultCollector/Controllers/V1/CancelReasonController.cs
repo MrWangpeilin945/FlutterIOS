@@ -26,7 +26,7 @@ public class CancelReasonController : ControllerBase
     }
 
     /// <summary>
-    /// 中止理由一覧を取得する
+    /// AP1011_中止理由一覧を取得する
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CancelReasonList))]
