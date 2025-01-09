@@ -19,6 +19,11 @@ type SelectProps = {
   onClick: (updatedExamItem: InputExamItem[] | undefined) => void;
 };
 
+interface BackendValidation {
+  itemPositionNumber: number;
+  examRegistResults: ExamRegistResult[];
+}
+
 export default function ExamSelectLR({
   examItems,
   onRegisterPressed,
@@ -29,6 +34,10 @@ export default function ExamSelectLR({
   }
 
   const [examItemsData, setExamItemsData] = useState(examItems);
+  // APIからのエラーメッセージを保存する
+  const [backendValidation, setBackendValidation] = useState<
+    BackendValidation[]
+  >([]);
   const examItem = examItemsData.find((item) => item.positionNumber === 1);
   if (!examItem?.examItemDetails?.length) {
     return null; // examItemDetailsが空の場合は何も表示しない
@@ -50,15 +59,10 @@ export default function ExamSelectLR({
     return item;
   };
 
-  // APIからのエラーメッセージを保存
-  const APIErrors = examItems.map((item) => ({
-    positionNumber: item.positionNumber,
-    examRegistResults: item.examRegistResults || [],
-  }));
-  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  // APIのエラーメッセージで更新する
   const resetErrorMessages = (item: InputExamItem) => {
-    const targetError = APIErrors.find(
-      (error) => error.positionNumber === item.positionNumber,
+    const targetError = backendValidation.find(
+      (error) => error.itemPositionNumber === item.positionNumber
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -84,7 +88,7 @@ export default function ExamSelectLR({
 
       const requiredMessage = getErrorMessage(
         errorMessages.required,
-        `${positionNumber === 1 ? "左" : "右"}は`,
+        `${positionNumber === 1 ? "左" : "右"}は`
       );
 
       // バリデーションが失敗した場合
@@ -97,7 +101,7 @@ export default function ExamSelectLR({
     }
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === InputErrorLevel.異常,
+      (error) => error.errorLevel === InputErrorLevel.異常
     );
 
     // エラーメッセージをexamItemに保存
@@ -116,6 +120,14 @@ export default function ExamSelectLR({
     return ValidationResult;
   };
 
+  // 初回読み込み時にAPIのエラーメッセージを保存する
+  useEffect(() => {
+    const backendErrorMessages: BackendValidation[] = examItems.map((item) => ({
+      itemPositionNumber: item.positionNumber ?? 0,
+      examRegistResults: item.examRegistResults ?? [],
+    }));
+    setBackendValidation(backendErrorMessages);
+  }, []);
   useEffect(() => {
     const updatedItems = examItems.map((item) => {
       let validatedData = item;
@@ -132,7 +144,7 @@ export default function ExamSelectLR({
   // 選択ボタン押下時
   const onSelect = (
     selector: ExamItemDetailOption,
-    targetDetail: ExamItemDetail,
+    targetDetail: ExamItemDetail
   ) => {
     const newSelected =
       targetDetail.value === selector.code ? "" : selector.code;
@@ -152,7 +164,7 @@ export default function ExamSelectLR({
                   ...detail,
                   value: newSelected,
                 }
-              : detail,
+              : detail
           ),
         };
 
@@ -184,7 +196,7 @@ export default function ExamSelectLR({
 
   // 対象のexamItemの中の、positionNumberが1のexamItemDetail
   let leftItemDetail = examItemDetails?.find(
-    (detail) => detail.positionNumber === 1,
+    (detail) => detail.positionNumber === 1
   );
   if (!leftItemDetail) {
     leftItemDetail = {
@@ -194,7 +206,7 @@ export default function ExamSelectLR({
   }
   //  対象のexamItemの中の、positionNumberが2のexamItemDetail
   let rightItemDetail = examItemDetails?.find(
-    (detail) => detail.positionNumber === 2,
+    (detail) => detail.positionNumber === 2
   );
   if (!rightItemDetail) {
     rightItemDetail = {
@@ -237,7 +249,7 @@ export default function ExamSelectLR({
                 (() => {
                   const prevName =
                     detail.examItemDetailOptions?.find(
-                      (option) => option.code === detail.prevValue,
+                      (option) => option.code === detail.prevValue
                     )?.name || detail.prevValue;
                   return (
                     <Text ml="auto" fw={700} maw={271}>
@@ -255,20 +267,22 @@ export default function ExamSelectLR({
                         w={524}
                         h={78}
                         variant="outline"
-                        bd={`2px solid ${isDisabled ? "" : isSelected ? "primary" : "gray03"}`}
+                        bd={`2px solid ${
+                          isDisabled ? "" : isSelected ? "primary" : "gray03"
+                        }`}
                         bg={
                           isDisabled
                             ? "gray03"
                             : isSelected
-                              ? "green03"
-                              : "white"
+                            ? "green03"
+                            : "white"
                         }
                         c={
                           isDisabled
                             ? "gray02"
                             : isSelected
-                              ? "primary"
-                              : "gray02"
+                            ? "primary"
+                            : "gray02"
                         }
                         size="xl"
                         fw={700}
@@ -278,7 +292,7 @@ export default function ExamSelectLR({
                         {selector.name}
                       </Button>
                     );
-                  },
+                  }
                 )}
               </Stack>
             </Stack>
