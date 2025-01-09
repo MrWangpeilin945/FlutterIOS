@@ -57,12 +57,13 @@ public class TicketRepository : ITicketRepository
                     , created_at
                     , created_by
                 )
-                    on tc.consult_id = new_data.consult_id
-                    when matched then update
-            set
+                on tc.consult_id = new_data.consult_id
+            when matched then 
+            update set
                 ticket_number = new_data.ticket_number
                 , created_at = new_data.created_at
-                , created_by = new_data.created_by when not matched then
+                , created_by = new_data.created_by 
+            when not matched then
             insert (
                 consult_id
                 , ticket_number
