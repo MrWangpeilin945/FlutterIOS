@@ -372,7 +372,7 @@ CREATE TABLE tickets (
 );
 
 CREATE TABLE tickets_histories (
-  id uuid NOT NULL
+  id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_id uuid NOT NULL
   , ticket_number text
   , action_type varchar(1) NOT NULL
