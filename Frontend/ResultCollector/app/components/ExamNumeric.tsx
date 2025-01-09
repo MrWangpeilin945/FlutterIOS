@@ -99,11 +99,18 @@ export default function ExamNumeric({
     // コールバック判断用のコンポーネントのエラーメッセージ
     const componentErrorMessage: ExamRegistResult[] = [];
     // detailsのpositionNumberが1のものについてバリデーションチェックを行う
-    for (const { positionNumber, value } of item.examItemDetails ?? []) {
+    for (const {
+      positionNumber,
+      value,
+      hasOrder,
+      cancelReasonId,
+    } of item.examItemDetails ?? []) {
       if (positionNumber !== 1) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
       }
-
+      if (!hasOrder || !!cancelReasonId) {
+        continue; // 対象がdisableの場合、処理をスキップする
+      }
       // 必須チェックと半角数字チェックを一度に行うスキーマ
       const schema = z
         .string()
@@ -284,13 +291,19 @@ export default function ExamNumeric({
             )
           }
         />
-        <Stack gap="0">
-          <Text size="md" fw="700" maw={271}>
-            {prevValue ? `(前回: ${prevValue})` : ""}
-          </Text>
-          <Text size="xs" fw="400">
-            {unit}
-          </Text>
+        <Stack w={173} h={80} gap={4} justify="space-between">
+          <Box>
+            {prevValue && (
+              <Text fw={700} mt={0}>
+                (前回：{prevValue})
+              </Text>
+            )}
+          </Box>
+          <Box>
+            <Text size="xs" mb={0}>
+              {unit}
+            </Text>
+          </Box>
         </Stack>
         <Button
           w={154}
@@ -342,6 +355,7 @@ export default function ExamNumeric({
               />
             ) : (
               <CollectionKeyboard
+                value={value ?? ""}
                 keyboardValues={keyboard?.values ?? []}
                 onChange={(newValue) =>
                   handleChange(newValue, positionNumber, detailPositionNumber)
