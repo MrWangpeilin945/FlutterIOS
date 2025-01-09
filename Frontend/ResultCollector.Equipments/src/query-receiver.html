@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>query-receiver</title>
+    <script>
+      const q = new URLSearchParams(window.location.search);
+      const p = q.get("value");
+      if (p) {
+        localStorage.setItem("measurementResult", p);
+      }
+      window.close();
+    </script>
+  </head>
+  <body></body>
+</html>

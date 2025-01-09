@@ -14,4 +14,5 @@ VOLUME /etc/nginx
 VOLUME /var/run
 VOLUME /var/cache/nginx/
 COPY Frontend/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY Frontend/ResultCollector.Equipments/src/ /usr/share/nginx/app/result-collector-equipments/
 COPY --from=build /source/ResultCollector/build/client/ /usr/share/nginx/app/result-collector/

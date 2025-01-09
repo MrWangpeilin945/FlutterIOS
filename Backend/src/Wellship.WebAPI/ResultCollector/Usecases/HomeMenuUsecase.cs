@@ -24,7 +24,7 @@ public class HomeMenuUsecase : IHomeMenuUsecase
     }
 
     /// <summary>
-    /// ホームメニュー項目を取得する
+    /// AP1005_ホームメニュー項目を取得する
     /// </summary>
     public async Task<HomeMenuGroupList> GetHomeMenusAsync(Guid? placeScheduleId)
     {

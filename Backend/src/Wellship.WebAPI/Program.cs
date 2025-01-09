@@ -118,6 +118,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IPlaceScheduleRepository, PlaceScheduleRepository>();
         services.AddScoped<IHomeMenuRepository, HomeMenuRepository>();
         services.AddScoped<IStaffRepository, StaffRepository>();
+        services.AddScoped<IStaffLoginHistoryRepository, StaffLoginHistoryRepository>();
         services.AddScoped<IExamMenuRepository, ExamMenuRepository>();
         services.AddScoped<IEquipmentRepository, EquipmentRepository>();
         services.AddScoped<IIntegrationRepository, IntegrationRepository>();
@@ -150,11 +151,11 @@ public static class IServiceCollectionExtension
         services.AddScoped<IIntegrationUsecase, IntegrationUsecase>();
         services.AddScoped<IProgressUsecase, ProgressUsecase>();
         services.AddScoped<ICancelReasonUsecase, CancelReasonUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.IOrganizationUsecases, ExternalConnection.Usecases.OrganizationUsecases>();
-        services.AddScoped<ExternalConnection.Usecases.IExamineeUsecases, ExternalConnection.Usecases.ExamineeUsecases>();
-        services.AddScoped<ExternalConnection.Usecases.ITeamUsecases, ExternalConnection.Usecases.TeamUsecases>();
-        services.AddScoped<ExternalConnection.Usecases.IPlaceUsecases, ExternalConnection.Usecases.PlaceUsecases>();
-        services.AddScoped<ExternalConnection.Usecases.IThresholdUsecases, ExternalConnection.Usecases.ThresholdUsecases>();
+        services.AddScoped<ExternalConnection.Usecases.IOrganizationUsecase, ExternalConnection.Usecases.OrganizationUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.IExamineeUsecase, ExternalConnection.Usecases.ExamineeUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.ITeamUsecase, ExternalConnection.Usecases.TeamUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.IPlaceUsecase, ExternalConnection.Usecases.PlaceUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.IThresholdUsecase, ExternalConnection.Usecases.ThresholdUsecase>();
         return services;
     }
     /// <summary>

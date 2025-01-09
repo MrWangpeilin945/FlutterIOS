@@ -5,7 +5,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
     /// <summary>
     /// 会場を登録するUsecase層
     /// </summary>
-    public interface IPlaceUsecases
+    public interface IPlaceUsecase
     {
         /// <summary>
         /// EC2007_会場を登録する

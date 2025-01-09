@@ -14,15 +14,14 @@ public class ExamNormalValueRange
     public required int ErrorLevel { get; init; }
 
     /// <summary>
-    /// 最大値
-    /// </summary>
-    [JsonPropertyName("maxValue")]
-    public required decimal MaxValue { get; init; }
-
-    /// <summary>
     /// 最小値
     /// </summary>
     [JsonPropertyName("minValue")]
     public required decimal MinValue { get; init; }
 
+    /// <summary>
+    /// 最大値
+    /// </summary>
+    [JsonPropertyName("maxValue")]
+    public required decimal MaxValue { get; init; }
 }

@@ -24,7 +24,7 @@ public class AuthenticationController : ControllerBase
     }
 
     /// <summary>
-    /// ログインする
+    /// AP1001_ログインする
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StaffLoginResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -48,7 +48,7 @@ public class AuthenticationController : ControllerBase
     }
 
     /// <summary>
-    /// アクセストークンをリフレッシュする
+    /// AP1023_アクセストークンをリフレッシュする
     /// </summary>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StaffLoginResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

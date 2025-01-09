@@ -16,20 +16,29 @@ public class AuthenticationUsecase(IAuthService authService,
                                    AuthSettings authSettings,
                                    IStaffRepository staffRepository,
                                    IRefreshTokenRepository refreshTokenRepository,
+                                   IStaffLoginHistoryRepository staffLoginHistoryRepository,
                                    TimeProvider timeProvider) : IAuthenticationUsecase
 {
     private readonly IAuthService _authService = authService;
     private readonly AuthSettings _authSettings = authSettings;
     private readonly IStaffRepository _staffRepository = staffRepository;
     private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
+    private readonly IStaffLoginHistoryRepository _staffLoginHistoryRepository = staffLoginHistoryRepository;
     private readonly TimeProvider _timeProvider = timeProvider;
 
     ///<inheritdoc/>
     public async ValueTask<(string accessToken, string refreshToken)> LoginStaffAsync(string identifier, string password)
     {
         var staff = await _staffRepository.GetStaffByLoginIdAsync(identifier);
-        var accessToken = staff.Enabled && staff.VerifyPassword(password) ? _authService.GenerateAccessToken(staff) : throw new WellshipAuthenticationException();
+        var loginHasSucceeded = staff.Enabled && staff.VerifyPassword(password);
+        if (!loginHasSucceeded)
+        {
+            await _staffLoginHistoryRepository.WriteLoginFailedLogAsync(staff);
+            throw new WellshipAuthenticationException();
+        }
+        var accessToken = _authService.GenerateAccessToken(staff);
         var refreshToken = RefreshToken.Create(_timeProvider.GetUtcNow().Add(_authSettings.RefreshTokenLifeTime));
+        await _staffLoginHistoryRepository.WriteLoginSucceededLogAsync(staff);
         await _refreshTokenRepository.ExpireRefreshTokenAsync(staff.StaffId);
         await _refreshTokenRepository.UpdateRefreshTokenAsync(staff.StaffId, refreshToken);
         return (accessToken, refreshToken.Token);

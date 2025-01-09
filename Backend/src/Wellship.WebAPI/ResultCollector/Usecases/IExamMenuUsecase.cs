@@ -8,7 +8,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 public interface IExamMenuUsecase
 {
     /// <summary>
-    /// 検査メニュー一覧を取得する
+    /// AP1006_検査メニュー一覧を取得する
     /// </summary>
     public Task<ExamMenuList> GetExamMenusAsync();
 }

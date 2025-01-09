@@ -10,13 +10,13 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
     /// </summary>
     public class ThresholdTestController : ControllerBase
     {
-        private readonly IThresholdUsecases _administratorUsecase;
+        private readonly IThresholdUsecase _administratorUsecase;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="thresholdUsecaseUsecase">基準パターンユースケース</param>
-        public ThresholdTestController(IThresholdUsecases thresholdUsecaseUsecase)
+        public ThresholdTestController(IThresholdUsecase thresholdUsecaseUsecase)
         {
             _administratorUsecase = thresholdUsecaseUsecase;
         }
