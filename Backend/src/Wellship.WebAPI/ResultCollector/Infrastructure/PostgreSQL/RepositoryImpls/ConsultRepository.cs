@@ -460,6 +460,16 @@ public class ConsultRepository : IConsultRepository
             and exam_item_detail_id = any(@ExamItemDetailIds);";
 
         var response = await connection.QueryAsync<ExamNormalValueRangeEntity>(sql, new { ConsultId = consultId, ExamItemDetailIds = examItemDetailIds });
-        return response.Select(x => new ExamNormalValueRange(x));
+
+        return response.Select(x => new ExamNormalValueRange(
+            name: x.RangeName,
+            thresholdId: x.ThresholdId,
+            examItemDetailId: x.ExamItemDetailId,
+            targetAge: new TargetAge(x.MinAge, x.MaxAge),
+            targetSex: new TargetSex((TargetSexType)x.TargetSex),
+            valueRange: new ValueRange(x.MinValue, x.MaxValue),
+            errorLevel: (InputErrorLevel)x.ErrorLevel,
+            priority: x.Priority
+        ));
     }
 }

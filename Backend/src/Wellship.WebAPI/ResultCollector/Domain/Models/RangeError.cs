@@ -10,7 +10,7 @@ public class RangeError
     /// <summary>
     /// 範囲ID
     /// </summary>
-    public int RangeId { get; init; }
+    public Guid RangeId { get; init; }
 
     /// <summary>
     /// 範囲名称
@@ -46,10 +46,11 @@ public class RangeError
         {
             return ErrorLevel switch
             {
+
                 InputErrorLevel.正常 => "",
                 InputErrorLevel.警告 => "入力値を確認してください。",
                 InputErrorLevel.異常 => "入力に誤りがあります。",
-                _ => ""
+                _ => throw new ArgumentOutOfRangeException(nameof(ErrorLevel), $"未対応のエラーレベル: {ErrorLevel}")
             };
         }
     }
