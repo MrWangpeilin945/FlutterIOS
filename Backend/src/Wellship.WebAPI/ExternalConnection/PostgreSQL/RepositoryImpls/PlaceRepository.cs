@@ -84,5 +84,46 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
             }
         }
 
+        /// <summary>
+        /// 存在する会場コードを取得する。
+        /// </summary>
+        /// <param name="placeCodes">会場コードリスト</param>
+        /// <returns>存在する会場コードリスト</returns>
+        public async Task<List<string>> GetPlacesByCodesAsync(List<string> placeCodes)
+        {
+            var connection = await _dbConnectionProvider.GetOrOpenAsync();
+            var sql = @"
+                    select
+                        place_code
+                    from
+                        resultcollector.places
+                    where
+                        place_code = any(@PlaceCodes);";
+
+            var result = await connection.QueryAsync<string>(sql, new { PlaceCodes = placeCodes.ToArray() });
+            return result.ToList();
+        }
+
+        /// <summary>
+        /// 会場情報を取得する
+        /// </summary>
+        /// <param name="placeCodes">会場コード</param>
+        /// <returns></returns>
+        public async Task<List<PlaceInfoEntity>> GetPlaceInfoAsync(List<string> placeCodes)
+        {
+            var connection = await _dbConnectionProvider.GetOrOpenAsync();
+            var sql = @"
+                    select
+                        place_id as PlaceId, place_code as PlaceCode
+                    from
+                        resultcollector.places
+                    where
+                        place_code = any(@PlaceCodes);";
+
+            var result = await connection.QueryAsync<PlaceInfoEntity>(sql, new { PlaceCodes = placeCodes.ToArray() });
+
+            return result.ToList();
+        }
+
     }
 }
