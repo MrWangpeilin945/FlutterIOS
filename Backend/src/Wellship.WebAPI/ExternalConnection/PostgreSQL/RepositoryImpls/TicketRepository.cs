@@ -3,6 +3,8 @@ using System.Data.Common;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
+using Ryobi.Wellship.ExternalConnection.Enums;
+using Ryobi.Wellship.Core.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 
@@ -74,6 +76,16 @@ public class TicketRepository : ITicketRepository
                 , new_data.created_by
             );";
             await connection.ExecuteAsync(mergeSql, upsertItems);
+            // consultのprogress_statusを検査中に更新する
+            const string consultSql = @"
+            update resultcollector.consult 
+            set
+                progress_status = @ProgressStatus
+            where
+                consult_id = any (@ConsultIds);";
+            await connection.ExecuteAsync(consultSql, new { ProgressStatus = (int)ConsultProgressStatus.検査中, 
+                                                            ConsultIds = upsertItems.Select(x=> x.ConsultId).ToArray()});
+
             // 受付を削除する
             var deleteTickets = actionTickets.Where(x => x.ActionType == Wellship.ExternalConnection.Enums.ActionType.削除)
                                              .Select(x => x.ConsultId)
@@ -85,11 +97,15 @@ public class TicketRepository : ITicketRepository
             where
                 consult_id = any (@ConsultIds);";
             await connection.ExecuteAsync(deleteSql, new { ConsultIds = deleteTickets});
-            // 受付履歴を登録する
+            // consultのprogress_statusを来場待ちに更新する
+            await connection.ExecuteAsync(consultSql, new { ProgressStatus = (int)ConsultProgressStatus.来場待ち, 
+                                                            ConsultIds = deleteTickets});
+
+           // 受付履歴を登録する
             var historyItems = tickets.Select(x => new {
                                     ConsultId = x.ConsultId,
-                                    TicketNumber = x.TicketNumber,
-                                    ActionType = (int)x.ActionType,
+                                    TicketNumber = x.ActionType == ActionType.登録 ? x.TicketNumber : "",
+                                    ActionType = x.ActionType == ActionType.登録 ? "I" : "D",
                                     OrderNumber = x.OrderNumber,
                                     CreatedAt = createdAt,
                                     CreatedBy = createdBy
@@ -116,7 +132,7 @@ public class TicketRepository : ITicketRepository
             await connection.ExecuteAsync(historiesSql, historyItems);
             await transaction.CommitAsync();
         }
-        catch(DbException)
+        catch(DbException e)
         {
             await transaction.RollbackAsync();
             throw;

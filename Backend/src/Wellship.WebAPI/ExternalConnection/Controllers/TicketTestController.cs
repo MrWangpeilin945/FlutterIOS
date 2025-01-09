@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
+using Ryobi.Wellship.ExternalConnection.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// <summary>
@@ -25,16 +27,16 @@ public class TicketTestController : ControllerBase
     /// </summary>
     [HttpPost]
     [Route("api/v{version:apiVersion}/ec2002/ticket")]
-    public async Task<IActionResult> StoreTicketsAsync()
+    public async Task<IActionResult> StoreTicketsAsync([FromQuery][Required] int actionType)
     {
-        // 10000～10099までの連携キーを3つずつ作成する
-        var tickets = (from x in Enumerable.Range(10000, 100)
+        // 10000～1009999までの連携キーを3つずつ作成する
+        var tickets = (from x in Enumerable.Range(10000, 10000)
                         from y in Enumerable.Range(1,3)
                         select new Ticket
                         {
                             SortNo =  (x - 10000) * 3 + y,
                             ConnectionCode = x.ToString(),
-                            ActionType = x % 2 == 0 ? Wellship.ExternalConnection.Enums.ActionType.登録 : Wellship.ExternalConnection.Enums.ActionType.削除,
+                            ActionType = (ActionType)actionType,
                             TicketNumber = (x + y).ToString(),
                             InputNote = ((x - 10000) * 3 + y).ToString()
                         }).ToList();
