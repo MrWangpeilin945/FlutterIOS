@@ -148,7 +148,7 @@ list.Count()  <> 0
 |Note
 |Yes
 |string
-|受診特記
+|受診.特記事項
 
 |PreviousResults
 |Yes
@@ -163,11 +163,11 @@ list.Count()  <> 0
 |ConsultNotes
 |Yes
 |List<ConsultNote>
-|受診特記
+|受診特記.特記事項
 
-|ExamItemDetails
+|ExamItemDetailOrders
 |Yes
-|List<ExamItemDetail>
+|List<ExamItemDetailOrder>
 |検査項目明細依頼
 
 |InputNote
@@ -236,7 +236,7 @@ list.Count()  <> 0
 
 |===
 
-===== ExamItemDetail
+===== ExamItemDetailOrder
 
 [cols="1,1,1,2" options="header"]
 |===
@@ -368,18 +368,18 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 **** Message `キー項目が重複しています。Code:ExamItemDetailCd:[Consult.PreviousResults.ExamItemDetailCd]`
 **** InputNote `Consult.InputNote`
 
-* 検査項目明細IDが取得できない(ExamItemDetail)
-** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `Consult.ExamItemDetails.ExamItemDetailCd` が存在しない
+* 検査項目明細IDが取得できない(ExamItemDetailOrders)
+** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` が存在しない
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10001`
-**** Message `指定されたExamItemDetailCdがシステム上に存在しません。Code:[Consult.ExamItemDetails.ExamItemDetailCd]`
+**** Message `指定されたExamItemDetailCdがシステム上に存在しません。Code:[Consult.ExamItemDetailOrders.ExamItemDetailCd]`
 **** InputNote `Consult.InputNote`
 
-* PKが重複するレコードが存在する(ExamItemDetail)
-** Consult.ExamItemDetailsを以下の条件でGroupByし、複数レコードが存在する
+* PKが重複するレコードが存在する(ExamItemDetailOrders)
+** Consult.ExamItemDetailOrdersを以下の条件でGroupByし、複数レコードが存在する
 *** 条件
-**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetails.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id` 
+**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id` 
 **** `Consult.PreviousResults.ExamDate`
 *** Consultの単位で該当を取り除く
 *** ErrorObject
@@ -575,7 +575,7 @@ Update : 更新しない
 
 |exam_item_detail_id
 |`[DB]external_exam_item_details.exam_item_detail_id`
-|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetails.ExamItemDetailCd` で検索し、`exam_item_detail_id`を登録する
+|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` で検索し、`exam_item_detail_id`を登録する
 
 
 |created_at
