@@ -62,8 +62,8 @@ public class AuthService(AuthSettings authSettings,
                 new(JwtRegisteredClaimNames.Sub, staff.StaffId.ToString()),
                 // StaffコードをJWTに含めます。登録者表示等の用途で使用することを想定しています。
                 new(JwtRegisteredClaimNames.UniqueName, staff.StaffCode),
-                // 発行時点のサーバー時刻(UnixTime)
-                new(JwtRegisteredClaimNames.Iat, utcNow.ToUnixTimeSeconds().ToString()),
+                // 発行時点のサーバー時刻(UnixTime)(64ビット整数値)
+                new(JwtRegisteredClaimNames.Iat, utcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
                 // 認証したユーザーのロール
                 new(CustomClaimTypes.Role, staff.Role.ToString()),
             ],
