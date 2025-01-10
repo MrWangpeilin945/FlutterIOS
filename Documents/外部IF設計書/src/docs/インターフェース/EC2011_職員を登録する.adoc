@@ -108,7 +108,7 @@ list.Count()  <> 0
 |boolean
 |有効
 
-|Role
+|RoleId
 |Yes
 |enum<Wellship.Core\Enums\Role>
 |ロール
