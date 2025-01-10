@@ -28,7 +28,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// </summary>
         /// <param name="teamCodes">班コード</param>
         /// <returns></returns>
-        public Task<List<TeamInfoEntity>> GetTeamInfoAsync(List<string> teamCodes);
+        public Task<List<TeamEntity>> GetTeamInfoAsync(List<string> teamCodes);
     }
 
 }

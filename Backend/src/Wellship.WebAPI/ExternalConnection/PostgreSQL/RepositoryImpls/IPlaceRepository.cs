@@ -28,7 +28,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// </summary>
         /// <param name="placeCodes"></param>
         /// <returns></returns>
-        public Task<List<PlaceInfoEntity>> GetPlaceInfoAsync(List<string> placeCodes);
+        public Task<List<PlaceEntity>> GetPlaceInfoAsync(List<string> placeCodes);
 
     }
 }

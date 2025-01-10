@@ -109,7 +109,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// </summary>
         /// <param name="teamCodes">班コード</param>
         /// <returns></returns>
-        public async Task<List<TeamInfoEntity>> GetTeamInfoAsync(List<string> teamCodes)
+        public async Task<List<TeamEntity>> GetTeamInfoAsync(List<string> teamCodes)
         {
             var connection = await _dbConnectionProvider.GetOrOpenAsync();
             var sql = @"
@@ -120,7 +120,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                     where
                         team_code = any(@TeamCodes);";
 
-            var result = await connection.QueryAsync<TeamInfoEntity>(sql, new { TeamCodes = teamCodes.ToArray() });
+            var result = await connection.QueryAsync<TeamEntity>(sql, new { TeamCodes = teamCodes.ToArray() });
 
             return result.ToList();
         }

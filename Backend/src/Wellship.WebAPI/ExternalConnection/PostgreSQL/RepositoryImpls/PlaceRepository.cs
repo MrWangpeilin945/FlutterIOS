@@ -109,7 +109,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// </summary>
         /// <param name="placeCodes">会場コード</param>
         /// <returns></returns>
-        public async Task<List<PlaceInfoEntity>> GetPlaceInfoAsync(List<string> placeCodes)
+        public async Task<List<PlaceEntity>> GetPlaceInfoAsync(List<string> placeCodes)
         {
             var connection = await _dbConnectionProvider.GetOrOpenAsync();
             var sql = @"
@@ -120,7 +120,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                     where
                         place_code = any(@PlaceCodes);";
 
-            var result = await connection.QueryAsync<PlaceInfoEntity>(sql, new { PlaceCodes = placeCodes.ToArray() });
+            var result = await connection.QueryAsync<PlaceEntity>(sql, new { PlaceCodes = placeCodes.ToArray() });
 
             return result.ToList();
         }
