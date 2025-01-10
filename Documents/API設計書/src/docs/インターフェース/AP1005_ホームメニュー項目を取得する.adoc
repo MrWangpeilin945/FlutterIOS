@@ -5,10 +5,12 @@
 * ホーム画面の表示に必要なホームメニューを取得する
 * ホームメニューの項目は設定したグループでグルーピングする
 * グループとグループ内の項目は表示順の昇順でソートする
+* グループ内のメニューリストが0件であれば、グループは返却しない
 * メニューごとに使用可能条件を設定する。すべての条件を満たすメニューを利用できる。ただし空リストの場合は制限なく使用できる。
 ** `placeScheduleSelected`: 会場日程が選択済みである
 ** `placeScheduleUnlocked`: 会場ロックが解除されている
 * 操作している職員のロール情報をレスポンスに含めて、フロントエンドでの画面制御に使用する
+* グループ名とメニュー名は任意の文字列に設定可能
 
 === URI
 
@@ -51,32 +53,25 @@
       "groupName": "一般",
       "menus": [
         {
+          "menuName": "検査メニュー選択",
+          "path": "exammenu-select",
+          "availableConditions": [
+            "PlaceScheduleUnlocked",
+            "PlaceScheduleSelected"
+          ]
+        },
+        {
           "menuName": "進捗",
           "path": "progress",
           "availableConditions": [
-            "placeScheduleSelected"
+            "PlaceScheduleSelected"
           ]
-        }
-      ]
-    },
-    {
-      "groupName": "外部システム連携",
-      "menus": [
-        {
-          "menuName": "健診結果出力",
-          "path": "examResultsExport",
-          "availableConditions": []
-        },
-        {
-          "menuName": "健診結果出力履歴",
-          "path": "examResultsExportHistory",
-          "availableConditions": []
         }
       ]
     }
   ],
-  "placeScheduleLockingStatus" : 21,
-  "staffRole" : 10
+  "placeScheduleLockingStatus": 21,
+  "staffRole": 10
 }
 ----
 
