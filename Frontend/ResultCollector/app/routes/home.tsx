@@ -73,24 +73,13 @@ export default function Home() {
   };
 
   //ホームメニューボタンのdisabled(押下可能/不可)を取得
-  const getDisabled = (
-    menus: HomeMenu,
-    placeSchedulelocking: number,
-    staffRole: number,
-  ) => {
+  const getDisabled = (menus: HomeMenu) => {
     let disabled = false;
     if (
       isPlaceSelected(menus?.availableConditions || []) &&
       (!team || !placeSchedule)
     ) {
       //availableConditions[placeScheduleSelected]有りで、jotaiの班／jotaiの会場 のどれか値がない場合
-      disabled = true;
-    } else if (
-      isPlaceUnlocked(menus?.availableConditions || []) &&
-      placeSchedulelocking === PlaceScheduleLockingStatus.検査完了 &&
-      staffRole === Role.一般
-    ) {
-      //availableConditions[placeScheduleUnlocked]有りで、placeSchedulelockingStatusの値が(検査完了)で、権限なし(一般)の場合
       disabled = true;
     }
     return disabled;
@@ -234,12 +223,7 @@ export default function Home() {
                                 homeMenuGroupData.placeScheduleLockingStatus ||
                                   0,
                               )}
-                              disabled={getDisabled(
-                                menus,
-                                homeMenuGroupData.placeScheduleLockingStatus ||
-                                  0,
-                                homeMenuGroupData.staffRole || 0,
-                              )}
+                              disabled={getDisabled(menus)}
                               onClick={() => navigate(`/${menus.path}`)}
                               marginBottom={
                                 homeMenuGroup.menus
