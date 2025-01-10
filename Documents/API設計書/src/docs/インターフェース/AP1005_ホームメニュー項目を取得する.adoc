@@ -5,10 +5,12 @@
 * ホーム画面の表示に必要なホームメニューを取得する
 * ホームメニューの項目は設定したグループでグルーピングする
 * グループとグループ内の項目は表示順の昇順でソートする
+* グループ内のメニューリストが0件であれば、グループは返却しない
 * メニューごとに使用可能条件を設定する。すべての条件を満たすメニューを利用できる。ただし空リストの場合は制限なく使用できる。
 ** `placeScheduleSelected`: 会場日程が選択済みである
 ** `placeScheduleUnlocked`: 会場ロックが解除されている
 * 操作している職員のロール情報をレスポンスに含めて、フロントエンドでの画面制御に使用する
+* グループ名とメニュー名は任意の文字列に設定可能
 
 === URI
 
@@ -46,37 +48,54 @@
 [source,json]
 ----
 {
+{
   "homeMenuGroups": [
     {
       "groupName": "一般",
       "menus": [
         {
+          "menuName": "検査メニュー選択",
+          "path": "exammenu-select",
+          "availableConditions": [
+            "PlaceScheduleUnlocked",
+            "PlaceScheduleSelected"
+          ]
+        },
+        {
           "menuName": "進捗",
           "path": "progress",
           "availableConditions": [
-            "placeScheduleSelected"
+            "PlaceScheduleSelected"
           ]
         }
       ]
     },
     {
-      "groupName": "外部システム連携",
+      "groupName": "管理",
       "menus": [
         {
-          "menuName": "健診結果出力",
-          "path": "examResultsExport",
+          "menuName": "会場ロック",
+          "path": "placeschedule-lock",
+          "availableConditions": [
+            "PlaceScheduleUnlocked",
+            "PlaceScheduleSelected"
+          ]
+        },
+        {
+          "menuName": "検査結果出力",
+          "path": "examresult-export",
           "availableConditions": []
         },
         {
-          "menuName": "健診結果出力履歴",
-          "path": "examResultsExportHistory",
+          "menuName": "検査結果出力履歴",
+          "path": "examresult-export-history",
           "availableConditions": []
         }
       ]
     }
   ],
-  "placeScheduleLockingStatus" : 21,
-  "staffRole" : 10
+  "placeScheduleLockingStatus": 21,
+  "staffRole": 20
 }
 ----
 
@@ -87,3 +106,44 @@
 ** JWT認証に失敗
 * 404 NotFound
 ** （クエリパラメータに会場日程IDがある場合）指定した会場日程が存在しない
+
+
+=== 仕様補足
+
+ホームメニュー項目と使用可能条件、ロールによる使用可否は以下の通り。
+
+[cols="2,2,2,2,1", options="header"]
+|===
+| ホームメニュー名 | パス | 会場ロックの解除が必要 | 会場日程の選択が必要 | 管理者のみ
+
+| 検査メニュー選択
+| exammenu-select
+| 〇（ロック中表示）
+| 〇
+|
+
+| 進捗
+| progress
+|
+| 〇
+|
+
+| 会場ロック
+| placeschedule-lock
+| 〇（ロック中表示）
+| 〇
+| 〇
+
+| 検査結果出力
+| examresult-export
+|
+|
+| 〇
+
+| 検査結果出力履歴
+| examresult-export-history
+|
+|  
+| 〇
+
+|===
