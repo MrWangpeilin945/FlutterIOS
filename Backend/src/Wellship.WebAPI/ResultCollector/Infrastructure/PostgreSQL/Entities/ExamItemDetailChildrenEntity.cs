@@ -1,6 +1,6 @@
 using Ryobi.Wellship.Core.Enums;
 
-namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 /// <summary>
 /// 検査項目明細マスタのエンティティ
@@ -11,7 +11,7 @@ public class ExamItemDetailChildrenEntity
     /// 検査項目明細ID
     /// </summary>
     public required int ExamItemDetailId { get; set; }
-   
+
     /// <summary>
     /// 検査項目明細名
     /// </summary>
@@ -55,7 +55,7 @@ public class ExamItemDetailChildrenEntity
     /// <summary>
     /// キーボードID
     /// </summary>
-    public  required int KeyboardId {get; set; }
+    public required int KeyboardId { get; set; }
 
     /// <summary>
     /// キーボード入力値
