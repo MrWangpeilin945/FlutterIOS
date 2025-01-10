@@ -51,12 +51,13 @@ public class HomeMenuUsecase : IHomeMenuUsecase
             HomeMenuGroups = repoResults.Select(x => new HomeMenuGroup()
             {
                 GroupName = x.GroupName,
-                Menus = x.HomeMenus.Select(m => new HomeMenu()
-                {
-                    MenuName = m.MenuName,
-                    Path = m.Path,
-                    AvailableConditions = homeMenuSettings.GetAvailableConditions(m.Path)
-                }).ToArray()
+                Menus = x.HomeMenus.Where(m => homeMenuSettings.CanRoleUseFeature(m.Path, staffRole))
+                                   .Select(m => new HomeMenu()
+                                   {
+                                       MenuName = m.MenuName,
+                                       Path = m.Path,
+                                       AvailableConditions = homeMenuSettings.GetAvailableConditions(m.Path)
+                                   }).ToArray()
             }).ToArray()
         };
         return result;
