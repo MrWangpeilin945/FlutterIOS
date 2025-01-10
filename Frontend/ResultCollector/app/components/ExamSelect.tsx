@@ -39,14 +39,14 @@ export default function ExamSelect({
   }
 
   const examItemDetail = examItem.examItemDetails.find(
-    (detail) => detail.positionNumber === 1
+    (detail) => detail.positionNumber === 1,
   );
   if (!examItemDetail) {
     return null; // examItemDetailがundefinedの場合は何も表示しない
   }
 
   const [selected, setSelected] = useState(
-    examItemDetail.value || examItemDetail.prevValue || undefined
+    examItemDetail.value || examItemDetail.prevValue || undefined,
   );
   // APIからのエラーメッセージを保存する
   const [backendValidation, setBackendValidation] = useState<
@@ -68,7 +68,7 @@ export default function ExamSelect({
   // APIのエラーメッセージで更新する
   const resetErrorMessages = (item: InputExamItem) => {
     const targetError = backendValidation.find(
-      (error) => error.itemPositionNumber === item.positionNumber
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -94,7 +94,7 @@ export default function ExamSelect({
 
       const requiredMessage = getErrorMessage(
         errorMessages.required,
-        `${item.name}は`
+        `${item.name}は`,
       );
 
       // バリデーションが失敗した場合
@@ -107,7 +107,7 @@ export default function ExamSelect({
     }
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === InputErrorLevel.異常
+      (error) => error.errorLevel === InputErrorLevel.異常,
     );
     // エラーメッセージをexamItemに保存
     const resultItem: InputExamItem = {
@@ -168,7 +168,7 @@ export default function ExamSelect({
                   ...detail,
                   value: newSelected,
                 }
-              : detail
+              : detail,
           ),
         };
 
@@ -219,7 +219,7 @@ export default function ExamSelect({
           (() => {
             const prevName =
               examItemDetail.examItemDetailOptions?.find(
-                (option) => option.code === examItemDetail.prevValue
+                (option) => option.code === examItemDetail.prevValue,
               )?.name || examItemDetail.prevValue;
             return (
               <Text ml="auto" fw={700} maw={271}>

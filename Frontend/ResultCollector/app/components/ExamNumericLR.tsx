@@ -55,10 +55,10 @@ export default function ExamNumericLR({
 
   if (
     !firstPosition?.examItemDetails?.some(
-      (detail) => detail.positionNumber === 左
+      (detail) => detail.positionNumber === 左,
     ) &&
     !firstPosition?.examItemDetails?.some(
-      (detail) => detail.positionNumber === 右
+      (detail) => detail.positionNumber === 右,
     )
   ) {
     return null;
@@ -104,7 +104,7 @@ export default function ExamNumericLR({
     setShowKeyboards({ left: false, right: false });
   };
   const closeKeyBoard = useClickOutside(() =>
-    setShowKeyboards({ left: false, right: false })
+    setShowKeyboards({ left: false, right: false }),
   );
 
   const sortErrorMessage = (item: InputExamItem): InputExamItem => {
@@ -131,7 +131,7 @@ export default function ExamNumericLR({
   // APIのエラーメッセージ以外を削除する
   const resetErrorMessages = (item: InputExamItem) => {
     const targetError = backendValidation.find(
-      (error) => error.itemPositionNumber === item.positionNumber
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -163,12 +163,12 @@ export default function ExamNumericLR({
         .string()
         .min(
           1,
-          getErrorMessage(errorMessages.required, `${item.name}:${name}は`)
+          getErrorMessage(errorMessages.required, `${item.name}:${name}は`),
         ) // 必須チェック
         .refine((value) => /^\d+(\.\d+)?$/.test(value), {
           message: getErrorMessage(
             errorMessages.numericString,
-            `${item.name}:${name}は`
+            `${item.name}:${name}は`,
           ),
         });
 
@@ -190,7 +190,7 @@ export default function ExamNumericLR({
     componentErrorMessage.push(...setRangesErrorMessage(item));
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === InputErrorLevel.異常
+      (error) => error.errorLevel === InputErrorLevel.異常,
     );
     // エラーメッセージをexamItemに保存
     const resultItem: InputExamItem = {
@@ -225,7 +225,7 @@ export default function ExamNumericLR({
   const handleChange = (
     value: string,
     positionNumber: number | undefined,
-    detailsPositionNumber?: number
+    detailsPositionNumber?: number,
   ) => {
     // 対象のpositionNumberか確認
     if (positionNumber !== 1) {
@@ -250,7 +250,7 @@ export default function ExamNumericLR({
           item.examItemDetails = item.examItemDetails?.map((detail) =>
             detail.positionNumber === detailsPositionNumber
               ? { ...detail, value: value }
-              : detail
+              : detail,
           );
         }
       }
@@ -273,14 +273,14 @@ export default function ExamNumericLR({
 
   // positionNumberが1のexamItem
   const firstPositionItem = examItemsData.find(
-    (item) => item.positionNumber === 1
+    (item) => item.positionNumber === 1,
   );
   const { positionNumber, examItemDetails, examRegistResults, name } =
     firstPositionItem ?? {};
 
   // 対象のexamItemの中の、positionNumberが1のexamItemDetail
   let leftItemDetail = examItemDetails?.find(
-    (detail) => detail.positionNumber === 左
+    (detail) => detail.positionNumber === 左,
   );
   if (!leftItemDetail) {
     leftItemDetail = {
@@ -290,7 +290,7 @@ export default function ExamNumericLR({
   }
   //  対象のexamItemの中の、positionNumberが2のexamItemDetail
   let rightItemDetail = examItemDetails?.find(
-    (detail) => detail.positionNumber === 右
+    (detail) => detail.positionNumber === 右,
   );
   if (!rightItemDetail) {
     rightItemDetail = {
@@ -354,14 +354,14 @@ export default function ExamNumericLR({
                         isDisabled
                           ? ""
                           : firstPositionItem?.examRegistResults?.some(
-                              (x) => x.errorLevel === InputErrorLevel.異常
-                            )
-                          ? `${styles["input-error"]}`
-                          : firstPositionItem?.examRegistResults?.some(
-                              (x) => x.errorLevel === InputErrorLevel.警告
-                            )
-                          ? `${styles["input-warning"]}`
-                          : ""
+                                (x) => x.errorLevel === InputErrorLevel.異常,
+                              )
+                            ? `${styles["input-error"]}`
+                            : firstPositionItem?.examRegistResults?.some(
+                                  (x) => x.errorLevel === InputErrorLevel.警告,
+                                )
+                              ? `${styles["input-warning"]}`
+                              : ""
                       }`,
                     }}
                     w={340}
@@ -373,7 +373,7 @@ export default function ExamNumericLR({
                       handleChange(
                         e.currentTarget.value,
                         positionNumber ?? 0,
-                        positionNumber ?? 0
+                        positionNumber ?? 0,
                       )
                     }
                     disabled={isDisabled}
@@ -440,7 +440,7 @@ export default function ExamNumericLR({
                       handleChange(
                         newValue,
                         positionNumber ?? 0,
-                        detail.positionNumber ?? 0
+                        detail.positionNumber ?? 0,
                       )
                     }
                     onConfirm={handleConfirm}
