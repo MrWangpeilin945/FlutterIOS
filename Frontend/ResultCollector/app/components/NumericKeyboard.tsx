@@ -51,13 +51,13 @@ export default function NumericKeyboard(props: KeyboardProps) {
     integerLength: number,
     decimalLength: number,
   ): string => {
-    if (!value || integerLength <= 0 || decimalLength < 0) return value;
+    if (!value || integerLength < 0 || decimalLength < 0) return value;
     const totalLength = integerLength + decimalLength;
     const paddedValue = value.padStart(totalLength, "0");
     const integerPart = paddedValue.slice(0, integerLength);
     const decimalPart = paddedValue.slice(integerLength, totalLength);
-    let formattedValue = `${integerPart}.${decimalPart}`;
-    // 整数部が1未満の場合、整数部の先頭ゼロは除去しない
+    let formattedValue = `${integerPart ? integerPart : 0}.${decimalPart}`;
+    // 整数部が1未満の場合、整数部に0を1つ付ける
     if (Number.parseInt(formattedValue) < 1) {
       formattedValue = `0.${decimalPart}`;
     } else {
@@ -79,7 +79,11 @@ export default function NumericKeyboard(props: KeyboardProps) {
     if (pattern.test(newValue)) {
       setValue(newValue);
       //小数点追加処理
-      if (props.integerLength && props.decimalLength) {
+      //数値以外の時は処理を行わない
+      if (
+        typeof props.integerLength === "number" &&
+        typeof props.decimalLength === "number"
+      ) {
         const formatValue = formatDecimalValue(
           newValue,
           props.integerLength,

@@ -28,6 +28,11 @@ type ExamNumericProps = {
   onChange: (newExamItems: InputExamItem[] | undefined) => void;
 };
 
+interface BackendValidation {
+  itemPositionNumber: number;
+  examRegistResults: ExamRegistResult[];
+}
+
 export default function ExamNumeric({
   examItems,
   onRegisterPressed,
@@ -50,9 +55,37 @@ export default function ExamNumeric({
   }
 
   const [examItemsData, setExamItemsData] = useState(examItems);
+  // APIからのエラーメッセージを保存する
+  const [backendValidation, setBackendValidation] = useState<
+    BackendValidation[]
+  >([]);
 
   // キーボードの表示インデックスを状態として管理する
   const [showKeyboards, setShowKeyboards] = useState(false);
+
+  // 初回読み込み時にAPIのエラーメッセージを保存する
+  useEffect(() => {
+    const backendErrorMessages: BackendValidation[] = examItems.map((item) => ({
+      itemPositionNumber: item.positionNumber ?? 0,
+      examRegistResults: item.examRegistResults ?? [],
+    }));
+    setBackendValidation(backendErrorMessages);
+  }, []);
+
+  useEffect(() => {
+    const updatedItems = examItems.map((item) => {
+      // positionNumberが1のアイテムのみに対してバリデーションチェックを実行
+      if (item.positionNumber === 1) {
+        let validatedData: InputExamItem = item;
+        if (onRegisterPressed) {
+          validatedData = validationCheck(item).validateResult;
+        }
+        return validatedData;
+      }
+      return item;
+    });
+    setExamItemsData(updatedItems);
+  }, [onRegisterPressed, examItems]);
 
   // キーボードのACボタン押下時にキーボードを非表示にする
   const handleConfirm = () => {
@@ -72,16 +105,10 @@ export default function ExamNumeric({
     return item;
   };
 
-  // APIからのエラーメッセージを保存
-  const APIErrors = examItems.map((item) => ({
-    positionNumber: item.positionNumber,
-    examRegistResults: item.examRegistResults || [],
-  }));
-
   // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
   const resetErrorMessages = (item: InputExamItem) => {
-    const targetError = APIErrors.find(
-      (error) => error.positionNumber === item.positionNumber
+    const targetError = backendValidation.find(
+      (error) => error.itemPositionNumber === item.positionNumber
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -144,19 +171,6 @@ export default function ExamNumeric({
     };
     return ValidationResult;
   };
-
-  useEffect(() => {
-    const updatedItems = examItems.map((item) => {
-      let validatedData = item;
-      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-      if (onRegisterPressed) {
-        validatedData = validationCheck(validatedData).validateResult;
-      }
-
-      return validatedData;
-    });
-    setExamItemsData(updatedItems);
-  }, [onRegisterPressed, examItems]);
 
   //変更イベント
   const handleChange = (

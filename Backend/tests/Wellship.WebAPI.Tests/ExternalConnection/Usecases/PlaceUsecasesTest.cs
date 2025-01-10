@@ -1,4 +1,4 @@
-﻿
+
 using System.Data;
 using Moq;
 
@@ -30,6 +30,7 @@ public class PlaceUsecasesTest
         // エンティティリスト生成
         List<PlaceEntity> placeEntities = inputPlaces.Select(item =>new PlaceEntity
         {
+            PlaceId = Guid.NewGuid(),
             PlaceCode = item.Code,
             Name = item.Name
         }).ToList();

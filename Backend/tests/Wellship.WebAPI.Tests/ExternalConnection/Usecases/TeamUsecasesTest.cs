@@ -1,4 +1,4 @@
-﻿
+
 using System.Data;
 using Moq;
 
@@ -30,6 +30,7 @@ public class TeamUsecasesTest
         // エンティティリスト生成
         List<TeamEntity> teamEntities = inputTeams.Select(item =>new TeamEntity
         {
+            TeamId = Guid.NewGuid(),
             TeamCode = item.Code,
             Name = item.Name
         }).ToList();

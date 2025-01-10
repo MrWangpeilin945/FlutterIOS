@@ -31,6 +31,11 @@ type BP2Props = {
   onChange: (updatedExamItem: InputExamItem[] | undefined) => void;
 };
 
+interface BackendValidation {
+  itemPositionNumber: number;
+  examRegistResults: ExamRegistResult[];
+}
+
 export default function ExamBP2({
   examItems,
   onRegisterPressed,
@@ -81,6 +86,10 @@ export default function ExamBP2({
 
   // examItemの管理
   const [examItemsData, setExamItemsData] = useState(examItems);
+  // APIからのエラーメッセージを保存する
+  const [backendValidation, setBackendValidation] = useState<
+    BackendValidation[]
+  >([]);
   // キーボードの表示状態を管理する
   const [showKeyboards, setShowKeyboards] = useState<{
     first: {
@@ -115,6 +124,27 @@ export default function ExamBP2({
       },
     });
   };
+
+  // 初回読み込み時にAPIのエラーメッセージを保存する
+  useEffect(() => {
+    const backendErrorMessages: BackendValidation[] = examItems.map((item) => ({
+      itemPositionNumber: item.positionNumber ?? 0,
+      examRegistResults: item.examRegistResults ?? [],
+    }));
+    setBackendValidation(backendErrorMessages);
+  }, []);
+
+  useEffect(() => {
+    const updatedItems = examItems.map((item) => {
+      let validatedData = item;
+      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
+      if (onRegisterPressed) {
+        validatedData = validationCheck(validatedData).validateResult;
+      }
+      return validatedData;
+    });
+    setExamItemsData(updatedItems);
+  }, [onRegisterPressed, examItems]);
 
   // キーボード外部をクリックした際に非表示にする
   const closeKeyBoard = useClickOutside(resetKeyboards);
@@ -167,16 +197,10 @@ export default function ExamBP2({
     return item;
   };
 
-  // APIからのエラーメッセージを保存
-  const APIErrors = examItems.map((item) => ({
-    positionNumber: item.positionNumber,
-    examRegistResults: item.examRegistResults || [],
-  }));
-
-  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  // APIのエラーメッセージで更新する
   const resetErrorMessages = (item: InputExamItem) => {
-    const targetError = APIErrors.find(
-      (error) => error.positionNumber === item.positionNumber
+    const targetError = backendValidation.find(
+      (error) => error.itemPositionNumber === item.positionNumber
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -275,18 +299,6 @@ export default function ExamBP2({
     };
     return ValidationResult;
   };
-
-  useEffect(() => {
-    const updatedItems = examItems.map((item) => {
-      let validatedData = item;
-      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-      if (onRegisterPressed) {
-        validatedData = validationCheck(validatedData).validateResult;
-      }
-      return validatedData;
-    });
-    setExamItemsData(updatedItems);
-  }, [onRegisterPressed, examItems]);
 
   // 平均値の計算,保存処理
   const calculateAverage = (updatedExamItems: InputExamItem[]) => {
