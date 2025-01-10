@@ -183,19 +183,9 @@ export default function ExamFreeInput({
   return (
     <Flex mt={16} justify="flex-start" align="flex-start" direction="column">
       <Flex gap={16} justify="flex-start" align="flex-start">
-        <Paper
-          w={274}
-          h={80}
-          className={styles["basic-grey"]}
-          radius="itemName"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
           <Text size="lg" fw={700}>
-            {name}
+            {name?.slice(0, 8)}
           </Text>
         </Paper>
         <Textarea

@@ -340,11 +340,10 @@ export default function ExamBody({
                 bg={isBMI ? "white" : "gray02"}
                 c={isBMI ? "gray02" : "white"}
                 radius="itemName"
-                px={32}
                 py={16}
               >
                 <Text size="lg" fw={700} ta="center">
-                  {name}
+                  {name?.slice(0, 8)}
                 </Text>
               </Paper>
 
