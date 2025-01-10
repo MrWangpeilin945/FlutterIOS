@@ -17,6 +17,11 @@ type ExamFreeInputProps = {
   onChange: (newExamItems: InputExamItem[] | undefined) => void;
 };
 
+interface BackendValidation {
+  itemPositionNumber: number;
+  examRegistResults: ExamRegistResult[];
+}
+
 export default function ExamFreeInput({
   examItems,
   onRegisterPressed,
@@ -36,6 +41,34 @@ export default function ExamFreeInput({
   }
 
   const [examItemsData, setExamItemsData] = useState(examItems);
+  // APIからのエラーメッセージを保存する
+  const [backendValidation, setBackendValidation] = useState<
+    BackendValidation[]
+  >([]);
+
+  // 初回読み込み時にAPIのエラーメッセージを保存する
+  useEffect(() => {
+    const backendErrorMessages: BackendValidation[] = examItems.map((item) => ({
+      itemPositionNumber: item.positionNumber ?? 0,
+      examRegistResults: item.examRegistResults ?? [],
+    }));
+    setBackendValidation(backendErrorMessages);
+  }, []);
+
+  useEffect(() => {
+    const updatedItems = examItems.map((item) => {
+      // positionNumberが1のアイテムのみに対してバリデーションチェックを実行
+      if (item.positionNumber === 1) {
+        let validatedData: InputExamItem = item;
+        if (onRegisterPressed) {
+          validatedData = validationCheck(item).validateResult;
+        }
+        return validatedData;
+      }
+      return item;
+    });
+    setExamItemsData(updatedItems);
+  }, [onRegisterPressed, examItems]);
 
   const firstPositionExamItem = examItemsData.find(
     (item) => item.positionNumber === 1
@@ -57,15 +90,10 @@ export default function ExamFreeInput({
     return item;
   };
 
-  // APIからのエラーメッセージを保存
-  const APIErrors = examItems.map((item) => ({
-    positionNumber: item.positionNumber,
-    examRegistResults: item.examRegistResults || [],
-  }));
-  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  // APIのエラーメッセージで更新する
   const resetErrorMessages = (item: InputExamItem) => {
-    const targetError = APIErrors.find(
-      (error) => error.positionNumber === item.positionNumber
+    const targetError = backendValidation.find(
+      (error) => error.itemPositionNumber === item.positionNumber
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -117,21 +145,6 @@ export default function ExamFreeInput({
     };
     return ValidationResult;
   };
-
-  useEffect(() => {
-    const updatedItems = examItems.map((item) => {
-      // positionNumberが1のアイテムのみに対してバリデーションチェックを実行
-      if (item.positionNumber === 1) {
-        let validatedData: InputExamItem = item;
-        if (onRegisterPressed) {
-          validatedData = validationCheck(item).validateResult;
-        }
-        return validatedData;
-      }
-      return item;
-    });
-    setExamItemsData(updatedItems);
-  }, [onRegisterPressed, examItems]);
 
   // 変更を保存し、コールバックする
   const handleChange = (value: string) => {

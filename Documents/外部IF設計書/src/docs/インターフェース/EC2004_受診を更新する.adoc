@@ -1,0 +1,751 @@
+== EC2004_受診を更新する
+
+=== 概要
+
+* 外部連携で使用する
+* 引数の受診をDBに登録する
+
+=== 処理フロー
+
+[mermaid]
+----
+flowchart TD
+    A[UseCase] --> ERROR{ERROR検証}
+    ERROR -- エラーあり --> C(ErrorObject生成、追加)
+    ERROR -- エラー無 --> WARNING{WARNING検証}    
+    WARNING -- ワーニングあり --> DROP(WARNINGレコードDrop)
+    DROP(WARNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
+    DROP_REC --> D[[Repository]]
+    WARNING -- ワーニング無 --> D
+    C --> E(返却)
+    D --> E
+    E --> UseCaseEND(END)
+
+    F[[Repository]] --> G[BEGIN]
+    G --> H["Upsert(一括):[DB]consult(受診)"]
+    H --> I["Update(一括):[DB]consult(受診)"]
+    I --> J["Dalete(一括):[DB]consult_notes(受診特記)"]
+    J --> K["Insert(一括):[DB]consult_notes(受診特記)"]
+    K --> L["Dalete(一括):[DB]exam_item_detail_orders(検査項目明細依頼)"]
+    L --> M["Insert(一括):[DB]exam_item_detail_orders(検査項目明細依頼)"]
+    M --> N["Dalete(一括):[DB]consult_thresholds(基準値)"]
+    N --> O["Insert(一括):[DB]consult_thresholds(基準値)"]
+    O --> P["Dalete(一括):[DB]previous_results(過去検査結果)"]
+    P --> Q["Insert(一括):[DB]previous_results(過去検査結果)"]
+    Q --> R["Dalete(一括):[DB]tickets_histories(受付履歴)"]
+    R --> S["Insert(一括):[DB]tickets_histories(受付履歴)"]
+    S --> Commit[Commit]
+    H -.Exception.-> ROLLBACK[ROLLBACK]
+    I -.Exception.-> ROLLBACK
+    J -.Exception.-> ROLLBACK
+    K -.Exception.-> ROLLBACK
+    L -.Exception.-> ROLLBACK
+    M -.Exception.-> ROLLBACK
+    N -.Exception.-> ROLLBACK
+    O -.Exception.-> ROLLBACK
+    P -.Exception.-> ROLLBACK
+    Q -.Exception.-> ROLLBACK
+    R -.Exception.-> ROLLBACK
+    S -.Exception.-> ROLLBACK
+    Commit --> RepositoryEND[[END]]
+    ROLLBACK .-> RepositoryEND
+----
+
+=== 非機能
+
+* 1万レコードの登録を10秒以内に完了する
+* 検証・DB登録に失敗した場合、全てロールバックする
+
+=== UseCase
+
+[source]
+----
+StoreConsultAsync
+----
+
+==== 引数
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Consults
+|Yes
+|List<Consult>
+|登録する受診のリスト
+
+|===
+
+==== 戻り値
+
+[source]
+----
+list<ErrorObject>
+----
+
+===== 正常登録
+
+[source]
+----
+list.Count() == 0
+----
+
+===== 異常有り
+
+[source]
+----
+list.Count()  <> 0
+----
+
+==== クラス
+
+===== Consult
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|SortNo
+|Yes
+|num
+|処理順
+
+|ConnectionCode
+|Yes
+|string
+|連携キー（重複あり）
+
+|ActionType
+|Yes
+|enum<Wellship.WebAPI\ExternalConnection\Enums\ActionType>
+|連携モード
+
+|PlaceCode
+|Yes
+|string
+|会場コード
+
+|TeamCode
+|Yes
+|string
+|班コード
+
+|ExamDate
+|Yes
+|DateOnly
+|健診日
+
+|ConsultNumber
+|Yes
+|string
+|受診番号
+
+|ExamineeCd
+|Yes
+|string
+|受診者コード
+
+|Note
+|Yes
+|string
+|受診.特記事項
+
+|PreviousResults
+|Yes
+|List<PreviousResult>
+|過去検査結果
+
+|ConsultThresholds
+|Yes
+|List<ConsultThreshold>
+|基準値判定
+
+|ConsultNotes
+|Yes
+|List<ConsultNote>
+|受診特記.特記事項
+
+|ExamItemDetailOrders
+|Yes
+|List<ExamItemDetailOrder>
+|検査項目明細依頼
+
+|InputNote
+|No
+|string
+|エラーオブジェクトに登録する入力項目Noなど
+
+|===
+
+===== PreviousResult
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|ExamItemDetailCd
+|Yes
+|string
+|検査項目明細CD
+
+|ExamDate
+|Yes
+|DateOnly
+|検査日
+
+|Value
+|Yes
+|string
+|結果値
+
+|===
+
+===== ConsultThreshold
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|ThresholdCode
+|Yes
+|string
+|基準値判定コード
+
+|Priority
+|Yes
+|integer
+|優先度
+
+|===
+
+===== ConsultNote
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|検査特記コード
+
+|Note
+|Yes
+|string
+|特記事項
+
+|===
+
+===== ExamItemDetailOrder
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|ExamItemDetailCd
+|Yes
+|string
+|検査項目明細CD
+
+|===
+
+===== Errorbject
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|エラーコード
+
+|Message
+|Yes
+|string
+|エラーメッセージ
+
+|InputNote
+|Yes
+|string
+|入力項目Noなど
+
+|===
+
+==== 列挙型
+
+===== ActionType
+
+namespace : `Wellship.WebAPI.ExternalConnection.Enums`
+
+[cols="1,1,2" options="header"]
+|===
+|名称|値|説明
+
+|登録
+|0
+|データを登録する
+
+|削除
+|1
+|データを削除する
+
+|===
+
+==== ERROR検証
+
+* None
+
+==== WARNING検証
+
+===== `Consult.ActionType` == `ActionType.登録`
+
+* 会場IDが取得できない
+** `[DB]places(会場).place_code(会場コード)` == `Consult.PlaceCode` が存在しない
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたPlaceCodeがシステム上に存在しません。Code:[Consult.PlaceCode]`
+**** InputNote `Consult.InputNote`
+
+* 班IDが取得できない
+** `[DB]teams(班).team_code(班コード)` == `Consult.TeamCode` が存在しない
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたTeamCodeがシステム上に存在しません。Code:[PlaceSchedule.TeamCode]`
+**** InputNote `Consult.InputNote`
+
+* 会場日程IDが取得できない
+** `[DB]PlaceSchedule.place_id(会場ID)` == `[DB]places.place_code` == `Consult.PlaceCode` で検索した `[DB]places.place_id` +
+And `[DB]PlaceSchedule.team_id(班ID)` == `[DB]teams.team_code` == `Consult.TeamCode` で検索した `[DB]teams.team_id` +
+And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在しない
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:[Consult.PlaceCode]/TeamCode:[Consult.TeamCode]/ExamDate:[Consult.ExamDate]`
+**** InputNote `Consult.InputNote`
+
+* 受診者IDが取得できない
+** `[DB]examinees(受診者).examinee_code(受診者コード)` == `Consult.ExamineeCd` が存在しない
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたExamineeCdがシステム上に存在しません。Code:[Consult.ExamineeCd]`
+**** InputNote `Consult.InputNote`
+
+* 検査特記が存在しない
+** `[DB]exam_menu_note_codes(検査メニュー特記_コード).code(検査特記コード)` == `Consult.ConsultNotes.Code` が存在しない
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたConsultNotes.Codeがシステム上に存在しません。Code:[Consult.ConsultNotes.Code]`
+**** InputNote `Consult.InputNote`
+
+* 基準値パターンが取得できない
+** `[DB]thresholds(基準値パターン).threshold_code(基準値パターンコード)` == `Consult.ThresholdCd` が存在しない
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたThresholdCdがシステム上に存在しません。Code:[ExamNormalValConsultueRange.ThresholdCd]`
+**** InputNote `Consult.InputNote`
+
+* 検査項目明細IDが取得できない(PreviousResult)
+** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `Consult.PreviousResults.ExamItemDetailCd` が存在しない
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたExamItemDetailCdがシステム上に存在しません。Code:[Consult.PreviousResult.ExamItemDetailCd]`
+**** InputNote `Consult.InputNote`
+
+* PKが重複するレコードが存在する(PreviousResult)
+** Consult.PreviousResultsを以下の条件でGroupByし、複数レコードが存在する
+*** 条件
+**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.PreviousResults.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id`
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。Code:ExamItemDetailCd:[Consult.PreviousResults.ExamItemDetailCd]`
+**** InputNote `Consult.InputNote`
+
+* 検査項目明細IDが取得できない(ExamItemDetailOrders)
+** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` が存在しない
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10001`
+**** Message `指定されたExamItemDetailCdがシステム上に存在しません。Code:[Consult.ExamItemDetailOrders.ExamItemDetailCd]`
+**** InputNote `Consult.InputNote`
+
+* PKが重複するレコードが存在する(ExamItemDetailOrders)
+** Consult.ExamItemDetailOrdersを以下の条件でGroupByし、複数レコードが存在する
+*** 条件
+**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id` 
+**** `Consult.PreviousResults.ExamDate`
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。Code:ExamItemDetailCd:[Consult.PreviousResults.ExamItemDetailCd]/ExamDate:[Consult.PreviousResults.ExamDate]`
+**** InputNote `Consult.InputNote`
+
+===== `Consult.ActionType` == `ActionType.削除`
+
+* 連携キーの取得に失敗
+** `Consult.ActionType` == `ActionType.削除` And +
+`[DB]consult(受診).external_connection_code(外部連携キー)` == `Consult.ConnectionCode` が存在しない
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+*** Code `10001`
+**** Message `指定されたConnectionCodeがシステム上に存在しません。Code:[Consult.ConnectionCode]` 
+**** InputNote `Consult.InputNote`
+
+=== 処理(Repository)
+
+`Consult.ConnectionCode` でグループ化し、 `Consult.SortNo` が最大のレコードでを処理対象とする
+
+* 下記の登録値は、呼びもとで指定する
+** `created_at` に登録する `system.datetime.now()`
+** `created_by` に登録する `'ExternalConnection'`
+
+==== 登録イメージ
+[cols="1,1,1,1,1" options="header"]
+|===
+|SortNo|ConnectionCode|ActionType|ExamineeCd|[DB]consult
+
+|1
+|C001
+|登録
+|1000
+|
+
+|2
+|C001
+|削除
+|
+|
+
+|3
+|C001
+|登録
+|2000
+|Upsert
+
+
+|4
+|C002
+|登録
+|1001
+|
+
+|5
+|C002
+|削除
+|
+|Delete(キャンセル登録)
+
+|===
+
+==== 登録処理
+
+* 条件
+** `Consult.ActionType` == `ActionType.登録` And +
+`Consult.ConnectionCode` でグループ化し、 `Consult.SortNo` が最大のレコード
+
+===== Table
+
+* [DB]consult(受診)
+
+===== Upsert
+
+* 競合条件
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode`
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|Insert : dotNet `Guid.NewGuid()` +
+Update : 更新しない
+|
+
+|consult_number
+|Consult.ConsultNumber
+|
+
+|progress_status
+|Insert : `enum<Wellship.Core\Enums\ConsultProgressStatus.来場待ち>` +
+Update : 更新しない
+|int型にパースする
+
+|export_status
+|Insert : `enum<Wellship.Core\Enums\ConsultResultExportStatus.未出力>` +
+Update : 更新しない
+|int型にパースする
+
+|place_schedule_id
+|`[DB]place_schedule.place_schedule_id`
+|`[DB]places.place_code` == `Consult.PlaceCode` で検索した `[DB]places.place_id` == `[DB]place_schedule.place_id` AND + 
+`[DB]teams.team_code` == `Consult.TeamCode` で検索した `[DB]teams.team_id` == `[DB]place_schedule.team_id` AND + 
+`[DB]PlaceSchedule.exam_date` == `Consult.ExamDate` ※DateOnly型にパース + 
+で検索した `place_schedule_id` を登録する
+
+|note
+|Consult.Note
+|
+
+|examinee_id
+|`[DB]examinees.examinee_id`
+|`[DB]examinees.examinee_code` == `Consult.ExamineeCd` で検索し、`examinee_id` を登録する
+
+|external_connection_code
+|Consult.ConnectionCode
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`ExternalConnection`
+|
+
+|===
+
+更新対象列のみ記載
+
+===== Table
+
+* [DB]consult_notes(受診特記)
+** 洗い替え
+
+====== Delete
+
+* 削除条件
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consult_notes.consult_id`
+*** 削除対象レコードが存在しない場合でも、エラーとしない
+
+====== Insert
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|[DB]consult(受診).consult_id
+|※Upsertした値
+
+|code
+|Consult.ConsultNotes.Code
+|
+
+|note
+|Consult.ConsultNotes.Note
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+===== Table
+
+* [DB]exam_item_detail_orders(検査項目明細依頼)
+** 洗い替え
+
+====== Delete
+
+* 削除条件
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consult_notes.consult_id`
+*** 削除対象レコードが存在しない場合でも、エラーとしない
+
+====== Insert
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|[DB]consult(受診).consult_id
+|※Upsertした値
+
+|exam_item_detail_id
+|`[DB]external_exam_item_details.exam_item_detail_id`
+|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` で検索し、`exam_item_detail_id`を登録する
+
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+===== Table
+
+* [DB]consult_thresholds(基準値)
+** 洗い替え
+
+====== Delete
+
+* 削除条件
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consult_thresholds.consult_id`
+*** 削除対象レコードが存在しない場合でも、エラーとしない
+
+====== Insert
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|threshold_id
+|`[DB]thresholds.threshold_id`
+|`[DB]thresholds.threshold_code` == `Consult.ConsultThresholds.ThresholdCode` で検索し、`threshold_id` を登録する
+
+|consult_id
+|[DB]consult(受診).consult_id
+|※Upsertした値
+
+|priority
+|Consult.ConsultThresholds.Priority
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+===== Table
+
+* [DB]previous_results(過去検査結果)
+** 洗い替え
+
+====== Delete
+
+* 削除条件
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]previous_results.consult_id`
+*** 削除対象レコードが存在しない場合でも、エラーとしない
+
+====== Insert
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|[DB]consult(受診).consult_id
+|※Upsertした値
+
+|exam_date
+|Consult.PreviousResults.ExamDate
+|
+
+|exam_item_detail_id
+|`[DB]external_exam_item_details.exam_item_detail_id`
+|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.PreviousResults.ExamItemDetailCd` で検索し、`exam_item_detail_id`を登録する
+
+|value
+|Consult.PreviousResults.Value
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+==== 削除処理
+
+* 条件
+** `Ticket.ActionType` == `ActionType.削除` And +
+`Consult.ConnectionCode` でグループ化し、 `Consult.SortNo` が最大のレコード
+* exam_results(検査結果)/tickets(受付) は操作しない
+
+===== Table
+
+* [DB]consult(受診)
+
+====== Update
+
+* 更新条件
+** `[DB]consult.external_connection_code` == `Ticket.ConnectionCode` のレコード
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|progress_status
+|`enum<Wellship.Core\Enums\ConsultProgressStatus.キャンセル>`
+|int型にパースする
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+更新対象列のみ記載
+
+===== Table
+
+* [DB]consult_notes(受診特記)
+
+====== Delete
+
+* 削除条件
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consult_notes.consult_id`
+*** 削除対象レコードが存在しない場合でも、エラーとしない
+
+===== Table
+
+* [DB]exam_item_detail_orders(検査項目明細依頼)
+
+====== Delete
+
+* 削除条件
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consult_notes.consult_id`
+*** 削除対象レコードが存在しない場合でも、エラーとしない
+
+===== Table
+
+* [DB]consult_thresholds(基準値)
+
+====== Delete
+
+* 削除条件
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consult_thresholds.consult_id`
+*** 削除対象レコードが存在しない場合でも、エラーとしない
+
+===== Table
+
+* [DB]previous_results(過去検査結果)
+
+====== Delete
+
+* 削除条件
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]previous_results.consult_id`
+*** 削除対象レコードが存在しない場合でも、エラーとしない
+
+=== レビュー履歴
+
+WELLSHIP_DEV-887 [外部IF_設計]EC2004_受診を更新する レビュー・リワーク

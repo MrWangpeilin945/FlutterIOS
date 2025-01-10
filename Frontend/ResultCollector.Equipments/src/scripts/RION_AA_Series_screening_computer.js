@@ -1,0 +1,17 @@
+﻿/* 聴力（選別検査）：AA-58, AA-K1A （コンピュータ）*/
+export function decode(base64UrlString) {
+  const rawText = atob(base64UrlString.replace(/-/g, "+").replace(/_/g, "/"));
+  const offset = rawText.lastIndexOf(" \x02");
+
+  const extract = (s, index) => {
+    const result = s[index];
+    return result == "P" ? true : result == "R" ? false : null;
+  };
+
+  return {
+    passScreening1000HzLeft: extract(rawText, 35 + offset),
+    passScreening1000HzRight: extract(rawText, 36 + offset),
+    passScreening4000HzLeft: extract(rawText, 45 + offset),
+    passScreening4000HzRight: extract(rawText, 46 + offset),
+  };
+}
