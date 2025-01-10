@@ -12,14 +12,18 @@ import {
 } from "@mantine/core";
 import { useClickOutside } from "@mantine/hooks";
 import NumericKeyboard from "~/components/NumericKeyboard";
+import CollectionKeyboard from "./CollectionKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import type {
   InputExamItem,
   ExamRegistResult,
 } from "~/domain/wellship.schemas";
-import { InputErrorLevel } from "~/domain/enums";
-import { IconExclamationCircleFilled } from "@tabler/icons-react";
+import { InputErrorLevel, KeyboardType } from "~/domain/enums";
+import {
+  IconExclamationCircleFilled,
+  IconSquareRoundedXFilled,
+} from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
 
 type ExamNumericProps = {
@@ -122,18 +126,32 @@ export default function ExamNumeric({
     // コールバック判断用のコンポーネントのエラーメッセージ
     const componentErrorMessage: ExamRegistResult[] = [];
     // detailsのpositionNumberが1のものについてバリデーションチェックを行う
-    for (const { name, positionNumber, value } of item.examItemDetails ?? []) {
+    for (const {
+      positionNumber,
+      value,
+      hasOrder,
+      cancelReasonId,
+    } of item.examItemDetails ?? []) {
       if (positionNumber !== 1) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
+      }
+      if (!hasOrder || !!cancelReasonId) {
+        continue; // 対象がdisableの場合、処理をスキップする
       }
       // 必須チェックと半角数字チェックを一度に行うスキーマ
       const schema = z
         .string()
-        .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)) // 必須チェック
+        .min(
+          1,
+          getErrorMessage(
+            errorMessages.required,
+            item.name ? `${item.name}は` : ""
+          )
+        ) // 必須チェック
         .refine((value) => /^\d+(\.\d+)?$/.test(value), {
           message: getErrorMessage(
             errorMessages.numericString,
-            `${item.name}は`
+            item.name ? `${item.name}は` : ""
           ),
         });
 
@@ -237,61 +255,65 @@ export default function ExamNumeric({
     prevValue,
     unit,
     value,
+    hasOrder,
+    cancelReasonId,
     integerLength,
     decimalLength,
+    keyboard,
   } = targetDetails ?? {};
+  const isDisabled = !hasOrder || !!cancelReasonId;
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Group w="11168" gap={16}>
-        <Paper
-          w={274}
-          h={80}
-          className={styles["basic-grey"]}
-          radius="itemName"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text size="lg" fw={700}>
-            {name}
+        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
+          <Text size="lg" fw={700} ta="center">
+            {name?.slice(0, 8)}
           </Text>
         </Paper>
         <TextInput
           classNames={{
-            input: `${styles["input-textbox"]} ${
-              examRegistResults?.some(
-                (x) => x.errorLevel === InputErrorLevel.異常
-              )
-                ? `${styles["input-error"]}`
-                : examRegistResults?.some(
-                    (x) => x.errorLevel === InputErrorLevel.警告
-                  )
-                ? `${styles["input-warning"]}`
-                : ""
-            }`,
+            input: `${styles["input-textbox"]}
+             ${
+               isDisabled
+                 ? ""
+                 : examRegistResults?.some(
+                     (x) => x.errorLevel === InputErrorLevel.異常
+                   )
+                 ? `${styles["input-error"]}`
+                 : examRegistResults?.some(
+                     (x) => x.errorLevel === InputErrorLevel.警告
+                   )
+                 ? `${styles["input-warning"]}`
+                 : ""
+             }`,
           }}
           w={340}
           radius="md"
           size="inputComponent"
           value={value}
+          disabled={isDisabled}
           onClick={() => setShowKeyboards(true)}
           onChange={(e) =>
             handleChange(
               e.currentTarget.value,
               positionNumber ?? 0,
-              detailPositionNumber ?? 0
+                    detailPositionNumber ?? 0
             )
           }
         />
-        <Stack gap="0">
-          <Text size="md" fw="700" maw={271}>
-            {prevValue ? `(前回: ${prevValue})` : ""}
-          </Text>
-          <Text size="xs" fw="400">
-            {unit}
-          </Text>
+        <Stack w={173} h={80} gap={4} justify="space-between">
+          <Box>
+            {prevValue && (
+              <Text fw={700} mt={0}>
+                (前回：{prevValue})
+              </Text>
+            )}
+          </Box>
+          <Box>
+            <Text size="xs" mb={0}>
+              {unit}
+            </Text>
+          </Box>
         </Stack>
         <Button
           w={154}
@@ -300,6 +322,7 @@ export default function ExamNumeric({
           bg="white01"
           variant="outline"
           bd={"2px,solid"}
+          disabled={isDisabled}
           tabIndex={-1}
           onClick={() => handleChange("", positionNumber)}
         >
@@ -307,31 +330,48 @@ export default function ExamNumeric({
         </Button>
       </Group>
       {/* エラーメッセージを表示する。 */}
-      {(examRegistResults || []).map((error, index) => (
-        <Group
-          key={index}
-          c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
-        >
-          <IconExclamationCircleFilled size={32} />
-          <Text>{error.description}</Text>
-        </Group>
-      ))}
+      {(examRegistResults || []).map((error, index) => {
+        const isWarning = error.errorLevel === InputErrorLevel.警告;
+        return (
+          <Group key={index} c={isWarning ? "warning" : "error"}>
+            {isWarning ? (
+              <IconExclamationCircleFilled size={32} />
+            ) : (
+              <IconSquareRoundedXFilled size={32} />
+            )}
+            <Text size="sm" fw={700}>
+              {error.description}
+            </Text>
+          </Group>
+        );
+      })}
       <Box ml={220} mt={50}>
         {showKeyboards && (
           <div ref={closeKeyBoard}>
-            <NumericKeyboard
-              value={value ?? ""}
-              integerLength={integerLength}
-              decimalLength={decimalLength}
-              onChange={(newValue) =>
-                handleChange(
-                  newValue,
-                  positionNumber ?? 0,
-                  detailPositionNumber ?? 0
-                )
-              }
-              onConfirm={handleConfirm}
-            />
+            {keyboard?.keyboardType === KeyboardType.テンキー ||
+            keyboard?.keyboardType === undefined ? (
+              <NumericKeyboard
+                value={value ?? ""}
+                integerLength={integerLength}
+                decimalLength={decimalLength}
+                onChange={(newValue) =>
+                  handleChange(
+                    newValue,
+                    positionNumber ?? 0,
+                    detailPositionNumber ?? 0
+                  )
+                }
+                onConfirm={handleConfirm}
+              />
+            ) : (
+              <CollectionKeyboard
+                value={value ?? ""}
+                keyboardValues={keyboard?.values ?? []}
+                onChange={(newValue) =>
+                  handleChange(newValue, positionNumber, detailPositionNumber)
+                }
+              />
+            )}
           </div>
         )}
       </Box>
