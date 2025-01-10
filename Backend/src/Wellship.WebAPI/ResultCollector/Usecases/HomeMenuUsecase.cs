@@ -35,8 +35,8 @@ public class HomeMenuUsecase : IHomeMenuUsecase
             not null => (int)(await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync((Guid)placeScheduleId)).Status
         };
 
-        // TODO: JWTから操作した職員のロールを取得する。あるいはDBにSELECTする
-        Role staffRole = Role.User; // TODO
+        // TODO: JWTから操作した職員のロールを取得する。プロバイダから取得する
+        Role staffRole = Role.Admin; // TODO
 
         // 機能ごとの利用可能条件の設定
         var homeMenuSettings = new Domain.Models.HomeMenuSettings();
@@ -58,7 +58,7 @@ public class HomeMenuUsecase : IHomeMenuUsecase
                                        Path = m.Path,
                                        AvailableConditions = homeMenuSettings.GetAvailableConditions(m.Path)
                                    }).ToArray()
-            }).ToArray()
+            }).Where(x => x.Menus.Length > 0).ToArray()
         };
         return result;
     }

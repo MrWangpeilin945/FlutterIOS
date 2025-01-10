@@ -48,6 +48,7 @@
 [source,json]
 ----
 {
+{
   "homeMenuGroups": [
     {
       "groupName": "一般",
@@ -68,10 +69,33 @@
           ]
         }
       ]
+    },
+    {
+      "groupName": "管理",
+      "menus": [
+        {
+          "menuName": "会場ロック",
+          "path": "placeschedule-lock",
+          "availableConditions": [
+            "PlaceScheduleUnlocked",
+            "PlaceScheduleSelected"
+          ]
+        },
+        {
+          "menuName": "検査結果出力",
+          "path": "examresult-export",
+          "availableConditions": []
+        },
+        {
+          "menuName": "検査結果出力履歴",
+          "path": "examresult-export-history",
+          "availableConditions": []
+        }
+      ]
     }
   ],
   "placeScheduleLockingStatus": 21,
-  "staffRole": 10
+  "staffRole": 20
 }
 ----
 
