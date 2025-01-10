@@ -141,11 +141,17 @@ export default function ExamNumeric({
       // 必須チェックと半角数字チェックを一度に行うスキーマ
       const schema = z
         .string()
-        .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)) // 必須チェック
+        .min(
+          1,
+          getErrorMessage(
+            errorMessages.required,
+            item.name ? `${item.name}は` : ""
+          )
+        ) // 必須チェック
         .refine((value) => /^\d+(\.\d+)?$/.test(value), {
           message: getErrorMessage(
             errorMessages.numericString,
-            `${item.name}は`
+            item.name ? `${item.name}は` : ""
           ),
         });
 
@@ -291,7 +297,7 @@ export default function ExamNumeric({
             handleChange(
               e.currentTarget.value,
               positionNumber ?? 0,
-              detailPositionNumber ?? 0
+                    detailPositionNumber ?? 0
             )
           }
         />
