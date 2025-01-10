@@ -267,7 +267,7 @@ export default function ExamNumeric({
       <Group w="11168" gap={16}>
         <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
           <Text size="lg" fw={700} ta="center">
-            {name && name.length > 8 ? name.slice(0, 8) : name}
+            {name?.slice(0, 8)}
           </Text>
         </Paper>
         <TextInput
