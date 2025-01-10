@@ -43,4 +43,25 @@ public class ConsultRepository : IConsultRepository
             throw;
         }
     }
+
+    /// <summary>
+    /// 存在する検査メニュー特記コード情報（検査特記コード、検査特記名）を取得する
+    /// </summary>
+    /// <param name="codes">検査メニュー特記コードのリスト</param>
+    public async Task<List<ExamMenuNoteCodeEntity>> GetExamMenuNodeCodesAsync(List<string> codes)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        var sql = @"
+                select
+                    code as Code
+                    , name as Name
+                from
+                    resultcollector.exam_menu_note_codes
+                where
+                    code = any(@Codes);";
+
+        var result = await connection.QueryAsync<ExamMenuNoteCodeEntity>(sql, new { Codes = codes });
+
+        return result.ToList();
+    }
 }

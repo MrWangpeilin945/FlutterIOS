@@ -12,6 +12,8 @@ public class ConsultUsecase : IConsultUsecase
     private readonly IConsultRepository _consultRepository;
     private readonly ITeamRepository _teamRepository;
     private readonly IPlaceRepository _placeRepository;
+    private readonly IPlaceScheduleRepository _placeScheduleRepository;
+    private readonly IExamineeRepository _examineeRepository;
 
     /// <summary>
     /// コンストラクタ
@@ -19,11 +21,16 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="consultRepository">受診リポジトリ</param>
     /// <param name="teamRepository">班リポジトリ</param>
     /// <param name="placeRepository">会場リポジトリ</param>
-    public ConsultUsecase(IConsultRepository consultRepository, ITeamRepository teamRepository, IPlaceRepository placeRepository)
+    /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
+    /// <param name="examineeRepository">受診者リポジトリ</param>
+    public ConsultUsecase(IConsultRepository consultRepository, ITeamRepository teamRepository, IPlaceRepository placeRepository,
+                          IPlaceScheduleRepository placeScheduleRepository, IExamineeRepository examineeRepository)
     {
         _consultRepository = consultRepository;
         _teamRepository = teamRepository;
         _placeRepository = placeRepository;
+        _placeScheduleRepository = placeScheduleRepository;
+        _examineeRepository = examineeRepository;
         _errorObjects = new List<ErrorObject>();
     }
 
@@ -38,8 +45,13 @@ public class ConsultUsecase : IConsultUsecase
         var teams = await _teamRepository.GetTeamInfoAsync(consults.Select(x => x.TeamCode).ToList());
         // 会場コードに紐づく会場IDを取得する
         var places = await _placeRepository.GetPlaceInfoAsync(consults.Select(x => x.PlaceCode).ToList());
-        
-                /*
+        // 会場日程を取得する
+        // 受診者コードに紐づく受診者IDを取得する
+        var examinees = await _examineeRepository.GetExamineeInfoAsync(consults.Select(x => x.ExamineeCd).ToList());
+        // 検査メニュー特記コードに紐づく情報を取得する
+        var examMenuNodeCodes = await _consultRepository.GetExamMenuNodeCodesAsync(
+                                            consults.SelectMany(x => x.ConsultNotes.Select(cn => cn.Code)).ToList());
+        /*
         // 登録する受付リストの受診IDを取得する
         var ticketConsultEntities = await _ticketRepository.GetTicketsAsync(tickets);
         // 受付可能な連携キー

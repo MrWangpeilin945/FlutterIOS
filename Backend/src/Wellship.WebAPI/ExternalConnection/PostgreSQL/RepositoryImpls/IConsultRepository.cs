@@ -15,4 +15,10 @@ public interface IConsultRepository
     /// <param name="createdBy">作成者</param>
     public Task UpsertConsultsAsync(List<string> consults, DateTime createdAt, string createdBy);
 
+    /// <summary>
+    /// 存在する検査メニュー特記コード情報（検査特記コード、検査特記名）を取得する
+    /// </summary>
+    /// <param name="codes">検査メニュー特記コードのリスト</param>
+    public Task<List<ExamMenuNoteCodeEntity>> GetExamMenuNodeCodesAsync(List<string> codes);
+
 }
