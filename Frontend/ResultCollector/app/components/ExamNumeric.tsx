@@ -259,19 +259,9 @@ export default function ExamNumeric({
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Group w="11168" gap={16}>
-        <Paper
-          w={274}
-          h={80}
-          className={styles["basic-grey"]}
-          radius="itemName"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text size="lg" fw={700}>
-            {name}
+        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
+          <Text size="lg" fw={700} ta="center">
+            {name && name.length > 8 ? name.slice(0, 8) : name}
           </Text>
         </Paper>
         <TextInput
