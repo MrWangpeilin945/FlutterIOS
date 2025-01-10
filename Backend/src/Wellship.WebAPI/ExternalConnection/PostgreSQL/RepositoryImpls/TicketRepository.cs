@@ -133,7 +133,7 @@ public class TicketRepository : ITicketRepository
             await connection.ExecuteAsync(historiesSql, historyItems);
             await transaction.CommitAsync();
         }
-        catch(DbException e)
+        catch(DbException)
         {
             await transaction.RollbackAsync();
             throw;
