@@ -52,7 +52,7 @@ export default function ExamNumeric({
   // positionNumberが1のexamItemDetailがあるかチェック
   if (
     !firstPosition?.examItemDetails?.some(
-      (detail) => detail.positionNumber === 1
+      (detail) => detail.positionNumber === 1,
     )
   ) {
     return null;
@@ -112,7 +112,7 @@ export default function ExamNumeric({
   // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
   const resetErrorMessages = (item: InputExamItem) => {
     const targetError = backendValidation.find(
-      (error) => error.itemPositionNumber === item.positionNumber
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -145,13 +145,13 @@ export default function ExamNumeric({
           1,
           getErrorMessage(
             errorMessages.required,
-            item.name ? `${item.name}は` : ""
-          )
+            item.name ? `${item.name}は` : "",
+          ),
         ) // 必須チェック
         .refine((value) => /^\d+(\.\d+)?$/.test(value), {
           message: getErrorMessage(
             errorMessages.numericString,
-            item.name ? `${item.name}は` : ""
+            item.name ? `${item.name}は` : "",
           ),
         });
 
@@ -172,7 +172,7 @@ export default function ExamNumeric({
     componentErrorMessage.push(...setRangesErrorMessage(item));
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === InputErrorLevel.異常
+      (error) => error.errorLevel === InputErrorLevel.異常,
     );
     // エラーメッセージをexamItemに保存
     const resultItem: InputExamItem = {
@@ -194,7 +194,7 @@ export default function ExamNumeric({
   const handleChange = (
     value: string,
     positionNumber: number | undefined,
-    detailsPositionNumber?: number
+    detailsPositionNumber?: number,
   ) => {
     // 対象のpositionNumberか確認
     if (positionNumber !== 1) {
@@ -218,7 +218,7 @@ export default function ExamNumeric({
           item.examItemDetails = item.examItemDetails?.map((detail) =>
             detail.positionNumber === detailsPositionNumber
               ? { ...detail, value: value }
-              : detail
+              : detail,
           );
         }
       }
@@ -241,14 +241,14 @@ export default function ExamNumeric({
 
   // positionNumberが1のexamItemを描写
   const firstPositionItem = examItemsData.find(
-    (item) => item.positionNumber === 1
+    (item) => item.positionNumber === 1,
   );
   const { positionNumber, examItemDetails, examRegistResults, name } =
     firstPositionItem ?? {};
 
   // positionNumberが1のexamItemDetailを描写
   const targetDetails = examItemDetails?.find(
-    (detail) => detail.positionNumber === 1
+    (detail) => detail.positionNumber === 1,
   );
   const {
     positionNumber: detailPositionNumber,
@@ -277,14 +277,14 @@ export default function ExamNumeric({
                isDisabled
                  ? ""
                  : examRegistResults?.some(
-                     (x) => x.errorLevel === InputErrorLevel.異常
-                   )
-                 ? `${styles["input-error"]}`
-                 : examRegistResults?.some(
-                     (x) => x.errorLevel === InputErrorLevel.警告
-                   )
-                 ? `${styles["input-warning"]}`
-                 : ""
+                       (x) => x.errorLevel === InputErrorLevel.異常,
+                     )
+                   ? `${styles["input-error"]}`
+                   : examRegistResults?.some(
+                         (x) => x.errorLevel === InputErrorLevel.警告,
+                       )
+                     ? `${styles["input-warning"]}`
+                     : ""
              }`,
           }}
           w={340}
@@ -297,7 +297,7 @@ export default function ExamNumeric({
             handleChange(
               e.currentTarget.value,
               positionNumber ?? 0,
-                    detailPositionNumber ?? 0
+              detailPositionNumber ?? 0,
             )
           }
         />
@@ -358,7 +358,7 @@ export default function ExamNumeric({
                   handleChange(
                     newValue,
                     positionNumber ?? 0,
-                    detailPositionNumber ?? 0
+                    detailPositionNumber ?? 0,
                   )
                 }
                 onConfirm={handleConfirm}
