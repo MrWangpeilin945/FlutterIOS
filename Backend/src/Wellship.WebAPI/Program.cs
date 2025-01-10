@@ -134,6 +134,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.ITeamRepository, ExternalConnection.PostgreSQL.RepositoryImpls.TeamRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IPlaceRepository, ExternalConnection.PostgreSQL.RepositoryImpls.PlaceRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IThresholdRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ThresholdRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IConsultRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ConsultRepository>();
         return services;
     }
     /// <summary>
@@ -156,6 +157,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<ExternalConnection.Usecases.ITeamUsecase, ExternalConnection.Usecases.TeamUsecase>();
         services.AddScoped<ExternalConnection.Usecases.IPlaceUsecase, ExternalConnection.Usecases.PlaceUsecase>();
         services.AddScoped<ExternalConnection.Usecases.IThresholdUsecase, ExternalConnection.Usecases.ThresholdUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.IConsultUsecase, ExternalConnection.Usecases.ConsultUsecase>();
         return services;
     }
     /// <summary>
