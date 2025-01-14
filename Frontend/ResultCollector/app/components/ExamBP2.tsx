@@ -576,13 +576,19 @@ export default function ExamBP2({
                   </Flex>
                 );
               })}
-              <Stack w={216} gap={4} mt="auto">
-                {highDetail?.prevValue && lowDetail?.prevValue && (
-                  <Text fw={700}>
-                    (前回：{highDetail.prevValue}/{lowDetail.prevValue})
+              <Stack w={173} h={80} gap={4} justify="space-between">
+                <Box>
+                  {highDetail?.prevValue && lowDetail?.prevValue && (
+                    <Text fw={700} mt={0}>
+                      (前回：{highDetail.prevValue}/{lowDetail.prevValue})
+                    </Text>
+                  )}
+                </Box>
+                <Box>
+                  <Text size="xs" mb={0}>
+                    {highDetail?.unit}
                   </Text>
-                )}
-                <Text size="xs">{highDetail?.unit}</Text>
+                </Box>
               </Stack>
               {!isAVE && (
                 <Button
