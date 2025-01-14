@@ -34,10 +34,7 @@ public class StaffController : ControllerBase
     [Route("api/v{version:apiVersion}/staff/profile")]
     public async Task<IActionResult> GetStaffAsync()
     {
-        // TODO: 認証認可の部品が出来次第、JWTから自身の職員IDを取得する
-
-        var staffId = Guid.Parse("affd0000-0000-0000-0000-000000000001"); // TODO: ダミーのIDです。
-        var result = await _administratorUsecase.GetStaffAsync(staffId);
+        var result = await _administratorUsecase.GetStaffAsync();
         return Ok(result);
     }
 }
