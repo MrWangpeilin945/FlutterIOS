@@ -219,17 +219,9 @@ export default function ExamSelectLR({
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Box mb={16}>
-        <Paper
-          w={274}
-          h={80}
-          bg="gray02"
-          c="white"
-          radius="itemName"
-          px={32}
-          py={16}
-        >
+        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
           <Text size="lg" fw={700} ta="center">
-            {examItem.name}
+            {examItem.name?.slice(0, 8)}
           </Text>
         </Paper>
       </Box>
