@@ -260,6 +260,25 @@ public static class IServiceCollectionExtension
                             {
                                 context.Fail("Invalid token audience.");
                             }
+                            // subがJWTに含まれ、GuidにParseできることをチェックします。
+                            // ログイン状態のとき操作者を識別するために使用する情報のため必須としています。
+                            var sub = context.Principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                            if (!Guid.TryParse(sub, out _))
+                            {
+                                context.Fail("Invalid token sub.");
+                            }
+                            // unique_nameがJWTに含まれることをチェックします。
+                            var uniqueName = context.Principal?.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value;
+                            if (string.IsNullOrEmpty(uniqueName))
+                            {
+                                context.Fail("Invalid token unique_name.");
+                            }
+                            // roleがJWTに含まれ、有効なロール名であることをチェックします。
+                            var role = context.Principal?.FindFirst(CustomClaimTypes.Role)?.Value;
+                            if (!Enum.TryParse<Role>(role, out _))
+                            {
+                                context.Fail("Invalid token role.");
+                            }
                             return Task.CompletedTask;
                         }
                     };
