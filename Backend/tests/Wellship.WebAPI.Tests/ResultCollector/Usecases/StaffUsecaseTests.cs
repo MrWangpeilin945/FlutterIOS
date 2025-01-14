@@ -4,6 +4,7 @@ using Moq;
 
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -17,6 +18,7 @@ public class StaffUsecaseTests
         // Arrange
         var staffId = Guid.Parse("a5d78b8f-7e9b-4f8c-b506-8fc86b1d7681");
         var staffRepositoryMock = new Mock<IStaffRepository>();
+        var providerMock = new Mock<IStaffIdentityProvider>();
 
         // テーブルから取得するもの
         var staffEntity = new StaffEntity()
@@ -30,7 +32,9 @@ public class StaffUsecaseTests
         };
         var staff = new Staff(staffEntity);
         staffRepositoryMock.Setup(r => r.GetStaffByStaffIdAsync(staffId)).ReturnsAsync(staff);
-        var staffUsecase = new StaffUsecase(staffRepositoryMock.Object);
+        providerMock.Setup(p => p.StaffId).Returns(Guid.Parse("a5d78b8f-7e9b-4f8c-b506-8fc86b1d7681"));
+
+        var staffUsecase = new StaffUsecase(staffRepositoryMock.Object, providerMock.Object);
 
         // ユースケースで変換後に期待するもの
         var expectedStaff = new APIModels.Responses.Staff()
@@ -40,7 +44,7 @@ public class StaffUsecaseTests
         };
 
         // Act
-        var result = await staffUsecase.GetStaffAsync(staffId);
+        var result = await staffUsecase.GetStaffAsync();
 
         // Assert
         result.Should().BeEquivalentTo(expectedStaff);

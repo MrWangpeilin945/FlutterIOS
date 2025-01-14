@@ -4,6 +4,7 @@ using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models.Triggers;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -19,6 +20,7 @@ public class ConsultUsecase : IConsultUsecase
     private readonly IExamItemRepository _examItemRepository;
     private readonly IPlaceScheduleRepository _placeScheduleRepository;
     private readonly IResultRepository _resultRepository;
+    private readonly IStaffIdentityProvider _staffIdentityProvider;
 
     /// <summary>
     /// コンストラクタ
@@ -29,8 +31,10 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="examItemRepository">検査項目リポジトリ</param>
     /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
     /// <param name="resultRepository">検査結果リポジトリ</param>
+    /// <param name="staffIdentityProvider">職員情報プロバイダ</param>
     public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamMenuRepository examMenuRepository,
-                          IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository, IResultRepository resultRepository)
+                          IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository, IResultRepository resultRepository,
+                          IStaffIdentityProvider staffIdentityProvider)
     {
         _consultRepository = consultRepository;
         _examineeRepository = examineeRepository;
@@ -38,6 +42,7 @@ public class ConsultUsecase : IConsultUsecase
         _examItemRepository = examItemRepository;
         _placeScheduleRepository = placeScheduleRepository;
         _resultRepository = resultRepository;
+        _staffIdentityProvider = staffIdentityProvider;
     }
 
     /// <summary>
@@ -527,9 +532,9 @@ public class ConsultUsecase : IConsultUsecase
     {
         var consult = await _consultRepository.GetConsultAsync(consultNumber);
         // 会場のロック中かを確認
-        // TODO: 管理者のみ更新可能 後方作業へ
+        // ロール：管理者は操作可能
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync(consult.PlaceScheduleId);
-        if (placeSchedule?.Status == PlaceScheduleLockingStatus.検査完了)
+        if (placeSchedule?.Status == PlaceScheduleLockingStatus.検査完了 && _staffIdentityProvider.Role != Role.Admin)
         {
             // 会場ロック中
             throw new PlaceScheduleLockedException();

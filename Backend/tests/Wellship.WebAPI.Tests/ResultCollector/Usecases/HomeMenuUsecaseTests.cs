@@ -5,6 +5,7 @@ using Moq;
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.Tests.ResultCollector.Usecases;
@@ -13,6 +14,7 @@ public class HomemenuUsecaseTests
 {
     private readonly Mock<IHomeMenuRepository> _homeMenuRepositoryMock;
     private readonly Mock<IPlaceScheduleRepository> _placeScheduleRepositoryMock;
+    private readonly Mock<IStaffIdentityProvider> _staffIdentityProviderMock;
     private readonly IEnumerable<WebAPI.ResultCollector.Domain.Models.HomeMenuGroup> _homeMenuGroups;
     private readonly WebAPI.ResultCollector.Domain.Models.PlaceScheduleStatus _placeScheduleStatus;
 
@@ -20,6 +22,7 @@ public class HomemenuUsecaseTests
     {
         _placeScheduleRepositoryMock = new Mock<IPlaceScheduleRepository>();
         _homeMenuRepositoryMock = new Mock<IHomeMenuRepository>();
+        _staffIdentityProviderMock = new Mock<IStaffIdentityProvider>();
 
         _homeMenuGroups = [
             new(){
@@ -81,6 +84,7 @@ public class HomemenuUsecaseTests
 
         _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(It.IsAny<Guid>())).ReturnsAsync(_placeScheduleStatus);
         _homeMenuRepositoryMock.Setup(x => x.GetHomeMenuGroupsAsync()).ReturnsAsync(_homeMenuGroups);
+        _staffIdentityProviderMock.Setup(x => x.Role).Returns(Role.User);
 
         var expected = new HomeMenuGroupList()
         {
@@ -105,7 +109,7 @@ public class HomemenuUsecaseTests
             ]
         };
 
-        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
+        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _staffIdentityProviderMock.Object);
 
         // Act
         var result = await homeMenuUsecase.GetHomeMenusAsync(placeScheduleId);
@@ -122,6 +126,7 @@ public class HomemenuUsecaseTests
 
         _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(It.IsAny<Guid>())).ReturnsAsync(_placeScheduleStatus);
         _homeMenuRepositoryMock.Setup(x => x.GetHomeMenuGroupsAsync()).ReturnsAsync(_homeMenuGroups);
+        _staffIdentityProviderMock.Setup(x => x.Role).Returns(Role.User);
 
         var expected = new HomeMenuGroupList()
         {
@@ -146,7 +151,7 @@ public class HomemenuUsecaseTests
             ]
         };
 
-        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
+        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _staffIdentityProviderMock.Object);
 
         // Act
         var result = await homeMenuUsecase.GetHomeMenusAsync(placeScheduleId);
@@ -155,7 +160,7 @@ public class HomemenuUsecaseTests
         result.Should().BeEquivalentTo(expected);
     }
 
-    [Fact(Skip = "TODO: プロダクトコードのロール取得実装待ち")]
+    [Fact]
 
     public async Task 管理者ロールでメニュー一覧を取得する_会場日程IDあり()
     {
@@ -164,6 +169,7 @@ public class HomemenuUsecaseTests
 
         _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(It.IsAny<Guid>())).ReturnsAsync(_placeScheduleStatus);
         _homeMenuRepositoryMock.Setup(x => x.GetHomeMenuGroupsAsync()).ReturnsAsync(_homeMenuGroups);
+        _staffIdentityProviderMock.Setup(x => x.Role).Returns(Role.Admin);
 
         var expected = new HomeMenuGroupList()
         {
@@ -208,7 +214,7 @@ public class HomemenuUsecaseTests
             ]
         };
 
-        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
+        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _staffIdentityProviderMock.Object);
 
         // Act
         var result = await homeMenuUsecase.GetHomeMenusAsync(placeScheduleId);
