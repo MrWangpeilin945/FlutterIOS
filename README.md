@@ -214,3 +214,55 @@ Backlog課題名が自動で入力されるので、課題名の後ろに変更�
 ```
 
 この例はDockerコンテナでローカルに立てたPostgreSQLを想定している。
+
+## WebAPIテスト
+
+### 使用ツール
+
+[runn](https://github.com/k1LoW/runn)
+
+YAMLでシナリオを記述して、WebAPIテストを実行するCLIツール。Go言語で書かれている。
+
+作者はk1LoWさんであり、最近様々な企業で利用されている。
+
+### コマンド
+
+環境変数ファイルを指定して、複数のシナリオを実行する。
+
+```bash
+runn run .\scenarios\*.yml　--env-file .\config\.stg.env
+```
+
+### YAMLシナリオの書き方
+
+代表的な例を記載する。
+
+```yaml
+desc: ホームメニューを取得する
+runners:
+  api: ${BACKEND_URL}
+steps:
+  getHomeMenus:
+    desc: "ホームメニュー取得"
+    api:
+      /api/v1/homeMenus:
+        get:
+          body:
+            application/json: null
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../dump/homeMenus.json
+
+```
+
+### 補足：活用事例
+
+- [【STAC2022】runnによるAPIのシナリオテストの導入と自動化 / 小山 健一郎さん #stac2022 - YouTube](https://www.youtube.com/watch?v=WroeAscXLdA)
+- [APIシナリオテストツールとしてのrunn / 4 API testing tools - Speaker Deck](https://speakerdeck.com/k1low/4-api-testing-tools)
+- [CI/CDがあたりまえの今の時代にAPIテスティングツールに求められていること / CI/CD Test Night #7 - Speaker Deck](https://speakerdeck.com/k1low/cd-test-night-number-7)
+- [Web Application のテストを runn で書いて、開発と価値提供を加速する - カミナシ エンジニアブログ](https://kaminashi-developer.hatenablog.jp/entry/2024/11/26/080000)
+- [runnによるAPIシナリオテスト自動化を試してみた - estie inside blog](https://www.estie.jp/blog/entry/2024/06/17/161156)
+- [個人開発してるWebサービスの API のシナリオテストに runn を使ってみたけど、とてもよかった - えいのうにっき](https://blog.a-know.me/entry/2024/01/24/142328)
+- [yamlでテストシナリオを書いてそのまま実行までできるAPIテストツールの新星 “runn” を試してみた | DevelopersIO](https://dev.classmethod.jp/articles/trying-runn/)

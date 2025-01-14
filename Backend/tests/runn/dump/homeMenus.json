@@ -1,0 +1,26 @@
+{
+  "homeMenuGroups": [
+    {
+      "groupName": "一般",
+      "menus": [
+        {
+          "availableConditions": [
+            "PlaceScheduleUnlocked",
+            "PlaceScheduleSelected"
+          ],
+          "menuName": "検査メニュー選択",
+          "path": "exammenu-select"
+        },
+        {
+          "availableConditions": [
+            "PlaceScheduleSelected"
+          ],
+          "menuName": "進捗",
+          "path": "progress"
+        }
+      ]
+    }
+  ],
+  "placeScheduleLockingStatus": null,
+  "staffRole": 10
+}

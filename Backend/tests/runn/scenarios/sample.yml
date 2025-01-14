@@ -1,0 +1,16 @@
+desc: ホームメニューを取得する
+runners:
+  api: ${BACKEND_URL}
+steps:
+  getHomeMenus:
+    desc: "ホームメニュー取得"
+    api:
+      /api/v1/homeMenus:
+        get:
+          body:
+            application/json: null
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../dump/homeMenus.json
