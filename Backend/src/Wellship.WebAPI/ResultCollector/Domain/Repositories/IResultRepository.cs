@@ -12,4 +12,8 @@ public interface IResultRepository
     /// </summary>
     public Task RegisterResultsAsync(Guid consultId, ExamResultRegisteEntity[] results);
 
+    /// <summary>
+    /// 検査結果登録時のログを記録する
+    /// </summary>
+    public Task WriteResultsLogAsync(Guid consultId, ExamResultRegisteEntity[] results);
 }

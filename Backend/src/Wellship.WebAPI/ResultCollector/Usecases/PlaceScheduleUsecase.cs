@@ -95,7 +95,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
             PlaceScheduleId = placeSchedule.PlaceScheduleId,
             PlaceId = placeSchedule.PlaceId,
             PlaceName = placeSchedule.PlaceName,
-            ExamDate =  DateOnly.FromDateTime(placeSchedule.ExamDate),
+            ExamDate = DateOnly.FromDateTime(placeSchedule.ExamDate),
             PlaceScheduleLockingStatus = (int)placeSchedule.Status,
             UpdatedAt = placeSchedule.CreatedAt,
             UpdatedBy = placeSchedule.CreatedBy
@@ -108,5 +108,6 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     public async Task UpdatePlaceScheduleLockingStatusAsync(Guid placeScheduleId, PlaceScheduleLockingStatus status)
     {
         await _placeScheduleRepository.UpdatePlaceScheduleLockingStatusAsync(placeScheduleId, status);
+        await _placeScheduleRepository.WriteLockLogAsync(placeScheduleId, status);
     }
 }
