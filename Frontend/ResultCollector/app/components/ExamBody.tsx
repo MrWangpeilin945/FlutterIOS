@@ -386,12 +386,23 @@ export default function ExamBody({
                   disabled={isDisabled}
                 />
               )}
-              <Stack w={173} gap={4} mt="auto">
-                {detail?.prevValue && (
-                  <Text fw={700}>(前回：{detail.prevValue})</Text>
-                )}
-                {!isBMI && <Text size="xs">{detail?.unit}</Text>}
+              <Stack w={173} h={80} gap={4} justify="space-between">
+                <Box>
+                  {detail?.prevValue && (
+                    <Text fw={700} mt={0}>
+                      (前回：{detail.prevValue})
+                    </Text>
+                  )}
+                </Box>
+                <Box>
+                  {!isBMI && (
+                    <Text size="xs" mb={0}>
+                      {detail?.unit}
+                    </Text>
+                  )}
+                </Box>
               </Stack>
+
               {!isBMI && (
                 <Button
                   w={154}
