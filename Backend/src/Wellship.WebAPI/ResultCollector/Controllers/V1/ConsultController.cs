@@ -107,32 +107,6 @@ public class ConsultController : ControllerBase
     }
 
     /// <summary>
-    /// 前提検査メニューを検証する（仮：動作確認用）
-    /// </summary>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(InputExamItems))]
-    [HttpGet]
-    [Route("api/v{version:apiVersion}/consult/{consultNumber}/prior/{currentExamId}")]
-    public async Task<IActionResult> ValidatePriorExamMenus([FromRoute][Required] string consultNumber, [FromRoute][Required] int currentExamId)
-    {
-        // TODO: 検証ロジックを実装後に削除すること
-        var results = await _consultUsecase.ValidatePriorExamMenus(consultNumber, currentExamId);
-        return Ok(results);
-    }
-
-    /// <summary>
-    /// 検査結果相関ルールを検証する（仮：動作確認用）
-    /// </summary>
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [HttpPost]
-    [Route("api/v{version:apiVersion}/consult/{consultNumber}/correlation")]
-    public async Task<IActionResult> ValidateCorrelationRuleAsync([FromRoute][Required] string consultNumber, [FromBody][Required] ResultsRequest request)
-    {
-        // TODO: 検証ロジックを実装後に削除すること
-        var results = await _consultUsecase.ValidateCorrelationRuleAsync(consultNumber, request);
-        return Ok(results);
-    }
-
-    /// <summary>
     /// AP1014_検査結果を登録する
     /// </summary>
     /// <param name="consultNumber">受診番号</param>

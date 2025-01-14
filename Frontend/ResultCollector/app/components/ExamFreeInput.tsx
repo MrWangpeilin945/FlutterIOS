@@ -34,7 +34,7 @@ export default function ExamFreeInput({
     !examItems.some(
       (item) =>
         item.positionNumber === 1 &&
-        item.examItemDetails?.some((detail) => detail.positionNumber === 1)
+        item.examItemDetails?.some((detail) => detail.positionNumber === 1),
     )
   ) {
     return null;
@@ -71,10 +71,10 @@ export default function ExamFreeInput({
   }, [onRegisterPressed, examItems]);
 
   const firstPositionExamItem = examItemsData.find(
-    (item) => item.positionNumber === 1
+    (item) => item.positionNumber === 1,
   );
   const firstPositionDetail = firstPositionExamItem?.examItemDetails?.find(
-    (detail) => detail.positionNumber === 1
+    (detail) => detail.positionNumber === 1,
   );
 
   // エラーメッセージの並び替え
@@ -93,7 +93,7 @@ export default function ExamFreeInput({
   // APIのエラーメッセージで更新する
   const resetErrorMessages = (item: InputExamItem) => {
     const targetError = backendValidation.find(
-      (error) => error.itemPositionNumber === item.positionNumber
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -128,7 +128,7 @@ export default function ExamFreeInput({
     componentErrorMessage.push(...setRangesErrorMessage(item));
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === 3
+      (error) => error.errorLevel === 3,
     );
     // エラーメッセージをexamItemに保存
     const resultItem: InputExamItem = {
@@ -156,7 +156,7 @@ export default function ExamFreeInput({
     for (const item of updatedExamItems) {
       if (item.positionNumber === 1) {
         item.examItemDetails = item.examItemDetails?.map((detail) =>
-          detail.positionNumber === 1 ? { ...detail, value: value } : detail
+          detail.positionNumber === 1 ? { ...detail, value: value } : detail,
         );
         // バリデーションチェックを実施
         const { validateResult, hasCallback } = validationCheck(item);
@@ -204,14 +204,14 @@ export default function ExamFreeInput({
               isDisabled
                 ? ""
                 : examRegistResults?.some(
-                    (x) => x.errorLevel === InputErrorLevel.異常
-                  )
-                ? `${styles["input-error"]}`
-                : examRegistResults?.some(
-                    (x) => x.errorLevel === InputErrorLevel.警告
-                  )
-                ? `${styles["input-warning"]}`
-                : ""
+                      (x) => x.errorLevel === InputErrorLevel.異常,
+                    )
+                  ? `${styles["input-error"]}`
+                  : examRegistResults?.some(
+                        (x) => x.errorLevel === InputErrorLevel.警告,
+                      )
+                    ? `${styles["input-warning"]}`
+                    : ""
             }`,
           }}
           w={524}

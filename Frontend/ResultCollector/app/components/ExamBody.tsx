@@ -57,7 +57,7 @@ export default function ExamBody({
   const hasValidDetail = examItems.some(
     (item) =>
       bodyItemPositionNumbers.includes(item.positionNumber ?? 0) &&
-      item.examItemDetails?.some((detail) => detail.positionNumber === 1)
+      item.examItemDetails?.some((detail) => detail.positionNumber === 1),
   );
 
   if (!hasValidDetail) {
@@ -81,9 +81,9 @@ export default function ExamBody({
           (detail) =>
             detail.positionNumber === 1 &&
             detail.hasOrder === true &&
-            !detail.cancelReasonId
-        )
-    )
+            !detail.cancelReasonId,
+        ),
+    ),
   );
 
   // キーボードの表示インデックスを状態として管理する
@@ -113,7 +113,7 @@ export default function ExamBody({
   // キーボードの表示/非表示をトグルする関数
   const toggleKeyboard = (positionNumber: number) => {
     setActiveKeyboard((prevNumber) =>
-      prevNumber === positionNumber ? null : positionNumber
+      prevNumber === positionNumber ? null : positionNumber,
     );
   };
   const handleConfirm = () => {
@@ -136,7 +136,7 @@ export default function ExamBody({
   // APIのエラーメッセージに更新する
   const resetErrorMessages = (item: InputExamItem) => {
     const targetError = backendValidation.find(
-      (error) => error.itemPositionNumber === item.positionNumber
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -162,7 +162,7 @@ export default function ExamBody({
 
     // バリデーション対象データを取得
     const targetDetail = item.examItemDetails?.find(
-      (item) => item.positionNumber === 1
+      (item) => item.positionNumber === 1,
     );
     const result = schema.safeParse(targetDetail?.value);
 
@@ -183,7 +183,7 @@ export default function ExamBody({
     componentErrorMessage.push(...(setRangesErrorMessage(item) ?? []));
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === InputErrorLevel.異常
+      (error) => error.errorLevel === InputErrorLevel.異常,
     );
     // エラーメッセージをexamItemに保存
     const resultItem: InputExamItem = {
@@ -289,7 +289,7 @@ export default function ExamBody({
     (positionNumber) => {
       // 該当するexamItemを検索
       let examItem = examItemsData.find(
-        (item) => item.positionNumber === positionNumber
+        (item) => item.positionNumber === positionNumber,
       );
 
       // 該当するexamItemがなければデフォルトを設定
@@ -300,17 +300,17 @@ export default function ExamBody({
             positionNumber === 身長
               ? "身長"
               : positionNumber === 体重
-              ? "体重"
-              : positionNumber === 体脂肪率
-              ? "体脂肪率"
-              : "BMI",
+                ? "体重"
+                : positionNumber === 体脂肪率
+                  ? "体脂肪率"
+                  : "BMI",
           examItemDetails: [{ positionNumber: 1 }],
           examRegistResults: [],
         };
       }
 
       return examItem;
-    }
+    },
   );
 
   return (
@@ -364,14 +364,14 @@ export default function ExamBody({
                   classNames={{
                     input: `${styles["input-textbox"]} ${
                       examRegistResults?.some(
-                        (x) => x.errorLevel === InputErrorLevel.異常
+                        (x) => x.errorLevel === InputErrorLevel.異常,
                       )
                         ? `${styles["input-error"]}`
                         : examRegistResults?.some(
-                            (x) => x.errorLevel === InputErrorLevel.警告
-                          )
-                        ? `${styles["input-warning"]}`
-                        : ""
+                              (x) => x.errorLevel === InputErrorLevel.警告,
+                            )
+                          ? `${styles["input-warning"]}`
+                          : ""
                     }`,
                   }}
                   w={340}
