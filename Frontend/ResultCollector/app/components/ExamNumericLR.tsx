@@ -308,14 +308,10 @@ export default function ExamNumericLR({
           h={80}
           className={styles["basic-grey"]}
           radius="itemName"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          py={16}
         >
-          <Text size="lg" fw={700}>
-            {name}
+          <Text size="lg" fw={700} ta="center">
+            {name?.slice(0, 8)}
           </Text>
         </Paper>
         <Group gap={16}>
@@ -332,16 +328,9 @@ export default function ExamNumericLR({
             const isDisabled = !hasOrder || !!cancelReasonId;
             return (
               <Stack key={detailPositionNumber}>
-                <Paper
-                  w={524}
-                  h={51}
-                  bg="gray02"
-                  c="white"
-                  radius="itemName"
-                  py={16}
-                >
-                  <Text size="lg" fw={700}>
-                    {detailName?.slice(0, 8)}
+                <Paper w={524} h={51} bg="gray02" c="white" radius="itemName">
+                  <Text size="lg" fw={700} ta="center">
+                    {detailName}
                   </Text>
                 </Paper>
                 <Group>
