@@ -184,7 +184,7 @@ export default function ExamFreeInput({
     <Flex mt={16} justify="flex-start" align="flex-start" direction="column">
       <Flex gap={16} justify="flex-start" align="flex-start">
         <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
-          <Text size="lg" fw={700}>
+          <Text size="lg" fw={700} ta="center">
             {name?.slice(0, 8)}
           </Text>
         </Paper>
