@@ -1,10 +1,11 @@
 desc: ホームメニューを取得する
 runners:
-  api: ${BACKEND_URL}
+  req:
+    endpoint: ${BACKEND_URL}
 steps:
   getHomeMenus:
     desc: "ホームメニュー取得"
-    api:
+    req:
       /api/v1/homeMenus:
         get:
           body:
