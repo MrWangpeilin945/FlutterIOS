@@ -565,7 +565,10 @@ public class ConsultUsecase : IConsultUsecase
                                                 Value = detail.Value
                                             })
                                             .ToArray();
+
+        // 登録と履歴を書き込む
         await _resultRepository.RegisterResultsAsync(consult.ConsultId, resultList);
+        await _resultRepository.WriteResultsLogAsync(consult.ConsultId, resultList);
     }
 
     /// <summary>

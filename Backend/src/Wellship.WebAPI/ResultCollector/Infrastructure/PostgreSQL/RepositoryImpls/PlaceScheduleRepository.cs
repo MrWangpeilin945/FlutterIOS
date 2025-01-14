@@ -3,6 +3,7 @@ using Dapper;
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
@@ -13,13 +14,17 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Reposi
 public class PlaceScheduleRepository : IPlaceScheduleRepository
 {
     private readonly IDbConnectionProvider _dbConnectionProvider;
+    private readonly IStaffIdentityProvider _staffIdentityProvider;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public PlaceScheduleRepository(IDbConnectionProvider dbConnectionProvider)
+    public PlaceScheduleRepository(IDbConnectionProvider dbConnectionProvider, IStaffIdentityProvider staffIdentityProvider, TimeProvider timeProvider)
     {
         _dbConnectionProvider = dbConnectionProvider;
+        _staffIdentityProvider = staffIdentityProvider;
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -207,10 +212,55 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
         const string updateSql = @"
         update resultcollector.place_schedule 
         set
-            status = @Status
+            status = @Status,
+            created_by = @CreatedBy,
+            created_at = @CreatedAt
         where
             place_schedule_id = @PlaceScheduleId;";
-        await connection.QueryAsync(updateSql, new { Status = (int)status, PlaceScheduleId = placeScheduleId });
+
+        var param = new
+        {
+            Status = (int)status,
+            CreatedBy = _staffIdentityProvider.StaffCode,
+            CreatedAt = _timeProvider.GetUtcNow(),
+            PlaceScheduleId = placeScheduleId
+        };
+
+        await connection.QueryAsync(updateSql, param);
+    }
+
+
+    /// <summary>
+    /// 会場ロックの履歴を記録する
+    /// </summary>
+    public async Task WriteLockLogAsync(Guid placeScheduleId, PlaceScheduleLockingStatus status)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+
+        const string sql = @"
+        insert 
+        into resultcollector.place_schedule_lock_histoies( 
+            place_schedule_id
+            , status
+            , created_at
+            , created_by
+        ) 
+        values ( 
+            @PlaceScheduleId
+            , @Status
+            , @CreatedBy
+            , @CreatedAt
+        );";
+
+        var param = new
+        {
+            PlaceScheduleId = placeScheduleId,
+            Status = (int)status,
+            CreatedBy = _staffIdentityProvider.StaffCode,
+            CreatedAt = _timeProvider.GetUtcNow()
+        };
+
+        await connection.QueryAsync(sql, param);
     }
 
     /// <summary>
