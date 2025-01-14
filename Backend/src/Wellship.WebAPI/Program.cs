@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using NLog.Web;
 
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
@@ -53,6 +54,7 @@ public class Program
                             .AddPostgreSqlServices();
         }
         builder.Services.AddScoped<IDbConnectionProvider, DbConnectionProvider>();
+        builder.Services.AddScoped<IStaffIdentityProvider, StaffIdentityFromHttpContextProvider>();
         builder.Services.AddSingleton(TimeProvider.System);
 
         builder.Services.AddOpenApiDocument(options =>
