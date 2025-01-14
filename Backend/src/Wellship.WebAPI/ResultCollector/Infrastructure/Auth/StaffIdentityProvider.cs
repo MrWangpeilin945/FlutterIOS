@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 using Ryobi.Wellship.Core.Enums;
 
@@ -39,9 +40,9 @@ public class StaffIdentityFromHttpContextProvider : IStaffIdentityProvider
     {
         var user = httpContextAccessor.HttpContext?.User;
 
-        StaffId = Guid.TryParse(user?.Identity?.Name, out var staffId) ? staffId : null;
-        StaffCode = user?.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value;
-        Role = Enum.TryParse<Role>(user?.FindFirst(CustomClaimTypes.Role)?.Value, out var role) ? role : null;
+        StaffId = Guid.TryParse(user?.FindFirstValue(JwtRegisteredClaimNames.Sub), out var staffId) ? staffId : null;
+        StaffCode = user?.FindFirstValue(JwtRegisteredClaimNames.UniqueName);
+        Role = Enum.TryParse<Role>(user?.FindFirstValue(CustomClaimTypes.Role), out var role) ? role : null;
     }
 
     /// <inheritdoc/>
