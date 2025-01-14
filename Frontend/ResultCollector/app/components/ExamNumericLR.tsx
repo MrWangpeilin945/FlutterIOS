@@ -303,13 +303,7 @@ export default function ExamNumericLR({
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Stack>
-        <Paper
-          w={274}
-          h={80}
-          className={styles["basic-grey"]}
-          radius="itemName"
-          py={16}
-        >
+        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
           <Text size="lg" fw={700} ta="center">
             {name?.slice(0, 8)}
           </Text>
