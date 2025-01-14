@@ -25,7 +25,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard
         /// <summary>
         /// 受付番号
         /// </summary>
-        public string TicketNumber { get; init; } = "";
+        public required string TicketNumber { get; init; }
 
         /// <summary>
         /// エラーオブジェクトに登録する入力項目Noなど
