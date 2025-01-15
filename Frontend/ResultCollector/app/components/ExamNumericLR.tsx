@@ -358,13 +358,19 @@ export default function ExamNumericLR({
                     }
                     disabled={isDisabled}
                   />
-                  <Stack gap="0">
-                    <Text size="md" fw="700" maw={172}>
-                      {prevValue ? `(前回: ${prevValue})` : ""}
-                    </Text>
-                    <Text size="xs" fw="400">
-                      {unit}
-                    </Text>
+                  <Stack w={173} h={80} gap={4} justify="space-between">
+                    <Box>
+                      {prevValue && (
+                        <Text fw={700} mt={0}>
+                          (前回：{prevValue})
+                        </Text>
+                      )}
+                    </Box>
+                    <Box>
+                      <Text size="xs" mb={0}>
+                        {unit}
+                      </Text>
+                    </Box>
                   </Stack>
                 </Group>
               </Stack>
