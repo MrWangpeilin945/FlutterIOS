@@ -70,9 +70,9 @@ public class HomemenuUsecaseTests
             PlaceScheduleId = Guid.Parse("75f3d492-4a3e-477d-b67b-c4320ce77dba"),
             PlaceId = Guid.Parse("d74b6117-e784-4607-9dc4-5218b07e23d6"),
             PlaceName = "会場A",
-            ExamDate = new DateTime(2024, 12, 20),
+            ExamDate = new DateOnly(2024, 12, 20),
             Status = PlaceScheduleLockingStatus.検査中,
-            CreatedAt = new DateTime(2024, 12, 10),
+            CreatedAt = DateTimeOffset.Parse("2024-12-10"),
             CreatedBy = "登録者A"
         };
     }

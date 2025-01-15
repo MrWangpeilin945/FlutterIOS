@@ -427,7 +427,7 @@ public class ConsultRepository : IConsultRepository
 
         var response = await connection.QueryAsync<PreviousResultEntity>(sql, new { ConsultId = consultId, ExamDate = examDate.ToString("yyyy-MM-dd") });
         // 受診日の直近日
-        var previousDate = DateTime.Parse(examDate.ToString("yyyy-MM-dd"));
+        var previousDate = DateOnly.Parse(examDate.ToString("yyyy-MM-dd"));
         if (response.Any())
         {
             previousDate = response.Select(x => x.ExamDate).ElementAt(0);
@@ -435,7 +435,7 @@ public class ConsultRepository : IConsultRepository
         return new PreviousResult()
         {
             ConsultId = consultId,
-            ExamDate = DateOnly.FromDateTime(previousDate),
+            ExamDate = previousDate,
             // 受診日の直近日の過去検査結果のみ返す
             ExamItemDetailResults = response.Where(x => x.ExamDate == previousDate)
                                             .Select(x => new ExamItemDetailResult()

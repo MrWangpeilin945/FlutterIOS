@@ -18,7 +18,7 @@ public class PlaceSchedulePlaceTeam
     /// <summary>
     /// 健診日
     /// </summary>
-    public required DateTime ExamDate { get; set; }
+    public required DateOnly ExamDate { get; set; }
 
     /// <summary>
     /// 開始時刻

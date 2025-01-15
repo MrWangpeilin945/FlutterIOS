@@ -836,7 +836,7 @@ public class ConsultUsecaseTests
                                         PlaceScheduleId = placeScheduleId,
                                         PlaceId = Guid.Parse("492d6d5c-17ab-4aba-89e2-51369373b8a8"),
                                         PlaceName = "市役所",
-                                        ExamDate = DateTime.Parse("2024-12-19"),
+                                        ExamDate = new DateOnly(2024, 12, 19),
                                         Status = PlaceScheduleLockingStatus.検査完了,
                                         CreatedAt = DateTime.Now,
                                         CreatedBy = "admin"

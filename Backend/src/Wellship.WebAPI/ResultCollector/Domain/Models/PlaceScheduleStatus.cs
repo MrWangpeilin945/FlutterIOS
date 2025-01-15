@@ -25,7 +25,7 @@ public class PlaceScheduleStatus
     /// <summary>
     /// 健診日
     /// </summary>
-    public required DateTime ExamDate { get; init; }
+    public required DateOnly ExamDate { get; init; }
 
     /// <summary>
     /// 状況
@@ -35,7 +35,7 @@ public class PlaceScheduleStatus
     /// <summary>
     /// 作成日時
     /// </summary>
-    public required DateTime CreatedAt { get; init; }
+    public required DateTimeOffset CreatedAt { get; init; }
 
     /// <summary>
     /// 作成者

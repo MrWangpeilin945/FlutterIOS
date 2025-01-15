@@ -64,7 +64,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
         return response.Select(x => new Domain.Models.PlaceSchedule()
         {
             Id = x.PlaceScheduleId,
-            ExamDate = DateOnly.FromDateTime(x.ExamDate),
+            ExamDate = x.ExamDate,
             StartTime = x.StartTime,
             PlaceScheduleLockingStatus = (PlaceScheduleLockingStatus)x.Status,
             Place = new Domain.Models.Place()
@@ -133,7 +133,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
         return response.Select(x => new Domain.Models.PlaceSchedule()
         {
             Id = x.PlaceScheduleId,
-            ExamDate = DateOnly.FromDateTime(x.ExamDate),
+            ExamDate = x.ExamDate,
             StartTime = x.StartTime,
             PlaceScheduleLockingStatus = (PlaceScheduleLockingStatus)x.Status,
             Place = new Domain.Models.Place()
@@ -226,7 +226,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
             PlaceScheduleId = placeScheduleId
         };
 
-        await connection.QueryAsync(updateSql, param);
+        await connection.ExecuteAsync(updateSql, param);
     }
 
 
@@ -248,8 +248,8 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
         values ( 
             @PlaceScheduleId
             , @Status
-            , @CreatedBy
             , @CreatedAt
+            , @CreatedBy
         );";
 
         var param = new
@@ -260,7 +260,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
             CreatedAt = _timeProvider.GetUtcNow()
         };
 
-        await connection.QueryAsync(sql, param);
+        await connection.ExecuteAsync(sql, param);
     }
 
     /// <summary>
