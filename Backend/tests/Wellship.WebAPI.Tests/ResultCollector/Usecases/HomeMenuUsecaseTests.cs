@@ -4,6 +4,7 @@ using Moq;
 
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Enums;
+using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -221,5 +222,23 @@ public class HomemenuUsecaseTests
 
         // Assert
         result.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task 一般ロールでメニュー一覧を取得する_職員情報が取得できない()
+    {
+        // Arrange
+        Guid? placeScheduleId = null;
+
+        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(It.IsAny<Guid>())).ReturnsAsync(_placeScheduleStatus);
+        _homeMenuRepositoryMock.Setup(x => x.GetHomeMenuGroupsAsync()).ReturnsAsync(_homeMenuGroups);
+        _staffIdentityProviderMock.Setup(x => x.Role).Returns((Role?)null);
+
+        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _staffIdentityProviderMock.Object);
+
+        // Act & Assert
+        await homeMenuUsecase.Invoking(x => x.GetHomeMenusAsync(placeScheduleId))
+                             .Should().ThrowAsync<WellshipAuthenticationException>()
+                             .WithMessage("認証情報が検証できませんでした。");
     }
 }

@@ -102,4 +102,44 @@ public class AuthenticationUsecaseTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<WellshipAuthenticationException>(async () => await usecase.LoginStaffAsync("S001", "BadPassword"));
     }
+
+    [Fact]
+    public async Task リフレッシュトークンの検証に成功した場合新しいアクセストークンとリフレッシュトークンが返ってくる()
+    {
+        // Arrange
+        var oldAccessToken = "oldAccessToken";
+        var oldRefreshToken = "oldRefreshToken";
+        var newAccessToken = "newAccessToken";
+        var newRefreshToken = RefreshToken.Create(_timeProvider.GetUtcNow().Add(_authSettings.RefreshTokenLifeTime));
+
+        var hash = "TX+Y1tzM7x6bfFxQob8oVpkSfY+avT+MJpGRzzJ54yilcsTx1T987plGIUW7ORJhfcPAPqreEzyyjzq2ufsw+w==";
+        var salt = "NaGPpMzTwdKiSWC8zWjj84nKm8WlXvlZSwIJ4o7kjo9/j4Hllkk61/8Vz14JVAx/KGt3GMGNE0Z/LmEb7Qfe4fAjf+aVMNkyuAywRBzwT7hUbzivt3NHohOVgIg3tYnVdLn+M4sORWIiYmq5kot9zWc02rRFeSraF4jORxQXucQ=";
+
+        var staffEntity = new StaffEntity()
+        {
+            StaffId = Guid.Parse("affd0000-0000-0000-0000-000000000001"),
+            StaffCode = "AS001",
+            LoginId = "S001",
+            Name = "職員A",
+            Enabled = true,
+            RoleId = (int)Role.User,
+            PasswordHash = Convert.FromBase64String(hash),
+            PasswordSalt = Convert.FromBase64String(salt),
+        };
+
+        var staff = new Staff(staffEntity);
+
+        _authService.Setup(x => x.RefreshAccessTokenAsync(oldAccessToken, oldRefreshToken)).ReturnsAsync((staff, newAccessToken));
+        _refreshTokenRepository.Setup(x => x.UpdateRefreshTokenAsync(staff.StaffId, It.IsAny<RefreshToken>())).Returns(ValueTask.CompletedTask);
+
+        var usecase = new AuthenticationUsecase(_authService.Object, _authSettings, _staffRepository.Object,
+                                                _refreshTokenRepository.Object, _staffLoginHistoryRepository.Object, _timeProvider);
+
+        // Act
+        var (returnedAccessToken, returnedRefreshToken) = await usecase.RefreshAccessTokenAsync(oldAccessToken, oldRefreshToken);
+
+        // Assert
+        returnedAccessToken.Should().Be(newAccessToken);
+        returnedRefreshToken.Should().NotBeNullOrWhiteSpace();
+    }
 }
