@@ -2,11 +2,6 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
-using Microsoft.AspNetCore.Mvc;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
-using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
-using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
 {
