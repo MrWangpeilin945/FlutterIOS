@@ -162,7 +162,7 @@ export default function ExamFreeInput({
     const updatedExamItems = [...examItemsData];
 
     // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
-    let hasValidationError = true;
+    let hasValidationError = false;
 
     for (const item of updatedExamItems) {
       if (item.positionNumber === 1) {
@@ -173,7 +173,7 @@ export default function ExamFreeInput({
         const { validateResult, hasCallback } = validationCheck(item);
         if (!hasCallback) {
           // falseのexamItemがあればコールバックを行わない
-          hasValidationError = false;
+          hasValidationError = true;
         }
         Object.assign(item, validateResult);
       }
