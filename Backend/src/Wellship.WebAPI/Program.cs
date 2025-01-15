@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using NLog.Web;
 
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
@@ -53,6 +54,7 @@ public class Program
                             .AddPostgreSqlServices();
         }
         builder.Services.AddScoped<IDbConnectionProvider, DbConnectionProvider>();
+        builder.Services.AddScoped<IStaffIdentityProvider, StaffIdentityFromHttpContextProvider>();
         builder.Services.AddSingleton(TimeProvider.System);
 
         builder.Services.AddOpenApiDocument(options =>
@@ -134,6 +136,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.ITeamRepository, ExternalConnection.PostgreSQL.RepositoryImpls.TeamRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IPlaceRepository, ExternalConnection.PostgreSQL.RepositoryImpls.PlaceRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IThresholdRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ThresholdRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.ITicketRepository, ExternalConnection.PostgreSQL.RepositoryImpls.TicketRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IPlaceScheduleRepository, ExternalConnection.PostgreSQL.RepositoryImpls.PlaceScheduleRepository>();
         return services;
     }
@@ -157,6 +160,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<ExternalConnection.Usecases.ITeamUsecase, ExternalConnection.Usecases.TeamUsecase>();
         services.AddScoped<ExternalConnection.Usecases.IPlaceUsecase, ExternalConnection.Usecases.PlaceUsecase>();
         services.AddScoped<ExternalConnection.Usecases.IThresholdUsecase, ExternalConnection.Usecases.ThresholdUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.ITicketUsecase, ExternalConnection.Usecases.TicketUsecase>();
         services.AddScoped<ExternalConnection.Usecases.IPlaceScheduleUsecase, ExternalConnection.Usecases.PlaceScheduleUsecase>();
         return services;
     }
@@ -257,6 +261,25 @@ public static class IServiceCollectionExtension
                             if (auds is null || !auds.Any(x => host.Equals(x, StringComparison.OrdinalIgnoreCase)))
                             {
                                 context.Fail("Invalid token audience.");
+                            }
+                            // subがJWTに含まれ、GuidにParseできることをチェックします。
+                            // ログイン状態のとき操作者を識別するために使用する情報のため必須としています。
+                            var sub = context.Principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                            if (!Guid.TryParse(sub, out _))
+                            {
+                                context.Fail("Invalid token sub.");
+                            }
+                            // unique_nameがJWTに含まれることをチェックします。
+                            var uniqueName = context.Principal?.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value;
+                            if (string.IsNullOrEmpty(uniqueName))
+                            {
+                                context.Fail("Invalid token unique_name.");
+                            }
+                            // roleがJWTに含まれ、有効なロール名であることをチェックします。
+                            var role = context.Principal?.FindFirst(CustomClaimTypes.Role)?.Value;
+                            if (!Enum.TryParse<Role>(role, out _))
+                            {
+                                context.Fail("Invalid token role.");
                             }
                             return Task.CompletedTask;
                         }

@@ -111,7 +111,7 @@ CREATE TABLE equipments (
 CREATE TABLE exam_cancel_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_id uuid NOT NULL
-  , consult_item_detail_id integer NOT NULL
+  , exam_item_detail_id integer NOT NULL
   , value text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -358,7 +358,7 @@ CREATE TABLE tickets (
 );
 
 CREATE TABLE tickets_histories (
-  id uuid NOT NULL
+  id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_id uuid NOT NULL
   , ticket_number text
   , action_type varchar(1) NOT NULL
@@ -909,7 +909,7 @@ COMMENT ON COLUMN equipments.created_by IS '作成者';
 COMMENT ON TABLE exam_cancel_histories IS '検査中止履歴';
 COMMENT ON COLUMN exam_cancel_histories.id IS 'ID';
 COMMENT ON COLUMN exam_cancel_histories.consult_id IS '受診ID';
-COMMENT ON COLUMN exam_cancel_histories.consult_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_cancel_histories.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_cancel_histories.value IS '値';
 COMMENT ON COLUMN exam_cancel_histories.created_at IS '作成日時';
 COMMENT ON COLUMN exam_cancel_histories.created_by IS '作成者';

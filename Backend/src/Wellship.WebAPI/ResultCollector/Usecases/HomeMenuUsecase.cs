@@ -1,6 +1,8 @@
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Enums;
+using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -11,16 +13,19 @@ public class HomeMenuUsecase : IHomeMenuUsecase
 {
     private readonly IHomeMenuRepository _homeMenuRepository;
     private readonly IPlaceScheduleRepository _placeScheduleRepository;
+    private readonly IStaffIdentityProvider _staffIdentityProvider;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="homeMenuRepository">ホームメニューリポジトリ</param>
     /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
-    public HomeMenuUsecase(IHomeMenuRepository homeMenuRepository, IPlaceScheduleRepository placeScheduleRepository)
+    /// <param name="staffIdentityProvider">職員情報プロバイダ</param>
+    public HomeMenuUsecase(IHomeMenuRepository homeMenuRepository, IPlaceScheduleRepository placeScheduleRepository, IStaffIdentityProvider staffIdentityProvider)
     {
         _homeMenuRepository = homeMenuRepository;
         _placeScheduleRepository = placeScheduleRepository;
+        _staffIdentityProvider = staffIdentityProvider;
     }
 
     /// <summary>
@@ -35,8 +40,11 @@ public class HomeMenuUsecase : IHomeMenuUsecase
             not null => (int)(await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync((Guid)placeScheduleId)).Status
         };
 
-        // TODO: JWTから操作した職員のロールを取得する。プロバイダから取得する
-        Role staffRole = Role.User; // TODO
+        var staffRole = _staffIdentityProvider.Role;
+        if (staffRole is null)
+        {
+            throw new WellshipAuthenticationException();
+        }
 
         // 機能ごとの利用可能条件の設定
         var homeMenuSettings = new Domain.Models.HomeMenuSettings();
@@ -51,7 +59,7 @@ public class HomeMenuUsecase : IHomeMenuUsecase
             HomeMenuGroups = repoResults.Select(x => new HomeMenuGroup()
             {
                 GroupName = x.GroupName,
-                Menus = x.HomeMenus.Where(m => homeMenuSettings.CanRoleUseFeature(m.Path, staffRole))
+                Menus = x.HomeMenus.Where(m => homeMenuSettings.CanRoleUseFeature(m.Path, (Role)staffRole))
                                    .Select(m => new HomeMenu()
                                    {
                                        MenuName = m.MenuName,

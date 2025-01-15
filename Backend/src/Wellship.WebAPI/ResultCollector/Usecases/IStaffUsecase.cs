@@ -10,5 +10,5 @@ public interface IStaffUsecase
     /// <summary>
     /// AP1002_職員の情報を取得する
     /// </summary>
-    public Task<Staff> GetStaffAsync(Guid staffId);
+    public Task<Staff> GetStaffAsync();
 }

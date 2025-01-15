@@ -15,7 +15,11 @@ import { customTheme } from "~/customTheme";
 import { setupAxiosInterceptors } from "~/utils/axiosInstance";
 import { authUtil } from "./utils/authUtil";
 
-const queryClient = new QueryClient();
+// TanStackQueryのリトライ回数を設定
+// query系:3回、mutation系：リトライしない
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 3 }, mutations: { retry: false } },
+});
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
