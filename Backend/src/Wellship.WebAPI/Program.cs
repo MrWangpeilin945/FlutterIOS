@@ -1,5 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 
+using Dapper;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +14,7 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth.Settings;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.TypeHandler;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ResultCollector.Middlewares;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -80,6 +83,10 @@ public class Program
                                                        .AllowAnyHeader()
                                                        .AllowCredentials());
         });
+
+        // カスタムタイプハンドラーの登録
+        SqlMapper.AddTypeHandler(new SqlDateOnlyTypeHandler());
+        SqlMapper.AddTypeHandler(new SqlDateTimeOffsetTypeHandler());
 
         var app = builder.Build();
 
