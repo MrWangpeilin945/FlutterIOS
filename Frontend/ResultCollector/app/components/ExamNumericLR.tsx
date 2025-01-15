@@ -163,12 +163,15 @@ export default function ExamNumericLR({
         .string()
         .min(
           1,
-          getErrorMessage(errorMessages.required, `${item.name}:${name}は`),
+          getErrorMessage(
+            errorMessages.required,
+            `${name ?? (positionNumber === 左 ? "左" : "右")}は`,
+          ),
         ) // 必須チェック
         .refine((value) => /^\d+(\.\d+)?$/.test(value), {
           message: getErrorMessage(
             errorMessages.numericString,
-            `${item.name}:${name}は`,
+            `${name ?? (positionNumber === 左 ? "左" : "右")}は`,
           ),
         });
 

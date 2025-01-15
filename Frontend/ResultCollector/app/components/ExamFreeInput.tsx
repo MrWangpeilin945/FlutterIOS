@@ -109,7 +109,7 @@ export default function ExamFreeInput({
     // 必須チェック行うスキーマ
     const schema = z
       .string()
-      .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)); // 必須チェック
+      .min(1, getErrorMessage(errorMessages.required, item.name?`${item.name}は`:"")); // 必須チェック
     // バリデーション対象データを取得
     const valueToValidate =
       item.examItemDetails?.find((item) => item.positionNumber === 1)?.value ||

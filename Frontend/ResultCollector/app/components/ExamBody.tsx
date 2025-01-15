@@ -155,9 +155,9 @@ export default function ExamBody({
     // 必須チェックと半角数字チェックを一度に行うスキーマ
     const schema = z
       .string()
-      .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)) // 必須チェック
+      .min(1, getErrorMessage(errorMessages.required, item.name?`${item.name}は`:"")) // 必須チェック
       .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-        message: getErrorMessage(errorMessages.numericString, `${item.name}は`),
+        message: getErrorMessage(errorMessages.numericString, item.name?`${item.name}は`:""),
       });
 
     // バリデーション対象データを取得

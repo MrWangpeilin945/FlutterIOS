@@ -94,7 +94,7 @@ export default function ExamSelect({
 
       const requiredMessage = getErrorMessage(
         errorMessages.required,
-        `${item.name}は`,
+        item.name?`${item.name}は`:"",
       );
 
       // バリデーションが失敗した場合
