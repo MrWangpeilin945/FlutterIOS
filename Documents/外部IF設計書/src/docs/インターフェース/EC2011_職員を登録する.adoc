@@ -168,7 +168,7 @@ list.Count()  <> 0
 ===== Upsert
 
 * 競合条件
-** `[DB]staffs.staff_code(職員コード)` == `Staff.StaffCode` OR `[DB]staffs.login_id(ログインID)` == `Staff.LoginId`
+** `[DB]staffs.staff_code(職員コード)` == `Staff.StaffCode`
 
 [cols="1,2,2" options="header"]
 |===
