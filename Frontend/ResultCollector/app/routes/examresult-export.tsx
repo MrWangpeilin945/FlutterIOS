@@ -43,6 +43,7 @@ import {
 import type { ExportDataList } from "~/domain/wellship.schemas";
 import { staffState } from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
+import styles from "~/styles/common.module.css";
 
 export const meta: MetaFunction = () => {
   return [{ title: "検査結果出力" }];
@@ -328,13 +329,7 @@ export default function ExamresultExport() {
                               "yyyy/MM/dd",
                             )}
                         </Table.Td>
-                        <Table.Td
-                          w={297}
-                          style={{
-                            wordBreak: "break-word",
-                            whiteSpace: "pre-wrap",
-                          }}
-                        >
+                        <Table.Td w={297} className={styles["text-wrap"]}>
                           {ed.placeName}
                         </Table.Td>
                         <Table.Td ta="center">
@@ -474,10 +469,7 @@ export default function ExamresultExport() {
                       w={646}
                       size="lg"
                       c="black01"
-                      style={{
-                        wordBreak: "break-word",
-                        whiteSpace: "pre-wrap",
-                      }}
+                      className={styles["text-wrap"]}
                     >
                       {resultsOutputConfirmDialog?.placeName}
                     </Text>
