@@ -48,7 +48,7 @@ public class ConsultRepository : IConsultRepository
     /// 存在する検査メニュー特記コード情報（検査特記コード、検査特記名）を取得する
     /// </summary>
     /// <param name="codes">検査メニュー特記コードのリスト</param>
-    public async Task<List<ExamMenuNoteCodeEntity>> GetExamMenuNodeCodesAsync(List<string> codes)
+    public async Task<List<ExamMenuNoteCodeEntity>> GetExamMenuNodeCodeInfoAsync(List<string> codes)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         var sql = @"
@@ -61,7 +61,45 @@ public class ConsultRepository : IConsultRepository
                     code = any(@Codes);";
 
         var result = await connection.QueryAsync<ExamMenuNoteCodeEntity>(sql, new { Codes = codes });
+        return result.ToList();
+    }
 
+    /// <summary>
+    /// 存在する外部検査項目明細情報（検査項目明細ID、外部コード検査項目明細CD）を取得する
+    /// </summary>
+    /// <param name="codes">外部コード検査項目明細コードのリスト</param>
+    public async Task<List<ExternalExamItemDetailEntity>> GetExternalExamItemDetailInfoAsync(List<string> codes)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        var sql = @"
+                select
+                    exam_item_detail_id as ExamItemDetailId
+                    , external_exam_item_detail_code as ExternalExamItemDetailCode
+                from
+                    resultcollector.external_exam_item_details
+                where
+                    external_exam_item_detail_code = any(@Codes);";
+
+        var result = await connection.QueryAsync<ExternalExamItemDetailEntity>(sql, new { Codes = codes });
+        return result.ToList();
+    }
+
+    /// <summary>
+    /// 存在する受診情報の外部連携キーを取得する
+    /// </summary>
+    /// <param name="codes">連携キーのリスト</param>
+    public async Task<List<string>> GetExternalConnectionCodeAsync(List<string> codes)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        var sql = @"
+                select
+                    external_connection_code
+                from
+                    resultcollector.consult
+                where
+                    external_connection_code = any(@Codes);";
+
+        var result = await connection.QueryAsync<string>(sql, new { Codes = codes });
         return result.ToList();
     }
 }

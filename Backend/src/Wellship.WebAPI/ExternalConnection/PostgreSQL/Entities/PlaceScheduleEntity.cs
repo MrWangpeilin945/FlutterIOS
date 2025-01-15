@@ -11,9 +11,19 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
         public required Guid PlaceId { get; init; }
 
         /// <summary>
+        /// 会場コード
+        /// </summary>
+        public string PlaceCode { get; init;} = "";
+
+        /// <summary>
         /// 班ID
         /// </summary>
         public required Guid TeamId { get; init; }
+
+        /// <summary>
+        /// 班コード
+        /// </summary>
+        public string TeamCode { get; init; } = "";
 
         /// <summary>
         /// 状況

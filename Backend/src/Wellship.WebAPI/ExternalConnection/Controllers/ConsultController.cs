@@ -55,7 +55,7 @@ public class ConsultTestController : ControllerBase
                 ExamineeCd = "100002",                      // 受診者コード
                 Note = "",                                  // 受診.特記事項
                 PreviousResults = [new PreviousResult{      // 過去検査結果
-                    ExamItemDetailCd = "1192",                  // 検査項目明細CD
+                    ExamItemDetailCd = "Previous5963",         // 検査項目明細CD
                     ExamDate = DateOnly.Parse("2024/10/02"),    // 検査日
                     Value = "100"                               // 結果値
                 }],
@@ -66,9 +66,9 @@ public class ConsultTestController : ControllerBase
                 ConsultNotes = [new ConsultNote{            // 受診特記.特記事項
                     Code = "ST01",                              // 検査特記コード
                     Note = "撮影番号"                           // 特記事項
-                }],                          
+                },new ConsultNote{Code = "ST02",Note = "撮影番号"} ],                          
                 ExamItemDetailOrders = [new ExamItemDetailOrder{    // 検査項目明細依頼
-                    ExamItemDetailCd = "1192"
+                    ExamItemDetailCd = "Order8931"                      // 検査項目明細CD
                 }],
                 InputNote = "20250110"
             }

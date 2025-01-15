@@ -83,5 +83,26 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                 scope.Complete();
             }
         }
+
+        /// <summary>
+        /// 存在する基準値パターン情報（基準値パターンコード、基準値パターンID）を取得する
+        /// </summary>
+        /// <param name="codes">基準値パターンコードのリスト</param>
+        public async Task<List<ThresholdEntity>> GetThresholdInfoAsync(List<string> codes)
+        {
+            var connection = await _dbConnectionProvider.GetOrOpenAsync();
+            var sql = @"
+                    select
+                        threshold_id as thresholdId
+                        , threshold_code as thresholdCode
+                    from
+                        resultcollector.thresholds
+                    where
+                        threshold_code = any(@Codes);";
+
+            var result = await connection.QueryAsync<ThresholdEntity>(sql, new { Codes = codes });
+
+            return result.ToList();
+        }
     }
 }

@@ -1,6 +1,8 @@
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
+using Npgsql.Internal;
+using System.Globalization;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
 /// <summary>
@@ -14,6 +16,7 @@ public class ConsultUsecase : IConsultUsecase
     private readonly IPlaceRepository _placeRepository;
     private readonly IPlaceScheduleRepository _placeScheduleRepository;
     private readonly IExamineeRepository _examineeRepository;
+    private readonly IThresholdRepository _thresholdRepository;
 
     /// <summary>
     /// コンストラクタ
@@ -23,61 +26,213 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="placeRepository">会場リポジトリ</param>
     /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
+    /// <param name="thresholdRepository">基準値パターンリポジトリ</param>
     public ConsultUsecase(IConsultRepository consultRepository, ITeamRepository teamRepository, IPlaceRepository placeRepository,
-                          IPlaceScheduleRepository placeScheduleRepository, IExamineeRepository examineeRepository)
+                          IPlaceScheduleRepository placeScheduleRepository, IExamineeRepository examineeRepository, 
+                          IThresholdRepository thresholdRepository)
     {
         _consultRepository = consultRepository;
         _teamRepository = teamRepository;
         _placeRepository = placeRepository;
         _placeScheduleRepository = placeScheduleRepository;
         _examineeRepository = examineeRepository;
+        _thresholdRepository = thresholdRepository;
         _errorObjects = new List<ErrorObject>();
     }
 
-    /// <summary>
+    /// <summary>   
     /// EC2004_受診を更新する
     /// </summary>
     /// <param name="consults">更新する受診のリスト</param>
     /// <returns>エラーリスト</returns>
     public async Task<List<ErrorObject>> StoreConsultAsync(List<Consult> consults)
     {
-        // 班コードに紐づく班IDを取得する
-        var teams = await _teamRepository.GetTeamInfoAsync(consults.Select(x => x.TeamCode).ToList());
+        var placeCodes = consults.Select(x => x.PlaceCode).ToList();
+        var teamCodes = consults.Select(x => x.TeamCode).ToList();
         // 会場コードに紐づく会場IDを取得する
-        var places = await _placeRepository.GetPlaceInfoAsync(consults.Select(x => x.PlaceCode).ToList());
-        // 会場日程を取得する
+        var places = await _placeRepository.GetPlaceInfoAsync(placeCodes);
+        // 班コードに紐づく班IDを取得する
+        var teams = await _teamRepository.GetTeamInfoAsync(teamCodes);
+        // 会場コード、班コード、健診日に紐づく会場日程情報を取得する
+        var placeSchedules = await _placeScheduleRepository.GetPlaceScheduleInfoAsync(placeCodes, teamCodes, consults.Select(x => x.ExamDate).ToList());
         // 受診者コードに紐づく受診者IDを取得する
         var examinees = await _examineeRepository.GetExamineeInfoAsync(consults.Select(x => x.ExamineeCd).ToList());
         // 検査メニュー特記コードに紐づく情報を取得する
-        var examMenuNodeCodes = await _consultRepository.GetExamMenuNodeCodesAsync(
+        var examMenuNodeCodes = await _consultRepository.GetExamMenuNodeCodeInfoAsync(
                                             consults.SelectMany(x => x.ConsultNotes.Select(cn => cn.Code)).ToList());
-        /*
-        // 登録する受付リストの受診IDを取得する
-        var ticketConsultEntities = await _ticketRepository.GetTicketsAsync(tickets);
-        // 受付可能な連携キー
-        var connectionCodes = ticketConsultEntities.Select(x => x.ConnectionCode).ToArray();
-        // 連携キーの取得に失敗した受付リスト
-        _errorObjects = tickets.Where(x => !connectionCodes.Contains(x.ConnectionCode))
-                                .Select(x => new ErrorObject
-                                {
-                                    Code = "10001",
-                                    Message = $"指定されたConnectionCodeがシステム上に存在しません。Code:[{x.ConnectionCode}]",
-                                    InputNote = x.InputNote
-                                }).ToList();
-        // 連携キーの取得に成功した受付リスト
-        var validTickets = tickets.Where(x => connectionCodes.Contains(x.ConnectionCode))
-                                    .Select(x => new TicketEntity
-                                    {
-                                        ConsultId = ticketConsultEntities.Where(t => t.ConnectionCode == x.ConnectionCode)
-                                                                         .Select(t => t.ConsultId).FirstOrDefault(),
-                                        TicketNumber = x.TicketNumber,
-                                        ConnectionCode = x.ConnectionCode,
-                                        ActionType = x.ActionType,
-                                        OrderNumber = x.SortNo          
-                                    }).ToList();
-        // 受付を更新する
-        await _ticketRepository.UpsertTicketsAsync(validTickets, DateTime.Now, "ExternalConnection"); 
-        */                       
+        // 基準値パターンコードに紐づく基準値パターンIDを取得する
+        var thresholds = await _thresholdRepository.GetThresholdInfoAsync(
+                                            consults.SelectMany(x => x.ConsultThresholds.Select(ct => ct.ThresholdCode)).ToList());
+        // 検査項目明細CDに紐づく外部検査項目明細IDを取得する
+        var detailCodes = consults.SelectMany(x => x.PreviousResults.Select(pr => pr.ExamItemDetailCd))
+                            .Concat(
+                                consults.SelectMany(x => x.ExamItemDetailOrders.Select(ei => ei.ExamItemDetailCd))
+                            ).ToList();
+        var externalExamItemDetails = await _consultRepository.GetExternalExamItemDetailInfoAsync(detailCodes);
+        // 連携キーに紐づく外部連携キーを取得する
+        var ExternalConnectionCodes = await _consultRepository.GetExternalConnectionCodeAsync(consults.Where(x => x.ActionType == Wellship.ExternalConnection.Enums.ActionType.削除)
+                                                                                                      .Select(x => x.ConnectionCode).ToList());
+
+        // WARNING検証
+        var warningConsult = new List<Consult>();
+        // 会場IDが取得できない
+        foreach(var warning in consults.Where(x => !places.Select(p => p.PlaceCode).Contains(x.PlaceCode))
+                                       .Where(x => !warningConsult.Select(c => c.ConnectionCode).ToList().Contains(x.ConnectionCode)))
+        {
+            warningConsult.Add(warning);
+            _errorObjects.Add( new ErrorObject
+            {
+                Code = "10001",
+                Message = $"指定されたPlaceCodeがシステム上に存在しません。Code:[{warning.PlaceCode}]",
+                InputNote = warning.InputNote
+            });
+        }
+        // 班IDが取得できない
+        foreach(var warning in consults.Where(x => !teams.Select(p => p.TeamCode).Contains(x.TeamCode))
+                                       .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        {
+            warningConsult.Add(warning);
+            _errorObjects.Add( new ErrorObject
+            {
+                Code = "10001",
+                Message = $"指定されたTeamCodeがシステム上に存在しません。Code:[{warning.TeamCode}]",
+                InputNote = warning.InputNote
+            });
+        }
+        // 会場日程IDが取得できない
+        foreach(var warning in consults.Where(x => !placeSchedules.Any(ps => x.PlaceCode == ps.PlaceCode &&
+                                                                             x.TeamCode == ps.TeamCode &&
+                                                                             x.ExamDate == DateOnly.FromDateTime(ps.ExamDate)))
+                                       .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        {
+            warningConsult.Add(warning);
+            _errorObjects.Add( new ErrorObject
+            {
+                Code = "10001",
+                Message = $"指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:[{warning.PlaceCode}]/TeamCode:[{warning.TeamCode}]/ExamDate:[{warning.ExamDate}]",
+                InputNote = warning.InputNote
+            });
+        }
+        // 受診者IDが取得できない
+        foreach(var warning in consults.Where(x => !examinees.Select(e => e.ExamineeCode).Contains(x.ExamineeCd))
+                                        .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        {
+            warningConsult.Add(warning);
+            _errorObjects.Add( new ErrorObject
+            {
+                Code = "10001",
+                Message = $"指定されたExamineeCdがシステム上に存在しません。Code:[{warning.ExamineeCd}]",
+                InputNote = warning.InputNote
+            });
+        }
+        // 検査特記が存在しない
+        foreach(var consult in consults.Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        {
+            foreach(var warning in consult.ConsultNotes.Where(x => !examMenuNodeCodes.Select(e => e.Code).Contains(x.Code)))
+            {
+                warningConsult.Add(consult);
+                _errorObjects.Add( new ErrorObject
+                {
+                    Code = "10001",
+                    Message = $"指定されたConsultNotes.Codeがシステム上に存在しません。Code:[{warning.Code}]",
+                    InputNote = consult.InputNote
+                });
+                break;
+            }
+        }
+        // 基準値パターンが取得できない
+        foreach(var consult in consults.Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        {
+            foreach(var warning in consult.ConsultThresholds.Where(x=> !thresholds.Select(t => t.ThresholdCode).Contains(x.ThresholdCode)))
+            {
+                warningConsult.Add(consult);
+                _errorObjects.Add( new ErrorObject
+                {
+                    Code = "10001",
+                    Message = $"指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:[{warning.ThresholdCode}]",
+                    InputNote = consult.InputNote
+                });
+                break;
+            }
+        }
+        // 検査項目明細ID（PreviousResults）
+        foreach(var consult in consults.Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        {
+            // 検査項目明細IDが取得できない
+            foreach(var warning in consult.PreviousResults.Where(x=> !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCd)))
+            {
+                warningConsult.Add(consult);
+                _errorObjects.Add( new ErrorObject
+                {
+                    Code = "10001",
+                    Message = $"指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:[{warning.ExamItemDetailCd}]",
+                    InputNote = consult.InputNote
+                });
+                break;
+            }
+            // PKが重複するレコードが存在する
+            foreach(var previousResult in consult.PreviousResults)
+            {
+                if (externalExamItemDetails.Count(x => x.ExternalExamItemDetailCode == previousResult.ExamItemDetailCd) > 1)
+                {
+                    warningConsult.Add(consult);
+                    _errorObjects.Add( new ErrorObject
+                    {
+                        Code = "10003",
+                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:[{previousResult.ExamItemDetailCd}]",
+                        InputNote = consult.InputNote
+                    });
+                    break;
+                }
+            }
+        }
+        // 検査項目明細ID（ExamItemDetailOrders）
+        foreach(var consult in consults.Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        {
+            // 検査項目明細IDが取得できない
+            foreach(var warning in consult.ExamItemDetailOrders.Where(x=> !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCd)))
+            {
+                warningConsult.Add(consult);
+                _errorObjects.Add( new ErrorObject
+                {
+                    Code = "10001",
+                    Message = $"指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:[{warning.ExamItemDetailCd}]",
+                    InputNote = consult.InputNote
+                });
+                break;
+            }
+            // PKが重複するレコードが存在する
+            foreach(var examItemDetailOrder in consult.ExamItemDetailOrders)
+            {
+                if (externalExamItemDetails.Count(x => x.ExternalExamItemDetailCode == examItemDetailOrder.ExamItemDetailCd) > 1)
+                {
+                    warningConsult.Add(consult);
+                    _errorObjects.Add( new ErrorObject
+                    {
+                        Code = "10003",
+                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:[{examItemDetailOrder.ExamItemDetailCd}]",
+                        InputNote = consult.InputNote
+                    });
+                    break;
+                }
+            }
+        }
+        // 削除
+        foreach(var warning in consults.Where(x => x.ActionType == Wellship.ExternalConnection.Enums.ActionType.削除)
+                                       .Where(x => !ExternalConnectionCodes.Contains(x.ConnectionCode)) 
+                                       .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        {
+            warningConsult.Add(warning);
+            _errorObjects.Add( new ErrorObject
+            {
+                Code = "10001",
+                Message = $"指定されたConnectionCodeがシステム上に存在しません。Code:[{warning.ConnectionCode}]",
+                InputNote = warning.InputNote
+            });
+        }
+        // 受診を更新するリストを取得する
+        var validConsults = consults.Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode));
+
         return _errorObjects;
     }
 }
