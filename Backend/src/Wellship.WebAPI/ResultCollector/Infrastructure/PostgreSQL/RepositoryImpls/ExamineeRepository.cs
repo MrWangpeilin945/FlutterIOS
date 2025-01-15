@@ -1,6 +1,6 @@
 
 using Dapper;
-using Namotion.Reflection;
+
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
@@ -67,15 +67,15 @@ public class ExamineeRepository : IExamineeRepository
             Name = examinee.First().Name,
             KanaName = examinee.First().KanaName,
             Sex = (Sex)examinee.First().Sex,
-            Birthdate = new Birthdate(DateOnly.FromDateTime(examinee.First().Birthdate)),
+            Birthdate = new Birthdate(examinee.First().Birthdate),
             Affiliations = string.IsNullOrWhiteSpace(examinee.First().OrganizationCode) ? []
                             : examinee.Select(x => new Affiliations
-                                        {
-                                            OrganizationId = x.OrganizationId,
-                                            OrganizationCode = x.OrganizationCode,
-                                            OrganizationName = x.OrganizationName,
-                                            OrderNumber = x.OrderNumber
-                                        })
+                            {
+                                OrganizationId = x.OrganizationId,
+                                OrganizationCode = x.OrganizationCode,
+                                OrganizationName = x.OrganizationName,
+                                OrderNumber = x.OrderNumber
+                            })
         };
     }
 }
