@@ -10,8 +10,8 @@ autonumber
   participant BE as バックエンド   
   User->>FE:バーコードリーダーで読み込み
   FE->>FE:読み込んだ値を保存して受診番号確認テキストボックスに表示
-  FE->>FE:受診番号確認テキストボックス<br>バリデーションチェック
-  alt バリデーションチェックでエラーなし
+  FE->>FE:受診番号確認テキストボックス<br>Enterキー押下
+  alt 受診番号確認テキストボックスが空ではない
   FE->>BE:AP1007_受診番号を検証する<br>[POST] /consult/consultNumber/verify
   BE-->>FE:レスポンスを取得
   alt httpステータスコードが200
@@ -19,11 +19,11 @@ autonumber
   else 400エラー or 500エラー
   FE->>KN:【CP0015】共通ダイアログを呼び出す
   end
-  else バリデーションチェックでエラー
-  FE->>KN:【CP0015】共通ダイアログを呼び出す
+  else 受診番号確認テキストボックスが空
+  FE ->>KN: 【CP0015】共通ダイアログを呼び出す
   end
-  
 
+  
 
 
  
