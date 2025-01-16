@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Requests;
@@ -13,6 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
+[Authorize]
 public class ConsultController : ControllerBase
 {
     private readonly IConsultUsecase _consultUsecase;
