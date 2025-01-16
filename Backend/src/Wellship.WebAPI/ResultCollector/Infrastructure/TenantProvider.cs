@@ -8,9 +8,9 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 public interface ITenantProvider
 {
     /// <summary>
-    /// テナントのキー文字列が取得できない環境でデフォルトの参照先として使用されるテナント名
+    /// テナントのキー文字列が取得できない環境でデフォルトとして使用されるテナントのキー文字列
     /// </summary>
-    public const string DefaultTenant = "default";
+    public const string DefaultTenant = "wellship";
     /// <summary>
     /// テナントを識別するキー文字列
     /// </summary>
