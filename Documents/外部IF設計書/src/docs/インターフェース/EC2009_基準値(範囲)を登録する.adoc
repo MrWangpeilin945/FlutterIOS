@@ -196,7 +196,7 @@ list.Count() <> 0
 *** ExamNormalValueRangeの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
-**** Message `キー項目が重複しています。Code:[ExamNormalValueRange.ExamItemDetailCd]/[ExamNormalValueRange.ThresholdCd]/[ExamNormalValueRange.ExamItemDetailCd]/[ExamNormalValueRange.TargetSex]/[ExamNormalValueRange.MaxAge]/[ExamNormalValueRange.MaxValue]`
+**** Message `キー項目が重複しています。Code:[ExamNormalValueRange.ThresholdCd]/[ExamNormalValueRange.ExamItemDetailCd]/[ExamNormalValueRange.TargetSex]/[ExamNormalValueRange.MaxAge]/[ExamNormalValueRange.MaxValue]`
 **** InputNote `ExamNormalValueRange.InputNote`
 
 ==== 処理(Repository)
