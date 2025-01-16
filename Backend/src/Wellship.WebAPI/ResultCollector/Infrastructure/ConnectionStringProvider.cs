@@ -51,13 +51,8 @@ public class EnvironmentVariableConnectionStringProvider() : IConnectionStringPr
     {
         var userId = Environment.GetEnvironmentVariable("RDS_USER_ID", EnvironmentVariableTarget.Process) ?? throw new ArgumentNullException("環境変数にDB接続情報が設定されていません。");
         var password = Environment.GetEnvironmentVariable("RDS_USER_PASS", EnvironmentVariableTarget.Process) ?? throw new ArgumentNullException("環境変数にDB接続情報が設定されていません。");
-        var endpoint = Environment.GetEnvironmentVariable("RDS_ENDPOINT", EnvironmentVariableTarget.Process) ?? throw new ArgumentNullException("環境変数にDB接続情報が設定されていません。");
-
-        // endpointは以下形式の文字列で設定するのでバラす
-        // 例：Host=localhost;Port=15433;Database=dev01;
-        var parts = endpoint.Split(';');
-        var host = parts.FirstOrDefault(p => p.StartsWith("Host="))?[5..];
-        var portString = parts.FirstOrDefault(p => p.StartsWith("Port="))?[5..];
+        var host = Environment.GetEnvironmentVariable("RDS_ENDPOINT_HOST", EnvironmentVariableTarget.Process) ?? throw new ArgumentNullException("環境変数にDB接続情報が設定されていません。");
+        var portString = Environment.GetEnvironmentVariable("RDS_ENDPOINT_PORT", EnvironmentVariableTarget.Process) ?? throw new ArgumentNullException("環境変数にDB接続情報が設定されていません。");
 
         if (!int.TryParse(portString, out var port))
         {
@@ -72,6 +67,7 @@ public class EnvironmentVariableConnectionStringProvider() : IConnectionStringPr
             Username = userId,
             Password = password,
             Database = key,
+            ApplicationName = $"Wellship.ResultCollector ({key})"
         };
         var connectionString = builder.ToString();
         return Task.FromResult(connectionString);
