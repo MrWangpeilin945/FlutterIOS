@@ -158,15 +158,14 @@ export default function ExamNumericLR({
       if (!hasOrder || !!cancelReasonId) {
         continue; // disableの場合、処理をスキップする
       }
-      // onRegisterPressedがtrueの時は必須チェックと半角数字チェックを
-      // falseの時は半角数字チェックのみを行うスキーマ
+      // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
       const schema = onRegisterPressed
         ? z
             .string()
             .min(
               1,
               getErrorMessage(errorMessages.required, name ? `${name}は` : ""),
-            )
+            ) // 必須チェック
             .refine((value) => /^\d+$/.test(value), {
               message: getErrorMessage(
                 errorMessages.numericString,

@@ -135,7 +135,7 @@ export default function ExamNumeric({
       if (!hasOrder || !!cancelReasonId) {
         continue; // 対象がdisableの場合、処理をスキップする
       }
-      // 必須チェックと半角数字チェックを一度に行うスキーマ
+      // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
       const schema = onRegisterPressed
         ? z
             .string()
@@ -144,8 +144,8 @@ export default function ExamNumeric({
               getErrorMessage(
                 errorMessages.required,
                 item.name ? `${item.name}は` : "",
-              ),
-            ) // 必須チェック
+              ), // 必須チェック
+            )
             .refine((value) => /^\d+(\.\d+)?$/.test(value), {
               message: getErrorMessage(
                 errorMessages.numericString,

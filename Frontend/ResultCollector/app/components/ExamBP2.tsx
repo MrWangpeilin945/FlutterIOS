@@ -242,7 +242,7 @@ export default function ExamBP2({
       if (positionNumber !== 上 && positionNumber !== 下) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
       }
-      // 必須チェックと半角数字チェックを一度に行うスキーマ
+      // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
       const schema = onRegisterPressed
         ? z
             .string()
