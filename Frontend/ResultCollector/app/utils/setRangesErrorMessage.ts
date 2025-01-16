@@ -12,7 +12,7 @@ const getMaxErrorLevelsByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
   return examItemDetails.reduce(
     (
       matchExamRanges: ExamNormalValueRange[],
-      { value, examNormalValueRanges, hasOrder, cancelReasonId }
+      { value, examNormalValueRanges, hasOrder, cancelReasonId },
     ) => {
       const isDisable = !hasOrder || !!cancelReasonId;
       const numericValue =
@@ -28,7 +28,7 @@ const getMaxErrorLevelsByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
             typeof minValue === "number" &&
             typeof maxValue === "number" &&
             numericValue >= minValue &&
-            numericValue < maxValue
+            numericValue < maxValue,
         );
         if (matchRange) {
           matchExamRanges.push(matchRange);
@@ -36,7 +36,7 @@ const getMaxErrorLevelsByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
       }
       return matchExamRanges;
     },
-    []
+    [],
   );
 };
 
@@ -47,26 +47,23 @@ export const setRangesErrorMessage = (inputexamItem: InputExamItem) => {
   }
   inputexamItem.examRegistResults = inputexamItem.examRegistResults || [];
   const matchExamRanges = getMaxErrorLevelsByRangeCheck(
-    inputexamItem.examItemDetails
+    inputexamItem.examItemDetails,
   );
-
   // 該当するエラーが無いときは空配列を返す
   if (matchExamRanges.length === 0) {
     return [];
   }
   // エラーレベルに応じたエラーメッセージを追加
-  const rangesErrorMessages: ExamRegistResult[] = matchExamRanges
-    .filter(
-      ({ errorLevel }) =>
-        errorLevel === InputErrorLevel.警告 ||
-        errorLevel === InputErrorLevel.異常
-    )
-    .map(({ errorLevel }) => ({
-      description:
-        errorLevel === InputErrorLevel.警告
-          ? "入力値を確認してください。"
-          : "入力に誤りがあります。",
-      errorLevel,
-    }));
+  const hasError = matchExamRanges.some(
+    ({ errorLevel }) => errorLevel === InputErrorLevel.異常,
+  );
+  const rangesErrorMessages: ExamRegistResult[] = [
+    {
+      description: hasError
+        ? "入力に誤りがあります。"
+        : "入力値を確認してください。",
+      errorLevel: hasError ? InputErrorLevel.異常 : InputErrorLevel.警告,
+    },
+  ];
   return rangesErrorMessages;
 };
