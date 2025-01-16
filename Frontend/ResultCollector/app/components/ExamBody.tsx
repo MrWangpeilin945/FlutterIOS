@@ -100,11 +100,7 @@ export default function ExamBody({
 
   useEffect(() => {
     const updatedItems = examItems.map((item) => {
-      let validatedData: InputExamItem = item;
-      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-      if (onRegisterPressed) {
-        validatedData = validationCheck(item).validateResult;
-      }
+      const validatedData = validationCheck(item).validateResult;
       return validatedData;
     });
     setExamItemsData(updatedItems);
@@ -161,21 +157,28 @@ export default function ExamBody({
             ? "体脂肪率は"
             : "";
     // 必須チェックと半角数字チェックを一度に行うスキーマ
-    const schema = z
-      .string()
-      .min(
-        1,
-        getErrorMessage(
-          errorMessages.required,
-          item.name ? `${item.name}は` : message,
-        ),
-      ) // 必須チェック
-      .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-        message: getErrorMessage(
-          errorMessages.numericString,
-          item.name ? `${item.name}は` : message,
-        ),
-      });
+    const schema = onRegisterPressed
+      ? z
+          .string()
+          .min(
+            1,
+            getErrorMessage(
+              errorMessages.required,
+              item.name ? `${item.name}は` : message,
+            ),
+          ) // 必須チェック
+          .refine((value) => /^\d+(\.\d+)?$/.test(value), {
+            message: getErrorMessage(
+              errorMessages.numericString,
+              item.name ? `${item.name}は` : message,
+            ),
+          })
+      : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
+          message: getErrorMessage(
+            errorMessages.numericString,
+            item.name ? `${item.name}は` : "",
+          ),
+        });
 
     // バリデーション対象データを取得
     const targetDetail = item.examItemDetails?.find(
