@@ -23,14 +23,14 @@ public interface IDbConnectionProvider
 /// DBConnectionを生成・管理するクラスです。
 /// </summary>
 /// <param name="registory">データソースのレジストリ</param>
-/// <param name="httpContextAccessor">TODO: 実装時はテナントキー情報を配布するプロバイダを実装したほうがよいです（動作環境によってテナント情報を取得する元を変えたい）</param>
-public class DbConnectionProvider(IDbDataSourceRegistry registory, IHttpContextAccessor httpContextAccessor) : IDbConnectionProvider, IDisposable
+/// <param name="environmentProvider">接続先環境の情報を提供するプロバイダです</param>
+public class DbConnectionProvider(IDbDataSourceRegistry registory, ITenantProvider environmentProvider) : IDbConnectionProvider, IDisposable
 {
     private readonly IDbDataSourceRegistry _registory = registory;
     // NOTE: コネクションは1HTTPアクセスに対して最大1つを想定しています。平行で投げたい場合は別途実装が必要です。
     private DbConnection? _connection;
     // NOTE: サンプルのためHTTPヘッダからキーを取得しています。
-    private readonly string _key = httpContextAccessor.HttpContext!.Request!.Headers!["key"]!.FirstOrDefault() ?? "";
+    private readonly string _key = environmentProvider.TenantKey;
 
     /// <summary>
     /// 現在使用しているコネクションを返します。まだオープンされていない・破棄されている場合はコネクションを開きます。
