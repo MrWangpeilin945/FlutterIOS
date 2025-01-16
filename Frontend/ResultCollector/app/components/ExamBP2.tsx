@@ -136,11 +136,7 @@ export default function ExamBP2({
 
   useEffect(() => {
     const updatedItems = examItems.map((item) => {
-      let validatedData = item;
-      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-      if (onRegisterPressed) {
-        validatedData = validationCheck(validatedData).validateResult;
-      }
+      const validatedData = validationCheck(item).validateResult;
       return validatedData;
     });
     setExamItemsData(updatedItems);
@@ -246,19 +242,26 @@ export default function ExamBP2({
       if (positionNumber !== 上 && positionNumber !== 下) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
       }
-      // 必須チェックと半角数字チェックを一度に行うスキーマ
-      const schema = z
-        .string()
-        .min(
-          1,
-          getErrorMessage(errorMessages.required, `${item.name}:${name}は`),
-        ) // 必須チェック
-        .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-          message: getErrorMessage(
-            errorMessages.numericString,
-            `${item.name}:${name}は`,
-          ),
-        });
+      // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
+      const schema = onRegisterPressed
+        ? z
+            .string()
+            .min(
+              1,
+              getErrorMessage(errorMessages.required, `${item.name}:${name}は`),
+            ) // 必須チェック
+            .refine((value) => /^\d+(\.\d+)?$/.test(value), {
+              message: getErrorMessage(
+                errorMessages.numericString,
+                `${item.name}:${name}は`,
+              ),
+            })
+        : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
+            message: getErrorMessage(
+              errorMessages.numericString,
+              name ? `${name}は` : "",
+            ),
+          });
 
       // バリデーション対象データを取得
       const valueToValidate = value;

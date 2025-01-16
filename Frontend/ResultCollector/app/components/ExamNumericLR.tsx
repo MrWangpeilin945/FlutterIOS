@@ -158,22 +158,26 @@ export default function ExamNumericLR({
       if (!hasOrder || !!cancelReasonId) {
         continue; // disableの場合、処理をスキップする
       }
-      // 必須チェックと半角数字チェックを一度に行うスキーマ
-      const schema = z
-        .string()
-        .min(
-          1,
-          getErrorMessage(
-            errorMessages.required,
-            `${name ?? (positionNumber === 左 ? "左" : "右")}は`,
-          ),
-        ) // 必須チェック
-        .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-          message: getErrorMessage(
-            errorMessages.numericString,
-            `${name ?? (positionNumber === 左 ? "左" : "右")}は`,
-          ),
-        });
+      // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
+      const schema = onRegisterPressed
+        ? z
+            .string()
+            .min(
+              1,
+              getErrorMessage(errorMessages.required, name ? `${name}は` : ""),
+            ) // 必須チェック
+            .refine((value) => /^\d+$/.test(value), {
+              message: getErrorMessage(
+                errorMessages.numericString,
+                name ? `${name}は` : "",
+              ),
+            })
+        : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
+            message: getErrorMessage(
+              errorMessages.numericString,
+              name ? `${name}は` : "",
+            ),
+          });
 
       // バリデーション対象データを取得
       const valueToValidate = value;
@@ -213,12 +217,7 @@ export default function ExamNumericLR({
 
   useEffect(() => {
     const updatedItems = examItems.map((item) => {
-      let validatedData = item;
-
-      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-      if (onRegisterPressed) {
-        validatedData = validationCheck(validatedData).validateResult;
-      }
+      const validatedData = validationCheck(item).validateResult;
       return validatedData;
     });
     setExamItemsData(updatedItems);
