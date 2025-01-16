@@ -45,9 +45,7 @@ export default function ExamSelect({
     return null; // examItemDetailがundefinedの場合は何も表示しない
   }
 
-  const [selected, setSelected] = useState(
-    examItemDetail.value || examItemDetail.prevValue || undefined,
-  );
+  const [selected, setSelected] = useState(examItemDetail.value);
   // APIからのエラーメッセージを保存する
   const [backendValidation, setBackendValidation] = useState<
     BackendValidation[]
@@ -200,7 +198,7 @@ export default function ExamSelect({
   const selectors = examItemDetail.examItemDetailOptions || [];
 
   return (
-    <Flex justify="flex-start" align="flex-start" direction="column">
+    <Flex w={1350} justify="flex-start" align="flex-start" direction="column">
       <Flex mb={16} gap={16}>
         <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
           <Text size="lg" fw={700} ta="center">
@@ -244,7 +242,7 @@ export default function ExamSelect({
               c={isDisabled ? "gray02" : isSelected ? "primary" : "gray02"}
               disabled={isDisabled}
             >
-              {selector.name}
+              {selector.name?.slice(0,8)}
             </Button>
           );
         })}
