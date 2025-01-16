@@ -70,8 +70,7 @@ public class ConsultUsecase : IConsultUsecase
                             ).ToList();
         var externalExamItemDetails = await _consultRepository.GetExternalExamItemDetailInfoAsync(detailCodes);
         // 連携キーに紐づく外部連携キーを取得する
-        var ExternalConnectionCodes = await _consultRepository.GetExternalConnectionCodeAsync(consults.Where(x => x.ActionType == Wellship.ExternalConnection.Enums.ActionType.削除)
-                                                                                                      .Select(x => x.ConnectionCode).ToList());
+        var ExternalConnectionCodes = await _consultRepository.GetExternalConnectionCodeAsync(consults.Select(x => x.ConnectionCode).ToList());
 
         // WARNING検証
         var warningConsult = new List<Consult>();
@@ -219,7 +218,7 @@ public class ConsultUsecase : IConsultUsecase
         }
         // 削除
         foreach(var warning in consults.Where(x => x.ActionType == Wellship.ExternalConnection.Enums.ActionType.削除)
-                                       .Where(x => !ExternalConnectionCodes.Contains(x.ConnectionCode)) 
+                                       .Where(x => !ExternalConnectionCodes.Select(x => x.ConnectionCode).Contains(x.ConnectionCode)) 
                                        .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
         {
             warningConsult.Add(warning);
@@ -231,8 +230,49 @@ public class ConsultUsecase : IConsultUsecase
             });
         }
         // 受診を更新するリストを取得する
-        var validConsults = consults.Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode));
-
+        var validConsults = consults.Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode))
+                                    .Select(x => new ConsultEntity
+                                    {
+                                        ActionType = x.ActionType
+                                        , ConsultId = ExternalConnectionCodes.Where(ec => ec.ConnectionCode == x.ConnectionCode)
+                                                                             .Select(ec => ec.ConsultId).FirstOrDefault()
+                                        , ConsultNumber = x.ConsultNumber
+                                        , PlaceScheduleId = placeSchedules.Where(ps => ps.PlaceCode == x.PlaceCode)
+                                                                          .Where(ps => ps.TeamCode == x.TeamCode)
+                                                                          .Where(ps => DateOnly.FromDateTime(ps.ExamDate) == x.ExamDate)
+                                                                          .Select(ps => ps.PlaceScheduleId).FirstOrDefault()
+                                        , Note = x.Note
+                                        , ExamineeId = examinees.Where(e => e.ExamineeCode == x.ExamineeCd)
+                                                                .Select(e => e.ExamineeId).FirstOrDefault()
+                                        , ConnectionCode = x.ConnectionCode
+                                        , SortNo = x.SortNo
+                                        , ConsultNotes = x.ConsultNotes.Select(cn => new ConsultNoteEntity
+                                        { 
+                                            Code = cn.Code
+                                            , Note = cn.Note 
+                                        }).ToList()
+                                        , ExamItemDetailOrders = x.ExamItemDetailOrders.Select(eo => new ExamItemDetailOrderEntity
+                                        {
+                                            ExamItemDetailId = externalExamItemDetails.Where(ed => ed.ExternalExamItemDetailCode == eo.ExamItemDetailCd)
+                                                                                      .Select(ed => ed.ExamItemDetailId).FirstOrDefault()
+                                            , ExamItemDetailCd = eo.ExamItemDetailCd
+                                        }).ToList()
+                                        , ConsultThresholds =x.ConsultThresholds.Select(ct => new ConsultThresholdEntity
+                                        {
+                                            ThresholdId = thresholds.Where(th => th.ThresholdCode == ct.ThresholdCode)
+                                                                    .Select(th => th.ThresholdId).FirstOrDefault()
+                                            , Priority = ct.Priority
+                                        }).ToList()
+                                        , PreviousResults = x.PreviousResults.Select(pr => new PreviousResultEntity
+                                        {
+                                            ExamDate = pr.ExamDate
+                                            , ExamItemDetailId = externalExamItemDetails.Where(ed => ed.ExternalExamItemDetailCode == pr.ExamItemDetailCd)
+                                                                                        .Select(ed => ed.ExamItemDetailId).FirstOrDefault()
+                                            , Value = pr.Value
+                                        }).ToList()
+                                    }).ToList();        
+        // 受付を更新する
+        await _consultRepository.UpsertConsultsAsync(validConsults, DateTime.Now, "ExternalConnection");                        
         return _errorObjects;
     }
 }

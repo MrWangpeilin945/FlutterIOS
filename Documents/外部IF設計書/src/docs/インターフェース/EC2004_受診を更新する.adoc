@@ -560,7 +560,7 @@ Update : 更新しない
 ====== Delete
 
 * 削除条件
-** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consult_notes.consult_id`
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consulexam_item_detail_orderst_notes.consult_id`
 *** 削除対象レコードが存在しない場合でも、エラーとしない
 
 ====== Insert
@@ -577,6 +577,9 @@ Update : 更新しない
 |`[DB]external_exam_item_details.exam_item_detail_id`
 |`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` で検索し、`exam_item_detail_id`を登録する
 
+|external_exam_item_detail_code
+|Consult.ExamItemDetailOrders.ExamItemDetailCd
+|
 
 |created_at
 |system.datetime.now()
@@ -723,7 +726,7 @@ Update : 更新しない
 ====== Delete
 
 * 削除条件
-** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consult_notes.consult_id`
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]exam_item_detail_orders.consult_id`
 *** 削除対象レコードが存在しない場合でも、エラーとしない
 
 ===== Table

@@ -6,6 +6,11 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
     public class PlaceScheduleEntity
     {
         /// <summary>
+        /// 会場日程ID
+        /// </summary>
+        public Guid PlaceScheduleId { get; init; }
+
+        /// <summary>
         /// 会場ID
         /// </summary>
         public required Guid PlaceId { get; init; }

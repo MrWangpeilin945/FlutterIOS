@@ -108,7 +108,8 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
             var connection = await _dbConnectionProvider.GetOrOpenAsync();
             var sql = @"
             select
-                ps.place_id as PlaceId
+                ps.place_schedule_id as PlaceScheduleId
+                , ps.place_id as PlaceId
                 , p.place_code as PlaceCode
                 , ps.team_id as TeamId
                 , t.team_code as TeamCode
