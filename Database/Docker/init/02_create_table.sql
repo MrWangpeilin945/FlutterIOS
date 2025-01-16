@@ -11,6 +11,15 @@ CREATE TABLE affiliations (
   , CONSTRAINT affiliations_PKC PRIMARY KEY (examinee_id,organization_id)
 );
 
+CREATE TABLE app_config (
+  key varchar(100) NOT NULL
+  , value text NOT NULL
+  , description text
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT app_config_PKC PRIMARY KEY (key)
+);
+
 CREATE TABLE consult_notes (
   consult_id uuid NOT NULL
   , code text NOT NULL
@@ -812,6 +821,13 @@ COMMENT ON COLUMN affiliations.examinee_id IS '受診者ID';
 COMMENT ON COLUMN affiliations.organization_id IS '団体ID';
 COMMENT ON COLUMN affiliations.created_at IS '作成日時';
 COMMENT ON COLUMN affiliations.created_by IS '作成者';
+
+COMMENT ON TABLE app_config IS 'アプリケーション設定';
+COMMENT ON COLUMN app_config.key IS '設定キー';
+COMMENT ON COLUMN app_config.value IS '設定値';
+COMMENT ON COLUMN app_config.description IS '説明';
+COMMENT ON COLUMN app_config.created_at IS '作成日時';
+COMMENT ON COLUMN app_config.created_by IS '作成者';
 
 COMMENT ON TABLE consult_notes IS '受診特記';
 COMMENT ON COLUMN consult_notes.consult_id IS '受診ID';
