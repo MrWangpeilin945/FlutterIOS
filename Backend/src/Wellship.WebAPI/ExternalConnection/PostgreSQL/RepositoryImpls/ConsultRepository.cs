@@ -166,16 +166,44 @@ public class ConsultRepository : IConsultRepository
             
             if (actionConsults.Any(x => x.ActionType == ActionType.登録))
             {
+                // 外部連携キーから受診IDを取得
+                var consultConnectionCodes = actionConsults.Where(x => x.ActionType == ActionType.登録)
+                                                           .Select(x => x.ConnectionCode).ToList(); 
+                const string selectConsultSQL = @"
+                select
+                    consult_id as ConsultId
+                    , external_connection_code as ExternalConnectionCode
+                from 
+                    resultcollector.consult 
+                where 
+                    external_connection_code = any (@ConnectionCodes);";
+                var consultExternalConnection = await connection.QueryAsync<ConsultExternalConnectionCodeEntity>(selectConsultSQL, new {ConnectionCodes = consultConnectionCodes});
+                var upsertConsults = actionConsults.Where(x => x.ActionType == ActionType.登録)
+                                                   .Select(x => new ConsultEntity
+                                                    {
+                                                        ActionType = x.ActionType
+                                                        , ConsultId = consultExternalConnection.Where(ex => ex.ExternalConnectionCode == x.ConnectionCode)
+                                                                                               .Select(ex => ex.ConsultId).FirstOrDefault()
+                                                        , ConsultNumber = x.ConsultNumber
+                                                        , PlaceScheduleId = x.PlaceScheduleId
+                                                        , Note = x.Note
+                                                        , ExamineeId = x.ExamineeId
+                                                        , ConnectionCode = x.ConnectionCode
+                                                        , SortNo = x.SortNo
+                                                        , ConsultNotes = x.ConsultNotes
+                                                        , ExamItemDetailOrders = x.ExamItemDetailOrders
+                                                        , ConsultThresholds = x.ConsultThresholds
+                                                        , PreviousResults = x.PreviousResults
+                                                    });
                 // consult_notes（受診特記）
-                var consultNotes = actionConsults.Where(x => x.ActionType == ActionType.登録)
-                                                 .SelectMany(x => x.ConsultNotes.Select(cn => new 
-                                                 {
-                                                    ConsultId = x.ConsultId
-                                                    , Code = cn.Code
-                                                    , Note = cn.Note
-                                                    , CreatedAt = createdAt
-                                                    , CreatedBy = createdBy
-                                                 }));
+                var consultNotes = upsertConsults.SelectMany(x => x.ConsultNotes.Select(cn => new 
+                                                            {
+                                                                ConsultId = x.ConsultId
+                                                                , Code = cn.Code
+                                                                , Note = cn.Note
+                                                                , CreatedAt = createdAt
+                                                                , CreatedBy = createdBy
+                                                            }));
                 const string insertConsultNotesSql = @"
                 insert into resultcollector.consult_notes 
                 (
@@ -196,15 +224,14 @@ public class ConsultRepository : IConsultRepository
                 await connection.ExecuteAsync(insertConsultNotesSql, consultNotes);
 
                 // exam_item_detail_orders（検査項目明細依頼）
-                var examItemDetailOrders = actionConsults.Where(x => x.ActionType == ActionType.登録)
-                                                         .SelectMany(x => x.ExamItemDetailOrders.Select(eo => new
-                                                         {
-                                                            ConsultId = x.ConsultId
-                                                            , ExamItemDetailId = eo.ExamItemDetailId
-                                                            , ExternalExamItemDetailCode = eo.ExamItemDetailCd
-                                                            , CreatedAt = createdAt
-                                                            , CreatedBy = createdBy
-                                                         }));
+                var examItemDetailOrders = upsertConsults.SelectMany(x => x.ExamItemDetailOrders.Select(eo => new
+                                                                    {
+                                                                        ConsultId = x.ConsultId
+                                                                        , ExamItemDetailId = eo.ExamItemDetailId
+                                                                        , ExternalExamItemDetailCode = eo.ExamItemDetailCd
+                                                                        , CreatedAt = createdAt
+                                                                        , CreatedBy = createdBy
+                                                                    }));
                 const string insertExamItemDetailOrdersSql = @"
                 insert into resultcollector.exam_item_detail_orders 
                 (
@@ -225,15 +252,14 @@ public class ConsultRepository : IConsultRepository
                 await connection.ExecuteAsync(insertExamItemDetailOrdersSql, examItemDetailOrders);
 
                 // consult_thresholds（基準値）
-                var consultThresholds = actionConsults.Where(x => x.ActionType == ActionType.登録)
-                                                         .SelectMany(x => x.ConsultThresholds.Select(ct => new
-                                                         {
-                                                            ThresholdId = ct.ThresholdId
-                                                            , ConsultId = x.ConsultId
-                                                            , Priority = ct.Priority
-                                                            , CreatedAt = createdAt
-                                                            , CreatedBy = createdBy
-                                                         }));
+                var consultThresholds = upsertConsults.SelectMany(x => x.ConsultThresholds.Select(ct => new
+                                                                {
+                                                                    ThresholdId = ct.ThresholdId
+                                                                    , ConsultId = x.ConsultId
+                                                                    , Priority = ct.Priority
+                                                                    , CreatedAt = createdAt
+                                                                    , CreatedBy = createdBy
+                                                                }));
                 const string insertConsultThresholdsSql = @"
                 insert into resultcollector.consult_thresholds 
                 (
@@ -254,16 +280,15 @@ public class ConsultRepository : IConsultRepository
                 await connection.ExecuteAsync(insertConsultThresholdsSql, consultThresholds);
 
                 // previous_results（過去検査結果）
-                var previousResults = actionConsults.Where(x => x.ActionType == ActionType.登録)
-                                                         .SelectMany(x => x.PreviousResults.Select(pr => new
-                                                         {
-                                                            ConsultId = x.ConsultId
-                                                            , ExamDate =  DateTime.Parse(pr.ExamDate.ToString())
-                                                            , ExamItemDetailId = pr.ExamItemDetailId
-                                                            , Value = pr.Value
-                                                            , CreatedAt = createdAt
-                                                            , CreatedBy = createdBy
-                                                         }));
+                var previousResults = upsertConsults.SelectMany(x => x.PreviousResults.Select(pr => new
+                                                                {
+                                                                    ConsultId = x.ConsultId
+                                                                    , ExamDate =  DateTime.Parse(pr.ExamDate.ToString())
+                                                                    , ExamItemDetailId = pr.ExamItemDetailId
+                                                                    , Value = pr.Value
+                                                                    , CreatedAt = createdAt
+                                                                    , CreatedBy = createdBy
+                                                                }));
                 const string insertPreviousResultsSql = @"
                 insert into resultcollector.previous_results 
                 (
