@@ -100,7 +100,7 @@ export default function ExamHearing({
     const componentErrorMessage: ExamRegistResult[] = [];
 
     const leftErrorMessage: ExamRegistResult = {
-      description: getErrorMessage(errorMessages.required, "聴力（左）は"),
+      description: getErrorMessage(errorMessages.required, "左は"),
       errorLevel: InputErrorLevel.異常,
     };
     const left1000 = item.examItemDetails?.find(
@@ -119,7 +119,7 @@ export default function ExamHearing({
     }
 
     const rightErrorMessage: ExamRegistResult = {
-      description: getErrorMessage(errorMessages.required, "聴力（右）は"),
+      description: getErrorMessage(errorMessages.required, "右は"),
       errorLevel: InputErrorLevel.異常,
     };
     const right1000 = item.examItemDetails?.find(

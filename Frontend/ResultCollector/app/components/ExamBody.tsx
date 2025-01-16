@@ -152,12 +152,29 @@ export default function ExamBody({
     // BMIはバリデーションチェックを実施しない
     if (item.positionNumber === BMI)
       return { validateResult: item, hasCallback: true };
+    const message =
+      item.positionNumber === 身長
+        ? "身長は"
+        : item.positionNumber === 体重
+          ? "体重は"
+          : item.positionNumber === 体脂肪率
+            ? "体脂肪率は"
+            : "";
     // 必須チェックと半角数字チェックを一度に行うスキーマ
     const schema = z
       .string()
-      .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)) // 必須チェック
+      .min(
+        1,
+        getErrorMessage(
+          errorMessages.required,
+          item.name ? `${item.name}は` : message,
+        ),
+      ) // 必須チェック
       .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-        message: getErrorMessage(errorMessages.numericString, `${item.name}は`),
+        message: getErrorMessage(
+          errorMessages.numericString,
+          item.name ? `${item.name}は` : message,
+        ),
       });
 
     // バリデーション対象データを取得

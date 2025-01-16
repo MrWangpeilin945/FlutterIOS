@@ -78,6 +78,7 @@ export default function ExamSelectLR({
     // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
     for (const {
       positionNumber,
+      name,
       value,
       hasOrder,
       cancelReasonId,
@@ -88,7 +89,7 @@ export default function ExamSelectLR({
 
       const requiredMessage = getErrorMessage(
         errorMessages.required,
-        `${positionNumber === 1 ? "左" : "右"}は`,
+        `${name ?? (positionNumber === 1 ? "左" : "右")}は`,
       );
 
       // バリデーションが失敗した場合
