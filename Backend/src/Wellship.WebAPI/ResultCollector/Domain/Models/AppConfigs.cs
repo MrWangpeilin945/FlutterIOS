@@ -68,7 +68,7 @@ public class AppConfigs
         {
             if (!_appConfigs.TryGetValue(AppConfigConsts.SecretKey.Key, out var resultString))
             {
-                throw new ArgumentNullException("SecretKeyは必須設定です。");
+                throw new ArgumentNullException(nameof(resultString), "SecretKeyは必須設定です。");
             }
 
             return resultString;
