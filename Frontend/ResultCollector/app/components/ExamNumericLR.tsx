@@ -167,19 +167,19 @@ export default function ExamNumericLR({
               1,
               getErrorMessage(
                 errorMessages.required,
-                name ? `${name}は` : positionNumber === 左 ? "左は" : "右は",
+                `${name || (positionNumber === 左 ? "左" : "右")}は`,
               ),
             ) // 必須チェック
             .refine((value) => /^\d+$/.test(value), {
               message: getErrorMessage(
                 errorMessages.numericString,
-                name ? `${name}は` : positionNumber === 左 ? "左は" : "右は",
+                `${name || (positionNumber === 左 ? "左" : "右")}は`,
               ),
             })
         : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
             message: getErrorMessage(
               errorMessages.numericString,
-              name ? `${name}は` : positionNumber === 左 ? "左は" : "右は",
+              `${name || (positionNumber === 左 ? "左" : "右")}は`,
             ),
           });
 
