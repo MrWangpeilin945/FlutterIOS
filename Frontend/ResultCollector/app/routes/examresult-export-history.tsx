@@ -39,6 +39,7 @@ import CommonHeader from "~/components/CommonHeader";
 import type { ExportHistoryList } from "~/domain/wellship.schemas";
 import { staffState } from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
+import styles from "~/styles/common.module.css";
 
 export const meta: MetaFunction = () => {
   return [{ title: "検査結果出力履歴" }];
@@ -322,13 +323,7 @@ export default function ExamresultExportHistory() {
                   <Table.Tbody h={118} fz="xs" c="black01">
                     {exportHistory?.exportHistories?.map((eh) => (
                       <Table.Tr key={eh.placeScheduleId}>
-                        <Table.Td
-                          w={267}
-                          style={{
-                            wordBreak: "break-word",
-                            whiteSpace: "pre-wrap",
-                          }}
-                        >
+                        <Table.Td w={267} className={styles["text-wrap"]}>
                           {eh.exportedBy}
                         </Table.Td>
                         <Table.Td ta="center">
@@ -338,13 +333,7 @@ export default function ExamresultExportHistory() {
                               "yyyy/MM/dd",
                             )}
                         </Table.Td>
-                        <Table.Td
-                          w={397}
-                          style={{
-                            wordBreak: "break-word",
-                            whiteSpace: "pre-wrap",
-                          }}
-                        >
+                        <Table.Td w={397} className={styles["text-wrap"]}>
                           {eh.placeName}
                         </Table.Td>
                         <Table.Td ta="center">{eh.dataCount}</Table.Td>
@@ -418,10 +407,7 @@ export default function ExamresultExportHistory() {
                       w={646}
                       size="lg"
                       c="black01"
-                      style={{
-                        wordBreak: "break-word",
-                        whiteSpace: "pre-wrap",
-                      }}
+                      className={styles["text-wrap"]}
                     >
                       {resultsOutputConfirmDialog?.placeName}
                     </Text>

@@ -7,6 +7,7 @@ import {
   getThemeColor,
   useMantineTheme,
 } from "@mantine/core";
+import styles from "~/styles/common.module.css";
 
 interface CommonDialogProps {
   message: string;
@@ -39,14 +40,7 @@ export default function CommonDialog({
       }}
     >
       <Stack gap={64}>
-        <Text
-          size="lg"
-          c="black01"
-          style={{
-            wordBreak: "break-word",
-            whiteSpace: "pre-wrap",
-          }}
-        >
+        <Text size="lg" c="black01" className={styles["text-wrap"]}>
           {message}
         </Text>
         <Center>

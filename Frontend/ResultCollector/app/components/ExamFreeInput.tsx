@@ -243,9 +243,10 @@ export default function ExamFreeInput({
       <Text
         mt={16}
         ml={287}
+        maw={528}
         size="md"
         fw="700"
-        className={styles["text-multiline"]}
+        className={styles["text-wrap"]}
       >
         {firstPositionDetail?.prevValue
           ? `(前回値)\n${firstPositionDetail?.prevValue}`
