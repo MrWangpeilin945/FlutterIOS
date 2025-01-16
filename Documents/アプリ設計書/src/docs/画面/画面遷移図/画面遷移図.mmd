@@ -1,0 +1,34 @@
+graph LR
+
+  web(WELLSHIP WEB)
+  menu(メニュー)
+  deep_link(Web連携用画面)
+  wire_setting(設定画面)
+  wire(通信画面)
+  spp_setting(設定画面)
+  spp(通信画面)
+  ble_setting(設定画面)
+  ble(通信画面)
+
+  menu--->wire_setting
+  menu--->spp_setting
+  menu--->ble_setting
+ 
+  web-- ディープリンク --->deep_link
+
+  deep_link-- クエリパラメータ<br/>transMethod=wired --->wire
+  deep_link-- クエリパラメータ<br/>transMethod=spp --->spp
+  deep_link-- クエリパラメータ<br/>transMethod=ble --->ble
+
+  subgraph graph_ble [BLE通信機能 ※未実装]
+    ble_setting-->ble
+  end
+
+  subgraph graph_spp [BluetoothSPP通信機能]
+    spp_setting-->spp
+  end
+
+  subgraph graph_wire [有線通信機能]
+    wire_setting-->wire
+  end
+
