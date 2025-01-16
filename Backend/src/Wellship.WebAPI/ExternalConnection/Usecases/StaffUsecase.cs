@@ -118,8 +118,8 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
                 .Where(staff => errorCodes.Contains(staff.StaffCode))
                 .Select(staff => new ErrorObject
                 {
-                    Code = "10001",
-                    Message = $"指定されたStaffCodeに設定されたログインIDは、既に他のStaffCodeで登録済みです。Code:{staff.StaffCode}",
+                    Code = "10002",
+                    Message = $"指定されたLoginIdが既に登録済みです。Code:{staff.LoginId}",
                     InputNote = staff.InputNote
                 }).ToList();
 
