@@ -1,6 +1,14 @@
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { Group, Paper, Text, Textarea, Button, Flex } from "@mantine/core";
+import {
+  Group,
+  Paper,
+  Text,
+  Textarea,
+  Button,
+  Flex,
+  Stack,
+} from "@mantine/core";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import type {
@@ -8,7 +16,10 @@ import type {
   ExamRegistResult,
 } from "~/domain/wellship.schemas";
 import { InputErrorLevel } from "~/domain/enums";
-import { IconExclamationCircleFilled } from "@tabler/icons-react";
+import {
+  IconExclamationCircleFilled,
+  IconSquareRoundedXFilled,
+} from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
 
 type ExamFreeInputProps = {
@@ -151,7 +162,7 @@ export default function ExamFreeInput({
     const updatedExamItems = [...examItemsData];
 
     // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
-    let hasValidationError = true;
+    let hasValidationError = false;
 
     for (const item of updatedExamItems) {
       if (item.positionNumber === 1) {
@@ -162,7 +173,7 @@ export default function ExamFreeInput({
         const { validateResult, hasCallback } = validationCheck(item);
         if (!hasCallback) {
           // falseのexamItemがあればコールバックを行わない
-          hasValidationError = false;
+          hasValidationError = true;
         }
         Object.assign(item, validateResult);
       }
@@ -223,6 +234,7 @@ export default function ExamFreeInput({
           variant="outline"
           bd={"2px,solid"}
           tabIndex={-1}
+          disabled={isDisabled}
           onClick={() => handleChange("")}
         >
           クリア
@@ -240,15 +252,23 @@ export default function ExamFreeInput({
           : ""}
       </Text>
       {/* エラーメッセージを表示する。 */}
-      {(examRegistResults || []).map((error, index) => (
-        <Group
-          key={index}
-          c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
-        >
-          <IconExclamationCircleFilled size={32} />
-          <Text>{error.description}</Text>
-        </Group>
-      ))}
+      <Stack gap={0}>
+        {(examRegistResults || []).map((error, index) => {
+          const isWarning = error.errorLevel === InputErrorLevel.警告;
+          return (
+            <Group key={index} c={isWarning ? "warning" : "error"}>
+              {isWarning ? (
+                <IconExclamationCircleFilled size={32} />
+              ) : (
+                <IconSquareRoundedXFilled size={32} />
+              )}
+              <Text size="sm" fw={700}>
+                {error.description}
+              </Text>
+            </Group>
+          );
+        })}
+      </Stack>
     </Flex>
   );
 }
