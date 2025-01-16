@@ -21,9 +21,9 @@ public class TenantProviderTests
         var httpContextAccessor = new Mock<IHttpContextAccessor>();
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext.Object);
 
-        var environmentProvider = new TenantProvider(httpContextAccessor.Object);
+        var tenantProvider = new TenantProvider(httpContextAccessor.Object);
 
-        environmentProvider.TenantKey.Should().Be(ITenantProvider.DefaultTenant);
+        tenantProvider.TenantKey.Should().Be(ITenantProvider.DefaultTenant);
     }
 
     [Fact]
@@ -37,9 +37,9 @@ public class TenantProviderTests
         var httpContextAccessor = new Mock<IHttpContextAccessor>();
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext.Object);
 
-        var environmentProvider = new TenantProvider(httpContextAccessor.Object);
+        var tenantProvider = new TenantProvider(httpContextAccessor.Object);
 
-        environmentProvider.TenantKey.Should().Be(ITenantProvider.DefaultTenant);
+        tenantProvider.TenantKey.Should().Be(ITenantProvider.DefaultTenant);
     }
 
     [Fact]
@@ -53,9 +53,9 @@ public class TenantProviderTests
         var httpContextAccessor = new Mock<IHttpContextAccessor>();
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext.Object);
 
-        var environmentProvider = new TenantProvider(httpContextAccessor.Object);
+        var tenantProvider = new TenantProvider(httpContextAccessor.Object);
 
-        environmentProvider.TenantKey.Should().Be(ITenantProvider.DefaultTenant);
+        tenantProvider.TenantKey.Should().Be(ITenantProvider.DefaultTenant);
     }
 
     [Fact]
@@ -69,9 +69,9 @@ public class TenantProviderTests
         var httpContextAccessor = new Mock<IHttpContextAccessor>();
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext.Object);
 
-        var environmentProvider = new TenantProvider(httpContextAccessor.Object);
+        var tenantProvider = new TenantProvider(httpContextAccessor.Object);
 
-        environmentProvider.TenantKey.Should().Be("tenant01");
+        tenantProvider.TenantKey.Should().Be("tenant01");
     }
 
     [Fact]
@@ -85,9 +85,9 @@ public class TenantProviderTests
         var httpContextAccessor = new Mock<IHttpContextAccessor>();
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext.Object);
 
-        var environmentProvider = new TenantProvider(httpContextAccessor.Object);
+        var tenantProvider = new TenantProvider(httpContextAccessor.Object);
 
-        environmentProvider.TenantKey.Should().Be("tenant01");
+        tenantProvider.TenantKey.Should().Be("tenant01");
     }
 
     [Fact]
@@ -101,8 +101,8 @@ public class TenantProviderTests
         var httpContextAccessor = new Mock<IHttpContextAccessor>();
         httpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext.Object);
 
-        var environmentProvider = new TenantProvider(httpContextAccessor.Object);
+        var tenantProvider = new TenantProvider(httpContextAccessor.Object);
 
-        environmentProvider.TenantKey.Should().Be("tenant01.wellship");
+        tenantProvider.TenantKey.Should().Be("tenant01.wellship");
     }
 }
