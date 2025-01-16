@@ -26,13 +26,13 @@
 }
 
 .input-error {
-  outline :1px solid #E26264;
-  color: #E26264;
+  outline: 1px solid #e26264;
+  color: #e26264;
 }
 
 .input-warning {
-  outline :1px solid #EE6A00;
-  color: #EE6A00;  
+  outline: 1px solid #ee6a00;
+  color: #ee6a00;
 }
 
 .input-textbox {
@@ -68,21 +68,4 @@
 .text-wrap {
   word-break: break-word;
   white-space: pre-wrap;
-}
-
-.progress-raijyo {
-  background-color: gray;
-}
-
-.progress-yotei {
-  background-color: black;
-}
-
-.progress-completed {
-  background-color: rgba(143, 196, 96, 1);
-}
-
-.progress-td {
-  width: 40px;
-  text-align: center;
 }
