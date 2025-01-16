@@ -137,6 +137,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<ICancelReasonRepository, CancelReasonRepository>();
         services.AddScoped<IExamItemRepository, ExamItemRepository>();
         services.AddScoped<IResultRepository, ResultRepository>();
+        services.AddScoped<IAppConfigRepository, AppConfigRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IOrganizationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.OrganizationRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExamineeRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExamineeRepository>();
