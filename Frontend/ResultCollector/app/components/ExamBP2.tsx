@@ -10,7 +10,10 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useClickOutside } from "@mantine/hooks";
-import { IconExclamationCircleFilled } from "@tabler/icons-react";
+import {
+  IconExclamationCircleFilled,
+  IconSquareRoundedXFilled,
+} from "@tabler/icons-react";
 import { z } from "zod";
 import { InputErrorLevel, KeyboardType } from "~/domain/enums";
 import type {
@@ -226,41 +229,48 @@ export default function ExamBP2({
 
   // バリデーションチェック
   const validationCheck = (item: InputExamItem) => {
-    // positionNumberが対象でなければ処理を終える
-    if (
-      item.positionNumber !== 血圧1回目 &&
-      item.positionNumber !== 血圧2回目
-    ) {
+    // 血圧は上下どちらかがグレーアウトの場合、両方バリデーションチェックを行わない
+    const highDetail = item.examItemDetails?.find(
+      (detail: ExamItemDetail) => detail.positionNumber === 上,
+    );
+    const lowDetail = item.examItemDetails?.find(
+      (detail: ExamItemDetail) => detail.positionNumber === 下,
+    );
+    const isDisableItem =
+      !highDetail?.hasOrder ||
+      !!highDetail.cancelReasonId ||
+      !lowDetail?.hasOrder ||
+      !!lowDetail.cancelReasonId;
+    if (isDisableItem) {
       return { validateResult: item, hasCallback: true };
     }
     // APIエラーメッセージで初期化
     resetErrorMessages(item);
     // コールバック判断用のコンポーネントのエラーメッセージ
-    const componentErrorMessage: ExamRegistResult[] = [];
+    let componentErrorMessage: ExamRegistResult[] = [];
     // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
-    for (const { name, positionNumber, value } of item.examItemDetails ?? []) {
+    for (const {
+      positionNumber,
+      value,
+      hasOrder,
+      cancelReasonId,
+    } of item.examItemDetails ?? []) {
       if (positionNumber !== 上 && positionNumber !== 下) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
+      }
+      if (!hasOrder || !!cancelReasonId) {
+        continue; // 対象がdisableの場合、処理をスキップする
       }
       // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
       const schema = onRegisterPressed
         ? z
             .string()
-            .min(
-              1,
-              getErrorMessage(errorMessages.required, `${item.name}:${name}は`),
-            ) // 必須チェック
+            .min(1, getErrorMessage(errorMessages.required, "血圧は")) // 必須チェック
             .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-              message: getErrorMessage(
-                errorMessages.numericString,
-                `${item.name}:${name}は`,
-              ),
+              message: getErrorMessage(errorMessages.numericString, "血圧は"),
             })
         : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
-            message: getErrorMessage(
-              errorMessages.numericString,
-              name ? `${name}は` : "",
-            ),
+            message: getErrorMessage(errorMessages.numericString, "血圧は"),
           });
 
       // バリデーション対象データを取得
@@ -276,6 +286,7 @@ export default function ExamBP2({
         });
       }
     }
+
     // 血圧の上下の値が逆転していないかのチェック
     const BPError = validateBPValues(item);
     if (BPError) {
@@ -283,6 +294,14 @@ export default function ExamBP2({
     }
     // 基準値によるエラーメッセージを追加
     componentErrorMessage.push(...setRangesErrorMessage(item));
+
+    // 血圧の上下で同一のエラーメッセージが発生する可能性があるため、重複を削除する
+    componentErrorMessage = componentErrorMessage.filter(
+      (error, index) =>
+        componentErrorMessage.findIndex(
+          (e) => e.description === error.description,
+        ) === index,
+    );
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
       (error) => error.errorLevel === InputErrorLevel.異常,
@@ -431,9 +450,12 @@ export default function ExamBP2({
     examItemDetails: [{ positionNumber: 上 }, { positionNumber: 下 }],
   };
   if (isValidBPfirst) {
-    BPfirstItem =
-      examItemsData.find((item) => item.positionNumber === 血圧1回目) ||
-      BPfirstItem;
+    const foundItem = examItemsData.find(
+      (item) => item.positionNumber === 血圧1回目,
+    );
+    if (foundItem) {
+      BPfirstItem = { ...foundItem, name: "血圧1" };
+    }
   }
   // 血圧2回目のexamItem
   let BPsecondItem: InputExamItem = {
@@ -442,9 +464,12 @@ export default function ExamBP2({
     examItemDetails: [{ positionNumber: 上 }, { positionNumber: 下 }],
   };
   if (isValidBPsecond) {
-    BPsecondItem =
-      examItemsData.find((item) => item.positionNumber === 血圧2回目) ||
-      BPsecondItem;
+    const foundItem = examItemsData.find(
+      (item) => item.positionNumber === 血圧2回目,
+    );
+    if (foundItem) {
+      BPsecondItem = { ...foundItem, name: "血圧2" };
+    }
   }
   // 平均値のexamItem
   let AVEItem: InputExamItem = {
@@ -452,10 +477,14 @@ export default function ExamBP2({
     name: "平均",
     examItemDetails: [{ positionNumber: 上 }, { positionNumber: 下 }],
   };
+
   if (isValidAVE) {
-    AVEItem =
-      examItemsData.find((item) => item.positionNumber === 平均値) ||
-      BPsecondItem;
+    const foundItem = examItemsData.find(
+      (item) => item.positionNumber === 平均値,
+    );
+    if (foundItem) {
+      AVEItem = { ...foundItem, name: "平均" };
+    }
   }
   const targetExamItems = [BPfirstItem, BPsecondItem, AVEItem];
 
@@ -528,7 +557,7 @@ export default function ExamBP2({
                         mt={-8}
                         ta="right"
                       >
-                        {detail?.value}
+                        {isDisableItem ? "" : detail?.value}
                       </Text>
                     ) : (
                       <TextInput
@@ -579,7 +608,7 @@ export default function ExamBP2({
                   </Flex>
                 );
               })}
-              <Stack w={173} h={80} gap={4} justify="space-between">
+              <Stack w={216} h={80} gap={4} justify="space-between">
                 <Box>
                   {highDetail?.prevValue && lowDetail?.prevValue && (
                     <Text fw={700} mt={0}>
@@ -604,6 +633,7 @@ export default function ExamBP2({
                   bd={"2px,solid"}
                   onClick={() => handleChange("", positionNumber)}
                   tabIndex={-1}
+                  disabled={isDisableItem}
                 >
                   クリア
                 </Button>
@@ -611,11 +641,15 @@ export default function ExamBP2({
             </Flex>
 
             {/* エラーメッセージの表示 */}
-            {examRegistResults.map((error, idx) => {
+            {(examRegistResults || []).map((error, index) => {
               const isWarning = error.errorLevel === InputErrorLevel.警告;
               return (
-                <Group key={idx} c={isWarning ? "warning" : "error"}>
-                  <IconExclamationCircleFilled size={32} />
+                <Group key={index} c={isWarning ? "warning" : "error"}>
+                  {isWarning ? (
+                    <IconExclamationCircleFilled size={32} />
+                  ) : (
+                    <IconSquareRoundedXFilled size={32} />
+                  )}
                   <Text size="sm" fw={700}>
                     {error.description}
                   </Text>
