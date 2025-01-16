@@ -58,6 +58,7 @@ public class Program
         }
         builder.Services.AddScoped<IDbConnectionProvider, DbConnectionProvider>();
         builder.Services.AddScoped<IStaffIdentityProvider, StaffIdentityFromHttpContextProvider>();
+        builder.Services.AddScoped<ITenantProvider, TenantProvider>();
         builder.Services.AddSingleton(TimeProvider.System);
 
         builder.Services.AddOpenApiDocument(options =>

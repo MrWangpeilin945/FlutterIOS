@@ -1,5 +1,5 @@
 -- DB切り替え
-\c dev01
+\c wellship
 
 set search_path = resultcollector;
 
