@@ -402,7 +402,6 @@ CREATE TABLE exam_item_details (
   exam_item_detail_id integer NOT NULL
   , exam_item_id integer NOT NULL
   , name text NOT NULL
-  , set_previous_as_default boolean DEFAULT false NOT NULL
   , order_number integer NOT NULL
   , position_number integer NOT NULL
   , type integer NOT NULL
@@ -1121,7 +1120,6 @@ COMMENT ON TABLE exam_item_details IS '検査項目明細';
 COMMENT ON COLUMN exam_item_details.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_item_details.exam_item_id IS '検査項目ID';
 COMMENT ON COLUMN exam_item_details.name IS '検査項目明細名';
-COMMENT ON COLUMN exam_item_details.set_previous_as_default IS '前回値を初期値としてセットするか';
 COMMENT ON COLUMN exam_item_details.order_number IS '表示順';
 COMMENT ON COLUMN exam_item_details.position_number IS '配置番号';
 COMMENT ON COLUMN exam_item_details.type IS '検査項目明細種別';
