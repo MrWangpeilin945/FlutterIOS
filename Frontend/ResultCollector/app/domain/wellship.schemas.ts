@@ -6,31 +6,31 @@
  * OpenAPI spec version: v1
  */
 export type PlaceScheduleGetTeamPlaceSchedulesParams = {
-date?: string;
-teamId?: string;
+  date?: string;
+  teamId?: string;
 };
 
 export type PlaceScheduleGetTeamsParams = {
-date?: string;
+  date?: string;
 };
 
 export type HomeMenuGetHomeMenuSettingsParams = {
-placeScheduleId?: string | null;
+  placeScheduleId?: string | null;
 };
 
 export type EquipmentGetEquipmentSettingsParams = {
-examMenuId?: number;
+  examMenuId?: number;
 };
 
 export type ConsultGetInputExamItemsExamineeParams = {
-/**
- * 検査メニューID
- */
-examMenuId?: number;
+  /**
+   * 検査メニューID
+   */
+  examMenuId?: number;
 };
 
 export type ConsultGetExamItemsExamineeParams = {
-examMenuId?: number;
+  examMenuId?: number;
 };
 
 /**
@@ -142,7 +142,7 @@ export interface PlaceSchedulePlaces {
 /**
  * 会場
  */
-export interface Place {
+export interface Place2 {
   /** 会場ID */
   placeId?: string;
   /** 会場名 */
@@ -154,7 +154,7 @@ export interface Place {
  */
 export interface PlaceScheduleTeam {
   /** 会場リスト */
-  places?: Place[];
+  places?: Place2[];
   /** 班ID */
   teamId?: string;
   /** 班名 */
@@ -324,8 +324,6 @@ export interface EquipmentList {
  * 検査結果検証結果情報
  */
 export interface VerifyExamItems {
-  /** エラーレベル */
-  errorLevel?: number;
   /** 検査結果入力項目グループ */
   examItemGroups?: ExamItemGroup[];
 }
@@ -507,6 +505,16 @@ export interface ExecutionsRequest {
 }
 
 /**
+ * 検査実施判断ルールの結果
+ */
+export interface ExamDecisionResult {
+  /** 説明 */
+  description?: string;
+  /** エラーレベル */
+  errorLevel?: number;
+}
+
+/**
  * 実施検査状況
  */
 export interface ExamDetail {
@@ -588,7 +596,7 @@ export interface ExamContent {
   /** 受診番号 */
   consultNumber?: string;
   /** 検査実施判断結果 */
-  examDecisionResult?: string[];
+  examDecisionResults?: ExamDecisionResult[];
   /** 受診者情報 */
   examinee?: Examinee;
   /** 実施検査項目 */
@@ -683,3 +691,38 @@ export interface StaffLoginResponse {
   token?: string;
 }
 
+/**
+ * 基準パターン
+ */
+export interface Threshold {
+  /** 基準パターンコード */
+  code?: string;
+  /** エラーオブジェクトに登録する入力項目Noなど */
+  inputNote?: string;
+  /** 基準パターン名 */
+  name?: string;
+}
+
+/**
+ * 班
+ */
+export interface Team {
+  /** 班コード */
+  code?: string;
+  /** エラーオブジェクトに登録する入力項目Noなど */
+  inputNote?: string;
+  /** 班名 */
+  name?: string;
+}
+
+/**
+ * 会場
+ */
+export interface Place {
+  /** 会場コード */
+  code?: string;
+  /** エラーオブジェクトに登録する入力項目Noなど */
+  inputNote?: string;
+  /** 会場名 */
+  name?: string;
+}

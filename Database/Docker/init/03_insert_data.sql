@@ -332,3 +332,9 @@ insert into decision_rule_evaluations(decision_rule_id,variable_number,evaluatio
 insert into decision_rule_exam_item_details(decision_rule_id,variable_number,source_type,exam_item_detail_id,created_at,created_by) VALUES
     (1,1,1,2,CURRENT_TIMESTAMP,'init')
   , (1,2,2,2,CURRENT_TIMESTAMP,'init');
+
+-- アプリケーション設定
+INSERT INTO app_config(key,value,description,created_at,created_by) VALUES 
+    ('Auth.AccessTokenLifetime','3','アクセストークンの有効期限（分）',CURRENT_TIMESTAMP,'init')
+  , ('Auth.RefreshTokenLifeTime','720','リフレッシュトークンの有効期限（分）',CURRENT_TIMESTAMP,'init')
+  , ('Auth.SecretKey','qguSdqCvPiGwUceBYXWEfJKLNrakzsnblVjxRIApFhmQtOHoZDTy','トークンのシークレット',CURRENT_TIMESTAMP,'init');
