@@ -1,0 +1,24 @@
+desc: ログインしてアクセストークンを取得する
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+steps:
+  login:
+    desc: "アクセストークンを取得する"
+    req:
+      /api/v1/staff/login:
+        post:
+          body:
+            application/json:
+              loginId: "S001"
+              password: "syokuinA"
+    test: |
+      // ステータスコードが200であること
+      current.res.status == 200
+      // アクセストークンが1文字以上であること
+      && len(current.res.body.token) > 0
+    bind:
+      token: current.res.body.token
