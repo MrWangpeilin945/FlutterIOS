@@ -443,7 +443,6 @@ export default function ExamBP2({
     // 全てのitemでバリデーションチェックが通った場合、コールバックする
     if (!hasValidationError) {
       onChange(addAVEExamItems);
-      console.log(addAVEExamItems);
     }
   };
 
