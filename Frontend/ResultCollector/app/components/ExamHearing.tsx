@@ -215,7 +215,7 @@ export default function ExamHearing({
   };
 
   // 同じグループのvalueが存在するかを確認
-  const checkValue = (detailNumber: number) => {
+  const getSameGroupData = (detailNumber: number) => {
     const mapping: Record<number, number> = {
       1: 左4000Hz,
       2: 左1000Hz,
@@ -228,18 +228,18 @@ export default function ExamHearing({
       (detail) => detail.positionNumber === targetDetailNumber,
     );
     return {
-      isChecked: !!targetDetail?.value,
+      hasValue: !!targetDetail?.value,
       targetDetail: targetDetail,
     };
   };
 
   const complementValue = (detailNumber: number, examItems: InputExamItem) => {
     // 同じグループ（左または右）の1000Hzまたは4000Hzのvalueが存在するかを確認
-    const { isChecked, targetDetail } = checkValue(detailNumber);
+    const { hasValue, targetDetail } = getSameGroupData(detailNumber);
 
     // 存在しない場合、所見なしのcodeをvalueに設定
     if (
-      !isChecked &&
+      !hasValue &&
       targetDetail?.hasOrder === true &&
       !targetDetail.cancelReasonId
     ) {
