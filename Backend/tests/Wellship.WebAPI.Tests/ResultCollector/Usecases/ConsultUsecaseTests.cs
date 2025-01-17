@@ -3,11 +3,11 @@ using FluentAssertions;
 using Moq;
 
 using Ryobi.Wellship.APIModels.Requests;
-using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.Tests.ResultCollector.Usecases;
@@ -20,6 +20,7 @@ public class ConsultUsecaseTests
     private readonly Mock<IExamItemRepository> _examItemRepositoryMock;
     private readonly Mock<IPlaceScheduleRepository> _placeScheduleRepositoryMock;
     private readonly Mock<IResultRepository> _resultRepositoryMock;
+    private readonly Mock<IStaffIdentityProvider> _staffIdentityProviderMock;
 
     public ConsultUsecaseTests()
     {
@@ -29,6 +30,7 @@ public class ConsultUsecaseTests
         _examItemRepositoryMock = new Mock<IExamItemRepository>();
         _placeScheduleRepositoryMock = new Mock<IPlaceScheduleRepository>();
         _resultRepositoryMock = new Mock<IResultRepository>();
+        _staffIdentityProviderMock = new Mock<IStaffIdentityProvider>();
     }
 
     [Fact]
@@ -38,7 +40,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(x => x.ConsultExistsAsync(It.IsAny<string>())).ReturnsAsync(true);
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
         var request = new ConsultNumberRequest
         {
             ConsultNumber = "12345"
@@ -57,7 +60,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(x => x.ConsultExistsAsync(It.IsAny<string>())).ReturnsAsync(false);
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
         var request = new ConsultNumberRequest
         {
             ConsultNumber = "54321"
@@ -128,7 +132,8 @@ public class ConsultUsecaseTests
                           });
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
 
         // Act
         var result = await usecase.GetUnexaminedMenusAsync(consultNumber);
@@ -174,7 +179,8 @@ public class ConsultUsecaseTests
                           });
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
 
         // Act
         var result = await usecase.GetUnexaminedMenusAsync(consultNumber);
@@ -233,7 +239,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(x => x.GetExamCancelsAsync(consult.ConsultId)).ReturnsAsync(examCancels);
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
 
         // Act
         await usecase.RegisterExecutionsAsync(consultNumber, request);
@@ -285,7 +292,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(x => x.GetExamCancelsAsync(consult.ConsultId)).ReturnsAsync(examCancel);
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
 
         // Act
         await usecase.RegisterExecutionsAsync(consultNumber, request);
@@ -384,7 +392,8 @@ public class ConsultUsecaseTests
         };
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
 
         // Act
         var errors = await usecase.ValidateCorrelationRuleAsync(consultNumber, resultsRequest);
@@ -518,7 +527,8 @@ public class ConsultUsecaseTests
         };
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
 
         // Act
         var errors = await usecase.ValidateCorrelationRuleAsync(consultNumber, resultsRequest);
@@ -608,7 +618,8 @@ public class ConsultUsecaseTests
         };
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
 
         // Act
         var errors = await usecase.ValidateDecisionRuleAsync(examMenuId, examResult, previousResult);
@@ -694,7 +705,8 @@ public class ConsultUsecaseTests
         _examItemRepositoryMock.Setup(x => x.GetDecisionRulesAsync(examMenuId)).ReturnsAsync(rules);
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
 
         // Act
         var errors = await usecase.ValidateDecisionRuleAsync(examMenuId, examResult, previousResult);
@@ -771,7 +783,8 @@ public class ConsultUsecaseTests
         _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"))).ReturnsAsync(examinee);
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
         var results = new ResultsRequest
         {
             ExamMenuId = 7,
@@ -823,13 +836,14 @@ public class ConsultUsecaseTests
                                         PlaceScheduleId = placeScheduleId,
                                         PlaceId = Guid.Parse("492d6d5c-17ab-4aba-89e2-51369373b8a8"),
                                         PlaceName = "市役所",
-                                        ExamDate = DateTime.Parse("2024-12-19"),
+                                        ExamDate = new DateOnly(2024, 12, 19),
                                         Status = PlaceScheduleLockingStatus.検査完了,
                                         CreatedAt = DateTime.Now,
                                         CreatedBy = "admin"
                                     });
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
-                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object);
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
         var results = new ResultsRequest
         {
             ExamMenuId = 7,

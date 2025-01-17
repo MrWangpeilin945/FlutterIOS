@@ -55,10 +55,10 @@ export default function ExamNumericLR({
 
   if (
     !firstPosition?.examItemDetails?.some(
-      (detail) => detail.positionNumber === 左
+      (detail) => detail.positionNumber === 左,
     ) &&
     !firstPosition?.examItemDetails?.some(
-      (detail) => detail.positionNumber === 右
+      (detail) => detail.positionNumber === 右,
     )
   ) {
     return null;
@@ -104,7 +104,7 @@ export default function ExamNumericLR({
     setShowKeyboards({ left: false, right: false });
   };
   const closeKeyBoard = useClickOutside(() =>
-    setShowKeyboards({ left: false, right: false })
+    setShowKeyboards({ left: false, right: false }),
   );
 
   const sortErrorMessage = (item: InputExamItem): InputExamItem => {
@@ -131,7 +131,7 @@ export default function ExamNumericLR({
   // APIのエラーメッセージ以外を削除する
   const resetErrorMessages = (item: InputExamItem) => {
     const targetError = backendValidation.find(
-      (error) => error.itemPositionNumber === item.positionNumber
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -158,19 +158,26 @@ export default function ExamNumericLR({
       if (!hasOrder || !!cancelReasonId) {
         continue; // disableの場合、処理をスキップする
       }
-      // 必須チェックと半角数字チェックを一度に行うスキーマ
-      const schema = z
-        .string()
-        .min(
-          1,
-          getErrorMessage(errorMessages.required, `${item.name}:${name}は`)
-        ) // 必須チェック
-        .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-          message: getErrorMessage(
-            errorMessages.numericString,
-            `${item.name}:${name}は`
-          ),
-        });
+      // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
+      const schema = onRegisterPressed
+        ? z
+            .string()
+            .min(
+              1,
+              getErrorMessage(errorMessages.required, name ? `${name}は` : ""),
+            ) // 必須チェック
+            .refine((value) => /^\d+$/.test(value), {
+              message: getErrorMessage(
+                errorMessages.numericString,
+                name ? `${name}は` : "",
+              ),
+            })
+        : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
+            message: getErrorMessage(
+              errorMessages.numericString,
+              name ? `${name}は` : "",
+            ),
+          });
 
       // バリデーション対象データを取得
       const valueToValidate = value;
@@ -190,7 +197,7 @@ export default function ExamNumericLR({
     componentErrorMessage.push(...setRangesErrorMessage(item));
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === InputErrorLevel.異常
+      (error) => error.errorLevel === InputErrorLevel.異常,
     );
     // エラーメッセージをexamItemに保存
     const resultItem: InputExamItem = {
@@ -210,12 +217,7 @@ export default function ExamNumericLR({
 
   useEffect(() => {
     const updatedItems = examItems.map((item) => {
-      let validatedData = item;
-
-      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-      if (onRegisterPressed) {
-        validatedData = validationCheck(validatedData).validateResult;
-      }
+      const validatedData = validationCheck(item).validateResult;
       return validatedData;
     });
     setExamItemsData(updatedItems);
@@ -225,7 +227,7 @@ export default function ExamNumericLR({
   const handleChange = (
     value: string,
     positionNumber: number | undefined,
-    detailsPositionNumber?: number
+    detailsPositionNumber?: number,
   ) => {
     // 対象のpositionNumberか確認
     if (positionNumber !== 1) {
@@ -250,7 +252,7 @@ export default function ExamNumericLR({
           item.examItemDetails = item.examItemDetails?.map((detail) =>
             detail.positionNumber === detailsPositionNumber
               ? { ...detail, value: value }
-              : detail
+              : detail,
           );
         }
       }
@@ -273,14 +275,14 @@ export default function ExamNumericLR({
 
   // positionNumberが1のexamItem
   const firstPositionItem = examItemsData.find(
-    (item) => item.positionNumber === 1
+    (item) => item.positionNumber === 1,
   );
   const { positionNumber, examItemDetails, examRegistResults, name } =
     firstPositionItem ?? {};
 
   // 対象のexamItemの中の、positionNumberが1のexamItemDetail
   let leftItemDetail = examItemDetails?.find(
-    (detail) => detail.positionNumber === 左
+    (detail) => detail.positionNumber === 左,
   );
   if (!leftItemDetail) {
     leftItemDetail = {
@@ -290,7 +292,7 @@ export default function ExamNumericLR({
   }
   //  対象のexamItemの中の、positionNumberが2のexamItemDetail
   let rightItemDetail = examItemDetails?.find(
-    (detail) => detail.positionNumber === 右
+    (detail) => detail.positionNumber === 右,
   );
   if (!rightItemDetail) {
     rightItemDetail = {
@@ -303,19 +305,9 @@ export default function ExamNumericLR({
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Stack>
-        <Paper
-          w={274}
-          h={80}
-          className={styles["basic-grey"]}
-          radius="itemName"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text size="lg" fw={700}>
-            {name}
+        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
+          <Text size="lg" fw={700} ta="center">
+            {name?.slice(0, 8)}
           </Text>
         </Paper>
         <Group gap={16}>
@@ -332,18 +324,8 @@ export default function ExamNumericLR({
             const isDisabled = !hasOrder || !!cancelReasonId;
             return (
               <Stack key={detailPositionNumber}>
-                <Paper
-                  w={524}
-                  h={51}
-                  className={styles["basic-grey"]}
-                  radius="itemName"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Text size="lg" fw={700}>
+                <Paper w={524} h={51} bg="gray02" c="white" radius="itemName">
+                  <Text size="lg" fw={700} ta="center">
                     {detailName}
                   </Text>
                 </Paper>
@@ -354,14 +336,14 @@ export default function ExamNumericLR({
                         isDisabled
                           ? ""
                           : firstPositionItem?.examRegistResults?.some(
-                              (x) => x.errorLevel === InputErrorLevel.異常
-                            )
-                          ? `${styles["input-error"]}`
-                          : firstPositionItem?.examRegistResults?.some(
-                              (x) => x.errorLevel === InputErrorLevel.警告
-                            )
-                          ? `${styles["input-warning"]}`
-                          : ""
+                                (x) => x.errorLevel === InputErrorLevel.異常,
+                              )
+                            ? `${styles["input-error"]}`
+                            : firstPositionItem?.examRegistResults?.some(
+                                  (x) => x.errorLevel === InputErrorLevel.警告,
+                                )
+                              ? `${styles["input-warning"]}`
+                              : ""
                       }`,
                     }}
                     w={340}
@@ -373,18 +355,24 @@ export default function ExamNumericLR({
                       handleChange(
                         e.currentTarget.value,
                         positionNumber ?? 0,
-                        positionNumber ?? 0
+                        positionNumber ?? 0,
                       )
                     }
                     disabled={isDisabled}
                   />
-                  <Stack gap="0">
-                    <Text size="md" fw="700" maw={172}>
-                      {prevValue ? `(前回: ${prevValue})` : ""}
-                    </Text>
-                    <Text size="xs" fw="400">
-                      {unit}
-                    </Text>
+                  <Stack w={173} h={80} gap={4} justify="space-between">
+                    <Box>
+                      {prevValue && (
+                        <Text fw={700} mt={0}>
+                          (前回：{prevValue})
+                        </Text>
+                      )}
+                    </Box>
+                    <Box>
+                      <Text size="xs" mb={0}>
+                        {unit}
+                      </Text>
+                    </Box>
                   </Stack>
                 </Group>
               </Stack>
@@ -440,7 +428,7 @@ export default function ExamNumericLR({
                       handleChange(
                         newValue,
                         positionNumber ?? 0,
-                        detail.positionNumber ?? 0
+                        detail.positionNumber ?? 0,
                       )
                     }
                     onConfirm={handleConfirm}

@@ -59,8 +59,8 @@ export default function ExamBP2({
       item.examItemDetails?.some(
         (detail) =>
           detail.positionNumber === 上 &&
-          item.examItemDetails?.some((detail) => detail.positionNumber === 下)
-      )
+          item.examItemDetails?.some((detail) => detail.positionNumber === 下),
+      ),
   );
 
   // positionNumberが2のexamItemが存在し、かつexamItemDetailsに必要な値が存在するかのチェック
@@ -68,7 +68,7 @@ export default function ExamBP2({
     (item) =>
       item.positionNumber === 血圧2回目 &&
       item.examItemDetails?.some((detail) => detail.positionNumber === 上) &&
-      item.examItemDetails?.some((detail) => detail.positionNumber === 下)
+      item.examItemDetails?.some((detail) => detail.positionNumber === 下),
   );
 
   // 両方を満たさない時、nullを返す
@@ -81,7 +81,7 @@ export default function ExamBP2({
     (item) =>
       item.positionNumber === 平均値 &&
       item.examItemDetails?.some((detail) => detail.positionNumber === 上) &&
-      item.examItemDetails?.some((detail) => detail.positionNumber === 下)
+      item.examItemDetails?.some((detail) => detail.positionNumber === 下),
   );
 
   // examItemの管理
@@ -136,11 +136,7 @@ export default function ExamBP2({
 
   useEffect(() => {
     const updatedItems = examItems.map((item) => {
-      let validatedData = item;
-      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-      if (onRegisterPressed) {
-        validatedData = validationCheck(validatedData).validateResult;
-      }
+      const validatedData = validationCheck(item).validateResult;
       return validatedData;
     });
     setExamItemsData(updatedItems);
@@ -152,7 +148,7 @@ export default function ExamBP2({
   // キーボードの表示/非表示をトグルする関数
   const toggleKeyboard = (
     positionNumber: number,
-    detailPositionNumber: number
+    detailPositionNumber: number,
   ) => {
     setShowKeyboards((prev) => {
       const updated = { ...prev };
@@ -200,7 +196,7 @@ export default function ExamBP2({
   // APIのエラーメッセージで更新する
   const resetErrorMessages = (item: InputExamItem) => {
     const targetError = backendValidation.find(
-      (error) => error.itemPositionNumber === item.positionNumber
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -246,19 +242,26 @@ export default function ExamBP2({
       if (positionNumber !== 上 && positionNumber !== 下) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
       }
-      // 必須チェックと半角数字チェックを一度に行うスキーマ
-      const schema = z
-        .string()
-        .min(
-          1,
-          getErrorMessage(errorMessages.required, `${item.name}:${name}は`)
-        ) // 必須チェック
-        .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-          message: getErrorMessage(
-            errorMessages.numericString,
-            `${item.name}:${name}は`
-          ),
-        });
+      // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
+      const schema = onRegisterPressed
+        ? z
+            .string()
+            .min(
+              1,
+              getErrorMessage(errorMessages.required, `${item.name}:${name}は`),
+            ) // 必須チェック
+            .refine((value) => /^\d+(\.\d+)?$/.test(value), {
+              message: getErrorMessage(
+                errorMessages.numericString,
+                `${item.name}:${name}は`,
+              ),
+            })
+        : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
+            message: getErrorMessage(
+              errorMessages.numericString,
+              name ? `${name}は` : "",
+            ),
+          });
 
       // バリデーション対象データを取得
       const valueToValidate = value;
@@ -282,7 +285,7 @@ export default function ExamBP2({
     componentErrorMessage.push(...setRangesErrorMessage(item));
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === InputErrorLevel.異常
+      (error) => error.errorLevel === InputErrorLevel.異常,
     );
     // エラーメッセージをexamItemに保存
     const resultItem: InputExamItem = {
@@ -370,7 +373,7 @@ export default function ExamBP2({
   const handleChange = (
     value: string,
     positionNumber: number | undefined,
-    detailPositionNumber?: number
+    detailPositionNumber?: number,
   ) => {
     // 対象のpositionNumberか確認
     if (positionNumber !== 血圧1回目 && positionNumber !== 血圧2回目) {
@@ -396,7 +399,7 @@ export default function ExamBP2({
           item.examItemDetails = item.examItemDetails?.map((detail) =>
             detail.positionNumber === detailPositionNumber
               ? { ...detail, value: value }
-              : detail
+              : detail,
           );
         }
       }
@@ -467,10 +470,10 @@ export default function ExamBP2({
         } = item;
 
         const highDetail = examItemDetails?.find((detail: ExamItemDetail) =>
-          detail.positionNumber === 1 ? detail : null
+          detail.positionNumber === 1 ? detail : null,
         );
         const lowDetail = examItemDetails?.find((detail: ExamItemDetail) =>
-          detail.positionNumber === 2 ? detail : null
+          detail.positionNumber === 2 ? detail : null,
         );
         const isAVE = item?.positionNumber === 平均値;
         const isDisableItem =
@@ -494,11 +497,10 @@ export default function ExamBP2({
                 bg={isAVE ? "white" : "gray02"}
                 c={isAVE ? "gray02" : "white"}
                 radius="itemName"
-                px={32}
                 py={16}
               >
                 <Text size="lg" fw={700} ta="center">
-                  {name}
+                  {name?.slice(0, 8)}
                 </Text>
               </Paper>
               {examItemDetails?.map((detail) => {
@@ -513,14 +515,14 @@ export default function ExamBP2({
                         size="inputComponent"
                         c={
                           examRegistResults?.some(
-                            (x) => x.errorLevel === InputErrorLevel.異常
+                            (x) => x.errorLevel === InputErrorLevel.異常,
                           )
                             ? "error"
                             : examRegistResults?.some(
-                                (x) => x.errorLevel === InputErrorLevel.警告
-                              )
-                            ? "warning"
-                            : "black"
+                                  (x) => x.errorLevel === InputErrorLevel.警告,
+                                )
+                              ? "warning"
+                              : "black"
                         }
                         px={32}
                         mt={-8}
@@ -535,14 +537,16 @@ export default function ExamBP2({
                             isDisableItem
                               ? `${styles["input-disabled"]}`
                               : examRegistResults?.some(
-                                  (x) => x.errorLevel === InputErrorLevel.異常
-                                )
-                              ? `${styles["input-error"]}`
-                              : examRegistResults?.some(
-                                  (x) => x.errorLevel === InputErrorLevel.警告
-                                )
-                              ? `${styles["input-warning"]}`
-                              : ""
+                                    (x) =>
+                                      x.errorLevel === InputErrorLevel.異常,
+                                  )
+                                ? `${styles["input-error"]}`
+                                : examRegistResults?.some(
+                                      (x) =>
+                                        x.errorLevel === InputErrorLevel.警告,
+                                    )
+                                  ? `${styles["input-warning"]}`
+                                  : ""
                           }`,
                         }}
                         w={172}
@@ -555,13 +559,13 @@ export default function ExamBP2({
                           handleChange(
                             e.currentTarget.value,
                             positionNumber,
-                            detail?.positionNumber
+                            detail?.positionNumber,
                           )
                         }
                         onClick={() =>
                           toggleKeyboard(
                             positionNumber ?? 0,
-                            detail?.positionNumber ?? 0
+                            detail?.positionNumber ?? 0,
                           )
                         }
                         disabled={isDisableItem}
@@ -575,13 +579,19 @@ export default function ExamBP2({
                   </Flex>
                 );
               })}
-              <Stack w={216} gap={4} mt="auto">
-                {highDetail?.prevValue && lowDetail?.prevValue && (
-                  <Text fw={700}>
-                    (前回：{highDetail.prevValue}/{lowDetail.prevValue})
+              <Stack w={173} h={80} gap={4} justify="space-between">
+                <Box>
+                  {highDetail?.prevValue && lowDetail?.prevValue && (
+                    <Text fw={700} mt={0}>
+                      (前回：{highDetail.prevValue}/{lowDetail.prevValue})
+                    </Text>
+                  )}
+                </Box>
+                <Box>
+                  <Text size="xs" mb={0}>
+                    {highDetail?.unit}
                   </Text>
-                )}
-                <Text size="xs">{highDetail?.unit}</Text>
+                </Box>
               </Stack>
               {!isAVE && (
                 <Button
@@ -628,7 +638,7 @@ export default function ExamBP2({
                             handleChange(
                               newValue,
                               positionNumber,
-                              detail?.positionNumber
+                              detail?.positionNumber,
                             )
                           }
                           onConfirm={resetKeyboards}
@@ -640,7 +650,7 @@ export default function ExamBP2({
                             handleChange(
                               newValue,
                               positionNumber,
-                              detail.positionNumber
+                              detail.positionNumber,
                             )
                           }
                         />

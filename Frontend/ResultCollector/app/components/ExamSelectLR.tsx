@@ -62,7 +62,7 @@ export default function ExamSelectLR({
   // APIのエラーメッセージで更新する
   const resetErrorMessages = (item: InputExamItem) => {
     const targetError = backendValidation.find(
-      (error) => error.itemPositionNumber === item.positionNumber
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -78,6 +78,7 @@ export default function ExamSelectLR({
     // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
     for (const {
       positionNumber,
+      name,
       value,
       hasOrder,
       cancelReasonId,
@@ -88,7 +89,7 @@ export default function ExamSelectLR({
 
       const requiredMessage = getErrorMessage(
         errorMessages.required,
-        `${positionNumber === 1 ? "左" : "右"}は`
+        `${name ?? (positionNumber === 1 ? "左" : "右")}は`,
       );
 
       // バリデーションが失敗した場合
@@ -101,7 +102,7 @@ export default function ExamSelectLR({
     }
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === InputErrorLevel.異常
+      (error) => error.errorLevel === InputErrorLevel.異常,
     );
 
     // エラーメッセージをexamItemに保存
@@ -144,7 +145,7 @@ export default function ExamSelectLR({
   // 選択ボタン押下時
   const onSelect = (
     selector: ExamItemDetailOption,
-    targetDetail: ExamItemDetail
+    targetDetail: ExamItemDetail,
   ) => {
     const newSelected =
       targetDetail.value === selector.code ? "" : selector.code;
@@ -164,7 +165,7 @@ export default function ExamSelectLR({
                   ...detail,
                   value: newSelected,
                 }
-              : detail
+              : detail,
           ),
         };
 
@@ -196,7 +197,7 @@ export default function ExamSelectLR({
 
   // 対象のexamItemの中の、positionNumberが1のexamItemDetail
   let leftItemDetail = examItemDetails?.find(
-    (detail) => detail.positionNumber === 1
+    (detail) => detail.positionNumber === 1,
   );
   if (!leftItemDetail) {
     leftItemDetail = {
@@ -206,7 +207,7 @@ export default function ExamSelectLR({
   }
   //  対象のexamItemの中の、positionNumberが2のexamItemDetail
   let rightItemDetail = examItemDetails?.find(
-    (detail) => detail.positionNumber === 2
+    (detail) => detail.positionNumber === 2,
   );
   if (!rightItemDetail) {
     rightItemDetail = {
@@ -219,17 +220,9 @@ export default function ExamSelectLR({
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Box mb={16}>
-        <Paper
-          w={274}
-          h={80}
-          bg="gray02"
-          c="white"
-          radius="itemName"
-          px={32}
-          py={16}
-        >
+        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
           <Text size="lg" fw={700} ta="center">
-            {examItem.name}
+            {examItem.name?.slice(0, 8)}
           </Text>
         </Paper>
       </Box>
@@ -242,21 +235,27 @@ export default function ExamSelectLR({
             <Stack key={detail.positionNumber} gap={0}>
               <Paper w={524} bg="gray02" c="white" radius="itemName">
                 <Text size="lg" fw={700} ta="center">
-                  {detail.name}
+                  {detail.name
+                    ? detail.name.slice(0, 14)
+                    : detail.positionNumber === 1
+                      ? "左"
+                      : "右"}
                 </Text>
               </Paper>
-              {detail.prevValue &&
-                (() => {
-                  const prevName =
-                    detail.examItemDetailOptions?.find(
-                      (option) => option.code === detail.prevValue
-                    )?.name || detail.prevValue;
-                  return (
-                    <Text ml="auto" fw={700} maw={271}>
-                      (前回：{prevName})
-                    </Text>
-                  );
-                })()}
+              <Box ml="auto" h={43.4}>
+                {detail.prevValue &&
+                  (() => {
+                    const prevName =
+                      detail.examItemDetailOptions?.find(
+                        (option) => option.code === detail.prevValue,
+                      )?.name || detail.prevValue;
+                    return (
+                      <Text ml="auto" fw={700} maw={271}>
+                        (前回：{prevName})
+                      </Text>
+                    );
+                  })()}
+              </Box>
               <Stack>
                 {detail.examItemDetailOptions?.map(
                   (selector: ExamItemDetailOption) => {
@@ -274,25 +273,25 @@ export default function ExamSelectLR({
                           isDisabled
                             ? "gray03"
                             : isSelected
-                            ? "green03"
-                            : "white"
+                              ? "green03"
+                              : "white"
                         }
                         c={
                           isDisabled
                             ? "gray02"
                             : isSelected
-                            ? "primary"
-                            : "gray02"
+                              ? "primary"
+                              : "gray02"
                         }
                         size="xl"
                         fw={700}
                         disabled={isDisabled}
                         onClick={() => onSelect(selector, detail)}
                       >
-                        {selector.name}
+                        {selector.name?.slice(0,8)}
                       </Button>
                     );
-                  }
+                  },
                 )}
               </Stack>
             </Stack>

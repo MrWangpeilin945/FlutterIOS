@@ -4,7 +4,9 @@ using Moq;
 
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Enums;
+using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.Tests.ResultCollector.Usecases;
@@ -13,6 +15,7 @@ public class HomemenuUsecaseTests
 {
     private readonly Mock<IHomeMenuRepository> _homeMenuRepositoryMock;
     private readonly Mock<IPlaceScheduleRepository> _placeScheduleRepositoryMock;
+    private readonly Mock<IStaffIdentityProvider> _staffIdentityProviderMock;
     private readonly IEnumerable<WebAPI.ResultCollector.Domain.Models.HomeMenuGroup> _homeMenuGroups;
     private readonly WebAPI.ResultCollector.Domain.Models.PlaceScheduleStatus _placeScheduleStatus;
 
@@ -20,6 +23,7 @@ public class HomemenuUsecaseTests
     {
         _placeScheduleRepositoryMock = new Mock<IPlaceScheduleRepository>();
         _homeMenuRepositoryMock = new Mock<IHomeMenuRepository>();
+        _staffIdentityProviderMock = new Mock<IStaffIdentityProvider>();
 
         _homeMenuGroups = [
             new(){
@@ -66,9 +70,9 @@ public class HomemenuUsecaseTests
             PlaceScheduleId = Guid.Parse("75f3d492-4a3e-477d-b67b-c4320ce77dba"),
             PlaceId = Guid.Parse("d74b6117-e784-4607-9dc4-5218b07e23d6"),
             PlaceName = "会場A",
-            ExamDate = new DateTime(2024, 12, 20),
+            ExamDate = new DateOnly(2024, 12, 20),
             Status = PlaceScheduleLockingStatus.検査中,
-            CreatedAt = new DateTime(2024, 12, 10),
+            CreatedAt = DateTimeOffset.Parse("2024-12-10"),
             CreatedBy = "登録者A"
         };
     }
@@ -81,6 +85,7 @@ public class HomemenuUsecaseTests
 
         _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(It.IsAny<Guid>())).ReturnsAsync(_placeScheduleStatus);
         _homeMenuRepositoryMock.Setup(x => x.GetHomeMenuGroupsAsync()).ReturnsAsync(_homeMenuGroups);
+        _staffIdentityProviderMock.Setup(x => x.Role).Returns(Role.User);
 
         var expected = new HomeMenuGroupList()
         {
@@ -105,7 +110,7 @@ public class HomemenuUsecaseTests
             ]
         };
 
-        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
+        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _staffIdentityProviderMock.Object);
 
         // Act
         var result = await homeMenuUsecase.GetHomeMenusAsync(placeScheduleId);
@@ -122,6 +127,7 @@ public class HomemenuUsecaseTests
 
         _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(It.IsAny<Guid>())).ReturnsAsync(_placeScheduleStatus);
         _homeMenuRepositoryMock.Setup(x => x.GetHomeMenuGroupsAsync()).ReturnsAsync(_homeMenuGroups);
+        _staffIdentityProviderMock.Setup(x => x.Role).Returns(Role.User);
 
         var expected = new HomeMenuGroupList()
         {
@@ -146,7 +152,7 @@ public class HomemenuUsecaseTests
             ]
         };
 
-        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
+        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _staffIdentityProviderMock.Object);
 
         // Act
         var result = await homeMenuUsecase.GetHomeMenusAsync(placeScheduleId);
@@ -155,7 +161,7 @@ public class HomemenuUsecaseTests
         result.Should().BeEquivalentTo(expected);
     }
 
-    [Fact(Skip = "TODO: プロダクトコードのロール取得実装待ち")]
+    [Fact]
 
     public async Task 管理者ロールでメニュー一覧を取得する_会場日程IDあり()
     {
@@ -164,6 +170,7 @@ public class HomemenuUsecaseTests
 
         _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(It.IsAny<Guid>())).ReturnsAsync(_placeScheduleStatus);
         _homeMenuRepositoryMock.Setup(x => x.GetHomeMenuGroupsAsync()).ReturnsAsync(_homeMenuGroups);
+        _staffIdentityProviderMock.Setup(x => x.Role).Returns(Role.Admin);
 
         var expected = new HomeMenuGroupList()
         {
@@ -208,12 +215,30 @@ public class HomemenuUsecaseTests
             ]
         };
 
-        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object);
+        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _staffIdentityProviderMock.Object);
 
         // Act
         var result = await homeMenuUsecase.GetHomeMenusAsync(placeScheduleId);
 
         // Assert
         result.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task 一般ロールでメニュー一覧を取得する_職員情報が取得できない()
+    {
+        // Arrange
+        Guid? placeScheduleId = null;
+
+        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(It.IsAny<Guid>())).ReturnsAsync(_placeScheduleStatus);
+        _homeMenuRepositoryMock.Setup(x => x.GetHomeMenuGroupsAsync()).ReturnsAsync(_homeMenuGroups);
+        _staffIdentityProviderMock.Setup(x => x.Role).Returns((Role?)null);
+
+        var homeMenuUsecase = new HomeMenuUsecase(_homeMenuRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _staffIdentityProviderMock.Object);
+
+        // Act & Assert
+        await homeMenuUsecase.Invoking(x => x.GetHomeMenusAsync(placeScheduleId))
+                             .Should().ThrowAsync<WellshipAuthenticationException>()
+                             .WithMessage("認証情報が検証できませんでした。");
     }
 }

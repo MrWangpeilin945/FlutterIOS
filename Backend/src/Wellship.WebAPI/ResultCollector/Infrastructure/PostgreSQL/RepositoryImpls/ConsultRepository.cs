@@ -6,6 +6,7 @@ using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
@@ -16,14 +17,20 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Reposi
 public class ConsultRepository : IConsultRepository
 {
     private readonly IDbConnectionProvider _dbConnectionProvider;
+    private readonly IStaffIdentityProvider _staffIdentityProvider;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// 受診リポジトリを生成します。
     /// </summary>
     /// <param name="dbConnectionProvider">dbConnectionProvider</param>
-    public ConsultRepository(IDbConnectionProvider dbConnectionProvider)
+    /// <param name="staffIdentityProvider">職員情報プロバイダ</param>
+    /// <param name="timeProvider">timeProvider</param>
+    public ConsultRepository(IDbConnectionProvider dbConnectionProvider, IStaffIdentityProvider staffIdentityProvider, TimeProvider timeProvider)
     {
         _dbConnectionProvider = dbConnectionProvider;
+        _staffIdentityProvider = staffIdentityProvider;
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -222,81 +229,113 @@ public class ConsultRepository : IConsultRepository
     /// </summary>
     public async Task SaveExamCancelsAsync(Guid consultId, IEnumerable<ExamItemCancel> examItemCancels)
     {
-        var connection = await _dbConnectionProvider.GetOrOpenAsync();
-
-        var operationTime = DateTime.UtcNow;
-
-        const string preSelectSql = @"
-        select
-            d.exam_item_id as ExamItemId
-            , od.exam_item_detail_id as ExamItemDetailId
-        from
-            resultcollector.exam_item_detail_orders od 
-            left join resultcollector.exam_item_details d 
-                on od.exam_item_detail_id = d.exam_item_detail_id 
-        where
-            exam_item_id = any (@ExamItemIds) 
-            and od.consult_id = @ConsultId;";
-
-        // マスタから検査項目ー検査項目明細の関連付けを取得する（検査依頼があるものに絞り込む）
-        var examItemIds = examItemCancels.Select(x => x.ExamItemId).Distinct().ToArray();
-        var orderedItemDetails = await connection.QueryAsync<(int examItemId, int examItemDetailId)>(preSelectSql, new { ConsultId = consultId, ExamItemIds = examItemIds });
-
-        // 検査項目明細単位で保存するオブジェクトを作る
-        var saveItems = new List<object>();
-        foreach (var examItemCancel in examItemCancels)
+        using var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        using var transaction = connection.BeginTransaction();
+        try
         {
-            // 明細単位にばらす（依頼ありのみ）
-            var detailIds = orderedItemDetails.Where(x => x.examItemId == examItemCancel.ExamItemId).Select(x => x.examItemDetailId).Distinct().ToArray();
-            foreach (var detailId in detailIds)
+            var operationTime = _timeProvider.GetUtcNow();
+            var operationStaffCode = _staffIdentityProvider.StaffCode;
+            if (operationStaffCode is null)
             {
-                var item = new
-                {
-                    ConsultId = consultId,
-                    ExamItemDetailId = detailId,
-                    CancelReasonId = examItemCancel.CancelReasonId,
-                    CreatedAt = operationTime, // TODO: システム時刻を取るサービスを作る 
-                    CreatedBy = "作成者（仮）" // TODO: JWTから操作者の情報を取得する
-                };
-                saveItems.Add(item);
+                throw new WellshipAuthenticationException();
             }
-        }
 
-        // UPSERTを実行する
-        // 複合主キーのconsult_idとexam_item_detail_idが一致するレコードがあれば
-        // cancel_reason_id, created_at, created_byを更新する
-        // なければレコードを新規作成する
-        const string mergeSql = @"
-        merge 
-        into resultcollector.exam_cancels as ec 
-            using (values (@ConsultId, @ExamItemDetailId, @CancelReasonId, @CreatedAt, @CreatedBy)) as new_data( 
+            const string preSelectSql = @"
+            select
+                d.exam_item_id as ExamItemId
+                , od.exam_item_detail_id as ExamItemDetailId
+            from
+                resultcollector.exam_item_detail_orders od 
+                left join resultcollector.exam_item_details d 
+                    on od.exam_item_detail_id = d.exam_item_detail_id 
+            where
+                exam_item_id = any (@ExamItemIds) 
+                and od.consult_id = @ConsultId;";
+
+            // マスタから検査項目ー検査項目明細の関連付けを取得する（検査依頼があるものに絞り込む）
+            var examItemIds = examItemCancels.Select(x => x.ExamItemId).Distinct().ToArray();
+            var orderedItemDetails = await connection.QueryAsync<(int examItemId, int examItemDetailId)>(preSelectSql, new { ConsultId = consultId, ExamItemIds = examItemIds });
+
+            // 検査項目明細単位で保存するオブジェクトを作る
+            var saveItems = new List<object>();
+            foreach (var examItemCancel in examItemCancels)
+            {
+                // 明細単位にばらす（依頼ありのみ）
+                var detailIds = orderedItemDetails.Where(x => x.examItemId == examItemCancel.ExamItemId).Select(x => x.examItemDetailId).Distinct().ToArray();
+                foreach (var detailId in detailIds)
+                {
+                    var item = new
+                    {
+                        ConsultId = consultId,
+                        ExamItemDetailId = detailId,
+                        CancelReasonId = examItemCancel.CancelReasonId,
+                        CreatedAt = operationTime,
+                        CreatedBy = operationStaffCode
+                    };
+                    saveItems.Add(item);
+                }
+            }
+
+            // UPSERTを実行する
+            // 複合主キーのconsult_idとexam_item_detail_idが一致するレコードがあれば
+            // cancel_reason_id, created_at, created_byを更新する
+            // なければレコードを新規作成する
+            const string mergeSql = @"
+            merge 
+            into resultcollector.exam_cancels as ec 
+                using (values (@ConsultId, @ExamItemDetailId, @CancelReasonId, @CreatedAt, @CreatedBy)) as new_data( 
+                    consult_id
+                    , exam_item_detail_id
+                    , cancel_reason_id
+                    , created_at
+                    , created_by
+                ) 
+                    on ec.consult_id = new_data.consult_id 
+                    and ec.exam_item_detail_id = new_data.exam_item_detail_id when matched then update 
+            set
+                cancel_reason_id = new_data.cancel_reason_id 
+                , created_at = new_data.created_at
+                , created_by = new_data.created_by when not matched then 
+            insert ( 
                 consult_id
                 , exam_item_detail_id
                 , cancel_reason_id
                 , created_at
                 , created_by
             ) 
-                on ec.consult_id = new_data.consult_id 
-                and ec.exam_item_detail_id = new_data.exam_item_detail_id when matched then update 
-        set
-            cancel_reason_id = new_data.cancel_reason_id 
-            , created_at = new_data.created_at
-            , created_by = new_data.created_by when not matched then 
-        insert ( 
-            consult_id
-            , exam_item_detail_id
-            , cancel_reason_id
-            , created_at
-            , created_by
-        ) 
-        values ( 
-            new_data.consult_id
-            , new_data.exam_item_detail_id
-            , new_data.cancel_reason_id
-            , new_data.created_at
-            , new_data.created_by
-        );";
-        await connection.ExecuteAsync(mergeSql, saveItems);
+            values ( 
+                new_data.consult_id
+                , new_data.exam_item_detail_id
+                , new_data.cancel_reason_id
+                , new_data.created_at
+                , new_data.created_by
+            );";
+
+            const string logSql = @"
+            insert 
+            into resultcollector.exam_cancel_histories(
+                consult_id
+                , exam_item_detail_id
+                , value
+                , created_by
+                , created_at
+            ) 
+            values ( 
+                @ConsultId
+                , @ExamItemDetailId
+                , @Value
+                , @CreatedBy
+                , @CreatedAt
+            );";
+
+            await connection.ExecuteAsync(mergeSql, saveItems);
+            await connection.ExecuteAsync(logSql, saveItems);
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
 
     /// <summary>
@@ -388,7 +427,7 @@ public class ConsultRepository : IConsultRepository
 
         var response = await connection.QueryAsync<PreviousResultEntity>(sql, new { ConsultId = consultId, ExamDate = examDate.ToString("yyyy-MM-dd") });
         // 受診日の直近日
-        var previousDate = DateTime.Parse(examDate.ToString("yyyy-MM-dd"));
+        var previousDate = DateOnly.Parse(examDate.ToString("yyyy-MM-dd"));
         if (response.Any())
         {
             previousDate = response.Select(x => x.ExamDate).ElementAt(0);
@@ -396,7 +435,7 @@ public class ConsultRepository : IConsultRepository
         return new PreviousResult()
         {
             ConsultId = consultId,
-            ExamDate = DateOnly.FromDateTime(previousDate),
+            ExamDate = previousDate,
             // 受診日の直近日の過去検査結果のみ返す
             ExamItemDetailResults = response.Where(x => x.ExamDate == previousDate)
                                             .Select(x => new ExamItemDetailResult()

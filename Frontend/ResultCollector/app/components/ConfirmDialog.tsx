@@ -8,6 +8,7 @@ import {
   getThemeColor,
   useMantineTheme,
 } from "@mantine/core";
+import styles from "~/styles/common.module.css";
 
 interface ConfirmDialogProps {
   message: string;
@@ -47,14 +48,7 @@ export default function ConfirmDialog({
       }}
     >
       <Stack gap={64}>
-        <Text
-          size="lg"
-          c="black01"
-          style={{
-            wordBreak: "break-word",
-            whiteSpace: "pre-wrap",
-          }}
-        >
+        <Text size="lg" c="black01" className={styles["text-wrap"]}>
           {message}
         </Text>
         <Center>

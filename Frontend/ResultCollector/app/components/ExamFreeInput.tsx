@@ -1,6 +1,14 @@
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { Group, Paper, Text, Textarea, Button, Flex } from "@mantine/core";
+import {
+  Group,
+  Paper,
+  Text,
+  Textarea,
+  Button,
+  Flex,
+  Stack,
+} from "@mantine/core";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import type {
@@ -8,7 +16,10 @@ import type {
   ExamRegistResult,
 } from "~/domain/wellship.schemas";
 import { InputErrorLevel } from "~/domain/enums";
-import { IconExclamationCircleFilled } from "@tabler/icons-react";
+import {
+  IconExclamationCircleFilled,
+  IconSquareRoundedXFilled,
+} from "@tabler/icons-react";
 import styles from "~/styles/common.module.css";
 
 type ExamFreeInputProps = {
@@ -34,7 +45,7 @@ export default function ExamFreeInput({
     !examItems.some(
       (item) =>
         item.positionNumber === 1 &&
-        item.examItemDetails?.some((detail) => detail.positionNumber === 1)
+        item.examItemDetails?.some((detail) => detail.positionNumber === 1),
     )
   ) {
     return null;
@@ -71,10 +82,10 @@ export default function ExamFreeInput({
   }, [onRegisterPressed, examItems]);
 
   const firstPositionExamItem = examItemsData.find(
-    (item) => item.positionNumber === 1
+    (item) => item.positionNumber === 1,
   );
   const firstPositionDetail = firstPositionExamItem?.examItemDetails?.find(
-    (detail) => detail.positionNumber === 1
+    (detail) => detail.positionNumber === 1,
   );
 
   // エラーメッセージの並び替え
@@ -93,7 +104,7 @@ export default function ExamFreeInput({
   // APIのエラーメッセージで更新する
   const resetErrorMessages = (item: InputExamItem) => {
     const targetError = backendValidation.find(
-      (error) => error.itemPositionNumber === item.positionNumber
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -109,7 +120,7 @@ export default function ExamFreeInput({
     // 必須チェック行うスキーマ
     const schema = z
       .string()
-      .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)); // 必須チェック
+      .min(1, getErrorMessage(errorMessages.required, item.name?`${item.name}は`:"")); // 必須チェック
     // バリデーション対象データを取得
     const valueToValidate =
       item.examItemDetails?.find((item) => item.positionNumber === 1)?.value ||
@@ -128,7 +139,7 @@ export default function ExamFreeInput({
     componentErrorMessage.push(...setRangesErrorMessage(item));
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === 3
+      (error) => error.errorLevel === 3,
     );
     // エラーメッセージをexamItemに保存
     const resultItem: InputExamItem = {
@@ -151,18 +162,18 @@ export default function ExamFreeInput({
     const updatedExamItems = [...examItemsData];
 
     // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
-    let hasValidationError = true;
+    let hasValidationError = false;
 
     for (const item of updatedExamItems) {
       if (item.positionNumber === 1) {
         item.examItemDetails = item.examItemDetails?.map((detail) =>
-          detail.positionNumber === 1 ? { ...detail, value: value } : detail
+          detail.positionNumber === 1 ? { ...detail, value: value } : detail,
         );
         // バリデーションチェックを実施
         const { validateResult, hasCallback } = validationCheck(item);
         if (!hasCallback) {
           // falseのexamItemがあればコールバックを行わない
-          hasValidationError = false;
+          hasValidationError = true;
         }
         Object.assign(item, validateResult);
       }
@@ -183,19 +194,9 @@ export default function ExamFreeInput({
   return (
     <Flex mt={16} justify="flex-start" align="flex-start" direction="column">
       <Flex gap={16} justify="flex-start" align="flex-start">
-        <Paper
-          w={274}
-          h={80}
-          className={styles["basic-grey"]}
-          radius="itemName"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text size="lg" fw={700}>
-            {name}
+        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
+          <Text size="lg" fw={700} ta="center">
+            {name?.slice(0, 8)}
           </Text>
         </Paper>
         <Textarea
@@ -204,14 +205,14 @@ export default function ExamFreeInput({
               isDisabled
                 ? ""
                 : examRegistResults?.some(
-                    (x) => x.errorLevel === InputErrorLevel.異常
-                  )
-                ? `${styles["input-error"]}`
-                : examRegistResults?.some(
-                    (x) => x.errorLevel === InputErrorLevel.警告
-                  )
-                ? `${styles["input-warning"]}`
-                : ""
+                      (x) => x.errorLevel === InputErrorLevel.異常,
+                    )
+                  ? `${styles["input-error"]}`
+                  : examRegistResults?.some(
+                        (x) => x.errorLevel === InputErrorLevel.警告,
+                      )
+                    ? `${styles["input-warning"]}`
+                    : ""
             }`,
           }}
           w={524}
@@ -233,6 +234,7 @@ export default function ExamFreeInput({
           variant="outline"
           bd={"2px,solid"}
           tabIndex={-1}
+          disabled={isDisabled}
           onClick={() => handleChange("")}
         >
           クリア
@@ -241,24 +243,33 @@ export default function ExamFreeInput({
       <Text
         mt={16}
         ml={287}
+        maw={528}
         size="md"
         fw="700"
-        className={styles["text-multiline"]}
+        className={styles["text-wrap"]}
       >
         {firstPositionDetail?.prevValue
           ? `(前回値)\n${firstPositionDetail?.prevValue}`
           : ""}
       </Text>
       {/* エラーメッセージを表示する。 */}
-      {(examRegistResults || []).map((error, index) => (
-        <Group
-          key={index}
-          c={error.errorLevel === InputErrorLevel.異常 ? "error" : "warning"}
-        >
-          <IconExclamationCircleFilled size={32} />
-          <Text>{error.description}</Text>
-        </Group>
-      ))}
+      <Stack gap={0}>
+        {(examRegistResults || []).map((error, index) => {
+          const isWarning = error.errorLevel === InputErrorLevel.警告;
+          return (
+            <Group key={index} c={isWarning ? "warning" : "error"}>
+              {isWarning ? (
+                <IconExclamationCircleFilled size={32} />
+              ) : (
+                <IconSquareRoundedXFilled size={32} />
+              )}
+              <Text size="sm" fw={700}>
+                {error.description}
+              </Text>
+            </Group>
+          );
+        })}
+      </Stack>
     </Flex>
   );
 }

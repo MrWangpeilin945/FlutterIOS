@@ -57,7 +57,7 @@ export default function ExamBody({
   const hasValidDetail = examItems.some(
     (item) =>
       bodyItemPositionNumbers.includes(item.positionNumber ?? 0) &&
-      item.examItemDetails?.some((detail) => detail.positionNumber === 1)
+      item.examItemDetails?.some((detail) => detail.positionNumber === 1),
   );
 
   if (!hasValidDetail) {
@@ -81,9 +81,9 @@ export default function ExamBody({
           (detail) =>
             detail.positionNumber === 1 &&
             detail.hasOrder === true &&
-            !detail.cancelReasonId
-        )
-    )
+            !detail.cancelReasonId,
+        ),
+    ),
   );
 
   // キーボードの表示インデックスを状態として管理する
@@ -100,11 +100,7 @@ export default function ExamBody({
 
   useEffect(() => {
     const updatedItems = examItems.map((item) => {
-      let validatedData: InputExamItem = item;
-      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-      if (onRegisterPressed) {
-        validatedData = validationCheck(item).validateResult;
-      }
+      const validatedData = validationCheck(item).validateResult;
       return validatedData;
     });
     setExamItemsData(updatedItems);
@@ -113,7 +109,7 @@ export default function ExamBody({
   // キーボードの表示/非表示をトグルする関数
   const toggleKeyboard = (positionNumber: number) => {
     setActiveKeyboard((prevNumber) =>
-      prevNumber === positionNumber ? null : positionNumber
+      prevNumber === positionNumber ? null : positionNumber,
     );
   };
   const handleConfirm = () => {
@@ -136,7 +132,7 @@ export default function ExamBody({
   // APIのエラーメッセージに更新する
   const resetErrorMessages = (item: InputExamItem) => {
     const targetError = backendValidation.find(
-      (error) => error.itemPositionNumber === item.positionNumber
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -152,17 +148,41 @@ export default function ExamBody({
     // BMIはバリデーションチェックを実施しない
     if (item.positionNumber === BMI)
       return { validateResult: item, hasCallback: true };
-    // 必須チェックと半角数字チェックを一度に行うスキーマ
-    const schema = z
-      .string()
-      .min(1, getErrorMessage(errorMessages.required, `${item.name}は`)) // 必須チェック
-      .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-        message: getErrorMessage(errorMessages.numericString, `${item.name}は`),
-      });
+    const message =
+      item.positionNumber === 身長
+        ? "身長は"
+        : item.positionNumber === 体重
+          ? "体重は"
+          : item.positionNumber === 体脂肪率
+            ? "体脂肪率は"
+            : "";
+    // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
+    const schema = onRegisterPressed
+      ? z
+          .string()
+          .min(
+            1,
+            getErrorMessage(
+              errorMessages.required,
+              item.name ? `${item.name}は` : message,
+            ), // 必須チェック
+          )
+          .refine((value) => /^\d+(\.\d+)?$/.test(value), {
+            message: getErrorMessage(
+              errorMessages.numericString,
+              item.name ? `${item.name}は` : message,
+            ),
+          })
+      : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
+          message: getErrorMessage(
+            errorMessages.numericString,
+            item.name ? `${item.name}は` : "",
+          ),
+        });
 
     // バリデーション対象データを取得
     const targetDetail = item.examItemDetails?.find(
-      (item) => item.positionNumber === 1
+      (item) => item.positionNumber === 1,
     );
     const result = schema.safeParse(targetDetail?.value);
 
@@ -183,7 +203,7 @@ export default function ExamBody({
     componentErrorMessage.push(...(setRangesErrorMessage(item) ?? []));
     // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
     const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === InputErrorLevel.異常
+      (error) => error.errorLevel === InputErrorLevel.異常,
     );
     // エラーメッセージをexamItemに保存
     const resultItem: InputExamItem = {
@@ -289,7 +309,7 @@ export default function ExamBody({
     (positionNumber) => {
       // 該当するexamItemを検索
       let examItem = examItemsData.find(
-        (item) => item.positionNumber === positionNumber
+        (item) => item.positionNumber === positionNumber,
       );
 
       // 該当するexamItemがなければデフォルトを設定
@@ -300,17 +320,17 @@ export default function ExamBody({
             positionNumber === 身長
               ? "身長"
               : positionNumber === 体重
-              ? "体重"
-              : positionNumber === 体脂肪率
-              ? "体脂肪率"
-              : "BMI",
+                ? "体重"
+                : positionNumber === 体脂肪率
+                  ? "体脂肪率"
+                  : "BMI",
           examItemDetails: [{ positionNumber: 1 }],
           examRegistResults: [],
         };
       }
 
       return examItem;
-    }
+    },
   );
 
   return (
@@ -340,11 +360,10 @@ export default function ExamBody({
                 bg={isBMI ? "white" : "gray02"}
                 c={isBMI ? "gray02" : "white"}
                 radius="itemName"
-                px={32}
                 py={16}
               >
                 <Text size="lg" fw={700} ta="center">
-                  {name}
+                  {name?.slice(0, 8)}
                 </Text>
               </Paper>
 
@@ -364,14 +383,14 @@ export default function ExamBody({
                   classNames={{
                     input: `${styles["input-textbox"]} ${
                       examRegistResults?.some(
-                        (x) => x.errorLevel === InputErrorLevel.異常
+                        (x) => x.errorLevel === InputErrorLevel.異常,
                       )
                         ? `${styles["input-error"]}`
                         : examRegistResults?.some(
-                            (x) => x.errorLevel === InputErrorLevel.警告
-                          )
-                        ? `${styles["input-warning"]}`
-                        : ""
+                              (x) => x.errorLevel === InputErrorLevel.警告,
+                            )
+                          ? `${styles["input-warning"]}`
+                          : ""
                     }`,
                   }}
                   w={340}
@@ -387,12 +406,23 @@ export default function ExamBody({
                   disabled={isDisabled}
                 />
               )}
-              <Stack w={173} gap={4} mt="auto">
-                {detail?.prevValue && (
-                  <Text fw={700}>(前回：{detail.prevValue})</Text>
-                )}
-                {!isBMI && <Text size="xs">{detail?.unit}</Text>}
+              <Stack w={173} h={80} gap={4} justify="space-between">
+                <Box>
+                  {detail?.prevValue && (
+                    <Text fw={700} mt={0}>
+                      (前回：{detail.prevValue})
+                    </Text>
+                  )}
+                </Box>
+                <Box>
+                  {!isBMI && (
+                    <Text size="xs" mb={0}>
+                      {detail?.unit}
+                    </Text>
+                  )}
+                </Box>
               </Stack>
+
               {!isBMI && (
                 <Button
                   w={154}

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Requests;
@@ -13,6 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
+[Authorize]
 public class ConsultController : ControllerBase
 {
     private readonly IConsultUsecase _consultUsecase;
@@ -103,32 +105,6 @@ public class ConsultController : ControllerBase
     public async Task<IActionResult> GetInputExamItemsExamineeAsync([FromRoute][Required] string consultNumber, [FromQuery][Required] int examMenuId)
     {
         var results = await _consultUsecase.GetInputExamItemsExamineeAsync(consultNumber, examMenuId);
-        return Ok(results);
-    }
-
-    /// <summary>
-    /// 前提検査メニューを検証する（仮：動作確認用）
-    /// </summary>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(InputExamItems))]
-    [HttpGet]
-    [Route("api/v{version:apiVersion}/consult/{consultNumber}/prior/{currentExamId}")]
-    public async Task<IActionResult> ValidatePriorExamMenus([FromRoute][Required] string consultNumber, [FromRoute][Required] int currentExamId)
-    {
-        // TODO: 検証ロジックを実装後に削除すること
-        var results = await _consultUsecase.ValidatePriorExamMenus(consultNumber, currentExamId);
-        return Ok(results);
-    }
-
-    /// <summary>
-    /// 検査結果相関ルールを検証する（仮：動作確認用）
-    /// </summary>
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [HttpPost]
-    [Route("api/v{version:apiVersion}/consult/{consultNumber}/correlation")]
-    public async Task<IActionResult> ValidateCorrelationRuleAsync([FromRoute][Required] string consultNumber, [FromBody][Required] ResultsRequest request)
-    {
-        // TODO: 検証ロジックを実装後に削除すること
-        var results = await _consultUsecase.ValidateCorrelationRuleAsync(consultNumber, request);
         return Ok(results);
     }
 

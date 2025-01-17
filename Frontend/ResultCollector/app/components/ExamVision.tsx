@@ -37,6 +37,11 @@ type VisionProps = {
   onChange: (updatedExamItem: InputExamItem[] | undefined) => void;
 };
 
+interface BackendValidation {
+  itemPositionNumber: number;
+  examRegistResults: ExamRegistResult[];
+}
+
 export default function ExamVision({
   examItems,
   onRegisterPressed,
@@ -80,12 +85,28 @@ export default function ExamVision({
     detailNumber: number;
   } | null>(null);
 
+  // APIからのエラーメッセージを保存する
+  const [backendValidation, setBackendValidation] = useState<
+    BackendValidation[]
+  >([]);
+  // 初回読み込み時にAPIのエラーメッセージを保存する
+  useEffect(() => {
+    const backendErrorMessages: BackendValidation[] = examItems.map((item) => ({
+      itemPositionNumber: item.positionNumber ?? 0,
+      examRegistResults: item.examRegistResults ?? [],
+    }));
+    setBackendValidation(backendErrorMessages);
+  }, []);
+
   useEffect(() => {
     // 登録ボタンフラグがtrueの場合、必須チェック
     if (onRegisterPressed) {
       requiredCheck(examItems);
     }
-    setExamItemsData(examItems);
+    const validatedItems = examItems.map((item) => {
+      return validationCheck(item).validateResult;
+    });
+    setExamItemsData(validatedItems);
   }, [onRegisterPressed, examItems]);
 
   // キーボード以外の部分を押下時に非表示
@@ -130,12 +151,12 @@ export default function ExamVision({
   };
 
   // 半角数字チェック
-  const validateNumeric = (detail: ExamItemDetail) => {
+  const validateNumeric = (detail: ExamItemDetail, message: string) => {
     const schema = z
       .string()
       .refine(
         (value) => value === "" || /^\d+(\.\d+)?$/.test(value),
-        getErrorMessage(errorMessages.numericString, `${detail.name}は`),
+        getErrorMessage(errorMessages.numericString, message),
       );
 
     const result = schema.safeParse(detail.value);
@@ -151,20 +172,38 @@ export default function ExamVision({
     return undefined;
   };
 
-  // 矯正区分が選択されているかチェック
+  // 矯正の固有チェック
   const collectionCheck = (
+    examItem: InputExamItem,
+    detailNumber: number,
     value: string,
-    targetDetail: ExamItemDetail,
   ): ExamRegistResult | undefined => {
-    const collectionSchema = z
-      .string()
-      .min(
-        1,
-        getErrorMessage(errorMessages.required, `${targetDetail?.name}は`),
-      );
+    //矯正以外の項目、矯正の両眼の場合はチェックを行わない
+    if (examItem.positionNumber !== 矯正 || detailNumber === 矯正入力値_両眼)
+      return undefined;
 
-    // 矯正の入力値が存在する場合、矯正区分を必須チェック
-    if (value) {
+    //対象のdetailを取得
+    const isSelect =
+      detailNumber === 矯正区分_左 || detailNumber === 矯正区分_右;
+    const isLeft =
+      detailNumber === 矯正区分_左 || detailNumber === 矯正入力値_左;
+    const targetDetail =
+      examItem.examItemDetails?.find((d) =>
+        isSelect
+          ? d.positionNumber === (isLeft ? 矯正入力値_左 : 矯正入力値_右)
+          : d.positionNumber === (isLeft ? 矯正区分_左 : 矯正区分_右),
+      ) ?? {};
+    const message = isSelect
+      ? isLeft
+        ? "矯正区分（左）が選択されていますが、矯正値（左）が入力されていません。"
+        : "矯正区分（右）が選択されていますが、矯正値（右）が入力されていません。"
+      : isLeft
+        ? "矯正値（左）が入力されていますが、矯正区分（左）が選択されていません。"
+        : "矯正値（右）が入力されていますが、矯正区分（右）が選択されていません。";
+    //必須スキーマ
+    const collectionSchema = z.string().min(1, message);
+    // 矯正の入力値または矯正区分を必須チェック
+    if (value && targetDetail.hasOrder && !targetDetail.cancelReasonId) {
       const result = collectionSchema.safeParse(targetDetail?.value);
       if (!result.success) {
         const error = result.error.errors[0];
@@ -174,23 +213,50 @@ export default function ExamVision({
         };
       }
     }
+
     return undefined;
   };
 
-  // APIからのエラーメッセージを保存
-  const APIErrors = examItems.map((item) => ({
-    positionNumber: item.positionNumber,
-    examRegistResults: item.examRegistResults || [],
-  }));
-  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  // 初回読み込み時のAPIからのエラーメッセージで初期化する
   const resetErrorMessages = (item: InputExamItem) => {
-    const targetError = APIErrors.find(
-      (error) => error.positionNumber === item.positionNumber,
+    const targetError = backendValidation.find(
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
     }
     return item;
+  };
+
+  const getNumericMessage = (
+    itemNumber: number | undefined,
+    detailNumber: number | undefined,
+  ) => {
+    if (itemNumber === 裸眼) {
+      switch (detailNumber) {
+        case 左眼:
+          return "左は";
+        case 右眼:
+          return "右は";
+        case 両眼:
+          return "両眼は";
+        default:
+          return "";
+      }
+    }
+    if (itemNumber === 矯正) {
+      switch (detailNumber) {
+        case 矯正入力値_左:
+          return "左は";
+        case 矯正入力値_右:
+          return "右は";
+        case 矯正入力値_両眼:
+          return "両眼は";
+        default:
+          return "";
+      }
+    }
+    return "";
   };
 
   // バリデーションチェック
@@ -205,42 +271,28 @@ export default function ExamVision({
       const isSelector =
         Array.isArray(detail.examItemDetailOptions) &&
         detail.examItemDetailOptions.length > 0;
-      if (isSelector) continue;
 
       // オーダーが存在するかつ中止理由が存在しない場合
-      if (detail.hasOrder && !detail.cancelReasonId) {
+      if (!isSelector && detail.hasOrder && !detail.cancelReasonId) {
         // 半角数字チェック
-        const result = validateNumeric(detail);
+        const result = validateNumeric(
+          detail,
+          getNumericMessage(item.positionNumber, detail.positionNumber),
+        );
         if (result !== undefined) {
           componentErrorMessage.push(result);
         }
       }
 
-      // 矯正の値が入力された場合に、矯正区分が選択されているかチェック
-      if (
-        item.positionNumber === 矯正 &&
-        (detail.positionNumber === 矯正入力値_左 ||
-          detail.positionNumber === 矯正入力値_右)
-      ) {
-        const targetDetail =
-          detail.positionNumber === 矯正入力値_左
-            ? item.examItemDetails?.find(
-                (d) => d.positionNumber === 矯正区分_左,
-              )
-            : item.examItemDetails?.find(
-                (d) => d.positionNumber === 矯正区分_右,
-              );
-
-        // 対象の矯正区分のオーダーが存在するかつ中止理由が存在しない場合
-        if (targetDetail?.hasOrder && !targetDetail.cancelReasonId) {
-          // 矯正区分チェック
-          const result = collectionCheck(
-            detail.value ?? "",
-            targetDetail ?? {},
-          );
-          if (result !== undefined) {
-            componentErrorMessage.push(result);
-          }
+      // 矯正チェック
+      if (onRegisterPressed) {
+        const result = collectionCheck(
+          item,
+          detail.positionNumber ?? 0,
+          detail.value ?? "",
+        );
+        if (result !== undefined) {
+          componentErrorMessage.push(result);
         }
       }
     }
@@ -475,7 +527,13 @@ export default function ExamVision({
                     px={16}
                     py={isCorrection ? 60 : 16}
                   >
-                    {item.name}
+                    {item.positionNumber === 裸眼
+                      ? "裸眼"
+                      : item.positionNumber === 矯正
+                        ? "矯正"
+                        : item.positionNumber === 特記
+                          ? "特記"
+                          : ""}
                   </Text>
                 </Paper>
                 <Grid

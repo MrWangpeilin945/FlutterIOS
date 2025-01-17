@@ -49,3 +49,14 @@
     transform: rotate(360deg);
   }
 }
+
+.loading-large > span {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.loading-large > div {
+  position: fixed;
+}

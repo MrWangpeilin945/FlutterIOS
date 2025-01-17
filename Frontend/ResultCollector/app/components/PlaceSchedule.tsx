@@ -1,6 +1,6 @@
 import { Stack, Text } from "@mantine/core";
 import { format, parse } from "date-fns";
-
+import styles from "~/styles/common.module.css";
 type PlaceScheduleProps = {
   placeName: string;
   examDate: string;
@@ -12,15 +12,7 @@ export default function PlaceSchedule({
 }: PlaceScheduleProps) {
   return (
     <Stack gap={16}>
-      <Text
-        size="lg"
-        fw={700}
-        c="black01"
-        style={{
-          wordBreak: "break-word",
-          whiteSpace: "pre-wrap",
-        }}
-      >
+      <Text size="lg" fw={700} c="black01" className={styles["text-wrap"]}>
         {placeName}
       </Text>
       <Text size="sm" c="black01">

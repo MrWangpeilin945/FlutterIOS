@@ -1,5 +1,5 @@
 -- DB切り替え
-\c dev01
+\c wellship
 
 set search_path = resultcollector;
 
@@ -9,6 +9,15 @@ CREATE TABLE affiliations (
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT affiliations_PKC PRIMARY KEY (examinee_id,organization_id)
+);
+
+CREATE TABLE app_config (
+  key varchar(100) NOT NULL
+  , value text NOT NULL
+  , description text
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT app_config_PKC PRIMARY KEY (key)
 );
 
 CREATE TABLE consult_notes (
@@ -111,7 +120,7 @@ CREATE TABLE equipments (
 CREATE TABLE exam_cancel_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_id uuid NOT NULL
-  , consult_item_detail_id integer NOT NULL
+  , exam_item_detail_id integer NOT NULL
   , value text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
@@ -358,7 +367,7 @@ CREATE TABLE tickets (
 );
 
 CREATE TABLE tickets_histories (
-  id uuid NOT NULL
+  id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_id uuid NOT NULL
   , ticket_number text
   , action_type varchar(1) NOT NULL
@@ -402,7 +411,6 @@ CREATE TABLE exam_item_details (
   exam_item_detail_id integer NOT NULL
   , exam_item_id integer NOT NULL
   , name text NOT NULL
-  , set_previous_as_default boolean DEFAULT false NOT NULL
   , order_number integer NOT NULL
   , position_number integer NOT NULL
   , type integer NOT NULL
@@ -813,6 +821,13 @@ COMMENT ON COLUMN affiliations.organization_id IS '団体ID';
 COMMENT ON COLUMN affiliations.created_at IS '作成日時';
 COMMENT ON COLUMN affiliations.created_by IS '作成者';
 
+COMMENT ON TABLE app_config IS 'アプリケーション設定';
+COMMENT ON COLUMN app_config.key IS '設定キー';
+COMMENT ON COLUMN app_config.value IS '設定値';
+COMMENT ON COLUMN app_config.description IS '説明';
+COMMENT ON COLUMN app_config.created_at IS '作成日時';
+COMMENT ON COLUMN app_config.created_by IS '作成者';
+
 COMMENT ON TABLE consult_notes IS '受診特記';
 COMMENT ON COLUMN consult_notes.consult_id IS '受診ID';
 COMMENT ON COLUMN consult_notes.code IS '検査特記コード';
@@ -909,7 +924,7 @@ COMMENT ON COLUMN equipments.created_by IS '作成者';
 COMMENT ON TABLE exam_cancel_histories IS '検査中止履歴';
 COMMENT ON COLUMN exam_cancel_histories.id IS 'ID';
 COMMENT ON COLUMN exam_cancel_histories.consult_id IS '受診ID';
-COMMENT ON COLUMN exam_cancel_histories.consult_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_cancel_histories.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_cancel_histories.value IS '値';
 COMMENT ON COLUMN exam_cancel_histories.created_at IS '作成日時';
 COMMENT ON COLUMN exam_cancel_histories.created_by IS '作成者';
@@ -1121,7 +1136,6 @@ COMMENT ON TABLE exam_item_details IS '検査項目明細';
 COMMENT ON COLUMN exam_item_details.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN exam_item_details.exam_item_id IS '検査項目ID';
 COMMENT ON COLUMN exam_item_details.name IS '検査項目明細名';
-COMMENT ON COLUMN exam_item_details.set_previous_as_default IS '前回値を初期値としてセットするか';
 COMMENT ON COLUMN exam_item_details.order_number IS '表示順';
 COMMENT ON COLUMN exam_item_details.position_number IS '配置番号';
 COMMENT ON COLUMN exam_item_details.type IS '検査項目明細種別';

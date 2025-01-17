@@ -4,6 +4,7 @@ using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models.Triggers;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -19,6 +20,7 @@ public class ConsultUsecase : IConsultUsecase
     private readonly IExamItemRepository _examItemRepository;
     private readonly IPlaceScheduleRepository _placeScheduleRepository;
     private readonly IResultRepository _resultRepository;
+    private readonly IStaffIdentityProvider _staffIdentityProvider;
 
     /// <summary>
     /// コンストラクタ
@@ -29,8 +31,10 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="examItemRepository">検査項目リポジトリ</param>
     /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
     /// <param name="resultRepository">検査結果リポジトリ</param>
+    /// <param name="staffIdentityProvider">職員情報プロバイダ</param>
     public ConsultUsecase(IConsultRepository consultRepository, IExamineeRepository examineeRepository, IExamMenuRepository examMenuRepository,
-                          IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository, IResultRepository resultRepository)
+                          IExamItemRepository examItemRepository, IPlaceScheduleRepository placeScheduleRepository, IResultRepository resultRepository,
+                          IStaffIdentityProvider staffIdentityProvider)
     {
         _consultRepository = consultRepository;
         _examineeRepository = examineeRepository;
@@ -38,6 +42,7 @@ public class ConsultUsecase : IConsultUsecase
         _examItemRepository = examItemRepository;
         _placeScheduleRepository = placeScheduleRepository;
         _resultRepository = resultRepository;
+        _staffIdentityProvider = staffIdentityProvider;
     }
 
     /// <summary>
@@ -327,11 +332,9 @@ public class ConsultUsecase : IConsultUsecase
         };
         // 検査結果相関ルールを検証する
         var ruleErrors = await ValidateCorrelationRuleAsync(consultNumber, results);
-        // 検査基準値を検証する
-        var rangeErrors = await ValidateNormalValueRangeAsync(consultNumber, results);
+
         // 検査項目グループ情報を取得する
-        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, examMenuId, results, examItemGroup,
-                                                     examResults, previousResults, ruleErrors, rangeErrors);
+        var examItemGroups = await GetExamItemGroups(consult.ConsultId, examAge, examinee.Sex, examItemGroup, examResults, previousResults, ruleErrors);
 
         return new InputExamItems()
         {
@@ -527,9 +530,9 @@ public class ConsultUsecase : IConsultUsecase
     {
         var consult = await _consultRepository.GetConsultAsync(consultNumber);
         // 会場のロック中かを確認
-        // TODO: 管理者のみ更新可能 後方作業へ
+        // ロール：管理者は操作可能
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync(consult.PlaceScheduleId);
-        if (placeSchedule?.Status == PlaceScheduleLockingStatus.検査完了)
+        if (placeSchedule?.Status == PlaceScheduleLockingStatus.検査完了 && _staffIdentityProvider.Role != Role.Admin)
         {
             // 会場ロック中
             throw new PlaceScheduleLockedException();
@@ -560,7 +563,10 @@ public class ConsultUsecase : IConsultUsecase
                                                 Value = detail.Value
                                             })
                                             .ToArray();
+
+        // 登録と履歴を書き込む
         await _resultRepository.RegisterResultsAsync(consult.ConsultId, resultList);
+        await _resultRepository.WriteResultsLogAsync(consult.ConsultId, resultList);
     }
 
     /// <summary>
@@ -587,8 +593,8 @@ public class ConsultUsecase : IConsultUsecase
         // 検査結果相関ルールを検証する
         var ruleErrors = await ValidateCorrelationRuleAsync(consultNumber, results);
         // 検査項目グループ情報を取得する
-        var examItemGroups = await GetExamItemGroups(consultNumber, consult.ConsultId, examAge, examinee.Sex, results.ExamMenuId, results,
-                                                     examItemGroup, examResults, previousResults, ruleErrors, []);
+        var examItemGroups = await GetExamItemGroups(consult.ConsultId, examAge, examinee.Sex, examItemGroup, examResults, previousResults, ruleErrors);
+
         return new VerifyExamItems
         {
             // 検査項目グループ情報を取得する
@@ -599,10 +605,9 @@ public class ConsultUsecase : IConsultUsecase
     /// <summary>
     /// 検査項目グループ情報を取得する
     /// </summary>
-    private async Task<IEnumerable<APIModels.Responses.ExamItemGroup>> GetExamItemGroups(string consultNumber, Guid consultId, Domain.Models.Age examAge, Sex sex, int examMenuId,
-                                                                                         ResultsRequest results, IEnumerable<Domain.Models.ExamItemGroup> examItemGroup,
+    private async Task<IEnumerable<APIModels.Responses.ExamItemGroup>> GetExamItemGroups(Guid consultId, Domain.Models.Age examAge, Sex sex, IEnumerable<Domain.Models.ExamItemGroup> examItemGroup,
                                                                                          Domain.Models.ExamResult examResults, Domain.Models.PreviousResult previousResults,
-                                                                                         IEnumerable<Domain.Models.RuleError> ruleErrors, IEnumerable<Domain.Models.RangeError> rangeErrors)
+                                                                                         IEnumerable<Domain.Models.RuleError> ruleErrors)
     {
         // 検査項目明細IDを取得
         var examItemDetailIds = examItemGroup.SelectMany(group => group.ExamItems)
@@ -679,24 +684,15 @@ public class ConsultUsecase : IConsultUsecase
                                           MinValue = r.ValueRange.MinValue
                                       }).ToArray()
                 }).ToArray(),
-                // 検査基準値エラーと相関ルールをマージする
-                ExamRegistResults =
-                    rangeErrors.Where(range => ei.ExamItemDetails.Select(ed => ed.ExamItemDetailId).Contains(range.ExamItemDetailId))
-                               .Select(range => new ExamRegistResult
-                               {
-                                   ErrorLevel = (int)range.ErrorLevel,
-                                   Description = range.Message
-                               })
-                               .Concat(
-                                    ruleErrors.Where(rule => ei.ExamItemId == rule.ExamItemId)
+                // 検査結果相関ルール
+                ExamRegistResults = ruleErrors.Where(rule => ei.ExamItemId == rule.ExamItemId)
                                               .Select(rule => new ExamRegistResult
                                               {
                                                   ErrorLevel = (int)rule.ErrorLevel,
                                                   Description = rule.Message
                                               })
-                               )
-                               .OrderByDescending(x => x.ErrorLevel)
-                               .ToArray()
+                                              .OrderByDescending(x => x.ErrorLevel)
+                                              .ToArray()
             }).ToArray()
         }).ToArray();
     }
