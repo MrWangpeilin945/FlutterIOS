@@ -346,10 +346,10 @@ export default function ExamBody({
         // グレーアウト表示判定
         const isDisabled = !detail?.hasOrder || !!detail?.cancelReasonId;
         const isBMI = item.positionNumber === BMI;
-        const isError = examRegistResults?.some(
+        const hasError = examRegistResults?.some(
           (x) => x.errorLevel === InputErrorLevel.異常,
         );
-        const isWarning = examRegistResults?.some(
+        const hasWarning = examRegistResults?.some(
           (x) => x.errorLevel === InputErrorLevel.警告,
         );
 
@@ -395,9 +395,9 @@ export default function ExamBody({
                   c={
                     isDisabled
                       ? "gray02"
-                      : isError
+                      : hasError
                         ? "error"
-                        : isWarning
+                        : hasWarning
                           ? "warning"
                           : "black"
                   }
@@ -409,9 +409,9 @@ export default function ExamBody({
                 <TextInput
                   classNames={{
                     input: `${styles["input-textbox"]} ${
-                      isError
+                      hasError
                         ? `${styles["input-error"]}`
-                        : isWarning
+                        : hasWarning
                           ? `${styles["input-warning"]}`
                           : ""
                     }`,
