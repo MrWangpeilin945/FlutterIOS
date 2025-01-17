@@ -195,11 +195,12 @@ public class PlaceScheduleUsecaseTests
         // Arrange
         var placeScheduleId = Guid.Parse("514486ae-acc7-40d8-8183-27c33963442b");
 
-        var placeScheduleStatus = new PlaceScheduleStatus() {
+        var placeScheduleStatus = new PlaceScheduleStatus()
+        {
             PlaceScheduleId = Guid.Parse("514486ae-acc7-40d8-8183-27c33963442b"),
-            PlaceId = Guid.Parse("d60abfaa-fa22-4d37-9dcd-edf9fe5bd336"), 
+            PlaceId = Guid.Parse("d60abfaa-fa22-4d37-9dcd-edf9fe5bd336"),
             PlaceName = "会場A",
-            ExamDate = DateTime.Parse("2024-10-01"),
+            ExamDate = new DateOnly(2024, 10, 01),
             Status = PlaceScheduleLockingStatus.検査中,
             CreatedAt = DateTime.Parse("2024-11-27 14:42:50"),
             CreatedBy = "tester"

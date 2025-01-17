@@ -23,7 +23,7 @@ public class ExportHistory
     /// <summary>
     /// 出力日時
     /// </summary>
-    public required DateTime ExportedAt { get; init; }
+    public required DateTimeOffset ExportedAt { get; init; }
 
     /// <summary>
     /// 出力者

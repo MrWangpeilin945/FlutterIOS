@@ -1,5 +1,5 @@
 import { Box, Button, Group, Text } from "@mantine/core";
-
+import styles from "~/styles/common.module.css";
 interface HeadlineButtonProps {
   title: string;
   elements?: string[];
@@ -18,7 +18,7 @@ export default function HeadlineButton({
       <Button
         fullWidth
         h="auto"
-        style={{ borderWidth: 2 }}
+        bd="2px solid"
         radius={24}
         bg={selected ? "green03" : "white01"}
         color={selected ? "primary" : "gray03"}
@@ -34,10 +34,7 @@ export default function HeadlineButton({
             fw={700}
             c={selected ? "primary" : "black01"}
             ta="left"
-            style={{
-              wordBreak: "break-word",
-              whiteSpace: "pre-wrap",
-            }}
+            className={styles["text-wrap"]}
           >
             {title}
           </Text>
@@ -48,10 +45,7 @@ export default function HeadlineButton({
               c={selected ? "primary" : "black01"}
               pt={index === 0 ? 16 : 8}
               ta="left"
-              style={{
-                wordBreak: "break-word",
-                whiteSpace: "pre-wrap",
-              }}
+              className={styles["text-wrap"]}
             >
               {elem}
             </Text>

@@ -317,7 +317,6 @@ public class ExamItemRepository : IExamItemRepository
             d.decimal_length as DecimalLength,
             kb.option_id as KeyboardId,
             kb.value as KeyboardValue,
-            op.option_id as OptionId,
             op.code as OptionCode,
             op.name as OptionName,
             op.order_number as OrderNumber
@@ -356,8 +355,8 @@ public class ExamItemRepository : IExamItemRepository
                                         IntegerLength = d.First().IntegerLength,
                                         DecimalLength = d.First().DecimalLength,
                                         DetailOptions = d.Where(op => op.ExamItemDetailId == d.First().ExamItemDetailId)
-                                                         .GroupBy(op => op.OptionId)
-                                                         .OrderBy(op => op.First().OptionId)
+                                                         .GroupBy(op => new { op.ExamItemDetailId, op.OptionCode })
+                                                         .OrderBy(op => op.First().OrderNumber)
                                                          .Select(op => new ExamItemDetailOption
                                                          {
                                                              Code = op.First().OptionCode,

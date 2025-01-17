@@ -11,6 +11,9 @@ type HeaderProps = {
 export default function CommonHeader({ screenName, staffName }: HeaderProps) {
   const navigate = useNavigate();
 
+  const displayableStaffName =
+    staffName.length > 8 ? `${staffName.slice(0, 7)}…` : staffName;
+
   return (
     <Box
       h={67}
@@ -26,7 +29,7 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
         {/* ユーザアイコン */}
         <Popover position="bottom">
           <Popover.Target>
-            <Button bg="white01" c="primary" h="auto" py={8} px={32}>
+            <Button w={88} h={40} bg="white01" c="primary">
               <IconUserFilled size={24} />
             </Button>
           </Popover.Target>
@@ -41,8 +44,8 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
             bg="white01"
           >
             <Box>
-              <Text size="xs" c="black01" pb={24} truncate="end">
-                {staffName}
+              <Text size="xs" c="black01" pb={24}>
+                {displayableStaffName}
               </Text>
               {/* ログアウトボタン */}
               <Button
@@ -50,12 +53,12 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
                 bg="white01"
                 c="primary"
                 variant="outline"
-                style={{ borderWidth: 2 }}
+                bd="2px,solid"
                 py={8}
                 px={32}
                 onClick={() => authUtil.logout(() => navigate("/login"))}
               >
-                <Text size="xs" fw={700} c="primary">
+                <Text size="xs" fw={700} c="primary" w={120} h={35}>
                   ログアウト
                 </Text>
               </Button>
@@ -72,17 +75,17 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
 
         {/* ホームボタン */}
         <Button
+          w={170}
+          h={51}
           bg="white01"
+          size="xs"
+          fw={700}
           c="primary"
-          h="auto"
-          py={8}
-          px={32}
+          pl={10}
+          leftSection={<IconHomeFilled size={24} />}
           onClick={() => navigate("/home")}
         >
-          <IconHomeFilled size={24} />
-          <Text size="xs" fw={700} c="primary" pl={10}>
-            ホーム
-          </Text>
+          ホーム
         </Button>
       </Flex>
     </Box>

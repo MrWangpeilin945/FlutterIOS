@@ -78,6 +78,7 @@ export default function ExamSelectLR({
     // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
     for (const {
       positionNumber,
+      name,
       value,
       hasOrder,
       cancelReasonId,
@@ -88,7 +89,7 @@ export default function ExamSelectLR({
 
       const requiredMessage = getErrorMessage(
         errorMessages.required,
-        `${positionNumber === 1 ? "左" : "右"}は`,
+        `${name || (positionNumber === 1 ? "左" : "右")}は`,
       );
 
       // バリデーションが失敗した場合
@@ -234,21 +235,27 @@ export default function ExamSelectLR({
             <Stack key={detail.positionNumber} gap={0}>
               <Paper w={524} bg="gray02" c="white" radius="itemName">
                 <Text size="lg" fw={700} ta="center">
-                  {detail.name}
+                  {detail.name
+                    ? detail.name.slice(0, 14)
+                    : detail.positionNumber === 1
+                      ? "左"
+                      : "右"}
                 </Text>
               </Paper>
-              {detail.prevValue &&
-                (() => {
-                  const prevName =
-                    detail.examItemDetailOptions?.find(
-                      (option) => option.code === detail.prevValue,
-                    )?.name || detail.prevValue;
-                  return (
-                    <Text ml="auto" fw={700} maw={271}>
-                      (前回：{prevName})
-                    </Text>
-                  );
-                })()}
+              <Box ml="auto" h={43.4}>
+                {detail.prevValue &&
+                  (() => {
+                    const prevName =
+                      detail.examItemDetailOptions?.find(
+                        (option) => option.code === detail.prevValue,
+                      )?.name || detail.prevValue;
+                    return (
+                      <Text ml="auto" fw={700} maw={271}>
+                        (前回：{prevName})
+                      </Text>
+                    );
+                  })()}
+              </Box>
               <Stack>
                 {detail.examItemDetailOptions?.map(
                   (selector: ExamItemDetailOption) => {
@@ -281,7 +288,7 @@ export default function ExamSelectLR({
                         disabled={isDisabled}
                         onClick={() => onSelect(selector, detail)}
                       >
-                        {selector.name}
+                        {selector.name?.slice(0,8)}
                       </Button>
                     );
                   },
