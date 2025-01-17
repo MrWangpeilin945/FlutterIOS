@@ -61,7 +61,7 @@ export default function ConfirmDialog({
               color="primary"
               py={16}
               px={32}
-              style={{ borderWidth: 2 }}
+              bd="2px solid"
               onClick={onCancel}
             >
               <Text size="lg" fw={700} c="primary">
@@ -76,7 +76,7 @@ export default function ConfirmDialog({
               color="primary"
               py={16}
               px={32}
-              style={{ borderWidth: 2 }}
+              bd="2px solid"
               onClick={onConfirm}
             >
               <Text size="lg" fw={700} c="white01">

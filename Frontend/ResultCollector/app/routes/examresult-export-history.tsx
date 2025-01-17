@@ -157,7 +157,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
             color="primary"
             py={16}
             px={32}
-            style={{ borderWidth: 2 }}
+            bd="2px solid"
             onClick={handleCancel}
           >
             <Text size="lg" fw={700} c="primary">
@@ -172,7 +172,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
             color="primary"
             py={16}
             px={32}
-            style={{ borderWidth: 2 }}
+            bd="2px solid"
             onClick={handleOk}
           >
             <Text size="lg" fw={700} c="white01">
