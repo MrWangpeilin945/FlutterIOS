@@ -107,7 +107,7 @@ export default function Home() {
         disabled={disabled}
         py={16}
         px={32}
-        style={{ borderWidth: 2 }}
+        bd="2px solid"
         variant="outline"
         bg="white01"
         color="gray03"

@@ -18,7 +18,7 @@ export default function HeadlineButton({
       <Button
         fullWidth
         h="auto"
-        style={{ borderWidth: 2 }}
+        bd="2px solid"
         radius={24}
         bg={selected ? "green03" : "white01"}
         color={selected ? "primary" : "gray03"}
