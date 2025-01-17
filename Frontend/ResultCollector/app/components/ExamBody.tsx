@@ -237,21 +237,27 @@ export default function ExamBody({
     // BMIの計算
     const height = Number.parseFloat(heightValue) / 100;
     const weight = Number.parseFloat(weightValue);
-    const bmi = height ? weight / height ** 2 : "";
-    const bmiString = String(bmi);
+    const bmi = weight / height ** 2;
+    // NaN または Infinity の場合に 0 を代入
+    const validBmi = Number.isFinite(bmi) ? bmi : 0;
 
     return updatedExamItems.map((item) => {
       if (item.positionNumber === BMI) {
         item.examItemDetails = item.examItemDetails?.map((detail) => {
           const decimalLength = detail.decimalLength ?? 0;
           const integerLength = detail.integerLength ?? 0;
-          const maxDigits = decimalLength + integerLength + 1;
 
-          if (detail.positionNumber === 1) {
-            if (detail.integerLength) {
-              return { ...detail, value: bmiString.slice(0, maxDigits) };
-            }
-            return { ...detail, value: bmiString };
+          if (detail.positionNumber === 1 && bmi !== null) {
+            // 四捨五入して指定された桁数までの値を作成
+            const roundedBMI =
+              validBmi === 0 ? "" : validBmi.toFixed(decimalLength); // 小数点以下で四捨五入
+
+            // 最大表示桁数を制限
+            const maxDigits =
+              integerLength + decimalLength + (decimalLength > 0 ? 1 : 0); // 小数点を含む桁数
+            const truncatedValue = roundedBMI.slice(0, maxDigits);
+
+            return { ...detail, value: truncatedValue };
           }
           return detail;
         });
@@ -340,6 +346,12 @@ export default function ExamBody({
         // グレーアウト表示判定
         const isDisabled = !detail?.hasOrder || !!detail?.cancelReasonId;
         const isBMI = item.positionNumber === BMI;
+        const isError = examRegistResults?.some(
+          (x) => x.errorLevel === InputErrorLevel.異常,
+        );
+        const isWarning = examRegistResults?.some(
+          (x) => x.errorLevel === InputErrorLevel.警告,
+        );
 
         return (
           <Flex
@@ -360,7 +372,17 @@ export default function ExamBody({
                 py={16}
               >
                 <Text size="lg" fw={700} ta="center">
-                  {name?.slice(0, 8)}
+                  {name
+                    ? name.slice(0, 8)
+                    : positionNumber === 身長
+                      ? "身長"
+                      : positionNumber === 体重
+                        ? "体重"
+                        : positionNumber === 体脂肪率
+                          ? "体脂肪率"
+                          : positionNumber === BMI
+                            ? "BMI"
+                            : ""}
                 </Text>
               </Paper>
 
@@ -370,7 +392,15 @@ export default function ExamBody({
                   h={80}
                   size="inputComponent"
                   ta="right"
-                  c={isDisabled ? "gray02" : "black"}
+                  c={
+                    isDisabled
+                      ? "gray02"
+                      : isError
+                        ? "error"
+                        : isWarning
+                          ? "warning"
+                          : "black"
+                  }
                   px={32}
                 >
                   {detail?.value}
@@ -379,13 +409,9 @@ export default function ExamBody({
                 <TextInput
                   classNames={{
                     input: `${styles["input-textbox"]} ${
-                      examRegistResults?.some(
-                        (x) => x.errorLevel === InputErrorLevel.異常,
-                      )
+                      isError
                         ? `${styles["input-error"]}`
-                        : examRegistResults?.some(
-                              (x) => x.errorLevel === InputErrorLevel.警告,
-                            )
+                        : isWarning
                           ? `${styles["input-warning"]}`
                           : ""
                     }`,
@@ -433,6 +459,7 @@ export default function ExamBody({
                       handleChange(positionNumber, "");
                     }
                   }}
+                  disabled={isDisabled}
                   ml={49}
                   tabIndex={-1}
                 >
