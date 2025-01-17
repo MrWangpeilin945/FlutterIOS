@@ -11,27 +11,26 @@ export default function AuthWrapper({
 
   useEffect(() => {
     (async () => {
-      // todo 認証チェックを行う
-      // 一旦処理は実装したがコメントアウトしておく
+      // 認証チェックを行う
 
-      // // アクセストークンがない時はログアウト処理を行う
-      // const accessToken = authUtil.getAccessToken();
-      // if (!accessToken) {
-      //   authUtil.logout(() => {
-      //     navigate("/login");
-      //   });
-      //   return;
-      // }
-      // if (authUtil.isAccessTokenExpired(accessToken)) {
-      //   // アクセストークンが期限切れの時はアクセストークンを再取得する
-      //   if (!(await authUtil.refreshAccessToken())) {
-      //     // アクセストークンが再取得できなかった時はログアウト処理を行う
-      //     authUtil.logout(() => {
-      //       navigate("/login");
-      //     });
-      //     return;
-      //   }
-      // }
+      // アクセストークンがない時はログアウト処理を行う
+      const accessToken = authUtil.getAccessToken();
+      if (!accessToken) {
+        authUtil.logout(() => {
+          navigate("/login");
+        });
+        return;
+      }
+      if (authUtil.isAccessTokenExpired(accessToken)) {
+        // アクセストークンが期限切れの時はアクセストークンを再取得する
+        if (!(await authUtil.refreshAccessToken())) {
+          // アクセストークンが再取得できなかった時はログアウト処理を行う
+          authUtil.logout(() => {
+            navigate("/login");
+          });
+          return;
+        }
+      }
 
       // 認証チェックOK
       setIsAuthenticated(true);
