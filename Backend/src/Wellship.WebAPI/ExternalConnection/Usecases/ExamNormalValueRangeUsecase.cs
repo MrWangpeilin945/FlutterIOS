@@ -38,7 +38,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
         /// <returns></returns>
         public async Task<List<ErrorObject>> StoreExamNormalValueRangeAsync(List<ExamNormalValueRange> examNormalValueRanges)
         {
-            // 既存基準値パターンコードの確認
+            // 基準値パターンコードの確認
             var insertExamNormalValueRangesByThresholdCodes = await GetCheckedThresholdCodes(examNormalValueRanges);
 
             // 検査項目明細IDの確認

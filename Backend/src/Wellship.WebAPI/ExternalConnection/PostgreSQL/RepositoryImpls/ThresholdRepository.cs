@@ -92,13 +92,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         public async Task<List<ThresholdEntity>> GetThresholdsByCodesAsync(List<string> thresholdCodes)
         {
             var connection = await _dbConnectionProvider.GetOrOpenAsync();
-            //var sql = @"
-            //        select
-            //            threshold_id as ThresholdId, threshold_code as ThresholdCode, name as Name
-            //        from
-            //            resultcollector.thresholds
-            //        where
-            //            threshold_code = any(@ThresholdCodes);";
             var sql = @"
                     select
                         threshold_id as ThresholdId, threshold_code as ThresholdCode
