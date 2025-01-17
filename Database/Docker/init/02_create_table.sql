@@ -137,14 +137,13 @@ CREATE TABLE exam_cancels (
 );
 
 CREATE TABLE exam_item_detail_options (
-  option_id integer NOT NULL
+  exam_item_detail_id integer NOT NULL
   , code text NOT NULL
-  , exam_item_detail_id integer NOT NULL
   , name text NOT NULL
   , order_number integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
-  , CONSTRAINT exam_item_detail_options_PKC PRIMARY KEY (option_id)
+  , CONSTRAINT exam_item_detail_options_PKC PRIMARY KEY (exam_item_detail_id,code)
 );
 
 CREATE TABLE exam_item_detail_orders (
@@ -937,9 +936,8 @@ COMMENT ON COLUMN exam_cancels.created_at IS '作成日時';
 COMMENT ON COLUMN exam_cancels.created_by IS '作成者';
 
 COMMENT ON TABLE exam_item_detail_options IS '検査項目明細_選択肢';
-COMMENT ON COLUMN exam_item_detail_options.option_id IS '選択肢ID';
-COMMENT ON COLUMN exam_item_detail_options.code IS 'コード';
 COMMENT ON COLUMN exam_item_detail_options.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_item_detail_options.code IS 'コード';
 COMMENT ON COLUMN exam_item_detail_options.name IS '名称';
 COMMENT ON COLUMN exam_item_detail_options.order_number IS '表示順';
 COMMENT ON COLUMN exam_item_detail_options.created_at IS '作成日時';
