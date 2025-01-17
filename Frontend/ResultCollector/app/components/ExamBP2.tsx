@@ -236,12 +236,12 @@ export default function ExamBP2({
     const lowDetail = item.examItemDetails?.find(
       (detail: ExamItemDetail) => detail.positionNumber === 下,
     );
-    const isDisableItem =
+    const hasDisableItem =
       !highDetail?.hasOrder ||
       !!highDetail.cancelReasonId ||
       !lowDetail?.hasOrder ||
       !!lowDetail.cancelReasonId;
-    if (isDisableItem) {
+    if (hasDisableItem) {
       return { validateResult: item, hasCallback: true };
     }
     // APIエラーメッセージで初期化
@@ -257,9 +257,6 @@ export default function ExamBP2({
     } of item.examItemDetails ?? []) {
       if (positionNumber !== 上 && positionNumber !== 下) {
         continue; // 対象のpositionNumberでない場合、処理をスキップする
-      }
-      if (!hasOrder || !!cancelReasonId) {
-        continue; // 対象がdisableの場合、処理をスキップする
       }
       // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
       const schema = onRegisterPressed
