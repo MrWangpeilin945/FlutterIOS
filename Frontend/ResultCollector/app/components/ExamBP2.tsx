@@ -399,8 +399,6 @@ export default function ExamBP2({
       return null;
     }
     const updatedExamItems = [...examItemsData];
-    // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
-    let hasValidationError = false;
 
     // 該当するitemを更新
     for (const item of updatedExamItems) {
@@ -422,7 +420,17 @@ export default function ExamBP2({
           );
         }
       }
-      // バリデーションチェックを実施
+    }
+
+    // 平均値の処理
+    const addAVEExamItems = calculateAverage(updatedExamItems);
+    // 更新されたデータをステートに設定
+    setExamItemsData(addAVEExamItems);
+
+    // 検査項目に異常エラーメッセージがあるかをチェックするフラグ変数
+    let hasValidationError = false;
+    // バリデーションチェックを実施
+    for (const item of updatedExamItems) {
       const { validateResult, hasCallback } = validationCheck(item);
       if (!hasCallback) {
         // falseのexamItemがあればコールバックを行わない
@@ -432,14 +440,10 @@ export default function ExamBP2({
       Object.assign(item, validateResult);
     }
 
-    // 平均値の処理
-    const addAVEExamItems = calculateAverage(updatedExamItems);
-    // 更新されたデータをステートに設定
-    setExamItemsData(addAVEExamItems);
-
     // 全てのitemでバリデーションチェックが通った場合、コールバックする
     if (!hasValidationError) {
       onChange(addAVEExamItems);
+      console.log(addAVEExamItems);
     }
   };
 
@@ -679,6 +683,7 @@ export default function ExamBP2({
                         />
                       ) : (
                         <CollectionKeyboard
+                          value={detail?.value ?? ""}
                           keyboardValues={detail.keyboard?.values ?? []}
                           onChange={(newValue) =>
                             handleChange(
