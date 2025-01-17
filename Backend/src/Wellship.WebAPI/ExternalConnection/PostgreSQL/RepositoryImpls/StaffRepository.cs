@@ -99,7 +99,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                 await connection.ExecuteAsync(mergeSql, upsertItems);
                 await transaction.CommitAsync();
             }
-            catch (DbException e)
+            catch (DbException)
             {
                 await transaction.RollbackAsync();
                 throw;
@@ -111,42 +111,38 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// </summary>
         /// <param name="staffCodesAndLoginIds"></param>
         /// <returns></returns>
-        public async Task<List<(string staffCode, string loginId)>> GetStaffsByLoginIdsAsync(List<(string staffCode, string loginId)> staffCodesAndLoginIds)
+        public async Task<List<StaffEntity>> GetStaffsByLoginIdsAsync(List<(string staffCode, string loginId)> staffCodesAndLoginIds)
         {
             var connection = await _dbConnectionProvider.GetOrOpenAsync();
-
-            // パラメータを準備
-            var sqlBuilder = new List<string>();
+            var loginIds = staffCodesAndLoginIds.Select(x => x.loginId).ToArray();
             var parameters = new DynamicParameters();
-
-            // 各ペアを動的に処理
+            parameters.Add("LoginIds", loginIds);
+            List<string> param = new List<string>();
             for (int i = 0; i < staffCodesAndLoginIds.Count; i++)
             {
-                var loginIdParam = $"LoginId{i}";
-                var staffCodeParam = $"StaffCode{i}";
-
-                // 条件を動的に追加
-                sqlBuilder.Add($"(login_id = @{loginIdParam} AND staff_code <> @{staffCodeParam})");
-
-                // パラメータを追加
-                parameters.Add(loginIdParam, staffCodesAndLoginIds[i].loginId);
-                parameters.Add(staffCodeParam, staffCodesAndLoginIds[i].staffCode);
+                var name = $"@Id{i + 1}";
+                param.Add(name);
+                parameters.Add(name, staffCodesAndLoginIds[i].loginId + staffCodesAndLoginIds[i].staffCode);
             }
-
-            // 動的に条件を OR で結合
-            var conditions = string.Join(" OR ", sqlBuilder);
-
-            // クエリ構築
-            var sql = $@"
+            string placeholders = string.Join(",", param);
+            var selectSQL = $@"
                 SELECT
-                    staff_code, login_id
+                    login_id as LoginId
+                    , staff_code as StaffCode
                 FROM
-                    resultcollector.staffs
+                    (
+                        SELECT
+                            login_id
+                            , staff_code 
+                        FROM
+                            resultcollector.staffs
+                        WHERE
+                            concat(login_id, staff_code) not in ({placeholders})
+                    ) as staffsList
                 WHERE
-                    {conditions};";
-
+                    staffsList.login_id = any (@LoginIds);";
             // クエリ実行
-            var result = await connection.QueryAsync<(string staffCode, string loginId)>(sql, parameters);
+            var result = await connection.QueryAsync<StaffEntity>(selectSQL, parameters);
             return result.ToList();
         }
     }

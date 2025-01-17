@@ -82,10 +82,12 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
             // ③ 条件に合わない職員情報を抽出
             foreach (var staff in staffs)
             {
-                var matched = existingStaffs.FirstOrDefault(e => e.loginId == staff.LoginId);
+                //var matched = existingStaffs.FirstOrDefault(e => e.loginId == staff.LoginId);
+                var matched = existingStaffs.Where(e => e.LoginId == staff.LoginId)
+                                            .FirstOrDefault();
 
                 // ログインIDが一致し、職員コードが異なる場合はエラー対象
-                if (matched != default && matched.staffCode != staff.StaffCode)
+                if (matched != default && matched.StaffCode != staff.StaffCode)
                 {
                     errorCodes.Add(staff.StaffCode);
                 }
