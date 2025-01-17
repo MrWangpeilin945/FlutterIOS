@@ -52,7 +52,7 @@ export default function CommonDialog({
             color="primary"
             py={16}
             px={32}
-            style={{ borderWidth: 2 }}
+            bd="2px solid"
             onClick={onClose}
           >
             <Text size="lg" fw={700} c="white01">

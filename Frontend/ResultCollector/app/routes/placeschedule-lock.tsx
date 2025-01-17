@@ -174,7 +174,7 @@ export default function PlaceScheduleLock() {
                           h={75}
                           px={32}
                           py={16}
-                          style={{ borderWidth: 2 }}
+                          bd="2px solid"
                           variant="outline"
                           bg={
                             placeScheduleLock.placeScheduleLockingStatus ===

@@ -244,8 +244,9 @@ export default function ConsultNumberInput() {
                     data-autofocus
                     size="xl"
                     value={consultNumber || ""}
-                    onFocus={() => setShowKeyboard(true)}
-                    onClick={() => setShowKeyboard(true)}
+                    // キーボード(整数)は使用しないため、コメントアウトしています。
+                    // onFocus={() => setShowKeyboard(true)}
+                    // onClick={() => setShowKeyboard(true)}
                     onChange={(e) => handleInputChange(e)}
                     onKeyDown={handleKeyDown}
                     ref={focusTrapRef}
