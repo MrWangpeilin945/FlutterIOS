@@ -1,3 +1,7 @@
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
+
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
@@ -12,6 +16,10 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 public class HealthCheckController : ControllerBase
 {
     private readonly IHealthCheckRepository _healthCheckRepository;
+
+    private const string bucketName = "wellship-stg-s3-fileshare-ryobi"; // TODO: 仮テスト用
+    private const string keyName = "Test/dummy.txt"; // TODO: 仮テスト用
+    private static readonly RegionEndpoint BucketRegion = RegionEndpoint.APNortheast1; // TODO: 仮テスト要
 
     /// <summary>
     /// コンストラクタ
@@ -50,5 +58,34 @@ public class HealthCheckController : ControllerBase
         }
 
         return StatusCode(503);
+    }
+
+    /// <summary>
+    /// AmazonS3に置かれた特定のファイルの内容を取得します。
+    /// 権限周りのテスト用であり、本実装のときに消します。 
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [HttpGet]
+    [Route("api/v{version:apiVersion}/health/s3-dummy-text")]
+    public async Task<IActionResult> GetS3TextAsync()
+    {
+        // TODO: 動作検証のための仮メソッドです。あとから消すこと！
+
+        // TODO: 本当はIAmazonS3をDIしないといけないはず。
+        var s3Client = new AmazonS3Client(BucketRegion);
+
+        var request = new GetObjectRequest
+        {
+            BucketName = bucketName,
+            Key = keyName
+        };
+
+        using (var response = await s3Client.GetObjectAsync(request))
+        using (var responseStream = response.ResponseStream)
+        using (var reader = new StreamReader(responseStream))
+        {
+            var content = await reader.ReadToEndAsync();
+            return Ok(content);
+        }
     }
 }
