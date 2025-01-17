@@ -32,7 +32,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
         /// </summary>
         /// <param name="staffs"></param>
         /// <returns></returns>
-        public async Task<List<ErrorObject>> StroreStaffsAsync(List<Model.Standard.Staff> staffs)
+        public async Task<List<ErrorObject>> StoreStaffsAsync(List<Model.Standard.Staff> staffs)
         {
             // ログインIDの確認
             var insertStaffs = await GetCheckedStaffs(staffs);

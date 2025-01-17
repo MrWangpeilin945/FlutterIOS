@@ -36,7 +36,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
             stopwatch.Stop();
             var creationTime = stopwatch.Elapsed.TotalSeconds;
             stopwatch.Restart();
-            var result = await _staffUsecase.StroreStaffsAsync(staffs);
+            var result = await _staffUsecase.StoreStaffsAsync(staffs);
             var processingTime = stopwatch.Elapsed.TotalSeconds;
             return Ok(new
             {
