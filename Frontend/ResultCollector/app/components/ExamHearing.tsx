@@ -245,7 +245,7 @@ export default function ExamHearing({
     return !detail || !detail.hasOrder || !!detail.cancelReasonId;
   };
 
-  //指定したorderNumberのvalueを取得
+  //指定したorderNumberのcodeを取得
   const getOptionCode = (detail: ExamItemDetail, orderNumber: number) => {
     return (
       detail.examItemDetailOptions?.find(
