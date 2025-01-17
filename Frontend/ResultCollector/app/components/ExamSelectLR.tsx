@@ -89,7 +89,7 @@ export default function ExamSelectLR({
 
       const requiredMessage = getErrorMessage(
         errorMessages.required,
-        `${name ?? (positionNumber === 1 ? "左" : "右")}は`,
+        `${name || (positionNumber === 1 ? "左" : "右")}は`,
       );
 
       // バリデーションが失敗した場合
