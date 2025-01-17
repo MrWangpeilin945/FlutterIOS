@@ -1,6 +1,7 @@
 graph LR
 
   web(WELLSHIP WEB)
+  app(アプリアイコン)
   menu(メニュー)
   deep_link(Web連携用画面)
   wire_setting(設定画面)
@@ -9,6 +10,8 @@ graph LR
   spp(通信画面)
   ble_setting(設定画面)
   ble(通信画面)
+
+  app-- アプリ起動 -->menu
 
   menu--->wire_setting
   menu--->spp_setting
