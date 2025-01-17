@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import { faker } from "@faker-js/faker";
-import { HttpResponse, delay, http } from "msw";
+import { http, HttpResponse, delay } from "msw";
 import type {
   CancelReasonList,
   EquipmentList,
@@ -19,15 +19,72 @@ import type {
   InputExamExaminee,
   InputExamItems,
   Keyboard,
+  Place,
   PlaceScheduleLocking,
   PlaceSchedulePlaces,
   PlaceScheduleProgress,
   PlaceScheduleTeams,
   Staff,
   StaffLoginResponse,
+  Team,
+  Threshold,
   UnexaminedMenuList,
   VerifyExamItems,
 } from "../domain/wellship.schemas";
+
+export const getPlaceTestTestPlaceResponseMock = (
+  overrideResponse: Partial<Place> = {},
+): Place => ({
+  code: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  inputNote: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  name: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  ...overrideResponse,
+});
+
+export const getPlaceTestTestPlaceUpsertResponseMock = (
+  overrideResponse: Partial<Place> = {},
+): Place => ({
+  code: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  inputNote: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  name: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  ...overrideResponse,
+});
+
+export const getTeamTestTestTeamResponseMock = (
+  overrideResponse: Partial<Team> = {},
+): Team => ({
+  code: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  inputNote: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  name: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  ...overrideResponse,
+});
+
+export const getTeamTestTestTeamUpsertResponseMock = (
+  overrideResponse: Partial<Team> = {},
+): Team => ({
+  code: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  inputNote: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  name: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  ...overrideResponse,
+});
+
+export const getThresholdTestTestThresholdResponseMock = (
+  overrideResponse: Partial<Threshold> = {},
+): Threshold => ({
+  code: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  inputNote: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  name: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  ...overrideResponse,
+});
+
+export const getThresholdTestTestThresholdUpsertResponseMock = (
+  overrideResponse: Partial<Threshold> = {},
+): Threshold => ({
+  code: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  inputNote: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  name: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+  ...overrideResponse,
+});
 
 export const getAuthenticationLoginResponseMock = (
   overrideResponse: Partial<StaffLoginResponse> = {},
@@ -133,11 +190,17 @@ export const getConsultGetExamItemsExamineeResponseMock = (
 ): ExamContent => ({
   consultName: faker.helpers.arrayElement([faker.word.sample(), undefined]),
   consultNumber: faker.helpers.arrayElement([faker.word.sample(), undefined]),
-  examDecisionResult: faker.helpers.arrayElement([
+  examDecisionResults: faker.helpers.arrayElement([
     Array.from(
       { length: faker.number.int({ min: 1, max: 10 }) },
       (_, i) => i + 1,
-    ).map(() => faker.word.sample()),
+    ).map(() => ({
+      description: faker.helpers.arrayElement([faker.word.sample(), undefined]),
+      errorLevel: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+      ]),
+    })),
     undefined,
   ]),
   examinee: faker.helpers.arrayElement([
@@ -658,10 +721,6 @@ export const getConsultVerifyResultsResponseKeyboardMock = (
 export const getConsultVerifyResultsResponseMock = (
   overrideResponse: Partial<VerifyExamItems> = {},
 ): VerifyExamItems => ({
-  errorLevel: faker.helpers.arrayElement([
-    faker.number.int({ min: undefined, max: undefined }),
-    undefined,
-  ]),
   examItemGroups: faker.helpers.arrayElement([
     Array.from(
       { length: faker.number.int({ min: 1, max: 10 }) },
@@ -1131,6 +1190,147 @@ export const getStaffGetStaffResponseMock = (
   staffName: faker.helpers.arrayElement([faker.word.sample(), undefined]),
   ...overrideResponse,
 });
+
+export const getPlaceScheduleTestPlaceScheduleTest1ResponseMock = (): Blob =>
+  new Blob(faker.helpers.arrayElements(faker.word.words(10).split(" ")));
+
+export const getPlaceTestTestPlaceMockHandler = (
+  overrideResponse?:
+    | Place
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<Place> | Place),
+) => {
+  return http.get("*/api/v:version/place/profile", async (info) => {
+    await delay(1000);
+
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPlaceTestTestPlaceResponseMock(),
+      ),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  });
+};
+
+export const getPlaceTestTestPlaceUpsertMockHandler = (
+  overrideResponse?:
+    | Place
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<Place> | Place),
+) => {
+  return http.get("*/api/v:version/place_upsert/profile", async (info) => {
+    await delay(1000);
+
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPlaceTestTestPlaceUpsertResponseMock(),
+      ),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  });
+};
+
+export const getTeamTestTestTeamMockHandler = (
+  overrideResponse?:
+    | Team
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<Team> | Team),
+) => {
+  return http.get("*/api/v:version/team/profile", async (info) => {
+    await delay(1000);
+
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getTeamTestTestTeamResponseMock(),
+      ),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  });
+};
+
+export const getTeamTestTestTeamUpsertMockHandler = (
+  overrideResponse?:
+    | Team
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<Team> | Team),
+) => {
+  return http.get("*/api/v:version/team_upsert/profile", async (info) => {
+    await delay(1000);
+
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getTeamTestTestTeamUpsertResponseMock(),
+      ),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  });
+};
+
+export const getThresholdTestTestThresholdMockHandler = (
+  overrideResponse?:
+    | Threshold
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<Threshold> | Threshold),
+) => {
+  return http.get("*/api/v:version/threshold/profile", async (info) => {
+    await delay(1000);
+
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getThresholdTestTestThresholdResponseMock(),
+      ),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  });
+};
+
+export const getThresholdTestTestThresholdUpsertMockHandler = (
+  overrideResponse?:
+    | Threshold
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<Threshold> | Threshold),
+) => {
+  return http.get("*/api/v:version/threshold_upsert/profile", async (info) => {
+    await delay(1000);
+
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getThresholdTestTestThresholdUpsertResponseMock(),
+      ),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  });
+};
 
 export const getAuthenticationLoginMockHandler = (
   overrideResponse?:
@@ -1732,6 +1932,54 @@ export const getStaffGetStaffMockHandler = (
   });
 };
 
+export const getExamineeTestExamineeTest1MockHandler = (
+  overrideResponse?:
+    | void
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<void> | void),
+) => {
+  return http.get("*/api/v:version/examinee/test1", async (info) => {
+    await delay(1000);
+    if (typeof overrideResponse === "function") {
+      await overrideResponse(info);
+    }
+    return new HttpResponse(null, { status: 200 });
+  });
+};
+
+export const getExamineeTestExamineeTest2MockHandler = (
+  overrideResponse?:
+    | void
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<void> | void),
+) => {
+  return http.get("*/api/v:version/examinee/test2", async (info) => {
+    await delay(1000);
+    if (typeof overrideResponse === "function") {
+      await overrideResponse(info);
+    }
+    return new HttpResponse(null, { status: 200 });
+  });
+};
+
+export const getExamineeTestExamineeTest3MockHandler = (
+  overrideResponse?:
+    | void
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<void> | void),
+) => {
+  return http.get("*/api/v:version/examinee/test3", async (info) => {
+    await delay(1000);
+    if (typeof overrideResponse === "function") {
+      await overrideResponse(info);
+    }
+    return new HttpResponse(null, { status: 200 });
+  });
+};
+
 export const getOrganizationTestInsertOrganizationMockHandler = (
   overrideResponse?:
     | void
@@ -1747,7 +1995,36 @@ export const getOrganizationTestInsertOrganizationMockHandler = (
     return new HttpResponse(null, { status: 200 });
   });
 };
+
+export const getPlaceScheduleTestPlaceScheduleTest1MockHandler = (
+  overrideResponse?:
+    | Blob
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<Blob> | Blob),
+) => {
+  return http.post("*/api/v:version/place_schedule/test1", async (info) => {
+    await delay(1000);
+
+    return new HttpResponse(
+      JSON.stringify(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getPlaceScheduleTestPlaceScheduleTest1ResponseMock(),
+      ),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  });
+};
 export const getWellshipMock = () => [
+  getPlaceTestTestPlaceMockHandler(),
+  getPlaceTestTestPlaceUpsertMockHandler(),
+  getTeamTestTestTeamMockHandler(),
+  getTeamTestTestTeamUpsertMockHandler(),
+  getThresholdTestTestThresholdMockHandler(),
+  getThresholdTestTestThresholdUpsertMockHandler(),
   getAuthenticationLoginMockHandler(),
   getAuthenticationRefreshMockHandler(),
   getCancelReasonGetCancelReasonsMockHandler(),
@@ -1775,5 +2052,9 @@ export const getWellshipMock = () => [
   getPlaceScheduleUpdatePlaceScheduleLockingStatusMockHandler(),
   getProgressGetProgressMockHandler(),
   getStaffGetStaffMockHandler(),
+  getExamineeTestExamineeTest1MockHandler(),
+  getExamineeTestExamineeTest2MockHandler(),
+  getExamineeTestExamineeTest3MockHandler(),
   getOrganizationTestInsertOrganizationMockHandler(),
+  getPlaceScheduleTestPlaceScheduleTest1MockHandler(),
 ];

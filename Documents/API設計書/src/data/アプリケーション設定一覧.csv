@@ -1,0 +1,4 @@
+設定キー,型,説明,デフォルト値
+Auth.SecretKey,文字列,トークンのシークレット,なし（必須エラー）
+Auth.RefreshTokenLifeTime,整数,リフレッシュトークンの有効期限（分）,3
+Auth.AccessTokenLifetime,整数,アクセストークンの有効期限（分）,720

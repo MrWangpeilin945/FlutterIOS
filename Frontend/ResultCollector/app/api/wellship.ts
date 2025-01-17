@@ -18,6 +18,7 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
+import { axiosInstance } from "../utils/axiosInstance";
 import type {
   AccessTokenRefreshRequest,
   CancelReasonList,
@@ -34,6 +35,7 @@ import type {
   HomeMenuGetHomeMenuSettingsParams,
   HomeMenuGroupList,
   InputExamItems,
+  Place,
   PlaceScheduleGetTeamPlaceSchedulesParams,
   PlaceScheduleGetTeamsParams,
   PlaceScheduleLocking,
@@ -47,14 +49,921 @@ import type {
   Staff,
   StaffLoginRequest,
   StaffLoginResponse,
+  Team,
+  Threshold,
   UndoIntegrationExportStatusRequest,
   UnexaminedMenuList,
   VerifyExamItems,
 } from "../domain/wellship.schemas";
-import { axiosInstance } from "../utils/axiosInstance";
 
 /**
- * @summary ログインする
+ * @summary 会場登録テスト
+ */
+export const placeTestTestPlace = (version: string, signal?: AbortSignal) => {
+  return axiosInstance<Place>({
+    url: `/api/v${version}/place/profile`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getPlaceTestTestPlaceQueryKey = (version: string) => {
+  return [`/api/v${version}/place/profile`] as const;
+};
+
+export const getPlaceTestTestPlaceQueryOptions = <
+  TData = Awaited<ReturnType<typeof placeTestTestPlace>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof placeTestTestPlace>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getPlaceTestTestPlaceQueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof placeTestTestPlace>>
+  > = ({ signal }) => placeTestTestPlace(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof placeTestTestPlace>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type PlaceTestTestPlaceQueryResult = NonNullable<
+  Awaited<ReturnType<typeof placeTestTestPlace>>
+>;
+export type PlaceTestTestPlaceQueryError = void;
+
+export function usePlaceTestTestPlace<
+  TData = Awaited<ReturnType<typeof placeTestTestPlace>>,
+  TError = void,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof placeTestTestPlace>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof placeTestTestPlace>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function usePlaceTestTestPlace<
+  TData = Awaited<ReturnType<typeof placeTestTestPlace>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof placeTestTestPlace>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof placeTestTestPlace>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function usePlaceTestTestPlace<
+  TData = Awaited<ReturnType<typeof placeTestTestPlace>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof placeTestTestPlace>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary 会場登録テスト
+ */
+
+export function usePlaceTestTestPlace<
+  TData = Awaited<ReturnType<typeof placeTestTestPlace>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof placeTestTestPlace>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getPlaceTestTestPlaceQueryOptions(version, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary 会場登録テスト（Upsertテスト）
+ */
+export const placeTestTestPlaceUpsert = (
+  version: string,
+  signal?: AbortSignal,
+) => {
+  return axiosInstance<Place>({
+    url: `/api/v${version}/place_upsert/profile`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getPlaceTestTestPlaceUpsertQueryKey = (version: string) => {
+  return [`/api/v${version}/place_upsert/profile`] as const;
+};
+
+export const getPlaceTestTestPlaceUpsertQueryOptions = <
+  TData = Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getPlaceTestTestPlaceUpsertQueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>
+  > = ({ signal }) => placeTestTestPlaceUpsert(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type PlaceTestTestPlaceUpsertQueryResult = NonNullable<
+  Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>
+>;
+export type PlaceTestTestPlaceUpsertQueryError = void;
+
+export function usePlaceTestTestPlaceUpsert<
+  TData = Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function usePlaceTestTestPlaceUpsert<
+  TData = Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function usePlaceTestTestPlaceUpsert<
+  TData = Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary 会場登録テスト（Upsertテスト）
+ */
+
+export function usePlaceTestTestPlaceUpsert<
+  TData = Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof placeTestTestPlaceUpsert>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getPlaceTestTestPlaceUpsertQueryOptions(
+    version,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary 班登録テスト
+ */
+export const teamTestTestTeam = (version: string, signal?: AbortSignal) => {
+  return axiosInstance<Team>({
+    url: `/api/v${version}/team/profile`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getTeamTestTestTeamQueryKey = (version: string) => {
+  return [`/api/v${version}/team/profile`] as const;
+};
+
+export const getTeamTestTestTeamQueryOptions = <
+  TData = Awaited<ReturnType<typeof teamTestTestTeam>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof teamTestTestTeam>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getTeamTestTestTeamQueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof teamTestTestTeam>>
+  > = ({ signal }) => teamTestTestTeam(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof teamTestTestTeam>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type TeamTestTestTeamQueryResult = NonNullable<
+  Awaited<ReturnType<typeof teamTestTestTeam>>
+>;
+export type TeamTestTestTeamQueryError = void;
+
+export function useTeamTestTestTeam<
+  TData = Awaited<ReturnType<typeof teamTestTestTeam>>,
+  TError = void,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof teamTestTestTeam>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof teamTestTestTeam>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useTeamTestTestTeam<
+  TData = Awaited<ReturnType<typeof teamTestTestTeam>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof teamTestTestTeam>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof teamTestTestTeam>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useTeamTestTestTeam<
+  TData = Awaited<ReturnType<typeof teamTestTestTeam>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof teamTestTestTeam>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary 班登録テスト
+ */
+
+export function useTeamTestTestTeam<
+  TData = Awaited<ReturnType<typeof teamTestTestTeam>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof teamTestTestTeam>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getTeamTestTestTeamQueryOptions(version, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary 班登録テスト（Upsertテスト）
+ */
+export const teamTestTestTeamUpsert = (
+  version: string,
+  signal?: AbortSignal,
+) => {
+  return axiosInstance<Team>({
+    url: `/api/v${version}/team_upsert/profile`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getTeamTestTestTeamUpsertQueryKey = (version: string) => {
+  return [`/api/v${version}/team_upsert/profile`] as const;
+};
+
+export const getTeamTestTestTeamUpsertQueryOptions = <
+  TData = Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getTeamTestTestTeamUpsertQueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof teamTestTestTeamUpsert>>
+  > = ({ signal }) => teamTestTestTeamUpsert(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type TeamTestTestTeamUpsertQueryResult = NonNullable<
+  Awaited<ReturnType<typeof teamTestTestTeamUpsert>>
+>;
+export type TeamTestTestTeamUpsertQueryError = void;
+
+export function useTeamTestTestTeamUpsert<
+  TData = Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useTeamTestTestTeamUpsert<
+  TData = Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useTeamTestTestTeamUpsert<
+  TData = Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary 班登録テスト（Upsertテスト）
+ */
+
+export function useTeamTestTestTeamUpsert<
+  TData = Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof teamTestTestTeamUpsert>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getTeamTestTestTeamUpsertQueryOptions(version, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary 基準パターン
+ */
+export const thresholdTestTestThreshold = (
+  version: string,
+  signal?: AbortSignal,
+) => {
+  return axiosInstance<Threshold>({
+    url: `/api/v${version}/threshold/profile`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getThresholdTestTestThresholdQueryKey = (version: string) => {
+  return [`/api/v${version}/threshold/profile`] as const;
+};
+
+export const getThresholdTestTestThresholdQueryOptions = <
+  TData = Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getThresholdTestTestThresholdQueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof thresholdTestTestThreshold>>
+  > = ({ signal }) => thresholdTestTestThreshold(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ThresholdTestTestThresholdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof thresholdTestTestThreshold>>
+>;
+export type ThresholdTestTestThresholdQueryError = void;
+
+export function useThresholdTestTestThreshold<
+  TData = Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+  TError = void,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useThresholdTestTestThreshold<
+  TData = Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useThresholdTestTestThreshold<
+  TData = Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary 基準パターン
+ */
+
+export function useThresholdTestTestThreshold<
+  TData = Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof thresholdTestTestThreshold>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getThresholdTestTestThresholdQueryOptions(
+    version,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary 基準パターン（Upsertテスト）
+ */
+export const thresholdTestTestThresholdUpsert = (
+  version: string,
+  signal?: AbortSignal,
+) => {
+  return axiosInstance<Threshold>({
+    url: `/api/v${version}/threshold_upsert/profile`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getThresholdTestTestThresholdUpsertQueryKey = (
+  version: string,
+) => {
+  return [`/api/v${version}/threshold_upsert/profile`] as const;
+};
+
+export const getThresholdTestTestThresholdUpsertQueryOptions = <
+  TData = Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getThresholdTestTestThresholdUpsertQueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>
+  > = ({ signal }) => thresholdTestTestThresholdUpsert(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ThresholdTestTestThresholdUpsertQueryResult = NonNullable<
+  Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>
+>;
+export type ThresholdTestTestThresholdUpsertQueryError = void;
+
+export function useThresholdTestTestThresholdUpsert<
+  TData = Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useThresholdTestTestThresholdUpsert<
+  TData = Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useThresholdTestTestThresholdUpsert<
+  TData = Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary 基準パターン（Upsertテスト）
+ */
+
+export function useThresholdTestTestThresholdUpsert<
+  TData = Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+  TError = void,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof thresholdTestTestThresholdUpsert>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getThresholdTestTestThresholdUpsertQueryOptions(
+    version,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary AP1001_ログインする
  */
 export const authenticationLogin = (
   version: string,
@@ -105,7 +1014,7 @@ export type AuthenticationLoginMutationBody = StaffLoginRequest;
 export type AuthenticationLoginMutationError = ProblemDetails;
 
 /**
- * @summary ログインする
+ * @summary AP1001_ログインする
  */
 export const useAuthenticationLogin = <
   TError = ProblemDetails,
@@ -129,7 +1038,7 @@ export const useAuthenticationLogin = <
 };
 
 /**
- * @summary アクセストークンをリフレッシュする
+ * @summary AP1023_アクセストークンをリフレッシュする
  */
 export const authenticationRefresh = (
   version: string,
@@ -180,7 +1089,7 @@ export type AuthenticationRefreshMutationBody = AccessTokenRefreshRequest;
 export type AuthenticationRefreshMutationError = ProblemDetails;
 
 /**
- * @summary アクセストークンをリフレッシュする
+ * @summary AP1023_アクセストークンをリフレッシュする
  */
 export const useAuthenticationRefresh = <
   TError = ProblemDetails,
@@ -204,7 +1113,7 @@ export const useAuthenticationRefresh = <
 };
 
 /**
- * @summary 中止理由一覧を取得する
+ * @summary AP1011_中止理由一覧を取得する
  */
 export const cancelReasonGetCancelReasons = (
   version: string,
@@ -324,7 +1233,7 @@ export function useCancelReasonGetCancelReasons<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 中止理由一覧を取得する
+ * @summary AP1011_中止理由一覧を取得する
  */
 
 export function useCancelReasonGetCancelReasons<
@@ -357,7 +1266,7 @@ export function useCancelReasonGetCancelReasons<
 }
 
 /**
- * @summary 受診番号の存在を確認する
+ * @summary AP1007_受診番号の存在を確認する
  */
 export const consultVerifyConsultNumber = (
   version: string,
@@ -408,7 +1317,7 @@ export type ConsultVerifyConsultNumberMutationBody = ConsultNumberRequest;
 export type ConsultVerifyConsultNumberMutationError = ProblemDetails;
 
 /**
- * @summary 受診番号の存在を確認する
+ * @summary AP1007_受診番号の存在を確認する
  */
 export const useConsultVerifyConsultNumber = <
   TError = ProblemDetails,
@@ -432,7 +1341,7 @@ export const useConsultVerifyConsultNumber = <
 };
 
 /**
- * @summary 未受診の検査メニューを取得する
+ * @summary AP1008_未受診の検査メニューを取得する
  */
 export const consultGetUnexaminedMenus = (
   version: string,
@@ -561,7 +1470,7 @@ export function useConsultGetUnexaminedMenus<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 未受診の検査メニューを取得する
+ * @summary AP1008_未受診の検査メニューを取得する
  */
 
 export function useConsultGetUnexaminedMenus<
@@ -596,7 +1505,7 @@ export function useConsultGetUnexaminedMenus<
 }
 
 /**
- * @summary 検査内容を取得する
+ * @summary AP1010_検査内容を取得する
  */
 export const consultGetExamItemsExaminee = (
   version: string,
@@ -736,7 +1645,7 @@ export function useConsultGetExamItemsExaminee<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 検査内容を取得する
+ * @summary AP1010_検査内容を取得する
  */
 
 export function useConsultGetExamItemsExaminee<
@@ -773,7 +1682,7 @@ export function useConsultGetExamItemsExaminee<
 }
 
 /**
- * @summary 検査の実施有無と中止理由を登録する
+ * @summary AP1022_検査の実施有無と中止理由を登録する
  */
 export const consultRegisterExecutions = (
   version: string,
@@ -825,7 +1734,7 @@ export type ConsultRegisterExecutionsMutationBody = ExecutionsRequest;
 export type ConsultRegisterExecutionsMutationError = ProblemDetails;
 
 /**
- * @summary 検査の実施有無と中止理由を登録する
+ * @summary AP1022_検査の実施有無と中止理由を登録する
  */
 export const useConsultRegisterExecutions = <
   TError = ProblemDetails,
@@ -849,7 +1758,7 @@ export const useConsultRegisterExecutions = <
 };
 
 /**
- * @summary 検査結果入力情報を取得する
+ * @summary AP1009_検査結果入力情報を取得する
  */
 export const consultGetInputExamItemsExaminee = (
   version: string,
@@ -989,7 +1898,7 @@ export function useConsultGetInputExamItemsExaminee<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 検査結果入力情報を取得する
+ * @summary AP1009_検査結果入力情報を取得する
  */
 
 export function useConsultGetInputExamItemsExaminee<
@@ -1287,7 +2196,7 @@ export const useConsultValidateCorrelationRule = <
 };
 
 /**
- * @summary 検査結果を登録する
+ * @summary AP1014_検査結果を登録する
  */
 export const consultRegisterResults = (
   version: string,
@@ -1339,7 +2248,7 @@ export type ConsultRegisterResultsMutationBody = ResultsRequest;
 export type ConsultRegisterResultsMutationError = ProblemDetails;
 
 /**
- * @summary 検査結果を登録する
+ * @summary AP1014_検査結果を登録する
  */
 export const useConsultRegisterResults = <
   TError = ProblemDetails,
@@ -1363,7 +2272,7 @@ export const useConsultRegisterResults = <
 };
 
 /**
- * @summary 検査結果を検証する
+ * @summary AP1013_検査結果を検証する
  */
 export const consultVerifyResults = (
   version: string,
@@ -1415,7 +2324,7 @@ export type ConsultVerifyResultsMutationBody = ResultsRequest;
 export type ConsultVerifyResultsMutationError = ProblemDetails;
 
 /**
- * @summary 検査結果を検証する
+ * @summary AP1013_検査結果を検証する
  */
 export const useConsultVerifyResults = <
   TError = ProblemDetails,
@@ -1439,7 +2348,7 @@ export const useConsultVerifyResults = <
 };
 
 /**
- * @summary 検査機器一覧を取得する
+ * @summary AP1012_検査機器一覧を取得する
  */
 export const equipmentGetEquipmentSettings = (
   version: string,
@@ -1569,7 +2478,7 @@ export function useEquipmentGetEquipmentSettings<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 検査機器一覧を取得する
+ * @summary AP1012_検査機器一覧を取得する
  */
 
 export function useEquipmentGetEquipmentSettings<
@@ -1604,7 +2513,7 @@ export function useEquipmentGetEquipmentSettings<
 }
 
 /**
- * @summary 検査メニュー一覧を取得する
+ * @summary AP1006_検査メニュー一覧を取得する
  */
 export const examMenuGetExamMenus = (version: string, signal?: AbortSignal) => {
   return axiosInstance<ExamMenuList>({
@@ -1721,7 +2630,7 @@ export function useExamMenuGetExamMenus<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 検査メニュー一覧を取得する
+ * @summary AP1006_検査メニュー一覧を取得する
  */
 
 export function useExamMenuGetExamMenus<
@@ -2051,7 +2960,7 @@ export function useHealthCheckGetDeepHealth<
 }
 
 /**
- * @summary ホームメニュー項目を取得する
+ * @summary AP1005_ホームメニュー項目を取得する
  */
 export const homeMenuGetHomeMenuSettings = (
   version: string,
@@ -2181,7 +3090,7 @@ export function useHomeMenuGetHomeMenuSettings<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary ホームメニュー項目を取得する
+ * @summary AP1005_ホームメニュー項目を取得する
  */
 
 export function useHomeMenuGetHomeMenuSettings<
@@ -2216,7 +3125,7 @@ export function useHomeMenuGetHomeMenuSettings<
 }
 
 /**
- * @summary 連携対象の検査結果を取得する
+ * @summary AP1018_連携対象の検査結果を取得する
  */
 export const integrationGetIntegrationResults = (
   version: string,
@@ -2339,7 +3248,7 @@ export function useIntegrationGetIntegrationResults<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 連携対象の検査結果を取得する
+ * @summary AP1018_連携対象の検査結果を取得する
  */
 
 export function useIntegrationGetIntegrationResults<
@@ -2372,7 +3281,7 @@ export function useIntegrationGetIntegrationResults<
 }
 
 /**
- * @summary 連携用に検査結果を出力する
+ * @summary AP1019_連携用に検査結果を出力する
  */
 export const integrationExportResults = (
   version: string,
@@ -2424,7 +3333,7 @@ export type IntegrationExportResultsMutationBody = ResultExportRequest;
 export type IntegrationExportResultsMutationError = ProblemDetails;
 
 /**
- * @summary 連携用に検査結果を出力する
+ * @summary AP1019_連携用に検査結果を出力する
  */
 export const useIntegrationExportResults = <
   TError = ProblemDetails,
@@ -2448,7 +3357,7 @@ export const useIntegrationExportResults = <
 };
 
 /**
- * @summary 検査結果の出力履歴を取得する
+ * @summary AP1020_検査結果の出力履歴を取得する
  */
 export const integrationGetExportHistory = (
   version: string,
@@ -2568,7 +3477,7 @@ export function useIntegrationGetExportHistory<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 検査結果の出力履歴を取得する
+ * @summary AP1020_検査結果の出力履歴を取得する
  */
 
 export function useIntegrationGetExportHistory<
@@ -2601,7 +3510,7 @@ export function useIntegrationGetExportHistory<
 }
 
 /**
- * @summary 出力した結果を未出力に戻す
+ * @summary AP1021_出力した結果を未出力に戻す
  */
 export const integrationUndoExportStatus = (
   version: string,
@@ -2653,7 +3562,7 @@ export type IntegrationUndoExportStatusMutationBody =
 export type IntegrationUndoExportStatusMutationError = ProblemDetails;
 
 /**
- * @summary 出力した結果を未出力に戻す
+ * @summary AP1021_出力した結果を未出力に戻す
  */
 export const useIntegrationUndoExportStatus = <
   TError = ProblemDetails,
@@ -2678,7 +3587,7 @@ export const useIntegrationUndoExportStatus = <
 };
 
 /**
- * @summary 日付を指定して班と会場のリストを取得する
+ * @summary AP1003_日付を指定して班と会場のリストを取得する
  */
 export const placeScheduleGetTeams = (
   version: string,
@@ -2810,7 +3719,7 @@ export function usePlaceScheduleGetTeams<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 日付を指定して班と会場のリストを取得する
+ * @summary AP1003_日付を指定して班と会場のリストを取得する
  */
 
 export function usePlaceScheduleGetTeams<
@@ -2845,7 +3754,7 @@ export function usePlaceScheduleGetTeams<
 }
 
 /**
- * @summary 班を指定して会場日程を取得する
+ * @summary AP1004_班を指定して会場日程を取得する
  */
 export const placeScheduleGetTeamPlaceSchedules = (
   version: string,
@@ -2979,7 +3888,7 @@ export function usePlaceScheduleGetTeamPlaceSchedules<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 班を指定して会場日程を取得する
+ * @summary AP1004_班を指定して会場日程を取得する
  */
 
 export function usePlaceScheduleGetTeamPlaceSchedules<
@@ -3014,7 +3923,7 @@ export function usePlaceScheduleGetTeamPlaceSchedules<
 }
 
 /**
- * @summary 会場ロック状態を取得する
+ * @summary AP1016_会場ロック状態を取得する
  */
 export const placeScheduleGetPlaceScheduleLockingStatus = (
   version: string,
@@ -3166,7 +4075,7 @@ export function usePlaceScheduleGetPlaceScheduleLockingStatus<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 会場ロック状態を取得する
+ * @summary AP1016_会場ロック状態を取得する
  */
 
 export function usePlaceScheduleGetPlaceScheduleLockingStatus<
@@ -3204,7 +4113,7 @@ export function usePlaceScheduleGetPlaceScheduleLockingStatus<
 }
 
 /**
- * @summary 会場ロック状態を更新する
+ * @summary AP1017_会場ロック状態を更新する
  */
 export const placeScheduleUpdatePlaceScheduleLockingStatus = (
   version: string,
@@ -3275,7 +4184,7 @@ export type PlaceScheduleUpdatePlaceScheduleLockingStatusMutationError =
   ProblemDetails;
 
 /**
- * @summary 会場ロック状態を更新する
+ * @summary AP1017_会場ロック状態を更新する
  */
 export const usePlaceScheduleUpdatePlaceScheduleLockingStatus = <
   TError = ProblemDetails,
@@ -3308,7 +4217,7 @@ export const usePlaceScheduleUpdatePlaceScheduleLockingStatus = <
 };
 
 /**
- * @summary 進捗状況を取得する
+ * @summary AP1015_進捗状況を取得する
  */
 export const progressGetProgress = (
   version: string,
@@ -3437,7 +4346,7 @@ export function useProgressGetProgress<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 進捗状況を取得する
+ * @summary AP1015_進捗状況を取得する
  */
 
 export function useProgressGetProgress<
@@ -3472,7 +4381,7 @@ export function useProgressGetProgress<
 }
 
 /**
- * @summary 職員の情報を取得する
+ * @summary AP1002_職員の情報を取得する
  */
 export const staffGetStaff = (version: string, signal?: AbortSignal) => {
   return axiosInstance<Staff>({
@@ -3572,7 +4481,7 @@ export function useStaffGetStaff<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 /**
- * @summary 職員の情報を取得する
+ * @summary AP1002_職員の情報を取得する
  */
 
 export function useStaffGetStaff<
@@ -3587,6 +4496,465 @@ export function useStaffGetStaff<
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getStaffGetStaffQueryOptions(version, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary テストケース1 新規受診者データの登録
+ */
+export const examineeTestExamineeTest1 = (
+  version: string,
+  signal?: AbortSignal,
+) => {
+  return axiosInstance<void>({
+    url: `/api/v${version}/examinee/test1`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getExamineeTestExamineeTest1QueryKey = (version: string) => {
+  return [`/api/v${version}/examinee/test1`] as const;
+};
+
+export const getExamineeTestExamineeTest1QueryOptions = <
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getExamineeTestExamineeTest1QueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof examineeTestExamineeTest1>>
+  > = ({ signal }) => examineeTestExamineeTest1(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ExamineeTestExamineeTest1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof examineeTestExamineeTest1>>
+>;
+export type ExamineeTestExamineeTest1QueryError = ProblemDetails;
+
+export function useExamineeTestExamineeTest1<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useExamineeTestExamineeTest1<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useExamineeTestExamineeTest1<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary テストケース1 新規受診者データの登録
+ */
+
+export function useExamineeTestExamineeTest1<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest1>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getExamineeTestExamineeTest1QueryOptions(
+    version,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary テストケース2 既存受診者データの更新
+ */
+export const examineeTestExamineeTest2 = (
+  version: string,
+  signal?: AbortSignal,
+) => {
+  return axiosInstance<void>({
+    url: `/api/v${version}/examinee/test2`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getExamineeTestExamineeTest2QueryKey = (version: string) => {
+  return [`/api/v${version}/examinee/test2`] as const;
+};
+
+export const getExamineeTestExamineeTest2QueryOptions = <
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getExamineeTestExamineeTest2QueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof examineeTestExamineeTest2>>
+  > = ({ signal }) => examineeTestExamineeTest2(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ExamineeTestExamineeTest2QueryResult = NonNullable<
+  Awaited<ReturnType<typeof examineeTestExamineeTest2>>
+>;
+export type ExamineeTestExamineeTest2QueryError = ProblemDetails;
+
+export function useExamineeTestExamineeTest2<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useExamineeTestExamineeTest2<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useExamineeTestExamineeTest2<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary テストケース2 既存受診者データの更新
+ */
+
+export function useExamineeTestExamineeTest2<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest2>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getExamineeTestExamineeTest2QueryOptions(
+    version,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary テストケース3 受診者データに紐づく団体情報が存在しない
+ */
+export const examineeTestExamineeTest3 = (
+  version: string,
+  signal?: AbortSignal,
+) => {
+  return axiosInstance<void>({
+    url: `/api/v${version}/examinee/test3`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getExamineeTestExamineeTest3QueryKey = (version: string) => {
+  return [`/api/v${version}/examinee/test3`] as const;
+};
+
+export const getExamineeTestExamineeTest3QueryOptions = <
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getExamineeTestExamineeTest3QueryKey(version);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof examineeTestExamineeTest3>>
+  > = ({ signal }) => examineeTestExamineeTest3(version, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!version,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ExamineeTestExamineeTest3QueryResult = NonNullable<
+  Awaited<ReturnType<typeof examineeTestExamineeTest3>>
+>;
+export type ExamineeTestExamineeTest3QueryError = ProblemDetails;
+
+export function useExamineeTestExamineeTest3<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useExamineeTestExamineeTest3<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+          TError,
+          TData
+        >,
+        "initialData"
+      >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useExamineeTestExamineeTest3<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+/**
+ * @summary テストケース3 受診者データに紐づく団体情報が存在しない
+ */
+
+export function useExamineeTestExamineeTest3<
+  TData = Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+  TError = ProblemDetails,
+>(
+  version: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof examineeTestExamineeTest3>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getExamineeTestExamineeTest3QueryOptions(
+    version,
+    options,
+  );
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;
@@ -3752,3 +5120,75 @@ export function useOrganizationTestInsertOrganization<
 
   return query;
 }
+
+/**
+ * @summary 会場日程登録テスト（Upsertテスト）
+ */
+export const placeScheduleTestPlaceScheduleTest1 = (version: string) => {
+  return axiosInstance<Blob>({
+    url: `/api/v${version}/place_schedule/test1`,
+    method: "POST",
+    responseType: "blob",
+  });
+};
+
+export const getPlaceScheduleTestPlaceScheduleTest1MutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof placeScheduleTestPlaceScheduleTest1>>,
+    TError,
+    { version: string },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof placeScheduleTestPlaceScheduleTest1>>,
+  TError,
+  { version: string },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof placeScheduleTestPlaceScheduleTest1>>,
+    { version: string }
+  > = (props) => {
+    const { version } = props ?? {};
+
+    return placeScheduleTestPlaceScheduleTest1(version);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PlaceScheduleTestPlaceScheduleTest1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof placeScheduleTestPlaceScheduleTest1>>
+>;
+
+export type PlaceScheduleTestPlaceScheduleTest1MutationError = unknown;
+
+/**
+ * @summary 会場日程登録テスト（Upsertテスト）
+ */
+export const usePlaceScheduleTestPlaceScheduleTest1 = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof placeScheduleTestPlaceScheduleTest1>>,
+    TError,
+    { version: string },
+    TContext
+  >;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof placeScheduleTestPlaceScheduleTest1>>,
+  TError,
+  { version: string },
+  TContext
+> => {
+  const mutationOptions =
+    getPlaceScheduleTestPlaceScheduleTest1MutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
