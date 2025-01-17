@@ -11,6 +11,9 @@ type HeaderProps = {
 export default function CommonHeader({ screenName, staffName }: HeaderProps) {
   const navigate = useNavigate();
 
+  const displayableStaffName =
+    staffName.length > 8 ? `${staffName.slice(0, 7)}…` : staffName;
+
   return (
     <Box
       h={67}
@@ -41,8 +44,8 @@ export default function CommonHeader({ screenName, staffName }: HeaderProps) {
             bg="white01"
           >
             <Box>
-              <Text size="xs" c="black01" pb={24} truncate="end">
-                {staffName}
+              <Text size="xs" c="black01" pb={24}>
+                {displayableStaffName}
               </Text>
               {/* ログアウトボタン */}
               <Button
