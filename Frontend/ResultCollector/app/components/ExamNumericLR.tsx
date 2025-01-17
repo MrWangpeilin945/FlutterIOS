@@ -12,13 +12,14 @@ import {
 } from "@mantine/core";
 import { useClickOutside } from "@mantine/hooks";
 import NumericKeyboard from "~/components/NumericKeyboard";
+import CollectionKeyboard from "./CollectionKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import type {
   InputExamItem,
   ExamRegistResult,
 } from "~/domain/wellship.schemas";
-import { InputErrorLevel } from "~/domain/enums";
+import { InputErrorLevel, KeyboardType } from "~/domain/enums";
 import {
   IconExclamationCircleFilled,
   IconSquareRoundedXFilled,
@@ -164,18 +165,21 @@ export default function ExamNumericLR({
             .string()
             .min(
               1,
-              getErrorMessage(errorMessages.required, name ? `${name}は` : ""),
+              getErrorMessage(
+                errorMessages.required,
+                `${name || (positionNumber === 左 ? "左" : "右")}は`,
+              ),
             ) // 必須チェック
             .refine((value) => /^\d+$/.test(value), {
               message: getErrorMessage(
                 errorMessages.numericString,
-                name ? `${name}は` : "",
+                `${name || (positionNumber === 左 ? "左" : "右")}は`,
               ),
             })
         : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
             message: getErrorMessage(
               errorMessages.numericString,
-              name ? `${name}は` : "",
+              `${name || (positionNumber === 左 ? "左" : "右")}は`,
             ),
           });
 
@@ -300,6 +304,9 @@ export default function ExamNumericLR({
       name: "右",
     };
   }
+  const isDisableItem =
+    (!leftItemDetail?.hasOrder || !!leftItemDetail.cancelReasonId) &&
+    (!rightItemDetail?.hasOrder || !!rightItemDetail.cancelReasonId);
   const targetDetails = [leftItemDetail, rightItemDetail];
 
   return (
@@ -322,11 +329,17 @@ export default function ExamNumericLR({
               cancelReasonId,
             } = detail;
             const isDisabled = !hasOrder || !!cancelReasonId;
+            const examPosition =
+              detailPositionNumber === 左
+                ? "左"
+                : detailPositionNumber === 右
+                  ? "右"
+                  : "";
             return (
               <Stack key={detailPositionNumber}>
                 <Paper w={524} h={51} bg="gray02" c="white" radius="itemName">
                   <Text size="lg" fw={700} ta="center">
-                    {detailName}
+                    {detailName?.slice(0, 14) || examPosition}
                   </Text>
                 </Paper>
                 <Group>
@@ -355,7 +368,7 @@ export default function ExamNumericLR({
                       handleChange(
                         e.currentTarget.value,
                         positionNumber ?? 0,
-                        positionNumber ?? 0,
+                        detailPositionNumber ?? 0,
                       )
                     }
                     disabled={isDisabled}
@@ -390,6 +403,7 @@ export default function ExamNumericLR({
           bd={"2px,solid"}
           onClick={() => handleChange("", positionNumber)}
           tabIndex={-1}
+          disabled={isDisableItem}
         >
           クリア
         </Button>
@@ -420,19 +434,34 @@ export default function ExamNumericLR({
                 detail.positionNumber === 左 ? "left" : "right"
               ] && (
                 <div ref={closeKeyBoard}>
-                  <NumericKeyboard
-                    value={detail?.value ?? ""}
-                    integerLength={detail.integerLength}
-                    decimalLength={detail.decimalLength}
-                    onChange={(newValue) =>
-                      handleChange(
-                        newValue,
-                        positionNumber ?? 0,
-                        detail.positionNumber ?? 0,
-                      )
-                    }
-                    onConfirm={handleConfirm}
-                  />
+                  {detail?.keyboard?.keyboardType === KeyboardType.テンキー ||
+                  detail?.keyboard?.keyboardType === undefined ? (
+                    <NumericKeyboard
+                      value={detail?.value ?? ""}
+                      integerLength={detail.integerLength}
+                      decimalLength={detail.decimalLength}
+                      onChange={(newValue) =>
+                        handleChange(
+                          newValue,
+                          positionNumber ?? 0,
+                          detail.positionNumber ?? 0,
+                        )
+                      }
+                      onConfirm={handleConfirm}
+                    />
+                  ) : (
+                    <CollectionKeyboard
+                      value={detail?.value ?? ""}
+                      keyboardValues={detail.keyboard?.values ?? []}
+                      onChange={(newValue) =>
+                        handleChange(
+                          newValue,
+                          positionNumber,
+                          detail.positionNumber,
+                        )
+                      }
+                    />
+                  )}
                 </div>
               )}
             </Box>

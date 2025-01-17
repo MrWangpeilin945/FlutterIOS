@@ -18,6 +18,11 @@ type HearingProps = {
   onClick: (updatedExamItem: InputExamItem[] | undefined) => void;
 };
 
+interface BackendValidation {
+  itemPositionNumber: number;
+  examRegistResults: ExamRegistResult[];
+}
+
 export default function ExamHearing({
   examItems,
   onRegisterPressed,
@@ -50,17 +55,36 @@ export default function ExamHearing({
 
   const [examItemData, setExamItemData] = useState<InputExamItem>(firstItem);
 
+  // APIからのエラーメッセージを保存する
+  const [backendValidation, setBackendValidation] = useState<
+    BackendValidation[]
+  >([]);
+  // 初回読み込み時にAPIのエラーメッセージを保存する
+  useEffect(() => {
+    const backendErrorMessages: BackendValidation[] = examItems.map((item) => ({
+      itemPositionNumber: item.positionNumber ?? 0,
+      examRegistResults: item.examRegistResults ?? [],
+    }));
+    setBackendValidation(backendErrorMessages);
+  }, []);
+
   useEffect(() => {
     // positionNumberが1のアイテムを1つだけ取り出してバリデーションチェック
     const updatedItem = firstItem;
     let validatedData: InputExamItem = { ...updatedItem };
-
+    //グループ内で1000Hzまたは4000Hzが所見ありの場合、もう一方のdetail.valueに所見なしのcodeを補完
+    validatedData = [左1000Hz, 左4000Hz, 右1000Hz, 右4000Hz].reduce(
+      (acc, i) => {
+        return complementValue(i, acc);
+      },
+      validatedData,
+    );
     // onRegisterPressedがtrueの場合のみバリデーションを実行
     if (onRegisterPressed) {
-      validatedData = validationCheck(updatedItem).validateResult;
+      validatedData = validationCheck(validatedData).validateResult;
     }
     // 状態を更新
-    setExamItemData(validatedData); // 配列にラップして1つだけセット
+    setExamItemData(validatedData);
   }, [onRegisterPressed, examItems]);
 
   const handleErrorMessage = (item: InputExamItem): InputExamItem => {
@@ -76,15 +100,10 @@ export default function ExamHearing({
     return item;
   };
 
-  // APIからのエラーメッセージを保存
-  const APIErrors = examItems.map((item) => ({
-    positionNumber: item.positionNumber,
-    examRegistResults: item.examRegistResults || [],
-  }));
-  // 引数のexamItemのpositionNumberを参照し、エラーメッセージを初期化する
+  // 初回読み込み時のAPIからのエラーメッセージで初期化する
   const resetErrorMessages = (item: InputExamItem) => {
-    const targetError = APIErrors.find(
-      (error) => error.positionNumber === item.positionNumber,
+    const targetError = backendValidation.find(
+      (error) => error.itemPositionNumber === item.positionNumber,
     );
     if (targetError) {
       item.examRegistResults = targetError.examRegistResults;
@@ -166,7 +185,8 @@ export default function ExamHearing({
         // 左の要素に値を設定
         if (
           isGroup === "左" &&
-          (detail.positionNumber === 左1000Hz || detail.positionNumber === 左4000Hz)
+          (detail.positionNumber === 左1000Hz ||
+            detail.positionNumber === 左4000Hz)
         ) {
           return {
             ...detail,
@@ -176,7 +196,8 @@ export default function ExamHearing({
         // 右の要素に値を設定
         if (
           isGroup === "右" &&
-          (detail.positionNumber === 右1000Hz || detail.positionNumber === 右4000Hz)
+          (detail.positionNumber === 右1000Hz ||
+            detail.positionNumber === 右4000Hz)
         ) {
           return {
             ...detail,
@@ -193,13 +214,61 @@ export default function ExamHearing({
     }
   };
 
+  // 同じグループのvalueが存在するかを確認
+  const getSameGroupData = (detailNumber: number) => {
+    const mapping: Record<number, number> = {
+      1: 左4000Hz,
+      2: 左1000Hz,
+      3: 右4000Hz,
+      4: 右1000Hz,
+    };
+
+    const targetDetailNumber = mapping[detailNumber];
+    const targetDetail = examItemData.examItemDetails?.find(
+      (detail) => detail.positionNumber === targetDetailNumber,
+    );
+    return {
+      hasValue: !!targetDetail?.value,
+      targetDetail: targetDetail,
+    };
+  };
+
+  const complementValue = (detailNumber: number, examItems: InputExamItem) => {
+    // 同じグループ（左または右）の1000Hzまたは4000Hzのvalueが存在するかを確認
+    const { hasValue, targetDetail } = getSameGroupData(detailNumber);
+
+    // 存在しない場合、所見なしのcodeをvalueに設定
+    if (
+      !hasValue &&
+      targetDetail?.hasOrder === true &&
+      !targetDetail.cancelReasonId
+    ) {
+      const targetNoFindingCode = getOptionCode(targetDetail, 1);
+      const updatedExamItem: InputExamItem = {
+        ...examItems,
+        examItemDetails: examItems.examItemDetails?.map((detail) =>
+          detail.positionNumber === targetDetail?.positionNumber
+            ? {
+                ...detail,
+                value: targetNoFindingCode,
+              }
+            : detail,
+        ),
+      };
+      return updatedExamItem;
+    }
+    return examItems;
+  };
+
   // 所見ありボタン押下時
   const setFindings = (value: string, detailNumber: number) => {
     const selectedDetail = examItemData.examItemDetails?.find(
       (detail) => detail.positionNumber === detailNumber,
     );
+    const noFindingCode = getOptionCode(selectedDetail ?? {}, 1);
     // 選択/未選択処理
-    const selectedValue = value === selectedDetail?.value ? "" : value;
+    const selectedValue =
+      value === selectedDetail?.value ? noFindingCode : value;
 
     // 値を更新
     const updatedExamItem: InputExamItem = {
@@ -214,7 +283,9 @@ export default function ExamHearing({
       ),
     };
 
-    const { validateResult, hasCallback } = validationCheck(updatedExamItem);
+    const complementedItems = complementValue(detailNumber, updatedExamItem);
+
+    const { validateResult, hasCallback } = validationCheck(complementedItems);
     setExamItemData(validateResult);
     if (hasCallback) {
       onClick([validateResult]);
@@ -259,13 +330,16 @@ export default function ExamHearing({
     return detail.value === getOptionCode(detail, orderNumber);
   };
 
-  // 所見ありの前回値が存在するかを判定
+  // 前回値が選択肢に存在するかを判定
   const checkPrev = (detail: ExamItemDetail | undefined) => {
-    if (!detail) return false;
-    const matchingOption = detail.examItemDetailOptions?.find(
-      (option) => option.orderNumber === 2,
-    );
-    return matchingOption?.code === detail.prevValue;
+    if (!detail) return "";
+    const noFindingCode = getOptionCode(detail, 1);
+    const findingCode = getOptionCode(detail, 2);
+    return detail.prevValue === noFindingCode
+      ? "所見なし"
+      : detail.prevValue === findingCode
+        ? "所見あり"
+        : `${detail.prevValue}`; //存在しない場合prevValueを表示
   };
 
   return (
@@ -305,13 +379,7 @@ export default function ExamHearing({
                 <Box ml="auto" h={43.4}>
                   {(h1000?.prevValue || h4000?.prevValue) && (
                     <Text fw={700} maw={500}>
-                      (前回：
-                      {checkPrev(h1000) ? "1000Hz" : ""}
-                      {(h1000?.prevValue && !h4000?.prevValue) ||
-                      (!h1000?.prevValue && h4000?.prevValue)
-                        ? ""
-                        : "/"}
-                      {checkPrev(h4000) ? "4000Hz" : ""})
+                      (前回：{checkPrev(h1000)}/{checkPrev(h4000)})
                     </Text>
                   )}
                 </Box>
