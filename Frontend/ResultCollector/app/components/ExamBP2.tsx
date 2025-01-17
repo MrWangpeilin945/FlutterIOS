@@ -672,6 +672,8 @@ export default function ExamBP2({
                       KeyboardType.テンキー ? (
                         <NumericKeyboard
                           value={detail?.value ?? ""}
+                          integerLength={detail?.integerLength}
+                          decimalLength={detail?.decimalLength}
                           onChange={(newValue) =>
                             handleChange(
                               newValue,
