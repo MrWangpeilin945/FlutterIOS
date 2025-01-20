@@ -54,7 +54,7 @@ class BtClassicSerialSettingsPage extends HookConsumerWidget {
                   ),
                   onTap: deviceStream.hasValue
                       ? () async {
-                          await showDialog(
+                          final value = await showDialog<BluetoothDevice>(
                             context: context,
                             builder: (context) {
                               return WscSelectDialog(
@@ -66,13 +66,17 @@ class BtClassicSerialSettingsPage extends HookConsumerWidget {
                                   subtitle: Text(x.address),
                                   groupValue: device.value,
                                   onChanged: (value) {
-                                    device.value = value;
-                                    Navigator.pop(context);
+                                    Navigator.pop(context, value);
                                   },
                                 ),
                               );
                             },
                           );
+                          if (value != null) {
+                            device.value = value;
+                            await BtClassicSettings.saveSettings(
+                                BtClassicSettings(deviceName: value.name, address: value.address));
+                          }
                         }
                       : null,
                 ),

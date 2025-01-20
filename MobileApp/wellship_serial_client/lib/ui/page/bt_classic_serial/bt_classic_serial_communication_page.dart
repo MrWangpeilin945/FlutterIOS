@@ -126,10 +126,12 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
                         },
                       );
                       if (device != null) {
-                        ref.read(btClassicSettingsProvider.notifier).state = BtClassicSettings(
+                        final settings = BtClassicSettings(
                           deviceName: device.name,
                           address: device.address,
                         );
+                        ref.read(btClassicSettingsProvider.notifier).state = settings;
+                        BtClassicSettings.saveSettings(settings);
                         // NOTE: 接続先が変更される場合、現在の接続を破棄します
                         connection.value?.dispose();
                         connection.value = null;

@@ -4,7 +4,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wellship_serial_client/data/enum/trans_method.dart';
 import 'package:wellship_serial_client/data/model/app_settings.dart';
+import 'package:wellship_serial_client/data/model/bt_classic_settings.dart';
 import 'package:wellship_serial_client/data/model/wired_settings.dart';
+import 'package:wellship_serial_client/data/provider/behavior_settings_provider.dart';
+import 'package:wellship_serial_client/data/provider/bt_classic_settings_provider.dart';
 import 'package:wellship_serial_client/ui/route/app_route.gr.dart';
 
 @RoutePage()
@@ -25,9 +28,8 @@ class DeepLinkHomePage extends ConsumerWidget {
         router.replace(const WiredSerialCommunicationRoute());
         return const Scaffold();
       case TransMethod.btClassic:
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          // TODO アプリに保存した設定からアドレス・デバイス名を取得・BtClassicSettingsを生成する
-          // ref.read(btClassicSettingsProvider.notifier).state = settings.toBtClassicSettings();
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          ref.read(btClassicSettingsProvider.notifier).state = await BtClassicSettings.loadSettings();
         });
         router.replace(const BtClassicSerialCommunicationRoute());
         return const Scaffold();
