@@ -3,13 +3,19 @@
 class WscSelectDialog<T> extends StatelessWidget {
   const WscSelectDialog({
     super.key,
+    this.titleMapper,
+    this.subtitleMapper,
     required this.title,
     required this.items,
-    required this.mapper,
+    required this.groupValue,
   });
+
+  final String Function(T)? titleMapper;
+  final String Function(T)? subtitleMapper;
+
   final String title;
-  final RadioListTile<T> Function(T) mapper;
   final List<T> items;
+  final T groupValue;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +23,17 @@ class WscSelectDialog<T> extends StatelessWidget {
       title: Text(title),
       content: SingleChildScrollView(
         child: Column(
-          children: items.map(mapper).toList(),
+          children: items
+              .map(
+                (x) => RadioListTile(
+                  value: x,
+                  title: titleMapper != null ? Text(titleMapper!(x)) : Text(x.toString()),
+                  subtitle: subtitleMapper != null ? Text(subtitleMapper!(x)) : null,
+                  groupValue: groupValue,
+                  onChanged: (value) => Navigator.pop(context, value),
+                ),
+              )
+              .toList(),
         ),
       ),
     );
