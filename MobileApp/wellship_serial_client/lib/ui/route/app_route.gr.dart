@@ -11,7 +11,7 @@
 import 'package:auto_route/auto_route.dart' as _i7;
 import 'package:wellship_serial_client/ui/page/bt_classic_serial/bt_classic_serial_communication_page.dart'
     as _i1;
-import 'package:wellship_serial_client/ui/page/bt_classic_serial/bt_classic_serial_settings_settings_page.dart'
+import 'package:wellship_serial_client/ui/page/bt_classic_serial/bt_classic_serial_settings_page.dart'
     as _i2;
 import 'package:wellship_serial_client/ui/page/deep_link_home/deep_link_home_page.dart'
     as _i3;
