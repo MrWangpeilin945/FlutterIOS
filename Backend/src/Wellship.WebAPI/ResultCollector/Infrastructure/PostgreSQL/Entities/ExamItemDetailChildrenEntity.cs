@@ -63,11 +63,6 @@ public class ExamItemDetailChildrenEntity
     public required string KeyboardValue { get; set; }
 
     /// <summary>
-    /// 選択肢ID
-    /// </summary>
-    public required string OptionId { get; set; }
-
-    /// <summary>
     /// 選択肢コード
     /// </summary>
     public required string OptionCode { get; set; }
