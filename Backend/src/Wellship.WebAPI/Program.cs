@@ -147,6 +147,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IThresholdRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ThresholdRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.ITicketRepository, ExternalConnection.PostgreSQL.RepositoryImpls.TicketRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IPlaceScheduleRepository, ExternalConnection.PostgreSQL.RepositoryImpls.PlaceScheduleRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IStaffRepository, ExternalConnection.PostgreSQL.RepositoryImpls.StaffRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExamNormalValueRangeRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExamNormalValueRangeRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExternalExamItemDetailsRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExternalExamItemDetailsRepository>();
         return services;
@@ -173,6 +174,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<ExternalConnection.Usecases.IThresholdUsecase, ExternalConnection.Usecases.ThresholdUsecase>();
         services.AddScoped<ExternalConnection.Usecases.ITicketUsecase, ExternalConnection.Usecases.TicketUsecase>();
         services.AddScoped<ExternalConnection.Usecases.IPlaceScheduleUsecase, ExternalConnection.Usecases.PlaceScheduleUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.IStaffUsecase, ExternalConnection.Usecases.StaffUsecase>();
         services.AddScoped<ExternalConnection.Usecases.IExamNormalValueRangeUsecase, ExternalConnection.Usecases.ExamNormalValueRangeUsecase>();
         return services;
     }
