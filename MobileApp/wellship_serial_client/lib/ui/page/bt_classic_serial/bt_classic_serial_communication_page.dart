@@ -10,9 +10,10 @@ import 'package:retry/retry.dart';
 import 'package:typed_data/typed_buffers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wellship_serial_client/data/model/behavior_settings.dart';
+import 'package:wellship_serial_client/data/model/bt_classic_settings.dart';
 import 'package:wellship_serial_client/data/provider/behavior_settings_provider.dart';
-import 'package:wellship_serial_client/data/provider/bt_classic_devices_provider.dart';
 import 'package:wellship_serial_client/data/provider/bt_classic_settings_provider.dart';
+import 'package:wellship_serial_client/ui/component/wsc_bluetooth_device_select_dialog.dart';
 
 @RoutePage()
 class BtClassicSerialCommunicationPage extends HookConsumerWidget {
@@ -20,29 +21,33 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final deviceStream = ref.watch(btClassicDevicesProvider);
-    // TODO 設定できるようにする。
-    // TODO デバイス名よりもアドレスで判別したほうがよい
-    final serialSettings = ref.read(btClassicSettingsProvider);
+    final serialSettings = ref.watch(btClassicSettingsProvider);
     final behaviorSettings = ref.read(behaviorSettingsProvider);
-    final device = deviceStream.value?.where((x) => x.device.address == serialSettings.address).firstOrNull?.device;
+    final device = serialSettings.address != null
+        ? BluetoothDevice(name: serialSettings.deviceName, address: serialSettings.address!)
+        : null;
 
     final connection = useState<BluetoothConnection?>(null);
     final text = useState<String>("");
 
     useEffect(() {
+      // デバイスを変更した際にコネクションを切断する
+      connection.value?.dispose();
+      connection.value = null;
       if (device == null) {
-        return () {
-          connection.value?.dispose();
-        };
+        return () {};
       }
       retry(
         () async {
+          // 接続先のデバイスを切り替えたあと接続を試行しないようにする
+          if (serialSettings.address != ref.read(btClassicSettingsProvider).address) {
+            return;
+          }
           final conn = await BluetoothConnection.toAddress(serialSettings.address);
           text.value = "";
           connection.value = conn;
           final buffer = Uint8Buffer();
-          // 多重に終了処理が行われないように
+          // 多重に終了処理が行われないように処理終了中かどうかのフラグを持つ
           bool aborting = false;
           int ackCount = 0;
           final ackTriggers = behaviorSettings.ackTriggers;
@@ -107,7 +112,29 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
                       onPressed: null,
                       icon: Icon(Icons.settings),
                     ),
-                    onTap: null),
+                    onTap: () async {
+                      final device = await showDialog<BluetoothDevice>(
+                        context: context,
+                        builder: (context) {
+                          return WscBluetoothDeviceSelectDialog(
+                            title: '接続デバイスを選択してください',
+                            groupValue: BluetoothDevice(
+                              name: serialSettings.deviceName,
+                              address: serialSettings.address ?? '',
+                            ),
+                          );
+                        },
+                      );
+                      if (device != null) {
+                        ref.read(btClassicSettingsProvider.notifier).state = BtClassicSettings(
+                          deviceName: device.name,
+                          address: device.address,
+                        );
+                        // NOTE: 接続先が変更される場合、現在の接続を破棄します
+                        connection.value?.dispose();
+                        connection.value = null;
+                      }
+                    }),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
