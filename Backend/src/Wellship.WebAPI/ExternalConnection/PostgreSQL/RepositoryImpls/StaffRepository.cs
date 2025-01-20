@@ -122,7 +122,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
             {
                 var name = $"@Id{i + 1}";
                 param.Add(name);
-                parameters.Add(name, staffCodesAndLoginIds[i].loginId + staffCodesAndLoginIds[i].staffCode);
+                parameters.Add(name, staffCodesAndLoginIds[i].loginId + '/' + staffCodesAndLoginIds[i].staffCode);
             }
             string placeholders = string.Join(",", param);
             var selectSQL = $@"
@@ -130,17 +130,10 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                     login_id as LoginId
                     , staff_code as StaffCode
                 FROM
-                    (
-                        SELECT
-                            login_id
-                            , staff_code 
-                        FROM
-                            resultcollector.staffs
-                        WHERE
-                            concat(login_id, staff_code) not in ({placeholders})
-                    ) as staffsList
+                    resultcollector.staffs
                 WHERE
-                    staffsList.login_id = any (@LoginIds);";
+                    concat(login_id, '/', staff_code) not in ({placeholders})
+                    AND login_id = any (@LoginIds);";
             // クエリ実行
             var result = await connection.QueryAsync<StaffEntity>(selectSQL, parameters);
             return result.ToList();
