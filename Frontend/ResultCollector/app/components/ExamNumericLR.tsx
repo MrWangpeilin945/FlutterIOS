@@ -12,13 +12,14 @@ import {
 } from "@mantine/core";
 import { useClickOutside } from "@mantine/hooks";
 import NumericKeyboard from "~/components/NumericKeyboard";
+import CollectionKeyboard from "./CollectionKeyboard";
 import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import type {
   InputExamItem,
   ExamRegistResult,
 } from "~/domain/wellship.schemas";
-import { InputErrorLevel } from "~/domain/enums";
+import { InputErrorLevel, KeyboardType } from "~/domain/enums";
 import {
   IconExclamationCircleFilled,
   IconSquareRoundedXFilled,
@@ -158,19 +159,29 @@ export default function ExamNumericLR({
       if (!hasOrder || !!cancelReasonId) {
         continue; // disableの場合、処理をスキップする
       }
-      // 必須チェックと半角数字チェックを一度に行うスキーマ
-      const schema = z
-        .string()
-        .min(
-          1,
-          getErrorMessage(errorMessages.required, `${item.name}:${name}は`),
-        ) // 必須チェック
-        .refine((value) => /^\d+(\.\d+)?$/.test(value), {
-          message: getErrorMessage(
-            errorMessages.numericString,
-            `${item.name}:${name}は`,
-          ),
-        });
+      // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
+      const schema = onRegisterPressed
+        ? z
+            .string()
+            .min(
+              1,
+              getErrorMessage(
+                errorMessages.required,
+                `${name || (positionNumber === 左 ? "左" : "右")}は`,
+              ),
+            ) // 必須チェック
+            .refine((value) => /^\d+$/.test(value), {
+              message: getErrorMessage(
+                errorMessages.numericString,
+                `${name || (positionNumber === 左 ? "左" : "右")}は`,
+              ),
+            })
+        : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
+            message: getErrorMessage(
+              errorMessages.numericString,
+              `${name || (positionNumber === 左 ? "左" : "右")}は`,
+            ),
+          });
 
       // バリデーション対象データを取得
       const valueToValidate = value;
@@ -210,12 +221,7 @@ export default function ExamNumericLR({
 
   useEffect(() => {
     const updatedItems = examItems.map((item) => {
-      let validatedData = item;
-
-      // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-      if (onRegisterPressed) {
-        validatedData = validationCheck(validatedData).validateResult;
-      }
+      const validatedData = validationCheck(item).validateResult;
       return validatedData;
     });
     setExamItemsData(updatedItems);
@@ -298,24 +304,17 @@ export default function ExamNumericLR({
       name: "右",
     };
   }
+  const isDisableItem =
+    (!leftItemDetail?.hasOrder || !!leftItemDetail.cancelReasonId) &&
+    (!rightItemDetail?.hasOrder || !!rightItemDetail.cancelReasonId);
   const targetDetails = [leftItemDetail, rightItemDetail];
 
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
       <Stack>
-        <Paper
-          w={274}
-          h={80}
-          className={styles["basic-grey"]}
-          radius="itemName"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text size="lg" fw={700}>
-            {name}
+        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
+          <Text size="lg" fw={700} ta="center">
+            {name?.slice(0, 8)}
           </Text>
         </Paper>
         <Group gap={16}>
@@ -330,21 +329,17 @@ export default function ExamNumericLR({
               cancelReasonId,
             } = detail;
             const isDisabled = !hasOrder || !!cancelReasonId;
+            const examPosition =
+              detailPositionNumber === 左
+                ? "左"
+                : detailPositionNumber === 右
+                  ? "右"
+                  : "";
             return (
               <Stack key={detailPositionNumber}>
-                <Paper
-                  w={524}
-                  h={51}
-                  className={styles["basic-grey"]}
-                  radius="itemName"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Text size="lg" fw={700}>
-                    {detailName}
+                <Paper w={524} h={51} bg="gray02" c="white" radius="itemName">
+                  <Text size="lg" fw={700} ta="center">
+                    {detailName?.slice(0, 14) || examPosition}
                   </Text>
                 </Paper>
                 <Group>
@@ -373,18 +368,24 @@ export default function ExamNumericLR({
                       handleChange(
                         e.currentTarget.value,
                         positionNumber ?? 0,
-                        positionNumber ?? 0,
+                        detailPositionNumber ?? 0,
                       )
                     }
                     disabled={isDisabled}
                   />
-                  <Stack gap="0">
-                    <Text size="md" fw="700" maw={172}>
-                      {prevValue ? `(前回: ${prevValue})` : ""}
-                    </Text>
-                    <Text size="xs" fw="400">
-                      {unit}
-                    </Text>
+                  <Stack w={173} h={80} gap={4} justify="space-between">
+                    <Box>
+                      {prevValue && (
+                        <Text fw={700} mt={0}>
+                          (前回：{prevValue})
+                        </Text>
+                      )}
+                    </Box>
+                    <Box>
+                      <Text size="xs" mb={0}>
+                        {unit}
+                      </Text>
+                    </Box>
                   </Stack>
                 </Group>
               </Stack>
@@ -402,6 +403,7 @@ export default function ExamNumericLR({
           bd={"2px,solid"}
           onClick={() => handleChange("", positionNumber)}
           tabIndex={-1}
+          disabled={isDisableItem}
         >
           クリア
         </Button>
@@ -432,19 +434,34 @@ export default function ExamNumericLR({
                 detail.positionNumber === 左 ? "left" : "right"
               ] && (
                 <div ref={closeKeyBoard}>
-                  <NumericKeyboard
-                    value={detail?.value ?? ""}
-                    integerLength={detail.integerLength}
-                    decimalLength={detail.decimalLength}
-                    onChange={(newValue) =>
-                      handleChange(
-                        newValue,
-                        positionNumber ?? 0,
-                        detail.positionNumber ?? 0,
-                      )
-                    }
-                    onConfirm={handleConfirm}
-                  />
+                  {detail?.keyboard?.keyboardType === KeyboardType.テンキー ||
+                  detail?.keyboard?.keyboardType === undefined ? (
+                    <NumericKeyboard
+                      value={detail?.value ?? ""}
+                      integerLength={detail.integerLength}
+                      decimalLength={detail.decimalLength}
+                      onChange={(newValue) =>
+                        handleChange(
+                          newValue,
+                          positionNumber ?? 0,
+                          detail.positionNumber ?? 0,
+                        )
+                      }
+                      onConfirm={handleConfirm}
+                    />
+                  ) : (
+                    <CollectionKeyboard
+                      value={detail?.value ?? ""}
+                      keyboardValues={detail.keyboard?.values ?? []}
+                      onChange={(newValue) =>
+                        handleChange(
+                          newValue,
+                          positionNumber,
+                          detail.positionNumber,
+                        )
+                      }
+                    />
+                  )}
                 </div>
               )}
             </Box>

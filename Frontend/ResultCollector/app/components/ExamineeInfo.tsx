@@ -11,6 +11,7 @@ import {
 import { IconAlertCircle } from "@tabler/icons-react";
 import { useState } from "react";
 import { dateUtil } from "~/utils/dateUtil";
+import styles from "~/styles/common.module.css";
 
 type ExamineeInfoProps = {
   name: string;
@@ -49,10 +50,7 @@ export default function ExamineeInfo({
           c="black01"
           display="table-cell"
           ta="left"
-          style={{
-            wordBreak: "break-word",
-            whiteSpace: "pre-wrap",
-          }}
+          className={styles["text-wrap"]}
         >
           {name}
         </Text>
@@ -109,10 +107,7 @@ export default function ExamineeInfo({
             arrowPosition="side"
             arrowOffset={20}
             position="top-end"
-            style={{
-              wordBreak: "break-word",
-              whiteSpace: "pre-wrap",
-            }}
+            className={styles["text-wrap"]}
           >
             <Text
               size="sm"
@@ -145,10 +140,7 @@ export default function ExamineeInfo({
           arrowPosition="side"
           arrowOffset={20}
           position="top-end"
-          style={{
-            wordBreak: "break-word",
-            whiteSpace: "pre-wrap",
-          }}
+          className={styles["text-wrap"]}
         >
           <Text
             size="sm"

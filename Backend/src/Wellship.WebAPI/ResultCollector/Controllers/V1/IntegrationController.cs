@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Requests;
-
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -14,6 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
+[Authorize]
 public class IntegrationController : ControllerBase
 {
     private readonly IIntegrationUsecase _integrationUsecase;

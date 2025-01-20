@@ -7,10 +7,11 @@ import {
   getThemeColor,
   useMantineTheme,
 } from "@mantine/core";
+import styles from "~/styles/common.module.css";
 
 interface CommonDialogProps {
   message: string;
-  buttonMessage: string;
+  buttonMessage?: string;
   isOpen: boolean; // 表示・非表示用
   onClose: () => void; // 閉じる
 }
@@ -20,6 +21,7 @@ export default function CommonDialog({
   isOpen,
   onClose,
 }: CommonDialogProps) {
+  buttonMessage = buttonMessage || "OK";
   const theme = useMantineTheme();
 
   return (
@@ -39,14 +41,7 @@ export default function CommonDialog({
       }}
     >
       <Stack gap={64}>
-        <Text
-          size="lg"
-          c="black01"
-          style={{
-            wordBreak: "break-word",
-            whiteSpace: "pre-wrap",
-          }}
-        >
+        <Text size="lg" c="black01" className={styles["text-wrap"]}>
           {message}
         </Text>
         <Center>
@@ -58,7 +53,7 @@ export default function CommonDialog({
             color="primary"
             py={16}
             px={32}
-            style={{ borderWidth: 2 }}
+            bd="2px solid"
             onClick={onClose}
           >
             <Text size="lg" fw={700} c="white01">

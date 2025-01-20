@@ -43,6 +43,7 @@ import {
 import type { ExportDataList } from "~/domain/wellship.schemas";
 import { staffState } from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
+import styles from "~/styles/common.module.css";
 
 export const meta: MetaFunction = () => {
   return [{ title: "検査結果出力" }];
@@ -160,7 +161,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
             color="primary"
             py={16}
             px={32}
-            style={{ borderWidth: 2 }}
+            bd="2px solid"
             onClick={handleCancel}
           >
             <Text size="lg" fw={700} c="primary">
@@ -175,7 +176,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
             color="primary"
             py={16}
             px={32}
-            style={{ borderWidth: 2 }}
+            bd="2px solid"
             onClick={handleOk}
           >
             <Text size="lg" fw={700} c="white01">
@@ -328,13 +329,7 @@ export default function ExamresultExport() {
                               "yyyy/MM/dd",
                             )}
                         </Table.Td>
-                        <Table.Td
-                          w={297}
-                          style={{
-                            wordBreak: "break-word",
-                            whiteSpace: "pre-wrap",
-                          }}
-                        >
+                        <Table.Td w={297} className={styles["text-wrap"]}>
                           {ed.placeName}
                         </Table.Td>
                         <Table.Td ta="center">
@@ -346,7 +341,7 @@ export default function ExamresultExport() {
                             color="gray03"
                             py={16}
                             px={32}
-                            style={{ borderWidth: 2 }}
+                            bd="2px solid"
                             onClick={() => navigate("/placeschedule-lock")}
                           >
                             <Text
@@ -474,10 +469,7 @@ export default function ExamresultExport() {
                       w={646}
                       size="lg"
                       c="black01"
-                      style={{
-                        wordBreak: "break-word",
-                        whiteSpace: "pre-wrap",
-                      }}
+                      className={styles["text-wrap"]}
                     >
                       {resultsOutputConfirmDialog?.placeName}
                     </Text>

@@ -1,4 +1,4 @@
-﻿namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
+namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
 {
     /// <summary>
     /// 基準パターン
@@ -8,13 +8,11 @@
         /// <summary>
         /// 基準値パターンID
         /// </summary>
-        public Guid ThresholdId { get; init; }
-
+        public required Guid ThresholdId { get; init; }
         /// <summary>
-        /// 基準値パターンコード
+        /// 基準パターンコード
         /// </summary>
         public required string ThresholdCode { get; init; }
-
         /// <summary>
         /// 基準値パターン名
         /// </summary>

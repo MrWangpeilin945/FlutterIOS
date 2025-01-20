@@ -33,6 +33,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
             // エンティティリスト生成
             List<ThresholdEntity> thresholdEntities = thresholds.Select(item =>new ThresholdEntity
             {
+                ThresholdId = Guid.NewGuid(),
                 ThresholdCode = item.Code,
                 Name = item.Name
             }).ToList();

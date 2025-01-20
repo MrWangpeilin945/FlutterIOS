@@ -8,6 +8,7 @@ import {
   getThemeColor,
   useMantineTheme,
 } from "@mantine/core";
+import styles from "~/styles/common.module.css";
 
 interface ConfirmDialogProps {
   message: string;
@@ -47,14 +48,7 @@ export default function ConfirmDialog({
       }}
     >
       <Stack gap={64}>
-        <Text
-          size="lg"
-          c="black01"
-          style={{
-            wordBreak: "break-word",
-            whiteSpace: "pre-wrap",
-          }}
-        >
+        <Text size="lg" c="black01" className={styles["text-wrap"]}>
           {message}
         </Text>
         <Center>
@@ -67,7 +61,7 @@ export default function ConfirmDialog({
               color="primary"
               py={16}
               px={32}
-              style={{ borderWidth: 2 }}
+              bd="2px solid"
               onClick={onCancel}
             >
               <Text size="lg" fw={700} c="primary">
@@ -82,7 +76,7 @@ export default function ConfirmDialog({
               color="primary"
               py={16}
               px={32}
-              style={{ borderWidth: 2 }}
+              bd="2px solid"
               onClick={onConfirm}
             >
               <Text size="lg" fw={700} c="white01">

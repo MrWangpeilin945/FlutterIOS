@@ -34,6 +34,11 @@ public interface IPlaceScheduleRepository
     public Task UpdatePlaceScheduleLockingStatusAsync(Guid placeScheduleId, PlaceScheduleLockingStatus status);
 
     /// <summary>
+    /// 会場ロックの履歴を記録する
+    /// </summary>
+    public Task WriteLockLogAsync(Guid placeScheduleId, PlaceScheduleLockingStatus status);
+
+    /// <summary>
     /// 会場日程での同姓同名の有無を判定する
     /// </summary>
     public Task<bool> IsSamenameAsync(string consultNumber);

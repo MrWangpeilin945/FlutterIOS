@@ -1,4 +1,4 @@
-﻿
+
 using System.Data;
 using Moq;
 
@@ -30,6 +30,7 @@ public class ThresholdUsecasesTest
         // エンティティリスト生成
         List<ThresholdEntity> thresholdEntities = inputThresholds.Select(item =>new ThresholdEntity
         {
+            ThresholdId = Guid.NewGuid(),
             ThresholdCode = item.Code,
             Name = item.Name
         }).ToList();

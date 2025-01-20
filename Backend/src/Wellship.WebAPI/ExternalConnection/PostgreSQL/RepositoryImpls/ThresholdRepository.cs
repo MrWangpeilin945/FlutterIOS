@@ -85,22 +85,22 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         }
 
         /// <summary>
-        /// 存在する基準値パターン情報（基準値パターンコード、基準値パターンID）を取得する
+        /// 基準値コードの取得
         /// </summary>
-        /// <param name="codes">基準値パターンコードのリスト</param>
-        public async Task<List<ThresholdEntity>> GetThresholdInfoAsync(List<string> codes)
+        /// <param name="thresholdCodes"></param>
+        /// <returns></returns>
+        public async Task<List<ThresholdEntity>> GetThresholdsByCodesAsync(List<string> thresholdCodes)
         {
             var connection = await _dbConnectionProvider.GetOrOpenAsync();
             var sql = @"
                     select
-                        threshold_id as thresholdId
-                        , threshold_code as thresholdCode
+                        threshold_id as ThresholdId, threshold_code as ThresholdCode
                     from
                         resultcollector.thresholds
                     where
-                        threshold_code = any(@Codes);";
+                        threshold_code = any(@ThresholdCodes);";
 
-            var result = await connection.QueryAsync<ThresholdEntity>(sql, new { Codes = codes });
+            var result = await connection.QueryAsync<ThresholdEntity>(sql, new { ThresholdCodes = thresholdCodes.ToArray() });
 
             return result.ToList();
         }

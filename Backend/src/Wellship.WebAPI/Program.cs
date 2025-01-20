@@ -1,5 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 
+using Dapper;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +14,7 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth.Settings;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.TypeHandler;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ResultCollector.Middlewares;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -55,6 +58,7 @@ public class Program
         }
         builder.Services.AddScoped<IDbConnectionProvider, DbConnectionProvider>();
         builder.Services.AddScoped<IStaffIdentityProvider, StaffIdentityFromHttpContextProvider>();
+        builder.Services.AddScoped<ITenantProvider, TenantProvider>();
         builder.Services.AddSingleton(TimeProvider.System);
 
         builder.Services.AddOpenApiDocument(options =>
@@ -80,6 +84,10 @@ public class Program
                                                        .AllowAnyHeader()
                                                        .AllowCredentials());
         });
+
+        // カスタムタイプハンドラーの登録
+        SqlMapper.AddTypeHandler(new SqlDateOnlyTypeHandler());
+        SqlMapper.AddTypeHandler(new SqlDateTimeOffsetTypeHandler());
 
         var app = builder.Build();
 
@@ -129,6 +137,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<ICancelReasonRepository, CancelReasonRepository>();
         services.AddScoped<IExamItemRepository, ExamItemRepository>();
         services.AddScoped<IResultRepository, ResultRepository>();
+        services.AddScoped<IAppConfigRepository, AppConfigRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IOrganizationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.OrganizationRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExamineeRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExamineeRepository>();
@@ -139,6 +148,8 @@ public static class IServiceCollectionExtension
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IConsultRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ConsultRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.ITicketRepository, ExternalConnection.PostgreSQL.RepositoryImpls.TicketRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IPlaceScheduleRepository, ExternalConnection.PostgreSQL.RepositoryImpls.PlaceScheduleRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExamNormalValueRangeRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExamNormalValueRangeRepository>();
+        services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExternalExamItemDetailsRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExternalExamItemDetailsRepository>();
         return services;
     }
     /// <summary>
@@ -164,6 +175,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<ExternalConnection.Usecases.IConsultUsecase, ExternalConnection.Usecases.ConsultUsecase>();
         services.AddScoped<ExternalConnection.Usecases.ITicketUsecase, ExternalConnection.Usecases.TicketUsecase>();
         services.AddScoped<ExternalConnection.Usecases.IPlaceScheduleUsecase, ExternalConnection.Usecases.PlaceScheduleUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.IExamNormalValueRangeUsecase, ExternalConnection.Usecases.ExamNormalValueRangeUsecase>();
         return services;
     }
     /// <summary>

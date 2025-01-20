@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Responses;
@@ -10,6 +11,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
+[Authorize]
 public class StaffController : ControllerBase
 {
     private readonly IStaffUsecase _administratorUsecase;

@@ -1,7 +1,7 @@
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
 {
     /// <summary>
-    /// 外部検査項目明細
+    /// 外部検査項目明細エンティティ
     /// </summary>
     public class ExternalExamItemDetailEntity
     {
@@ -10,7 +10,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
         /// </summary>
         public required int ExamItemDetailId { get; init; }
         /// <summary>
-        /// 外部コード検査項目明細CD
+        /// 外部コード検査項目明細コード
         /// </summary>
         public required string ExternalExamItemDetailCode { get; init; }
     }

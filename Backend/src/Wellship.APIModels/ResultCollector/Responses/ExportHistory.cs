@@ -47,7 +47,7 @@ public class ExportHistory
     /// 出力日時
     /// </summary>
     [JsonPropertyName("exportedAt")]
-    public required DateTime ExportedAt { get; init; }
+    public required DateTimeOffset ExportedAt { get; init; }
 
     /// <summary>
     /// 出力者
