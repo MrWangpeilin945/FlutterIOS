@@ -2,6 +2,8 @@ using System.Diagnostics;
 
 using Microsoft.AspNetCore.Mvc;
 
+using NSwag.Annotations;
+
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
 
@@ -12,6 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
     /// </summary>
     [ApiController]
     [ApiVersion("1")]
+    [OpenApiIgnore]
     public class OrganizationTestController : ControllerBase
     {
         private readonly IOrganizationUsecase _organizationUsecases;
@@ -40,7 +43,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
             var stopwatch = Stopwatch.StartNew();
 
             var organizationList = Enumerable.Range(101, 10000)
-                .Select(i => new Organization { Code = (i * 10).ToString(), Name = "テスト更新団体" + i.ToString(), InputNote = (i*10).ToString() })
+                .Select(i => new Organization { Code = (i * 10).ToString(), Name = "テスト更新団体" + i.ToString(), InputNote = (i * 10).ToString() })
                 .ToList();
 
             stopwatch.Stop();

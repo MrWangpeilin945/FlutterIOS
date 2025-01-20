@@ -2,6 +2,8 @@ using System.Diagnostics;
 
 using Microsoft.AspNetCore.Mvc;
 
+using NSwag.Annotations;
+
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
@@ -13,6 +15,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
     /// </summary>
     [ApiController]
     [ApiVersion("1")]
+    [OpenApiIgnore]
     public class ExamineeTestController : ControllerBase
     {
         private readonly IExamineeUsecase _examineeUsecases;

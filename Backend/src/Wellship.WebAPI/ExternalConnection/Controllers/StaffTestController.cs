@@ -1,5 +1,9 @@
 using System.Diagnostics;
+
 using Microsoft.AspNetCore.Mvc;
+
+using NSwag.Annotations;
+
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 
@@ -8,6 +12,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
     /// <summary>
     /// 職員テスト用コントローラー
     /// </summary>
+    [OpenApiIgnore]
     public class StaffTestController : ControllerBase
     {
         private readonly Usecases.IStaffUsecase _staffUsecase;
