@@ -24,6 +24,7 @@ abstract class BehaviorSettings implements _$BehaviorSettings {
     if (ackString == null || (ackTriggers?.isEmpty ?? true)) {
       return false;
     }
+    // TODO: Ackを返す判定を実装する
     return false;
   }
 
