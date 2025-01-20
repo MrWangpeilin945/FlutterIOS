@@ -68,8 +68,11 @@ export const setupAxiosInterceptors = (handleLogout: () => void) => {
     // 異常時
     (error) => {
       if (!error.response) {
+        // 開発モードの時のみ、StrictModeの影響でキャンセルエラーが発生するのでここで抜ける
+        if (error.code === "ERR_CANCELED") {
+          return Promise.resolve();
+        }
         // ネットワークエラーの時
-        console.log("network error");
         return Promise.reject(
           new Error("Network error: Unable to reach the server"),
         );
