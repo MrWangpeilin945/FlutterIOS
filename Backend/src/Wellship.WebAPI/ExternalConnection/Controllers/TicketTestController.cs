@@ -1,14 +1,19 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
+
+using Microsoft.AspNetCore.Mvc;
+
+using NSwag.Annotations;
+
 using Ryobi.Wellship.ExternalConnection.Enums;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// <summary>
 /// 動作確認用コントローラ
 /// </summary>
+[OpenApiIgnore]
 public class TicketTestController : ControllerBase
 {
     private readonly ITicketUsecase _ticketUsecase;
@@ -31,15 +36,15 @@ public class TicketTestController : ControllerBase
     {
         // 10000～1009999までの連携キーを3つずつ作成する
         var tickets = (from x in Enumerable.Range(10000, 10000)
-                        from y in Enumerable.Range(1,3)
-                        select new Ticket
-                        {
-                            SortNo =  (x - 10000) * 3 + y,
-                            ConnectionCode = x.ToString(),
-                            ActionType = (ActionType)actionType,
-                            TicketNumber = (x + y).ToString(),
-                            InputNote = ((x - 10000) * 3 + y).ToString()
-                        }).ToList();
+                       from y in Enumerable.Range(1, 3)
+                       select new Ticket
+                       {
+                           SortNo = (x - 10000) * 3 + y,
+                           ConnectionCode = x.ToString(),
+                           ActionType = (ActionType)actionType,
+                           TicketNumber = (x + y).ToString(),
+                           InputNote = ((x - 10000) * 3 + y).ToString()
+                       }).ToList();
 
         var stopwatch = Stopwatch.StartNew();
         stopwatch.Start();
