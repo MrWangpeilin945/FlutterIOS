@@ -474,7 +474,7 @@ Update : 更新しない
 
 |progress_status
 |Insert : `enum<Wellship.Core\Enums\ConsultProgressStatus.来場待ち>` +
-Update : 更新しない
+Update : `enum<Wellship.Core\Enums\ConsultProgressStatus.キャンセル>`は`enum<Wellship.Core\Enums\ConsultProgressStatus.来場待ち>`、それ以外は更新しない
 |int型にパースする
 
 |export_status

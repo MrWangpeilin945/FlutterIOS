@@ -56,6 +56,8 @@ public class ConsultRepository : IConsultRepository
                                                         , ExternalConnectionCode = x.ConnectionCode
                                                         , CreatedAt = createdAt
                                                         , CreatedBy = createdBy
+                                                        , CancelStatus = (int)ConsultProgressStatus.キャンセル
+                                                        , WaitStatus = (int)ConsultProgressStatus.来場待ち
                                                    }).ToArray();       
                 // consult（受診）
                 const string mergeConsultSql = @"
@@ -82,6 +84,11 @@ public class ConsultRepository : IConsultRepository
                         , external_connection_code = new_data.external_connection_code
                         , created_at = new_data.created_at
                         , created_by = new_data.created_by 
+                        , progress_status =
+                            CASE
+                                WHEN cs.progress_status = @CancelStatus THEN @WaitStatus
+                                ELSE cs.progress_status
+                            END
                 when not matched then
                     insert (
                         consult_id
@@ -312,7 +319,7 @@ public class ConsultRepository : IConsultRepository
             }
             await transaction.CommitAsync();
         }
-        catch(DbException e)
+        catch(DbException)
         {
             await transaction.RollbackAsync();
             throw;
