@@ -21,18 +21,6 @@ public class ConsultTestController : ControllerBase
     {
         _consultUsecase = consultUsecase;
     }
-
-    /// <summary>
-    /// テスト用のAPIリクエスト
-    /// </summary>
-    public class ConsultRequest
-    {
-        /// <summary>
-        /// 連携データ
-        /// </summary>
-        [JsonPropertyName("consults")]
-        public required Consult[] Consults { get; set; }
-    }
     
     /// <summary>
     /// 受診を更新するテスト
@@ -42,7 +30,7 @@ public class ConsultTestController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("api/v{version:apiVersion}/ec2004/consult")]
-    public async Task<IActionResult> StoreConsultAsync([FromQuery] int? actionType, [FromBody] ConsultRequest request)
+    public async Task<IActionResult> StoreConsultAsync([FromQuery] int? actionType, [FromBody] Consult[] request)
     {
         List<Consult> consults;
         if(actionType != null)
@@ -82,7 +70,7 @@ public class ConsultTestController : ControllerBase
         else
         {
             // リクエストから受診を更新する
-            consults = request.Consults.ToList();
+            consults = request.ToList();
         }
 
         var stopwatch = Stopwatch.StartNew();
