@@ -1,4 +1,4 @@
-﻿using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
@@ -15,6 +15,13 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="createdAt">作成日時</param>
         /// <param name="createdBy">作成者</param>
         public Task UpsertThresholdsAsync(List<ThresholdEntity> thresholds, DateTime createdAt, string createdBy);
+
+        /// <summary>
+        /// 基準パターンを取得する
+        /// </summary>
+        /// <param name="thresholdCodes"></param>
+        /// <returns></returns>
+        public Task<List<ThresholdEntity>> GetThresholdsByCodesAsync(List<string> thresholdCodes);
 
     }
 }
