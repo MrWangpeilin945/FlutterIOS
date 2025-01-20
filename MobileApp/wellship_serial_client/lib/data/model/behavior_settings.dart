@@ -32,7 +32,7 @@ abstract class BehaviorSettings implements _$BehaviorSettings {
     if (dataLength != null && buffer.length >= dataLength!) {
       return true;
     }
-    if (eotString != null && utf8.decode(buffer).contains(eotString!)) {
+    if (eotString != null && eotString!.isNotEmpty && utf8.decode(buffer).contains(eotString!)) {
       return true;
     }
     return false;

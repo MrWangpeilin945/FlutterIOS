@@ -38,13 +38,13 @@ abstract class AppSettings implements _$AppSettings {
         parity: Parity.fromString(map['parity'] ?? ''),
         stopBits: StopBits.fromString(map['stopBits'] ?? ''),
         ackTriggers: (map['ackTriggers'] ?? '').split(','),
-        ackString: map['ackString'] ?? '',
-        eotString: map['eotString'] ?? '',
+        ackString: map['ackString'],
+        eotString: map['eotString'],
         dataLength: int.tryParse(map['dataLength'] ?? ''),
         useRts: bool.tryParse(map['useRts'] ?? '') ?? false,
         useDtr: bool.tryParse(map['useDtr'] ?? '') ?? false,
-        transmissionDataTrigger: map['transDataTrigger'] ?? '',
-        transmissionData: map['transData'] ?? '',
+        transmissionDataTrigger: map['transDataTrigger'],
+        transmissionData: map['transData'],
         debugMode: bool.tryParse(map['debugMode'] ?? '') ?? false);
   }
   WiredSettings toWiredSettings() => WiredSettings(
