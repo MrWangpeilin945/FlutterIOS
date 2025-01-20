@@ -98,7 +98,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
             {
                 // 返却用エラーオブジェクトに追加
                 AddThresholdCodeErrorObjects(examNormalValueRanges, errorThresholdCodes);
-                // 会場コードが存在する会場日程のみ抽出
+                // 基準値パターンが存在する基準値範囲のみ抽出
                 results = examNormalValueRanges
                     .Where(examNormalValueRange => !errorThresholdCodes.Contains(examNormalValueRange.ThresholdCd))
                     .ToList();
@@ -127,7 +127,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
             {
                 // 返却用エラーオブジェクトに追加
                 AddExternalExamItemDetailCodesErrorObjects(examNormalValueRanges, errorExternalExamItemDetailCodes);
-                // 会場コードが存在する会場日程のみ抽出
+                // 検査項目明細が存在する基準値範囲のみ抽出
                 results = examNormalValueRanges
                     .Where(examNormalValueRange => !errorExternalExamItemDetailCodes.Contains(examNormalValueRange.ExamItemDetailCd))
                     .ToList();
