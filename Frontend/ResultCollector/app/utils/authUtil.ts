@@ -62,6 +62,9 @@ export const authUtil = {
           return true;
         } catch (error) {
           return false;
+        } finally {
+          // 処理終了後、Promiseをクリアする
+          refreshTokenPromise = null;
         }
       })();
     }
