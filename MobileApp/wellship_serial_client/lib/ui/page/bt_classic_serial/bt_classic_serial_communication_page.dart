@@ -1,4 +1,5 @@
-﻿import 'dart:convert';
+﻿import 'dart:async';
+import 'dart:convert';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -9,11 +10,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:retry/retry.dart';
 import 'package:typed_data/typed_buffers.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:wellship_serial_client/data/model/behavior_settings.dart';
 import 'package:wellship_serial_client/data/model/bt_classic_settings.dart';
 import 'package:wellship_serial_client/data/provider/behavior_settings_provider.dart';
 import 'package:wellship_serial_client/data/provider/bt_classic_settings_provider.dart';
 import 'package:wellship_serial_client/ui/component/wsc_bluetooth_device_select_dialog.dart';
+import 'package:wellship_serial_client/ui/component/wsc_control_char_escaped_selectable_text.dart';
 
 @RoutePage()
 class BtClassicSerialCommunicationPage extends HookConsumerWidget {
@@ -43,47 +44,40 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
           if (serialSettings.address != ref.read(btClassicSettingsProvider).address) {
             return;
           }
-          final conn = await BluetoothConnection.toAddress(serialSettings.address);
+          final conn = await BluetoothConnection.toAddress(serialSettings.address).timeout(const Duration(seconds: 3));
           text.value = "";
           connection.value = conn;
           final buffer = Uint8Buffer();
-          // 多重に終了処理が行われないように処理終了中かどうかのフラグを持つ
+          // NOTE: 多重に終了処理が行われないように処理終了中かどうかのフラグを持つ
           bool aborting = false;
-          int ackCount = 0;
-          final ackTriggers = behaviorSettings.ackTriggers;
-          final ackString = behaviorSettings.ackString;
-          conn.input!.listen((data) async {
-            buffer.addAll(data);
-            text.value = utf8
-                .decode(buffer)
-                .replaceAllMapped(
-                    RegExp(r'[\x00-\x20]'), (x) => String.fromCharCode(0x2400 + x.group(0)!.codeUnitAt(0)))
-                .replaceAll(RegExp(r'[\x7f]'), String.fromCharCode(0x2421));
-            if (ackTriggers != null && ackTriggers.isEmpty == false && ackString != null) {
-              final checkText = utf8.decode(buffer);
-              final count = RegExp(ackTriggers.first).allMatches(checkText).length;
-              if (ackCount < count) {
-                conn.output.add(utf8.encode(ackString));
-                ackCount = count;
+          conn.input!.listen(
+            (data) async {
+              buffer.addAll(data);
+              text.value = utf8.decode(buffer);
+              // Ack判定
+              if (behaviorSettings.shouldAck(buffer, data)) {
+                conn.output.add(utf8.encode(behaviorSettings.ackString ?? ''));
               }
-            }
-            // 停止判定
-            if (!aborting && shouldAbort(buffer, behaviorSettings)) {
-              aborting = true;
-              connection.value?.dispose();
-              final b = base64UrlEncode(buffer);
-              final callback = behaviorSettings.callback;
-              if (callback != null) {
-                final result = {"value": b};
-                final uri = callback.replace(queryParameters: result..addAll(callback.queryParameters));
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              // 停止判定
+              if (!aborting && behaviorSettings.shouldAbort(buffer)) {
+                aborting = true;
+                connection.value?.dispose();
+                // flutterのbase64UrlEncodeは末尾の=を除去しないため手動で除去する
+                final b = base64UrlEncode(buffer).replaceAll('=', '');
+                final callback = behaviorSettings.callback;
+                if (callback != null) {
+                  final result = {"value": b};
+                  final uri = callback.replace(queryParameters: result..addAll(callback.queryParameters));
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
               }
-            }
-          });
+            },
+          );
         },
         maxAttempts: 99999,
-        delayFactor: const Duration(seconds: 1),
-        retryIf: (e) => e is PlatformException,
+        // リクエスト間の最大待ち時間を1秒にしています
+        maxDelay: const Duration(seconds: 1),
+        retryIf: (e) => e is PlatformException || e is TimeoutException,
       );
       return () {
         connection.value?.dispose();
@@ -146,7 +140,7 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        connection.value != null ? "準備完了！" : "準備中",
+                        connection.value != null && (connection.value?.isConnected ?? false) ? "準備完了！" : "準備中",
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -167,23 +161,11 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
                 border: Border.all(color: Colors.teal.shade900),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: SelectableText(text.value),
+              child: WscControlCharEscapedSelectableText(text.value),
             ),
           ),
         ],
       ),
     );
-  }
-
-  bool shouldAbort(Uint8Buffer buffer, BehaviorSettings behaviorSettings) {
-    final dataLength = behaviorSettings.dataLength;
-    if (dataLength != null && buffer.length >= dataLength) {
-      return true;
-    }
-    final eotString = behaviorSettings.eotString;
-    if (eotString != null && utf8.decode(buffer).contains(eotString)) {
-      return true;
-    }
-    return false;
   }
 }
