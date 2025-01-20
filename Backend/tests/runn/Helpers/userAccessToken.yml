@@ -1,10 +1,14 @@
-desc: ログインしてアクセストークンを取得する
+desc: ログインして一般ロールのアクセストークンを取得する
+if: included
 runners:
   req:
     endpoint: ${BACKEND_URL}
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
     skipValidateResponse: false
+vars:
+  loginId: "S001"
+  password: "syokuinA"
 steps:
   login:
     desc: "アクセストークンを取得する"
