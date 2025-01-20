@@ -2,7 +2,8 @@ using System.Diagnostics;
 
 using Microsoft.AspNetCore.Mvc;
 
-using Ryobi.Wellship.Core.Enums;
+using NSwag.Annotations;
+
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
 
@@ -13,6 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
     /// </summary>
     [ApiController]
     [ApiVersion("1")]
+    [OpenApiIgnore]
     public class PlaceScheduleTestController : ControllerBase
     {
         private readonly IPlaceScheduleUsecase _placeScheduleUsecase;
