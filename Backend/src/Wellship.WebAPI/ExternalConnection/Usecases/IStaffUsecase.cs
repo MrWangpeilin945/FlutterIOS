@@ -11,6 +11,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
         /// </summary>
         /// <param name="staffs"></param>
         /// <returns></returns>
-        public Task<List<ErrorObject>> StroreStaffsAsync(List<Staff> staffs);
+        public Task<List<ErrorObject>> StoreStaffsAsync(List<Staff> staffs);
     }
 }

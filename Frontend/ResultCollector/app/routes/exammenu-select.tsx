@@ -154,7 +154,7 @@ export default function ExamMenuSelect() {
                           }
                           w={320}
                           h={78}
-                          style={{ borderWidth: 2 }}
+                          bd="2px solid"
                           key={examMenu.examMenuId}
                           onClick={() =>
                             handleMenuButtonClick(examMenu.examMenuId)

@@ -1,11 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.APIModels.Responses;
-using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 using Ryobi.Wellship.Core.Enums;
+using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 
@@ -14,6 +15,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
+[Authorize]
 public class PlaceScheduleController : ControllerBase
 {
     private readonly IPlaceScheduleUsecase _placeScheduleUsecase;
@@ -96,11 +98,11 @@ public class PlaceScheduleController : ControllerBase
     public async Task<IActionResult> UpdatePlaceScheduleLockingStatusAsync([FromRoute][Required] Guid placeScheduleId,
                                                           [FromBody] PlaceScheduleLockingRequest placeScheduleLockingRequest)
     {
-        if(placeScheduleId != placeScheduleLockingRequest.PlaceScheduleId)
+        if (placeScheduleId != placeScheduleLockingRequest.PlaceScheduleId)
         {
             return BadRequest("パスパラメータとリクエストパラメータが一致しません。");
         }
-        PlaceScheduleLockingStatus placeScheduleLockingStatus = 
+        PlaceScheduleLockingStatus placeScheduleLockingStatus =
             (PlaceScheduleLockingStatus)Enum.ToObject(typeof(PlaceScheduleLockingStatus), placeScheduleLockingRequest.PlaceScheduleLockingStatus);
         await _placeScheduleUsecase.UpdatePlaceScheduleLockingStatusAsync(placeScheduleId, placeScheduleLockingStatus);
         return Ok();

@@ -21,7 +21,10 @@ export default function ExamineeHeader({
 }: HeaderProps) {
   const navigate = useNavigate();
 
-  const displayableName = name.length > 14 ? `${name.slice(0, 13)}…` : name;
+  const displayableExamineeName =
+    name.length > 14 ? `${name.slice(0, 13)}…` : name;
+  const displayableStaffName =
+    staffName.length > 8 ? `${staffName.slice(0, 7)}…` : staffName;
   const isAgeNumber: boolean = typeof age === "number";
 
   return (
@@ -70,23 +73,22 @@ export default function ExamineeHeader({
             bg="white01"
           >
             <Box>
-              <Text size="xs" c="black01" pb={24} truncate="end">
-                {staffName}
+              <Text size="xs" c="black01" pb={24}>
+                {displayableStaffName}
               </Text>
               <Button
                 h="auto"
                 bg="white01"
                 c="primary"
                 variant="outline"
-                style={{ borderWidth: 2 }}
                 py={8}
                 px={32}
                 onClick={() => authUtil.logout(() => navigate("/login"))}
-                size="xs"
-                fw={700}
                 bd="2px,solid"
               >
-                ログアウト
+                <Text size="xs" fw={700} c="primary" w={120} h={35}>
+                  ログアウト
+                </Text>
               </Button>
             </Box>
           </Popover.Dropdown>
@@ -94,7 +96,7 @@ export default function ExamineeHeader({
 
         {/* 受付番号、受診者名、年齢 */}
         <Text size="lg" fw={700}>
-          {managerNo} {displayableName}
+          {managerNo} {displayableExamineeName}
           {isAgeNumber && `(${age})`}
         </Text>
         {/* ホームボタン */}
@@ -111,6 +113,7 @@ export default function ExamineeHeader({
                 ? "femaleSecondary"
                 : "green01"
           }
+          pl={10}
           leftSection={<IconHomeFilled size={24} />}
           onClick={() => navigate("/home")}
         >

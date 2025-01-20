@@ -13,7 +13,7 @@ public class PreviousResultEntity
     /// <summary>
     /// 健診日
     /// </summary>
-    public required DateTime ExamDate { get; set; }
+    public required DateOnly ExamDate { get; set; }
 
     /// <summary>
     /// 検査項目ID

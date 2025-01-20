@@ -33,7 +33,7 @@ public class ExamineeEntity
     /// <summary>
     /// 生年月日
     /// </summary>
-    public required DateTime Birthdate { get; init; }
+    public required DateOnly Birthdate { get; init; }
 
     /// <summary>
     /// 団体ID
