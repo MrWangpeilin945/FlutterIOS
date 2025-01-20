@@ -43,8 +43,8 @@ abstract class AppSettings implements _$AppSettings {
         dataLength: int.tryParse(map['dataLength'] ?? ''),
         useRts: bool.tryParse(map['useRts'] ?? '') ?? false,
         useDtr: bool.tryParse(map['useDtr'] ?? '') ?? false,
-        transmissionDataTrigger: map['transmissionDataTrigger'] ?? '',
-        transmissionData: map['transmissionData'] ?? '',
+        transmissionDataTrigger: map['transDataTrigger'] ?? '',
+        transmissionData: map['transData'] ?? '',
         debugMode: bool.tryParse(map['debugMode'] ?? '') ?? false);
   }
   WiredSettings toWiredSettings() => WiredSettings(
