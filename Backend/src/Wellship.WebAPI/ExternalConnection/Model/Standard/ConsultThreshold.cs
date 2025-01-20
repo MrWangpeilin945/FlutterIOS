@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard
 {
     /// <summary>
@@ -8,11 +10,13 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard
         /// <summary>
         /// 基準値判定コード
         /// </summary>
+        [JsonPropertyName("thresholdCode")]
         public required string ThresholdCode { get; init; }
 
         /// <summary>
         /// 優先度
         /// </summary>
+        [JsonPropertyName("priority")]
         public required int Priority { get; init; }
     }
 }
