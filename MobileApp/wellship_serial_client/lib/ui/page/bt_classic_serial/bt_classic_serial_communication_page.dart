@@ -106,35 +106,35 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 ListTile(
-                    title: Text(serialSettings.deviceName ?? '未選択'),
-                    subtitle: Text(serialSettings.address ?? ''),
-                    trailing: const IconButton(
-                      onPressed: null,
-                      icon: Icon(Icons.settings),
-                    ),
-                    onTap: () async {
+                  title: Text(serialSettings.deviceName ?? '未選択'),
+                  subtitle: Text(serialSettings.address ?? ''),
+                  trailing: OutlinedButton(
+                    child: const Text('接続先デバイス変更'),
+                    onPressed: () async {
+                      ref.read(btClassicSettingsProvider.notifier).state = const BtClassicSettings();
                       final device = await showDialog<BluetoothDevice>(
                         context: context,
                         builder: (context) {
-                          return WscBluetoothDeviceSelectDialog(
+                          return const WscBluetoothDeviceSelectDialog(
                             title: '接続デバイスを選択してください',
-                            groupValue: BluetoothDevice(
-                              name: serialSettings.deviceName,
-                              address: serialSettings.address ?? '',
-                            ),
                           );
                         },
                       );
                       if (device != null) {
-                        ref.read(btClassicSettingsProvider.notifier).state = BtClassicSettings(
+                        final settings = BtClassicSettings(
                           deviceName: device.name,
                           address: device.address,
                         );
+                        ref.read(btClassicSettingsProvider.notifier).state = settings;
+                        BtClassicSettings.saveSettings(settings);
                         // NOTE: 接続先が変更される場合、現在の接続を破棄します
                         connection.value?.dispose();
                         connection.value = null;
                       }
-                    }),
+                    },
+                  ),
+                  onTap: null,
+                ),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -7,10 +7,10 @@ class WscBluetoothDeviceSelectDialog extends HookConsumerWidget {
   const WscBluetoothDeviceSelectDialog({
     super.key,
     required this.title,
-    required this.groupValue,
+    this.groupValue,
   });
   final String title;
-  final BluetoothDevice groupValue;
+  final BluetoothDevice? groupValue;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
