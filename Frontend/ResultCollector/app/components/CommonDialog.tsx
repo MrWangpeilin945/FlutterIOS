@@ -11,7 +11,7 @@ import styles from "~/styles/common.module.css";
 
 interface CommonDialogProps {
   message: string;
-  buttonMessage: string;
+  buttonMessage?: string;
   isOpen: boolean; // 表示・非表示用
   onClose: () => void; // 閉じる
 }
@@ -21,6 +21,7 @@ export default function CommonDialog({
   isOpen,
   onClose,
 }: CommonDialogProps) {
+  buttonMessage = buttonMessage || "OK";
   const theme = useMantineTheme();
 
   return (
