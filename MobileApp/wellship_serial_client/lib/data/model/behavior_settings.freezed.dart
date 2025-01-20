@@ -190,7 +190,7 @@ class __$$BehaviorSettingsImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$BehaviorSettingsImpl implements _BehaviorSettings {
+class _$BehaviorSettingsImpl extends _BehaviorSettings {
   const _$BehaviorSettingsImpl(
       {this.title,
       this.callback,
@@ -200,7 +200,8 @@ class _$BehaviorSettingsImpl implements _BehaviorSettings {
       this.dataLength,
       this.transmissionDataTrigger,
       this.transmissionData})
-      : _ackTriggers = ackTriggers;
+      : _ackTriggers = ackTriggers,
+        super._();
 
   @override
   final String? title;
@@ -277,7 +278,7 @@ class _$BehaviorSettingsImpl implements _BehaviorSettings {
           this, _$identity);
 }
 
-abstract class _BehaviorSettings implements BehaviorSettings {
+abstract class _BehaviorSettings extends BehaviorSettings {
   const factory _BehaviorSettings(
       {final String? title,
       final Uri? callback,
@@ -287,6 +288,7 @@ abstract class _BehaviorSettings implements BehaviorSettings {
       final int? dataLength,
       final String? transmissionDataTrigger,
       final String? transmissionData}) = _$BehaviorSettingsImpl;
+  const _BehaviorSettings._() : super._();
 
   @override
   String? get title;
