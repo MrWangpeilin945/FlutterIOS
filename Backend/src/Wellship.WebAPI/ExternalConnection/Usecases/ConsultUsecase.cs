@@ -61,7 +61,7 @@ public class ConsultUsecase : IConsultUsecase
         var examMenuNodeCodes = await _consultRepository.GetExamMenuNodeCodeInfoAsync(
                                             consults.SelectMany(x => x.ConsultNotes.Select(cn => cn.Code)).ToList());
         // 基準値パターンコードに紐づく基準値パターンIDを取得する
-        var thresholds = await _thresholdRepository.GetThresholdInfoAsync(
+        var thresholds = await _thresholdRepository.GetThresholdsByCodesAsync(
                                             consults.SelectMany(x => x.ConsultThresholds.Select(ct => ct.ThresholdCode)).ToList());
         // 検査項目明細CDに紐づく外部検査項目明細IDを取得する
         var detailCodes = consults.SelectMany(x => x.PreviousResults.Select(pr => pr.ExamItemDetailCd))
