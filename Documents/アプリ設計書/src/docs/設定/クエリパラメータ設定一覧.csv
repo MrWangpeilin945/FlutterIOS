@@ -1,0 +1,16 @@
+パラメータ名,名称,型,必須・省略時の値,概要
+transMethod,通信方法,string(enum),◯,機器と通信する方法をwired/btClassic/bleで指定します
+title,読み取り画面タイトル,string,,読み取り画面のタイトルに表示する文字列
+callback,コールバックURL,string(URI),◯,受信・送信完了後に開くURL
+baud,ボーレート,int,9600,機器仕様に合った通信速度を指定します
+dataBits,データビット長,int,8,機器仕様に合ったデータビットサイズを指定します
+parity,パリティビット,string(enum),none,none/odd/even/mark/space から通信仕様に合ったものを指定します
+stopBits,ストップビット,string(enum),1,1/1.5/2 から通信仕様に合ったものを指定します
+useRts,RTS,bool,false,RTS制御を使用します　※有線で使用するライブラリのサポート
+useDtr,DTR,bool,false,DTR制御を使用します　※有線で使用するライブラリのサポート
+eotString,終端文字列,string,,End Of Transmissionとして使用される文字列　読み取りを終了します
+dataLength,受信データ長,int,,受信する想定のデータ長　指定したデータ長を受け取ったとき読み取りを終了します
+ackTriggers,応答トリガー文字列,string,,**未実装・予約** ackStringを返却するトリガーとなる文字列を指定します（複数設定する可能性を想定）
+ackString,応答文字列,string,,**未実装・予約** ackとして使用する文字列
+transDataTrigger,送信トリガー文字列,string,,**未実装・予約** データ送信をトリガーする文字列です
+transData,送信データ,string,,**未実装・予約** 送信するデータです（uint8ArrayのBase64Url表現を想定）
