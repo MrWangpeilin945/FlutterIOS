@@ -97,5 +97,30 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                 }
             }
         }
+
+        /// <summary>
+        /// 受診者情報を取得する
+        /// </summary>
+        /// <param name="examinees">受診者コードのリスト</param>
+        public async Task<List<ExamineeEntity>> GetExamineeInfoAsync(List<string> examinees)
+        {
+            var connection = await _dbConnectionProvider.GetOrOpenAsync();
+            var sql = @"
+                    select
+                        examinee_id as ExamineeId
+                        , examinee_code as ExamineeCode
+                        , name as Name
+                        , kana_name as KanaName
+                        , sex as Sex
+                        , birthdate as Birthdate
+                    from
+                        resultcollector.examinees
+                    where
+                        examinee_code = any(@ExamineeCodes);";
+
+            var result = await connection.QueryAsync<ExamineeEntity>(sql, new { ExamineeCodes = examinees });
+
+            return result.ToList();
+        }
     }
 }
