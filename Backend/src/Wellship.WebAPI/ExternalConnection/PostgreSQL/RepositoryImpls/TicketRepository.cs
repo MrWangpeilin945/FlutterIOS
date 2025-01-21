@@ -151,7 +151,7 @@ public class TicketRepository : ITicketRepository
     /// <param name="tickets">更新する受付のリスト</param>
     public async Task<IEnumerable<TicketConsultEntity>> GetTicketsAsync(List<Ticket> tickets)
     {
-        var ticketNumbers = tickets.Select(x => x.TicketNumber).ToArray();
+        var connectionCodes = tickets.Select(x => x.ConnectionCode).ToArray();
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
         select
@@ -160,7 +160,7 @@ public class TicketRepository : ITicketRepository
         from
             resultcollector.consult
         where
-            external_connection_code = any (@TicketNumbers);";
-        return await connection.QueryAsync<TicketConsultEntity>(sql, new { TicketNumbers = ticketNumbers });
+            external_connection_code = any (@ConnectionCodes);";
+        return await connection.QueryAsync<TicketConsultEntity>(sql, new { ConnectionCodes = connectionCodes });
     }
 }
