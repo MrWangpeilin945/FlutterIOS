@@ -1,0 +1,26 @@
+desc: AP1012-03 検査機器取得_無効なアクセストークン [401]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  get:
+    desc: "検査機器取得_無効なアクセストークン"
+    req:
+      /api/v1/equipments:
+        get:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+    test: |
+      current.res.status == 401
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1012-03.json
+

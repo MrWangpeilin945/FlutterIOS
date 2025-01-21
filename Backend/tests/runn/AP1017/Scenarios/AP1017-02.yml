@@ -1,0 +1,26 @@
+desc: AP1017-02 会場ロック更新_指定した会場日程IDの形式が不正 [400]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  put:
+    desc: "会場ロック更新_指定した会場日程IDの形式が不正"
+    req:
+      /api/v1/placeSchedules/{placeScheduleId}/placeScheduleLockingStatus:
+        put:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+    test: |
+      current.res.status == 400
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1017-02.json
+

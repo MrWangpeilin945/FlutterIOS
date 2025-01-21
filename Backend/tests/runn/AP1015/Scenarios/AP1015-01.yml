@@ -1,0 +1,26 @@
+desc: AP1015-01 進捗取得_正常 [200]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  get:
+    desc: "進捗取得_正常"
+    req:
+      /api/v1/progress/{placeScheduleId}:
+        get:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1015-01.json
+

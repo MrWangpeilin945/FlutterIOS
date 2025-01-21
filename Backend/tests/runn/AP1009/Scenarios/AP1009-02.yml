@@ -1,0 +1,26 @@
+desc: AP1009-02 結果入力情報取得_指定した受診番号の形式が不正 [400]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  get:
+    desc: "結果入力情報取得_指定した受診番号の形式が不正"
+    req:
+      /api/v1/consult/{consultNumber}/inputExamItems:
+        get:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+    test: |
+      current.res.status == 400
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1009-02.json
+
