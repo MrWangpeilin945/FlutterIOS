@@ -329,16 +329,22 @@ export default function ConsultInput() {
     setIsLoading(false);
   };
 
-  //検査継続処理
+  // 検査継続処理
   const continuingExam = () => {
-    if (!examMenus) return;
-    const currentIndex = examMenus.findIndex((menu) => menu === examMenuId);
-    if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
-      const nextExam = examMenus[currentIndex + 1];
-      navigate(`/examorder-confirm/${consultNumber}?exammenuid=${nextExam}`);
-    } else {
-      navigate(`/consultnumber-input?consultnumber=${consultNumber}`);
+    let targetPath = "";
+    if (examMenus) {
+      const currentIndex = examMenus.findIndex((menu) => menu === examMenuId);
+      if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
+        const nextExam = examMenus[currentIndex + 1];
+        targetPath = `/examorder-confirm/${consultNumber}?exammenuid=${nextExam}`;
+      }
     }
+    // 共通の遷移処理
+    if (!targetPath) {
+      targetPath = `/consultnumber-input?consultnumber=${consultNumber}`;
+    }
+    //設定したurlへ遷移
+    navigate(targetPath);
   };
 
   //AP1014_検査結果を登録する
@@ -420,7 +426,6 @@ export default function ConsultInput() {
     //AP1014_検査結果を登録する
     registerResults();
     setIsLoading(false);
-
   };
 
   //閉じる処理
