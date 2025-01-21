@@ -216,3 +216,32 @@ Backlog課題名が自動で入力されるので、課題名の後ろに変更�
 ```
 
 この例はDockerコンテナでローカルに立てたPostgreSQLを想定している。
+
+## 箱庭
+
+ローカル端末でフロントエンド、バックエンド、データベースを起動して動作を試すことができる。
+
+### 実行手順
+
+1. WSL2でDockerの実行環境を作る
+2. WSL2にログインしてWELLSHIPディレクトリのルートに移動する
+3. `docker compose up`を実行する
+4. アクセスする（デフォルトだと以下の設定）
+   - フロントエンド：`http://localhost:8000`
+   - バックエンド：`http://localhost:5000`
+   - DB：localhost:15434;postgres;p@ssw0rd
+
+起動中のコンテナ群を停止してビルドして再度起動するときは以下のコマンドを実行する。
+
+```bash
+docker compose down && docker compose build && docker compose up
+```
+
+### 【補足】ポートやパスワードを変更したい
+
+WELLSHIPディレクトリのルートにある`compose.yml`を読んで変更する。
+
+### 【補足】WSL2の有効化とDockerインストール
+
+- [WSL のインストール | Microsoft Learn](https://learn.microsoft.com/ja-jp/windows/wsl/install)
+- [WSL2+Ubuntu+Dockerでの環境整備](https://zenn.dev/pion24/articles/wsl2-ubuntu-docker_install#ubuntu%E4%B8%8A%E3%81%A7%E3%81%AEdocker%E6%95%B4%E5%82%99)
