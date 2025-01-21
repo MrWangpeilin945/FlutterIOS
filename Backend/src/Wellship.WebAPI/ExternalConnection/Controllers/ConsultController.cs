@@ -3,12 +3,13 @@ using System.Diagnostics;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.ExternalConnection.Enums;
-using System.Text.Json.Serialization;
+using NSwag.Annotations;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// <summary>
 /// 動作確認用コントローラ
 /// </summary>
+[OpenApiIgnore]
 public class ConsultTestController : ControllerBase
 {
     private readonly IConsultUsecase _consultUsecase;
