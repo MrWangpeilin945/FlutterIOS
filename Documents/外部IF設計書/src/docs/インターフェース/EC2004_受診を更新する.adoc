@@ -343,22 +343,22 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 **** InputNote `Consult.InputNote`
 
 * 基準値パターンが取得できない
-** `[DB]thresholds(基準値パターン).threshold_code(基準値パターンコード)` == `Consult.ThresholdCd` が存在しない
+** `[DB]thresholds(基準値パターン).threshold_code(基準値パターンコード)` == `Consult.ConsultThresholds.ThresholdCode` が存在しない
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10001`
-**** Message `指定されたThresholdCdがシステム上に存在しません。Code:[ExamNormalValConsultueRange.ThresholdCd]`
+**** Message `指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:[Consult.ConsultThresholds.ThresholdCode]`
 **** InputNote `Consult.InputNote`
 
-* 検査項目明細IDが取得できない(PreviousResult)
+* 検査項目明細IDが取得できない(PreviousResults)
 ** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `Consult.PreviousResults.ExamItemDetailCd` が存在しない
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10001`
-**** Message `指定されたExamItemDetailCdがシステム上に存在しません。Code:[Consult.PreviousResult.ExamItemDetailCd]`
+**** Message `指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:[Consult.PreviousResults.ExamItemDetailCd]`
 **** InputNote `Consult.InputNote`
 
-* PKが重複するレコードが存在する(PreviousResult)
+* PKが重複するレコードが存在する(PreviousResults)
 ** Consult.PreviousResultsを以下の条件でGroupByし、複数レコードが存在する
 *** 条件
 **** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.PreviousResults.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id`
@@ -373,7 +373,7 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10001`
-**** Message `指定されたExamItemDetailCdがシステム上に存在しません。Code:[Consult.ExamItemDetailOrders.ExamItemDetailCd]`
+**** Message `指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:[Consult.ExamItemDetailOrders.ExamItemDetailCd]`
 **** InputNote `Consult.InputNote`
 
 * PKが重複するレコードが存在する(ExamItemDetailOrders)
@@ -474,7 +474,7 @@ Update : 更新しない
 
 |progress_status
 |Insert : `enum<Wellship.Core\Enums\ConsultProgressStatus.来場待ち>` +
-Update : 更新しない
+Update : `enum<Wellship.Core\Enums\ConsultProgressStatus.キャンセル>`は`enum<Wellship.Core\Enums\ConsultProgressStatus.来場待ち>`、それ以外は更新しない
 |int型にパースする
 
 |export_status
@@ -560,7 +560,7 @@ Update : 更新しない
 ====== Delete
 
 * 削除条件
-** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consult_notes.consult_id`
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consulexam_item_detail_orderst_notes.consult_id`
 *** 削除対象レコードが存在しない場合でも、エラーとしない
 
 ====== Insert
@@ -577,6 +577,9 @@ Update : 更新しない
 |`[DB]external_exam_item_details.exam_item_detail_id`
 |`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` で検索し、`exam_item_detail_id`を登録する
 
+|external_exam_item_detail_code
+|Consult.ExamItemDetailOrders.ExamItemDetailCd
+|
 
 |created_at
 |system.datetime.now()
@@ -723,7 +726,7 @@ Update : 更新しない
 ====== Delete
 
 * 削除条件
-** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consult_notes.consult_id`
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]exam_item_detail_orders.consult_id`
 *** 削除対象レコードが存在しない場合でも、エラーとしない
 
 ===== Table

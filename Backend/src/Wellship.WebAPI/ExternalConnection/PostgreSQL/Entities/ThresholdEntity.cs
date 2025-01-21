@@ -14,7 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
         /// </summary>
         public required string ThresholdCode { get; init; }
         /// <summary>
-        /// 基準パターン名
+        /// 基準値パターン名
         /// </summary>
         public required string Name { get; init; }
     }
