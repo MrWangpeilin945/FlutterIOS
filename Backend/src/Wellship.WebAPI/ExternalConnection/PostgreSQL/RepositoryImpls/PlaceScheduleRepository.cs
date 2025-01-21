@@ -97,6 +97,37 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                 throw;
             }
         }
-
+        /// <summary>
+        /// 存在する会場日程（会場ID、会場コード、班ID、班コード、健診日）を取得する
+        /// </summary>
+        /// <param name="placeCodes">会場コードのリスト</param>
+        /// <param name="teamCodes">班コードのリスト</param>
+        /// <param name="examDates">健診日のリスト</param>
+        public async Task<List<PlaceScheduleEntity>> GetPlaceScheduleInfoAsync(List<string> placeCodes, List<string> teamCodes, List<DateOnly>  examDates)
+        {
+            var connection = await _dbConnectionProvider.GetOrOpenAsync();
+            var sql = @"
+            select
+                ps.place_schedule_id as PlaceScheduleId
+                , ps.place_id as PlaceId
+                , p.place_code as PlaceCode
+                , ps.team_id as TeamId
+                , t.team_code as TeamCode
+                , ps.status as Status
+                , ps.exam_date as ExamDate
+                , ps.start_time as StartTime
+            from
+                resultcollector.place_schedule ps
+                left join resultcollector.places p
+                    on ps.place_id = p.place_id
+                left join resultcollector.teams t
+                    on ps.team_id = t.team_id
+            where
+                p.place_code = any(@PlaceCodes)
+                or t.team_code = any(@TeamCodes)
+                or ps.exam_date = any(@ExamDates);";
+            var result = await connection.QueryAsync<PlaceScheduleEntity>(sql, new { PlaceCodes = placeCodes, TeamCodes = teamCodes, ExamDates = examDates });
+            return result.ToList();
+        }
     }
 }
