@@ -60,7 +60,7 @@ export default function ConsultInput() {
   const [commonMessage, setCommonMessage] = useState<string>("");
   const [confirmMessage, setConfirmMessage] = useState<string>("");
   const [commonButtonMessage, setCommonButtonMessage] = useState<string>("");
-  const [commonCallbackFlag, setCommonCallbackFlag] = useState(false);
+  const [commonBrowserbackFlag, setCommonBrowserbackFlag] = useState(false);
   // 通過用
   const [hasPass, setHasPass] = useState(false);
   const [passValue, setPassValue] = useState("");
@@ -83,7 +83,7 @@ export default function ConsultInput() {
   );
 
   useEffect(() => {
-    setCommonCallbackFlag(true);
+    setCommonBrowserbackFlag(true);
     //受診番号の受け取り確認
     if (!consultNumber) {
       setCommonMessage("必要な受診番号がありません");
@@ -120,7 +120,7 @@ export default function ConsultInput() {
 
     inputExamItems();
     setIsLoading(false);
-    setCommonCallbackFlag(false);
+    setCommonBrowserbackFlag(false);
   }, [consultNumber, examMenuId]);
 
   useEffect(() => {
@@ -435,7 +435,7 @@ export default function ConsultInput() {
   //共通ダイアログ：閉じる処理
   const callbackCloseCommon = () => {
     closeCommon();
-    if (commonCallbackFlag) {
+    if (commonBrowserbackFlag) {
       navigate(-1);
     }
   };
