@@ -19,15 +19,16 @@ public interface IAuthService
     /// 指定した職員のアクセストークンを生成します
     /// </summary>
     /// <param name="staff">職員</param>
+    /// <param name="sid">セッションID</param>
     /// <returns></returns>
-    public string GenerateAccessToken(Staff staff);
+    public string GenerateAccessToken(Staff staff, Guid sid);
     /// <summary>
     /// 指定した職員のアクセストークンをリフレッシュします
     /// </summary>
     /// <param name="jwt">アクセストークン</param>
     /// <param name="refreshToken">リフレッシュトークン</param>
     /// <returns></returns>
-    public ValueTask<(Staff staff, string refreshToken)> RefreshAccessTokenAsync(string jwt, string refreshToken);
+    public ValueTask<(Staff staff, Guid sid, string refreshToken)> RefreshAccessTokenAsync(string jwt, string refreshToken);
 }
 
 /// <inheritdoc/>
@@ -49,7 +50,7 @@ public class AuthService(AuthSettings authSettings,
     private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
 
     /// <inheritdoc/>
-    public string GenerateAccessToken(Staff staff)
+    public string GenerateAccessToken(Staff staff, Guid sid)
     {
         var host = _httpContextAccessor.HttpContext?.Request.Host.Value ?? "";
         var utcNow = _timeProvider.GetUtcNow();
@@ -66,6 +67,8 @@ public class AuthService(AuthSettings authSettings,
                 new(JwtRegisteredClaimNames.Iat, utcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
                 // 認証したユーザーのロール
                 new(CustomClaimTypes.Role, staff.Role.ToString()),
+                // ログインセッションID
+                new(JwtRegisteredClaimNames.Sid, sid.ToString()),
             ],
             // JWTが有効になる時刻
             notBefore: utcNow.UtcDateTime,
@@ -80,20 +83,29 @@ public class AuthService(AuthSettings authSettings,
     }
 
     /// <inheritdoc/>
-    public async ValueTask<(Staff staff, string refreshToken)> RefreshAccessTokenAsync(string jwt, string refreshToken)
+    public async ValueTask<(Staff staff, Guid sid, string refreshToken)> RefreshAccessTokenAsync(string jwt, string refreshToken)
     {
+        var tokenHandler = new JwtSecurityTokenHandler()
+        {
+            MapInboundClaims = false
+        };
+        var jwtSecurityToken = tokenHandler.ReadJwtToken(jwt);
+        // 呼び出し元でjwtSecurityTokenを得ているが、CanRefreshAccessTokenAsyncには文字列のjwtを渡します。
+        // https://learn.microsoft.com/en-us/dotnet/api/system.identitymodel.tokens.securitytokenhandler.validatetoken?view=netframework-4.8.1&viewFallbackFrom=net-8.0
         var (refreshable, staff) = await CanRefreshAccessTokenAsync(jwt, refreshToken);
         if (!refreshable || staff is null)
         {
             throw new WellshipAuthenticationException();
         }
-        return (staff, GenerateAccessToken(staff));
+        var sid = Guid.Parse(jwtSecurityToken.Payload[JwtRegisteredClaimNames.Sid].ToString() ?? "");
+        return (staff, sid, GenerateAccessToken(staff, sid));
     }
+
 
     /// <summary>
     /// アクセストークンをリフレッシュしてよいか確認します。
     /// </summary>
-    /// <param name="jwt">アクセストークンとして使用しているjwt</param>
+    /// <param name="jwt">jwt</param>
     /// <param name="refreshToken">リフレッシュトークン</param>
     /// <returns>バリデーション結果</returns>
     private async ValueTask<(bool result, Staff? staff)> CanRefreshAccessTokenAsync(string jwt, string refreshToken)
@@ -114,6 +126,7 @@ public class AuthService(AuthSettings authSettings,
         {
             MapInboundClaims = false
         };
+        //
         var result = await tokenHandler.ValidateTokenAsync(jwt, tokenValidationParameters);
         if (result.SecurityToken is not JwtSecurityToken jst ||
             !jst.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
@@ -142,7 +155,8 @@ public class AuthService(AuthSettings authSettings,
             return (false, null);
         }
         // リフレッシュトークンをチェックします
-        var storedRefreshToken = await _refreshTokenRepository.GetRefreshTokenOrNullAsync(staffId);
+        var sid = Guid.Parse(result.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Sid)?.Value ?? "");
+        var storedRefreshToken = await _refreshTokenRepository.GetRefreshTokenOrNullAsync(staffId, sid);
         if (storedRefreshToken is null || storedRefreshToken.Token != refreshToken || storedRefreshToken.ExpiresAt < _timeProvider.GetUtcNow())
         {
             return (false, null);

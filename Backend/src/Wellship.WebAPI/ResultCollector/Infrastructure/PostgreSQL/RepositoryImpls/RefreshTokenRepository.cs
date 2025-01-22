@@ -12,20 +12,22 @@ public class RefreshTokenRepository(IDbConnectionProvider dbConnectionProvider) 
     private readonly IDbConnectionProvider _dbConnectionProvider = dbConnectionProvider;
 
     /// <inheritdoc/>
-    public async ValueTask<RefreshToken?> GetRefreshTokenOrNullAsync(Guid staffId)
+    public async ValueTask<RefreshToken?> GetRefreshTokenOrNullAsync(Guid staffId, Guid sid)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string query = @"
         select
             staff_id as StaffId
+            , sid as Sid
             , token as Token
             , expires_at as ExpiresAt
         from
             resultcollector.refresh_tokens
         where
-            staff_id = @StaffId;";
+            staff_id = @StaffId
+        and sid = @Sid;";
 
-        var result = await connection.QuerySingleOrDefaultAsync<RefreshTokenEntity>(query, new { StaffId = staffId });
+        var result = await connection.QuerySingleOrDefaultAsync<RefreshTokenEntity>(query, new { StaffId = staffId, Sid = sid });
         if (result is null)
         {
             return null;
@@ -38,16 +40,18 @@ public class RefreshTokenRepository(IDbConnectionProvider dbConnectionProvider) 
     }
 
     /// <inheritdoc/>
-    public async ValueTask UpdateRefreshTokenAsync(Guid staffId, RefreshToken refreshTokenEntity)
+    public async ValueTask UpdateRefreshTokenAsync(Guid staffId, Guid sid, RefreshToken refreshTokenEntity)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string query = @"
         merge into resultcollector.refresh_tokens r
-        using (values (@StaffId, @Token, @ExpiresAt)) as new_data(
+        using (values (@StaffId, @Sid, @Token, @ExpiresAt)) as new_data(
             staff_id
+            , sid
             , token
             , expires_at)
             on r.staff_id = new_data.staff_id
+           and r.sid = new_data.sid
         when matched then
             update
             set
@@ -55,28 +59,31 @@ public class RefreshTokenRepository(IDbConnectionProvider dbConnectionProvider) 
         when not matched then
             insert (
                 staff_id
+                , sid
                 , token
                 , expires_at
                 , created_by
             )
             values (
                 new_data.staff_id
+                , new_data.sid
                 , new_data.token
                 , new_data.expires_at
                 , 'system'
             );";
-        await connection.ExecuteAsync(query, new { StaffId = staffId, refreshTokenEntity.Token, refreshTokenEntity.ExpiresAt });
+        await connection.ExecuteAsync(query, new { StaffId = staffId, Sid = sid, refreshTokenEntity.Token, refreshTokenEntity.ExpiresAt });
     }
 
     /// <inheritdoc/>
-    public async ValueTask ExpireRefreshTokenAsync(Guid staffId)
+    public async ValueTask ExpireRefreshTokenAsync(Guid staffId, Guid sid)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string query = @"
         delete
             from resultcollector.refresh_tokens
         where
-            staff_id = @StaffId;";
-        await connection.ExecuteAsync(query, new { StaffId = staffId });
+            staff_id = @StaffId
+        and sid = @Sid;";
+        await connection.ExecuteAsync(query, new { StaffId = staffId, Sid = sid });
     }
 }

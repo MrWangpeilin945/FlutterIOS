@@ -36,20 +36,21 @@ public class AuthenticationUsecase(IAuthService authService,
             await _staffLoginHistoryRepository.WriteLoginFailedLogAsync(staff);
             throw new WellshipAuthenticationException();
         }
-        var accessToken = _authService.GenerateAccessToken(staff);
+        // 新規ログイン時、セッションを識別するIDを新規発番します
+        var sid = Guid.NewGuid();
+        var accessToken = _authService.GenerateAccessToken(staff, sid);
         var refreshToken = RefreshToken.Create(_timeProvider.GetUtcNow().Add(_authSettings.RefreshTokenLifeTime));
         await _staffLoginHistoryRepository.WriteLoginSucceededLogAsync(staff);
-        await _refreshTokenRepository.ExpireRefreshTokenAsync(staff.StaffId);
-        await _refreshTokenRepository.UpdateRefreshTokenAsync(staff.StaffId, refreshToken);
+        await _refreshTokenRepository.UpdateRefreshTokenAsync(staff.StaffId, sid, refreshToken);
         return (accessToken, refreshToken.Token);
     }
 
     ///<inheritdoc/>
     public async ValueTask<(string accessToken, string refreshToken)> RefreshAccessTokenAsync(string accessToken, string refreshToken)
     {
-        var (staff, newAccessToken) = await _authService.RefreshAccessTokenAsync(accessToken, refreshToken);
+        var (staff, sid, newAccessToken) = await _authService.RefreshAccessTokenAsync(accessToken, refreshToken);
         var newRefreshToken = RefreshToken.Create(_timeProvider.GetUtcNow().Add(_authSettings.RefreshTokenLifeTime));
-        await _refreshTokenRepository.UpdateRefreshTokenAsync(staff.StaffId, newRefreshToken);
+        await _refreshTokenRepository.UpdateRefreshTokenAsync(staff.StaffId, sid, newRefreshToken);
         return (newAccessToken, newRefreshToken.Token);
     }
 }
