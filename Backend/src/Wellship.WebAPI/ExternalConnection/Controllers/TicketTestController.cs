@@ -1,8 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-
 using Microsoft.AspNetCore.Mvc;
-
 using NSwag.Annotations;
 
 using Ryobi.Wellship.ExternalConnection.Enums;
@@ -32,10 +30,13 @@ public class TicketTestController : ControllerBase
     /// </summary>
     [HttpPost]
     [Route("api/v{version:apiVersion}/ec2002/ticket")]
-    public async Task<IActionResult> StoreTicketsAsync([FromQuery][Required] int actionType)
+    public async Task<IActionResult> StoreTicketsAsync([FromQuery] int? actionType, [FromBody] Ticket[] request)
     {
-        // 10000～1009999までの連携キーを3つずつ作成する
-        var tickets = (from x in Enumerable.Range(10000, 10000)
+        List<Ticket> tickets;
+        if (actionType != null)
+        {
+            // 10000～1009999までの連携キーを3つずつ作成する
+            tickets = (from x in Enumerable.Range(10000, 10000)
                        from y in Enumerable.Range(1, 3)
                        select new Ticket
                        {
@@ -45,6 +46,12 @@ public class TicketTestController : ControllerBase
                            TicketNumber = (x + y).ToString(),
                            InputNote = ((x - 10000) * 3 + y).ToString()
                        }).ToList();
+        }
+        else
+        {
+            // リクエストから受付を更新する
+            tickets = request.ToList();
+        }
 
         var stopwatch = Stopwatch.StartNew();
         stopwatch.Start();

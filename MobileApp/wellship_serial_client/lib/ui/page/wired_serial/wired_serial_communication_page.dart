@@ -7,10 +7,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:typed_data/typed_buffers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:usb_serial/usb_serial.dart';
-import 'package:wellship_serial_client/data/model/behavior_settings.dart';
 import 'package:wellship_serial_client/data/provider/behavior_settings_provider.dart';
 import 'package:wellship_serial_client/data/provider/wired_devices_provider.dart';
-import 'package:wellship_serial_client/data/model/wired_settings.dart';
+import 'package:wellship_serial_client/data/provider/wired_settings_provider.dart';
+import 'package:wellship_serial_client/ui/component/wsc_control_char_escaped_selectable_text.dart';
 
 @RoutePage()
 class WiredSerialCommunicationPage extends HookConsumerWidget {
@@ -50,34 +50,28 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
         final buffer = Uint8Buffer();
         // 多重に終了処理が行われないように
         bool aborting = false;
-        int ackCount = 0;
-        final ackTriggers = behaviorSettings.ackTriggers;
-        final ackString = behaviorSettings.ackString;
-        port.inputStream!.listen((data) async {
-          buffer.addAll(data);
-          text.value = utf8
-              .decode(buffer)
-              .replaceAllMapped(RegExp(r'[\x00-\x20]'), (x) => String.fromCharCode(0x2400 + x.group(0)!.codeUnitAt(0)))
-              .replaceAll(RegExp(r'[\x7f]'), String.fromCharCode(0x2421));
-          if (ackTriggers != null && ackTriggers.isEmpty == false && ackString != null) {
-            final checkText = utf8.decode(buffer);
-            final count = RegExp(ackTriggers.first).allMatches(checkText).length;
-            if (ackCount < count) {
-              port.write(utf8.encode(ackString));
-              ackCount = count;
+        port.inputStream!.listen(
+          (data) async {
+            buffer.addAll(data);
+            text.value = utf8.decode(buffer);
+            // Ack判定
+            if (behaviorSettings.shouldAck(buffer, data)) {
+              port.write(utf8.encode(behaviorSettings.ackString ?? ''));
             }
-          }
-          if (!aborting && shouldAbort(buffer, behaviorSettings)) {
-            aborting = true;
-            final b = base64UrlEncode(buffer);
-            final callback = behaviorSettings.callback;
-            if (callback != null) {
-              final result = {"value": b};
-              final uri = callback.replace(queryParameters: result..addAll(callback.queryParameters));
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            // 停止判定
+            if (!aborting && behaviorSettings.shouldAbort(buffer)) {
+              aborting = true;
+              // flutterのbase64UrlEncodeは末尾の=を除去しないため手動で除去する
+              final b = base64UrlEncode(buffer).replaceAll('=', '');
+              final callback = behaviorSettings.callback;
+              if (callback != null) {
+                final result = {"value": b};
+                final uri = callback.replace(queryParameters: result..addAll(callback.queryParameters));
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
             }
-          }
-        });
+          },
+        );
       }).onError((x, s) async {
         error.value = x.toString();
       });
@@ -99,13 +93,7 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
                   '接続先',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                ListTile(
-                    title: Text(firstDevice?.deviceName ?? ''),
-                    trailing: const IconButton(
-                      onPressed: null,
-                      icon: Icon(Icons.settings),
-                    ),
-                    onTap: null),
+                ListTile(title: Text(firstDevice?.deviceName ?? ''), onTap: null),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -138,7 +126,7 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
                 border: Border.all(color: Colors.teal.shade900),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: SelectableText(
+              child: WscControlCharEscapedSelectableText(
                 text.value,
               ),
             ),
@@ -146,17 +134,5 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
         ],
       ),
     );
-  }
-
-  bool shouldAbort(Uint8Buffer buffer, BehaviorSettings behaviorSettings) {
-    final dataLength = behaviorSettings.dataLength;
-    if (dataLength != null && buffer.length >= dataLength) {
-      return true;
-    }
-    final eotString = behaviorSettings.eotString;
-    if (eotString != null && utf8.decode(buffer).contains(eotString)) {
-      return true;
-    }
-    return false;
   }
 }
