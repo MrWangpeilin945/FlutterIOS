@@ -369,17 +369,14 @@ export default function ConsultInput() {
 
   // 検査継続処理
   const continuingExam = () => {
-    let targetPath = `/consultnumber-input?consultnumber=${consultNumber}`;
-    if (examMenus) {
-      const currentIndex = examMenus.findIndex((menu) => menu === examMenuId);
-      if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
-        const nextExam = examMenus[currentIndex + 1];
-        targetPath = `/examorder-confirm/${consultNumber}?exammenuid=${nextExam}`;
-      }
+    if (!examMenus) return;
+    const currentIndex = examMenus.findIndex((menu) => menu === examMenuId);
+    if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
+      const nextExam = examMenus[currentIndex + 1];
+      navigate(`/examorder-confirm/${consultNumber}?exammenuid=${nextExam}`);
+    } else {
+      navigate(`/consultnumber-input?consultnumber=${consultNumber}`);
     }
-
-    //設定したurlへ遷移
-    navigate(targetPath);
   };
 
   //AP1014_検査結果を登録する
