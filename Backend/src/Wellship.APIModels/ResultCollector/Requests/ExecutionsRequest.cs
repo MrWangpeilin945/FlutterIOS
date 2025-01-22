@@ -11,5 +11,5 @@ public class ExecutionsRequest
     /// 検査項目ごとの実施有無と中止理由
     /// </summary>
     [JsonPropertyName("executions")]
-    public ExecutionRequest[] Executions { get; set; } = [];
+    public required ExecutionRequest[] Executions { get; set; }
 }

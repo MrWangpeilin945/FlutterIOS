@@ -30,7 +30,6 @@ public class CancelReasonController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CancelReasonList))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/cancelReasons")]

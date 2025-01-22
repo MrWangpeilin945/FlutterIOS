@@ -50,7 +50,6 @@ public class ConsultController : ControllerBase
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UnexaminedMenuList))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/unexaminedMenus")]
@@ -85,7 +84,7 @@ public class ConsultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpPost]
     [Route("api/v{version:apiVersion}/consult/{consultNumber}/executions")]
-    public async Task<IActionResult> RegisterExecutions([FromRoute] string consultNumber, [FromBody] ExecutionsRequest executions)
+    public async Task<IActionResult> RegisterExecutions([FromRoute] string consultNumber, [FromBody][Required] ExecutionsRequest executions)
     {
         await _consultUsecase.RegisterExecutionsAsync(consultNumber, executions);
         return Ok();
