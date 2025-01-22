@@ -117,7 +117,6 @@ export default function Login() {
             setErrorMessage(getErrorMessage(errorMessages.serverError));
           }
           open();
-          throw new Error();
         }
       } finally {
         setIsLoading(false);
