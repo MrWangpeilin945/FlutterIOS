@@ -63,7 +63,7 @@ export default function ConsultInput() {
   const [commonCallbackFlag, setCommonCallbackFlag] = useState(false);
   // 通過用
   const [hasPass, setHasPass] = useState(false);
-  const [passCompleted, setPassCompleted] = useState(false);
+  const [passValue, setPassValue] = useState("");
   //測定ボタン用
   const [visibleRemeasurement, setVisibleRemeasurement] = useState(true);
   const [disabledRemeasurement, setDisabledRemeasurement] = useState(false);
@@ -223,13 +223,50 @@ export default function ConsultInput() {
     //TODO:js呼び出し処理以降
   };
 
+  //通過のvalueを更新
+  const updatedPassValue = (examData: InputExamItems) => {
+    const updatedInputExamItems: InputExamItems = {
+      ...examData, // 最新のexamDataを参照
+      examItemGroups: examData?.examItemGroups?.map((group) => {
+        if (group.type === ExamItemGroupType.通過) {
+          return {
+            ...group,
+            examItems: group.examItems?.map((item) => {
+              if (item.positionNumber === 1) {
+                return {
+                  ...item,
+                  examItemDetails: item.examItemDetails?.map((detail) =>
+                    detail.positionNumber === 1
+                      ? {
+                          ...detail,
+                          value: passValue, // 新しい値をセット
+                        }
+                      : detail,
+                  ),
+                };
+              }
+              return item;
+            }),
+          };
+        }
+        return group;
+      }),
+    };
+    return updatedInputExamItems;
+  };
+
   //リクエストボディ作成
   const makeBody = (): ResultsRequest => {
-    if (examData) {
+    let updatedExamData = { ...examData };
+    //通過が存在する場合、通過のvalueを更新
+    if (hasPass) {
+      updatedExamData = updatedPassValue(updatedExamData);
+    }
+    if (updatedExamData) {
       const converted = {
         examMenuId: examMenuId,
-        examResults: examData.examItemGroups
-          ? examData.examItemGroups.flatMap(
+        examResults: updatedExamData.examItemGroups
+          ? updatedExamData.examItemGroups?.flatMap(
               (group) =>
                 group.examItems?.map((examItem) => ({
                   examItemId: examItem.examItemId,
@@ -325,13 +362,14 @@ export default function ConsultInput() {
   //検証処理
   const handleVerify = () => {
     setIsLoading(true);
+    //AP1013_検査結果を検証する
     verifyResults();
     setIsLoading(false);
   };
 
   // 検査継続処理
   const continuingExam = () => {
-    let targetPath = "";
+    let targetPath = `/consultnumber-input?consultnumber=${consultNumber}`;
     if (examMenus) {
       const currentIndex = examMenus.findIndex((menu) => menu === examMenuId);
       if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
@@ -339,10 +377,7 @@ export default function ConsultInput() {
         targetPath = `/examorder-confirm/${consultNumber}?exammenuid=${nextExam}`;
       }
     }
-    // 共通の遷移処理
-    if (!targetPath) {
-      targetPath = `/consultnumber-input?consultnumber=${consultNumber}`;
-    }
+
     //設定したurlへ遷移
     navigate(targetPath);
   };
@@ -395,43 +430,23 @@ export default function ConsultInput() {
   //登録処理
   const callbackRegister = () => {
     setIsLoading(true);
-    //通過のvalue変更処理
-    if (hasPass) {
-      const updatedInputExamItems: InputExamItems = {
-        ...examData, // もともとのデータをコピー
-        examItemGroups: examData?.examItemGroups?.map((group) => {
-          if (group.type === ExamItemGroupType.通過) {
-            return {
-              ...group,
-              examItems: group.examItems?.map((item) => {
-                if (item.positionNumber === 1) {
-                  return {
-                    ...item,
-                    examItemDetails: item.examItemDetails?.map((detail) =>
-                      detail.positionNumber === 1
-                        ? { ...detail, value: passCompleted ? "" : "1" } // 新しい値をセット
-                        : detail,
-                    ),
-                  };
-                }
-                return item;
-              }),
-            };
-          }
-          return group;
-        }), // 更新されたexamItemGroupsをセット
-      };
-      setExamData(updatedInputExamItems);
-    }
     //AP1014_検査結果を登録する
     registerResults();
     setIsLoading(false);
   };
 
-  //閉じる処理
+  //共通ダイアログ：閉じる処理
   const callbackCloseCommon = () => {
     closeCommon();
     if (commonCallbackFlag) {
+      navigate(-1);
+    }
+  };
+
+  //確認ダイアログ：閉じる処理
+  const callbackCloseConfirm = () => {
+    closeConfirm();
+    if (hasPass) {
       navigate(-1);
     }
   };
@@ -449,7 +464,7 @@ export default function ConsultInput() {
     if (!examItems || examItems.length === 0) {
       return <Text>検査項目がありません</Text>;
     }
-    //通過の存在チェックをリセット
+    //通過フラグをリセット
     setHasPass(false);
     // 共通のコールバック関数
     const handleChange = (updatedExamItem: InputExamItem[] | undefined) =>
@@ -540,26 +555,28 @@ export default function ConsultInput() {
         );
       case ExamItemGroupType.通過: {
         setHasPass(true);
-        const prevCompleted = passCompleted;
+        //valueを取得
         const detailValue = examItems
           ?.find((item) => item.positionNumber === 1)
           ?.examItemDetails?.find(
             (detail) => detail.positionNumber === 1,
           )?.value;
+        // 設定するvalueをset
+        const newValue = detailValue === "1" ? "" : "1";
+        setPassValue(newValue);
+
+        // メッセージの設定
         if (detailValue === "1") {
           setConfirmMessage("実施済みです。取消してよろしいですか。");
-          setPassCompleted(true);
         } else {
           setConfirmMessage("登録します。よろしいですか。");
-          setPassCompleted(false);
         }
+
         openConfirm();
-
-        return null; // UIのレンダリングをスキップ
+        return null;
       }
-
       default:
-        return <Text>未対応のタイプ: {type}</Text>;
+        return;
     }
   };
 
@@ -611,7 +628,7 @@ export default function ConsultInput() {
           message={confirmMessage}
           confirmButtonMessage={"OK"}
           isOpen={openedConfirm}
-          onCancel={closeConfirm}
+          onCancel={callbackCloseConfirm}
           onConfirm={callbackRegister}
         />
         <CommonDialog
