@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard
 {
     /// <summary>
@@ -8,6 +10,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard
         /// <summary>
         /// 団体コード
         /// </summary>
+        [JsonPropertyName("organizationCode")]
         public required string OrganizationCode { get; init; }
     }
 }

@@ -62,5 +62,27 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
             });
 
         }
+
+        /// <summary>
+        /// EC2008_団体を登録する
+        /// </summary>
+        /// <param name="request">連携データ</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/v{version:apiVersion}/ec2008/organization")]
+        public async Task<IActionResult> StoreOrganizationsAsync([FromBody] Organization[] request)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
+            var result = await _organizationUsecases.StoreOrganizationsAsync(request.ToList());
+
+            var processingTime = stopwatch.Elapsed.TotalSeconds;
+            return Ok(new
+            {
+                DataProcessingTime = processingTime.ToString() + "秒",
+                ErrorObject = result
+            });
+        }
     }
 }

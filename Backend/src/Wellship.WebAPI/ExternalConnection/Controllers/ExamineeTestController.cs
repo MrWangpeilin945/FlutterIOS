@@ -160,5 +160,27 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
                 ErrorObject = result
             });
         }
+
+        /// <summary>
+        /// EC2001_受診者を登録する
+        /// </summary>
+        /// <param name="request">連携データ</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/v{version:apiVersion}/ec2001/examinee")]
+        public async Task<IActionResult> StoreConsultAsync([FromBody] Examinee[] request)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
+            var result = await _examineeUsecases.StoreExamineesAsync(request.ToList());
+
+            var processingTime = stopwatch.Elapsed.TotalSeconds;
+            return Ok(new
+            {
+                DataProcessingTime = processingTime.ToString() + "秒",
+                ErrorObject = result
+            });
+        }
     }
 }

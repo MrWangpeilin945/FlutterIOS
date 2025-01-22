@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
 using NSwag.Annotations;
 
@@ -97,5 +98,26 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
             return places;
         }
 
+        /// <summary>
+        /// EC2007_会場を登録する
+        /// </summary>
+        /// <param name="request">連携データ</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/v{version:apiVersion}/ec2007/place")]
+        public async Task<IActionResult> StorePlacesAsync([FromBody] Place[] request)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
+            var result = await _administratorUsecase.StorePlacesAsync(request.ToList());
+
+            var processingTime = stopwatch.Elapsed.TotalSeconds;
+            return Ok(new
+            {
+                DataProcessingTime = processingTime.ToString() + "秒",
+                ErrorObject = result
+            });
+        }
     }
 }
