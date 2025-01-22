@@ -5,6 +5,8 @@ runners:
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
     skipValidateResponse: false
+vars:
+  exportId: "af0971a0-186f-4b14-86a1-0c648d77c9af"
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
@@ -18,6 +20,9 @@ steps:
         post:
           headers:
             Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              exportId: "{{ vars.exportId }}"
     test: |
       current.res.status == 200
     dump:

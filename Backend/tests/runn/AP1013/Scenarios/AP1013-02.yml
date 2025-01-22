@@ -1,4 +1,4 @@
-desc: AP1013-02 結果検証_指定した受診番号の形式が不正 [400]
+desc: AP1013-02 結果検証_リクエストボディの形式が不正 [400]
 runners:
   req:
     endpoint: ${BACKEND_URL}
@@ -12,7 +12,7 @@ steps:
       path:
         ../../Helpers/adminAccessToken.yml
   post:
-    desc: "結果検証_指定した受診番号の形式が不正"
+    desc: "結果検証_リクエストボディの形式が不正"
     req:
       /api/v1/consult/{consultNumber}/results/verify:
         post:

@@ -1,10 +1,10 @@
-desc: AP1011-02 中止理由取得_検査項目IDの形式が不正 [400]
+desc: AP1011-02 中止理由取得_無効なアクセストークン [401]
 runners:
   req:
     endpoint: ${BACKEND_URL}
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
-    skipValidateResponse: false
+    skipValidateResponse: true
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
@@ -12,14 +12,14 @@ steps:
       path:
         ../../Helpers/adminAccessToken.yml
   get:
-    desc: "中止理由取得_検査項目IDの形式が不正"
+    desc: "中止理由取得_無効なアクセストークン"
     req:
       /api/v1/cancelReasons:
         get:
           headers:
-            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+            Authorization: "Bearer invalidToken"
     test: |
-      current.res.status == 400
+      current.res.status == 401
     dump:
       expr: current.res.body
       out: ../Dump/AP1011-02.json

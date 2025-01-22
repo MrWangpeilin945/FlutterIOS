@@ -9,8 +9,7 @@ steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
     include:
-      path:
-        ../../Helpers/adminAccessToken.yml
+      path: ../../Helpers/adminAccessToken.yml
   post:
     desc: "ログイン_パスワード不一致"
     req:
@@ -18,9 +17,12 @@ steps:
         post:
           headers:
             Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              loginId: "S002"
+              password: "dummy"
     test: |
       current.res.status == 401
     dump:
       expr: current.res.body
       out: ../Dump/AP1001-02.json
-

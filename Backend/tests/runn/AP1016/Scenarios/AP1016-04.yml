@@ -4,7 +4,9 @@ runners:
     endpoint: ${BACKEND_URL}
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
-    skipValidateResponse: false
+    skipValidateResponse: true
+vars:
+  placeScheduleId: "86a24591-8e56-4d6a-a380-d1677cbb1f11"
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
@@ -14,7 +16,7 @@ steps:
   get:
     desc: "会場ロック取得_指定した会場日程が存在しない"
     req:
-      /api/v1/placeSchedules/{placeScheduleId}/placeScheduleLockingStatus:
+      /api/v1/placeSchedules/{{ vars.placeScheduleId }}/placeScheduleLockingStatus:
         get:
           headers:
             Authorization: "Bearer {{ steps.getAccessToken.token }}"

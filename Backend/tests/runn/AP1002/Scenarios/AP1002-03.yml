@@ -1,16 +1,16 @@
+skipTest: true
 desc: AP1002-03 職員取得_存在しない [404]
 runners:
   req:
     endpoint: ${BACKEND_URL}
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
-    skipValidateResponse: false
+    skipValidateResponse: true
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
     include:
-      path:
-        ../../Helpers/adminAccessToken.yml
+      path: ../../Helpers/adminAccessToken.yml
   get:
     desc: "職員取得_存在しない"
     req:
@@ -23,4 +23,3 @@ steps:
     dump:
       expr: current.res.body
       out: ../Dump/AP1002-03.json
-

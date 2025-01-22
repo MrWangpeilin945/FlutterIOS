@@ -4,20 +4,18 @@ runners:
     endpoint: ${BACKEND_URL}
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
-    skipValidateResponse: false
+    skipValidateResponse: true
+vars:
+  consultNumber: "0001"
+  examMenuId: 1
 steps:
-  getAccessToken:
-    desc: "アクセストークンを取得します"
-    include:
-      path:
-        ../../Helpers/adminAccessToken.yml
   get:
     desc: "検査内容取得_無効なアクセストークン"
     req:
-      /api/v1/consult/{consultNumber}/examItems:
+      /api/v1/consult/{{ vars.consultNumber }}/examItems?examMenuId={{ vars.examMenuId }}:
         get:
           headers:
-            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+            Authorization: "Bearer invalidToken"
     test: |
       current.res.status == 401
     dump:

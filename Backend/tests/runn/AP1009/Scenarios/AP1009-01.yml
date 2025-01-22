@@ -5,6 +5,9 @@ runners:
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
     skipValidateResponse: false
+vars:
+  consultNumber: "0001"
+  examMenuId: 1
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
@@ -14,7 +17,7 @@ steps:
   get:
     desc: "結果入力情報取得_正常"
     req:
-      /api/v1/consult/{consultNumber}/inputExamItems:
+      /api/v1/consult/{{ vars.consultNumber }}/inputExamItems?examMenuId={{ vars.examMenuId }}:
         get:
           headers:
             Authorization: "Bearer {{ steps.getAccessToken.token }}"
@@ -23,4 +26,3 @@ steps:
     dump:
       expr: current.res.body
       out: ../Dump/AP1009-01.json
-

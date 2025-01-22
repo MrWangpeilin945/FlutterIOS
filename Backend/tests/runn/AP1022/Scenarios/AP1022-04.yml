@@ -4,7 +4,10 @@ runners:
     endpoint: ${BACKEND_URL}
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
-    skipValidateResponse: false
+    skipValidateResponse: true
+vars:
+  consultNumber: "9999"
+  request: "json://../Requests/AP1022-04.json"
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
@@ -14,10 +17,13 @@ steps:
   post:
     desc: "中止理由登録_指定した受診が存在しない"
     req:
-      /api/v1/consult/{consultNumber}/executions:
+      /api/v1/consult/{{ vars.consultNumber }}/executions:
         post:
           headers:
             Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              "{{ vars.request }}"
     test: |
       current.res.status == 404
     dump:

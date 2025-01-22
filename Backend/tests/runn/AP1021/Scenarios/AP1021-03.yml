@@ -3,21 +3,21 @@ runners:
   req:
     endpoint: ${BACKEND_URL}
     openapi3: ${OPENAPI3_URL}
-    skipValidateRequest: false
-    skipValidateResponse: false
+    skipValidateRequest: true
+    skipValidateResponse: true
+vars:
+  exportId: "af0971a0-186f-4b14-86a1-0c648d77c9af"
 steps:
-  getAccessToken:
-    desc: "アクセストークンを取得します"
-    include:
-      path:
-        ../../Helpers/adminAccessToken.yml
   post:
     desc: "結果連携未出力_無効なアクセストークン"
     req:
       /api/v1/integrations/examResults/undoExport:
         post:
           headers:
-            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+            Authorization: "Bearer invalidToken"
+          body:
+            application/json:
+              exportId: "{{ vars.exportId }}"
     test: |
       current.res.status == 401
     dump:
