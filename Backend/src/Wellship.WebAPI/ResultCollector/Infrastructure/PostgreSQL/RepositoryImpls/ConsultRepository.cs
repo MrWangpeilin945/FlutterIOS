@@ -1,4 +1,3 @@
-
 using Dapper;
 
 using Ryobi.Wellship.Core.Enums;
@@ -323,7 +322,7 @@ public class ConsultRepository : IConsultRepository
             values ( 
                 @ConsultId
                 , @ExamItemDetailId
-                , @Value
+                , @CancelReasonId
                 , @CreatedBy
                 , @CreatedAt
             );";
