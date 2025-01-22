@@ -4,9 +4,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wellship_serial_client/data/enum/parity.dart';
 import 'package:wellship_serial_client/data/enum/stop_bits.dart';
-import 'package:wellship_serial_client/data/model/behavior_settings.dart';
 import 'package:wellship_serial_client/data/model/wired_settings.dart';
-import 'package:wellship_serial_client/data/provider/behavior_settings_provider.dart';
+import 'package:wellship_serial_client/data/provider/wired_settings_provider.dart';
 import 'package:wellship_serial_client/ui/component/wsc_input_dialog.dart';
 import 'package:wellship_serial_client/ui/component/wsc_select_dialog.dart';
 import 'package:wellship_serial_client/ui/route/app_route.dart';
@@ -54,7 +53,7 @@ class WiredSerialSettingsPage extends HookConsumerWidget {
                   onTap: () async {
                     final controller =
                         TextEditingController.fromValue(TextEditingValue(text: baudState.value.toString()));
-                    await showDialog(
+                    final value = await showDialog<int>(
                       context: context,
                       builder: (context) {
                         return WscInputDialog(
@@ -62,85 +61,71 @@ class WiredSerialSettingsPage extends HookConsumerWidget {
                           keyboardType: TextInputType.number,
                           controller: controller,
                           onConfirmed: () {
-                            baudState.value = int.tryParse(controller.text) ?? 0;
-                            Navigator.pop(context);
+                            Navigator.pop(context, int.tryParse(controller.text) ?? 0);
                           },
                         );
                       },
                     );
+                    if (value != null) {
+                      baudState.value = value;
+                    }
                   },
                 ),
                 ListTile(
                   title: const Text("データビット数"),
                   subtitle: Text(dataBitsState.value.toString()),
                   onTap: () async {
-                    await showDialog(
+                    final value = await showDialog<int>(
                       context: context,
                       builder: (context) {
                         return WscSelectDialog(
                           title: "データビット数を入力してください",
                           items: const [5, 6, 7, 8],
-                          mapper: (x) => RadioListTile(
-                            value: x,
-                            title: Text(x.toString()),
-                            groupValue: dataBitsState.value,
-                            onChanged: (value) {
-                              if (value != null) {
-                                dataBitsState.value = value;
-                              }
-                              Navigator.pop(context);
-                            },
-                          ),
+                          groupValue: dataBitsState.value,
                         );
                       },
                     );
+                    if (value != null) {
+                      dataBitsState.value = value;
+                    }
                   },
                 ),
                 ListTile(
                   title: const Text("パリティビット"),
                   subtitle: Text(parityBitState.value.toString()),
                   onTap: () async {
-                    await showDialog(
+                    final value = await showDialog<Parity>(
                       context: context,
                       builder: (context) {
                         return WscSelectDialog(
                           title: "パリティビットを選択してください",
                           items: Parity.values,
-                          mapper: (x) => RadioListTile(
-                              value: x,
-                              title: Text(x.name),
-                              groupValue: parityBitState.value,
-                              onChanged: (value) {
-                                parityBitState.value = value ?? Parity.none;
-                                Navigator.pop(context);
-                              }),
+                          groupValue: parityBitState.value,
                         );
                       },
                     );
+                    if (value != null) {
+                      parityBitState.value = value;
+                    }
                   },
                 ),
                 ListTile(
                   title: const Text("ストップビット"),
                   subtitle: Text(stopBitState.value.toString()),
                   onTap: () async {
-                    await showDialog(
+                    final value = await showDialog<StopBits>(
                       context: context,
                       builder: (context) {
                         return WscSelectDialog(
                           title: "ストップビットを選択してください",
                           items: StopBits.values,
-                          mapper: (x) => RadioListTile(
-                            value: x,
-                            groupValue: stopBitState.value,
-                            title: Text(x.name),
-                            onChanged: (value) {
-                              stopBitState.value = value ?? StopBits.stopBits_1;
-                              Navigator.pop(context);
-                            },
-                          ),
+                          groupValue: stopBitState.value,
                         );
                       },
                     );
+                    if (value != null) {
+                      stopBitState.value = value;
+                    }
                   },
                 ),
                 SwitchListTile(

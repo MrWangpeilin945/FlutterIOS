@@ -2,7 +2,8 @@ using System.Diagnostics;
 
 using Microsoft.AspNetCore.Mvc;
 
-using Ryobi.Wellship.Core.Enums;
+using NSwag.Annotations;
+
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
 
@@ -13,6 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
     /// </summary>
     [ApiController]
     [ApiVersion("1")]
+    [OpenApiIgnore]
     public class PlaceScheduleTestController : ControllerBase
     {
         private readonly IPlaceScheduleUsecase _placeScheduleUsecase;
@@ -65,6 +67,28 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
                 placeSchedules.Add((PlaceSchedule)tmp_place_schedule);
             }
             return placeSchedules;
+        }
+
+        /// <summary>
+        /// EC2012_会場日程を登録する
+        /// </summary>
+        /// <param name="request">連携データ</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/v{version:apiVersion}/ec2012/placeSchedule")]
+        public async Task<IActionResult> StorePlaceSchedulesAsync([FromBody] PlaceSchedule[] request)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
+            var result = await _placeScheduleUsecase.StorePlaceSchedulesAsync(request.ToList());
+
+            var processingTime = stopwatch.Elapsed.TotalSeconds;
+            return Ok(new
+            {
+                DataProcessingTime = processingTime.ToString() + "秒",
+                ErrorObject = result
+            });
         }
     }
 }

@@ -20,33 +20,30 @@ export const setupAxiosInterceptors = (handleLogout: () => void) => {
     // アクセストークンを取得する
     let accessToken = authUtil.getAccessToken();
 
-    // todo 認証チェックを行う
-    // 一旦処理は実装したがコメントアウトしておく
+    // 認証系のエンドポイントの時は認証チェックをしない
+    if (!authEndpoints.includes(endpoint)) {
+      // 認証チェック
 
-    // // 認証系のエンドポイントの時は認証チェックをしない
-    // if (!authEndpoints.includes(endpoint)) {
-    //   // 認証チェック
-
-    //   // アクセストークンがない時はログアウト処理を行う
-    //   if (!accessToken) {
-    //     handleLogout();
-    //     return Promise.reject(
-    //       new Error("No authentication token, redirecting to login"),
-    //     );
-    //   }
-    //   if (authUtil.isAccessTokenExpired(accessToken)) {
-    //     // アクセストークンが期限切れの時はアクセストークンをリフレッシュする
-    //     if (!(await authUtil.refreshAccessToken())) {
-    //       // アクセストークンが再取得できなかった時はログアウト処理を行う
-    //       handleLogout();
-    //       return Promise.reject(
-    //         new Error("No authentication token, redirecting to login"),
-    //       );
-    //     }
-    //     // リフレッシュしたアクセストークンを取得しなおす
-    //     accessToken = authUtil.getAccessToken();
-    //   }
-    // }
+      // アクセストークンがない時はログアウト処理を行う
+      if (!accessToken) {
+        handleLogout();
+        return Promise.reject(
+          new Error("No authentication token, redirecting to login"),
+        );
+      }
+      if (authUtil.isAccessTokenExpired(accessToken)) {
+        // アクセストークンが期限切れの時はアクセストークンをリフレッシュする
+        if (!(await authUtil.refreshAccessToken())) {
+          // アクセストークンが再取得できなかった時はログアウト処理を行う
+          handleLogout();
+          return Promise.reject(
+            new Error("No authentication token, redirecting to login"),
+          );
+        }
+        // リフレッシュしたアクセストークンを取得しなおす
+        accessToken = authUtil.getAccessToken();
+      }
+    }
 
     // 認証処理
     if (authEndpoints.includes(endpoint)) {

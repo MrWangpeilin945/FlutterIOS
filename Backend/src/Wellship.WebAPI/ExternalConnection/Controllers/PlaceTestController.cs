@@ -1,13 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
+using NSwag.Annotations;
+
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
 {
     /// <summary>
     /// 動作確認用コントローラ
     /// </summary>
+    [OpenApiIgnore]
     public class PlaceTestController : ControllerBase
     {
         private readonly IPlaceUsecase _administratorUsecase;
@@ -66,7 +70,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
             Console.WriteLine($"　{ts.Hours}時間 {ts.Minutes}分 {ts.Seconds}秒 {ts.Milliseconds}ミリ秒");
             return Ok(result);
         }
-        
+
         /// <summary>
         /// 投入データ作成
         /// </summary>
@@ -75,14 +79,14 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
         protected List<Place> CreateTestPlaces(int num)
         {
             List<Place> places = new List<Place>();
-            for(int i = 1; i < num + 1; i++)
+            for (int i = 1; i < num + 1; i++)
             {
-                Place tmp_place = new Place{Code="Place"+i.ToString("00000"), Name="会場"+i.ToString("00000"), InputNote=i.ToString() };
+                Place tmp_place = new Place { Code = "Place" + i.ToString("00000"), Name = "会場" + i.ToString("00000"), InputNote = i.ToString() };
                 places.Add((Place)tmp_place);
             }
             return places;
         }
-        
+
         /// <summary>
         /// 投入データ作成
         /// </summary>
@@ -90,9 +94,30 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
         protected List<Place> CreateUpsertTestPlaces()
         {
             List<Place> places = new List<Place>();
-            places.Add(new Place{Code="Place00010", Name="会場upsert00010", InputNote=999.ToString()});
+            places.Add(new Place { Code = "Place00010", Name = "会場upsert00010", InputNote = 999.ToString() });
             return places;
         }
-        
+
+        /// <summary>
+        /// EC2007_会場を登録する
+        /// </summary>
+        /// <param name="request">連携データ</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/v{version:apiVersion}/ec2007/place")]
+        public async Task<IActionResult> StorePlacesAsync([FromBody] Place[] request)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
+            var result = await _administratorUsecase.StorePlacesAsync(request.ToList());
+
+            var processingTime = stopwatch.Elapsed.TotalSeconds;
+            return Ok(new
+            {
+                DataProcessingTime = processingTime.ToString() + "秒",
+                ErrorObject = result
+            });
+        }
     }
 }

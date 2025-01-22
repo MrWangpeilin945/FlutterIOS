@@ -11,13 +11,13 @@ public class ExecutionRequest
     /// 検査項目ID
     /// </summary>
     [JsonPropertyName("examItemId")]
-    public int ExamItemId { get; set; }
+    public required int ExamItemId { get; set; }
 
     /// <summary>
     /// 検査実施するか
     /// </summary>
     [JsonPropertyName("isPerforming")]
-    public bool IsPerforming { get; set; }
+    public required bool IsPerforming { get; set; }
 
     /// <summary>
     /// 中止理由ID

@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:wellship_serial_client/data/model/behavior_settings.dart';
 import 'package:wellship_serial_client/data/model/bt_classic_settings.dart';
-import 'package:wellship_serial_client/data/provider/behavior_settings_provider.dart';
 import 'package:wellship_serial_client/data/provider/bt_classic_devices_provider.dart';
 import 'package:wellship_serial_client/data/provider/bt_classic_settings_provider.dart';
 import 'package:wellship_serial_client/ui/component/wsc_select_dialog.dart';
@@ -54,25 +52,21 @@ class BtClassicSerialSettingsPage extends HookConsumerWidget {
                   ),
                   onTap: deviceStream.hasValue
                       ? () async {
-                          await showDialog(
+                          final value = await showDialog<BluetoothDevice>(
                             context: context,
                             builder: (context) {
                               return WscSelectDialog(
                                 title: "接続デバイスを選択してください",
                                 items: deviceStream.value?.map((x) => x.device).toList() ?? <BluetoothDevice>[],
-                                mapper: (x) => RadioListTile(
-                                  value: x,
-                                  title: Text(x.name ?? ''),
-                                  subtitle: Text(x.address),
-                                  groupValue: device.value,
-                                  onChanged: (value) {
-                                    device.value = value;
-                                    Navigator.pop(context);
-                                  },
-                                ),
+                                titleMapper: (x) => x?.name ?? '',
+                                subtitleMapper: (x) => x?.address ?? '',
+                                groupValue: device.value,
                               );
                             },
                           );
+                          if (value != null) {
+                            device.value = value;
+                          }
                         }
                       : null,
                 ),
@@ -113,8 +107,12 @@ class BtClassicSerialSettingsPage extends HookConsumerWidget {
               if (selectedDevice == null) {
                 return;
               }
-              ref.read(btClassicSettingsProvider.notifier).state =
-                  BtClassicSettings(deviceName: selectedDevice.name, address: selectedDevice.address);
+              final btClassicSettings = BtClassicSettings(
+                deviceName: selectedDevice.name,
+                address: selectedDevice.address,
+              );
+              await BtClassicSettings.saveSettings(btClassicSettings);
+              ref.read(btClassicSettingsProvider.notifier).state = btClassicSettings;
               // ref.read(behaviorSettingsProvider.notifier).state = BehaviorSettings(
               //     ackString: '\x06',
               //     ackTriggers: ['\x20'],

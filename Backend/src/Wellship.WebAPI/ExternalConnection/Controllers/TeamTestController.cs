@@ -1,13 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
+using NSwag.Annotations;
+
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
 {
     /// <summary>
     /// 動作確認用コントローラ
     /// </summary>
+    [OpenApiIgnore]
     public class TeamTestController : ControllerBase
     {
         private readonly ITeamUsecase _administratorUsecase;
@@ -66,7 +70,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
             Console.WriteLine($"　{ts.Hours}時間 {ts.Minutes}分 {ts.Seconds}秒 {ts.Milliseconds}ミリ秒");
             return Ok(result);
         }
-        
+
         /// <summary>
         /// 投入データ作成
         /// </summary>
@@ -75,14 +79,14 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
         protected List<Team> CreateTestTeams(int num)
         {
             List<Team> teams = new List<Team>();
-            for(int i = 1; i < num + 1; i++)
+            for (int i = 1; i < num + 1; i++)
             {
-                Team tmp_team = new Team{Code="Team"+i.ToString("00000"), Name="班"+i.ToString("00000"), InputNote=i.ToString() };
+                Team tmp_team = new Team { Code = "Team" + i.ToString("00000"), Name = "班" + i.ToString("00000"), InputNote = i.ToString() };
                 teams.Add((Team)tmp_team);
             }
             return teams;
         }
-        
+
         /// <summary>
         /// 投入データ作成
         /// </summary>
@@ -90,10 +94,30 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
         protected List<Team> CreateUpsertTestTeams()
         {
             List<Team> teams = new List<Team>();
-            teams.Add(new Team{ Code="Team00010", Name="班upsert00010", InputNote=999.ToString()});
+            teams.Add(new Team { Code = "Team00010", Name = "班upsert00010", InputNote = 999.ToString() });
             return teams;
         }
-        
-        
+
+        /// <summary>
+        /// EC2006_班を登録する
+        /// </summary>
+        /// <param name="request">連携データ</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/v{version:apiVersion}/ec2006/team")]
+        public async Task<IActionResult> StoreTeamsAsync([FromBody] Team[] request)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
+            var result = await _administratorUsecase.StoreTeamsAsync(request.ToList());
+
+            var processingTime = stopwatch.Elapsed.TotalSeconds;
+            return Ok(new
+            {
+                DataProcessingTime = processingTime.ToString() + "秒",
+                ErrorObject = result
+            });
+        }
     }
 }

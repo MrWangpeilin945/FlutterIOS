@@ -8,7 +8,7 @@
     switch (value.toLowerCase()) {
       case 'wired':
         return TransMethod.wired;
-      case 'btclassic':
+      case 'btClassic':
         return TransMethod.btClassic;
       case 'ble':
         return TransMethod.ble;

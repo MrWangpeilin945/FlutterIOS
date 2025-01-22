@@ -1,5 +1,9 @@
 using System.Diagnostics;
+
 using Microsoft.AspNetCore.Mvc;
+
+using NSwag.Annotations;
+
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 
@@ -8,6 +12,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
     /// <summary>
     /// 職員テスト用コントローラー
     /// </summary>
+    [OpenApiIgnore]
     public class StaffTestController : ControllerBase
     {
         private readonly Usecases.IStaffUsecase _staffUsecase;
@@ -62,5 +67,26 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
             return staffs;
         }
 
+        /// <summary>
+        /// EC2011_職員を登録する
+        /// </summary>
+        /// <param name="request">連携データ</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/v{version:apiVersion}/ec2011/staff")]
+        public async Task<IActionResult> StoreStaffsAsync([FromBody] Staff[] request)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
+            var result = await _staffUsecase.StoreStaffsAsync(request.ToList());
+
+            var processingTime = stopwatch.Elapsed.TotalSeconds;
+            return Ok(new
+            {
+                DataProcessingTime = processingTime.ToString() + "秒",
+                ErrorObject = result
+            });
+        }
     }
 }
