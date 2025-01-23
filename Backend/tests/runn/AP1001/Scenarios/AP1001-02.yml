@@ -5,11 +5,9 @@ runners:
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
     skipValidateResponse: false
+vars:
+  request: "json://../Requests/AP1001-02.json"
 steps:
-  getAccessToken:
-    desc: "アクセストークンを取得します"
-    include:
-      path: ../../Helpers/adminAccessToken.yml
   post:
     desc: "ログイン_パスワード不一致"
     req:
@@ -19,8 +17,7 @@ steps:
             Authorization: "Bearer {{ steps.getAccessToken.token }}"
           body:
             application/json:
-              loginId: "S002"
-              password: "dummy"
+              "{{ vars.request }}"
     test: |
       current.res.status == 401
     dump:

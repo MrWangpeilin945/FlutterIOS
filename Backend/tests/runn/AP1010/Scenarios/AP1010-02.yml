@@ -7,7 +7,6 @@ runners:
     skipValidateResponse: true
 vars:
   consultNumber: "0001"
-  examMenuId: 1
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
@@ -17,7 +16,7 @@ steps:
   get:
     desc: "検査内容取得_必須パラメータ不足"
     req:
-      /api/v1/consult/{{ vars.consultNumber }}/examItems?examMenuId={{ vars.examMenuId }}:
+      /api/v1/consult/{{ vars.consultNumber }}/examItems:
         get:
           headers:
             Authorization: "Bearer {{ steps.getAccessToken.token }}"
