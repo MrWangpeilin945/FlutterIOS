@@ -22,7 +22,7 @@ export const authUtil = {
   // アクセストークンを取得する
   getAccessToken: (): string | null => {
     const cryptToken = localStorage.getItem(accessTokenName);
-    // 複合化して返却する
+    // 復号化して返却する
     return cryptToken ? authUtil.decrypt(cryptToken) : null;
   },
 
