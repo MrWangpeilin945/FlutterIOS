@@ -30,14 +30,20 @@ import CommonDialog from "~/components/CommonDialog";
 import ConfirmDialog from "~/components/ConfirmDialog";
 import ExamNumeric from "~/components/ExamNumeric";
 import ExamSelect from "~/components/ExamSelect";
+import ExamBP2 from "~/components/ExamBP2";
+import ExamFreeInput from "~/components/ExamFreeInput";
+import ExamNumericLR from "~/components/ExamNumericLR";
 import ExamSelectLR from "~/components/ExamSelectLR";
+import ExamBody from "~/components/ExamBody";
+import ExamVision from "~/components/ExamVision";
+import ExamHearing from "~/components/ExamHearing";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
 export default function ConsultInput() {
   const navigate = useNavigate();
   const [examData, setExamData] = useState<InputExamItems>();
   // パスパラメータの取得
-  const consultNumber = useParams().cousultnumber ?? undefined;
+  const consultNumber = useParams().consultnumber ?? undefined;
   // クエリパラメータの取得
   const [searchParams] = useSearchParams();
   const examMenuId = Number(searchParams.get("exammenuid"));
@@ -54,6 +60,11 @@ export default function ConsultInput() {
   const [commonMessage, setCommonMessage] = useState<string>("");
   const [confirmMessage, setConfirmMessage] = useState<string>("");
   const [commonButtonMessage, setCommonButtonMessage] = useState<string>("");
+  const [commonBrowserbackFlag, setCommonBrowserbackFlag] = useState(false);
+  // 通過用
+  const [hasPass, setHasPass] = useState(false);
+  const [passValue, setPassValue] = useState("");
+  //測定ボタン用
   const [visibleRemeasurement, setVisibleRemeasurement] = useState(true);
   const [disabledRemeasurement, setDisabledRemeasurement] = useState(false);
   //機器連携用
@@ -72,6 +83,7 @@ export default function ConsultInput() {
   );
 
   useEffect(() => {
+    setCommonBrowserbackFlag(true);
     //受診番号の受け取り確認
     if (!consultNumber) {
       setCommonMessage("必要な受診番号がありません");
@@ -83,7 +95,7 @@ export default function ConsultInput() {
     if (!examMenuId) {
       setCommonMessage("必要な検査メニューIDがありません");
       setCommonButtonMessage("閉じる");
-      open();
+      openCommon();
       return;
     }
     setIsLoading(true);
@@ -95,9 +107,7 @@ export default function ConsultInput() {
         setExamData(result.data.data);
       } else if (result.error) {
         if (result.error.status === 400) {
-          setCommonMessage(
-            getErrorMessage(errorMessages.invalid, "受診番号と検査項目"),
-          );
+          setCommonMessage(getErrorMessage(errorMessages.invalid, "受診番号"));
         } else if (result.error.status === 404) {
           setCommonMessage(getErrorMessage(errorMessages.notFound, "検査項目"));
         } else if (result.error.status === 500) {
@@ -110,6 +120,7 @@ export default function ConsultInput() {
 
     inputExamItems();
     setIsLoading(false);
+    setCommonBrowserbackFlag(false);
   }, [consultNumber, examMenuId]);
 
   useEffect(() => {
@@ -212,13 +223,50 @@ export default function ConsultInput() {
     //TODO:js呼び出し処理以降
   };
 
+  //通過のvalueを更新
+  const updatedPassValue = (examData: InputExamItems) => {
+    const updatedInputExamItems: InputExamItems = {
+      ...examData, // 最新のexamDataを参照
+      examItemGroups: examData?.examItemGroups?.map((group) => {
+        if (group.type === ExamItemGroupType.通過) {
+          return {
+            ...group,
+            examItems: group.examItems?.map((item) => {
+              if (item.positionNumber === 1) {
+                return {
+                  ...item,
+                  examItemDetails: item.examItemDetails?.map((detail) =>
+                    detail.positionNumber === 1
+                      ? {
+                          ...detail,
+                          value: passValue, // 新しい値をセット
+                        }
+                      : detail,
+                  ),
+                };
+              }
+              return item;
+            }),
+          };
+        }
+        return group;
+      }),
+    };
+    return updatedInputExamItems;
+  };
+
   //リクエストボディ作成
   const makeBody = (): ResultsRequest => {
-    if (examData) {
+    let updatedExamData = { ...examData };
+    //通過が存在する場合、通過のvalueを更新
+    if (hasPass) {
+      updatedExamData = updatedPassValue(updatedExamData);
+    }
+    if (updatedExamData) {
       const converted = {
         examMenuId: examMenuId,
-        examResults: examData.examItemGroups
-          ? examData.examItemGroups.flatMap(
+        examResults: updatedExamData.examItemGroups
+          ? updatedExamData.examItemGroups?.flatMap(
               (group) =>
                 group.examItems?.map((examItem) => ({
                   examItemId: examItem.examItemId,
@@ -277,15 +325,27 @@ export default function ConsultInput() {
           const status = error.response.status;
           // エラー処理
           if (status === 400) {
-            errorMessage = getErrorMessage(
-              errorMessages.invalid,
-              "受診番号と検査項目",
-            );
+            errorMessage = getErrorMessage(errorMessages.invalid, "受診番号");
           } else if (status === 404) {
             errorMessage = getErrorMessage(errorMessages.notFound, "検査項目");
           } else if (status === 422) {
             setExamData(result.data);
-            errorBranch(result.data.errorLevel);
+            // 最大 errorLevel を取得
+            const maxErrorLevel = Math.max(
+              0, // デフォルト値として 0 を指定
+              ...(result?.data?.examItemGroups?.flatMap(
+                (group) =>
+                  group.examItems?.flatMap(
+                    (item) =>
+                      item.examRegistResults
+                        ?.map((result) => result.errorLevel)
+                        .filter(
+                          (level): level is number => level !== undefined,
+                        ) || [],
+                  ) || [],
+              ) || []),
+            );
+            errorBranch(maxErrorLevel);
           } else if (status === 500) {
             errorMessage = getErrorMessage(errorMessages.serverError);
           }
@@ -302,11 +362,12 @@ export default function ConsultInput() {
   //検証処理
   const handleVerify = () => {
     setIsLoading(true);
+    //AP1013_検査結果を検証する
     verifyResults();
     setIsLoading(false);
   };
 
-  //検査継続処理
+  // 検査継続処理
   const continuingExam = () => {
     if (!examMenus) return;
     const currentIndex = examMenus.findIndex((menu) => menu === examMenuId);
@@ -342,10 +403,7 @@ export default function ConsultInput() {
           const status = error.response.status;
           // エラー処理
           if (status === 400) {
-            errorMessage = getErrorMessage(
-              errorMessages.invalid,
-              "指定した受診番号",
-            );
+            errorMessage = getErrorMessage(errorMessages.invalid, "回答登録の");
           } else if (status === 403) {
             errorMessage = "会場ロック中です。管理者のみ更新可能です。";
           } else if (status === 404) {
@@ -369,8 +427,25 @@ export default function ConsultInput() {
   //登録処理
   const callbackRegister = () => {
     setIsLoading(true);
+    //AP1014_検査結果を登録する
     registerResults();
     setIsLoading(false);
+  };
+
+  //共通ダイアログ：閉じる処理
+  const callbackCloseCommon = () => {
+    closeCommon();
+    if (commonBrowserbackFlag) {
+      navigate(-1);
+    }
+  };
+
+  //確認ダイアログ：閉じる処理
+  const callbackCloseConfirm = () => {
+    closeConfirm();
+    if (hasPass) {
+      navigate(-1);
+    }
   };
 
   const ExamItemRender = ({
@@ -386,7 +461,8 @@ export default function ConsultInput() {
     if (!examItems || examItems.length === 0) {
       return <Text>検査項目がありません</Text>;
     }
-
+    //通過フラグをリセット
+    setHasPass(false);
     // 共通のコールバック関数
     const handleChange = (updatedExamItem: InputExamItem[] | undefined) =>
       callbackChangeValue(updatedExamItem, groupIndex);
@@ -471,15 +547,34 @@ export default function ConsultInput() {
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={true}
-            onChange={handleChange}
+            onClick={handleChange}
           />
         );
-      case ExamItemGroupType.通過:
-        setConfirmMessage("実施済みです。取消してよろしいですか。");
+      case ExamItemGroupType.通過: {
+        setHasPass(true);
+        //valueを取得
+        const detailValue = examItems
+          ?.find((item) => item.positionNumber === 1)
+          ?.examItemDetails?.find(
+            (detail) => detail.positionNumber === 1,
+          )?.value;
+        // 設定するvalueをset
+        const 実施済み = "1";
+        const newValue = detailValue === 実施済み ? "" : 実施済み;
+        setPassValue(newValue);
+
+        // メッセージの設定
+        if (detailValue === 実施済み) {
+          setConfirmMessage("実施済みです。取消してよろしいですか。");
+        } else {
+          setConfirmMessage("登録します。よろしいですか。");
+        }
+
         openConfirm();
-        return null; // UIのレンダリングをスキップ
+        return null;
+      }
       default:
-        return <Text>未対応のタイプ: {type}</Text>;
+        return;
     }
   };
 
@@ -489,7 +584,7 @@ export default function ConsultInput() {
         <LoadingOverlay visible={isLoading} />
         <ExamineeHeader
           staffName={staffData?.name ?? ""}
-          managerNo={staffData?.id ?? ""}
+          managerNo={examData?.examinee?.ticketNumber ?? ""}
           name={examData?.examinee?.kanaName ?? ""}
           gender={examData?.examinee?.sex ?? 0}
           age={examData?.examinee?.examDateAge ?? 0}
@@ -529,16 +624,16 @@ export default function ConsultInput() {
 
         <ConfirmDialog
           message={confirmMessage}
-          confirmButtonMessage={"登録する"}
+          confirmButtonMessage={"OK"}
           isOpen={openedConfirm}
-          onCancel={closeConfirm}
+          onCancel={callbackCloseConfirm}
           onConfirm={callbackRegister}
         />
         <CommonDialog
           message={commonMessage}
           buttonMessage={commonButtonMessage}
           isOpen={openedCommon}
-          onClose={closeCommon}
+          onClose={callbackCloseCommon}
         />
         <CommonFooter />
       </AuthWrapper>
