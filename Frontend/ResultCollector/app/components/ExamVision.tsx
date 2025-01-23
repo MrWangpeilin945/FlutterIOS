@@ -281,9 +281,7 @@ export default function ExamVision({
     // detailsをエラーチェック
     for (const detail of item.examItemDetails || []) {
       // 選択系の場合はバリデーションチェックをスキップ
-      const isSelector =
-        Array.isArray(detail.examItemDetailOptions) &&
-        detail.examItemDetailOptions.length > 0;
+      const isSelector = detail.type === ExamItemDetailType.入力;
 
       // オーダーが存在するかつ中止理由が存在しない場合
       if (!isSelector && detail.hasOrder && !detail.cancelReasonId) {
