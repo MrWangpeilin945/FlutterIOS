@@ -82,6 +82,8 @@ public class ConsultRepository : IConsultRepository
                         consult_number = new_data.consult_number
                         , note = new_data.note
                         , external_connection_code = new_data.external_connection_code
+                        , place_schedule_id = new_data.place_schedule_id
+                        , examinee_id = new_data.examinee_id
                         , created_at = new_data.created_at
                         , created_by = new_data.created_by 
                         , progress_status =
