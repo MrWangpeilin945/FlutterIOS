@@ -1,9 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 
-using Dapper;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
+
+using Asp.Versioning;
+
+using Dapper;
 
 using NLog.Web;
 
