@@ -4,7 +4,7 @@ import type {
   ExamRegistResult,
   ExamNormalValueRange,
 } from "~/domain/wellship.schemas";
-import { InputErrorLevel } from "~/domain/enums";
+import { InputErrorLevel, ExamItemDetailType } from "~/domain/enums";
 
 // 受け取ったExamItemDetailsから
 // それぞれの最も高いエラーレベルに該当するExamNormalValueRangeを返す
@@ -18,7 +18,7 @@ const getMaxErrorLevelsByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
       if (isDisable) {
         return matchExamRanges; // オーダーが無い場合、中止された検査項目明細の場合は処理をスキップ
       }
-      if (type === 2) {
+      if (type === ExamItemDetailType.選択) {
         return matchExamRanges; // 選択肢を表示する検査項目明細の場合は処理をスキップ
       }
       const numericValue =
