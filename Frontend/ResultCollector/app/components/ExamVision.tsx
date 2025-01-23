@@ -475,8 +475,8 @@ export default function ExamVision({
         } else if (positionNumber === 特記) {
           isSelecterDetail = true;
           detailOptions = [
-            { orderNumber: 1, name: "メガネ不要" },
-            { orderNumber: 2, name: "コンタクト不要" },
+            { orderNumber: 1, name: "メガネ不備" },
+            { orderNumber: 2, name: "コンタクト不備" },
           ];
         }
         if (
@@ -580,8 +580,8 @@ export default function ExamVision({
                     }
                     // 選択ボタン用
                     const isSelector =
-                      (detail.positionNumber === 矯正区分_左 ||
-                        detail.positionNumber === 矯正区分_右) &&
+                      (detail.positionNumber === 左眼 ||
+                        detail.positionNumber === 右眼) &&
                       (isCorrection || isNote);
 
                     return (
