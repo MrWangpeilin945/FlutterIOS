@@ -518,6 +518,7 @@ export default function ExamBP2({
             align="flex-start"
             direction="column"
             mb={16}
+            w={1101}
           >
             <Flex align="center" gap="md">
               <Paper
