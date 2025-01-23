@@ -268,7 +268,7 @@ export default function ExamNumeric({
   const isDisabled = !hasOrder || !!cancelReasonId;
   return (
     <Flex justify="flex-start" align="flex-start" direction="column">
-      <Group w="11168" gap={16}>
+      <Group w={1036} gap={16}>
         <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
           <Text size="lg" fw={700} ta="center">
             {name?.slice(0, 8)}
