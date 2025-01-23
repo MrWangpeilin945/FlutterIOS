@@ -7,9 +7,10 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
 
 /// <inheritdoc/>
-public class RefreshTokenRepository(IDbConnectionProvider dbConnectionProvider) : IRefreshTokenRepository
+public class RefreshTokenRepository(IDbConnectionProvider dbConnectionProvider, TimeProvider timeProvider) : IRefreshTokenRepository
 {
     private readonly IDbConnectionProvider _dbConnectionProvider = dbConnectionProvider;
+    private readonly TimeProvider _timeProvider = timeProvider;
 
     /// <inheritdoc/>
     public async ValueTask<RefreshToken?> GetRefreshTokenOrNullAsync(Guid staffId, Guid sid)
@@ -45,17 +46,19 @@ public class RefreshTokenRepository(IDbConnectionProvider dbConnectionProvider) 
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string query = @"
         merge into resultcollector.refresh_tokens r
-        using (values (@StaffId, @Sid, @Token, @ExpiresAt)) as new_data(
+        using (values (@StaffId, @Sid, @Token, @ExpiresAt, @CreatedAt)) as new_data(
             staff_id
             , sid
             , token
-            , expires_at)
+            , expires_at
+            , created_at)
             on r.staff_id = new_data.staff_id
            and r.sid = new_data.sid
         when matched then
             update
             set
                 token = new_data.token
+                , created_at = new_data.created_at
         when not matched then
             insert (
                 staff_id
@@ -71,7 +74,14 @@ public class RefreshTokenRepository(IDbConnectionProvider dbConnectionProvider) 
                 , new_data.expires_at
                 , 'system'
             );";
-        await connection.ExecuteAsync(query, new { StaffId = staffId, Sid = sid, refreshTokenEntity.Token, refreshTokenEntity.ExpiresAt });
+        await connection.ExecuteAsync(query, new
+        {
+            StaffId = staffId,
+            Sid = sid,
+            refreshTokenEntity.Token,
+            refreshTokenEntity.ExpiresAt,
+            CreatedAt = _timeProvider.GetUtcNow(),
+        });
     }
 
     /// <inheritdoc/>
