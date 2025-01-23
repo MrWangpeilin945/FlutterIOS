@@ -2,6 +2,8 @@ using System.Diagnostics;
 
 using Microsoft.AspNetCore.Mvc;
 
+using Asp.Versioning;
+
 using NSwag.Annotations;
 
 using Ryobi.Wellship.Core.Enums;
