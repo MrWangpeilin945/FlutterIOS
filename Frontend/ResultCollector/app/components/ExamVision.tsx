@@ -18,7 +18,11 @@ import {
   IconSquareRoundedXFilled,
 } from "@tabler/icons-react";
 import { z } from "zod";
-import { InputErrorLevel, KeyboardType } from "~/domain/enums";
+import {
+  InputErrorLevel,
+  KeyboardType,
+  ExamItemDetailType,
+} from "~/domain/enums";
 import type {
   ExamItemDetail,
   ExamItemDetailOption,
@@ -482,8 +486,8 @@ export default function ExamVision({
           (isSelecterDetail &&
             (!detail.examItemDetailOptions ||
               detail.examItemDetailOptions?.length < 2)) || // 選択肢を表示する場所の検査項目明細において、選択肢の設定が未定義もしくは2個無い場合
-          (isSelecterDetail && detail.type === 1) || // 選択肢を表示する場所の検査項目明細において、明細タイプの設定が誤って1（入力テキストボックス）になっている場合
-          (!isSelecterDetail && detail.type === 2) // 入力テキストボックスを表示する場所の検査項目明細において、明細タイプの設定が誤って2（選択肢）になっている場合
+          (isSelecterDetail && detail.type === ExamItemDetailType.入力) || // 選択肢を表示する場所の検査項目明細において、明細タイプの設定が誤って1（入力テキストボックス）になっている場合
+          (!isSelecterDetail && detail.type === ExamItemDetailType.選択) // 入力テキストボックスを表示する場所の検査項目明細において、明細タイプの設定が誤って2（選択肢）になっている場合
         ) {
           return {
             positionNumber: detailPosition,
