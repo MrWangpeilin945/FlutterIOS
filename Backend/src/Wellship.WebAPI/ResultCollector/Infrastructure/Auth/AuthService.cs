@@ -85,30 +85,22 @@ public class AuthService(AuthSettings authSettings,
     /// <inheritdoc/>
     public async ValueTask<(Staff staff, Guid sid, string refreshToken)> RefreshAccessTokenAsync(string jwt, string refreshToken)
     {
-        var tokenHandler = new JwtSecurityTokenHandler()
-        {
-            MapInboundClaims = false
-        };
-        var jwtSecurityToken = tokenHandler.ReadJwtToken(jwt);
-        // 呼び出し元でjwtSecurityTokenを得ているが、CanRefreshAccessTokenAsyncには文字列のjwtを渡します。
-        // https://learn.microsoft.com/en-us/dotnet/api/system.identitymodel.tokens.securitytokenhandler.validatetoken?view=netframework-4.8.1&viewFallbackFrom=net-8.0
-        var (refreshable, staff) = await CanRefreshAccessTokenAsync(jwt, refreshToken);
-        if (!refreshable || staff is null)
+        var (refreshable, sid, staff) = await CanRefreshAccessTokenAsync(jwt, refreshToken);
+        if (!refreshable || staff is null || sid is null)
         {
             throw new WellshipAuthenticationException();
         }
-        var sid = Guid.Parse(jwtSecurityToken.Payload[JwtRegisteredClaimNames.Sid].ToString() ?? "");
-        return (staff, sid, GenerateAccessToken(staff, sid));
+        return (staff, sid.Value, GenerateAccessToken(staff, sid.Value));
     }
 
 
     /// <summary>
     /// アクセストークンをリフレッシュしてよいか確認します。
     /// </summary>
-    /// <param name="jwt">jwt</param>
+    /// <param name="jwt">アクセストークンとして使用しているjwt</param>
     /// <param name="refreshToken">リフレッシュトークン</param>
     /// <returns>バリデーション結果</returns>
-    private async ValueTask<(bool result, Staff? staff)> CanRefreshAccessTokenAsync(string jwt, string refreshToken)
+    private async ValueTask<(bool result, Guid? sid, Staff? staff)> CanRefreshAccessTokenAsync(string jwt, string refreshToken)
     {
         var host = _httpContextAccessor.HttpContext?.Request.Host.Value ?? "";
         var tokenValidationParameters = new TokenValidationParameters
@@ -126,19 +118,18 @@ public class AuthService(AuthSettings authSettings,
         {
             MapInboundClaims = false
         };
-        //
         var result = await tokenHandler.ValidateTokenAsync(jwt, tokenValidationParameters);
         if (result.SecurityToken is not JwtSecurityToken jst ||
             !jst.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
         {
-            return (false, null);
+            return (false, null, null);
         }
 
         // StaffIDが正しいことを確認します
         var sub = result.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (sub is null || !Guid.TryParse(sub, out var staffId))
         {
-            return (false, null);
+            return (false, null, null);
         }
         Staff? staff;
         try
@@ -147,20 +138,24 @@ public class AuthService(AuthSettings authSettings,
         }
         catch (StaffNotFoundException)
         {
-            return (false, null);
+            return (false, null, null);
         }
         // 職員が無効になっている場合は更新させません
         if (!staff.Enabled)
         {
-            return (false, null);
+            return (false, null, null);
         }
         // リフレッシュトークンをチェックします
-        var sid = Guid.Parse(result.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Sid)?.Value ?? "");
+        var sidIsValid = Guid.TryParse(result.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Sid)?.Value, out var sid);
+        if (!sidIsValid)
+        {
+            return (false, null, null);
+        }
         var storedRefreshToken = await _refreshTokenRepository.GetRefreshTokenOrNullAsync(staffId, sid);
         if (storedRefreshToken is null || storedRefreshToken.Token != refreshToken || storedRefreshToken.ExpiresAt < _timeProvider.GetUtcNow())
         {
-            return (false, null);
+            return (false, null, null);
         }
-        return (true, staff);
+        return (true, sid, staff);
     }
 }
