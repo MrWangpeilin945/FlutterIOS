@@ -559,11 +559,12 @@ export default function ConsultInput() {
             (detail) => detail.positionNumber === 1,
           )?.value;
         // 設定するvalueをset
-        const newValue = detailValue === "1" ? "" : "1";
+        const 実施済み = "1";
+        const newValue = detailValue === 実施済み ? "" : 実施済み;
         setPassValue(newValue);
 
         // メッセージの設定
-        if (detailValue === "1") {
+        if (detailValue === 実施済み) {
           setConfirmMessage("実施済みです。取消してよろしいですか。");
         } else {
           setConfirmMessage("登録します。よろしいですか。");
