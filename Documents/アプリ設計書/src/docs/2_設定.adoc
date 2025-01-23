@@ -1,0 +1,39 @@
+= 設定
+
+== 起動設定
+
+=== 起動URL
+
+以下のURLが起動時のベースです。クエリパラメータを付与して機器仕様に合った設定で起動をします。
+
+``
+wellshipserialclient:///deep-link-home
+``
+
+=== クエリパラメータ
+
+[format="csv", options="header, autowidth"]
+|====
+include::設定/クエリパラメータ設定一覧.csv[]
+|====
+
+==== 起動URLサンプル
+
+機器型番AA-58（聴力）の場合
+
+- ボーレート：4800bps（設定）
+- データビット：7bit
+- パリティビット：偶数パリティ
+- ストップビット：1bit
+- 終端文字：ETX
+
+```
+wellshipserialclient:///deep-link-home
+    ?transMethod=wired
+    &title=聴力（選別）
+    &callback=https://dev01.wellship.jp/ResultCollector/Equipments/query-receiver.html
+    &baud=4800
+    &dataBits=7
+    &parity=even
+    &eotString=%03
+```
