@@ -1,0 +1,47 @@
+= RION_AA_Series_monitoring_computer.js
+
+== 返却する検査項目
+
+[options="header",cols="1,2"]
+|===
+
+|検査項目
+|プロパティ名
+
+|精密聴力　右　250Hz	
+|monitoring250HzRight
+
+|精密聴力　左　250Hz	
+|monitoring250HzLeft
+
+|精密聴力　右　500Hz	
+|monitoring500HzRight
+
+|精密聴力　左　500Hz	
+|monitoring500HzLeft
+
+|精密聴力　右　1kHz	
+|monitoring1000HzRight
+
+|精密聴力　左　1kHz	
+|monitoring1000HzLeft
+
+|精密聴力　右　2kHz	
+|monitoring2000HzRight
+
+|精密聴力　左　2kHz	
+|monitoring2000HzLeft
+
+|精密聴力　右　4kHz	
+|monitoring4000HzRight
+
+|精密聴力　左　4kHz	
+|monitoring4000HzLeft
+
+|精密聴力　右　8kHz	
+|monitoring8000HzRight
+
+|精密聴力　左　8kHz	
+|monitoring8000HzLeft
+
+|===

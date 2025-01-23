@@ -22,4 +22,5 @@
 include::docs/1_概要.adoc[leveloffset=+1]
 include::docs/2_検査項目オブジェクト.adoc[leveloffset=+1]
 include::docs/3_機器.adoc[leveloffset=+1]
+include::docs/4_計測結果解析スクリプト.adoc[leveloffset=+1]
 include::docs/改版履歴.adoc[leveloffset=+1]

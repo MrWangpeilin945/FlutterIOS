@@ -1,0 +1,33 @@
+= 計測結果解析スクリプト
+
+== インターフェース
+
+計測結果解析スクリプトは以下の形式の.jsファイルです。
+
+```javascript
+// function名は decode 、引数は base64UrlString
+export function decode(base64UrlString) {
+  // 受け取ったbase64UrlStringをデコードします
+  const rawText = atob(base64UrlString.replace(/-/g, "+").replace(/_/g, "/"));
+
+  /*
+    レイアウトごとの実装
+    rawText → obj
+  */
+
+  // 計測結果オブジェクトを返します
+  return obj;
+}
+
+```
+
+== スクリプト一覧
+
+[format="csv", options="header, autowidth"]
+|====
+include::計測結果解析スクリプト/計測結果解析スクリプトまとめ.csv[]
+|====
+
+※複数の機種で同じレイアウトを使用している場合が多いため、単純な機器名をできるだけ避けようとしています。
+
+※同じシリーズで異なるレイアウトの場合、連番や代表機種名で区別することを考えています。

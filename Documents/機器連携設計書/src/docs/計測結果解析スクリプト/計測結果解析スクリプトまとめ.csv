@@ -1,0 +1,8 @@
+検査,スクリプト名,備考
+身体計測,AD-6350.js,
+腹囲,YAMAYO_DTM_Series.js,
+血圧,TM-2580.js,
+心電図,FUKUDA_FCP_Series.js,
+視力,NV-300.js,
+聴力（選別）,RION_AA_Series_screening_computer.js,選別聴力・コンピュータ向けレイアウト
+聴力（閾値）,RION_AA_Series_monitoring_computer.js,閾値聴力・コンピュータ向けレイアウト
