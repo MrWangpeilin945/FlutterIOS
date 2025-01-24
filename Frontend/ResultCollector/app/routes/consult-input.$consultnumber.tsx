@@ -238,6 +238,8 @@ export default function ConsultInput() {
           };
         }
         setExamData(updatedExamData);
+        // ローカルストレージのデータを削除
+        localStorage.removeItem(localStorageKey);
         // 変更後に監視を解除
         if (isWatching) {
           setIsWatching(false);
