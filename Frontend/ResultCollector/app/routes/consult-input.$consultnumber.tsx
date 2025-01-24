@@ -95,6 +95,7 @@ export default function ConsultInput() {
   //機器連携用
   const localStorageKey = "measurementResult";
   const [isWatching, setIsWatching] = useState(false); // 監視状態を管理するフラグ
+  const [initialDisplay,setInitialDisplay] = useState(true);
 
   //AP1009呼び出し用(GET系APIの定義)
   const { refetch } = useConsultGetInputExamItemsExaminee(
@@ -154,6 +155,7 @@ export default function ConsultInput() {
 
   useEffect(() => {
     if (!examData) return;
+    
     //機器ラベルとvalueが空かをチェック
     const isValueEmptyForEquipmentLabel = (): boolean => {
       return (
@@ -178,7 +180,8 @@ export default function ConsultInput() {
       ); // 機器が選択されていないなら非表示
       setDisabledRemeasurement(!isEmpty); // valueが全て存在する場合無効化
 
-      if (targetConnectionEquipment && isEmpty) {
+      if (targetConnectionEquipment && isEmpty && initialDisplay) {
+        setInitialDisplay(false);
         launchConnectionEquipment();
       }
     };
