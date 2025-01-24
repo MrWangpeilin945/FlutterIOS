@@ -1,0 +1,8 @@
+{
+    "ec2InstanceId": "i-067b2c52312de6548",
+    "dbInstanceIdentifier": "wellship-db1",
+    "frontendEcsClusterName": "wellship-stg-ecs-frontend-culster",
+    "frontendEcsServiceName": "wellship-stg-ecs-frontend-service",
+    "backendEcsClusterName": "wellship-stg-ecs-culster",
+    "backendEcsServiceName": "wellship-stg-ecs-service"
+}
