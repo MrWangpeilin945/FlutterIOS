@@ -145,6 +145,13 @@ export default function ConsultInput() {
     setCommonBrowserbackFlag(false);
   }, [consultNumber, examMenuId]);
 
+  const launchConnectionEquipment = () => {
+    //ローカルストレージの監視を開始
+    setIsWatching(true);
+    // 機器連携アプリへ遷移
+    window.location.href = `${targetConnectionEquipment?.appLaunchUrl}`;
+  };
+
   useEffect(() => {
     if (!examData) return;
     //機器ラベルとvalueが空かをチェック
@@ -172,10 +179,7 @@ export default function ConsultInput() {
       setDisabledRemeasurement(!isEmpty); // valueが全て存在する場合無効化
 
       if (targetConnectionEquipment && isEmpty) {
-        //ローカルストレージの監視を開始
-        setIsWatching(true);
-        // 機器連携アプリへ遷移
-        window.location.href = `${targetConnectionEquipment?.appLaunchUrl}`;
+        launchConnectionEquipment();
       }
     };
     handleRemeasurementCheck();
@@ -183,8 +187,7 @@ export default function ConsultInput() {
 
   //測定ボタン押下時
   const handleRemeasurement = () => {
-    setIsWatching(true);
-    window.location.href = `${targetConnectionEquipment?.appLaunchUrl}`;
+    launchConnectionEquipment();
   };
 
   //解析js呼び出し
@@ -206,12 +209,21 @@ export default function ConsultInput() {
         //value更新処理
         let updatePositionNumberBP = 0; //血圧の対象回数判定用
         let updatedExamData = { ...examData };
+        //血圧のkey
+        const targetKeysBP = ["systolicBP", "diastolicBP", "pulseRate"];
+        //選別聴力のkey
+        const targetKeysSelectiveHearing = [
+          "screening1000HzRight",
+          "screening1000HzLeft",
+          "screening4000HzRight",
+          "screening4000HzLeft",
+        ];
         for (const [key, value] of Object.entries(analyzedData)) {
           let stringValue = String(value);
           // valueがnullの場合は処理を行わない
           if (stringValue === null) continue;
 
-          // equipmentLabelが一致するvalueを更新 
+          // equipmentLabelが一致するvalueを更新
           let isUpdated = false; // 更新が行われたかを追跡するフラグ
           updatedExamData = {
             ...updatedExamData,
@@ -226,25 +238,18 @@ export default function ConsultInput() {
                     !detail.cancelReasonId &&
                     !detail.value &&
                     //血圧の場合、同じitem内に上下の値を設定する
-                    ((key === "systolicBP" ||
-                      key === "diastolicBP" ||
-                      key === "pulseRate") &&
-                    isUpdated
+                    (targetKeysBP.includes(key) && isUpdated
                       ? updatePositionNumberBP === item.positionNumber
                       : true)
                   ) {
                     isUpdated = true;
                     updatePositionNumberBP = item.positionNumber ?? 0;
                     //選別聴力の場合はcodeを取得
-                    if (
-                      key === "screening1000HzRight" ||
-                      key === "screening1000HzLeft" ||
-                      key === "screening4000HzRight" ||
-                      key === "screening4000HzLeft"
-                    ) {
-                      stringValue = detail.examItemDetailOptions?.find(
-                        (option) => value === option.orderNumber,
-                      )?.code??"";
+                    if (targetKeysSelectiveHearing.includes(key)) {
+                      stringValue =
+                        detail.examItemDetailOptions?.find(
+                          (option) => value === option.orderNumber,
+                        )?.code ?? "";
                     }
                     return { ...detail, value: stringValue };
                   }
@@ -258,7 +263,7 @@ export default function ConsultInput() {
         // 変更後に監視を解除
         if (isWatching) {
           setIsWatching(false);
-          window.removeEventListener('storage', handleStorageChange);
+          window.removeEventListener("storage", handleStorageChange);
         }
       }
     };
