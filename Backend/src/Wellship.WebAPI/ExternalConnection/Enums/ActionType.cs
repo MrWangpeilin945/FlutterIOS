@@ -1,4 +1,4 @@
-namespace Ryobi.Wellship.ExternalConnection.Enums;
+namespace Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 
 /// <summary>
 /// 連携モード
