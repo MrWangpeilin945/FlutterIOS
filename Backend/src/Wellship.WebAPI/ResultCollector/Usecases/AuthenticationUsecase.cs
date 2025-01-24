@@ -3,6 +3,7 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth.Settings;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Transaction;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -40,8 +41,12 @@ public class AuthenticationUsecase(IAuthService authService,
         var sid = Guid.NewGuid();
         var accessToken = _authService.GenerateAccessToken(staff, sid);
         var refreshToken = RefreshToken.Create(_timeProvider.GetUtcNow().Add(_authSettings.RefreshTokenLifeTime));
+        using var tran = TransactionScopeHelper.GetTransactionScope();
         await _staffLoginHistoryRepository.WriteLoginSucceededLogAsync(staff);
         await _refreshTokenRepository.UpdateRefreshTokenAsync(staff.StaffId, sid, refreshToken);
+        // 新規ログイン時に対象者の期限切れトークンを削除します
+        await _refreshTokenRepository.DeleteOutdatedRefreshTokensAsync(staff.StaffId);
+        tran.Complete();
         return (accessToken, refreshToken.Token);
     }
 
