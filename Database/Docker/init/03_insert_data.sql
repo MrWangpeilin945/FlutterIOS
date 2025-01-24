@@ -48,16 +48,16 @@ INSERT INTO place_schedule(place_schedule_id,place_id,team_id,status,exam_date,s
   , ('20d6daa6-eac7-4ef4-8ea4-0f3b439668a6','aced0000-0000-0000-0000-000000000001','ea000000-0000-0000-0000-000000000001',21,DATE '2024-11-30','1000',CURRENT_TIMESTAMP,'init');
 
 -- 検査メニュー
-INSERT INTO exam_menus(exam_menu_id,name,order_number,created_at,created_by) VALUES 
-    (1,'身体計測',1,CURRENT_TIMESTAMP,'init')
-  , (2,'視力',2,CURRENT_TIMESTAMP,'init')
-  , (3,'聴力',3,CURRENT_TIMESTAMP,'init')
-  , (4,'心電図',4,CURRENT_TIMESTAMP,'init')
-  , (5,'腹囲',5,CURRENT_TIMESTAMP,'init')
-  , (6,'眼底',6,CURRENT_TIMESTAMP,'init')
-  , (7,'血圧',7,CURRENT_TIMESTAMP,'init')
-  , (8,'眼圧',8,CURRENT_TIMESTAMP,'init')
-  , (9,'握力',9,CURRENT_TIMESTAMP,'init');
+INSERT INTO exam_menus(exam_menu_id,name,order_number,enabled,created_at,created_by) VALUES 
+    (1,'身体計測',1,True,CURRENT_TIMESTAMP,'init')
+  , (2,'視力',2,True,CURRENT_TIMESTAMP,'init')
+  , (3,'聴力',3,True,CURRENT_TIMESTAMP,'init')
+  , (4,'心電図',4,True,CURRENT_TIMESTAMP,'init')
+  , (5,'腹囲',5,True,CURRENT_TIMESTAMP,'init')
+  , (6,'眼底',6,True,CURRENT_TIMESTAMP,'init')
+  , (7,'血圧',7,True,CURRENT_TIMESTAMP,'init')
+  , (8,'眼圧',8,True,CURRENT_TIMESTAMP,'init')
+  , (9,'握力',9,True,CURRENT_TIMESTAMP,'init');
 
 -- 検査項目グループ
 INSERT INTO exam_item_groups(exam_item_group_id,name,exam_menu_id,type,order_number,created_at,created_by) VALUES 

@@ -23,7 +23,7 @@ public class ExamMenuUsecase : IExamMenuUsecase
     /// </summary>
     public async Task<APIModels.Responses.ExamMenuList> GetExamMenusAsync()
     {
-        var menus = await _examMenuRepository.GetExamMenusAsync();
+        var menus = await _examMenuRepository.GetEnabledExamMenusAsync();
         return new APIModels.Responses.ExamMenuList()
         {
             ExamMenus = menus.Select(x => new APIModels.Responses.ExamMenu()

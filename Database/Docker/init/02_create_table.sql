@@ -540,6 +540,7 @@ CREATE TABLE exam_menus (
   exam_menu_id integer NOT NULL
   , name text NOT NULL
   , order_number integer NOT NULL
+  , enabled boolean DEFAULT true NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_menus_PKC PRIMARY KEY (exam_menu_id)
@@ -1230,5 +1231,6 @@ COMMENT ON TABLE exam_menus IS '検査メニュー';
 COMMENT ON COLUMN exam_menus.exam_menu_id IS '検査メニューID';
 COMMENT ON COLUMN exam_menus.name IS '検査メニュー名';
 COMMENT ON COLUMN exam_menus.order_number IS '表示順';
+COMMENT ON COLUMN exam_menus.enabled IS '有効';
 COMMENT ON COLUMN exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN exam_menus.created_by IS '作成者';
