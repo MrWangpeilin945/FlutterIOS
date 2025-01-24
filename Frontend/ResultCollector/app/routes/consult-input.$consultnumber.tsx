@@ -207,24 +207,12 @@ export default function ConsultInput() {
         const scriptUrl = targetConnectionEquipment?.processingScriptUrl;
         const analyzedData = dynamicScriptExecute(base64Data, scriptUrl ?? "");
         //value更新処理
-        let updatePositionNumberBP = 0; //血圧の対象回数判定用
         let updatedExamData = { ...examData };
-        //血圧のkey
-        const targetKeysBP = ["systolicBP", "diastolicBP", "pulseRate"];
-        //選別聴力のkey
-        const targetKeysSelectiveHearing = [
-          "screening1000HzRight",
-          "screening1000HzLeft",
-          "screening4000HzRight",
-          "screening4000HzLeft",
-        ];
         for (const [key, value] of Object.entries(analyzedData)) {
-          let stringValue = String(value);
           // valueがnullの場合は処理を行わない
-          if (stringValue === null) continue;
+          if (value === null) continue;
 
           // equipmentLabelが一致するvalueを更新
-          let isUpdated = false; // 更新が行われたかを追跡するフラグ
           updatedExamData = {
             ...updatedExamData,
             examItemGroups: updatedExamData.examItemGroups?.map((group) => ({
@@ -236,22 +224,9 @@ export default function ConsultInput() {
                     detail.equipmentLabel === key &&
                     detail.hasOrder &&
                     !detail.cancelReasonId &&
-                    !detail.value &&
-                    //血圧の場合、同じitem内に上下の値を設定する
-                    (targetKeysBP.includes(key) && isUpdated
-                      ? updatePositionNumberBP === item.positionNumber
-                      : true)
+                    !detail.value
                   ) {
-                    isUpdated = true;
-                    updatePositionNumberBP = item.positionNumber ?? 0;
-                    //選別聴力の場合はcodeを取得
-                    if (targetKeysSelectiveHearing.includes(key)) {
-                      stringValue =
-                        detail.examItemDetailOptions?.find(
-                          (option) => value === option.orderNumber,
-                        )?.code ?? "";
-                    }
-                    return { ...detail, value: stringValue };
+                    return { ...detail, value: String(value) };
                   }
                   return detail;
                 }),
