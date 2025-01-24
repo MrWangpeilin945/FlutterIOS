@@ -25,10 +25,10 @@ public interface IAuthService
     /// <summary>
     /// 指定した職員のアクセストークンをリフレッシュします
     /// </summary>
-    /// <param name="jwt">アクセストークン</param>
+    /// <param name="oldAccessToken">アクセストークン</param>
     /// <param name="refreshToken">リフレッシュトークン</param>
     /// <returns></returns>
-    public ValueTask<(Staff staff, Guid sid, string refreshToken)> RefreshAccessTokenAsync(string jwt, string refreshToken);
+    public ValueTask<(Staff staff, Guid sid, string newAccessToken)> RefreshAccessTokenAsync(string oldAccessToken, string refreshToken);
 }
 
 /// <inheritdoc/>
@@ -83,9 +83,9 @@ public class AuthService(AuthSettings authSettings,
     }
 
     /// <inheritdoc/>
-    public async ValueTask<(Staff staff, Guid sid, string refreshToken)> RefreshAccessTokenAsync(string jwt, string refreshToken)
+    public async ValueTask<(Staff staff, Guid sid, string newAccessToken)> RefreshAccessTokenAsync(string oldAccessToken, string refreshToken)
     {
-        var (refreshable, sid, staff) = await CanRefreshAccessTokenAsync(jwt, refreshToken);
+        var (refreshable, sid, staff) = await CanRefreshAccessTokenAsync(oldAccessToken, refreshToken);
         if (!refreshable || staff is null || sid is null)
         {
             throw new WellshipAuthenticationException();
