@@ -1,4 +1,4 @@
-using Ryobi.Wellship.ExternalConnection.Enums;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 /// <summary>

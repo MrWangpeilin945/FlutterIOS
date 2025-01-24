@@ -1,8 +1,7 @@
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
-using Npgsql.Internal;
-using System.Globalization;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
 /// <summary>
@@ -217,7 +216,7 @@ public class ConsultUsecase : IConsultUsecase
             }
         }
         // 削除
-        foreach(var warning in consults.Where(x => x.ActionType == Wellship.ExternalConnection.Enums.ActionType.削除)
+        foreach(var warning in consults.Where(x => x.ActionType == ActionType.削除)
                                        .Where(x => !ExternalConnectionCodes.Select(x => x.ConnectionCode).Contains(x.ConnectionCode)) 
                                        .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
         {
