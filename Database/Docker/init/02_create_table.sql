@@ -307,11 +307,12 @@ CREATE TABLE prior_exam_menus (
 
 CREATE TABLE refresh_tokens (
   staff_id uuid NOT NULL
+  , sid uuid NOT NULL
   , token text NOT NULL
   , expires_at timestamp with time zone NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
-  , CONSTRAINT refresh_tokens_PKC PRIMARY KEY (staff_id)
+  , CONSTRAINT refresh_tokens_PKC PRIMARY KEY (staff_id, sid)
 );
 
 CREATE TABLE staff_login_histories (
@@ -1063,6 +1064,7 @@ COMMENT ON COLUMN prior_exam_menus.created_by IS '作成者';
 
 COMMENT ON TABLE refresh_tokens IS 'リフレッシュトークン';
 COMMENT ON COLUMN refresh_tokens.staff_id IS '職員ID';
+COMMENT ON COLUMN refresh_tokens.sid IS 'セッションID';
 COMMENT ON COLUMN refresh_tokens.token IS 'リフレッシュトークン';
 COMMENT ON COLUMN refresh_tokens.expires_at IS '有効期限';
 COMMENT ON COLUMN refresh_tokens.created_at IS '作成日時';

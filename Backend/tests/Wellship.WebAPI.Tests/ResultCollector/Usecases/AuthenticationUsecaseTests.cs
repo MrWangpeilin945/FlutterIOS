@@ -57,10 +57,10 @@ public class AuthenticationUsecaseTests
         };
         var staff = new Staff(staffEntity);
         _staffRepository.Setup(x => x.GetStaffByLoginIdAsync(It.IsAny<string>())).ReturnsAsync(staff);
-        _authService.Setup(x => x.GenerateAccessToken(It.IsAny<Staff>())).Returns("accessToken");
+        _authService.Setup(x => x.GenerateAccessToken(It.IsAny<Staff>(), It.IsAny<Guid>())).Returns("accessToken");
         _staffLoginHistoryRepository.Setup(x => x.WriteLoginSucceededLogAsync(It.IsAny<Staff>())).Returns(ValueTask.CompletedTask);
-        _refreshTokenRepository.Setup(x => x.ExpireRefreshTokenAsync(It.IsAny<Guid>())).Returns(ValueTask.CompletedTask);
-        _refreshTokenRepository.Setup(x => x.UpdateRefreshTokenAsync(It.IsAny<Guid>(), It.IsAny<RefreshToken>())).Returns(ValueTask.CompletedTask);
+        _refreshTokenRepository.Setup(x => x.ExpireRefreshTokenAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(ValueTask.CompletedTask);
+        _refreshTokenRepository.Setup(x => x.UpdateRefreshTokenAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<RefreshToken>())).Returns(ValueTask.CompletedTask);
 
         var usecase = new AuthenticationUsecase(_authService.Object, _authSettings, _staffRepository.Object,
                                                 _refreshTokenRepository.Object, _staffLoginHistoryRepository.Object, _timeProvider);
@@ -93,7 +93,7 @@ public class AuthenticationUsecaseTests
         };
         var staff = new Staff(staffEntity);
         _staffRepository.Setup(x => x.GetStaffByLoginIdAsync(It.IsAny<string>())).ReturnsAsync(staff);
-        _authService.Setup(x => x.GenerateAccessToken(It.IsAny<Staff>())).Returns("accessToken");
+        _authService.Setup(x => x.GenerateAccessToken(It.IsAny<Staff>(), It.IsAny<Guid>())).Returns("accessToken");
         _staffLoginHistoryRepository.Setup(x => x.WriteLoginFailedLogAsync(It.IsAny<Staff>())).Returns(ValueTask.CompletedTask);
 
         var usecase = new AuthenticationUsecase(_authService.Object, _authSettings, _staffRepository.Object,
@@ -109,6 +109,7 @@ public class AuthenticationUsecaseTests
         // Arrange
         var oldAccessToken = "oldAccessToken";
         var oldRefreshToken = "oldRefreshToken";
+        var sid = Guid.Parse("abcd0000-0000-0000-0000-000000000001");
         var newAccessToken = "newAccessToken";
         var newRefreshToken = RefreshToken.Create(_timeProvider.GetUtcNow().Add(_authSettings.RefreshTokenLifeTime));
 
@@ -129,8 +130,8 @@ public class AuthenticationUsecaseTests
 
         var staff = new Staff(staffEntity);
 
-        _authService.Setup(x => x.RefreshAccessTokenAsync(oldAccessToken, oldRefreshToken)).ReturnsAsync((staff, newAccessToken));
-        _refreshTokenRepository.Setup(x => x.UpdateRefreshTokenAsync(staff.StaffId, It.IsAny<RefreshToken>())).Returns(ValueTask.CompletedTask);
+        _authService.Setup(x => x.RefreshAccessTokenAsync(oldAccessToken, oldRefreshToken)).ReturnsAsync((staff, sid, newAccessToken));
+        _refreshTokenRepository.Setup(x => x.UpdateRefreshTokenAsync(staff.StaffId, sid, It.IsAny<RefreshToken>())).Returns(ValueTask.CompletedTask);
 
         var usecase = new AuthenticationUsecase(_authService.Object, _authSettings, _staffRepository.Object,
                                                 _refreshTokenRepository.Object, _staffLoginHistoryRepository.Object, _timeProvider);
