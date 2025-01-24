@@ -26,4 +26,10 @@ public interface IRefreshTokenRepository
     /// <param name="sid">セッションID</param>
     /// <param name="staffId">職員ID</param>
     public ValueTask ExpireRefreshTokenAsync(Guid staffId, Guid sid);
+    /// <summary>
+    /// 指定した職員IDの有効期限切れリフレッシュトークンを削除します
+    /// </summary>
+    /// <param name="staffId">職員ID</param>
+    public ValueTask DeleteOutdatedRefreshTokensAsync(Guid staffId);
+
 }

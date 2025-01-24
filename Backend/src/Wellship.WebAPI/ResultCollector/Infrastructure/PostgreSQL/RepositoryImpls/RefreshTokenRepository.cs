@@ -96,4 +96,18 @@ public class RefreshTokenRepository(IDbConnectionProvider dbConnectionProvider, 
         and sid = @Sid;";
         await connection.ExecuteAsync(query, new { StaffId = staffId, Sid = sid });
     }
+
+    /// <inheritdoc/>
+    public async ValueTask DeleteOutdatedRefreshTokensAsync(Guid staffId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        var utcNow = _timeProvider.GetUtcNow();
+        const string query = @"
+        delete
+            from resultcollector.refresh_tokens
+        where
+            staff_id = @StaffId
+        and expires_at < @Now";
+        await connection.ExecuteAsync(query, new { StaffId = staffId, Now = utcNow });
+    }
 }
