@@ -486,10 +486,11 @@ Top=1000
 Field="検査メニューID","exam_menu_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査メニュー名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="有効","enabled","boolean","NOT NULL",,"true","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241112141222
+ModifiedDateTime=20250124092251
 Position="MAIN",2150,1000
 ZOrder=30
 
