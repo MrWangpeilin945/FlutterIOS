@@ -7,9 +7,9 @@ public interface IExamMenuRepository
 {
     /// <summary>
     /// 検査メニューを取得します。
-    /// テナントに設定されているすべての検査メニューを表示順昇順で取得します。 
+    /// テナントに設定されている有効な検査メニューを表示順昇順で取得します。 
     /// </summary>
-    public Task<IEnumerable<Models.ExamMenu>> GetExamMenusAsync();
+    public Task<IEnumerable<Models.ExamMenu>> GetEnabledExamMenusAsync();
 
     /// <summary>
     /// 前提検査メニューの設定一覧を取得します。

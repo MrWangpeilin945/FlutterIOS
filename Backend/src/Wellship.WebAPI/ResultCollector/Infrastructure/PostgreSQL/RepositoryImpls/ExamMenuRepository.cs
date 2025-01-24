@@ -25,9 +25,9 @@ public class ExamMenuRepository : IExamMenuRepository
 
     /// <summary>
     /// 検査メニューを取得します。
-    /// テナントに設定されているすべての検査メニューを表示順昇順で取得します。 
+    /// テナントに設定されている有効な検査メニューを表示順昇順で取得します。 
     /// </summary>
-    public async Task<IEnumerable<ExamMenu>> GetExamMenusAsync()
+    public async Task<IEnumerable<ExamMenu>> GetEnabledExamMenusAsync()
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
@@ -36,6 +36,8 @@ public class ExamMenuRepository : IExamMenuRepository
             , name as MenuName 
         from
             resultcollector.exam_menus 
+        where
+            enabled = true 
         order by
             order_number;";
 
