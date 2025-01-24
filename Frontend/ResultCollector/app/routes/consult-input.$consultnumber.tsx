@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
+import {
+  type MetaFunction,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "@remix-run/react";
 import { Button, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useAtom } from "jotai";
@@ -39,6 +44,10 @@ import ExamVision from "~/components/ExamVision";
 import ExamHearing from "~/components/ExamHearing";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
+export const meta: MetaFunction = () => {
+  return [{ title: "検査結果入力" }];
+};
+
 export default function ConsultInput() {
   const navigate = useNavigate();
   const [examData, setExamData] = useState<InputExamItems>();
@@ -47,32 +56,46 @@ export default function ConsultInput() {
   // クエリパラメータの取得
   const [searchParams] = useSearchParams();
   const examMenuId = Number(searchParams.get("exammenuid"));
+  // 登録ボタンフラグ
+  const [isRegisterPressed, setIsRegisterPressed] = useState(false);
   //APIのバージョン
   const apiVersion = "1";
+  //職員の状態管理
   const [staffData] = useAtom(staffState);
+  //検査メニューの状態管理
   const [examMenus] = useAtom(examMenuState);
-  const [ConnectionEquipment] = useAtom(connectionEquipmentState);
+  //機器連携の状態管理
+  const [connectionEquipment] = useAtom(connectionEquipmentState);
+  const targetConnectionEquipment = connectionEquipment?.find(
+    (item) => item.examMenuId === examMenuId,
+  )?.equipment;
+  //ローディング管理
   const [isLoading, setIsLoading] = useState(false);
+  //共通ダイアログ表示管理
   const [openedCommon, { open: openCommon, close: closeCommon }] =
     useDisclosure(false);
+  // 共通ダイアログで表示するメッセージ
+  const [commonMessage, setCommonMessage] = useState<string>("");
+  //共通ダイアログのボタンラベル
+  const [commonButtonMessage, setCommonButtonMessage] = useState<string>("");
+  //確認ダイアログ表示管理
   const [openedConfirm, { open: openConfirm, close: closeConfirm }] =
     useDisclosure(false);
-  const [commonMessage, setCommonMessage] = useState<string>("");
+  // 確認ダイアログで表示するメッセージ
   const [confirmMessage, setConfirmMessage] = useState<string>("");
-  const [commonButtonMessage, setCommonButtonMessage] = useState<string>("");
+  // 共通ダイアログのボタン押下時にブラウザバック処理を追加するフラグ
   const [commonBrowserbackFlag, setCommonBrowserbackFlag] = useState(false);
   // 通過用
   const [hasPass, setHasPass] = useState(false);
   const [passValue, setPassValue] = useState("");
-  //測定ボタン用
+  //測定ボタンの表示切り替え
   const [visibleRemeasurement, setVisibleRemeasurement] = useState(true);
+  //測定ボタンの無効切り替え
   const [disabledRemeasurement, setDisabledRemeasurement] = useState(false);
   //機器連携用
-  const localStorageKey = "value"; //TODO:Keyは未確定
-  const [value, setValue] = useState<string>(
-    localStorage.getItem(localStorageKey) || "",
-  ); //TODO:jsonにvalueセット方法どうするか
+  const localStorageKey = "measurementResult";
   const [isWatching, setIsWatching] = useState(false); // 監視状態を管理するフラグ
+  const [initialDisplay,setInitialDisplay] = useState(true);
 
   //AP1009呼び出し用(GET系APIの定義)
   const { refetch } = useConsultGetInputExamItemsExaminee(
@@ -123,9 +146,17 @@ export default function ConsultInput() {
     setCommonBrowserbackFlag(false);
   }, [consultNumber, examMenuId]);
 
+  const launchConnectionEquipment = () => {
+    //ローカルストレージの監視を開始
+    setIsWatching(true);
+    // 機器連携アプリへ遷移
+    window.location.href = `${targetConnectionEquipment?.appLaunchUrl}`;
+  };
+
   useEffect(() => {
     if (!examData) return;
-
+    
+    //機器ラベルとvalueが空かをチェック
     const isValueEmptyForEquipmentLabel = (): boolean => {
       return (
         examData.examItemGroups?.some((group) =>
@@ -138,35 +169,82 @@ export default function ConsultInput() {
       );
     };
 
+    // 機器連携
     const handleRemeasurementCheck = () => {
       const isEmpty = isValueEmptyForEquipmentLabel();
 
-      setVisibleRemeasurement(!!connectionEquipmentState); // 機器が選択されていないなら非表示
-      setDisabledRemeasurement(isEmpty); // valueが空なら無効化
+      setVisibleRemeasurement(
+        !!targetConnectionEquipment &&
+          !!targetConnectionEquipment.appLaunchUrl &&
+          !!targetConnectionEquipment.processingScriptUrl,
+      ); // 機器が選択されていないなら非表示
+      setDisabledRemeasurement(!isEmpty); // valueが全て存在する場合無効化
 
-      if (connectionEquipmentState && isEmpty) {
-        setIsWatching(true);
-        // TODO: 機器連携アプリへ遷移
+      if (targetConnectionEquipment && isEmpty && initialDisplay) {
+        setInitialDisplay(false);
+        launchConnectionEquipment();
       }
     };
-    //TODO:初期表示の時だけ処理を走らせるか確認
     handleRemeasurementCheck();
-  }, [examData, connectionEquipmentState]);
+  }, [examData, connectionEquipment]);
+
+  //測定ボタン押下時
+  const handleRemeasurement = () => {
+    launchConnectionEquipment();
+  };
+
+  //解析js呼び出し
+  const dynamicScriptExecute = async (data: string, scriptPath: string) => {
+    const module = await import(/* @vite-ignore */ `${scriptPath}`);
+    const output = module.decode(data);
+    return output;
+  };
 
   //機器連携：監視用
   useEffect(() => {
-    const initialValue = localStorage.getItem(localStorageKey || "");
-    setValue(initialValue ?? "");
     // StorageEventの変更を監視する関数
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === "value") {
-        setValue(event.newValue || "");
-        //TODO:valueにsetする処理　どこのvalueを更新するかの判定をどうするか
+      if (event.key === localStorageKey) {
+        const base64Data = event.newValue ?? "";
+        //解析js呼び出し処理
+        const scriptUrl = targetConnectionEquipment?.processingScriptUrl;
+        const analyzedData = dynamicScriptExecute(base64Data, scriptUrl ?? "");
+        //value更新処理
+        let updatedExamData = { ...examData };
+        for (const [key, value] of Object.entries(analyzedData)) {
+          // valueがnullの場合は処理を行わない
+          if (value === null) continue;
 
-        // 初回の変更後に監視を解除
+          // equipmentLabelが一致するvalueを更新
+          updatedExamData = {
+            ...updatedExamData,
+            examItemGroups: updatedExamData.examItemGroups?.map((group) => ({
+              ...group,
+              examItems: group.examItems?.map((item) => ({
+                ...item,
+                examItemDetails: item.examItemDetails?.map((detail) => {
+                  if (
+                    detail.equipmentLabel === key &&
+                    detail.hasOrder &&
+                    !detail.cancelReasonId &&
+                    !detail.value
+                  ) {
+                    return { ...detail, value: String(value) };
+                  }
+                  return detail;
+                }),
+              })),
+            })),
+          };
+        }
+        setExamData(updatedExamData);
+        // 変更後に監視を解除
         if (isWatching) {
           setIsWatching(false);
+          window.removeEventListener("storage", handleStorageChange);
         }
+        // ローカルストレージのデータを削除
+        localStorage.removeItem(localStorageKey);
       }
     };
 
@@ -213,14 +291,6 @@ export default function ConsultInput() {
         };
       });
     }
-  };
-
-  //TODO：機器連携
-  //再計測ボタン押下時
-  const handleRemeasurement = () => {
-    setIsWatching(true);
-    //TODO:機器連携アプリへ遷移
-    //TODO:js呼び出し処理以降
   };
 
   //通過のvalueを更新
@@ -288,7 +358,7 @@ export default function ConsultInput() {
   //エラーレベルによる分岐処理
   const errorBranch = (errorLevel?: number) => {
     if (errorLevel === InputErrorLevel.異常) {
-      setCommonMessage("エラーがあります。内容を確認してください"); //改行文字入れるかも
+      setCommonMessage("エラーがあります。内容を確認してください");
       setCommonButtonMessage("閉じる");
       openCommon();
     } else if (errorLevel === InputErrorLevel.警告) {
@@ -361,6 +431,7 @@ export default function ConsultInput() {
 
   //検証処理
   const handleVerify = () => {
+    setIsRegisterPressed(true);
     setIsLoading(true);
     //AP1013_検査結果を検証する
     verifyResults();
@@ -372,9 +443,11 @@ export default function ConsultInput() {
     if (!examMenus) return;
     const currentIndex = examMenus.findIndex((menu) => menu === examMenuId);
     if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
+      //次の検査メニューIDが存在する場合、検査内容確認画面へ遷移
       const nextExam = examMenus[currentIndex + 1];
       navigate(`/examorder-confirm/${consultNumber}?exammenuid=${nextExam}`);
     } else {
+      //最後の検査メニューの場合、受診番号入力画面へ遷移
       navigate(`/consultnumber-input?consultnumber=${consultNumber}`);
     }
   };
@@ -424,15 +497,15 @@ export default function ConsultInput() {
     postMutateAsync();
   };
 
-  //登録処理
+  // 登録処理
   const callbackRegister = () => {
     setIsLoading(true);
-    //AP1014_検査結果を登録する
+    // AP1014_検査結果を登録する
     registerResults();
     setIsLoading(false);
   };
 
-  //共通ダイアログ：閉じる処理
+  // 共通ダイアログ：閉じる処理
   const callbackCloseCommon = () => {
     closeCommon();
     if (commonBrowserbackFlag) {
@@ -440,7 +513,7 @@ export default function ConsultInput() {
     }
   };
 
-  //確認ダイアログ：閉じる処理
+  // 確認ダイアログ：閉じる処理
   const callbackCloseConfirm = () => {
     closeConfirm();
     if (hasPass) {
@@ -448,6 +521,7 @@ export default function ConsultInput() {
     }
   };
 
+  // 検査項目コンポーネントのレンダリング
   const ExamItemRender = ({
     groupIndex,
     examItemGroup,
@@ -461,7 +535,7 @@ export default function ConsultInput() {
     if (!examItems || examItems.length === 0) {
       return <Text>検査項目がありません</Text>;
     }
-    //通過フラグをリセット
+    // 通過フラグをリセット
     setHasPass(false);
     // 共通のコールバック関数
     const handleChange = (updatedExamItem: InputExamItem[] | undefined) =>
@@ -474,7 +548,7 @@ export default function ConsultInput() {
           <ExamNumeric
             key={groupIndex}
             examItems={examItems}
-            onRegisterPressed={true}
+            onRegisterPressed={isRegisterPressed}
             onChange={handleChange}
           />
         );
@@ -483,7 +557,7 @@ export default function ConsultInput() {
           <ExamSelect
             key={groupIndex}
             examItems={examItems}
-            onRegisterPressed={true}
+            onRegisterPressed={isRegisterPressed}
             onClick={handleChange}
           />
         );
@@ -492,7 +566,7 @@ export default function ConsultInput() {
           <ExamBP2
             key={groupIndex}
             examItems={examItems}
-            onRegisterPressed={true}
+            onRegisterPressed={isRegisterPressed}
             onChange={handleChange}
           />
         );
@@ -501,7 +575,7 @@ export default function ConsultInput() {
           <ExamFreeInput
             key={groupIndex}
             examItems={examItems}
-            onRegisterPressed={true}
+            onRegisterPressed={isRegisterPressed}
             onChange={handleChange}
           />
         );
@@ -510,7 +584,7 @@ export default function ConsultInput() {
           <ExamNumericLR
             key={groupIndex}
             examItems={examItems}
-            onRegisterPressed={true}
+            onRegisterPressed={isRegisterPressed}
             onChange={handleChange}
           />
         );
@@ -519,7 +593,7 @@ export default function ConsultInput() {
           <ExamSelectLR
             key={groupIndex}
             examItems={examItems}
-            onRegisterPressed={true}
+            onRegisterPressed={isRegisterPressed}
             onClick={handleChange}
           />
         );
@@ -528,7 +602,7 @@ export default function ConsultInput() {
           <ExamBody
             key={groupIndex}
             examItems={examItems}
-            onRegisterPressed={true}
+            onRegisterPressed={isRegisterPressed}
             onChange={handleChange}
           />
         );
@@ -537,7 +611,7 @@ export default function ConsultInput() {
           <ExamVision
             key={groupIndex}
             examItems={examItems}
-            onRegisterPressed={true}
+            onRegisterPressed={isRegisterPressed}
             onChange={handleChange}
           />
         );
@@ -546,7 +620,7 @@ export default function ConsultInput() {
           <ExamHearing
             key={groupIndex}
             examItems={examItems}
-            onRegisterPressed={true}
+            onRegisterPressed={isRegisterPressed}
             onClick={handleChange}
           />
         );
@@ -571,7 +645,7 @@ export default function ConsultInput() {
         }
 
         openConfirm();
-        return null;
+        return;
       }
       default:
         return;
@@ -582,6 +656,7 @@ export default function ConsultInput() {
     <>
       <AuthWrapper>
         <LoadingOverlay visible={isLoading} />
+        {/* 受診者ヘッダー */}
         <ExamineeHeader
           staffName={staffData?.name ?? ""}
           managerNo={examData?.examinee?.ticketNumber ?? ""}
@@ -589,8 +664,10 @@ export default function ConsultInput() {
           gender={examData?.examinee?.sex ?? 0}
           age={examData?.examinee?.examDateAge ?? 0}
         />
+        {/* ブース特記 */}
         <BoothNote relatedExamItems={examData?.relatedExamItems ?? []} />
         <Stack align="center" gap={32} px={32} mt={32}>
+          {/* 測定ボタン */}
           {visibleRemeasurement && (
             <Button
               ml="auto"
@@ -601,13 +678,14 @@ export default function ConsultInput() {
               fw={700}
               variant="outline"
               bg="white"
-              color="gray03"
               c="black"
+              bd={`2px solid ${disabledRemeasurement ? "" : "gray03"}`}
               onClick={handleRemeasurement}
             >
               測定する
             </Button>
           )}
+          {/* 検査項目コンポーネント */}
           {examData?.examItemGroups?.map(
             (examItemGroup: ExamItemGroup, index: number) => (
               <ExamItemRender
@@ -617,11 +695,12 @@ export default function ConsultInput() {
               />
             ),
           )}
-          <Button w={860} h={75} my={30} onClick={handleVerify}>
+          {/* 登録ボタン */}
+          <Button w={860} h={75} mt={24} mb={83} onClick={handleVerify}>
             登録する
           </Button>
         </Stack>
-
+        {/* 確認ダイアログ */}
         <ConfirmDialog
           message={confirmMessage}
           confirmButtonMessage={"OK"}
@@ -629,6 +708,7 @@ export default function ConsultInput() {
           onCancel={callbackCloseConfirm}
           onConfirm={callbackRegister}
         />
+        {/* 共通ダイアログ */}
         <CommonDialog
           message={commonMessage}
           buttonMessage={commonButtonMessage}
