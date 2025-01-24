@@ -1,15 +1,15 @@
 # EC2インスタンスのステータスを取得する関数
 function Get-EC2Status {
     param ([string]$ec2InstanceId)
-    $status = aws ec2 describe-instances --instance-ids $($ec2InstanceId) --query 'Reservations[0].Instances[0].State.Name' --output json
-    return $status
+    $status = aws ec2 describe-instances --instance-ids $($ec2InstanceId) --query 'Reservations[0].Instances[0].State.Name' --output text
+    return $status -replace '"'
 }
 
 # RDSインスタンスのステータスを取得する関数
 function Get-RDSStatus {
     param ([string]$dbInstanceIdentifier)
-    $status = aws rds describe-db-instances --db-instance-identifier $($dbInstanceIdentifier) --query 'DBInstances[0].DBInstanceStatus' --output json
-    return $status
+    $status = aws rds describe-db-instances --db-instance-identifier $($dbInstanceIdentifier) --query 'DBInstances[0].DBInstanceStatus' --output text
+    return $status -replace '"'
 }
 
 # ECSサービスのタスク数を取得する関数

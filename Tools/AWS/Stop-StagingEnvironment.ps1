@@ -1,8 +1,11 @@
 # 共通関数をインポート
-Import-Module -Name .\AWSCLIFunctions.psm1
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$modulePath = Join-Path -Path $scriptDir -ChildPath "AWSCLIFunctions.psm1"
+Import-Module -Name $modulePath
 
 # 外部ファイルから設定を読み込む
-$config = Get-Content -Raw -Path "config.json" | ConvertFrom-Json
+$configPath = Join-Path -Path $scriptDir -ChildPath "config.json"
+$config = Get-Content -Raw -Path $configPath | ConvertFrom-Json
 
 $ec2InstanceId = $config.ec2InstanceId
 $dbInstanceIdentifier = $config.dbInstanceIdentifier
@@ -46,10 +49,10 @@ Write-Output "サービスを停止しています。お待ちください..."
 $ec2Job = $null
 if ($ec2Status -eq "running") {
     Write-Output "EC2インスタンスを停止しています: $($ec2InstanceId)"
-    aws ec2 stop-instances --instance-ids $($ec2InstanceId) --output json
+    aws ec2 stop-instances --instance-ids $($ec2InstanceId) --output json | Out-Null
     $ec2Job = Start-Job -ScriptBlock {
         param ($instanceId)
-        aws ec2 wait instance-stopped --instance-ids $($instanceId) --output json
+        aws ec2 wait instance-stopped --instance-ids $($instanceId) --output json | Out-Null
     } -ArgumentList $ec2InstanceId
 }
 
@@ -57,10 +60,10 @@ if ($ec2Status -eq "running") {
 $rdsJob = $null
 if ($rdsStatus -eq "available") {
     Write-Output "RDSインスタンスを停止しています: $($dbInstanceIdentifier)"
-    aws rds stop-db-instance --db-instance-identifier $($dbInstanceIdentifier) --output json
+    aws rds stop-db-instance --db-instance-identifier $($dbInstanceIdentifier) --output json | Out-Null
     $rdsJob = Start-Job -ScriptBlock {
         param ($dbInstanceId)
-        aws rds wait db-instance-stopped --db-instance-identifier $($dbInstanceId) --output json
+        aws rds wait db-instance-stopped --db-instance-identifier $($dbInstanceId) --output json | Out-Null
     } -ArgumentList $dbInstanceIdentifier
 }
 
@@ -68,11 +71,11 @@ if ($rdsStatus -eq "available") {
 $frontendEcsJob = $null
 if ($frontendEcsTaskCount -ne 0) {
     Write-Output "フロントエンドECSサービスを更新しています: $($frontendEcsServiceName) in cluster: $($frontendEcsClusterName) to desired count 0"
-    aws ecs update-service --cluster $($frontendEcsClusterName) --service $($frontendEcsServiceName) --desired-count 0 --output json
+    aws ecs update-service --cluster $($frontendEcsClusterName) --service $($frontendEcsServiceName) --desired-count 0 --output json | Out-Null
     $frontendEcsJob = Start-Job -ScriptBlock {
         param ($clusterName, $serviceName)
         do {
-            $taskCount = aws ecs describe-services --cluster $($clusterName) --services $($serviceName) --query 'services[0].runningCount' --output json
+            $taskCount = aws ecs describe-services --cluster $($clusterName) --services $($serviceName) --query 'services[0].runningCount' --output json | Out-Null
             Start-Sleep -Seconds 10
         } while ($taskCount -ne 0)
     } -ArgumentList $frontendEcsClusterName, $frontendEcsServiceName
@@ -82,11 +85,11 @@ if ($frontendEcsTaskCount -ne 0) {
 $backendEcsJob = $null
 if ($backendEcsTaskCount -ne 0) {
     Write-Output "バックエンドECSサービスを更新しています: $($backendEcsServiceName) in cluster: $($backendEcsClusterName) to desired count 0"
-    aws ecs update-service --cluster $($backendEcsClusterName) --service $($backendEcsServiceName) --desired-count 0 --output json
+    aws ecs update-service --cluster $($backendEcsClusterName) --service $($backendEcsServiceName) --desired-count 0 --output json | Out-Null
     $backendEcsJob = Start-Job -ScriptBlock {
         param ($clusterName, $serviceName)
         do {
-            $taskCount = aws ecs describe-services --cluster $($clusterName) --services $($serviceName) --query 'services[0].runningCount' --output json
+            $taskCount = aws ecs describe-services --cluster $($clusterName) --services $($serviceName) --query 'services[0].runningCount' --output json | Out-Null
             Start-Sleep -Seconds 10
         } while ($taskCount -ne 0)
     } -ArgumentList $backendEcsClusterName, $backendEcsServiceName
