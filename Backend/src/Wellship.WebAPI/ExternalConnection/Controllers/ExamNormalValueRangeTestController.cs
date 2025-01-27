@@ -2,6 +2,8 @@ using System.Diagnostics;
 
 using Microsoft.AspNetCore.Mvc;
 
+using Asp.Versioning;
+
 using NSwag.Annotations;
 
 using Ryobi.Wellship.Core.Enums;
@@ -69,6 +71,28 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
             }
 
             return examNormalValueRanges;
+        }
+
+        /// <summary>
+        /// EC2009_基準値(範囲)を登録する
+        /// </summary>
+        /// <param name="request">連携データ</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/v{version:apiVersion}/ec2009/examNormalValueRange")]
+        public async Task<IActionResult> StoreExamNormalValueRangeAsync([FromBody] ExamNormalValueRange[] request)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
+            var result = await _examNormalValueRange.StoreExamNormalValueRangeAsync(request.ToList());
+
+            var processingTime = stopwatch.Elapsed.TotalSeconds;
+            return Ok(new
+            {
+                DataProcessingTime = processingTime.ToString() + "秒",
+                ErrorObject = result
+            });
         }
     }
 }

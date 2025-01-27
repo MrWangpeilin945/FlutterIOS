@@ -115,7 +115,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                 await connection.ExecuteAsync(mergeSql, upsertItems);
                 await transaction.CommitAsync();
             }
-            catch (DbException e)
+            catch (DbException)
             {
                 await transaction.RollbackAsync();
                 throw;

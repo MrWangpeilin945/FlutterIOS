@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
 using NSwag.Annotations;
 
@@ -97,6 +98,26 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
             return teams;
         }
 
+        /// <summary>
+        /// EC2006_班を登録する
+        /// </summary>
+        /// <param name="request">連携データ</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/v{version:apiVersion}/ec2006/team")]
+        public async Task<IActionResult> StoreTeamsAsync([FromBody] Team[] request)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
 
+            var result = await _administratorUsecase.StoreTeamsAsync(request.ToList());
+
+            var processingTime = stopwatch.Elapsed.TotalSeconds;
+            return Ok(new
+            {
+                DataProcessingTime = processingTime.ToString() + "秒",
+                ErrorObject = result
+            });
+        }
     }
 }

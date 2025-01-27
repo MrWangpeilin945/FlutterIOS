@@ -22,6 +22,8 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
         /// </summary>
         /// <param name="dbConnectionProvider"></param>
         /// <param name="examNormalValueRangeRepository"></param>
+        /// <param name="thresholdRepository"></param>
+        /// <param name="externalExamItemDetailsRepository"></param>
         public ExamNormalValueRangeUsecase(IDbConnectionProvider dbConnectionProvider, IExamNormalValueRangeRepository examNormalValueRangeRepository, IThresholdRepository thresholdRepository, IExternalExamItemDetailsRepository externalExamItemDetailsRepository)
         {
             _dbConnectionProvider = dbConnectionProvider;
@@ -143,6 +145,8 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
         /// PKが重複するレコードの確認
         /// </summary>
         /// <param name="examNormalValueRanges"></param>
+        /// <param name="thresholds"></param>
+        /// <param name="externalExamItemDetails"></param>
         /// <returns></returns>
         private async Task<List<ExamNormalValueRange>> CheckDuplicateExamNormalValueRanges(List<ExamNormalValueRange> examNormalValueRanges, List<ThresholdEntity> thresholds, List<ExternalExamItemDetailEntity> externalExamItemDetails)
         {
@@ -219,7 +223,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
         /// <param name="thresholds"></param>
         /// <param name="externalExamItemDetails"></param>
         /// <returns></returns>
-        private async Task<List<ExamNormalValueRange>> GetDuplicatedData(List<ExamNormalValueRange> examNormalValueRanges, List<ThresholdEntity> thresholds, List<ExternalExamItemDetailEntity> externalExamItemDetails)
+        private Task<List<ExamNormalValueRange>> GetDuplicatedData(List<ExamNormalValueRange> examNormalValueRanges, List<ThresholdEntity> thresholds, List<ExternalExamItemDetailEntity> externalExamItemDetails)
         {
             // ThresholdCode と ThresholdId のマッピングを作成
             var thresholdMap = thresholds.ToDictionary(t => t.ThresholdCode, t => t.ThresholdId);
@@ -251,7 +255,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
                     range.MaxValue == key.MaxValue))
                 .ToList();
 
-            return duplicateData;
+            return Task.FromResult(duplicateData); ;
         }
  
         /// <summary>

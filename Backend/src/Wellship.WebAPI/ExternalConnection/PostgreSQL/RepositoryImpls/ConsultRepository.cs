@@ -3,7 +3,7 @@ using System.Data.Common;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
-using Ryobi.Wellship.ExternalConnection.Enums;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 using Ryobi.Wellship.Core.Enums;
 using YamlDotNet.Core;
 
@@ -82,6 +82,8 @@ public class ConsultRepository : IConsultRepository
                         consult_number = new_data.consult_number
                         , note = new_data.note
                         , external_connection_code = new_data.external_connection_code
+                        , place_schedule_id = new_data.place_schedule_id
+                        , examinee_id = new_data.examinee_id
                         , created_at = new_data.created_at
                         , created_by = new_data.created_by 
                         , progress_status =
@@ -121,7 +123,7 @@ public class ConsultRepository : IConsultRepository
             if (actionConsults.Any(x => x.ActionType == ActionType.削除))
             {
                 // consult（受診）
-                var deleteConsults = actionConsults.Where(x => x.ActionType == Wellship.ExternalConnection.Enums.ActionType.削除)
+                var deleteConsults = actionConsults.Where(x => x.ActionType == ActionType.削除)
                                                    .Select(x => x.ConnectionCode)
                                                    .ToArray();
                 const string updateConsultSql = @"

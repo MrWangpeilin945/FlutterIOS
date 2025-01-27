@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Asp.Versioning;
+
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;

@@ -4,7 +4,7 @@ import type {
   ExamRegistResult,
   ExamNormalValueRange,
 } from "~/domain/wellship.schemas";
-import { InputErrorLevel } from "~/domain/enums";
+import { InputErrorLevel, ExamItemDetailType } from "~/domain/enums";
 
 // 受け取ったExamItemDetailsから
 // それぞれの最も高いエラーレベルに該当するExamNormalValueRangeを返す
@@ -12,16 +12,20 @@ const getMaxErrorLevelsByRangeCheck = (examItemDetails: ExamItemDetail[]) => {
   return examItemDetails.reduce(
     (
       matchExamRanges: ExamNormalValueRange[],
-      { value, examNormalValueRanges, hasOrder, cancelReasonId },
+      { value, examNormalValueRanges, hasOrder, cancelReasonId, type },
     ) => {
       const isDisable = !hasOrder || !!cancelReasonId;
+      if (isDisable) {
+        return matchExamRanges; // オーダーが無い場合、中止された検査項目明細の場合は処理をスキップ
+      }
+      if (type === ExamItemDetailType.選択) {
+        return matchExamRanges; // 選択肢を表示する検査項目明細の場合は処理をスキップ
+      }
       const numericValue =
         value !== undefined && value !== ""
           ? Number.parseFloat(value)
           : Number.NaN;
-      if (isDisable) {
-        return matchExamRanges; // isDisable の場合は処理をスキップ
-      }
+
       if (!Number.isNaN(numericValue) && examNormalValueRanges) {
         const matchRange = examNormalValueRanges.find(
           ({ minValue, maxValue }) =>

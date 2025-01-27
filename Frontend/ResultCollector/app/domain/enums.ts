@@ -107,7 +107,7 @@ export enum ExamItemGroupType {
  * 検査項目明細種別
  * @description フロントエンドで入力や選択を出し分けるためのタイプです。 検査項目種別ごとに設定します。
  */
-enum ExamItemDetailType {
+export enum ExamItemDetailType {
   入力 = 1,
   選択 = 2,
   演算値 = 3,

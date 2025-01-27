@@ -17,6 +17,7 @@ https://remix.run/[Remix] +
 |https://date-fns.org/[date-fns] |日付操作
 |https://axios-http.com/[axios] |PromiseベースのHTTPクライアント
 |https://tabler.io/icons[Tabler icons]|アイコンライブラリ
+|https://orval.dev/[Orval]|APIClient自動生成
 |===
 
 == ライブラリ等のバージョン
@@ -64,13 +65,11 @@ apiフォルダ内の資産はOpenAPI設計書から出力したもののみ格�
 
 == CSS
 
-トライアルでは https://github.com/css-modules/css-modules[CSS Modules]を使用する +
+https://github.com/css-modules/css-modules[CSS Modules]を使用する +
 CSSファイル(*.module.css)は `app/styles` フォルダに格納する +
 画面単位でのCSS定義は使用しない想定 +
-本開発では何を使用するかは以下の内容を基に再検討する
+Mantineのプロパティで実現できるものはそちらで対応する +
 
-* トライアルでCSS Modulesを使用してみた使用感
-* デザインチームから出てきたデザイン
 
 == データ管理(作成中)
 * 認証情報(JWT)に持たせる
@@ -97,14 +96,13 @@ TODO: 必要なパラメータは画面一覧から洗い出す
 == エディター関連
 文字コード:: UTF-8(BOMなし)
 改行コード:: CRLF
-コードフォーマッタ:: https://biomejs.dev/ja/[Biome]をトライアル使用する
+コードフォーマッタ:: https://biomejs.dev/ja/[Biome]を使用する
 
 == APIコール時の共通処理
 
-**未作成** +
-リトライ処理、共通のエラーハンドリングなどを実装する予定 +
-リトライ条件については要検討 +
-(ステータスコード、HTTPメソッドの種類での判断が可能か要調査)
+axiosInstanceを使用する +
+Orvalで出力したAPIClientから使用するのみなので各画面で意識する必要はない +
+認証エラーはaxiosInstanceで吸収する +
 
 == コンポーネント作成ルール
 
@@ -135,56 +133,21 @@ const callbackConfirm = () => {}
 <Hoge onConfirm={callbackConfirm} />
 ----
 
+== 認証処理
 
-== メモ
-* TanStack QueryでAPIキャッシュを行う
-** https://zenn.dev/eviry/articles/9bb81136a8cde0[TanStack Queryを用いたキャッシュハンドリング入門]
-
-* 未ログイン状態で直接URLを叩くなどしてログインが必要な画面に遷移してきた場合、ログイン画面に遷移する処理をどこで行うか
-** 認証チェックだけの画面をコンポーネントとして作成し、認証が必要な画面についてはそのコンポーネントを読み込むようにする？ +
-(SSRだとカスタムフックを作成して認証処理をroot.tsxから呼び出せばできるみたいだったけど、SPAだと認証チェックを実装した別レイアウトを読み込まないといけない)
-
-実装例
-
-app/components/secureLayout.tsx
-[source,js,indent=4]
-----
-import { useNavigate } from "@remix-run/react";
-import { useEffect } from "react";
-
-export default function SecureLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // 認証チェックを行う
-    const token = localStorage.getItem("authToken");
-
-    if (!token) {
-      // 未ログイン状態の時はログイン画面に遷移する
-      navigate("/login");
-    }
-  }, [navigate]);
-
-  return <>{children}</>;
-}
-----
-※ 認証チェックは仮
+ログインが必要な画面ではAuthWrapperを組み込む
 
 認証していないと使用できない画面.tsx
 [source,js,indent=4]
 ----
-import SecureLayout from "../components/secureLayout";
+import AuthWrapper from "../components/AuthWrapper";
 
 export default function Hoge() {
   return (
     <>
-      <SecureLayout>
+      <AuthWrapper>
         <!-- ここにコードを記述 -->
-      </SecureLayout>
+      </AuthWrapper>
     </>
   );
 }
@@ -193,6 +156,9 @@ export default function Hoge() {
 上記のように、認証が必要な画面で認証チェックを行うコンポーネントを読み込む +
 認証が不要な画面(ログイン画面など)はこのコンポーネントを読み込まなければいい
 
+== メモ
+* TanStack QueryでAPIキャッシュを行う
+** https://zenn.dev/eviry/articles/9bb81136a8cde0[TanStack Queryを用いたキャッシュハンドリング入門]
 
 == フロントエンド開発におけるルール
 
@@ -264,8 +230,8 @@ export default function Hoge() {
 #40B7EE| blue04 | 進捗「中止」の色
 |pass:[<span style="color:#6A6A6A;font-size:30pt">■</span>] +
 #6A6A6A| gray01 | ソフトウェアキーボードの「AC」「確定」の背景色
-|pass:[<span style="color:#9A9A9A;font-size:30pt">■</span>] +
-#9A9A9A| gray02 | フッターの背景色、検査項目名の背景色
+|pass:[<span style="color:#949494;font-size:30pt">■</span>] +
+#949494| gray02 | フッターの背景色、検査項目名の背景色
 |pass:[<span style="color:#CECECE;font-size:30pt">■</span>] +
 #CECECE| gray03 | コンポーネントの枠線 +
 ※色が異なっている場合はMantine標準の色を使う
@@ -306,3 +272,19 @@ export default function Hoge() {
 * ログアウト時のrefreshTokenの破棄について
 ** frontendから制御はしない
 * login系のAPIは完成したら連絡する
+
+== APIClient生成方法
+
+1. 最新のAPI仕様書(swagger.json)をDLし、Frontend/ResultCollector/OpenAPIフォルダに格納する
+2. VSCodeでResultCollectorのルートフォルダを開く
+3. app/utils/axiosInstance.tsの拡張子を##.tsx##に変更する
+4. コンソールで##npx orval##を実行する
+5. 3で変更したファイル名を元に戻す
+6. app/api/フォルダに出力されたファイルのうち、##wellship.schemas.ts##をapp/domain/フォルダに移動する
+7. app/api/フォルダの`wellship.ts`と`wellship.msw.ts`の##wellship.schemas##のimportするパスを"./wellship.schemas"から"../domain/wellship/schemas"に変更する
+
+
+
+
+
+

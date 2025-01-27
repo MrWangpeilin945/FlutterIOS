@@ -486,10 +486,11 @@ Top=1000
 Field="検査メニューID","exam_menu_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査メニュー名","name","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="有効","enabled","boolean","NOT NULL",,"true","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241112141222
+ModifiedDateTime=20250124092251
 Position="MAIN",2150,1000
 ZOrder=30
 
@@ -1691,13 +1692,14 @@ Page=MAIN
 Left=100
 Top=850
 Field="職員ID","staff_id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
+Field="セッションID","sid","uuid","NOT NULL",1,"","",$FFFFFFFF,""
 Field="リフレッシュトークン","token","text","NOT NULL",,"","",$FFFFFFFF,""
 Field="有効期限","expires_at","timestamp with time zone","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241218215759
-Position="MAIN",100,850,694,107
+ModifiedDateTime=20250122161242
+Position="MAIN",100,850,694,138
 ZOrder=102
 
 [Relation]

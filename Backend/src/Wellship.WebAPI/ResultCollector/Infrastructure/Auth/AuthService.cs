@@ -19,15 +19,16 @@ public interface IAuthService
     /// 指定した職員のアクセストークンを生成します
     /// </summary>
     /// <param name="staff">職員</param>
+    /// <param name="sid">セッションID</param>
     /// <returns></returns>
-    public string GenerateAccessToken(Staff staff);
+    public string GenerateAccessToken(Staff staff, Guid sid);
     /// <summary>
     /// 指定した職員のアクセストークンをリフレッシュします
     /// </summary>
-    /// <param name="jwt">アクセストークン</param>
+    /// <param name="oldAccessToken">アクセストークン</param>
     /// <param name="refreshToken">リフレッシュトークン</param>
     /// <returns></returns>
-    public ValueTask<(Staff staff, string refreshToken)> RefreshAccessTokenAsync(string jwt, string refreshToken);
+    public ValueTask<(Staff staff, Guid sid, string newAccessToken)> RefreshAccessTokenAsync(string oldAccessToken, string refreshToken);
 }
 
 /// <inheritdoc/>
@@ -49,7 +50,7 @@ public class AuthService(AuthSettings authSettings,
     private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
 
     /// <inheritdoc/>
-    public string GenerateAccessToken(Staff staff)
+    public string GenerateAccessToken(Staff staff, Guid sid)
     {
         var host = _httpContextAccessor.HttpContext?.Request.Host.Value ?? "";
         var utcNow = _timeProvider.GetUtcNow();
@@ -66,6 +67,8 @@ public class AuthService(AuthSettings authSettings,
                 new(JwtRegisteredClaimNames.Iat, utcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
                 // 認証したユーザーのロール
                 new(CustomClaimTypes.Role, staff.Role.ToString()),
+                // ログインセッションID
+                new(JwtRegisteredClaimNames.Sid, sid.ToString()),
             ],
             // JWTが有効になる時刻
             notBefore: utcNow.UtcDateTime,
@@ -80,15 +83,16 @@ public class AuthService(AuthSettings authSettings,
     }
 
     /// <inheritdoc/>
-    public async ValueTask<(Staff staff, string refreshToken)> RefreshAccessTokenAsync(string jwt, string refreshToken)
+    public async ValueTask<(Staff staff, Guid sid, string newAccessToken)> RefreshAccessTokenAsync(string oldAccessToken, string refreshToken)
     {
-        var (refreshable, staff) = await CanRefreshAccessTokenAsync(jwt, refreshToken);
-        if (!refreshable || staff is null)
+        var (refreshable, sid, staff) = await CanRefreshAccessTokenAsync(oldAccessToken, refreshToken);
+        if (!refreshable || staff is null || sid is null)
         {
             throw new WellshipAuthenticationException();
         }
-        return (staff, GenerateAccessToken(staff));
+        return (staff, sid.Value, GenerateAccessToken(staff, sid.Value));
     }
+
 
     /// <summary>
     /// アクセストークンをリフレッシュしてよいか確認します。
@@ -96,7 +100,7 @@ public class AuthService(AuthSettings authSettings,
     /// <param name="jwt">アクセストークンとして使用しているjwt</param>
     /// <param name="refreshToken">リフレッシュトークン</param>
     /// <returns>バリデーション結果</returns>
-    private async ValueTask<(bool result, Staff? staff)> CanRefreshAccessTokenAsync(string jwt, string refreshToken)
+    private async ValueTask<(bool result, Guid? sid, Staff? staff)> CanRefreshAccessTokenAsync(string jwt, string refreshToken)
     {
         var host = _httpContextAccessor.HttpContext?.Request.Host.Value ?? "";
         var tokenValidationParameters = new TokenValidationParameters
@@ -118,14 +122,14 @@ public class AuthService(AuthSettings authSettings,
         if (result.SecurityToken is not JwtSecurityToken jst ||
             !jst.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
         {
-            return (false, null);
+            return (false, null, null);
         }
 
         // StaffIDが正しいことを確認します
         var sub = result.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (sub is null || !Guid.TryParse(sub, out var staffId))
         {
-            return (false, null);
+            return (false, null, null);
         }
         Staff? staff;
         try
@@ -134,19 +138,24 @@ public class AuthService(AuthSettings authSettings,
         }
         catch (StaffNotFoundException)
         {
-            return (false, null);
+            return (false, null, null);
         }
         // 職員が無効になっている場合は更新させません
         if (!staff.Enabled)
         {
-            return (false, null);
+            return (false, null, null);
         }
         // リフレッシュトークンをチェックします
-        var storedRefreshToken = await _refreshTokenRepository.GetRefreshTokenOrNullAsync(staffId);
+        var sidIsValid = Guid.TryParse(result.ClaimsIdentity.FindFirst(JwtRegisteredClaimNames.Sid)?.Value, out var sid);
+        if (!sidIsValid)
+        {
+            return (false, null, null);
+        }
+        var storedRefreshToken = await _refreshTokenRepository.GetRefreshTokenOrNullAsync(staffId, sid);
         if (storedRefreshToken is null || storedRefreshToken.Token != refreshToken || storedRefreshToken.ExpiresAt < _timeProvider.GetUtcNow())
         {
-            return (false, null);
+            return (false, null, null);
         }
-        return (true, staff);
+        return (true, sid, staff);
     }
 }

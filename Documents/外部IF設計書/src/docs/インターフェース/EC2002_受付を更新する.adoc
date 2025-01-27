@@ -102,7 +102,7 @@ list.Count()  <> 0
 
 |ActionType
 |Yes
-|enum<Wellship.WebAPI\ExternalConnection\Enums\ActionType>
+|enum<Ryobi.Wellship.WebAPI.ExternalConnection.Enums.ActionType>
 |連携モード
 
 |TicketNumber

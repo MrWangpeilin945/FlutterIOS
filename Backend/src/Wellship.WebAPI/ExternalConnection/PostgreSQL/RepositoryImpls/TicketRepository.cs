@@ -3,7 +3,7 @@ using System.Data.Common;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
-using Ryobi.Wellship.ExternalConnection.Enums;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 using Ryobi.Wellship.Core.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
@@ -41,7 +41,7 @@ public class TicketRepository : ITicketRepository
                                                (y, z) => z.OrderByDescending(a => a.OrderNumber).First())
                                        .ToArray();
             // 受付を更新する
-            var upsertTickets = actionTickets.Where(x => x.ActionType == Wellship.ExternalConnection.Enums.ActionType.登録)
+            var upsertTickets = actionTickets.Where(x => x.ActionType == ActionType.登録)
                                              .Select(x => new {
                                                 ConsultId = x.ConsultId,
                                                 TicketNumber = x.TicketNumber,
@@ -92,7 +92,7 @@ public class TicketRepository : ITicketRepository
                                                             ConsultIds = upsertTickets.Select(x=> x.ConsultId).ToArray()});
 
             // 受付を削除する
-            var deleteTickets = actionTickets.Where(x => x.ActionType == Wellship.ExternalConnection.Enums.ActionType.削除)
+            var deleteTickets = actionTickets.Where(x => x.ActionType == ActionType.削除)
                                              .Select(x => x.ConsultId)
                                              .ToArray();
             const string deleteSql = @"

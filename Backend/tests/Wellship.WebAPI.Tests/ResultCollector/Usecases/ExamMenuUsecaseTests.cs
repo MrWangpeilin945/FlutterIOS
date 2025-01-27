@@ -23,7 +23,7 @@ public class ExamMenuUsecaseTests
             new(){MenuId = 4,MenuName = "心電図"}
         };
 
-        examMenuRepositoryMock.Setup(r => r.GetExamMenusAsync()).ReturnsAsync(examMenuData);
+        examMenuRepositoryMock.Setup(r => r.GetEnabledExamMenusAsync()).ReturnsAsync(examMenuData);
         var examMenuUsecase = new ExamMenuUsecase(examMenuRepositoryMock.Object);
 
         // ユースケースで変換後に期待するもの
