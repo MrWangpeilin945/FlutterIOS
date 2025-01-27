@@ -1,0 +1,5 @@
+-- 初回構築時のみ実行します。
+-- 実行DB:postgres, 実行ロール:postgres
+
+CREATE ROLE db_admin LOGIN PASSWORD '**マスク**' CREATEDB CREATEROLE NOINHERIT CONNECTION LIMIT -1;
+CREATE ROLE app LOGIN PASSWORD '**マスク**' NOINHERIT CONNECTION LIMIT -1;
