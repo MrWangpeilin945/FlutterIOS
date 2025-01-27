@@ -95,7 +95,7 @@ export default function ConsultInput() {
   //機器連携用
   const localStorageKey = "measurementResult";
   const [isWatching, setIsWatching] = useState(false); // 監視状態を管理するフラグ
-  const [initialDisplay,setInitialDisplay] = useState(true);
+  const [initialDisplay, setInitialDisplay] = useState(true);
 
   //AP1009呼び出し用(GET系APIの定義)
   const { refetch } = useConsultGetInputExamItemsExaminee(
@@ -210,6 +210,7 @@ export default function ConsultInput() {
         const scriptUrl = targetConnectionEquipment?.processingScriptUrl;
         const analyzedData = dynamicScriptExecute(base64Data, scriptUrl ?? "");
         //value更新処理
+        let isUpdated = false;
         let updatedExamData = { ...examData };
         for (const [key, value] of Object.entries(analyzedData)) {
           // valueがnullの場合は処理を行わない
@@ -229,6 +230,7 @@ export default function ConsultInput() {
                     !detail.cancelReasonId &&
                     !detail.value
                   ) {
+                    isUpdated = true;
                     return { ...detail, value: String(value) };
                   }
                   return detail;
@@ -245,6 +247,12 @@ export default function ConsultInput() {
         }
         // ローカルストレージのデータを削除
         localStorage.removeItem(localStorageKey);
+        // 値を更新しなかった場合、ダイアログを表示
+        if (!isUpdated) {
+          setCommonMessage("表示可能な測定結果がありませんでした。");
+          setCommonButtonMessage("閉じる");
+          openCommon();
+        }
       }
     };
 
