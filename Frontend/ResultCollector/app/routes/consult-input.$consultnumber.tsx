@@ -204,6 +204,7 @@ export default function ConsultInput() {
   useEffect(() => {
     // StorageEventの変更を監視する関数
     const handleStorageChange = (event: StorageEvent) => {
+      setIsLoading(true);
       if (event.key === localStorageKey) {
         const base64Data = event.newValue ?? "";
         //解析js呼び出し処理
@@ -253,6 +254,7 @@ export default function ConsultInput() {
           setCommonButtonMessage("閉じる");
           openCommon();
         }
+        setIsLoading(false);
       }
     };
 
