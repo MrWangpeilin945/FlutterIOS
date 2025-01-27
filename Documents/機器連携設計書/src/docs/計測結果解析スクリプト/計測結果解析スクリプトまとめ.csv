@@ -1,0 +1,8 @@
+検査,スクリプト名,備考
+身体計測,AANDD_AD_Series_6350.js,同じシリーズでも型番によってレイアウトが大きく異なる場合がある
+腹囲,YAMAYO_DTM_Series.js,
+血圧,AANDD_TM_Series.js,
+心電図,FUKUDA_FCP_Series.js,
+視力,NIDEK_NV_Series_300.js,NV-350には動作モードとしてNV-350とNV-300が存在する
+聴力（選別）,RION_AA_Series_screening_computer.js,選別聴力・コンピュータ向けレイアウト
+聴力（閾値）,RION_AA_Series_monitoring_computer.js,閾値聴力・コンピュータ向けレイアウト

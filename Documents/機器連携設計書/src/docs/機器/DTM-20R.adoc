@@ -1,0 +1,15 @@
+= DTR-20R
+
+== 接続方式
+
+[cols="1,2"]
+|===
+
+|接続方法	
+|Bluetooth Classic接続
+
+|===
+
+== 計測結果解析スクリプト
+
+* YAMAYO_DTM_Series.js

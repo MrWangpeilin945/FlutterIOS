@@ -1,0 +1,51 @@
+= 機器
+
+調査・分析した機器を掲載します
+
+== 機器一覧
+
+[format="csv", options="header, autowidth"]
+|====
+include::機器/機器まとめ.csv[]
+|====
+
+== 機器詳細
+
+include::機器/AD-6351.adoc[leveloffset=+2]
+
+---
+
+include::機器/BSM370.adoc[leveloffset=+2]
+
+---
+
+include::機器/DTM-20R.adoc[leveloffset=+2]
+
+---
+
+include::機器/TM-2580.adoc[leveloffset=+2]
+
+---
+
+include::機器/FCP-8300.adoc[leveloffset=+2]
+
+---
+
+include::機器/FCP-8321.adoc[leveloffset=+2]
+
+---
+
+include::機器/FCP-8400.adoc[leveloffset=+2]
+
+---
+
+include::機器/NV-350.adoc[leveloffset=+2]
+
+---
+
+include::機器/AA-58.adoc[leveloffset=+2]
+
+---
+
+include::機器/AA-K1A.adoc[leveloffset=+2]
+
