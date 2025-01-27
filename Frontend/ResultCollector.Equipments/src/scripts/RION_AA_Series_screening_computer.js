@@ -5,13 +5,13 @@ export function decode(base64UrlString) {
 
   const extract = (s, index) => {
     const result = s[index];
-    return result == "P" ? true : result == "R" ? false : null;
+    return result == "P" ? "1" : result == "R" ? "2" : null;
   };
 
   return {
-    passScreening1000HzLeft: extract(rawText, 35 + offset),
-    passScreening1000HzRight: extract(rawText, 36 + offset),
-    passScreening4000HzLeft: extract(rawText, 45 + offset),
-    passScreening4000HzRight: extract(rawText, 46 + offset),
+    passScreening1000HzLeft: extract(rawText, 36 + offset),
+    passScreening1000HzRight: extract(rawText, 35 + offset),
+    passScreening4000HzLeft: extract(rawText, 46 + offset),
+    passScreening4000HzRight: extract(rawText, 45 + offset),
   };
 }

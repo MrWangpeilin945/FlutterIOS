@@ -6,14 +6,18 @@ export function decode(base64UrlString) {
 
   const extractNumber = (s) => {
     if (s == null) return null;
-    const result = s?.substring(1, 3);
-    return result == "FF" ? 0 : result / 10;
+    const substring = s?.substring(1, 3);
+    if (substring == "FF") return 0;
+    const result = parseInt(substring);
+    return isNaN(result) ? null : result / 10;
   };
 
   const extractBool = (s) => {
     if (s == null) return null;
-    const result = s?.substring(1, 2);
-    return result == "Y";
+    const substring = s?.substring(1, 2);
+    if (substring == "Y") return true;
+    if (substring == "N") return false;
+    return null;
   };
 
   const rightDV = extractNumber(records.find((x) => x.startsWith("D")));
@@ -26,25 +30,17 @@ export function decode(base64UrlString) {
   const leftNV = extractNumber(records.find((x) => x.startsWith("L")));
 
   return {
-    nakedRightDV: dvWithCorrection === false ? rightDV : null,
     nakedLeftDV: dvWithCorrection === false ? leftDV : null,
+    nakedRightDV: dvWithCorrection === false ? rightDV : null,
     nakedBothDV: dvWithCorrection === false ? bothDV : null,
-    correctedRightDV: dvWithCorrection === true ? rightDV : null,
     correctedLeftDV: dvWithCorrection === true ? leftDV : null,
+    correctedRightDV: dvWithCorrection === true ? rightDV : null,
     correctedBothDV: dvWithCorrection === true ? bothDV : null,
-    rightDV: rightDV,
-    leftDV: leftDV,
-    bothDV: bothDV,
-    dvWithCorrection: dvWithCorrection,
-    nakedRightNV: nvWithCorrection === false ? rightNV : null,
     nakedLeftNV: nvWithCorrection === false ? leftNV : null,
+    nakedRightNV: nvWithCorrection === false ? rightNV : null,
     nakedBothNV: nvWithCorrection === false ? bothNV : null,
-    correctedRightNV: nvWithCorrection === true ? rightNV : null,
     correctedLeftNV: nvWithCorrection === true ? leftNV : null,
+    correctedRightNV: nvWithCorrection === true ? rightNV : null,
     correctedBothNV: nvWithCorrection === true ? bothNV : null,
-    rightNV: rightNV,
-    leftNV: leftNV,
-    bothNV: bothNV,
-    nvWithCorrection: nvWithCorrection,
   };
 }

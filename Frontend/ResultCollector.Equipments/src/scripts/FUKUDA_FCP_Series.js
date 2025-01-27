@@ -6,8 +6,8 @@ export function decode(base64UrlString) {
   const extract = (s, index, length) => {
     const span = s?.substring(index, index + length);
     if (span == null || span == "") return null;
-    const result = Number(span);
-    return result != NaN ? result : null;
+    const result = parseInt(span);
+    return isNaN(result) ? null : result;
   };
 
   return {
