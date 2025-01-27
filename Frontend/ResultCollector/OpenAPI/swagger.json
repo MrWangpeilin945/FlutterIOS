@@ -17,7 +17,7 @@
         "tags": [
           "Authentication"
         ],
-        "summary": "ログインする",
+        "summary": "AP1001_ログインする",
         "operationId": "Authentication_Login",
         "parameters": [
           {
@@ -53,7 +53,7 @@
               }
             }
           },
-          "403": {
+          "401": {
             "description": "",
             "content": {
               "application/json": {
@@ -71,7 +71,7 @@
         "tags": [
           "Authentication"
         ],
-        "summary": "アクセストークンをリフレッシュする",
+        "summary": "AP1023_アクセストークンをリフレッシュする",
         "operationId": "Authentication_Refresh",
         "parameters": [
           {
@@ -125,7 +125,7 @@
         "tags": [
           "CancelReason"
         ],
-        "summary": "中止理由一覧を取得する",
+        "summary": "AP1011_中止理由一覧を取得する",
         "operationId": "CancelReason_GetCancelReasons",
         "parameters": [
           {
@@ -149,16 +149,6 @@
               }
             }
           },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "401": {
             "description": "",
             "content": {
@@ -177,7 +167,7 @@
         "tags": [
           "Consult"
         ],
-        "summary": "受診番号の存在を確認する",
+        "summary": "AP1007_受診番号の存在を確認する",
         "operationId": "Consult_VerifyConsultNumber",
         "parameters": [
           {
@@ -208,24 +198,10 @@
             "description": "存在するか"
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -235,7 +211,7 @@
         "tags": [
           "Consult"
         ],
-        "summary": "未受診の検査メニューを取得する",
+        "summary": "AP1008_未受診の検査メニューを取得する",
         "operationId": "Consult_GetUnexaminedMenus",
         "parameters": [
           {
@@ -269,25 +245,8 @@
               }
             }
           },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -297,7 +256,7 @@
         "tags": [
           "Consult"
         ],
-        "summary": "検査内容を取得する",
+        "summary": "AP1010_検査内容を取得する",
         "operationId": "Consult_GetExamItemsExaminee",
         "parameters": [
           {
@@ -340,34 +299,13 @@
             }
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -377,7 +315,7 @@
         "tags": [
           "Consult"
         ],
-        "summary": "検査の実施有無と中止理由を登録する",
+        "summary": "AP1022_検査の実施有無と中止理由を登録する",
         "operationId": "Consult_RegisterExecutions",
         "parameters": [
           {
@@ -416,34 +354,13 @@
             "description": ""
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -453,7 +370,7 @@
         "tags": [
           "Consult"
         ],
-        "summary": "検査結果入力情報を取得する",
+        "summary": "AP1009_検査結果入力情報を取得する",
         "operationId": "Consult_GetInputExamItemsExaminee",
         "parameters": [
           {
@@ -498,130 +415,12 @@
             }
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v{version}/consult/{consultNumber}/prior/{currentExamId}": {
-      "get": {
-        "tags": [
-          "Consult"
-        ],
-        "summary": "前提検査メニューを検証する（仮：動作確認用）",
-        "operationId": "Consult_ValidatePriorExamMenus",
-        "parameters": [
-          {
-            "name": "consultNumber",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "currentExamId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 3
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InputExamItems"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v{version}/consult/{consultNumber}/correlation": {
-      "post": {
-        "tags": [
-          "Consult"
-        ],
-        "summary": "検査結果相関ルールを検証する（仮：動作確認用）",
-        "operationId": "Consult_ValidateCorrelationRule",
-        "parameters": [
-          {
-            "name": "consultNumber",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 3
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResultsRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
             "description": ""
           }
         }
@@ -632,7 +431,7 @@
         "tags": [
           "Consult"
         ],
-        "summary": "検査結果を登録する",
+        "summary": "AP1014_検査結果を登録する",
         "operationId": "Consult_RegisterResults",
         "parameters": [
           {
@@ -673,44 +472,16 @@
             "description": ""
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -720,7 +491,7 @@
         "tags": [
           "Consult"
         ],
-        "summary": "検査結果を検証する",
+        "summary": "AP1013_検査結果を検証する",
         "operationId": "Consult_VerifyResults",
         "parameters": [
           {
@@ -768,44 +539,16 @@
             }
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -815,7 +558,7 @@
         "tags": [
           "Equipment"
         ],
-        "summary": "検査機器一覧を取得する",
+        "summary": "AP1012_検査機器一覧を取得する",
         "operationId": "Equipment_GetEquipmentSettings",
         "parameters": [
           {
@@ -849,24 +592,10 @@
             }
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -876,7 +605,7 @@
         "tags": [
           "ExamMenu"
         ],
-        "summary": "検査メニュー一覧を取得する",
+        "summary": "AP1006_検査メニュー一覧を取得する",
         "operationId": "ExamMenu_GetExamMenus",
         "parameters": [
           {
@@ -971,7 +700,7 @@
         "tags": [
           "HomeMenu"
         ],
-        "summary": "ホームメニュー項目を取得する",
+        "summary": "AP1005_ホームメニュー項目を取得する",
         "operationId": "HomeMenu_GetHomeMenuSettings",
         "parameters": [
           {
@@ -1033,7 +762,7 @@
         "tags": [
           "Integration"
         ],
-        "summary": "連携対象の検査結果を取得する",
+        "summary": "AP1018_連携対象の検査結果を取得する",
         "operationId": "Integration_GetIntegrationResults",
         "parameters": [
           {
@@ -1058,14 +787,7 @@
             }
           },
           "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -1075,7 +797,7 @@
         "tags": [
           "Integration"
         ],
-        "summary": "連携用に検査結果を出力する",
+        "summary": "AP1019_連携用に検査結果を出力する",
         "operationId": "Integration_ExportResults",
         "parameters": [
           {
@@ -1115,34 +837,13 @@
             "description": ""
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -1152,7 +853,7 @@
         "tags": [
           "Integration"
         ],
-        "summary": "検査結果の出力履歴を取得する",
+        "summary": "AP1020_検査結果の出力履歴を取得する",
         "operationId": "Integration_GetExportHistory",
         "parameters": [
           {
@@ -1177,14 +878,7 @@
             }
           },
           "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -1194,7 +888,7 @@
         "tags": [
           "Integration"
         ],
-        "summary": "出力した結果を未出力に戻す",
+        "summary": "AP1021_出力した結果を未出力に戻す",
         "operationId": "Integration_UndoExportStatus",
         "parameters": [
           {
@@ -1224,24 +918,10 @@
             "description": ""
           },
           "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           },
           "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
+            "description": ""
           }
         }
       }
@@ -1251,7 +931,7 @@
         "tags": [
           "PlaceSchedule"
         ],
-        "summary": "日付を指定して班と会場のリストを取得する",
+        "summary": "AP1003_日付を指定して班と会場のリストを取得する",
         "operationId": "PlaceSchedule_GetTeams",
         "parameters": [
           {
@@ -1311,7 +991,7 @@
         "tags": [
           "PlaceSchedule"
         ],
-        "summary": "班を指定して会場日程を取得する",
+        "summary": "AP1004_班を指定して会場日程を取得する",
         "operationId": "PlaceSchedule_GetTeamPlaceSchedules",
         "parameters": [
           {
@@ -1390,7 +1070,7 @@
         "tags": [
           "PlaceSchedule"
         ],
-        "summary": "会場ロック状態を取得する",
+        "summary": "AP1016_会場ロック状態を取得する",
         "operationId": "PlaceSchedule_GetPlaceScheduleLockingStatus",
         "parameters": [
           {
@@ -1460,7 +1140,7 @@
         "tags": [
           "PlaceSchedule"
         ],
-        "summary": "会場ロック状態を更新する",
+        "summary": "AP1017_会場ロック状態を更新する",
         "operationId": "PlaceSchedule_UpdatePlaceScheduleLockingStatus",
         "parameters": [
           {
@@ -1537,7 +1217,7 @@
         "tags": [
           "Progress"
         ],
-        "summary": "進捗状況を取得する",
+        "summary": "AP1015_進捗状況を取得する",
         "operationId": "Progress_GetProgress",
         "parameters": [
           {
@@ -1589,7 +1269,7 @@
         "tags": [
           "Staff"
         ],
-        "summary": "職員の情報を取得する",
+        "summary": "AP1002_職員の情報を取得する",
         "operationId": "Staff_GetStaff",
         "parameters": [
           {
@@ -1612,51 +1292,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v{version}/organization/insert": {
-      "get": {
-        "tags": [
-          "OrganizationTest"
-        ],
-        "summary": "団体を登録する",
-        "operationId": "OrganizationTest_InsertOrganization",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
           },
           "401": {
             "description": "",
@@ -1879,11 +1514,11 @@
               "$ref": "#/components/schemas/ExamDetail"
             }
           },
-          "examDecisionResult": {
+          "examDecisionResults": {
             "type": "array",
             "description": "検査実施判断結果",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/ExamDecisionResult"
             }
           },
           "unexaminedItems": {
@@ -1978,6 +1613,22 @@
             "description": "中止理由ID",
             "format": "int32",
             "nullable": true
+          }
+        }
+      },
+      "ExamDecisionResult": {
+        "type": "object",
+        "description": "検査実施判断ルールの結果",
+        "additionalProperties": false,
+        "properties": {
+          "errorLevel": {
+            "type": "integer",
+            "description": "エラーレベル",
+            "format": "int32"
+          },
+          "description": {
+            "type": "string",
+            "description": "説明"
           }
         }
       },
@@ -2262,14 +1913,14 @@
             "description": "エラーレベル",
             "format": "int32"
           },
-          "maxValue": {
-            "type": "number",
-            "description": "最大値",
-            "format": "decimal"
-          },
           "minValue": {
             "type": "number",
             "description": "最小値",
+            "format": "decimal"
+          },
+          "maxValue": {
+            "type": "number",
+            "description": "最大値",
             "format": "decimal"
           }
         }
@@ -2349,11 +2000,6 @@
         "description": "検査結果検証結果情報",
         "additionalProperties": false,
         "properties": {
-          "errorLevel": {
-            "type": "integer",
-            "description": "エラーレベル",
-            "format": "int32"
-          },
           "examItemGroups": {
             "type": "array",
             "description": "検査結果入力項目グループ",

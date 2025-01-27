@@ -142,7 +142,7 @@ export interface PlaceSchedulePlaces {
 /**
  * 会場
  */
-export interface Place2 {
+export interface Place {
   /** 会場ID */
   placeId?: string;
   /** 会場名 */
@@ -154,7 +154,7 @@ export interface Place2 {
  */
 export interface PlaceScheduleTeam {
   /** 会場リスト */
-  places?: Place2[];
+  places?: Place[];
   /** 班ID */
   teamId?: string;
   /** 班名 */
@@ -689,40 +689,4 @@ export interface ProblemDetails {
 export interface StaffLoginResponse {
   /** トークン */
   token?: string;
-}
-
-/**
- * 基準パターン
- */
-export interface Threshold {
-  /** 基準パターンコード */
-  code?: string;
-  /** エラーオブジェクトに登録する入力項目Noなど */
-  inputNote?: string;
-  /** 基準パターン名 */
-  name?: string;
-}
-
-/**
- * 班
- */
-export interface Team {
-  /** 班コード */
-  code?: string;
-  /** エラーオブジェクトに登録する入力項目Noなど */
-  inputNote?: string;
-  /** 班名 */
-  name?: string;
-}
-
-/**
- * 会場
- */
-export interface Place {
-  /** 会場コード */
-  code?: string;
-  /** エラーオブジェクトに登録する入力項目Noなど */
-  inputNote?: string;
-  /** 会場名 */
-  name?: string;
 }
