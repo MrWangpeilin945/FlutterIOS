@@ -45,3 +45,8 @@
 |monitoring8000HzLeft
 
 |===
+
+== 適合する機器
+
+* AA-58
+* AA-K1A

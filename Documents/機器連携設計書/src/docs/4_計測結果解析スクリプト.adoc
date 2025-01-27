@@ -30,4 +30,21 @@ include::計測結果解析スクリプト/計測結果解析スクリプトま�
 
 ※複数の機種で同じレイアウトを使用している場合が多いため、単純な機器名をできるだけ避けようとしています。
 
-※同じシリーズで異なるレイアウトの場合、連番や代表機種名で区別することを考えています。
+※同じシリーズで異なるレイアウトの場合、連番や代表機種名やモード名で区別することを考えています。
+
+---
+
+include::計測結果解析スクリプト/AANDD_AD_Series_6350.js.adoc[leveloffset=+2]
+
+---
+
+include::計測結果解析スクリプト/YAMAYO_DTM_Series.js.adoc[leveloffset=+2]
+
+---
+
+include::計測結果解析スクリプト/RION_AA_Series_screening_computer.js.adoc[leveloffset=+2]
+
+---
+
+include::計測結果解析スクリプト/RION_AA_Series_monitoring_computer.js.adoc[leveloffset=+2]
+

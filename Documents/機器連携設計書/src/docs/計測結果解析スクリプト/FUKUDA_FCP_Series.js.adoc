@@ -1,0 +1,20 @@
+= FUKUDA_FCP_Series.js
+
+== 返却する検査項目
+
+[options="header",cols="1,2"]
+|===
+
+|検査項目
+|プロパティ名
+
+|心拍数
+|heartRate
+
+|===
+
+== 適合する機器
+
+* FCP-8300
+* FCP-8321
+* FCP-8400
