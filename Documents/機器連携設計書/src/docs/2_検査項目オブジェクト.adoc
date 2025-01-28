@@ -1,0 +1,34 @@
+= 検査項目オブジェクト
+
+== 検査項目一覧
+
+[format="csv", options="header, autowidth"]
+|====
+include::検査項目/検査項目.csv[]
+|====
+
+※心拍数は心臓の拍動回数を、脈拍は血管の拍動を指しており、別物として異なる名前を付けています
+
+== 検査項目詳細
+
+include::健診/1_視力.adoc[leveloffset=+2]
+
+---
+
+include::健診/2_身体.adoc[leveloffset=+2]
+
+---
+
+include::健診/3_聴力.adoc[leveloffset=+2]
+
+---
+
+include::健診/4_心電図.adoc[leveloffset=+2]
+
+---
+
+include::健診/5_腹囲.adoc[leveloffset=+2]
+
+---
+
+include::健診/6_血圧.adoc[leveloffset=+2]

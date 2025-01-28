@@ -1,0 +1,28 @@
+= RION_AA_Series_screening_computer.js
+
+== 返却する検査項目
+
+[options="header",cols="1,2"]
+|===
+
+|検査項目
+|プロパティ名
+
+|選別聴力　右　1kHz	
+|screening1000HzRight
+
+|選別聴力　左　1kHz	
+|screening1000HzLeft
+
+|選別聴力　右　4kHz	
+|screening4000HzRight
+
+|選別聴力　左　4kHz	
+|screening4000HzLeft
+
+|===
+
+== 適合する機器
+
+* AA-58
+* AA-K1A

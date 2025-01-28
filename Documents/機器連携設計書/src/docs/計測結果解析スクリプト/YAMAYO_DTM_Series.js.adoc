@@ -1,0 +1,18 @@
+= YAMAYO_DTM_Series.js
+
+== 返却する検査項目
+
+[options="header",cols="1,2"]
+|===
+
+|検査項目
+|プロパティ名
+
+|腹囲
+|waist
+
+|===
+
+== 適合する機器
+
+* DTR-20R

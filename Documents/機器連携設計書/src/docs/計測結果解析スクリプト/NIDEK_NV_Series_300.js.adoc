@@ -1,0 +1,52 @@
+= NIDEK_NV_Series_300.js
+
+== 返却する検査項目
+
+[options="header",cols="1,2"]
+|===
+
+|検査項目
+|プロパティ名
+
+|視力（遠距離）裸眼　右
+|nakedRightDV
+
+|視力（遠距離）裸眼　左
+|nakedLeftDV
+
+|視力（遠距離）矯正　右
+|correctedRightDV
+
+|視力（遠距離）矯正　左
+|correctedLeftDV
+
+|視力（遠距離）裸眼　両眼
+|nakedBothDV
+
+|視力（遠距離）矯正　両眼
+|correctedBothDV
+
+|視力（近距離）裸眼　右
+|nakedRightNV
+
+|視力（近距離）裸眼　左
+|nakedLeftNV
+
+|視力（近距離）矯正　右
+|correctedRightNV
+
+|視力（近距離）矯正　左
+|correctedLeftNV
+
+|視力（近距離）裸眼　両眼
+|nakedBothNV
+
+|視力（近距離）矯正　両眼
+|correctedBothNV
+
+|===
+
+== 適合する機器
+
+* NV-300
+* NV-350（NV-300モード）

@@ -1,0 +1,39 @@
+健診,検査項目,プロパティ名,型
+視力（遠距離）,裸眼　右,nakedRightDV,Number or null
+視力（遠距離）,裸眼　左,nakedLeftDV,Number or null
+視力（遠距離）,矯正　右,correctedRightDV,Number or null
+視力（遠距離）,矯正　左,correctedLeftDV,Number or null
+視力（遠距離）,裸眼　両眼,nakedBothDV,Number or null
+視力（遠距離）,矯正　両眼,correctedBothDV,Number or null
+視力（近距離）,裸眼　右,nakedRightNV,Number or null
+視力（近距離）,裸眼　左,nakedLeftNV,Number or null
+視力（近距離）,矯正　右,correctedRightNV,Number or null
+視力（近距離）,矯正　左,correctedLeftNV,Number or null
+視力（近距離）,裸眼　両眼,nakedBothNV,Number or null
+視力（近距離）,矯正　両眼,correctedBothNV,Number or null
+身体計測,身長,height,Number or null
+身体計測,体重,weight,Number or null
+聴力（選別）,選別聴力　右　1kHz,screening1000HzRight,String or null
+聴力（選別）,選別聴力　左　1kHz,screening1000HzLeft,String or null
+聴力（選別）,選別聴力　右　4kHz,screening4000HzRight,String or null
+聴力（選別）,選別聴力　左　4kHz,screening4000HzLeft,String or null
+聴力（閾値）,域値聴力　右　250Hz,monitoring250HzRight,Number or null
+聴力（閾値）,域値聴力　左　250Hz,monitoring250HzLeft,Number or null
+聴力（閾値）,域値聴力　右　500Hz,monitoring500HzRight,Number or null
+聴力（閾値）,域値聴力　左　500Hz,monitoring500HzLeft,Number or null
+聴力（閾値）,域値聴力　右　1kHz,monitoring1000HzRight,Number or null
+聴力（閾値）,域値聴力　左　1kHz,monitoring1000HzLeft,Number or null
+聴力（閾値）,域値聴力　右　2kHz,monitoring2000HzRight,Number or null
+聴力（閾値）,域値聴力　左　2kHz,monitoring2000HzLeft,Number or null
+聴力（閾値）,域値聴力　右　4kHz,monitoring4000HzRight,Number or null
+聴力（閾値）,域値聴力　左　4kHz,monitoring4000HzLeft,Number or null
+聴力（閾値）,域値聴力　右　8kHz,monitoring8000HzRight,Number or null
+聴力（閾値）,域値聴力　左　8kHz,monitoring8000HzLeft,Number or null
+心電図,心拍数,heartRate,Number or null
+腹囲,腹囲,waist,Number or null
+血圧,最高血圧,systolicBP,Number or null
+血圧,最低血圧,diastolicBP,Number or null
+血圧,平均血圧,meanBP,Number or null
+血圧,脈拍数,pulseRate,Number or null
+眼圧,右,rightIOP,Number or null
+眼圧,左,leftIOP,Number or null

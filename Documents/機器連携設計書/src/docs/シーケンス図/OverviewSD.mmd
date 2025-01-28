@@ -1,0 +1,23 @@
+sequenceDiagram
+box Webブラウザ
+  participant FE as frontend
+  participant QR as 機器連携結果受領ページ
+  participant SC as 結果解析スクリプト
+  participant LS as localstorage
+end
+autonumber
+participant APP as 機器連携アプリ
+participant EQ as 計測機器
+FE->>+LS:localstorageの変更イベントを購読
+FE->>APP:DeepLinkによりアプリを起動
+APP->+EQ:接続
+EQ->>-APP:計測結果を送信
+APP->>QR:ブラウザで開く
+QR->>LS:localstorageに計測結果を書き込む
+LS-->>-FE:localstorageの変更のイベントが発火 
+QR-->QR:タブを閉じる
+Note over FE,QR: 機器連携結果受領ページの<br/>タブが閉じられることで<br/>frontendタブがアクティブになる
+FE->>SC:連携結果をスクリプトに渡す
+SC-->SC:変換処理
+SC-->>FE:計測結果オブジェクトを返す
+FE-->FE:計測結果を反映する

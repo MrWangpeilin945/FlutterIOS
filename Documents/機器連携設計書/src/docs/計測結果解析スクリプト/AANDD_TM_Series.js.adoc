@@ -1,0 +1,27 @@
+= AANDD_TM_Series.js
+
+== 返却する検査項目
+
+[options="header",cols="1,2"]
+|===
+
+|検査項目
+|プロパティ名
+
+|最高血圧
+|systolicBP
+
+|平均血圧
+|meanBP
+
+|最低血圧
+|diastolicBP
+
+|脈拍
+|pulseRate
+
+|===
+
+== 適合する機器
+
+* TM-2580
