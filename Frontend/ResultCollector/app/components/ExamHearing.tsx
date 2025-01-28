@@ -80,7 +80,7 @@ export default function ExamHearing({
             (detail) => detail.positionNumber === detailNumber,
           ) ?? {};
         //所見なしの場合は処理を行わない
-        if (!detail.value && detail.value === getOptionCode(detail, 1)) return item;
+        if (!detail.value || detail.value === getOptionCode(detail, 1)) return item;
         //所見ありの場合は処理を行う
         return complementValue(detailNumber, item);
       },
