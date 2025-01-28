@@ -155,7 +155,7 @@ export default function ConsultInput() {
 
   useEffect(() => {
     if (!examData) return;
-    
+
     //機器ラベルとvalueが空かをチェック
     const isValueEmptyForEquipmentLabel = (): boolean => {
       return (
@@ -217,6 +217,8 @@ export default function ConsultInput() {
           // valueがnullの場合は処理を行わない
           if (value === null) continue;
 
+          let isUpdatedInThisKey = false;
+
           // equipmentLabelが一致するvalueを更新
           updatedExamData = {
             ...updatedExamData,
@@ -226,12 +228,14 @@ export default function ConsultInput() {
                 ...item,
                 examItemDetails: item.examItemDetails?.map((detail) => {
                   if (
+                    !isUpdatedInThisKey &&
                     detail.equipmentLabel === key &&
                     detail.hasOrder &&
                     !detail.cancelReasonId &&
                     !detail.value
                   ) {
                     isUpdated = true;
+                    isUpdatedInThisKey = true;
                     return { ...detail, value: String(value) };
                   }
                   return detail;
