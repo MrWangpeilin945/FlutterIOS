@@ -1831,16 +1831,4 @@ public class ConsultUsecaseTests
         // Assert
         response.Should().BeEquivalentTo(verifyExamItems);
     }
-
-    [Fact]
-    public async Task 前提検査メニューを検証する()
-    {
-
-        // Arrange
-        // 未受診の検査メニューを取得する
-
-        // Act
-
-        // Assert
-    }
 }
