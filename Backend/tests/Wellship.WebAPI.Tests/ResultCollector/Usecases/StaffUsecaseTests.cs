@@ -29,7 +29,9 @@ public class StaffUsecaseTests
             LoginId = "STF123",
             Name = "職員　太郎",
             Enabled = true,
-            RoleId = 999
+            RoleId = 999,
+            PasswordHash = new byte[64],
+            PasswordSalt = new byte[128]
         };
         var staff = new Staff(staffEntity);
         staffRepositoryMock.Setup(r => r.GetStaffByStaffIdAsync(staffId)).ReturnsAsync(staff);
@@ -67,7 +69,9 @@ public class StaffUsecaseTests
             LoginId = "STF123",
             Name = "職員　太郎",
             Enabled = true,
-            RoleId = 999
+            RoleId = 999,
+            PasswordHash = new byte[64],
+            PasswordSalt = new byte[128]
         };
         var staff = new Staff(staffEntity);
         staffRepositoryMock.Setup(r => r.GetStaffByStaffIdAsync(staffId)).ReturnsAsync(staff);

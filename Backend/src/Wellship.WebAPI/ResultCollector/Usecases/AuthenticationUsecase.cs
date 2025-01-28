@@ -31,7 +31,7 @@ public class AuthenticationUsecase(IAuthService authService,
     public async ValueTask<(string accessToken, string refreshToken)> LoginStaffAsync(string identifier, string password)
     {
         var staff = await _staffRepository.GetStaffByLoginIdAsync(identifier);
-        var loginHasSucceeded = staff.Enabled && staff.VerifyPassword(password);
+        var loginHasSucceeded = staff.Enabled && staff.Password.Verify(password);
         if (!loginHasSucceeded)
         {
             await _staffLoginHistoryRepository.WriteLoginFailedLogAsync(staff);
