@@ -1450,4 +1450,397 @@ public class ConsultUsecaseTests
         response.Should().BeEquivalentTo(inputExamItems);
 
     }
+
+    [Fact]
+    public async Task 検査結果を検証する()
+    {
+        // Arrange
+        var consultNumber = "0006";
+        var examMenuId = 1;
+        var request = new ResultsRequest
+        {
+            ExamMenuId = examMenuId,
+            ExamResults = [
+                                new ResultRequest{
+                                    ExamItemId = 1,
+                                    ExamItemDetails = [
+                                        new ExamItemDetailRequest {
+                                            ExamItemDetailId = 1, Value = "175.3"
+                                        }
+                                    ]
+                                },
+                                new ResultRequest{
+                                    ExamItemId = 2,
+                                    ExamItemDetails = [
+                                        new ExamItemDetailRequest {
+                                            ExamItemDetailId = 2, Value = "105.5"
+                                        }
+                                    ]
+                                }
+                            ]
+        };
+
+        var examineeCode = "100002";
+        var consultId = Guid.Parse("8d670eb8-d9f2-40b2-bfa6-cef6403be53d");
+        var examineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3");
+        var placeScheduleId = Guid.Parse("531eb00c-1850-4d5e-9561-f24cdfd9a250");
+        var organizationId = Guid.Parse("7bf76a3d-8bb4-41f5-8bd5-3b8fc8482511");
+        var examDate = new DateOnly(2024, 10, 02);
+        _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber))
+                            .ReturnsAsync(new Consult
+                            {
+                                ConsultId = consultId,
+                                ConsultNumber = consultNumber,
+                                ExamineeId = examineeId,
+                                ProgressStatus = ConsultProgressStatus.来場待ち,
+                                Note = "定期健康診断",
+                                ExportStatus = ConsultResultExportStatus.未出力,
+                                PlaceScheduleId = placeScheduleId,
+                                TicketNumber = "1192"
+                            });
+        _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(examineeId))
+                            .ReturnsAsync(new Examinee
+                            {
+                                ExamineeId = examineeId,
+                                ExamineeCode = examineeCode,
+                                Name = "両備　花子",
+                                KanaName = "リョウビ　ハナコ",
+                                Sex = Sex.女,
+                                Birthdate = new Birthdate(new DateOnly(1976, 6, 25)),
+                                Affiliations = []
+                            });
+        // 会場日程IDを指定して会場日程を取得する
+        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleAsync(placeScheduleId))
+                            .ReturnsAsync(new PlaceSchedule
+                            {
+                                Id = placeScheduleId,
+                                Place = new Place
+                                {
+                                    Id = Guid.Parse("aced0000-0000-0000-0000-000000000001"),
+                                    Code = "P001",
+                                    Name = "会場A",
+                                    OrderNumber = 1
+                                },
+                                Team = new Team
+                                {
+                                    Id = Guid.Parse("ea000000-0000-0000-0000-000000000001"),
+                                    Code = "T001",
+                                    Name = "班A",
+                                    OrderNumber = 1
+                                },
+                                ExamDate = examDate,
+                                StartTime = "1300",
+                                PlaceScheduleLockingStatus = PlaceScheduleLockingStatus.検査中
+                            });
+        // 検査メニューに関連した検査項目情報を取得
+        _examItemRepositoryMock.Setup(x => x.GetExamItemGroupsAsync(examMenuId))
+                            .ReturnsAsync([ new ExamItemGroup{ ExamItemGroupId = 1, Type = ExamItemGroupType.数値,
+                                                   ExamItems = [
+                                                        new ExamItem { PositionNumber = 1,  ExamItemId = 1, Name = "身長",
+                                                                       ExamItemDetails = [ new ExamItemDetail {
+                                                                                PositionNumber = 1,
+                                                                                ExamItemDetailId =1,
+                                                                                EquipmentLabel = "height",
+                                                                                Name = "身長",
+                                                                                Unit = "cm",
+                                                                                Type = ExamItemDetailType.入力,
+                                                                                IntegerLength = 3,
+                                                                                DecimalLength = 2,
+                                                                                KeyboardType = KeyboardType.テンキー
+                                                                      }]
+                                                        },
+                                                        new ExamItem { PositionNumber = 2,  ExamItemId = 2, Name = "体重",
+                                                                       ExamItemDetails = [ new ExamItemDetail {
+                                                                                PositionNumber = 2,
+                                                                                ExamItemDetailId =2,
+                                                                                EquipmentLabel = "weight",
+                                                                                Name = "体重",
+                                                                                Unit = "kg",
+                                                                                Type = ExamItemDetailType.入力,
+                                                                                IntegerLength = 3,
+                                                                                DecimalLength = 2,
+                                                                                KeyboardType = KeyboardType.テンキー
+                                                                      }]
+                                                        }
+                                         ]
+                            }]);
+        // 検査結果を取得
+        _consultRepositoryMock.Setup(x => x.GetExamResultsAsync(consultId))
+        .ReturnsAsync(new ExamResult
+        {
+            ConsultId = consultId,
+            ExamItemDetailResults = [
+                new ExamItemDetailResult{
+                    ExamItemId = 1,
+                    ExamItemDetailId = 1,
+                    Value = "178.5"
+                },
+                new ExamItemDetailResult{
+                    ExamItemId = 2,
+                    ExamItemDetailId = 2,
+                    Value = "70.8"
+                }
+            ]
+        });
+        // 過去検査結果を取得
+        _consultRepositoryMock.Setup(x => x.GetPreviousResultsAsync(consultId, examDate))
+                                .ReturnsAsync(new PreviousResult
+                                {
+                                    ConsultId = consultId,
+                                    ExamDate = new DateOnly(2023, 04, 10),
+                                    ExamItemDetailResults = [
+                                                                new ExamItemDetailResult{ ExamItemId = 1, ExamItemDetailId = 1, Value  = "175.4" },
+                                                                new ExamItemDetailResult{ ExamItemId = 2, ExamItemDetailId = 2, Value  = "100.5" }
+                                                            ]
+                                });
+        // 検査項目明細マスタ一覧を取得
+        _examItemRepositoryMock.Setup(x => x.GetExamItemDetailChildrenAsync(new int[] { 1, 2 }))
+        .ReturnsAsync([
+        new ExamItemDetailChild
+        {
+            ExamItemDetailId = 1,
+            Name = "身長",
+            PositionNumber = 1,
+            EquipmentLabel = "height",
+            Unit = "cm",
+            Type = ExamItemDetailType.入力,
+            IntegerLength = 3,
+            DecimalLength = 0,
+            KeyboardType = KeyboardType.テンキー,
+            Keyboards = [
+                new Keyboard{
+                    OptionId = 1,
+                    ExamItemDetailId = 1,
+                    Value = "80"
+                },
+                new Keyboard{
+                    OptionId = 2,
+                    ExamItemDetailId = 1,
+                    Value = "100"
+                },
+                new Keyboard{
+                    OptionId = 3,
+                    ExamItemDetailId = 1,
+                    Value = "200"
+                }
+            ],
+            DetailOptions = []
+        },
+        new ExamItemDetailChild
+        {
+            ExamItemDetailId = 2,
+            Name = "体重",
+            PositionNumber = 2,
+            EquipmentLabel = "weight",
+            Unit = "cm",
+            Type = ExamItemDetailType.入力,
+            IntegerLength = 3,
+            DecimalLength = 0,
+            KeyboardType = KeyboardType.テンキー,
+            Keyboards = [],
+            DetailOptions = []
+        }
+        ]);
+        // 検査メニュー特記一覧を取得
+        _examMenuRepositoryMock.Setup(x => x.GetMenuNotesAsync(examMenuId))
+            .ReturnsAsync([
+                new MenuNote{
+                    MenuNoteId = 1,
+                    Name = "身長",
+                    ExamMenuId = examMenuId,
+                    Suffix = "cm",
+                    ConsultNotes = [],
+                    ExamResults = [
+                        new  MenuNoteExamResult{
+                            ExamItemDetailId = 1,
+                            SourceType = SourceType.今回値
+                        },
+                        new  MenuNoteExamResult{
+                            ExamItemDetailId = 1,
+                            SourceType = SourceType.前回値
+                        }
+                    ]
+                }
+            ]);
+        // 検査結果相関ルールマスタを取得する
+        _examItemRepositoryMock.Setup(x => x.GetCorrelationRulesAsync(examMenuId))
+        .ReturnsAsync([
+            new CorrelationRule{
+            CorrelationRuleId = 1,
+            Name = "体重_前回差20kg以上",
+            ExamMenuId = examMenuId,
+            Priority = 1,
+            TriggerType = RuleTriggerType.ThresholdExceeded,
+            ErrorLevel = InputErrorLevel.異常,
+            ExamItemId = 2,
+            Message = "体重の前回差が20kg以上です。",
+            Evaluations = [ new CorrelationRuleEvaluation { EvaluationValue = "20.0", VariableNumber = 1}],
+            ExamItemDetails = [ new CorrelationRuleExamItemDetail{ ExamItemDetailId = 2, SourceType = SourceType.今回値, VariableNumber = 1},
+                                new CorrelationRuleExamItemDetail{ ExamItemDetailId = 2, SourceType = SourceType.前回値, VariableNumber = 2}
+                              ]
+        }
+        ]);
+        // キーボード入力値リスト
+        _examItemRepositoryMock.Setup(x => x.GetKeyboardOptionssAsync(new int[] { 1, 2 }))
+        .ReturnsAsync([
+            new Keyboard { ExamItemDetailId = 1, OptionId = 1, Value = "80"},
+            new Keyboard { ExamItemDetailId = 1, OptionId = 2, Value = "100"},
+            new Keyboard { ExamItemDetailId = 1, OptionId = 3, Value = "200"}
+        ]);
+        // 検査項目明細選択肢
+        _examItemRepositoryMock.Setup(x => x.GetExamItemDetailOptionsAsync(new int[] { 1, 2 }))
+        .ReturnsAsync([
+            new ExamItemDetailOption { ExamItemDetailId = 2, OrderNumber = 1, Code = "001", Name = "痩せ"},
+            new ExamItemDetailOption { ExamItemDetailId = 2, OrderNumber = 2, Code = "002", Name = "痩せ気味"},
+            new ExamItemDetailOption { ExamItemDetailId = 2, OrderNumber = 3, Code = "003", Name = "標準"},
+            new ExamItemDetailOption { ExamItemDetailId = 2, OrderNumber = 4, Code = "004", Name = "肥満気味"},
+            new ExamItemDetailOption { ExamItemDetailId = 2, OrderNumber = 5, Code = "005", Name = "肥満"}
+        ]);
+        // 検査基準値範囲を取得
+        var thresholdId1 = Guid.Parse("f1e54cf5-5aeb-4b1f-99f3-3dc984da6d00");
+        var thresholdId2 = Guid.Parse("0838f508-f40d-4973-9f51-c43ab4f14805");
+        var thresholdId3 = Guid.Parse("6537a6c5-c828-42e1-a1fb-4a76cbb41315");
+        _consultRepositoryMock.Setup(x => x.GetExamNormalValueRangesAsync(consultId, new int[] { 1, 2 }))
+        .ReturnsAsync([
+            new ExamNormalValueRange("身長1", thresholdId1, 1, new TargetAge("00000","9999999"),
+                                     new TargetSex(TargetSexType.両方), new ValueRange(0, 100), InputErrorLevel.正常, 1),
+            new ExamNormalValueRange("身長2", thresholdId2, 1, new TargetAge("00000","9999999"),
+                                     new TargetSex(TargetSexType.両方), new ValueRange(101, 150), InputErrorLevel.警告, 2),
+            new ExamNormalValueRange("身長3", thresholdId3, 1, new TargetAge("00000","9999999"),
+                                     new TargetSex(TargetSexType.両方), new ValueRange(151, 200), InputErrorLevel.異常, 3),
+            new ExamNormalValueRange("体重1", thresholdId1, 2, new TargetAge("00000","9999999"),
+                                     new TargetSex(TargetSexType.両方), new ValueRange(0, 50), InputErrorLevel.正常, 1),
+            new ExamNormalValueRange("体重2", thresholdId2, 2, new TargetAge("00000","9999999"),
+                                     new TargetSex(TargetSexType.両方), new ValueRange(51, 150), InputErrorLevel.警告, 2),
+            new ExamNormalValueRange("体重3", thresholdId3, 2, new TargetAge("00000","9999999"),
+                                     new TargetSex(TargetSexType.両方), new ValueRange(151, 200), InputErrorLevel.異常, 3)
+        ]);
+        // 検査中止を取得
+        _consultRepositoryMock.Setup(x => x.GetExamCancelsAsync(consultId))
+        .ReturnsAsync(new ExamCancel
+        {
+            ConsultId = consultId,
+            ExamItemDetailCancels = [
+                new  ExamItemDetailCancel {
+                    ExamItemId = 2, ExamItemDetailId = 2, CancelReasonId = 2
+                }
+            ]
+        });
+        // 検査依頼を取得
+        _consultRepositoryMock.Setup(x => x.GetExamOrdersAsync(consultId))
+        .ReturnsAsync(new ExamOrder
+        {
+            ConsultId = consultId,
+            ExamItemDetailOrders = [
+                new  ExamItemDetailOrder {
+                    ExamItemId = 1, ExamItemDetailId = 1
+                },
+                new  ExamItemDetailOrder {
+                    ExamItemId = 2, ExamItemDetailId = 2
+                }
+            ]
+        });
+
+        var verifyExamItems = new APIModels.Responses.VerifyExamItems
+        {
+            ExamItemGroups = [
+                new APIModels.Responses.ExamItemGroup
+                {
+                    Type = (int)ExamItemGroupType.数値 ,
+                    ExamItems = [
+                        new APIModels.Responses.InputExamItem{
+                            PositionNumber = 1,
+                            ExamItemId = 1,
+                            Name = "身長",
+                            ExamItemDetails = [
+                                new APIModels.Responses.ExamItemDetail{
+                                    PositionNumber = 1,
+                                    ExamItemDetailId = 1,
+                                    EquipmentLabel = "height",
+                                    Name = "身長",
+                                    HasOrder = true,
+                                    CancelReasonId = null,
+                                    Value = "178.5",
+                                    PrevValue = "175.4",
+                                    Unit = "cm",
+                                    Type = (int)ExamItemDetailType.入力,
+                                    IntegerLength = 3,
+                                    DecimalLength = 2,
+                                    Keyboard = new APIModels.Responses.Keyboard{
+                                        KeyboardType = 1,
+                                        Values = ["80", "100", "200"]
+                                    },
+                                    ExamItemDetailOptions = [],
+                                    ExamNormalValueRanges = [
+                                        new APIModels.Responses.ExamNormalValueRange { ErrorLevel = (int)InputErrorLevel.正常, MaxValue = 100, MinValue = 0},
+                                        new APIModels.Responses.ExamNormalValueRange { ErrorLevel = (int)InputErrorLevel.警告, MaxValue = 150, MinValue = 101},
+                                        new APIModels.Responses.ExamNormalValueRange { ErrorLevel = (int)InputErrorLevel.異常, MaxValue = 200, MinValue = 151}
+                                    ]
+                                }
+                            ],
+                            ExamRegistResults = []
+                        },
+                        new APIModels.Responses.InputExamItem{
+                            PositionNumber = 2,
+                            ExamItemId = 2,
+                            Name = "体重",
+                            ExamItemDetails = [
+                                new APIModels.Responses.ExamItemDetail{
+                                    PositionNumber = 2,
+                                    ExamItemDetailId = 2,
+                                    EquipmentLabel = "weight",
+                                    Name = "体重",
+                                    HasOrder = true,
+                                    CancelReasonId = 2,
+                                    Value = "70.8",
+                                    PrevValue = "100.5",
+                                    Unit = "kg",
+                                    Type = (int)ExamItemDetailType.入力,
+                                    IntegerLength = 3,
+                                    DecimalLength = 2 ,
+                                    Keyboard = new APIModels.Responses.Keyboard{
+                                        KeyboardType = 1,
+                                        Values = []
+                                    },
+                                    ExamItemDetailOptions = [
+                                        new APIModels.Responses.ExamItemDetailOption { OrderNumber = 1, Code = "001", Name = "痩せ"},
+                                        new APIModels.Responses.ExamItemDetailOption { OrderNumber = 2, Code = "002", Name = "痩せ気味"},
+                                        new APIModels.Responses.ExamItemDetailOption { OrderNumber = 3, Code = "003", Name = "標準"},
+                                        new APIModels.Responses.ExamItemDetailOption { OrderNumber = 4, Code = "004", Name = "肥満気味"},
+                                        new APIModels.Responses.ExamItemDetailOption { OrderNumber = 5, Code = "005", Name = "肥満"}
+                                    ],
+                                    ExamNormalValueRanges = [
+                                        new APIModels.Responses.ExamNormalValueRange { ErrorLevel = (int)InputErrorLevel.正常, MaxValue = 50, MinValue = 0},
+                                        new APIModels.Responses.ExamNormalValueRange { ErrorLevel = (int)InputErrorLevel.警告, MaxValue = 150, MinValue = 51},
+                                        new APIModels.Responses.ExamNormalValueRange { ErrorLevel = (int)InputErrorLevel.異常, MaxValue = 200, MinValue = 151}
+                                    ]
+                                }
+                            ],
+                            ExamRegistResults = []
+                        }
+                    ]
+                }
+            ]
+        };
+        // Act
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
+        var response = await usecase.VerifyResults(consultNumber, request);
+
+        // Assert
+        response.Should().BeEquivalentTo(verifyExamItems);
+    }
+
+    [Fact]
+    public async Task 前提検査メニューを検証する()
+    {
+
+        // Arrange
+        // 未受診の検査メニューを取得する
+
+        // Act
+
+        // Assert
+    }
 }
