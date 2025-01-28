@@ -258,8 +258,8 @@ export default function ConsultInput() {
           setCommonButtonMessage("閉じる");
           openCommon();
         }
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
 
     // isWatchingがtrueのときに監視を開始
