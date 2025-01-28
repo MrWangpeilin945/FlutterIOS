@@ -95,7 +95,7 @@ export default function ConsultInput() {
   //機器連携用
   const localStorageKey = "measurementResult";
   const [isWatching, setIsWatching] = useState(false); // 監視状態を管理するフラグ
-  const [initialDisplay,setInitialDisplay] = useState(true);
+  const [initialDisplay, setInitialDisplay] = useState(true);
 
   //AP1009呼び出し用(GET系APIの定義)
   const { refetch } = useConsultGetInputExamItemsExaminee(
@@ -155,7 +155,7 @@ export default function ConsultInput() {
 
   useEffect(() => {
     if (!examData) return;
-    
+
     //機器ラベルとvalueが空かをチェック
     const isValueEmptyForEquipmentLabel = (): boolean => {
       return (
@@ -204,16 +204,20 @@ export default function ConsultInput() {
   useEffect(() => {
     // StorageEventの変更を監視する関数
     const handleStorageChange = (event: StorageEvent) => {
+      setIsLoading(true);
       if (event.key === localStorageKey) {
         const base64Data = event.newValue ?? "";
         //解析js呼び出し処理
         const scriptUrl = targetConnectionEquipment?.processingScriptUrl;
         const analyzedData = dynamicScriptExecute(base64Data, scriptUrl ?? "");
         //value更新処理
+        let isUpdated = false;
         let updatedExamData = { ...examData };
         for (const [key, value] of Object.entries(analyzedData)) {
           // valueがnullの場合は処理を行わない
           if (value === null) continue;
+
+          let isUpdatedInThisKey = false;
 
           // equipmentLabelが一致するvalueを更新
           updatedExamData = {
@@ -224,11 +228,14 @@ export default function ConsultInput() {
                 ...item,
                 examItemDetails: item.examItemDetails?.map((detail) => {
                   if (
+                    !isUpdatedInThisKey &&
                     detail.equipmentLabel === key &&
                     detail.hasOrder &&
                     !detail.cancelReasonId &&
                     !detail.value
                   ) {
+                    isUpdated = true;
+                    isUpdatedInThisKey = true;
                     return { ...detail, value: String(value) };
                   }
                   return detail;
@@ -245,7 +252,14 @@ export default function ConsultInput() {
         }
         // ローカルストレージのデータを削除
         localStorage.removeItem(localStorageKey);
+        // 値を更新しなかった場合、ダイアログを表示
+        if (!isUpdated) {
+          setCommonMessage("表示可能な測定結果がありませんでした。");
+          setCommonButtonMessage("閉じる");
+          openCommon();
+        }
       }
+      setIsLoading(false);
     };
 
     // isWatchingがtrueのときに監視を開始
