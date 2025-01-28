@@ -7,6 +7,8 @@
 - [UI設計書（シーケンス図）](http://10.191.26.49/wellship-docs/ui-design/)
 - [アーキテクチャ設計書](http://10.191.26.49/wellship-docs/architecture/)
 - [API設計書](http://10.191.26.49/wellship-docs/webapi-design/)
+- [機器連携アプリ設計書](http://10.191.26.49/wellship-docs/mobileapp-design/)
+- [機器連携設計書](http://10.191.26.49/wellship-docs/equipment-design/)
 - [WebAPI仕様書（自動生成）](http://10.191.26.49/wellship/redoc/)
 - [WebAPIカバレッジレポート](http://10.191.26.49/wellship-tests/)
 

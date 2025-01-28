@@ -28,7 +28,7 @@ frontendはlocalstorageから取得した機器連携結果をこのスクリプ
 
 == シーケンス図
 
-[mermaid,機器連携概要,png,scale=3,pdfwidth=100%]
+[mermaid,OverviewSD,png,scale=3,pdfwidth=100%]
 ....
-include::./シーケンス図/機器連携概要.mmd[]
+include::./シーケンス図/OverviewSD.mmd[]
 ....
