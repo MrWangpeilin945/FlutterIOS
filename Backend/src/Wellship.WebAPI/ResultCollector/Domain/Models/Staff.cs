@@ -1,6 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
-
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
@@ -11,9 +8,6 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 /// </summary>
 public class Staff
 {
-    private readonly byte[] _passwordHash;
-    private readonly byte[] _passwordSalt;
-
     /// <summary>
     /// コンストラクタ
     /// </summary>
@@ -25,8 +19,7 @@ public class Staff
         Name = entity.Name;
         Enabled = entity.Enabled;
         Role = (Role)entity.RoleId;
-        _passwordHash = entity.PasswordHash;
-        _passwordSalt = entity.PasswordSalt;
+        Password = new Password(entity.PasswordHash, entity.PasswordSalt);
     }
 
     /// <summary>
@@ -60,18 +53,7 @@ public class Staff
     public Role Role { get; }
 
     /// <summary>
-    /// パスワードを検証する
+    /// パスワード認証情報
     /// </summary>
-    /// <param name="password">検証するパスワード</param>
-    public bool VerifyPassword(string password)
-    {
-        if (password == "" || _passwordHash.Length != 64 || _passwordSalt.Length != 128)
-        {
-            return false;
-        }
-        using var hmac = new HMACSHA512(_passwordSalt);
-        // NOTE: ストレッチングの要否は要件を確認した上で判断します
-        var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-        return hash.SequenceEqual(_passwordHash);
-    }
+    public Password Password { get; }
 }

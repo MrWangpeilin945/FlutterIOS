@@ -41,7 +41,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models
         /// <returns></returns>
         public bool Verify(string password)
         {
-            if (password == "" || Hash.Length != 64 || Hash.Length != 128)
+            if (password == "" || Hash.Length != 64 || Salt.Length != 128)
             {
                 return false;
             }
