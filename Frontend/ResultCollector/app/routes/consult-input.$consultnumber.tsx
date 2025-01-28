@@ -172,15 +172,14 @@ export default function ConsultInput() {
     // 機器連携
     const handleRemeasurementCheck = () => {
       const isEmpty = isValueEmptyForEquipmentLabel();
-
-      setVisibleRemeasurement(
+      const isConnectionEquipment =
         !!targetConnectionEquipment &&
-          !!targetConnectionEquipment.appLaunchUrl &&
-          !!targetConnectionEquipment.processingScriptUrl,
-      ); // 機器が選択されていないなら非表示
+        !!targetConnectionEquipment.appLaunchUrl &&
+        !!targetConnectionEquipment.processingScriptUrl;
+      setVisibleRemeasurement(isConnectionEquipment); // 機器が選択されていないなら非表示
       setDisabledRemeasurement(!isEmpty); // valueが全て存在する場合無効化
 
-      if (targetConnectionEquipment && isEmpty && initialDisplay) {
+      if (isConnectionEquipment && isEmpty && initialDisplay) {
         setInitialDisplay(false);
         launchConnectionEquipment();
       }
@@ -195,21 +194,31 @@ export default function ConsultInput() {
 
   //解析js呼び出し
   const dynamicScriptExecute = async (data: string, scriptPath: string) => {
-    const module = await import(/* @vite-ignore */ `${scriptPath}`);
-    const output = module.decode(data);
-    return output;
+    try {
+      const module = await import(/* @vite-ignore */ scriptPath);
+      const output = module.decode(data);
+      return output;
+    } catch {
+      //解析js内でエラーが発生した場合
+      setIsWatching(false);
+      setIsLoading(false);
+      localStorage.removeItem(localStorageKey);
+    }
   };
 
   //機器連携：監視用
   useEffect(() => {
     // StorageEventの変更を監視する関数
-    const handleStorageChange = (event: StorageEvent) => {
+    const handleStorageChange = async (event: StorageEvent) => {
       setIsLoading(true);
       if (event.key === localStorageKey) {
         const base64Data = event.newValue ?? "";
         //解析js呼び出し処理
         const scriptUrl = targetConnectionEquipment?.processingScriptUrl;
-        const analyzedData = dynamicScriptExecute(base64Data, scriptUrl ?? "");
+        const analyzedData = await dynamicScriptExecute(
+          base64Data,
+          scriptUrl ?? "",
+        );
         //value更新処理
         let isUpdated = false;
         let updatedExamData = { ...examData };
