@@ -20,6 +20,7 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ResultCollector.Middlewares;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 using Ryobi.Wellship.WebAPI.ResultCollector.Utilities;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Logger;
 
 namespace Ryobi.Wellship.WebAPI;
 
@@ -61,6 +62,7 @@ public class Program
         builder.Services.AddScoped<IStaffIdentityProvider, StaffIdentityFromHttpContextProvider>();
         builder.Services.AddScoped<ITenantProvider, TenantProvider>();
         builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddScoped<ILoggingService, LoggingService>();
 
         builder.Services.AddOpenApiDocument(options =>
         {
