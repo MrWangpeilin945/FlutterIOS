@@ -1473,7 +1473,7 @@ public class ConsultUsecaseTests
                                     ExamItemId = 2,
                                     ExamItemDetails = [
                                         new ExamItemDetailRequest {
-                                            ExamItemDetailId = 2, Value = "105.5"
+                                            ExamItemDetailId = 2, Value = "70.5"
                                         }
                                     ]
                                 }
@@ -1578,7 +1578,7 @@ public class ConsultUsecaseTests
                 new ExamItemDetailResult{
                     ExamItemId = 2,
                     ExamItemDetailId = 2,
-                    Value = "70.8"
+                    Value = "100.8"
                 }
             ]
         });
@@ -1792,7 +1792,7 @@ public class ConsultUsecaseTests
                                     Name = "体重",
                                     HasOrder = true,
                                     CancelReasonId = 2,
-                                    Value = "70.8",
+                                    Value = "100.8",
                                     PrevValue = "100.5",
                                     Unit = "kg",
                                     Type = (int)ExamItemDetailType.入力,
@@ -1816,7 +1816,9 @@ public class ConsultUsecaseTests
                                     ]
                                 }
                             ],
-                            ExamRegistResults = []
+                            ExamRegistResults = [
+                                new APIModels.Responses.ExamRegistResult { ErrorLevel = (int)InputErrorLevel.異常, Description = "体重の前回差が20kg以上です。"}
+                            ]
                         }
                     ]
                 }
