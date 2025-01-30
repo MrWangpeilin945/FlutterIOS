@@ -1,5 +1,6 @@
 desc: AP1017-01 会場ロック更新_正常 [200]
 runners:
+  db: ${DB_HOST}
   req:
     endpoint: ${BACKEND_URL}
     openapi3: ${OPENAPI3_URL}
@@ -27,6 +28,15 @@ steps:
               placeScheduleLockingStatus: "{{ vars.placeScheduleLockingStatus }}"
     test: |
       current.res.status == 200
-    dump:
-      expr: current.res.body
-      out: ../Dump/AP1017-01.json
+  selectStatus:
+    desc: "会場日程の状況を確認"
+    db:
+      query: |
+        SELECT
+          status
+        FROM
+          resultcollector.place_schedule
+        WHERE
+          place_schedule_id = '{{ vars.placeScheduleId }}';    
+    test: |
+      current.rows[0].status == vars.placeScheduleLockingStatus
