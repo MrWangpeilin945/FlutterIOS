@@ -297,7 +297,7 @@ export default function ExamresultExport() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching || isLoading} />
         <CommonHeader screenName="検査結果出力" staffName={staff?.name || ""} />
-        <Container fluid bg="background" py={32} px={24}>
+        <Container fluid bg="background" mb={59} p={0}>
           {!isFetching && (
             <>
               {exportData?.exportData ? (
@@ -316,7 +316,7 @@ export default function ExamresultExport() {
                       <Table.Th ta="center">未</Table.Th>
                       <Table.Th ta="center">保留</Table.Th>
                       <Table.Th ta="center">済</Table.Th>
-                      <Table.Th ta="center">出力</Table.Th>
+                      <Table.Th ta="right" pr={94}>出力</Table.Th>
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody h={118} fz="xs" c="black01">
@@ -329,10 +329,10 @@ export default function ExamresultExport() {
                               "yyyy/MM/dd",
                             )}
                         </Table.Td>
-                        <Table.Td w={297} className={styles["text-wrap"]}>
+                        <Table.Td miw={297} className={styles["text-wrap"]}>
                           {ed.placeName}
                         </Table.Td>
-                        <Table.Td ta="center">
+                        <Table.Td ta="center" w={250}>
                           <Button
                             variant="outline"
                             w={154}
@@ -380,7 +380,7 @@ export default function ExamresultExport() {
                               d.status === ConsultResultExportStatus.出力済み,
                           )?.count || 0}
                         </Table.Td>
-                        <Table.Td ta="center">
+                        <Table.Td ta="right" pr={24}>
                           <Button
                             variant="outline"
                             w={186}
@@ -432,7 +432,7 @@ export default function ExamresultExport() {
               ) : (
                 <>
                   {/* エラーメッセージを表示 */}
-                  <Text size="sm" c="black01">
+                  <Text size="sm" c="black01" ml={32} mt={24}>
                     {getErrorMessage(errorMessages.notFound, "検査結果データ")}
                   </Text>
                 </>
@@ -447,7 +447,7 @@ export default function ExamresultExport() {
                 <Stack>
                   <Group wrap="nowrap" gap={0}>
                     <Text size="lg" c="black01">
-                      登録日：
+                      健診日：
                     </Text>
                     <Text size="lg" c="black01">
                       {resultsOutputConfirmDialog?.examDate &&
