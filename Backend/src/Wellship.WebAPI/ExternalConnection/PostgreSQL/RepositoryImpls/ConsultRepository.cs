@@ -1,11 +1,12 @@
-using Dapper;
 using System.Data.Common;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
-using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
-using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
+
+using Dapper;
+
 using Ryobi.Wellship.Core.Enums;
-using YamlDotNet.Core;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
+using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 
@@ -31,11 +32,11 @@ public class ConsultRepository : IConsultRepository
     /// <param name="consults">更新する受診リスト</param>
     /// <param name="createdAt">作成日時</param>
     /// <param name="createdBy">作成者</param>
-    public async Task UpsertConsultsAsync(List<ConsultEntity> consults, DateTime createdAt, string createdBy)
+    public async Task UpsertConsultsAsync(List<ConsultEntity> consults, DateTimeOffset createdAt, string createdBy)
     {
         // ConnectionCodeでグループ化しSortNoの最大のレコードを絞り込む
         var actionConsults = consults.GroupBy(x => x.ConnectionCode, 
-                                            (y, z) => z.OrderByDescending(a => a.SortNo).First())
+                                             (y, z) => z.OrderByDescending(a => a.SortNo).First())
                                      .ToArray();
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         var transaction = await connection.BeginTransactionAsync();

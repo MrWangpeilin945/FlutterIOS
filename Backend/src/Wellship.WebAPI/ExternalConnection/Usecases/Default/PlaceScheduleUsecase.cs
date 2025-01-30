@@ -16,6 +16,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     private readonly IPlaceScheduleRepository _placeScheduleRepository;
     private readonly IPlaceRepository _placeRepository;
     private readonly ITeamRepository _teamRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// ユースケースを作成する
@@ -24,13 +25,17 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// <param name="placeScheduleRepository"></param>
     /// <param name="placeRepository"></param>
     /// <param name="teamRepository"></param>
-    public PlaceScheduleUsecase(IDbConnectionProvider dbConnectionProvider, IPlaceScheduleRepository placeScheduleRepository, IPlaceRepository placeRepository, ITeamRepository teamRepository)
+    /// <param name="timeProvider"></param>
+    public PlaceScheduleUsecase(IDbConnectionProvider dbConnectionProvider, IPlaceScheduleRepository placeScheduleRepository, 
+                                IPlaceRepository placeRepository, ITeamRepository teamRepository,
+                                TimeProvider timeProvider)
     {
         _dbConnectionProvider = dbConnectionProvider;
         _errorObjects = new List<ErrorObject>();
         _placeScheduleRepository = placeScheduleRepository;
         _placeRepository = placeRepository;
         _teamRepository = teamRepository;
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -60,11 +65,11 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
             PlaceId = places.Where(p => p.PlaceCode == placeSchedule.PlaceCode).Select(p => p.PlaceId).FirstOrDefault(),
             TeamId = teams.Where(t => t.TeamCode == placeSchedule.TeamCode).Select(t => t.TeamId).FirstOrDefault(),
             Status = (int)PlaceScheduleLockingStatus.検査中,
-            ExamDate = placeSchedule.ExamDate,
+            ExamDate = DateOnly.FromDateTime(placeSchedule.ExamDate),
             StartTime = placeSchedule.ExamDate.ToString("HHmm")
         }).ToList();
 
-        DateTime createdAt = DateTime.Now;
+        var createdAt = _timeProvider.GetUtcNow();
         string createdBy = "ExternalConnection";
 
         // 会場日時を登録する

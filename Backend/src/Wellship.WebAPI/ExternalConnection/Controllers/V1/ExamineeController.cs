@@ -9,7 +9,7 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers.V1;
 /// <summary>
-/// 受診者テスト用コントローラー
+/// 受診者 コントローラ
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
@@ -19,9 +19,9 @@ public class ExamineeController : ControllerBase
     private readonly IExamineeUsecase _examineeUsecases;
 
     /// <summary>
-    /// コントローラーを生成します。
+    /// コンストラクタ
     /// </summary>
-    /// <param name="examineeUsecases">受診者ユースケース</param>
+    /// <param name="examineeUsecases">受診者 ユースケース</param>
     public ExamineeController(IExamineeUsecase examineeUsecases)
     {
         _examineeUsecases = examineeUsecases;

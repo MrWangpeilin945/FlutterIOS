@@ -8,9 +8,8 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers.V1;
-
 /// <summary>
-/// 基準値範囲テスト用コントローラー
+/// 基準値(範囲) コントローラ
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
@@ -20,9 +19,9 @@ public class ExamNormalValueRangeController : ControllerBase
     private readonly IExamNormalValueRangeUsecase _examNormalValueRange;
 
     /// <summary>
-    /// コントローラーの生成
+    /// コンストラクタ
     /// </summary>
-    /// <param name="examNormalValueRange">基準値範囲コントローラー</param>
+    /// <param name="examNormalValueRange">基準値範囲 ユースケース</param>
     public ExamNormalValueRangeController(IExamNormalValueRangeUsecase examNormalValueRange)
     {
         _examNormalValueRange = examNormalValueRange;
@@ -35,7 +34,7 @@ public class ExamNormalValueRangeController : ControllerBase
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ErrorObject))]
     [HttpPost]
-    [Route("api/v{version:apiVersion}/external/examNormalValueRanges")]
+    [Route("api/v{version:apiVersion}/external/examNormalValueRange")]
     public async Task<IActionResult> StoreExamNormalValueRangeAsync([FromBody] ExamNormalValueRange[] request)
     {
         var result = await _examNormalValueRange.StoreExamNormalValueRangeAsync(request.ToList());

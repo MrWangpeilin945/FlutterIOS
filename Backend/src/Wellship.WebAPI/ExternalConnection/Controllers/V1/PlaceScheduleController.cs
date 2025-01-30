@@ -1,8 +1,6 @@
-using System.Diagnostics;
+using Asp.Versioning;
 
 using Microsoft.AspNetCore.Mvc;
-
-using Asp.Versioning;
 
 using NSwag.Annotations;
 
@@ -10,9 +8,8 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers.V1;
-
 /// <summary>
-/// 会場日程テスト用コントローラー
+/// 会場日程テスト用 コントローラ
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
@@ -22,9 +19,9 @@ public class PlaceScheduleController : ControllerBase
     private readonly IPlaceScheduleUsecase _placeScheduleUsecase;
 
     /// <summary>
-    /// コントローラーの生成
+    /// コンストラクタ
     /// </summary>
-    /// <param name="placeScheduleUsecases">会場日程コントローラー</param>
+    /// <param name="placeScheduleUsecases">会場日程 ユースケース</param>
     public PlaceScheduleController(IPlaceScheduleUsecase placeScheduleUsecases)
     {
         _placeScheduleUsecase = placeScheduleUsecases;
@@ -44,5 +41,4 @@ public class PlaceScheduleController : ControllerBase
 
         return Ok(result);
     }
-
 }

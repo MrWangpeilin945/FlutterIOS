@@ -10,15 +10,17 @@ public class TeamUsecase : ITeamUsecase
 {
     private readonly List<ErrorObject> _errorObjects;
     private readonly ITeamRepository _teamRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="teamRepository"></param>
-    public TeamUsecase(ITeamRepository teamRepository)
+    public TeamUsecase(ITeamRepository teamRepository, TimeProvider timeProvider)
     {
         _teamRepository = teamRepository;
         _errorObjects = new List<ErrorObject>();
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -37,7 +39,7 @@ public class TeamUsecase : ITeamUsecase
         }).ToList();
 
         // Repository処理
-        await _teamRepository.UpsertTeamsAsync(teamEntities, DateTime.Now, "ExternalConnection");
+        await _teamRepository.UpsertTeamsAsync(teamEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
         return _errorObjects;
     }

@@ -14,7 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="places">会場</param>
         /// <param name="createdAt">作成日時</param>
         /// <param name="createdBy">作成者</param>
-        public Task UpsertPlacesAsync(List<PlaceEntity> places, DateTime createdAt, string createdBy);
+        public Task UpsertPlacesAsync(List<PlaceEntity> places, DateTimeOffset createdAt, string createdBy);
 
         /// <summary>
         /// 存在する会場コードを取得する

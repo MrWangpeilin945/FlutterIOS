@@ -10,15 +10,18 @@ public class PlaceUsecase : IPlaceUsecase
 {
     private readonly List<ErrorObject> _errorObjects;
     private readonly IPlaceRepository _placeRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="placeRepository"></param>
-    public PlaceUsecase(IPlaceRepository placeRepository)
+    /// <param name="timeProvider"></param>
+    public PlaceUsecase(IPlaceRepository placeRepository, TimeProvider timeProvider)
     {
         _placeRepository = placeRepository;
         _errorObjects = new List<ErrorObject>();
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -37,7 +40,7 @@ public class PlaceUsecase : IPlaceUsecase
         }).ToList();
 
         // Repository処理
-        await _placeRepository.UpsertPlacesAsync(placeEntities, DateTime.Now, "ExternalConnection");
+        await _placeRepository.UpsertPlacesAsync(placeEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
         return _errorObjects;
     }

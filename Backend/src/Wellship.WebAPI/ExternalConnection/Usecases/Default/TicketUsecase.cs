@@ -10,15 +10,17 @@ public class TicketUsecase : ITicketUsecase
 {
     private List<ErrorObject> _errorObjects;
     private readonly ITicketRepository _ticketRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="ticketRepository"></param>
-    public TicketUsecase(ITicketRepository ticketRepository)
+    public TicketUsecase(ITicketRepository ticketRepository, TimeProvider timeProvider)
     {
         _ticketRepository = ticketRepository;
         _errorObjects = new List<ErrorObject>();
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -52,7 +54,7 @@ public class TicketUsecase : ITicketUsecase
                                         OrderNumber = x.SortNo
                                     }).ToList();
         // 受付を更新する
-        await _ticketRepository.UpsertTicketsAsync(validTickets, DateTime.Now, "ExternalConnection");
+        await _ticketRepository.UpsertTicketsAsync(validTickets, _timeProvider.GetUtcNow(), "ExternalConnection");
         return _errorObjects;
     }
 }

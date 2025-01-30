@@ -2,6 +2,7 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
+using System;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -16,6 +17,7 @@ public class ConsultUsecase : IConsultUsecase
     private readonly IPlaceScheduleRepository _placeScheduleRepository;
     private readonly IExamineeRepository _examineeRepository;
     private readonly IThresholdRepository _thresholdRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// コンストラクタ
@@ -26,9 +28,10 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
     /// <param name="thresholdRepository">基準値パターンリポジトリ</param>
+    /// <param name="timeProvider"></param>
     public ConsultUsecase(IConsultRepository consultRepository, ITeamRepository teamRepository, IPlaceRepository placeRepository,
                           IPlaceScheduleRepository placeScheduleRepository, IExamineeRepository examineeRepository,
-                          IThresholdRepository thresholdRepository)
+                          IThresholdRepository thresholdRepository, TimeProvider timeProvider)
     {
         _consultRepository = consultRepository;
         _teamRepository = teamRepository;
@@ -37,6 +40,7 @@ public class ConsultUsecase : IConsultUsecase
         _examineeRepository = examineeRepository;
         _thresholdRepository = thresholdRepository;
         _errorObjects = new List<ErrorObject>();
+        _timeProvider = timeProvider;
     }
 
     /// <summary>   
@@ -100,7 +104,7 @@ public class ConsultUsecase : IConsultUsecase
         // 会場日程IDが取得できない
         foreach (var warning in consults.Where(x => !placeSchedules.Any(ps => x.PlaceCode == ps.PlaceCode &&
                                                                               x.TeamCode == ps.TeamCode &&
-                                                                              x.ExamDate == DateOnly.FromDateTime(ps.ExamDate)))
+                                                                              x.ExamDate == ps.ExamDate))
                                         .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
         {
             warningConsult.Add(warning);
@@ -238,7 +242,7 @@ public class ConsultUsecase : IConsultUsecase
                                         ConsultNumber = x.ConsultNumber,
                                         PlaceScheduleId = placeSchedules.Where(ps => ps.PlaceCode == x.PlaceCode)
                                                                         .Where(ps => ps.TeamCode == x.TeamCode)
-                                                                        .Where(ps => DateOnly.FromDateTime(ps.ExamDate) == x.ExamDate)
+                                                                        .Where(ps => ps.ExamDate == x.ExamDate)
                                                                         .Select(ps => ps.PlaceScheduleId).FirstOrDefault(),
                                         Note = x.Note,
                                         ExamineeId = examinees.Where(e => e.ExamineeCode == x.ExamineeCd)
@@ -271,7 +275,7 @@ public class ConsultUsecase : IConsultUsecase
                                         }).ToList()
                                     }).ToList();
         // 受付を更新する
-        await _consultRepository.UpsertConsultsAsync(validConsults, DateTime.Now, "ExternalConnection");
+        await _consultRepository.UpsertConsultsAsync(validConsults, _timeProvider.GetUtcNow(), "ExternalConnection");
         return _errorObjects;
     }
 }

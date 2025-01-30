@@ -7,10 +7,9 @@ using NSwag.Annotations;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
-namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
-
+namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers.V1;
 /// <summary>
-/// 動作確認用コントローラ
+/// 班 コントローラ
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
@@ -22,7 +21,7 @@ public class TeamController : ControllerBase
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="teamUsecaseUsecase">班ユースケース</param>
+    /// <param name="teamUsecaseUsecase">班 ユースケース</param>
     public TeamController(ITeamUsecase teamUsecaseUsecase)
     {
         _teamUsecaseUsecase = teamUsecaseUsecase;

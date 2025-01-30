@@ -12,17 +12,21 @@ public class StaffUsecase : IStaffUsecase
     private readonly IDbConnectionProvider _dbConnectionProvider;
     private readonly List<ErrorObject> _errorObjects;
     private readonly IStaffRepository _staffRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// ユースケースを作成する
     /// </summary>
     /// <param name="dbConnectionProvider"></param>
     /// <param name="staffRepository"></param>
-    public StaffUsecase(IDbConnectionProvider dbConnectionProvider, IStaffRepository staffRepository)
+    /// <param name="timeProvider"></param>
+    public StaffUsecase(IDbConnectionProvider dbConnectionProvider, IStaffRepository staffRepository,
+                        TimeProvider timeProvider)
     {
         _dbConnectionProvider = dbConnectionProvider;
         _errorObjects = new List<ErrorObject>();
         _staffRepository = staffRepository;
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -52,7 +56,7 @@ public class StaffUsecase : IStaffUsecase
             };
         }).ToList();
 
-        DateTime createdAt = DateTime.Now;
+        var createdAt = _timeProvider.GetUtcNow();
         string createdBy = "ExternalConnection";
 
         //職員を登録する

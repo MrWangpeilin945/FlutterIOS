@@ -14,7 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="thresholds">基準パターン</param>
         /// <param name="createdAt">作成日時</param>
         /// <param name="createdBy">作成者</param>
-        public Task UpsertThresholdsAsync(List<ThresholdEntity> thresholds, DateTime createdAt, string createdBy);
+        public Task UpsertThresholdsAsync(List<ThresholdEntity> thresholds, DateTimeOffset createdAt, string createdBy);
 
         /// <summary>
         /// 基準パターンを取得する

@@ -8,9 +8,8 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers.V1;
-
 /// <summary>
-/// 職員コントローラー
+/// 職員 コントローラ
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
@@ -20,9 +19,9 @@ public class StaffController : ControllerBase
     private readonly IStaffUsecase _staffUsecase;
 
     /// <summary>
-    /// コントローラの生成
+    /// コンストラクタ
     /// </summary>
-    /// <param name="staffUsecase"></param>
+    /// <param name="staffUsecase">職員 ユースケース</param>
     public StaffController(IStaffUsecase staffUsecase)
     {
         _staffUsecase = staffUsecase;

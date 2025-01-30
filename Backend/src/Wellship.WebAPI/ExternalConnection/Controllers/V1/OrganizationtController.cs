@@ -7,10 +7,9 @@ using NSwag.Annotations;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
-namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers;
-
+namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers.V1;
 /// <summary>
-/// 団体テスト用コントローラー
+/// 団体 コントローラ
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
@@ -22,7 +21,7 @@ public class OrganizationtController : ControllerBase
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="organizationUsecases"></param>
+    /// <param name="organizationUsecases">団体 ユースケース</param>
     public OrganizationtController(IOrganizationUsecase organizationUsecases)
     {
         _organizationUsecases = organizationUsecases;
