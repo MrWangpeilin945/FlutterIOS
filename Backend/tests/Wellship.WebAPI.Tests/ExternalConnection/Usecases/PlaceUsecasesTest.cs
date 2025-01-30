@@ -1,11 +1,12 @@
 
 using System.Data;
+
 using Moq;
 
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
 namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases;
 
