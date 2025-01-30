@@ -62,7 +62,7 @@ public class Program
         builder.Services.AddScoped<IStaffIdentityProvider, StaffIdentityFromHttpContextProvider>();
         builder.Services.AddScoped<ITenantProvider, TenantProvider>();
         builder.Services.AddSingleton(TimeProvider.System);
-        builder.Services.AddScoped<ILoggingService, LoggingService>();
+        builder.Services.AddScoped<ICustomLoggingService, CustomLoggingService>();
 
         builder.Services.AddOpenApiDocument(options =>
         {
@@ -141,6 +141,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IExamItemRepository, ExamItemRepository>();
         services.AddScoped<IResultRepository, ResultRepository>();
         services.AddScoped<IAppConfigRepository, AppConfigRepository>();
+        services.AddScoped<ILogRepository, LogRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IOrganizationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.OrganizationRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExamineeRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExamineeRepository>();
