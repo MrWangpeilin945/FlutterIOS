@@ -16,6 +16,7 @@ public class TeamUsecase : ITeamUsecase
     /// コンストラクタ
     /// </summary>
     /// <param name="teamRepository"></param>
+    /// <param name="timeProvider"></param>
     public TeamUsecase(ITeamRepository teamRepository, TimeProvider timeProvider)
     {
         _teamRepository = teamRepository;

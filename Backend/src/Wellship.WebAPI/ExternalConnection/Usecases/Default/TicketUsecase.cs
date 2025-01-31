@@ -16,6 +16,7 @@ public class TicketUsecase : ITicketUsecase
     /// コンストラクタ
     /// </summary>
     /// <param name="ticketRepository"></param>
+    /// <param name="timeProvider"></param>
     public TicketUsecase(ITicketRepository ticketRepository, TimeProvider timeProvider)
     {
         _ticketRepository = ticketRepository;
