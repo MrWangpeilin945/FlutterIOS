@@ -2,7 +2,7 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 
-namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
+namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
 /// EC2002_受付を更新する
 /// </summary>
@@ -49,10 +49,10 @@ public class TicketUsecase : ITicketUsecase
                                         TicketNumber = x.TicketNumber,
                                         ConnectionCode = x.ConnectionCode,
                                         ActionType = x.ActionType,
-                                        OrderNumber = x.SortNo          
+                                        OrderNumber = x.SortNo
                                     }).ToList();
         // 受付を更新する
-        await _ticketRepository.UpsertTicketsAsync(validTickets, DateTime.Now, "ExternalConnection");                        
+        await _ticketRepository.UpsertTicketsAsync(validTickets, DateTime.Now, "ExternalConnection");
         return _errorObjects;
     }
 }

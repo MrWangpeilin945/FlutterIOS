@@ -1,20 +1,13 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Dapper;
 
 using FluentAssertions;
 
 using Moq;
+
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
-using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
 namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
 {
