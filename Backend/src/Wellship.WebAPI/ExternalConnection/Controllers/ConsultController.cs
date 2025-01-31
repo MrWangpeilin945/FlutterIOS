@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 using NSwag.Annotations;
