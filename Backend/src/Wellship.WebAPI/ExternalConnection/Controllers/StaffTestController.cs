@@ -15,13 +15,13 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
     [OpenApiIgnore]
     public class StaffTestController : ControllerBase
     {
-        private readonly Usecases.IStaffUsecase _staffUsecase;
+        private readonly Usecases.Default.IStaffUsecase _staffUsecase;
 
         /// <summary>
         /// コントローラの生成
         /// </summary>
         /// <param name="staffUsecase"></param>
-        public StaffTestController(Usecases.IStaffUsecase staffUsecase)
+        public StaffTestController(Usecases.Default.IStaffUsecase staffUsecase)
         {
             _staffUsecase = staffUsecase;
         }

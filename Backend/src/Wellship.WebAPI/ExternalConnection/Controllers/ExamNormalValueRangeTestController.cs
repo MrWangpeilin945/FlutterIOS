@@ -8,7 +8,7 @@ using NSwag.Annotations;
 
 using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers
 {
