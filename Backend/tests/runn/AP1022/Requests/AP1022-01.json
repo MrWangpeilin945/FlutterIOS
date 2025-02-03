@@ -2,13 +2,18 @@
     "executions": [
       {
         "examItemId": 1,
-        "isPerforming": true,
-        "cancelReasonId": null
+        "isPerforming": false,
+        "cancelReasonId": 2
       },
       {
-        "examItemId": 2,
+        "examItemId": 71,
         "isPerforming": false,
-        "cancelReasonId": 3
+        "cancelReasonId": 2
+      },
+      {
+        "examItemId": 72,
+        "isPerforming": true,
+        "cancelReasonId": null
       }
     ]
   }
