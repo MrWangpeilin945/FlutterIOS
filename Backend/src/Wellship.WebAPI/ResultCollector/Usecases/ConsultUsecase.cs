@@ -238,8 +238,7 @@ public class ConsultUsecase : IConsultUsecase
             CancelReasonId = (int)x.CancelReasonId!,
         }).ToArray();
 
-        await _consultRepository.RemoveExamCancelsAsync(consult.ConsultId, removeTargets);
-        await _consultRepository.SaveExamCancelsAsync(consult.ConsultId, toSave);
+        await _consultRepository.SaveExamCancelsAsync(consult.ConsultId, removeTargets, toSave);
     }
 
     /// <summary>

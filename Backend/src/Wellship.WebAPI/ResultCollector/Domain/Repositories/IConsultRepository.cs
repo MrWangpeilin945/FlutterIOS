@@ -34,15 +34,11 @@ public interface IConsultRepository
     public Task<ExamCancel> GetExamCancelsAsync(Guid consultId);
 
     /// <summary>
-    /// 検査中止を削除します。
-    /// </summary>
-    public Task RemoveExamCancelsAsync(Guid consultId, int[] examItemDetailIds);
-
-    /// <summary>
-    /// 検査中止を保存します。
+    /// 検査中止を削除・保存します。
+    /// 実施で検査項目明細の中止が存在すれば削除します。
     /// すでに同じ検査項目明細の中止が存在すれば上書き更新、存在しなければ新規作成します。
     /// </summary>
-    public Task SaveExamCancelsAsync(Guid consultId, IEnumerable<ExamItemCancel> examItemCancels);
+    public Task SaveExamCancelsAsync(Guid consultId, int[] removeDetailIds, IEnumerable<ExamItemCancel> examItemCancels);
 
     /// <summary>
     /// 受診を指定して検査依頼を取得します。
