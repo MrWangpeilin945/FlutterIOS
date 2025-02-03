@@ -1,10 +1,10 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 using NSwag.Annotations;
 
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1
 {
