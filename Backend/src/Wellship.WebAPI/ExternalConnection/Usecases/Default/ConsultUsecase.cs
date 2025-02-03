@@ -85,7 +85,7 @@ public class ConsultUsecase : IConsultUsecase
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたPlaceCodeがシステム上に存在しません。Code:[{warning.PlaceCode}]",
+                Message = $"指定されたPlaceCodeがシステム上に存在しません。Code:{warning.PlaceCode}",
                 InputNote = warning.InputNote
             });
         }
@@ -97,7 +97,7 @@ public class ConsultUsecase : IConsultUsecase
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたTeamCodeがシステム上に存在しません。Code:[{warning.TeamCode}]",
+                Message = $"指定されたTeamCodeがシステム上に存在しません。Code:{warning.TeamCode}",
                 InputNote = warning.InputNote
             });
         }
@@ -111,7 +111,7 @@ public class ConsultUsecase : IConsultUsecase
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:[{warning.PlaceCode}]/TeamCode:[{warning.TeamCode}]/ExamDate:[{warning.ExamDate}]",
+                Message = $"指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:{warning.PlaceCode}/TeamCode:{warning.TeamCode}/ExamDate:{warning.ExamDate}",
                 InputNote = warning.InputNote
             });
         }
@@ -123,7 +123,7 @@ public class ConsultUsecase : IConsultUsecase
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたExamineeCdがシステム上に存在しません。Code:[{warning.ExamineeCd}]",
+                Message = $"指定されたExamineeCdがシステム上に存在しません。Code:{warning.ExamineeCd}",
                 InputNote = warning.InputNote
             });
         }
@@ -136,7 +136,7 @@ public class ConsultUsecase : IConsultUsecase
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
-                    Message = $"指定されたConsultNotes.Codeがシステム上に存在しません。Code:[{warning.Code}]",
+                    Message = $"指定されたConsultNotes.Codeがシステム上に存在しません。Code:{warning.Code}",
                     InputNote = consult.InputNote
                 });
                 break;
@@ -151,7 +151,7 @@ public class ConsultUsecase : IConsultUsecase
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
-                    Message = $"指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:[{warning.ThresholdCode}]",
+                    Message = $"指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:{warning.ThresholdCode}",
                     InputNote = consult.InputNote
                 });
                 break;
@@ -167,7 +167,7 @@ public class ConsultUsecase : IConsultUsecase
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
-                    Message = $"指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:[{warning.ExamItemDetailCd}]",
+                    Message = $"指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:{warning.ExamItemDetailCd}",
                     InputNote = consult.InputNote
                 });
                 break;
@@ -181,7 +181,7 @@ public class ConsultUsecase : IConsultUsecase
                     _errorObjects.Add(new ErrorObject
                     {
                         Code = "10003",
-                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:[{previousResult.ExamItemDetailCd}]",
+                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:{previousResult.ExamItemDetailCd}",
                         InputNote = consult.InputNote
                     });
                     break;
@@ -198,7 +198,7 @@ public class ConsultUsecase : IConsultUsecase
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
-                    Message = $"指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:[{warning.ExamItemDetailCd}]",
+                    Message = $"指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:{warning.ExamItemDetailCd}",
                     InputNote = consult.InputNote
                 });
                 break;
@@ -212,7 +212,7 @@ public class ConsultUsecase : IConsultUsecase
                     _errorObjects.Add(new ErrorObject
                     {
                         Code = "10003",
-                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:[{examItemDetailOrder.ExamItemDetailCd}]",
+                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:{examItemDetailOrder.ExamItemDetailCd}",
                         InputNote = consult.InputNote
                     });
                     break;
@@ -228,7 +228,7 @@ public class ConsultUsecase : IConsultUsecase
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたConnectionCodeがシステム上に存在しません。Code:[{warning.ConnectionCode}]",
+                Message = $"指定されたConnectionCodeがシステム上に存在しません。Code:{warning.ConnectionCode}",
                 InputNote = warning.InputNote
             });
         }

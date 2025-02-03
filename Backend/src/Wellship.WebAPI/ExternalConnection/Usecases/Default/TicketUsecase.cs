@@ -40,7 +40,7 @@ public class TicketUsecase : ITicketUsecase
                                 .Select(x => new ErrorObject
                                 {
                                     Code = "10001",
-                                    Message = $"指定されたConnectionCodeがシステム上に存在しません。Code:[{x.ConnectionCode}]",
+                                    Message = $"指定されたConnectionCodeがシステム上に存在しません。Code:{x.ConnectionCode}",
                                     InputNote = x.InputNote
                                 }).ToList();
         // 連携キーの取得に成功した受付リスト
