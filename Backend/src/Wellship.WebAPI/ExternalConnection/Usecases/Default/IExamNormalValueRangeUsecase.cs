@@ -1,6 +1,6 @@
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 
-namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases
+namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default
 {
     /// <summary>
     /// 基準値範囲ユーズケースインターフェース

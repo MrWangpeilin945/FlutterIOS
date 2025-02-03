@@ -1,8 +1,8 @@
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 
-namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
+namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
-/// EC2002_受付を更新する
+/// EC2002_受付を更新する インターフェース
 /// </summary>
 public interface ITicketUsecase
 {

@@ -169,16 +169,16 @@ public static class IServiceCollectionExtension
         services.AddScoped<IIntegrationUsecase, IntegrationUsecase>();
         services.AddScoped<IProgressUsecase, ProgressUsecase>();
         services.AddScoped<ICancelReasonUsecase, CancelReasonUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.IOrganizationUsecase, ExternalConnection.Usecases.OrganizationUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.IExamineeUsecase, ExternalConnection.Usecases.ExamineeUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.ITeamUsecase, ExternalConnection.Usecases.TeamUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.IPlaceUsecase, ExternalConnection.Usecases.PlaceUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.IThresholdUsecase, ExternalConnection.Usecases.ThresholdUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.IConsultUsecase, ExternalConnection.Usecases.ConsultUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.ITicketUsecase, ExternalConnection.Usecases.TicketUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.IPlaceScheduleUsecase, ExternalConnection.Usecases.PlaceScheduleUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.IStaffUsecase, ExternalConnection.Usecases.StaffUsecase>();
-        services.AddScoped<ExternalConnection.Usecases.IExamNormalValueRangeUsecase, ExternalConnection.Usecases.ExamNormalValueRangeUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.IOrganizationUsecase, ExternalConnection.Usecases.Default.OrganizationUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.IExamineeUsecase, ExternalConnection.Usecases.Default.ExamineeUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.ITeamUsecase, ExternalConnection.Usecases.Default.TeamUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.IPlaceUsecase, ExternalConnection.Usecases.Default.PlaceUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.IThresholdUsecase, ExternalConnection.Usecases.Default.ThresholdUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.IConsultUsecase, ExternalConnection.Usecases.Default.ConsultUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.ITicketUsecase, ExternalConnection.Usecases.Default.TicketUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.IPlaceScheduleUsecase, ExternalConnection.Usecases.Default.PlaceScheduleUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.IStaffUsecase, ExternalConnection.Usecases.Default.StaffUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.IExamNormalValueRangeUsecase, ExternalConnection.Usecases.Default.ExamNormalValueRangeUsecase>();
         return services;
     }
     /// <summary>
