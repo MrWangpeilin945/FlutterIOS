@@ -153,7 +153,13 @@ list.Count()  <> 0
 
 ==== WARNING検証
 
-* None
+* ログインIDが異なる職員コードで登録されている
+** `[DB]Staff.login_id (ログインID)` == `Staff.LoginId` && `[DB]staffs.staff_code(職員コード)` != `Staff.StaffCode` が存在する
+*** Staffの単位で該当を取り除く
+*** ErrorObject
+*** Code `10002`
+**** Message `指定されたLoginIdが既に登録済みです。Code:[Staff.LoginId]` 
+**** InputNote `Staff.InputNote`
 
 ==== 処理(Repository)
 
