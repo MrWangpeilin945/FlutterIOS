@@ -7,8 +7,8 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  consultNumber: "0004"
-  consultId: "caaaaa00-0000-0000-0000-000000000004"
+  consultNumber: "1022"
+  consultId: "a0102200-0000-0000-0000-000000000001"
   deleteDetailId : 721
   insertDetailId1 : 711
   insertDetailId2 : 712
