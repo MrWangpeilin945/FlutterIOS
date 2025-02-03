@@ -246,8 +246,7 @@ public class ConsultUsecaseTests
         await usecase.RegisterExecutionsAsync(consultNumber, request);
 
         // Assert
-        _consultRepositoryMock.Verify(x => x.RemoveExamCancelsAsync(consult.ConsultId, It.IsAny<int[]>()), Times.Once);
-        _consultRepositoryMock.Verify(x => x.SaveExamCancelsAsync(consult.ConsultId, It.IsAny<ExamItemCancel[]>()), Times.Once);
+        _consultRepositoryMock.Verify(x => x.SaveExamCancelsAsync(consult.ConsultId, It.IsAny<int[]>(), It.IsAny<ExamItemCancel[]>()), Times.Once);
     }
 
     [Fact]
@@ -299,8 +298,7 @@ public class ConsultUsecaseTests
         await usecase.RegisterExecutionsAsync(consultNumber, request);
 
         // Assert
-        _consultRepositoryMock.Verify(x => x.RemoveExamCancelsAsync(consult.ConsultId, It.IsAny<int[]>()), Times.Once());
-        _consultRepositoryMock.Verify(x => x.SaveExamCancelsAsync(consult.ConsultId, It.IsAny<ExamItemCancel[]>()), Times.Once);
+        _consultRepositoryMock.Verify(x => x.SaveExamCancelsAsync(consult.ConsultId, It.IsAny<int[]>(), It.IsAny<ExamItemCancel[]>()), Times.Once);
     }
 
     [Fact]
