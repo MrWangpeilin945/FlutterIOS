@@ -74,8 +74,15 @@ export default function ExamHearing({
     let validatedData: InputExamItem = { ...updatedItem };
     //グループ内で1000Hzまたは4000Hzが所見ありの場合、もう一方のdetail.valueに所見なしのcodeを補完
     validatedData = [左1000Hz, 左4000Hz, 右1000Hz, 右4000Hz].reduce(
-      (acc, i) => {
-        return complementValue(i, acc);
+      (item, detailNumber) => {
+        const detail =
+          item.examItemDetails?.find(
+            (detail) => detail.positionNumber === detailNumber,
+          ) ?? {};
+        //所見なしの場合は処理を行わない
+        if (!detail.value || detail.value === getOptionCode(detail, 1)) return item;
+        //所見ありの場合は処理を行う
+        return complementValue(detailNumber, item);
       },
       validatedData,
     );
