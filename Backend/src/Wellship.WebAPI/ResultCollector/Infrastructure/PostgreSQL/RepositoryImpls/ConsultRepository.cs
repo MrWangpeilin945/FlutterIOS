@@ -223,10 +223,11 @@ public class ConsultRepository : IConsultRepository
     }
 
     /// <summary>
-    /// 検査中止を保存します。
+    /// 検査中止を削除・保存します。
+    /// 実施で検査項目明細の中止が存在すれば削除します。
     /// すでに同じ検査項目明細の中止が存在すれば上書き更新、存在しなければ新規作成します。
     /// </summary>
-    public async Task SaveExamCancelsAsync(Guid consultId, IEnumerable<ExamItemCancel> examItemCancels)
+    public async Task SaveExamCancelsAsync(Guid consultId, int[] removeDetailIds, IEnumerable<ExamItemCancel> examItemCancels)
     {
         using var connection = await _dbConnectionProvider.GetOrOpenAsync();
         using var transaction = connection.BeginTransaction();
@@ -237,6 +238,18 @@ public class ConsultRepository : IConsultRepository
             if (operationStaffCode is null)
             {
                 throw new WellshipAuthenticationException();
+            }
+
+            if (removeDetailIds.Length > 0)
+            {
+                const string deteleSql = @"
+                delete 
+                from
+                    resultcollector.exam_cancels 
+                where
+                    consult_id = @ConsultId
+                    and exam_item_detail_id = any (@RemoveDetailIds);";
+                await connection.ExecuteAsync(deteleSql, new { ConsultId = consultId, RemoveDetailIds = removeDetailIds });
             }
 
             const string preSelectSql = @"
@@ -329,6 +342,7 @@ public class ConsultRepository : IConsultRepository
 
             await connection.ExecuteAsync(mergeSql, saveItems);
             await connection.ExecuteAsync(logSql, saveItems);
+            transaction.Commit();
         }
         catch
         {
