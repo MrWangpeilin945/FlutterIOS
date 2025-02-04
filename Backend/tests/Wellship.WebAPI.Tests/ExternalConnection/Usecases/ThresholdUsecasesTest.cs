@@ -37,7 +37,7 @@ public class ThresholdUsecasesTest
         }).ToList();
 
         // モックのセットアップ
-        mockRepo.Setup(repo => repo.UpsertThresholdsAsync(It.IsAny<List<ThresholdEntity>>(), It.IsAny<DateTime>(), "ExternalConnection"));
+        mockRepo.Setup(repo => repo.UpsertThresholdsAsync(It.IsAny<List<ThresholdEntity>>(), It.IsAny<DateTimeOffset>(), "ExternalConnection"));
 
         ThresholdUsecase usecases = new ThresholdUsecase(mockRepo.Object, TimeProvider.System);
 
@@ -53,7 +53,7 @@ public class ThresholdUsecasesTest
                 thresholdEntities[0].Name == inputThresholds[0].Name &&
                 thresholdEntities[1].ThresholdCode == inputThresholds[1].Code &&
                 thresholdEntities[1].Name == inputThresholds[1].Name
-            ), It.IsAny<DateTime>(), "ExternalConnection"), Times.Once);
+            ), It.IsAny<DateTimeOffset>(), "ExternalConnection"), Times.Once);
 
         // 戻り値のエラーリストについて
         // 正常系の想定であり、エラーオブジェクトの中身が空っぽのものだけであることを確認する。
