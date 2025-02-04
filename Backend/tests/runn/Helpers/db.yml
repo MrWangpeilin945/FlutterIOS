@@ -1,0 +1,23 @@
+desc: DBに接続テスト
+runners:
+  db: ${DB_HOST}
+vars:
+steps:
+  insertRole:
+    desc: "ロール追加"
+    db:
+      query: |
+        DELETE FROM resultcollector.roles
+        WHERE role_id = 30;
+        INSERT INTO resultcollector.roles(role_id,name,created_by) VALUES
+          (30,'特権','init');
+  selectRoles:
+    desc: "接続確認"
+    db:
+      query: |
+        SELECT 
+          *
+        FROM
+          resultcollector.roles;
+    test: |
+      len(current.rows) == 3

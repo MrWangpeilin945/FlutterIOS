@@ -1,0 +1,14 @@
+{
+  "executions": [
+    {
+      "examItemId": null,
+      "isPerforming": true,
+      "cancelReasonId": null
+    },
+    {
+      "examItemId": 2,
+      "isPerforming": false,
+      "cancelReasonId": 3
+    }
+  ]
+}

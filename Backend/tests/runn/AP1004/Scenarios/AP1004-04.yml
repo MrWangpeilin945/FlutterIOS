@@ -1,0 +1,21 @@
+desc: AP1004-04 会場日程取得_無効なアクセストークン [401]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: true
+steps:
+  get:
+    desc: "会場日程取得_無効なアクセストークン"
+    req:
+      /api/v1/placeSchedules/places:
+        get:
+          headers:
+            Authorization: "Bearer invalidToken"
+    test: |
+      current.res.status == 401
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1004-04.json
+

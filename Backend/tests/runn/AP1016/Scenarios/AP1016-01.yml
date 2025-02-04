@@ -1,0 +1,26 @@
+desc: AP1016-01 会場ロック取得_正常 [200]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  placeScheduleId: "aceced00-0000-0000-0000-000000000001"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path: ../../Helpers/adminAccessToken.yml
+  get:
+    desc: "会場ロック取得_正常"
+    req:
+      /api/v1/placeSchedules/{{ vars.placeScheduleId }}/placeScheduleLockingStatus:
+        get:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1016-01.json

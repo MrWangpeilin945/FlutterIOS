@@ -1,0 +1,28 @@
+desc: AP1005-03 ホームメニュー取得_指定した会場日程が存在しない [404]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  placeScheduleId: "86a24591-8e56-4d6a-a380-d1677cbb1f11"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  get:
+    desc: "ホームメニュー取得_指定した会場日程が存在しない"
+    req:
+      /api/v1/homeMenus?placeScheduleId={{ vars.placeScheduleId }}:
+        get:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+    test: |
+      current.res.status == 404
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1005-03.json
+
