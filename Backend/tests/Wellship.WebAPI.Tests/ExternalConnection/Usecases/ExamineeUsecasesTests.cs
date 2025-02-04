@@ -28,8 +28,8 @@ namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
 
             dbConnectionProvider.Setup(x => x.GetOrOpenAsync()).ReturnsAsync(new Mock<DbConnection>().Object);
             organizationRepository.Setup(x => x.GetOrganizationsByCodesAsync(It.IsAny<List<string>>())).ReturnsAsync(new List<string> { "001" });
-            examineeRepository.Setup(x => x.UpsertExamineesAsync(It.IsAny<List<ExamineeEntity>>(), It.IsAny<DateTime>(), It.IsAny<string>())).Returns(Task.CompletedTask);
-            affiliationRepository.Setup(x => x.InsertAffiliationsAsync(It.IsAny<List<Examinee>>(), It.IsAny<DateTime>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+            examineeRepository.Setup(x => x.UpsertExamineesAsync(It.IsAny<List<ExamineeEntity>>(), It.IsAny<DateTimeOffset>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+            affiliationRepository.Setup(x => x.InsertAffiliationsAsync(It.IsAny<List<Examinee>>(), It.IsAny<DateTimeOffset>(), It.IsAny<string>())).Returns(Task.CompletedTask);
 
             _usecases = new ExamineeUsecase(dbConnectionProvider.Object, organizationRepository.Object, examineeRepository.Object, affiliationRepository.Object, TimeProvider.System);
         }
