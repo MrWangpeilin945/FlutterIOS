@@ -14,6 +14,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="createAt">作成日時</param>
         /// <param name="createdBy">作成者</param>
         /// <returns></returns>
-        public Task InsertAffiliationsAsync(List<Examinee> examinees, DateTime createAt, string createdBy);
+        public Task InsertAffiliationsAsync(List<Examinee> examinees, DateTimeOffset createAt, string createdBy);
     }
 }

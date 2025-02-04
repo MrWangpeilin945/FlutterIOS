@@ -2,6 +2,7 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
+using System;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -16,6 +17,7 @@ public class ConsultUsecase : IConsultUsecase
     private readonly IPlaceScheduleRepository _placeScheduleRepository;
     private readonly IExamineeRepository _examineeRepository;
     private readonly IThresholdRepository _thresholdRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// コンストラクタ
@@ -26,9 +28,10 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="placeScheduleRepository">会場日程リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
     /// <param name="thresholdRepository">基準値パターンリポジトリ</param>
+    /// <param name="timeProvider"></param>
     public ConsultUsecase(IConsultRepository consultRepository, ITeamRepository teamRepository, IPlaceRepository placeRepository,
                           IPlaceScheduleRepository placeScheduleRepository, IExamineeRepository examineeRepository,
-                          IThresholdRepository thresholdRepository)
+                          IThresholdRepository thresholdRepository, TimeProvider timeProvider)
     {
         _consultRepository = consultRepository;
         _teamRepository = teamRepository;
@@ -37,6 +40,7 @@ public class ConsultUsecase : IConsultUsecase
         _examineeRepository = examineeRepository;
         _thresholdRepository = thresholdRepository;
         _errorObjects = new List<ErrorObject>();
+        _timeProvider = timeProvider;
     }
 
     /// <summary>   
@@ -81,7 +85,7 @@ public class ConsultUsecase : IConsultUsecase
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたPlaceCodeがシステム上に存在しません。Code:[{warning.PlaceCode}]",
+                Message = $"指定されたPlaceCodeがシステム上に存在しません。Code:{warning.PlaceCode}",
                 InputNote = warning.InputNote
             });
         }
@@ -93,21 +97,21 @@ public class ConsultUsecase : IConsultUsecase
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたTeamCodeがシステム上に存在しません。Code:[{warning.TeamCode}]",
+                Message = $"指定されたTeamCodeがシステム上に存在しません。Code:{warning.TeamCode}",
                 InputNote = warning.InputNote
             });
         }
         // 会場日程IDが取得できない
         foreach (var warning in consults.Where(x => !placeSchedules.Any(ps => x.PlaceCode == ps.PlaceCode &&
                                                                               x.TeamCode == ps.TeamCode &&
-                                                                              x.ExamDate == DateOnly.FromDateTime(ps.ExamDate)))
+                                                                              x.ExamDate == ps.ExamDate))
                                         .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
         {
             warningConsult.Add(warning);
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:[{warning.PlaceCode}]/TeamCode:[{warning.TeamCode}]/ExamDate:[{warning.ExamDate}]",
+                Message = $"指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:{warning.PlaceCode}/TeamCode:{warning.TeamCode}/ExamDate:{warning.ExamDate}",
                 InputNote = warning.InputNote
             });
         }
@@ -119,7 +123,7 @@ public class ConsultUsecase : IConsultUsecase
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたExamineeCdがシステム上に存在しません。Code:[{warning.ExamineeCd}]",
+                Message = $"指定されたExamineeCdがシステム上に存在しません。Code:{warning.ExamineeCd}",
                 InputNote = warning.InputNote
             });
         }
@@ -132,7 +136,7 @@ public class ConsultUsecase : IConsultUsecase
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
-                    Message = $"指定されたConsultNotes.Codeがシステム上に存在しません。Code:[{warning.Code}]",
+                    Message = $"指定されたConsultNotes.Codeがシステム上に存在しません。Code:{warning.Code}",
                     InputNote = consult.InputNote
                 });
                 break;
@@ -147,7 +151,7 @@ public class ConsultUsecase : IConsultUsecase
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
-                    Message = $"指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:[{warning.ThresholdCode}]",
+                    Message = $"指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:{warning.ThresholdCode}",
                     InputNote = consult.InputNote
                 });
                 break;
@@ -163,7 +167,7 @@ public class ConsultUsecase : IConsultUsecase
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
-                    Message = $"指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:[{warning.ExamItemDetailCd}]",
+                    Message = $"指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:{warning.ExamItemDetailCd}",
                     InputNote = consult.InputNote
                 });
                 break;
@@ -177,7 +181,7 @@ public class ConsultUsecase : IConsultUsecase
                     _errorObjects.Add(new ErrorObject
                     {
                         Code = "10003",
-                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:[{previousResult.ExamItemDetailCd}]",
+                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:{previousResult.ExamItemDetailCd}",
                         InputNote = consult.InputNote
                     });
                     break;
@@ -194,7 +198,7 @@ public class ConsultUsecase : IConsultUsecase
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
-                    Message = $"指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:[{warning.ExamItemDetailCd}]",
+                    Message = $"指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:{warning.ExamItemDetailCd}",
                     InputNote = consult.InputNote
                 });
                 break;
@@ -208,7 +212,7 @@ public class ConsultUsecase : IConsultUsecase
                     _errorObjects.Add(new ErrorObject
                     {
                         Code = "10003",
-                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:[{examItemDetailOrder.ExamItemDetailCd}]",
+                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:{examItemDetailOrder.ExamItemDetailCd}",
                         InputNote = consult.InputNote
                     });
                     break;
@@ -224,7 +228,7 @@ public class ConsultUsecase : IConsultUsecase
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたConnectionCodeがシステム上に存在しません。Code:[{warning.ConnectionCode}]",
+                Message = $"指定されたConnectionCodeがシステム上に存在しません。Code:{warning.ConnectionCode}",
                 InputNote = warning.InputNote
             });
         }
@@ -238,7 +242,7 @@ public class ConsultUsecase : IConsultUsecase
                                         ConsultNumber = x.ConsultNumber,
                                         PlaceScheduleId = placeSchedules.Where(ps => ps.PlaceCode == x.PlaceCode)
                                                                         .Where(ps => ps.TeamCode == x.TeamCode)
-                                                                        .Where(ps => DateOnly.FromDateTime(ps.ExamDate) == x.ExamDate)
+                                                                        .Where(ps => ps.ExamDate == x.ExamDate)
                                                                         .Select(ps => ps.PlaceScheduleId).FirstOrDefault(),
                                         Note = x.Note,
                                         ExamineeId = examinees.Where(e => e.ExamineeCode == x.ExamineeCd)
@@ -271,7 +275,7 @@ public class ConsultUsecase : IConsultUsecase
                                         }).ToList()
                                     }).ToList();
         // 受付を更新する
-        await _consultRepository.UpsertConsultsAsync(validConsults, DateTime.Now, "ExternalConnection");
+        await _consultRepository.UpsertConsultsAsync(validConsults, _timeProvider.GetUtcNow(), "ExternalConnection");
         return _errorObjects;
     }
 }

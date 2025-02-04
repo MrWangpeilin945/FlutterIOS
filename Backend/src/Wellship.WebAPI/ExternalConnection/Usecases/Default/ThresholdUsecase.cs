@@ -10,15 +10,18 @@ public class ThresholdUsecase : IThresholdUsecase
 {
     private readonly List<ErrorObject> _errorObjects;
     private readonly IThresholdRepository _thresholdRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="thresholdRepository"></param>
-    public ThresholdUsecase(IThresholdRepository thresholdRepository)
+    /// <param name="timeProvider"></param>
+    public ThresholdUsecase(IThresholdRepository thresholdRepository, TimeProvider timeProvider)
     {
         _thresholdRepository = thresholdRepository;
         _errorObjects = new List<ErrorObject>();
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -37,7 +40,7 @@ public class ThresholdUsecase : IThresholdUsecase
         }).ToList();
 
         // Repository処理
-        await _thresholdRepository.UpsertThresholdsAsync(thresholdEntities, DateTime.Now, "ExternalConnection");
+        await _thresholdRepository.UpsertThresholdsAsync(thresholdEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
         return _errorObjects;
     }
