@@ -447,7 +447,7 @@ export default function ConsultInput() {
             );
             
             errorBranch(maxErrorLevel);
-            setExamData(result.data);
+            setExamData(error.response.data);
           } else if (status === 500) {
             errorMessage = getErrorMessage(errorMessages.serverError);
           }
