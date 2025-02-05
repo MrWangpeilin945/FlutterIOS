@@ -15,6 +15,7 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     private readonly IExamNormalValueRangeRepository _examNormalValueRangeRepository;
     private readonly IThresholdRepository _thresholdRepository;
     private readonly IExternalExamItemDetailsRepository _externalExamItemDetailsRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// ユースケースを作成する
@@ -23,13 +24,17 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     /// <param name="examNormalValueRangeRepository"></param>
     /// <param name="thresholdRepository"></param>
     /// <param name="externalExamItemDetailsRepository"></param>
-    public ExamNormalValueRangeUsecase(IDbConnectionProvider dbConnectionProvider, IExamNormalValueRangeRepository examNormalValueRangeRepository, IThresholdRepository thresholdRepository, IExternalExamItemDetailsRepository externalExamItemDetailsRepository)
+    /// <param name="timeProvider"></param>
+    public ExamNormalValueRangeUsecase(IDbConnectionProvider dbConnectionProvider, IExamNormalValueRangeRepository examNormalValueRangeRepository, 
+                                       IThresholdRepository thresholdRepository, IExternalExamItemDetailsRepository externalExamItemDetailsRepository,
+                                       TimeProvider timeProvider)
     {
         _dbConnectionProvider = dbConnectionProvider;
         _errorObjects = new List<ErrorObject>();
         _examNormalValueRangeRepository = examNormalValueRangeRepository;
         _thresholdRepository = thresholdRepository;
         _externalExamItemDetailsRepository = externalExamItemDetailsRepository;
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -73,7 +78,7 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
             ErrorLevel = (int)examNormalValueRange.ErrorLevel
         }).ToList();
 
-        DateTime createdAt = DateTime.Now;
+        var createdAt = _timeProvider.GetUtcNow();
         string createdBy = "ExternalConnection";
 
         // 基準値範囲を登録する

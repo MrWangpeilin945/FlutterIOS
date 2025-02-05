@@ -10,15 +10,18 @@ public class TicketUsecase : ITicketUsecase
 {
     private List<ErrorObject> _errorObjects;
     private readonly ITicketRepository _ticketRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="ticketRepository"></param>
-    public TicketUsecase(ITicketRepository ticketRepository)
+    /// <param name="timeProvider"></param>
+    public TicketUsecase(ITicketRepository ticketRepository, TimeProvider timeProvider)
     {
         _ticketRepository = ticketRepository;
         _errorObjects = new List<ErrorObject>();
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -37,7 +40,7 @@ public class TicketUsecase : ITicketUsecase
                                 .Select(x => new ErrorObject
                                 {
                                     Code = "10001",
-                                    Message = $"指定されたConnectionCodeがシステム上に存在しません。Code:[{x.ConnectionCode}]",
+                                    Message = $"指定されたConnectionCodeがシステム上に存在しません。Code:{x.ConnectionCode}",
                                     InputNote = x.InputNote
                                 }).ToList();
         // 連携キーの取得に成功した受付リスト
@@ -52,7 +55,7 @@ public class TicketUsecase : ITicketUsecase
                                         OrderNumber = x.SortNo
                                     }).ToList();
         // 受付を更新する
-        await _ticketRepository.UpsertTicketsAsync(validTickets, DateTime.Now, "ExternalConnection");
+        await _ticketRepository.UpsertTicketsAsync(validTickets, _timeProvider.GetUtcNow(), "ExternalConnection");
         return _errorObjects;
     }
 }

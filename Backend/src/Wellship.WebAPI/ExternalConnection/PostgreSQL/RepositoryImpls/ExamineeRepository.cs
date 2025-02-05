@@ -33,7 +33,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="createdAt">作成日時</param>
         /// <param name="createdBy">作成者</param>
         /// <returns></returns>
-        public async Task UpsertExamineesAsync(List<ExamineeEntity> examineeEntities, DateTime createdAt, string createdBy)
+        public async Task UpsertExamineesAsync(List<ExamineeEntity> examineeEntities, DateTimeOffset createdAt, string createdBy)
         {
             using var connection = await _dbConnectionProvider.GetOrOpenAsync();
             {

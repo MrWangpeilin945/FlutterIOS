@@ -8,6 +8,7 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 
 namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
 {
@@ -32,7 +33,7 @@ namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
 
             organizationRepositoryMock.Setup(r => r.UpsertOrganizationsAsync(organizationEntities, DateTime.Now, "ExternalConnection"));
 
-            var usecases = new OrganizationUsecase(organizationRepositoryMock.Object);
+            var usecases = new OrganizationUsecase(organizationRepositoryMock.Object,TimeProvider.System);
 
             // Act & Assert
             await usecases.Invoking(x => x.StoreOrganizationsAsync(organizations))
