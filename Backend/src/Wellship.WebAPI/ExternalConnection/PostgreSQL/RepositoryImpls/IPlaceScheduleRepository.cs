@@ -14,7 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="createdAt"></param>
         /// <param name="createdBy"></param>
         /// <returns></returns>
-        public Task UpsertPlaceScheduleAsync(List<PlaceScheduleEntity> placeScheduleEntities, DateTime createdAt, string createdBy);
+        public Task UpsertPlaceScheduleAsync(List<PlaceScheduleEntity> placeScheduleEntities, DateTimeOffset createdAt, string createdBy);
 
         /// <summary>
         /// 存在する会場日程（会場ID、会場コード、班ID、班コード、健診日）を取得する

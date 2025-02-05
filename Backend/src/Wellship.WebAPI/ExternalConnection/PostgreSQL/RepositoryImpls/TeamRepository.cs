@@ -30,7 +30,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="teams">班</param>
         /// <param name="createdAt">作成日時</param>
         /// <param name="createdBy">作成者</param>
-        public async Task UpsertTeamsAsync(List<TeamEntity> teams, DateTime createdAt, string createdBy)
+        public async Task UpsertTeamsAsync(List<TeamEntity> teams, DateTimeOffset createdAt, string createdBy)
         {
             using var scope = TransactionScopeHelper.GetTransactionScope();
             {

@@ -36,7 +36,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard
         /// 生年月日
         /// </summary>
         [JsonPropertyName("birthdate")]
-        public required DateTime Birthdate { get; init; }
+        public required DateOnly Birthdate { get; init; }
 
         /// <summary>
         /// 所属

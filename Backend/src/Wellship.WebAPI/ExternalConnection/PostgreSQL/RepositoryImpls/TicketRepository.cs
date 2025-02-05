@@ -30,7 +30,7 @@ public class TicketRepository : ITicketRepository
     /// <param name="tickets">更新する受付リスト</param>
     /// <param name="createdAt">作成日時</param>
     /// <param name="createdBy">作成者</param>
-    public async Task UpsertTicketsAsync(List<TicketEntity> tickets, DateTime createdAt, string createdBy)
+    public async Task UpsertTicketsAsync(List<TicketEntity> tickets, DateTimeOffset createdAt, string createdBy)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         var transaction = await connection.BeginTransactionAsync();

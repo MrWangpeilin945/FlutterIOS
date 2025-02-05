@@ -28,7 +28,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="createdAt"></param>
         /// <param name="createdBy"></param>
         /// <returns></returns>
-        public async Task UpsertStaffAsync(List<StaffEntity> staffEntities, DateTime createdAt, string createdBy)
+        public async Task UpsertStaffAsync(List<StaffEntity> staffEntities, DateTimeOffset createdAt, string createdBy)
         {
             var connection = await _dbConnectionProvider.GetOrOpenAsync();
             var transaction = await connection.BeginTransactionAsync();

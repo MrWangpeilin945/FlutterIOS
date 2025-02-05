@@ -14,7 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="createdAt"></param>
         /// <param name="createdBy"></param>
         /// <returns></returns>
-        public Task UpsertStaffAsync(List<StaffEntity> staffEntities, DateTime createdAt, string createdBy);
+        public Task UpsertStaffAsync(List<StaffEntity> staffEntities, DateTimeOffset createdAt, string createdBy);
         /// <summary>
         /// 職員コードとログインIDのペアを取得する
         /// </summary>

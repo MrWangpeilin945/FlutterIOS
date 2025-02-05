@@ -25,6 +25,10 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Utilities
                     return $"'{number.ToString()}'";
                 case DateTime date:
                     return $"'{date:yyyy-MM-dd HH:mm:ss}'";
+                case DateTimeOffset date:
+                    return $"'{date:yyyy-MM-dd HH:mm:ss}'";
+                case DateOnly date:
+                    return $"'{date:yyyy-MM-dd}'";
                 case Guid guid:
                     return $"'{guid.ToString("D")}'";
                 default:

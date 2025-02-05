@@ -33,7 +33,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="createdAt"></param>
         /// <param name="createdBy"></param>
         /// <returns></returns>
-        public async Task UpsertExamNormalValueRangeAsync(List<ExamNormalValueRangeEntity> examNormalValueRangeEntities, DateTime createdAt, string createdBy)
+        public async Task UpsertExamNormalValueRangeAsync(List<ExamNormalValueRangeEntity> examNormalValueRangeEntities, DateTimeOffset createdAt, string createdBy)
         {
             var connection = await _dbConnectionProvider.GetOrOpenAsync();
             var transaction = await connection.BeginTransactionAsync();
