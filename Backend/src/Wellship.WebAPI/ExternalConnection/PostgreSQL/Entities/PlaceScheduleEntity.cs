@@ -38,7 +38,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
         /// <summary>
         /// 健診日
         /// </summary>
-        public required DateTime ExamDate { get; init; }
+        public required DateOnly ExamDate { get; init; }
 
         /// <summary>
         /// 開始時刻

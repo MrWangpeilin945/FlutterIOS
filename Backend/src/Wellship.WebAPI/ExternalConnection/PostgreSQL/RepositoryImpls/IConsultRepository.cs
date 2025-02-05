@@ -13,7 +13,7 @@ public interface IConsultRepository
     /// <param name="consults">登録する受診のリスト</param>
     /// <param name="createdAt">作成日時</param>
     /// <param name="createdBy">作成者</param>
-    public Task UpsertConsultsAsync(List<ConsultEntity> consults, DateTime createdAt, string createdBy);
+    public Task UpsertConsultsAsync(List<ConsultEntity> consults, DateTimeOffset createdAt, string createdBy);
 
     /// <summary>
     /// 存在する検査メニュー特記コード情報（検査特記コード、検査特記名）を取得する

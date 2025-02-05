@@ -37,9 +37,9 @@ public class PlaceUsecasesTest
         }).ToList();
 
         // モックのセットアップ
-        mockRepo.Setup(repo => repo.UpsertPlacesAsync(It.IsAny<List<PlaceEntity>>(), It.IsAny<DateTime>(), "ExternalConnection"));
+        mockRepo.Setup(repo => repo.UpsertPlacesAsync(It.IsAny<List<PlaceEntity>>(), It.IsAny<DateTimeOffset>(), "ExternalConnection"));
 
-        PlaceUsecase usecases = new PlaceUsecase(mockRepo.Object);
+        PlaceUsecase usecases = new PlaceUsecase(mockRepo.Object, TimeProvider.System);
 
         // Act
         List<ErrorObject> result = await usecases.StorePlacesAsync(inputPlaces);
@@ -53,7 +53,7 @@ public class PlaceUsecasesTest
                 placeEntities[0].Name == inputPlaces[0].Name &&
                 placeEntities[1].PlaceCode == inputPlaces[1].Code &&
                 placeEntities[1].Name == inputPlaces[1].Name
-            ), It.IsAny<DateTime>(), "ExternalConnection"), Times.Once);
+            ), It.IsAny<DateTimeOffset>(), "ExternalConnection"), Times.Once);
 
         // 戻り値のエラーリストについて
         // 正常系の想定であり、エラーオブジェクトの中身が空っぽのものだけであることを確認する。

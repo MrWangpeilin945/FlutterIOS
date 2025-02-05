@@ -30,7 +30,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="thresholds">基準パターン</param>
         /// <param name="createdAt">作成日時</param>
         /// <param name="createdBy">作成者</param>
-        public async Task UpsertThresholdsAsync(List<ThresholdEntity> thresholds, DateTime createdAt, string createdBy)
+        public async Task UpsertThresholdsAsync(List<ThresholdEntity> thresholds, DateTimeOffset createdAt, string createdBy)
         {
             using var scope = TransactionScopeHelper.GetTransactionScope();
             {

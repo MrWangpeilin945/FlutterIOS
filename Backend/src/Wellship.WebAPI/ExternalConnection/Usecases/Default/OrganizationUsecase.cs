@@ -10,15 +10,18 @@ public class OrganizationUsecase : IOrganizationUsecase
 {
     private readonly List<ErrorObject> _errorObjects;
     private readonly IOrganizationRepository _organizationRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="organizationRepository">団体リポジトリ</param>
-    public OrganizationUsecase(IOrganizationRepository organizationRepository)
+    /// <param name="timeProvider"></param>
+    public OrganizationUsecase(IOrganizationRepository organizationRepository, TimeProvider timeProvider)
     {
         _organizationRepository = organizationRepository;
         _errorObjects = new List<ErrorObject>();
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -36,7 +39,7 @@ public class OrganizationUsecase : IOrganizationUsecase
         }).ToList();
 
         // 団体登録
-        await _organizationRepository.UpsertOrganizationsAsync(organizationEntities, DateTime.Now, "ExternalConnection");
+        await _organizationRepository.UpsertOrganizationsAsync(organizationEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
         return _errorObjects;
     }

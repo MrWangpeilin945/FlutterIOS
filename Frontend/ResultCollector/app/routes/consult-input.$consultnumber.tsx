@@ -172,15 +172,14 @@ export default function ConsultInput() {
     // 機器連携
     const handleRemeasurementCheck = () => {
       const isEmpty = isValueEmptyForEquipmentLabel();
-
-      setVisibleRemeasurement(
+      const isConnectionEquipment =
         !!targetConnectionEquipment &&
-          !!targetConnectionEquipment.appLaunchUrl &&
-          !!targetConnectionEquipment.processingScriptUrl,
-      ); // 機器が選択されていないなら非表示
+        !!targetConnectionEquipment.appLaunchUrl &&
+        !!targetConnectionEquipment.processingScriptUrl;
+      setVisibleRemeasurement(isConnectionEquipment); // 機器が選択されていないなら非表示
       setDisabledRemeasurement(!isEmpty); // valueが全て存在する場合無効化
 
-      if (targetConnectionEquipment && isEmpty && initialDisplay) {
+      if (isConnectionEquipment && isEmpty && initialDisplay) {
         setInitialDisplay(false);
         launchConnectionEquipment();
       }
@@ -195,69 +194,88 @@ export default function ConsultInput() {
 
   //解析js呼び出し
   const dynamicScriptExecute = async (data: string, scriptPath: string) => {
-    const module = await import(/* @vite-ignore */ `${scriptPath}`);
-    const output = module.decode(data);
-    return output;
+    try {
+      const module = await import(/* @vite-ignore */ scriptPath);
+      const output = module.decode(data);
+      return output;
+    } catch {
+      return null; // エラー時は null を返す
+    }
   };
 
-  //機器連携：監視用
+  // 機器連携：監視用
   useEffect(() => {
     // StorageEventの変更を監視する関数
-    const handleStorageChange = (event: StorageEvent) => {
+    const handleStorageChange = async (event: StorageEvent) => {
+      if (event.key !== localStorageKey) return;
+
       setIsLoading(true);
-      if (event.key === localStorageKey) {
-        const base64Data = event.newValue ?? "";
-        //解析js呼び出し処理
-        const scriptUrl = targetConnectionEquipment?.processingScriptUrl;
-        const analyzedData = dynamicScriptExecute(base64Data, scriptUrl ?? "");
-        //value更新処理
-        let isUpdated = false;
-        let updatedExamData = { ...examData };
-        for (const [key, value] of Object.entries(analyzedData)) {
-          // valueがnullの場合は処理を行わない
-          if (value === null) continue;
+      const base64Data = event.newValue ?? "";
+      const scriptUrl = targetConnectionEquipment?.processingScriptUrl;
 
-          let isUpdatedInThisKey = false;
+      // 解析js呼び出し処理
+      const analyzedData = await dynamicScriptExecute(
+        base64Data,
+        scriptUrl ?? "",
+      );
 
-          // equipmentLabelが一致するvalueを更新
-          updatedExamData = {
-            ...updatedExamData,
-            examItemGroups: updatedExamData.examItemGroups?.map((group) => ({
-              ...group,
-              examItems: group.examItems?.map((item) => ({
-                ...item,
-                examItemDetails: item.examItemDetails?.map((detail) => {
-                  if (
-                    !isUpdatedInThisKey &&
-                    detail.equipmentLabel === key &&
-                    detail.hasOrder &&
-                    !detail.cancelReasonId &&
-                    !detail.value
-                  ) {
-                    isUpdated = true;
-                    isUpdatedInThisKey = true;
-                    return { ...detail, value: String(value) };
-                  }
-                  return detail;
-                }),
-              })),
-            })),
-          };
-        }
-        setExamData(updatedExamData);
-        // 変更後に監視を解除
-        if (isWatching) {
-          setIsWatching(false);
-          window.removeEventListener("storage", handleStorageChange);
-        }
-        // ローカルストレージのデータを削除
+      if (analyzedData === null) {
+        // 解析エラー発生時
+        setIsWatching(false);
+        setIsLoading(false);
         localStorage.removeItem(localStorageKey);
-        // 値を更新しなかった場合、ダイアログを表示
-        if (!isUpdated) {
-          setCommonMessage("表示可能な測定結果がありませんでした。");
-          setCommonButtonMessage("閉じる");
-          openCommon();
-        }
+        return;
+      }
+
+      // value更新処理
+      let isUpdated = false;
+      let updatedExamData = { ...examData };
+
+      for (const [key, value] of Object.entries(analyzedData)) {
+        // valueがnullの場合は処理を行わない
+        if (value === null) continue;
+        let isUpdatedInThisKey = false;
+
+        // equipmentLabelが一致するvalueを更新
+        updatedExamData = {
+          ...updatedExamData,
+          examItemGroups: updatedExamData.examItemGroups?.map((group) => ({
+            ...group,
+            examItems: group.examItems?.map((item) => ({
+              ...item,
+              examItemDetails: item.examItemDetails?.map((detail) => {
+                if (
+                  !isUpdatedInThisKey &&
+                  detail.equipmentLabel === key &&
+                  detail.hasOrder &&
+                  !detail.cancelReasonId &&
+                  !detail.value
+                ) {
+                  isUpdated = true;
+                  isUpdatedInThisKey = true;
+                  return { ...detail, value: String(value) };
+                }
+                return detail;
+              }),
+            })),
+          })),
+        };
+      }
+      setExamData(updatedExamData);
+      // 変更後に監視を解除
+      if (isWatching) {
+        setIsWatching(false);
+        window.removeEventListener("storage", handleStorageChange);
+      }
+
+      // ローカルストレージのデータを削除
+      localStorage.removeItem(localStorageKey);
+
+      // 値を更新しなかった場合、ダイアログを表示
+      if (!isUpdated) {
+        setCommonMessage("表示可能な測定結果がありませんでした。");
+        setCommonButtonMessage("閉じる");
+        openCommon();
       }
       setIsLoading(false);
     };
