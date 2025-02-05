@@ -14,6 +14,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="createdAt"></param>
         /// <param name="createdBy"></param>
         /// <returns></returns>
-        public Task UpsertExamNormalValueRangeAsync(List<ExamNormalValueRangeEntity> examNormalValueRangeEntities, DateTime createdAt, string createdBy);
+        public Task UpsertExamNormalValueRangeAsync(List<ExamNormalValueRangeEntity> examNormalValueRangeEntities, DateTimeOffset createdAt, string createdBy);
     }
 }

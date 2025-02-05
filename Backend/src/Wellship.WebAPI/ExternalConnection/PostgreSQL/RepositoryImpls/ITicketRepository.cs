@@ -13,7 +13,7 @@ public interface ITicketRepository
     /// <param name="tickets">更新する受付リスト</param>
     /// <param name="createdAt">作成日時</param>
     /// <param name="createdBy">作成者</param>
-    public Task UpsertTicketsAsync(List<TicketEntity> tickets, DateTime createdAt, string createdBy);
+    public Task UpsertTicketsAsync(List<TicketEntity> tickets, DateTimeOffset createdAt, string createdBy);
 
     /// <summary>
     /// 更新対象の受付リストを取得する

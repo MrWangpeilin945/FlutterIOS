@@ -17,7 +17,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="createdAt">作成日時</param>
         /// <param name="createdBy">作成者</param>
         /// <returns></returns>
-        public Task UpsertExamineesAsync(List<ExamineeEntity> examineeEntities, DateTime createdAt, string createdBy);
+        public Task UpsertExamineesAsync(List<ExamineeEntity> examineeEntities, DateTimeOffset createdAt, string createdBy);
 
         /// <summary>
         /// 存在する受診者情報（ID、コード）を取得する

@@ -17,6 +17,7 @@ public class ExamineeUsecase : IExamineeUsecase
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IExamineeRepository _examineeRepository;
     private readonly IAffiliationRepository _affiliationRepository;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// ユースケースを生成します。
@@ -25,13 +26,17 @@ public class ExamineeUsecase : IExamineeUsecase
     /// <param name="organizationRepository">団体リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
     /// <param name="affiliationRepository">所属リポジトリ</param>
-    public ExamineeUsecase(IDbConnectionProvider dbConnectionProvider, IOrganizationRepository organizationRepository, IExamineeRepository examineeRepository, IAffiliationRepository affiliationRepository)
+    /// <param name="timeProvider"></param>
+    public ExamineeUsecase(IDbConnectionProvider dbConnectionProvider, IOrganizationRepository organizationRepository,
+                           IExamineeRepository examineeRepository, IAffiliationRepository affiliationRepository,
+                           TimeProvider timeProvider)
     {
         _dbConnectionProvider = dbConnectionProvider;
         _organizationRepository = organizationRepository;
         _examineeRepository = examineeRepository;
         _affiliationRepository = affiliationRepository;
         _errorObjects = new List<ErrorObject>();
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -62,7 +67,7 @@ public class ExamineeUsecase : IExamineeUsecase
             {
                 connection.EnlistTransaction(Transaction.Current);
 
-                DateTime createdAt = DateTime.Now;
+                var createdAt = _timeProvider.GetUtcNow();
                 string createdBy = "ExternalConnection";
 
                 // 受診者を登録する
