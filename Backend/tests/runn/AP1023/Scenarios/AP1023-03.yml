@@ -1,0 +1,45 @@
+desc: ログインして管理者ロールのアクセストークンを取得する
+if: included
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+    useCookie: true
+vars:
+  loginId: "S001"
+  password: "syokuinA"
+  staffId: "affd0000-0000-0000-0000-000000000002"
+steps:
+  login:
+    desc: "アクセストークンを取得する"
+    req:
+      /api/v1/staff/login:
+        post:
+          body:
+            application/json:
+              loginId: "S002"
+              password: "syokuinB"
+    test: |
+      // ステータスコードが200であること
+      current.res.status == 200
+      // アクセストークンが1文字以上であること
+      && len(current.res.body.token) > 0
+    bind:
+      token: current.res.body.token
+  refreshTokens:
+    desc: "ログイン時のアクセストークンをＤＢから取得する"
+    db:
+      query: |
+        SELECT
+          token
+        FROM
+          resultcollector.refresh_tokens
+        WHERE
+          staff_id = '{{ vars.staffId }}'
+        ORDER BY
+          created_at desc;
+    bind:
+      refreshToken: current.rows[0].token

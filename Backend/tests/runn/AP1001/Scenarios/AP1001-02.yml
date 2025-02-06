@@ -13,8 +13,6 @@ steps:
     req:
       /api/v1/staff/login:
         post:
-          headers:
-            Authorization: "Bearer {{ steps.getAccessToken.token }}"
           body:
             application/json:
               "{{ vars.request }}"
