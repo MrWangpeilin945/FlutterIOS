@@ -10,10 +10,10 @@ vars:
   consultNumber: "1014"
   consultId: "a0101400-0000-0000-0000-000000000001"
   request: "json://../Requests/AP1014-01.json"
-  heightId: 1
-  heightValue: "168.5"
-  weightId: 2
-  weightValue: "52.8"
+  examItemId1: 10141
+  examItemValue1: "140"
+  examItemId2: 10142
+  examItemValue2: "150"
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
@@ -32,8 +32,8 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
-  examResults_height:
-    desc: "検査結果の登録確認_身長"
+  examResults_examItem1:
+    desc: "検査結果の登録確認_1"
     db:
       query: |
         SELECT
@@ -42,11 +42,11 @@ steps:
           resultcollector.exam_results
         WHERE
           consult_id = '{{ vars.consultId }}'
-          AND exam_item_detail_id = {{ vars.heightId }};    
+          AND exam_item_detail_id = {{ vars.examItemId1 }};    
     test: |
-      current.rows[0].value == vars.heightValue
-  examResults_weight:
-    desc: "検査結果の登録確認_体重"
+      current.rows[0].value == vars.examItemValue1
+  examResults_examItem2:
+    desc: "検査結果の登録確認_2"
     db:
       query: |
         SELECT
@@ -55,11 +55,11 @@ steps:
           resultcollector.exam_results
         WHERE
           consult_id = '{{ vars.consultId }}'
-          AND exam_item_detail_id = {{ vars.weightId }};    
+          AND exam_item_detail_id = {{ vars.examItemId2 }};    
     test: |
-      current.rows[0].value == vars.weightValue
-  examResultHistories_height:
-    desc: "検査結果履歴の登録確認_身長"
+      current.rows[0].value == vars.examItemValue2
+  examResultHistories_examItem1:
+    desc: "検査結果履歴の登録確認_1"
     db:
       query: |
         SELECT
@@ -68,13 +68,13 @@ steps:
           resultcollector.exam_result_histories
         WHERE
           consult_id = '{{ vars.consultId }}'
-          AND exam_item_detail_id = {{ vars.heightId }}    
+          AND exam_item_detail_id = {{ vars.examItemId1 }}    
         ORDER BY
           created_at desc; 
     test: |
-      current.rows[0].value == vars.heightValue
-  examResultHistories_weight:
-    desc: "検査結果履歴の登録確認_体重"
+      current.rows[0].value == vars.examItemValue1
+  examResultHistories_examItem2:
+    desc: "検査結果履歴の登録確認_2"
     db:
       query: |
         SELECT
@@ -83,11 +83,11 @@ steps:
           resultcollector.exam_result_histories
         WHERE
           consult_id = '{{ vars.consultId }}'
-          AND exam_item_detail_id = {{ vars.weightId }}
+          AND exam_item_detail_id = {{ vars.examItemId2 }}
         ORDER BY
           created_at desc;
     test: |
-      current.rows[0].value == vars.weightValue
+      current.rows[0].value == vars.examItemValue2
 
 
 
