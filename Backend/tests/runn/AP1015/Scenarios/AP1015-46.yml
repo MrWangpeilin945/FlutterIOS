@@ -1,0 +1,35 @@
+desc: AP1015-46 進捗取得_済41(結果:Detail1,3 / 中止:Detail2)
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  placeScheduleId: "00001015-0000-0000-0000-000000000044"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path: ../../Helpers/adminAccessToken.yml
+  get:
+    desc: "進捗取得_済41(結果:Detail1,3 / 中止:Detail2)"
+    req:
+      "/api/v1/progress/{{ vars.placeScheduleId }}":
+        get:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+    test: |
+      current.res.status == 200
+      && len(current.res.body.progress) == 1
+      // 予定
+      && current.res.body.progress[0].details[0].count ==  0
+      // 来場
+      && current.res.body.progress[0].details[1].count ==  0
+      // 済
+      && current.res.body.progress[0].details[2].count ==  1
+      // 中止
+      && current.res.body.progress[0].details[3].count ==  0
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1015-46.json
