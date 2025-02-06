@@ -5,19 +5,23 @@ runners:
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
     skipValidateResponse: false
+    useCookie: true
+vars:
+  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZmZkMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDIiLCJ1bmlxdWVfbmFtZSI6IlMwMDIiLCJpYXQiOjE3Mzg3MzAwMzEsInJvbGUiOiJBZG1pbiIsInNpZCI6ImJhYTk4MGNkLTQ3OWMtNDIzZi1hNWQ3LTAzZjY2NjZkYzI4NCIsIm5iZiI6MTczODczMDAzMSwiZXhwIjoxNzM4NzMwMjExLCJpc3MiOiJsb2NhbGhvc3Q6NTAwMCIsImF1ZCI6WyJsb2NhbGhvc3Q6NTAwMCJdfQ.V8z3TLUIm1lzqDT4AhpDOXzhub9NoT_eywS6oDSGrkQ"
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
     include:
       path:
-        ../../Helpers/adminAccessToken.yml
+        ./AP1023-03.yml
   post:
     desc: "ログイン状態更新_無効なアクセストークン"
     req:
       /api/v1/staff/login/refresh:
         post:
-          headers:
-            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              token: "{{ vars.token }}"
     test: |
       current.res.status == 401
     dump:
