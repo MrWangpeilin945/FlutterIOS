@@ -1,0 +1,23 @@
+{
+    "examMenuId": 1,
+    "examResults": [
+        {
+            "examItemId": 1,
+            "examItemDetails": [
+                {
+                    "examItemDetailId": 1,
+                    "value": "168.5"
+                }
+            ]
+        },
+        {
+            "examItemId": 2,
+            "examItemDetails": [
+                {
+                    "examItemDetailId": 2,
+                    "value": "52.8"
+                }
+            ]
+        }
+    ]
+}
