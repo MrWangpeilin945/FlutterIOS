@@ -1,0 +1,19 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  User->>KN:クリアボタンの押下
+  KN->>KN:入力値を更新
+  alt onRegisterPressedがtrueの時
+  KN-->>KN:バリデーションチェック
+  alt バリデーションチェックでエラーなし
+  KN-->>FE:引数.変更イベントを表示
+  else バリデーションチェックでエラーあり
+  KN->>KN:エラーメッセージを表示
+  end
+  else onRegisterPressedがfalseの時
+KN->>FE:引数.変更イベントを呼び出す
+end

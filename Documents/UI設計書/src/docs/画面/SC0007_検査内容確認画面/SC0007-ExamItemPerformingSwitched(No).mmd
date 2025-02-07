@@ -1,0 +1,12 @@
+```mermaid
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor st as 職員
+  participant fr as フロントエンド
+  participant co as コンポーネント
+  participant ba as バックエンド
+  st ->> fr: 検査実施を「しない」に変更
+  fr ->> fr: 中止理由ボタンを表示
+  fr -->> st: 中止理由ダイアログを表示
+```

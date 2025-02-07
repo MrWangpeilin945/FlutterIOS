@@ -1,0 +1,25 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント
+  participant BE as バックエンド  
+  User->>FE:【SC0010】進捗画面に遷移
+  FE->>FE:Jotaiから会場日程ID、会場名、健診日、職員名を取得
+  FE->>KN:【CP0001】共通ヘッダーを呼び出す
+  FE->>KN:【CP0002】共通フッターを呼び出す
+  FE->>KN:【CP0007】会場日程を呼び出す  
+  FE->>BE:AP1015_進捗状況を取得する<br>[GET] /progress/{placeScheduleId}
+  BE-->>FE:レスポンスを取得（進捗情報）
+  alt httpステータスコードが200かつ取得データが1件以上
+  loop 検査項目毎に
+  FE->>KN:【CP0006】検査項目進捗を呼び出す
+  end
+  else 200かつデータ件数が0件
+  FE-->>User:エラーメッセージを表示
+  else 400エラー or 500エラー
+  FE->>KN:【CP0015】共通ダイアログを呼び出す
+  end 
+  FE-->>User:【SC0010】進捗画面の表示
+  note over User,FE:取得した情報を表示
