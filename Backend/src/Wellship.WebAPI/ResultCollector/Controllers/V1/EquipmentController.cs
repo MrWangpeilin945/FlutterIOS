@@ -13,7 +13,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// <summary>
 /// 機器コントローラー
 /// </summary>
-/// [ApiController]
+[ApiController]
 [ApiVersion("1")]
 [Authorize]
 public class EquipmentController : ControllerBase
