@@ -1,4 +1,4 @@
-desc: ログインして管理者ロールのアクセストークンを取得する
+desc: ログインして管理者ロールのアクセストークンを取得する(AP1023用のログイン)
 if: included
 runners:
   db: ${DB_HOST}
@@ -9,8 +9,6 @@ runners:
     skipValidateResponse: false
     useCookie: true
 vars:
-  loginId: "S001"
-  password: "syokuinA"
   staffId: "affd0000-0000-0000-0000-000000000002"
 steps:
   login:
