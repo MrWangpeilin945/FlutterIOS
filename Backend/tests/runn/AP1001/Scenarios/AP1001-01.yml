@@ -1,5 +1,6 @@
 desc: AP1001-01 ログイン_正常 [200]
 runners:
+  db: ${DB_HOST}
   req:
     endpoint: ${BACKEND_URL}
     openapi3: ${OPENAPI3_URL}
@@ -7,19 +8,48 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/AP1001-01.json"
+  staffId: "affd0000-0000-0000-0000-000000000002"
 steps:
   post:
     desc: "ログイン_正常"
     req:
       /api/v1/staff/login:
         post:
-          headers:
-            Authorization: "Bearer {{ steps.getAccessToken.token }}"
           body:
             application/json:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
+      // アクセストークンが1文字以上であること
+      && len(current.res.body.token) > 0
     dump:
       expr: current.res.body
       out: ../Dump/AP1001-01.json
+  refreshTokens:
+    desc: "リフレッシュトークンの登録確認"
+    db:
+      query: |
+        SELECT
+          staff_id::text
+        FROM
+          resultcollector.refresh_tokens
+        WHERE
+          staff_id = '{{ vars.staffId }}' 
+        ORDER BY
+          created_at DESC;   
+    test: |
+      current.rows[0].staff_id == vars.staffId
+  staffLoginHistories:
+    desc: "職員ログイン履歴の登録確認"
+    db:
+      query: |
+        SELECT
+          staff_id::text
+        FROM
+          resultcollector.staff_login_histories
+        WHERE
+          staff_id = '{{ vars.staffId }}' 
+        ORDER BY
+          created_at DESC;   
+    test: |
+      current.rows[0].staff_id == vars.staffId

@@ -14,7 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// <summary>
 /// 基幹システム連携コントローラー
 /// </summary>
-/// [ApiController]
+[ApiController]
 [ApiVersion("1")]
 [Authorize]
 public class IntegrationController : ControllerBase
