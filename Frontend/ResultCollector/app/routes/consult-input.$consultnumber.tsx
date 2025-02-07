@@ -429,7 +429,7 @@ export default function ConsultInput() {
           if (status === 400) {
             errorMessage = getErrorMessage(errorMessages.invalid, "受診番号");
           } else if (status === 404) {
-            errorMessage = getErrorMessage(errorMessages.notFound, "検査項目");
+            errorMessage = getErrorMessage(errorMessages.notFound, "受診番号");
           } else if (status === 422) {
             setExamData(result.data);
             // 最大 errorLevel を取得
