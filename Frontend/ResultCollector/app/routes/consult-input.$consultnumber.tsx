@@ -512,10 +512,7 @@ export default function ConsultInput() {
           } else if (status === 403) {
             errorMessage = "会場ロック中です。管理者のみ更新可能です。";
           } else if (status === 404) {
-            errorMessage = getErrorMessage(
-              errorMessages.notFound,
-              "指定した受診情報",
-            );
+            errorMessage = getErrorMessage(errorMessages.notFound, "受診番号");
           } else if (status === 500) {
             errorMessage = getErrorMessage(errorMessages.serverError);
           }
