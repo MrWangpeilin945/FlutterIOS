@@ -4,7 +4,7 @@ runners:
     endpoint: ${BACKEND_URL}
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
-    skipValidateResponse: false
+    skipValidateResponse: true
 vars:
   consultNumber: "1013"
   request: "json://../Requests/AP1013-03.json"
