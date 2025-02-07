@@ -8,7 +8,6 @@ runners:
 vars:
   consultNumber: "10103"
   examMenuId: 1
-  response: "json://../Dump/AP1010-06.json"
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
@@ -25,7 +24,7 @@ steps:
     test: |
       current.res.status == 200
       // 同姓同名なし（カナ氏名の'オ'と'ヲ'が異なる）
-      && vars.response.examinee.sameNameAlert == false
+      && current.res.body.examinee.sameNameAlert == false
     dump:
       expr: current.res.body
       out: ../Dump/AP1010-06.json

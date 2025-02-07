@@ -8,7 +8,6 @@ runners:
 vars:
   consultNumber: "10101"
   examMenuId: 1
-  response: "json://../Dump/AP1010-05.json"
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
@@ -25,7 +24,7 @@ steps:
     test: |
       current.res.status == 200
       // 同姓同名あり
-      && vars.response.examinee.sameNameAlert == true
+      && current.res.body.examinee.sameNameAlert == true
     dump:
       expr: current.res.body
       out: ../Dump/AP1010-05.json
