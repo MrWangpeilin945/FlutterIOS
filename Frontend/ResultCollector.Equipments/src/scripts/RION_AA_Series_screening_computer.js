@@ -9,9 +9,9 @@ export function decode(base64UrlString) {
   };
 
   return {
-    passScreening1000HzLeft: extract(rawText, 36 + offset),
-    passScreening1000HzRight: extract(rawText, 35 + offset),
-    passScreening4000HzLeft: extract(rawText, 46 + offset),
-    passScreening4000HzRight: extract(rawText, 45 + offset),
+    screening1000HzLeft: extract(rawText, 36 + offset),
+    screening1000HzRight: extract(rawText, 35 + offset),
+    screening4000HzLeft: extract(rawText, 46 + offset),
+    screening4000HzRight: extract(rawText, 45 + offset),
   };
 }
