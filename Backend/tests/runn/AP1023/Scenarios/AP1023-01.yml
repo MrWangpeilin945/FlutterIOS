@@ -9,7 +9,6 @@ runners:
     useCookie: true
 vars:
   staffId: "affd0000-0000-0000-0000-000000000002"
-  response: "json://../Dump/AP1023-01.json"
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
@@ -26,7 +25,7 @@ steps:
               token: "{{ steps.getAccessToken.token }}"
     test: |
       current.res.status == 200
-      && steps.getAccessToken.token != vars.response.token
+      && steps.getAccessToken.token != current.res.body.token
     dump:
       expr: current.res.body
       out: ../Dump/AP1023-01.json
