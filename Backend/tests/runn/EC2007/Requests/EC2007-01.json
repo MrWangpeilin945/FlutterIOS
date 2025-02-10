@@ -1,17 +1,17 @@
 [
     {
-      "code": "P250201",
+      "code": "P2007-01-1",
       "name": "第１会場",
-      "inputNote": "250201"
+      "inputNote": "2007011"
     },
     {
-      "code": "P250202",
+      "code": "P2007-01-2",
       "name": "第２会場",
-      "inputNote": "250202"
+      "inputNote": "2007012"
     },
     {
-      "code": "P250203",
+      "code": "P2007-01-3",
       "name": "第３会場",
-      "inputNote": "250203"
+      "inputNote": "2007013"
     }
   ]

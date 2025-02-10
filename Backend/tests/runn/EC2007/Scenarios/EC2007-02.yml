@@ -27,7 +27,7 @@ steps:
         FROM
           resultcollector.places
         WHERE
-          place_code in ('P241001', 'P241002')
+          place_code in ('P2007-02-1', 'P2007-02-2')
         ORDER BY
           place_code ASC;
     test: |
