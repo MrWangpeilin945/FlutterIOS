@@ -9,7 +9,7 @@ vars:
   request: "json://../Requests/EC2006-02.json"
 steps:
   post:
-    desc: "班を登録_更新"
+    desc: "班を更新_正常"
     req:
       /api/v1/external/teams:
         post:
