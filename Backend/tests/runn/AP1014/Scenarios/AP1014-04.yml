@@ -5,22 +5,31 @@ runners:
     openapi3: ${OPENAPI3_URL}
     skipValidateRequest: false
     skipValidateResponse: false
+vars:
+  consultNumber: "1114"
+  request: "json://../Requests/AP1014-04.json"
 steps:
-  getAccessToken:
-    desc: "アクセストークンを取得します"
-    include:
-      path:
-        ../../Helpers/adminAccessToken.yml
+  login:
+    desc: "アクセストークンを取得する"
+    req:
+      /api/v1/staff/login:
+        post:
+          body:
+            application/json:
+              loginId: "S001"
+              password: "syokuinA"
+    bind:
+      token: current.res.body.token
   post:
     desc: "結果登録_会場ロック中の操作権限がない"
     req:
-      /api/v1/consult/{consultNumber}/results:
+      /api/v1/consult/{{ vars.consultNumber }}/results:
         post:
           headers:
-            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+            Authorization: "Bearer {{ token }}"
+          body:
+            application/json:
+              "{{ vars.request }}"
     test: |
       current.res.status == 403
-    dump:
-      expr: current.res.body
-      out: ../Dump/AP1014-04.json
 
