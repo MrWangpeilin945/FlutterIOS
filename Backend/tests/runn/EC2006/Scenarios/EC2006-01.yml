@@ -27,7 +27,7 @@ steps:
         FROM
           resultcollector.teams
         WHERE
-          team_code in ('T250201', 'T250202', 'T250203')
+          team_code in ('T2006-01-1', 'T2006-01-2', 'T2006-01-3')
         ORDER BY
           team_code ASC;
     test: |

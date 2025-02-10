@@ -1,17 +1,17 @@
 [
   {
-    "code": "T250201",
+    "code": "T2006-01-1",
     "name": "１班",
-    "inputNote": "250201"
+    "inputNote": "2006011"
   },
   {
-    "code": "T250202",
+    "code": "T2006-01-2",
     "name": "２班",
-    "inputNote": "250202"
+    "inputNote": "2006012"
   },
   {
-    "code": "T250203",
+    "code": "T2006-01-3",
     "name": "３班",
-    "inputNote": "250203"
+    "inputNote": "2006013"
   }
 ]
