@@ -1,0 +1,23 @@
+{
+    "examMenuId": 1014,
+    "examResults": [
+        {
+            "examItemId": 10141,
+            "examItemDetails": [
+                {
+                    "examItemDetailId": 10141,
+                    "value": "140"
+                }
+            ]
+        },
+        {
+            "examItemId": 10142,
+            "examItemDetails": [
+                {
+                    "examItemDetailId": 10142,
+                    "value": "150"
+                }
+            ]
+        }
+    ]
+}

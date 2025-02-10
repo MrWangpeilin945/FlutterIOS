@@ -429,25 +429,25 @@ export default function ConsultInput() {
           if (status === 400) {
             errorMessage = getErrorMessage(errorMessages.invalid, "受診番号");
           } else if (status === 404) {
-            errorMessage = getErrorMessage(errorMessages.notFound, "検査項目");
+            errorMessage = getErrorMessage(errorMessages.notFound, "受診番号");
           } else if (status === 422) {
-            setExamData(result.data);
+            const response:VerifyExamItems = error.response.data;
             // 最大 errorLevel を取得
             const maxErrorLevel = Math.max(
-              0, // デフォルト値として 0 を指定
-              ...(result?.data?.examItemGroups?.flatMap(
+              ...(response.examItemGroups?.flatMap(
                 (group) =>
                   group.examItems?.flatMap(
                     (item) =>
-                      item.examRegistResults
-                        ?.map((result) => result.errorLevel)
-                        .filter(
-                          (level): level is number => level !== undefined,
-                        ) || [],
+                      item.examRegistResults?.map(
+                        (result) => result.errorLevel ?? 0,
+                      ) || [],
                   ) || [],
-              ) || []),
+              ) || []), 
+              0, // データがない場合のデフォルト値
             );
+            
             errorBranch(maxErrorLevel);
+            setExamData(error.response.data);
           } else if (status === 500) {
             errorMessage = getErrorMessage(errorMessages.serverError);
           }
@@ -473,11 +473,11 @@ export default function ConsultInput() {
   // 検査継続処理
   const continuingExam = () => {
     if (!examMenus) return;
-    const currentIndex = examMenus.findIndex((menu) => menu === examMenuId);
+    const currentIndex = examMenus.findIndex((menu) => menu.id === examMenuId);
     if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
       //次の検査メニューIDが存在する場合、検査内容確認画面へ遷移
       const nextExam = examMenus[currentIndex + 1];
-      navigate(`/examorder-confirm/${consultNumber}?exammenuid=${nextExam}`);
+      navigate(`/examorder-confirm/${consultNumber}?exammenuid=${nextExam.id}`);
     } else {
       //最後の検査メニューの場合、受診番号入力画面へ遷移
       navigate(`/consultnumber-input?consultnumber=${consultNumber}`);
@@ -512,10 +512,7 @@ export default function ConsultInput() {
           } else if (status === 403) {
             errorMessage = "会場ロック中です。管理者のみ更新可能です。";
           } else if (status === 404) {
-            errorMessage = getErrorMessage(
-              errorMessages.notFound,
-              "指定した受診情報",
-            );
+            errorMessage = getErrorMessage(errorMessages.notFound, "受診番号");
           } else if (status === 500) {
             errorMessage = getErrorMessage(errorMessages.serverError);
           }
