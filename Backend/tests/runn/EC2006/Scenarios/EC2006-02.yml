@@ -1,4 +1,4 @@
-desc: EC2006-01 班を更新_正常 [200]
+desc: EC2006-02 班を更新_正常 [200]
 runners:
   db: ${DB_HOST}
   req:
