@@ -6,7 +6,6 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  consultNumber: "0001"
   request: "json://../Requests/EC2006-01.json"
 steps:
   post:
