@@ -1,4 +1,4 @@
-desc: AP1016-01 会場ロック取得_正常_職員名あり [200]
+desc: AP1016-05 会場ロック取得_正常_職員名なし [200]
 runners:
   req:
     endpoint: ${BACKEND_URL}
@@ -6,14 +6,14 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  placeScheduleId: "aceced00-0000-0000-0000-000000000001"
+  placeScheduleId: "aceced00-0000-0000-0000-000000000002"
 steps:
   getAccessToken:
     desc: "アクセストークンを取得します"
     include:
       path: ../../Helpers/adminAccessToken.yml
   get:
-    desc: "会場ロック取得_正常_職員名あり"
+    desc: "会場ロック取得_正常_職員名なし"
     req:
       /api/v1/placeSchedules/{{ vars.placeScheduleId }}/placeScheduleLockingStatus:
         get:
@@ -21,7 +21,7 @@ steps:
             Authorization: "Bearer {{ steps.getAccessToken.token }}"
     test: |
       current.res.status == 200
-      && current.res.body.updatedBy == '職員A'
+      && current.res.body.updatedBy == 'init'
     dump:
       expr: current.res.body
-      out: ../Dump/AP1016-01.json
+      out: ../Dump/AP1016-05.json
