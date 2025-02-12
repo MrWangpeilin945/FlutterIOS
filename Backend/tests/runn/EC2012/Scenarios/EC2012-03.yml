@@ -1,0 +1,47 @@
+desc: EC2012-03 健診日の追加登録_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2012-03.json"
+  placeId: "e0002012-0000-0000-0000-000000000004"
+  teamId:  "c0002012-0000-0000-0000-000000000004"
+steps:
+  post:
+    desc: "健診日の追加登録_正常"
+    req:
+      /api/v1/external/placeSchedules:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2012-03.json
+  confirmPlaceSchedule:
+    desc: "健診日の追加の確認"
+    db:
+      query: |
+        SELECT
+          status
+          , to_char(exam_date, 'yyyymmdd') as examdate
+          , start_time
+        FROM
+          resultcollector.place_schedule
+        WHERE
+          place_Id = '{{ vars.placeId }}' 
+          AND team_Id = '{{ vars.teamId }}' 
+        ORDER BY
+          examdate DESC;
+    test: |
+      len(current.rows) == 2
+      // 新しい健診日が追加される
+      && current.rows[0].examdate == '20250315'
+      && current.rows[0].start_time == '1300'
+      // 状況は検査中で追加される
+      && current.rows[0].status == 21

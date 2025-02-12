@@ -1,0 +1,54 @@
+desc: EC2012-01 会場日程を登録_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2012-01.json"
+  placeId1: "e0002012-0000-0000-0000-000000000001"
+  placeId2: "e0002012-0000-0000-0000-000000000002"
+  teamId1:  "c0002012-0000-0000-0000-000000000001"
+  teamId2:  "c0002012-0000-0000-0000-000000000002"
+steps:
+  post:
+    desc: "会場日程を登録_正常"
+    req:
+      /api/v1/external/placeSchedules:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2012-01.json
+  confirmPlaceSchedule:
+    desc: "会場日程の登録を確認"
+    db:
+      query: |
+        SELECT
+          status
+          , to_char(exam_date, 'yyyymmdd') as examdate
+          , start_time
+          , concat(place_id::text, team_id::text) as placeTeam
+        FROM
+          resultcollector.place_schedule
+        WHERE
+          concat(place_id::text, '-', team_id::text) 
+          in (concat('{{ vars.placeId1 }}', '-', '{{ vars.teamId1 }}')
+          ,   concat('{{ vars.placeId2 }}', '-', '{{ vars.teamId2 }}'))
+        ORDER BY
+          placeTeam ASC;
+    test: |
+      len(current.rows) == 2
+      // 状況は検査中で登録される
+      && current.rows[0].status == 21
+      && current.rows[0].examdate == '20250130'
+      && current.rows[0].start_time == '0845'
+      // 状況は検査中で登録される
+      && current.rows[1].status == 21
+      && current.rows[1].examdate == '20250202'
+      && current.rows[1].start_time == '0930'
