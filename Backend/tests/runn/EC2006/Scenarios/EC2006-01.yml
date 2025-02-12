@@ -32,6 +32,9 @@ steps:
           team_code ASC;
     test: |
       len(current.rows) == 3
+      && current.rows[0].team_code == "T2006-01-1"
       && current.rows[0].name == "１班"
+      && current.rows[1].team_code == "T2006-01-2"
       && current.rows[1].name == "２班"
+      && current.rows[2].team_code == "T2006-01-3"
       && current.rows[2].name == "３班"
