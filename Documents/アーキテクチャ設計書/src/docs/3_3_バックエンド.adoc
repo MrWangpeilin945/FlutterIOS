@@ -215,11 +215,40 @@ CREATE TABLE app_logs (
 
 構造化ログとしてJSON形式で出力する。
 
+
+[cols="1,1,2", options="header"]
+|===
+| キー
+| 名称
+| 例
+
+| date
+| 日時
+| 2025-02-04 16:44:10.8429
+
+| level
+| ログレベル
+| ERROR
+
+| message
+| メッセージ
+| ○○処理に失敗しました。
+
+| tenantKey
+| テナントキー
+| stg01
+
+| errorCode
+| エラーコード
+| E002
+
+|===
+
 以下は出力の例。
 
 [source,json]
 ----
-{ "date": "2025-02-04 16:44:10.8429", "level": "ERROR", "message": "○○処理に失敗しました。"}
+{ "date": "2025-02-04 16:44:10.8429", "level": "ERROR", "message": "○○処理に失敗しました。", "tenantKey": "stg01", "errorCode": "E002"}
 ----
 
 Amazon ECSから標準出力すると、CloudWatchに転送されるためマネジメントコンソールから確認する。
@@ -234,7 +263,7 @@ Amazon ECSから標準出力すると、CloudWatchに転送されるためマネ
 | Microsoft
 | NLog
 | NLog→CloudWatch→ 通知
-| カスタムログ（DB）→app_logs
+| カスタムログ→app_logs
 
 | None
 | Off
@@ -283,14 +312,16 @@ AWS上ではError以上のログに限り、NLog経由で出力する。
 
 メッセージ以外に付加的な情報を書き込みたい場合は、details（ `<string, object>` 型の辞書）に値をセットする。detailsがある場合は、app_logsテーブルのdetailsカラムにJSON文字列化して保存する。
 
+WarnとErrorの場合は、エラーコードを指定して書き込む。エラーコードはEnumで管理する。Enumを文字列に変換して記録する。
+
 [mermaid,ICustomLoggingService-cd,png]
 ----
 classDiagram
 class ICustomLoggingService {
     <<interface>>
     +Task LogInfoAsync(string message, Dictionary~string, object~? details = null)
-    +Task LogWarnAsync(string message, Dictionary~string, object~? details = null)
-    +Task LogErrorAsync(string message, Dictionary~string, object~? details = null)
+    +Task LogWarnAsync(string message, ErrorCode errorCode, Dictionary~string, object~? details = null)
+    +Task LogErrorAsync(string message, ErrorCode errorCode, Dictionary~string, object~? details = null)
 }
 
 class CustomLoggingService {
@@ -299,9 +330,9 @@ class CustomLoggingService {
     +ILogRepository _logRepository
     +CustomLoggingService(ILogger<CustomLoggingService> logger, ITenantProvider tenantProvider, ILogRepository logRepository)
     +Task LogInfoAsync(string message, Dictionary~string, object~? details = null)
-    +Task LogWarnAsync(string message, Dictionary~string, object~? details = null)
-    +Task LogErrorAsync(string message, Dictionary~string, object~? details = null)
-    -Task LogAsync(LogLevel level, string message, Dictionary~string, object~? details)
+    +Task LogWarnAsync(string message, ErrorCode errorCode, Dictionary~string, object~? details = null)
+    +Task LogErrorAsync(string message, ErrorCode errorCode, Dictionary~string, object~? details = null)
+    -Task LogAsync(LogLevel level, ErrorCode errorCode, string message, Dictionary~string, object~? details)
 }
 
 ICustomLoggingService <|.. CustomLoggingService
@@ -314,8 +345,8 @@ ICustomLoggingService <|.. CustomLoggingService
 書き込みたいログレベルに応じて、3種類の公開メソッドを呼び分ける。
 
 * LogInfoAsync(message, details)
-* LogWarnAsync(message, details)
-* LogErrorAsync(message, details)
+* LogWarnAsync(message, errorCode, details)
+* LogErrorAsync(message, errorCode, details)
 
 [mermaid,CustomLoggingService-sd,png]
 ----
@@ -328,15 +359,17 @@ sequenceDiagram
     rect rgb(216, 245, 255)
         Client->>CustomLoggingService: LogInfoAsync(message, details)
         CustomLoggingService->>LogRepository: WriteLogAsync(log)
+        CustomLoggingService->>NLog: LogInformation(message)
     end
 
     rect rgb(248, 226, 191)
-        Client->>CustomLoggingService: LogWarnAsync(message, details)
+        Client->>CustomLoggingService: LogWarnAsync(message, errorCode, details)
         CustomLoggingService->>LogRepository: WriteLogAsync(log)
+        CustomLoggingService->>NLog: LogWarning(message)
     end
 
     rect rgb(253, 228, 232)
-        Client->>CustomLoggingService: LogErrorAsync(message, details)
+        Client->>CustomLoggingService: LogErrorAsync(message, errorCode, details)
         CustomLoggingService->>LogRepository: WriteLogAsync(log)
         CustomLoggingService->>NLog: LogError(message)
     end
