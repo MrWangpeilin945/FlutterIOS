@@ -142,6 +142,14 @@ public class ConsultController : ControllerBase
     public async Task<IActionResult> VerifyResults([FromRoute][Required] string consultNumber, [FromBody] ResultsRequest results)
     {
         var response = await _consultUsecase.VerifyResults(consultNumber, results);
+
+        // responseのexamRegistResultsが一つでもあれば422を返却する。
+        var hasError = response.ExamItemGroups.SelectMany(g => g.ExamItems).Any(item => item.ExamRegistResults.Length != 0);
+
+        if (hasError)
+        {
+            return StatusCode(StatusCodes.Status422UnprocessableEntity, response);
+        }
         return Ok(response);
     }
 
