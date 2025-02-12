@@ -174,6 +174,13 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 **** Message `指定されたConnectionCodeがシステム上に存在しません。Code:[Ticket.ConnectionCode]` 
 **** InputNote `Ticket.InputNote`
 
+** `[DB]consult(受診).progress_status(進捗状況)` が `ConsultProgressStatus.来場待ち(11)`、`ConsultProgressStatus.検査中(21)` 以外
+*** Ticketの単位で該当を取り除く
+*** ErrorObject
+*** Code `10001`
+**** Message `指定されたConnectionCodeがシステム上に存在しません。Code:[Ticket.ConnectionCode]` 
+**** InputNote `Ticket.InputNote`
+
 === 処理(Repository)
 
 * `Ticket.ConnectionCode` でグループ化し、 `Ticket.SortNo` が最大のレコードでを処理対象とする
