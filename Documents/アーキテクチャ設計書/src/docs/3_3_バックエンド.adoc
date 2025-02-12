@@ -314,6 +314,8 @@ AWS上ではError以上のログに限り、NLog経由で出力する。
 
 WarnとErrorの場合は、エラーコードを指定して書き込む。エラーコードはEnumで管理する。Enumを文字列に変換して記録する。
 
+エラーコードはNLogのプロパティとapp_logsテーブルのdetailsカラムに記録する。つまり任意のパラメータdetailsにerrorCodeを設定してはならない。もし設定した場合は、メソッド引数のerrorCodeで上書きする。
+
 [mermaid,ICustomLoggingService-cd,png]
 ----
 classDiagram
