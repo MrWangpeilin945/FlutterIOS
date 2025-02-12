@@ -32,6 +32,9 @@ steps:
           place_code ASC;
     test: |
       len(current.rows) == 3
+      && current.rows[0].place_code == "P2007-01-1"
       && current.rows[0].name == "第１会場"
+      && current.rows[1].place_code == "P2007-01-2"
       && current.rows[1].name == "第２会場"
+      && current.rows[2].place_code == "P2007-01-3"
       && current.rows[2].name == "第３会場"
