@@ -167,7 +167,7 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 ==== WARNING検証
 
 * 連携キーの取得に失敗
-** `[DB]consult(受診).external_connection_code(外部連携キー)` == `Ticket.ConnectionCode` が存在しない `または` `[DB]consult(受診).progress_status(進捗状況)` が `ConsultProgressStatus.来場待ち(11)`、`ConsultProgressStatus.検査中(21)` 以外
+** `[DB]consult(受診).external_connection_code(外部連携キー)` == `Ticket.ConnectionCode` And `[DB]consult(受診).progress_status(進捗状況)` In  (`11` (ConsultProgressStatus.来場待ち) , `21` (ConsultProgressStatus.検査中)) が存在しない
 *** Ticketの単位で該当を取り除く
 *** ErrorObject
 *** Code `10001`
