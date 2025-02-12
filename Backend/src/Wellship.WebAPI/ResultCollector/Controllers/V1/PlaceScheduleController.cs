@@ -39,7 +39,7 @@ public class PlaceScheduleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/placeSchedules/teams")]
-    public async Task<IActionResult> GetTeamsAsync([FromQuery] string date)
+    public async Task<IActionResult> GetTeamsAsync([FromQuery][Required] string date)
     {
 
         if (!DateOnly.TryParse(date, out var dateOnlyDate))
@@ -60,7 +60,7 @@ public class PlaceScheduleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/placeSchedules/places")]
-    public async Task<IActionResult> GetTeamPlaceSchedulesAsync([FromQuery] string date, [FromQuery] Guid teamId)
+    public async Task<IActionResult> GetTeamPlaceSchedulesAsync([FromQuery][Required] string date, [FromQuery][Required] Guid teamId)
     {
         if (!DateOnly.TryParse(date, out var dateOnlyDate))
         {

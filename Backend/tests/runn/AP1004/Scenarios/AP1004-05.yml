@@ -1,0 +1,29 @@
+desc: AP1004-05 会場日程取得_必須パラメータ不足_date [400]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: true
+vars:
+  date: "2024-10-01"
+  teamId: "ea000000-0000-0000-0000-000000000001"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  get:
+    desc: "会場日程取得_必須パラメータ不足_date"
+    req:
+      /api/v1/placeSchedules/places?teamId={{ vars.teamId }}:
+        get:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+    test: |
+      current.res.status == 400
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1004-05.json
+
