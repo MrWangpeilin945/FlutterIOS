@@ -30,7 +30,9 @@ steps:
     db:
       query: |
         SELECT
-          status
+          place_id::text
+          , team_id::text
+          , status
           , to_char(exam_date, 'yyyymmdd') as examdate
           , start_time
           , concat(place_id::text, team_id::text) as placeTeam
@@ -45,10 +47,14 @@ steps:
     test: |
       len(current.rows) == 2
       // 状況は検査中で登録される
+      && current.rows[0].place_id == vars.placeId1
+      && current.rows[0].team_id == vars.teamId1
       && current.rows[0].status == 21
       && current.rows[0].examdate == '20250130'
       && current.rows[0].start_time == '0845'
       // 状況は検査中で登録される
+      && current.rows[1].place_id == vars.placeId2
+      && current.rows[1].team_id == vars.teamId2
       && current.rows[1].status == 21
       && current.rows[1].examdate == '20250202'
       && current.rows[1].start_time == '0930'
