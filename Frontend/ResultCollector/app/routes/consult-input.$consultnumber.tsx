@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  type MetaFunction,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "@remix-run/react";
+import { type MetaFunction, useNavigate, useParams, useSearchParams } from "react-router";
 import { Button, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useAtom } from "jotai";

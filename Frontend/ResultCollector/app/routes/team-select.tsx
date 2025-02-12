@@ -1,7 +1,7 @@
 import { Container, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import type { MetaFunction } from "@remix-run/node";
-import { useNavigate } from "@remix-run/react";
+import type { MetaFunction } from "react-router";
+import { useNavigate } from "react-router";
 import { format } from "date-fns";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
