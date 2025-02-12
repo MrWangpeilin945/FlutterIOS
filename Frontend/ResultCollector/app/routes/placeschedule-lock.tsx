@@ -1,7 +1,5 @@
 import {
-  Box,
   Button,
-  Center,
   Container,
   Flex,
   LoadingOverlay,
@@ -166,8 +164,7 @@ export default function PlaceScheduleLock() {
               {placeScheduleLock ? (
                 <>
                   <Space h={40} />
-                  <Center>
-                    <Box ta="center">
+                    <Container ta="center" mt={40} mb={300}>
                       {statusButton?.map((button) => (
                         <Button
                           w={860}
@@ -213,16 +210,14 @@ export default function PlaceScheduleLock() {
                           </Text>
                         </Button>
                       ))}
-                    </Box>
-                  </Center>
-                  <Space h={300} />
+                    </Container>
                   <Flex justify="flex-end">
                     <Text size="xs" c="black01" ta="right">
                       最終更新者：{placeScheduleLock.updatedBy}（
                       {placeScheduleLock.updatedAt
                         ? format(
                             new Date(placeScheduleLock.updatedAt),
-                            "yyyy/MM/dd hh:mm",
+                            "yyyy/MM/dd HH:mm",
                           )
                         : ""}
                       ）&nbsp;
