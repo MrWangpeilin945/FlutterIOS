@@ -174,7 +174,7 @@ export default function Login() {
           <Flex columnGap={16}>
             <Group w="486" justify="flex-end">
               <Text size="sm" c="black01" ta="right">
-                職員ID
+                ログインID
               </Text>
               <TextInput
                 value={loginId}
