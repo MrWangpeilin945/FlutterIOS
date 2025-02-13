@@ -1,0 +1,23 @@
+desc: AP1001-02 ログイン_ログインID不一致 [401]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: true
+vars:
+  request: "json://../Requests/AP1001-03.json"
+steps:
+  post:
+    desc: "ログイン_パスワード不一致"
+    req:
+      /api/v1/staff/login:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 401
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1001-03.json
