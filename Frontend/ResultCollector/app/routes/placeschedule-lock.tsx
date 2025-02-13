@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
+import { useSearchParams } from "@remix-run/react";
 import { isAxiosError } from "axios";
 import { format } from "date-fns";
 import { useAtom } from "jotai";
@@ -37,6 +38,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function PlaceScheduleLock() {
+  const [searchParams] = useSearchParams();
+  const placeScheduleId = searchParams.get("placescheduleid");
   const [isLoading, setIsLoading] = useState(false);
   const [staff] = useAtom(staffState);
   const [placeSchedule] = useAtom(placeScheduleState);
@@ -65,7 +68,7 @@ export default function PlaceScheduleLock() {
   //AP1016呼び出し用(GET系APIの定義)
   const { isFetching, refetch } = usePlaceScheduleGetPlaceScheduleLockingStatus(
     "1",
-    placeSchedule?.placeScheduleId || "",
+    placeScheduleId || placeSchedule?.placeScheduleId || "",
     { query: { enabled: false } },
   );
 
