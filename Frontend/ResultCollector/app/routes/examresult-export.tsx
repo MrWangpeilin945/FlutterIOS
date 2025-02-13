@@ -5,6 +5,8 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  ScrollArea,
+  Space,
   Stack,
   Table,
   Text,
@@ -119,6 +121,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
       closeOnClickOutside={false} // modalの外クリックしても消えないように
       withCloseButton={false} // closeボタンを消す
       centered
+      scrollAreaComponent={ScrollArea.Autosize}
       styles={{
         header: {
           height: 75,
@@ -142,6 +145,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
       <Flex w={800} pt={24} px={16}>
         <Flex m="0px auto">{children}</Flex>
       </Flex>
+      <Space h={136} />
       <Flex
         w={800}
         py={24}
@@ -316,7 +320,9 @@ export default function ExamresultExport() {
                       <Table.Th ta="center">未</Table.Th>
                       <Table.Th ta="center">保留</Table.Th>
                       <Table.Th ta="center">済</Table.Th>
-                      <Table.Th ta="right" pr={94}>出力</Table.Th>
+                      <Table.Th ta="right" pr={94}>
+                        出力
+                      </Table.Th>
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody h={118} fz="xs" c="black01">
@@ -362,19 +368,19 @@ export default function ExamresultExport() {
                             </Text>
                           </Button>
                         </Table.Td>
-                        <Table.Td ta="center">
+                        <Table.Td w={100} ta="center">
                           {ed.details?.find(
                             (d) =>
                               d.status === ConsultResultExportStatus.未出力,
                           )?.count || 0}
                         </Table.Td>
-                        <Table.Td ta="center">
+                        <Table.Td w={100} ta="center">
                           {ed.details?.find(
                             (d) =>
                               d.status === ConsultResultExportStatus.出力保留,
                           )?.count || 0}
                         </Table.Td>
-                        <Table.Td ta="center">
+                        <Table.Td w={100} ta="center">
                           {ed.details?.find(
                             (d) =>
                               d.status === ConsultResultExportStatus.出力済み,
