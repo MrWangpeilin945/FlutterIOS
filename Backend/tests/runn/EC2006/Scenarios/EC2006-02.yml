@@ -27,12 +27,16 @@ steps:
         FROM
           resultcollector.teams
         WHERE
-          team_code in ('T2006-02-1', 'T2006-02-2')
+          team_code in ('T2006-02-1', 'T2006-02-2', 'T2006-02-3')
         ORDER BY
           team_code ASC;
     test: |
-      len(current.rows) == 2
+      len(current.rows) == 3
+      // リクエストの２つの班の名称は変更されたことを確認
       && current.rows[0].team_code == "T2006-02-1"
       && current.rows[0].name == "新１班"
       && current.rows[1].team_code == "T2006-02-2"
       && current.rows[1].name == "新２班"
+      // リクエストに存在しない班の名称は変更されないことを確認
+      && current.rows[2].team_code == "T2006-02-3"
+      && current.rows[2].name == "旧３班"

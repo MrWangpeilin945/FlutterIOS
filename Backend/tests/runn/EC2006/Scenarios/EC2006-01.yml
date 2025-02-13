@@ -31,6 +31,7 @@ steps:
         ORDER BY
           team_code ASC;
     test: |
+      // リクエストの３つの班が追加されたことを確認
       len(current.rows) == 3
       && current.rows[0].team_code == "T2006-01-1"
       && current.rows[0].name == "１班"
