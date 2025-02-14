@@ -32,4 +32,11 @@ public interface IConsultRepository
     /// </summary>
     /// <param name="codes">連携キーのリスト</param>
     public Task<List<ExternalConnectionCodeEntity>> GetExternalConnectionCodeAsync(List<string> codes);
+
+    /// <summary>
+    /// 受診番号に紐づけられた外部連携キーを取得する
+    /// </summary>
+    /// <param name="consultNumbers">受診番号のリスト</param>
+    public Task<List<ExternalConnectionCodeEntity>> GetConsultExternalConnectionCodeAsync(List<string> consultNumbers);
+
 }
