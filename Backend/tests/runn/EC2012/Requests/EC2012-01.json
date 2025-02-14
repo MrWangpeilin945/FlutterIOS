@@ -1,0 +1,14 @@
+[
+    {
+        "teamCode": "T2012-01",
+        "placeCode": "P2012-01",
+        "examDate": "2025-01-30T08:45:00",
+        "inputNote": "201201"
+    },
+    {
+        "teamCode": "T2012-02",
+        "placeCode": "P2012-02",
+        "examDate": "2025-02-02T09:30:00",
+        "inputNote": "201202"
+    }
+]

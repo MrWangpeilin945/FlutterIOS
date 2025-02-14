@@ -1,0 +1,27 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント
+  participant BE as バックエンド   
+  User->>FE:ログインボタンを押下
+  FE->>FE:各テキストボックス<br>バリデーションチェック
+  alt バリデーションチェックでエラー無し
+  FE->>BE:AP1001_ログイン<br>[POST] /staff/login
+  BE-->>FE:レスポンスを取得
+  alt httpステータスコードが200
+  FE->>BE:AP1002_職員の情報を取得する<br>[GET] /staff/profile
+  BE-->>FE:レスポンスを取得
+  alt httpステータスコードが200
+  FE-->>FE:jotaiに保存
+  FE-->>User:【SC0002】班選択画面に遷移 
+  else  400エラー 0r 500エラー
+  FE->>KN:【CP0015】共通ダイアログを呼び出す
+  end  
+  else  400エラー 0r 500エラー
+  FE->>KN:【CP0015】共通ダイアログを呼び出す
+  end  
+  else バリデーションチェックでエラー
+  FE->>KN:【CP0015】共通ダイアログを呼び出す  
+  end 

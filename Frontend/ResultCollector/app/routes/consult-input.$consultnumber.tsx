@@ -5,7 +5,7 @@ import {
   useParams,
   useSearchParams,
 } from "@remix-run/react";
-import { Button, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { Button, LoadingOverlay, Space, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useAtom } from "jotai";
 import { type AxiosResponse, isAxiosError } from "axios";
@@ -109,14 +109,14 @@ export default function ConsultInput() {
     setCommonBrowserbackFlag(true);
     //受診番号の受け取り確認
     if (!consultNumber) {
-      setCommonMessage("必要な受診番号がありません");
+      setCommonMessage("必要な受診番号がありません。");
       setCommonButtonMessage("閉じる");
       openCommon();
       return;
     }
     //検査メニューIDの受け取り確認
     if (!examMenuId) {
-      setCommonMessage("必要な検査メニューIDがありません");
+      setCommonMessage("必要な検査メニューIDがありません。");
       setCommonButtonMessage("閉じる");
       openCommon();
       return;
@@ -532,6 +532,7 @@ export default function ConsultInput() {
 
   // 登録処理
   const callbackRegister = () => {
+    closeConfirm();
     // AP1014_検査結果を登録する
     registerResults();
   };
@@ -727,7 +728,7 @@ export default function ConsultInput() {
             ),
           )}
           {/* 登録ボタン */}
-          <Button w={860} h={75} mt={24} mb={83} onClick={handleVerify}>
+          <Button w={860} h={75} mt={24} onClick={handleVerify}>
             登録する
           </Button>
         </Stack>
@@ -746,6 +747,7 @@ export default function ConsultInput() {
           isOpen={openedCommon}
           onClose={callbackCloseCommon}
         />
+        <Space h={100} />
         <CommonFooter />
       </AuthWrapper>
     </>

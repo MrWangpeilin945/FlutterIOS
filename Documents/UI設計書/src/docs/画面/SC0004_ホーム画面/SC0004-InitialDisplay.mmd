@@ -1,0 +1,24 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント 
+  participant BE as バックエンド   
+  User->>FE:【SC0003】ホーム画面に遷移
+  
+  
+  
+  FE->>FE:Jotaiから班名、会場名、職員名を取得して表示処理
+ FE->>KN:【CP0001】共通ヘッダーを呼び出す
+  FE->>BE:AP1005_ホームメニュー項目を取得する<br>[GET] /homeMenus
+  BE-->>FE:レスポンスを取得
+  alt httpステータスコードが200
+   FE->>FE:ホームメニュー一覧を表示処理
+  
+  else 400エラー or 500エラー 
+  FE-->>FE:エラーメッセージを表示 
+  end
+  FE-->>User:【SC0003】ホーム画面の表示
+  note over User,FE:取得した情報を表示
+ 

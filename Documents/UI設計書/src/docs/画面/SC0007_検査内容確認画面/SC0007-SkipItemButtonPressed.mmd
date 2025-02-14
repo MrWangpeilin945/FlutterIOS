@@ -1,0 +1,15 @@
+```mermaid
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor st as 職員
+  participant fr as フロントエンド
+  participant co as コンポーネント
+  participant ba as バックエンド
+  st ->> fr: この項目をスキップするボタン押下
+  alt 未実施の検査メニューあり
+    fr -->> st: [SC0007]検査内容確認画面に遷移<br>検査メニューID=次の検査メニューID
+  else すべての検査メニュー終了
+    fr -->> st: [SC0006]受診番号入力画面に遷移
+  end
+```

@@ -5,6 +5,7 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  Space,
   Stack,
   Table,
   Text,
@@ -297,7 +298,7 @@ export default function ExamresultExport() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching || isLoading} />
         <CommonHeader screenName="検査結果出力" staffName={staff?.name || ""} />
-        <Container fluid bg="background" mb={59} p={0}>
+        <Container fluid bg="background" p={0}>
           {!isFetching && (
             <>
               {exportData?.exportData ? (
@@ -316,7 +317,9 @@ export default function ExamresultExport() {
                       <Table.Th ta="center">未</Table.Th>
                       <Table.Th ta="center">保留</Table.Th>
                       <Table.Th ta="center">済</Table.Th>
-                      <Table.Th ta="right" pr={94}>出力</Table.Th>
+                      <Table.Th ta="right" pr={94}>
+                        出力
+                      </Table.Th>
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody h={118} fz="xs" c="black01">
@@ -342,7 +345,7 @@ export default function ExamresultExport() {
                             py={16}
                             px={32}
                             bd="2px solid"
-                            onClick={() => navigate("/placeschedule-lock")}
+                            onClick={() => navigate(`/placeschedule-lock?placescheduleid=${ed.placeScheduleId}`)}
                           >
                             <Text
                               size="lg"
@@ -479,6 +482,7 @@ export default function ExamresultExport() {
             </>
           )}
         </Container>
+        <Space h={100} />
         <CommonFooter items={footerItems} />
       </AuthWrapper>
     </>

@@ -1,0 +1,46 @@
+desc: EC2012-02 会場日程を更新_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2012-02.json"
+  placeId: "e0002012-0000-0000-0000-000000000003"
+  teamId:  "c0002012-0000-0000-0000-000000000003"
+steps:
+  post:
+    desc: "会場日程を更新_正常"
+    req:
+      /api/v1/external/placeSchedules:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2012-02.json
+  confirmPlaceSchedule:
+    desc: "会場日程の更新を確認"
+    db:
+      query: |
+        SELECT
+          status
+          , to_char(exam_date, 'yyyymmdd') as examdate
+          , start_time
+        FROM
+          resultcollector.place_schedule
+        WHERE
+          place_Id = '{{ vars.placeId }}' 
+          AND team_Id = '{{ vars.teamId }}' 
+    test: |
+      len(current.rows) == 1
+      // 状況は検査完了のまま更新されない
+      && current.rows[0].status == 31
+      // 健診日は更新されない
+      && current.rows[0].examdate == '20250303'
+      // 開始時刻は更新される
+      && current.rows[0].start_time == '1030'

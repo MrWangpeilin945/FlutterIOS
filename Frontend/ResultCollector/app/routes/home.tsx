@@ -148,14 +148,15 @@ export default function Home() {
   }, []);
 
   return (
-    <>
-      <AuthWrapper>
+    <AuthWrapper>
+      <Box h="100vh" bg="white01">
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="ホーム" staffName={staff?.name || ""} />
-        <Container fluid bg="white01" py={32} px={24}>
+        <Container fluid py={32} px={24}>
           {!isFetching && (
             <>
-              {homeMenuGroupData?.homeMenuGroups ? (
+              {homeMenuGroupData?.homeMenuGroups &&
+              homeMenuGroupData.homeMenuGroups.length > 0 ? (
                 <>
                   <Stack pb={24}>
                     <Box
@@ -256,7 +257,7 @@ export default function Home() {
             </>
           )}
         </Container>
-      </AuthWrapper>
-    </>
+      </Box>
+    </AuthWrapper>
   );
 }

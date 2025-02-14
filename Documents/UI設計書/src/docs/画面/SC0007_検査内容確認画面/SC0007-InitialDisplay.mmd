@@ -1,0 +1,44 @@
+```mermaid
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor st as 職員
+  participant fr as フロントエンド
+  participant co as コンポーネント
+  participant ba as バックエンド
+
+  st ->> fr: [SC0007]検査内容確認画面に遷移
+  opt パラメータチェックでNGの時
+    fr ->> co: [CP0015]共通ダイアログを呼び出す
+    fr --x st: 処理中止<br>[SC0006]受診番号入力画面に遷移
+  end
+    fr ->> ba: AP1010_検査内容を取得する<br>[GET] /consult/{consultNumber}/examItems?examMenuId={examMenuId}
+  ba -->> fr: レスポンスを取得
+  opt HTTPステータスコードが200以外
+    fr ->> co: [CP0015]共通ダイアログを呼び出す
+    fr --x st: 処理中止<br>[SC0006]受診番号入力画面に遷移
+  end
+  fr ->> ba: AP1011_中止理由一覧を取得する<br>[GET] /cancelReasons
+  ba -->> fr: レスポンスを取得
+  opt HTTPステータスコードが200以外
+    fr ->> co: [CP0015]共通ダイアログを呼び出す
+    fr --x st: 処理中止<br>[SC0006]受診番号入力画面に遷移
+  end
+  fr ->> ba: AP1012_検査機器一覧を取得する<br>[GET] /equipments/{examMenuId}
+  ba -->> fr: レスポンスを取得
+  opt HTTPステータスコードが200以外
+    fr ->> co: [CP0015]共通ダイアログを呼び出す
+    fr --x st: 処理中止<br>[SC0006]受診番号入力画面に遷移
+  end
+  fr ->> co: [CP0003]受診者ヘッダーを呼び出す
+  fr ->> co: [CP0008]個人属性情報を呼び出す
+  fr ->> co: [CP0009]ブース特記を呼び出す
+    fr ->> co: [CP0002]共通フッターを呼び出す
+  fr ->> fr: 画面表示
+  fr -->> st: [SC0007]検査内容確認画面を表示
+  opt AP1012で検査機器が取得できた時
+    opt 取得した検査機器が1つの時
+      fr -->> st: 自動的に機器選択状態とする
+    end
+  end
+```
