@@ -369,7 +369,7 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 * PKが重複するレコードが存在する(PreviousResults)
 ** Consult.PreviousResultsを以下の条件でGroupByし、複数レコードが存在する
 *** 条件
-**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.PreviousResults.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id`
+**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.PreviousResults.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id`が一致、かつ `Consult.PreviousResults.ExamDate`が一致
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
@@ -388,7 +388,6 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 ** Consult.ExamItemDetailOrdersを以下の条件でGroupByし、複数レコードが存在する
 *** 条件
 **** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id` 
-**** `Consult.PreviousResults.ExamDate`
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
