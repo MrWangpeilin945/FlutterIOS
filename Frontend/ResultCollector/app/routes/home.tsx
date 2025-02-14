@@ -148,8 +148,8 @@ export default function Home() {
   }, []);
 
   return (
-    <Box h="100vh" bg="white01">
-      <AuthWrapper>
+    <AuthWrapper>
+      <Box h="100vh" bg="white01">
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="ホーム" staffName={staff?.name || ""} />
         <Container fluid py={32} px={24}>
@@ -257,7 +257,7 @@ export default function Home() {
             </>
           )}
         </Container>
-      </AuthWrapper>
-    </Box>
+      </Box>
+    </AuthWrapper>
   );
 }
