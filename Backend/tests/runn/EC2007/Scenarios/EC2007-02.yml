@@ -27,12 +27,16 @@ steps:
         FROM
           resultcollector.places
         WHERE
-          place_code in ('P2007-02-1', 'P2007-02-2')
+          place_code in ('P2007-02-1', 'P2007-02-2', 'P2007-02-3')
         ORDER BY
           place_code ASC;
     test: |
-      len(current.rows) == 2
+      len(current.rows) == 3
+      // リクエストの２つの会場の名称は変更されたことを確認
       && current.rows[0].place_code == "P2007-02-1"
       && current.rows[0].name == "新第１会場"
       && current.rows[1].place_code == "P2007-02-2"
       && current.rows[1].name == "新第２会場"
+      // リクエストに存在しない会場の名称は変更されないことを確認
+      && current.rows[2].place_code == "P2007-02-3"
+      && current.rows[2].name == "旧第３会場"
