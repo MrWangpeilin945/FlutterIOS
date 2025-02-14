@@ -109,14 +109,14 @@ export default function ConsultInput() {
     setCommonBrowserbackFlag(true);
     //受診番号の受け取り確認
     if (!consultNumber) {
-      setCommonMessage("必要な受診番号がありません");
+      setCommonMessage("必要な受診番号がありません。");
       setCommonButtonMessage("閉じる");
       openCommon();
       return;
     }
     //検査メニューIDの受け取り確認
     if (!examMenuId) {
-      setCommonMessage("必要な検査メニューIDがありません");
+      setCommonMessage("必要な検査メニューIDがありません。");
       setCommonButtonMessage("閉じる");
       openCommon();
       return;
