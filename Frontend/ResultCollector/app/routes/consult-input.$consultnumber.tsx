@@ -70,7 +70,7 @@ export default function ConsultInput() {
     (item) => item.examMenuId === examMenuId,
   )?.equipment;
   //ローディング管理
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   //共通ダイアログ表示管理
   const [openedCommon, { open: openCommon, close: closeCommon }] =
     useDisclosure(false);
@@ -139,10 +139,12 @@ export default function ConsultInput() {
         setCommonButtonMessage("閉じる");
         openCommon();
       }
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
     };
 
     inputExamItems();
-    setIsLoading(false);
     setCommonBrowserbackFlag(false);
   }, [consultNumber, examMenuId]);
 
@@ -409,6 +411,7 @@ export default function ConsultInput() {
     if (!consultNumber) return;
 
     const postMutateAsync = async () => {
+      setIsLoading(true);
       try {
         result = await verifyMutateAsync({
           version: apiVersion,
@@ -457,6 +460,7 @@ export default function ConsultInput() {
         setCommonButtonMessage("閉じる");
         openCommon();
       }
+      setIsLoading(false);
     };
     postMutateAsync();
   };
@@ -464,10 +468,8 @@ export default function ConsultInput() {
   //検証処理
   const handleVerify = () => {
     setIsRegisterPressed(true);
-    setIsLoading(true);
     //AP1013_検査結果を検証する
     verifyResults();
-    setIsLoading(false);
   };
 
   // 検査継続処理
@@ -491,6 +493,7 @@ export default function ConsultInput() {
     const resultsRequest = makeBody();
     if (!consultNumber) return;
     const postMutateAsync = async () => {
+      setIsLoading(true);
       try {
         result = await registMutateAsync({
           version: apiVersion,
@@ -522,16 +525,15 @@ export default function ConsultInput() {
         setCommonButtonMessage("閉じる");
         openCommon();
       }
+      setIsLoading(false);
     };
     postMutateAsync();
   };
 
   // 登録処理
   const callbackRegister = () => {
-    setIsLoading(true);
     // AP1014_検査結果を登録する
     registerResults();
-    setIsLoading(false);
   };
 
   // 共通ダイアログ：閉じる処理
