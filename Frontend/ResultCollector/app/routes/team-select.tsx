@@ -69,7 +69,7 @@ export default function Teams() {
         <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
-              {teamsData?.teams ? (
+              {teamsData?.teams && teamsData.teams.length > 0 ? (
                 <Stack gap={16}>
                   {teamsData.teams.map((tm) => (
                     <HeadlineButton

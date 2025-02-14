@@ -1,0 +1,55 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+  actor stf as 職員
+  participant fe as フロントエンド
+  participant cmp as コンポーネント
+  participant be as バックエンド
+  participant app as アプリ
+  autonumber
+  stf ->> fe: 【SC0008】検査結果入力画面に遷移
+
+  fe ->> fe: クエリパラメータ：検査メニューIDの正当性チェック
+  break 検査メニューIDが異常
+    fe ->> cmp: 【CP0015】共通ダイアログを呼び出す
+    Note over fe,cmp: 「必要な検査メニューIDがありません。」
+    fe ->> fe: ブラウザバック処理
+  end
+  fe ->> fe: パスパラメータ：受診番号の正当性チェック
+  break 受診番号が異常
+    fe ->> cmp: 【CP0015】共通ダイアログを呼び出す
+    Note over fe,cmp: 「必要な受診番号がありません。」
+    fe ->> fe: ブラウザバック処理
+  end
+  fe ->> fe: jotaiから選択中の機器情報を取得
+  fe ->> be: AP1009_検査結果入力情報を取得する
+  be -->> fe: レスポンスを取得（受診者情報+ブース特記+検査情報）
+  break ステータスコードが200以外
+    fe ->> cmp: 【CP0015】共通ダイアログを呼び出す
+    Note over fe,cmp: statuscode=400(Bad Request)<br>「受診番号の入力形式が間違っています。」
+    Note over fe,cmp: statuscode=404(Not Found)<br>「検査項目が存在しません。」
+    fe ->> fe: ブラウザバック処理
+  end
+  break 検査項目グループに通過がある場合
+    alt 未実施
+      fe ->>cmp: 【CP0016】確認ダイアログを呼び出す
+      Note over fe,cmp: 「登録します。よろしいですか。」
+      fe -->>stf: ■登録する　シーケンスの処理へ
+    else 実施済み
+      fe ->>cmp: 【CP0016】確認ダイアログを呼び出す
+      Note over fe,cmp: 「実施済みです。<br>取消してよろしいですか。」
+      fe -->>stf: ■登録する　シーケンスの処理へ
+    end
+  end
+  fe ->> fe: jotaiからログインしている職員名を取得（ヘッダーに渡す用）
+  fe ->> cmp: 【CP0003】受診者ヘッダーを呼び出す
+  fe ->> cmp: 【CP0002】共通フッターを呼び出す
+  alt ブース特記データがある場合
+    fe ->> cmp: 【CP0009】ブース特記を呼び出す
+  end
+  fe ->> cmp: 【CP1001~CP1013】検査項目グループ呼び出す
+  fe ->>fe: [測定する]ボタンのDisabledチェック処理
+  opt [測定する]ボタンのDisabled=falseの場合
+    fe->>fe: ローカルストレージの監視開始
+    fe ->>app: 機器連携アプリのURLへ遷移<br>（機器データ監視開始）
+  end
+  fe ->> stf: 【SC0008】検査結果入力画面の表示

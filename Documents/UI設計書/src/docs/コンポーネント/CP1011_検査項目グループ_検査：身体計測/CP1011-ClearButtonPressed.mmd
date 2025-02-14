@@ -1,0 +1,15 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  User->>KN:いずれかのクリアボタンを押下
+  KN->>KN:対象の項目の値をクリア
+  KN-->>KN:バリデーションチェック
+   alt バリデーションチェックで異常エラーなし
+  KN-->>FE:引数.変更イベントを呼び出す
+  else バリデーションチェックでエラー
+  KN-->>KN:エラーメッセージを表示 
+  end

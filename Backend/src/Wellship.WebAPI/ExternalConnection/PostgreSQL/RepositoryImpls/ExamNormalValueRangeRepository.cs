@@ -39,7 +39,18 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
             var transaction = await connection.BeginTransactionAsync();
             try
             {
-                var upsertItems = examNormalValueRangeEntities.Select(e => new
+                // Delete文を実行
+                var deleteKeys = examNormalValueRangeEntities.Select(x => x.ThresholdId.ToString() + '-' + x.ExamItemDetailId.ToString())
+                                                             .ToArray();
+                const string deleteSql = @"
+                                delete 
+                                    from resultcollector.exam_normal_value_range
+                                where 
+                                    concat(threshold_id::text, '-', exam_item_detail_id) = any (@DeleteKeys)";
+                await connection.ExecuteAsync(deleteSql, new { DeleteKeys = deleteKeys });
+
+                // Insert文を実行
+                var insertItems = examNormalValueRangeEntities.Select(e => new
                 {
                     Name = e.Name,
                     ThresholdId = e.ThresholdId,
@@ -53,66 +64,35 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                     CreatedAt = createdAt,
                     CreatedBy = createdBy
                 }).ToArray();
-
-                // Upsert文を実行
-                string mergeSql = @"
-                        merge
-                        into resultcollector.exam_normal_value_range as range
-                            using (values (@Name, @ThresholdId, @ExamItemDetailId, @MaxAge, @MinAge, @TargetSex, @MaxValue, @MinValue, @ErrorLevel, @CreatedAt, @CreatedBy)) as new_data (
-                                name,
-                                threshold_id,
-                                exam_item_detail_id,
-                                max_age,
-                                min_age,
-                                target_sex,
-                                max_value,
-                                min_value,
-                                error_level,
-                                created_at,
-                                created_by
-                            )
-                                on range.threshold_id = new_data.threshold_id
-                                and range.exam_item_detail_id = new_data.exam_item_detail_id
-                                and range.max_age = new_data.max_age
-                                and range.target_sex = new_data.target_sex
-                                and range.max_value = new_data.max_value
-                        when matched then update
-                        set
-                            name = new_data.name,
-                            min_age = new_data.min_age,
-                            min_value = new_data.min_value,
-                            error_level = new_data.error_level,
-                            created_at = new_data.created_at,
-                            created_by = new_data.created_by 
-                        when not matched then
-                        insert (
-                                name,
-                                threshold_id,
-                                exam_item_detail_id,
-                                max_age,
-                                min_age,
-                                target_sex,
-                                max_value,
-                                min_value,
-                                error_level,
-                                created_at,
-                                created_by
+                const string insertSql = @"
+                        insert into resultcollector.exam_normal_value_range
+                        (
+                            name,
+                            threshold_id,
+                            exam_item_detail_id,
+                            max_age,
+                            min_age,
+                            target_sex,
+                            max_value,
+                            min_value,
+                            error_level,
+                            created_at,
+                            created_by
                         )
                         values (
-                            new_data.name,
-                            new_data.threshold_id,
-                            new_data.exam_item_detail_id,
-                            new_data.max_age,
-                            new_data.min_age,
-                            new_data.target_sex,
-                            new_data.max_value,
-                            new_data.min_value,
-                            new_data.error_level,
-                            new_data.created_at,
-                            new_data.created_by
+                            @Name,
+                            @ThresholdId,
+                            @ExamItemDetailId,
+                            @MaxAge,
+                            @MinAge,
+                            @TargetSex,
+                            @MaxValue,
+                            @MinValue,
+                            @ErrorLevel,
+                            @CreatedAt,
+                            @CreatedBy
                         );";
-
-                await connection.ExecuteAsync(mergeSql, upsertItems);
+                await connection.ExecuteAsync(insertSql, insertItems);
                 await transaction.CommitAsync();
             }
             catch (DbException)

@@ -1,4 +1,4 @@
-desc: AP1013-01 結果検証_正常 [200]
+desc: AP1013-01 結果検証_バリデーションエラーなし [200]
 runners:
   req:
     endpoint: ${BACKEND_URL}
@@ -15,7 +15,7 @@ steps:
       path:
         ../../Helpers/adminAccessToken.yml
   post:
-    desc: "結果検証_正常"
+    desc: "結果検証_バリデーションエラーなし"
     req:
       /api/v1/consult/{{ vars.consultNumber }}/results/verify:
         post:
@@ -31,10 +31,6 @@ steps:
       // 検査項目明細が２項目づつ返ってくる
       && len(current.res.body.examItemGroups[0].examItems[0].examItemDetails) == 2
       && len(current.res.body.examItemGroups[0].examItems[1].examItemDetails) == 2
-      // 検査結果登録エラーが返ってくる
-      && len(current.res.body.examItemGroups[0].examItems[0].examRegistResults) == 1
-      && current.res.body.examItemGroups[0].examItems[0].examRegistResults[0].errorLevel == 3
-      && current.res.body.examItemGroups[0].examItems[0].examRegistResults[0].description == '入力値範囲外です。'
     dump:
       expr: current.res.body
       out: ../Dump/AP1013-01.json

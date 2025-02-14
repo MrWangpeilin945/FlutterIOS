@@ -1,4 +1,4 @@
-desc: AP1016-01 会場ロック取得_正常 [200]
+desc: AP1016-01 会場ロック取得_正常_職員名あり [200]
 runners:
   req:
     endpoint: ${BACKEND_URL}
@@ -13,7 +13,7 @@ steps:
     include:
       path: ../../Helpers/adminAccessToken.yml
   get:
-    desc: "会場ロック取得_正常"
+    desc: "会場ロック取得_正常_職員名あり"
     req:
       /api/v1/placeSchedules/{{ vars.placeScheduleId }}/placeScheduleLockingStatus:
         get:
@@ -21,6 +21,7 @@ steps:
             Authorization: "Bearer {{ steps.getAccessToken.token }}"
     test: |
       current.res.status == 200
+      && current.res.body.updatedBy == '職員A'
     dump:
       expr: current.res.body
       out: ../Dump/AP1016-01.json

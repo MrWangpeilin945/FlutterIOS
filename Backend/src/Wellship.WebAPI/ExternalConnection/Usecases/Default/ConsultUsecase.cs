@@ -75,14 +75,33 @@ public class ConsultUsecase : IConsultUsecase
                                   ).ToList();
         var externalExamItemDetails = await _consultRepository.GetExternalExamItemDetailInfoAsync(detailCodes);
         // 連携キーに紐づく外部連携キーを取得する
-        var ExternalConnectionCodes = await _consultRepository.GetExternalConnectionCodeAsync(consults.Select(x => x.ConnectionCode).ToList());
+        var externalConnectionCodes = await _consultRepository.GetExternalConnectionCodeAsync(consults.Select(x => x.ConnectionCode).ToList());
+        // 受診番号に紐づく連携キーを取得する
+        var consultExternalConnectionCodes = await _consultRepository.GetConsultExternalConnectionCodeAsync(consults.Select(x => x.ConsultNumber).ToList());
 
         // WARNING検証
         var warningConsult = new List<Consult>();
+        // 受診番号が異なる連携キーで登録されている
+        foreach (var warning in consults.Where(x => x.ActionType == ActionType.登録))
+        {
+            // 受診番号に紐づいている連携キーを取得する
+            var connectionCode = consultExternalConnectionCodes.Where(x => x.ConsultNumber == warning.ConsultNumber)
+                                                               .Select(x => x.ConnectionCode)
+                                                               .FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(connectionCode) && connectionCode != warning.ConnectionCode)
+            {
+                warningConsult.Add(warning);
+                _errorObjects.Add(new ErrorObject
+                {
+                    Code = "10002",
+                    Message = $"指定されたConsultNumberが既に登録済みです。Code:{warning.ConsultNumber}",
+                    InputNote = warning.InputNote
+                });
+            }
+        }
         // 会場IDが取得できない
         foreach (var warning in consults.Where(x => x.ActionType == ActionType.登録)
-                                        .Where(x => !places.Select(p => p.PlaceCode).Contains(x.PlaceCode))
-                                        .Where(x => !warningConsult.Select(c => c.ConnectionCode).ToList().Contains(x.ConnectionCode)))
+                                        .Where(x => !places.Select(p => p.PlaceCode).Contains(x.PlaceCode)))
         {
             warningConsult.Add(warning);
             _errorObjects.Add(new ErrorObject
@@ -94,8 +113,7 @@ public class ConsultUsecase : IConsultUsecase
         }
         // 班IDが取得できない
         foreach (var warning in consults.Where(x => x.ActionType == ActionType.登録)
-                                        .Where(x => !teams.Select(p => p.TeamCode).Contains(x.TeamCode))
-                                        .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+                                        .Where(x => !teams.Select(p => p.TeamCode).Contains(x.TeamCode)))
         {
             warningConsult.Add(warning);
             _errorObjects.Add(new ErrorObject
@@ -110,8 +128,7 @@ public class ConsultUsecase : IConsultUsecase
                                         .Where(x => !placeSchedules.Any(ps => x.PlaceCode == ps.PlaceCode &&
                                                                               x.TeamCode == ps.TeamCode &&
                                                                               !string.IsNullOrWhiteSpace(x.ExamDate) &&
-                                                                              DateOnly.Parse(x.ExamDate) == ps.ExamDate))
-                                        .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+                                                                              DateOnly.Parse(x.ExamDate) == ps.ExamDate)))
         {
             warningConsult.Add(warning);
             _errorObjects.Add(new ErrorObject
@@ -123,8 +140,7 @@ public class ConsultUsecase : IConsultUsecase
         }
         // 受診者IDが取得できない
         foreach (var warning in consults.Where(x => x.ActionType == ActionType.登録)
-                                        .Where(x => !examinees.Select(e => e.ExamineeCode).Contains(x.ExamineeCd))
-                                        .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+                                        .Where(x => !examinees.Select(e => e.ExamineeCode).Contains(x.ExamineeCd)))
         {
             warningConsult.Add(warning);
             _errorObjects.Add(new ErrorObject
@@ -135,8 +151,7 @@ public class ConsultUsecase : IConsultUsecase
             });
         }
         // 検査特記が存在しない
-        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録)
-                                        .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録))
         {
             foreach (var warning in consult.ConsultNotes.Where(x => !examMenuNodeCodes.Select(e => e.Code).Contains(x.Code)))
             {
@@ -151,8 +166,7 @@ public class ConsultUsecase : IConsultUsecase
             }
         }
         // 基準値パターンが取得できない
-        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録)
-                                        .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録))
         {
             foreach (var warning in consult.ConsultThresholds.Where(x => !thresholds.Select(t => t.ThresholdCode).Contains(x.ThresholdCode)))
             {
@@ -167,8 +181,7 @@ public class ConsultUsecase : IConsultUsecase
             }
         }
         // 検査項目明細ID（PreviousResults）
-        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録)
-                                        .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録))
         {
             // 検査項目明細IDが取得できない
             foreach (var warning in consult.PreviousResults.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCd)))
@@ -183,27 +196,26 @@ public class ConsultUsecase : IConsultUsecase
                 break;
             }
             // PKが重複するレコードが存在する
-            var previousResults = consult.PreviousResults.Select(x => x.ExamItemDetailCd).ToList();
-            foreach (var previousResultCd in previousResults)
+            foreach (var previousResults in consult.PreviousResults)
             {
-                var previousResultId = externalExamItemDetails.Where(x => x.ExternalExamItemDetailCode == previousResultCd)
+                var previousResultId = externalExamItemDetails.Where(x => x.ExternalExamItemDetailCode == previousResults.ExamItemDetailCd)
                                                               .Select(x => x.ExamItemDetailId).FirstOrDefault();
-                if (externalExamItemDetails.Count(x => x.ExamItemDetailId == previousResultId && previousResults.Contains(x.ExternalExamItemDetailCode)) > 1)
+                var externalExamItemDetailCode = externalExamItemDetails.Where(x => x.ExamItemDetailId == previousResultId)
+                                                                        .Select(x => x.ExternalExamItemDetailCode).ToList();
+                if (consult.PreviousResults.Count(x => x.ExamDate == previousResults.ExamDate && externalExamItemDetailCode.Contains(x.ExamItemDetailCd)) > 1)
                 {
                     warningConsult.Add(consult);
                     _errorObjects.Add(new ErrorObject
                     {
                         Code = "10003",
-                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:{previousResultCd}",
+                        Message = $"キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:{previousResults.ExamItemDetailCd}/PreviousResults.ExamDate:{previousResults.ExamDate}",
                         InputNote = consult.InputNote
                     });
-                    break;
                 }
             }
         }
         // 検査項目明細ID（ExamItemDetailOrders）
-        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録)
-                                        .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録))
         {
             // 検査項目明細IDが取得できない
             foreach (var warning in consult.ExamItemDetailOrders.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCd)))
@@ -229,17 +241,15 @@ public class ConsultUsecase : IConsultUsecase
                     _errorObjects.Add(new ErrorObject
                     {
                         Code = "10003",
-                        Message = $"キー項目が重複しています。Code:ExamItemDetailCd:{examItemDetailOrderCd}",
+                        Message = $"キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:{examItemDetailOrderCd}",
                         InputNote = consult.InputNote
                     });
-                    break;
                 }
             }
         }
         // 削除
         foreach (var warning in consults.Where(x => x.ActionType == ActionType.削除)
-                                        .Where(x => !ExternalConnectionCodes.Select(x => x.ConnectionCode).Contains(x.ConnectionCode))
-                                        .Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode)))
+                                        .Where(x => !externalConnectionCodes.Select(x => x.ConnectionCode).Contains(x.ConnectionCode)))
         {
             warningConsult.Add(warning);
             _errorObjects.Add(new ErrorObject
@@ -254,7 +264,7 @@ public class ConsultUsecase : IConsultUsecase
                                     .Select(x => new ConsultEntity
                                     {
                                         ActionType = x.ActionType,
-                                        ConsultId = ExternalConnectionCodes.Where(ec => ec.ConnectionCode == x.ConnectionCode)
+                                        ConsultId = externalConnectionCodes.Where(ec => ec.ConnectionCode == x.ConnectionCode)
                                                                            .Select(ec => ec.ConsultId).FirstOrDefault(),
                                         ConsultNumber = x.ConsultNumber,
                                         PlaceScheduleId = placeSchedules.Where(ps => ps.PlaceCode == x.PlaceCode)

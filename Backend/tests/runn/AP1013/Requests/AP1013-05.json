@@ -6,6 +6,23 @@
             "examItemDetails": [
                 {
                     "examItemDetailId": 101311,
+                    "value": "20"
+                },
+                {
+                    "examItemDetailId": 101312,
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "examItemId": 10132,
+            "examItemDetails": [
+                {
+                    "examItemDetailId": 101321,
+                    "value": "26"
+                },
+                {
+                    "examItemDetailId": 101322,
                     "value": "28"
                 }
             ]
