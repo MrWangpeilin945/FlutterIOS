@@ -46,3 +46,10 @@ export const clearAllState = atom(null, (_get, set) => {
   set(connectionEquipmentState, RESET);
   set(serverTimeOffsetState, RESET);
 });
+
+// 状態管理をクリアする(班選択画面で使用)
+export const clearExamState = atom(null,(_get, set) =>{
+  set(placeScheduleState, RESET);
+  set(examDateState, RESET);
+  set(examMenuState, RESET);
+})
