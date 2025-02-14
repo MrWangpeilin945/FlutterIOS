@@ -178,6 +178,7 @@ export default function Login() {
               </Text>
               <TextInput
                 value={loginId}
+                autoComplete="off"
                 onChange={(e) => setLoginId(e.target.value)}
                 maxLength={20}
                 styles={{
@@ -198,6 +199,7 @@ export default function Login() {
               </Text>
               <PasswordInput
                 value={password}
+                autoComplete="one-time-code"
                 onChange={(e) => setPassword(e.target.value)}
                 maxLength={20}
                 styles={{
