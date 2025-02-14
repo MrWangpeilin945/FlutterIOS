@@ -1,0 +1,9 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント 
+  participant BE as バックエンド   
+  User->>FE:ホームメニュー一覧ボタンを押下
+  FE-->>User:次画面に遷移

@@ -1,0 +1,36 @@
+%%{init:{'theme':'forest'}}%%
+
+sequenceDiagram
+ autonumber
+ actor stf as 職員
+ participant fe as フロントエンド
+ participant cmp as コンポーネント
+ participant be as バックエンド
+
+ stf->>fe: [登録する]タップ
+ fe ->>fe: 登録用request bodyを作成
+ fe->>be: API1013_検査結果を検証する<br>[POST] /consult/{consultNumber}/results/verify
+ be-->>fe: responce
+ break statuscodeが200と422以外
+  fe->>cmp: 【CP0015】共通ダイアログを呼び出す
+  Note over fe,cmp: status=400 (Bad Request)<br>「受診番号の入力形式が間違っています。」
+  Note over fe,cmp: status=404 (NotFound)<br>「受診情報が存在しません。」
+ end
+
+ alt status=422
+   fe ->>fe: バリデーションエラーを検査項目グループコンポーネントの引数に設定する
+   fe -->>cmp: 【CP1001~CP1013】検査項目グループ<br>バリデーションメッセージ渡す
+   fe ->>fe: 検証結果のエラーレベルを確認
+   alt エラーレベル：登録不可（エラー）
+     fe->>cmp: 【CP0015】共通ダイアログを呼び出す
+     Note over fe,cmp: 「エラーがあります。<br>内容を確認してください。」
+   else エラーレベル：登録可（ワーニング）
+     fe->>cmp: 【CP0016】確認ダイアログを呼び出す
+     Note over fe,cmp: 「ワーニングがありますが、登録します。<br>よろしいですか。」
+     fe -->>stf: ■登録する　シーケンスの処理へ
+   end
+ else statu=200
+   fe ->>cmp: 【CP0016】確認ダイアログを呼び出す
+   Note over fe,cmp: 「登録します。よろしいですか。」
+   fe -->>stf: ■登録する　シーケンスの処理へ
+ end

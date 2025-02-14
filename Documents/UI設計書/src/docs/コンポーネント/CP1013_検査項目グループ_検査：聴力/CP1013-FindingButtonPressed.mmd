@@ -1,0 +1,19 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  User->>KN:所見ありボタンを押下
+  alt 選択済みに変更した場合
+  alt 押下したボタン側の1000Hzのvalueに所見ありのcodeが設定されている場合 かつ 4000Hzのvalueが設定されていない場合 かつ 4000HzのhasOrderがtrueの場合 かつ 4000HzのcancelReasonIdが設定されていない場合
+  KN->>KN:4000Hzのvalueに所見なしのcodeを設定
+  else 4000Hzのvalueに所見ありのcodeが設定されている場合 かつ 1000Hzのvalueが設定されていない場合 かつ 1000HzのhasOrderがtrueの場合 かつ 1000HzのcancelReasonIdが設定されていない場合
+  KN->>KN:1000Hzのvalueに所見なしのcodeを設定
+  end
+  KN->>KN:押下した項目の値を更新
+  else 未選択に変更した場合
+  KN->>KN:押下した項目の値をクリア
+  end
+  KN-->>FE:引数.変更イベントを呼び出す

@@ -5,6 +5,7 @@ import {
   Container,
   Flex,
   LoadingOverlay,
+  Space,
   Stack,
   Text,
 } from "@mantine/core";
@@ -129,7 +130,7 @@ export default function ExamMenuSelect() {
         <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
-              {examMenuList?.examMenus ? (
+              {examMenuList?.examMenus && examMenuList.examMenus.length > 0 ? (
                 <Center>
                   <Stack>
                     <Flex
@@ -215,6 +216,7 @@ export default function ExamMenuSelect() {
             </>
           )}
         </Container>
+        <Space h={100} />
         <CommonFooter />
       </AuthWrapper>
     </>

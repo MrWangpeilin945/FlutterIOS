@@ -167,11 +167,13 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
             , ps.exam_date as ExamDate
             , ps.status as Status
             , ps.created_at as CreatedAt
-            , ps.created_by as CreatedBy
+            , COALESCE(s.name, ps.created_by) as CreatedBy
         from
             resultcollector.place_schedule as ps
             left join resultcollector.places as p 
                 on ps.place_id = p.place_id 
+            left join resultcollector.staffs s 
+                on ps.created_by = s.staff_code 
         where
             ps.place_schedule_id = @PlaceScheduleId;";
 

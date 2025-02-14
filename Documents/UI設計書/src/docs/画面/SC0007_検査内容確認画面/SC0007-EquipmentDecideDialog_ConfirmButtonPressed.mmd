@@ -1,0 +1,14 @@
+```mermaid
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor st as 職員
+  participant fr as フロントエンド
+  %%participant co as コンポーネント
+  %%participant ba as バックエンド
+
+  st ->> fr: 決定ボタン押下
+  fr ->> fr: 選択している検査機器を保持
+  fr -->> st: ダイアログを閉じる
+
+```
