@@ -156,7 +156,7 @@ export default function ConsultInput() {
   };
 
   useEffect(() => {
-    if (!examData) return;
+    if (!examData.current) return;
 
     //機器ラベルとvalueが空かをチェック
     const isValueEmptyForEquipmentLabel = (): boolean => {
@@ -187,7 +187,7 @@ export default function ConsultInput() {
       }
     };
     handleRemeasurementCheck();
-  }, [examData, connectionEquipment]);
+  }, [examData.current, connectionEquipment]);
 
   //測定ボタン押下時
   const handleRemeasurement = () => {
