@@ -106,10 +106,10 @@ export default function ConsultNumberInput() {
           }
           open();
         }
+        setIsLoading(false);
       };
       fetchUnexaminedItemsSelect();
     }
-    setIsLoading(false);
   }, []);
 
   // キーボード以外の部分がクリックされると非表示に
@@ -153,6 +153,7 @@ export default function ConsultNumberInput() {
     };
 
     const postMutateAsync = async () => {
+      setIsLoading(true);
       try {
         const result = await mutateAsync({
           version: "1",
@@ -186,17 +187,16 @@ export default function ConsultNumberInput() {
           open();
         }
       }
+      setIsLoading(false);
     };
     postMutateAsync();
   };
 
   // Enterキーが押されたときの処理
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    setIsLoading(true);
     if (e.key === "Enter") {
       handleConfirm();
     }
-    setIsLoading(false);
   };
 
   // 確定処理
