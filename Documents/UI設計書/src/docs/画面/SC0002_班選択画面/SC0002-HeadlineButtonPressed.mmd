@@ -1,0 +1,11 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント 
+  participant BE as バックエンド   
+  User->>FE:【CP0005】見出しボタンを押下
+  FE->>FE:jotaiに選択した班を保存
+  FE-->>User:【SC0002】会場選択画面に遷移
+ 

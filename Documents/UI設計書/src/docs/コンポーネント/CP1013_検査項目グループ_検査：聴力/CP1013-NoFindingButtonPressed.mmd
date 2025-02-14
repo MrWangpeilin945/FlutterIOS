@@ -1,0 +1,18 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  User->>KN:左右いずれかの所見なしボタンを押下
+  alt 選択済みに変更した場合
+  KN->>KN:押下した側の全項目の値を所見なしに設定
+  KN->>KN:所見ありボタンをグレーアウトして表示
+  else 未選択に変更した場合
+  KN->>KN:押下した側の全項目の値をクリア
+  KN->>KN:所見ありボタンのグレーアウトを解除
+  end
+  KN-->>FE:引数.変更イベントを呼び出す
+
+  

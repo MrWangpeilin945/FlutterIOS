@@ -959,7 +959,8 @@ public class ConsultUsecaseTests
                                 {
                                     ConsultId = consultId,
                                     ExamItemDetailCancels = [
-                                        new ExamItemDetailCancel{ExamItemId=71, ExamItemDetailId =722 ,CancelReasonId= 10 }
+                                        new ExamItemDetailCancel{ExamItemId=72, ExamItemDetailId =721 ,CancelReasonId= 10 },
+                                        new ExamItemDetailCancel{ExamItemId=72, ExamItemDetailId =722 ,CancelReasonId= 10 }
                                     ]
                                 });
         // 検査依頼を取得
@@ -968,6 +969,7 @@ public class ConsultUsecaseTests
                                 {
                                     ConsultId = consultId,
                                     ExamItemDetailOrders = [
+                                        new ExamItemDetailOrder{ ExamItemId=71, ExamItemDetailId =711 },
                                         new ExamItemDetailOrder{ ExamItemId=71, ExamItemDetailId =712 }
                                     ]
                                 });

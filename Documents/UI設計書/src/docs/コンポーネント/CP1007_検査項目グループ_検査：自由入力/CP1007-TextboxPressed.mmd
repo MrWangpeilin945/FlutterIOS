@@ -1,0 +1,19 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+User->>KN:テキストボックスを押下
+KN->>KN:渡された値を保存してテキストボックスに表示
+alt onRegisterPressedがtrueの時
+KN->>KN:必須バリデーションチェック
+alt バリデーションチェックでエラーなし
+KN->>FE:引数.変更イベントを呼び出す
+else バリデーションチェックでエラー
+KN->>KN:エラーメッセージを表示
+end
+else onRegisterPressedがfalseの時
+KN->>FE:引数.変更イベントを呼び出す
+end

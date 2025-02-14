@@ -1,0 +1,37 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  #actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  FE->>KN:【CP1013】検査項目グループ_検査：聴力を呼び出す
+  break examItems.positionNumberが「1」の<br/>examItemDetails.positinoNumberが「1」「2」「3」「4」の要素が全て存在しない場合
+  KN-->>FE:【CP1013】検査項目グループ_検査：聴力を表示しない
+  end
+  alt 引数.検査項目情報にexamRegistResultsが存在する場合
+  KN->>KN:エラーメッセージを表示
+  end
+  alt 引数.登録ボタンフラグがtrueの場合
+  KN->>KN:バリデーションチェック
+  alt バリデーションチェックでエラーあり
+  KN->>KN:エラーメッセージを表示
+  end
+  end
+  loop 左右ごとに要素を表示する(positionNumber1と2が左、3と4が右)
+  alt 1000Hzのvalueに所見ありのcodeが設定されている場合 かつ 4000Hzのvalueが設定されていない場合 かつ 4000HzのhasOrderがtrueの場合 かつ 4000HzのcancelReasonIdが設定されていない場合
+  KN->>KN:4000Hzのvalueに所見なしのcodeを設定
+  else 4000Hzのvalueに所見ありのcodeが設定されている場合 かつ 1000Hzのvalueが設定されていない場合 かつ 1000HzのhasOrderがtrueの場合 かつ 1000HzのcancelReasonIdが設定されていない場合
+  KN->>KN:1000Hzのvalueに所見なしのcodeを設定
+  end
+  alt 1000Hzと4000Hzの要素について、ともにhasOrderがfalse or cancelReasonIdが設定されている場合
+  KN->>KN:所見なしボタンをグレーアウト（選択不可）して表示
+  end
+  loop examItemDetailsの要素を繰り返し表示
+  alt hasOrderがfalseの場合<br> or <br>cancelReasonIdが設定されている場合
+  KN->>KN:グレーアウト（選択不可）して表示
+  end
+  end
+  KN->>KN:各パラメータの表示
+  end
+  KN-->>FE:【CP1013】検査項目グループ_検査：聴力を返す

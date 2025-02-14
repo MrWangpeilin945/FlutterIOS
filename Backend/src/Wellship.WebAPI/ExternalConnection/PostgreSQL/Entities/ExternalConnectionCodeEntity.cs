@@ -11,6 +11,11 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
         public required Guid ConsultId { get; init; }
 
         /// <summary>
+        /// 受診番号
+        /// </summary>
+        public required string ConsultNumber { get; init; }
+
+        /// <summary>
         /// 外部連携キー
         /// </summary>
         public required string ConnectionCode { get; init; }
