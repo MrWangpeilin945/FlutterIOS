@@ -115,8 +115,8 @@ export default function ConsultNumberInput() {
   // テキストボックスのバリデーションチェック
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // 20文字以内
-    if (value.length <= 20) {
+    // 50文字以内
+    if (value.length <= 50) {
       setConsultNumber(value);
     }
   };
@@ -127,7 +127,7 @@ export default function ConsultNumberInput() {
     const validationSchema = z
       .string()
       .min(1, getErrorMessage(errorMessages.required, "受診番号は"))
-      .max(20, getErrorMessage(errorMessages.maxLength, "受診番号は", 20))
+      .max(50, getErrorMessage(errorMessages.maxLength, "受診番号は", 50))
       .regex(
         /^[a-zA-Z0-9]+$/,
         getErrorMessage(errorMessages.alphaNumericString, "受診番号は"),
