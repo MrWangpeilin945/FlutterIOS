@@ -5,7 +5,7 @@ import {
   useParams,
   useSearchParams,
 } from "@remix-run/react";
-import { Button, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { Button, LoadingOverlay, Space, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useAtom } from "jotai";
 import { type AxiosResponse, isAxiosError } from "axios";
@@ -431,7 +431,7 @@ export default function ConsultInput() {
           } else if (status === 404) {
             errorMessage = getErrorMessage(errorMessages.notFound, "受診番号");
           } else if (status === 422) {
-            const response:VerifyExamItems = error.response.data;
+            const response: VerifyExamItems = error.response.data;
             // 最大 errorLevel を取得
             const maxErrorLevel = Math.max(
               ...(response.examItemGroups?.flatMap(
@@ -442,10 +442,10 @@ export default function ConsultInput() {
                         (result) => result.errorLevel ?? 0,
                       ) || [],
                   ) || [],
-              ) || []), 
+              ) || []),
               0, // データがない場合のデフォルト値
             );
-            
+
             errorBranch(maxErrorLevel);
             setExamData(error.response.data);
           } else if (status === 500) {
@@ -726,7 +726,7 @@ export default function ConsultInput() {
             ),
           )}
           {/* 登録ボタン */}
-          <Button w={860} h={75} mt={24} mb={83} onClick={handleVerify}>
+          <Button w={860} h={75} mt={24} onClick={handleVerify}>
             登録する
           </Button>
         </Stack>
@@ -745,6 +745,7 @@ export default function ConsultInput() {
           isOpen={openedCommon}
           onClose={callbackCloseCommon}
         />
+        <Space h={100} />
         <CommonFooter />
       </AuthWrapper>
     </>
