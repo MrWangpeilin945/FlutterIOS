@@ -345,7 +345,7 @@ export default function ExamresultExport() {
                             py={16}
                             px={32}
                             bd="2px solid"
-                            onClick={() => navigate("/placeschedule-lock")}
+                            onClick={() => navigate(`/placeschedule-lock?placescheduleid=${ed.placeScheduleId}`)}
                           >
                             <Text
                               size="lg"
