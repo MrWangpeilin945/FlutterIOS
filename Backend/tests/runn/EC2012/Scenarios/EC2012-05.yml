@@ -7,8 +7,10 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2012-05.json"
-  errorMessage: "指定されたPlaceCodeがシステム上に存在しません。"
-  examDate: "2030-03-03"
+  errorMessage: "指定されたTeamCodeがシステム上に存在しません。"
+  examDate: "20300305"
+  placeId: "e0002012-0000-0000-0000-000000000001"
+  teamId:  "c0002012-0000-0000-0000-000000000005"
 steps:
   post:
     desc: "班IDが取得できない"
@@ -23,7 +25,7 @@ steps:
       && len(current.res.body) == 1
       // 班エラーがErrorObjectで返される
       && current.res.body[0].code == "10001"
-      && current.res.body[0].inputNote == "201205"
+      && current.res.body[0].inputNote == "201205-01"
       && current.res.body[0].message startsWith vars.errorMessage
     dump:
       expr: current.res.body
@@ -33,10 +35,20 @@ steps:
     db:
       query: |
         SELECT
-          exam_date
+          place_id::text as placeid
+          , team_id::text as teamid
+          , status
+          , to_char(exam_date, 'yyyymmdd') as examdate
+          , start_time as starttime
         FROM
           resultcollector.place_schedule
         WHERE
           exam_date = '{{ vars.examDate }}'
     test: |
-      current.rows == null      
+      len(current.rows) == 1
+      // 会場コードが存在する会場日程が追加される
+      && current.rows[0].placeid == vars.placeId
+      && current.rows[0].teamid == vars.teamId
+      && current.rows[0].status == 21
+      && current.rows[0].examdate == vars.examDate
+      && current.rows[0].starttime == '1530'
