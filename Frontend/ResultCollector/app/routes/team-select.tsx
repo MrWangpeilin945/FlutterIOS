@@ -59,8 +59,10 @@ export default function Teams() {
       const teamData = { id: teamId, name: teamName };
       setTeam(teamData);
     }
+    //Jotaiを削除（会場、健診日、検査メニュー）
     const store = getDefaultStore();
     store.set(clearExamState);
+    //会場選択画面に遷移
     navigate("/place-select");
   };
 
