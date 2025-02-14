@@ -1,0 +1,30 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント
+  participant Key as キーボード
+
+  User->>KN:入力値テキストボックスを押下
+  alt keyboardTypeが1の場合
+  KN->>Key:【CP0012】キーボード(整数)を呼び出す
+  Key->>KN:【CP0012】キーボード(整数)の値変更<br>数字ボタン押下 or AC押下
+  alt 【CP0012】キーボード(整数)の確定ボタン押下
+  KN-->>KN:【CP0012】キーボード(整数)を非表示
+  end
+  else keyboardTypeが2の場合
+  KN->>Key:【CP0013】キーボード(選択)を呼び出す
+  Key->>KN:【CP0013】キーボード(選択)の値変更<br>カスタムボタン押下 or AC押下
+  KN-->>KN:【CP0013】キーボード(選択)を非表示
+  end
+  KN-->>KN:渡された値を保存してテキストボックスに表示
+  alt 身長または体重の値が変更された場合
+  KN->>KN:BMIの値を更新
+  end
+  KN-->>KN:バリデーションチェック
+  alt バリデーションチェックで異常エラーなし
+  KN-->>FE:引数.変更イベントを呼び出す
+  else バリデーションチェックでエラー
+  KN-->>KN:エラーメッセージを表示 
+  end

@@ -1,4 +1,4 @@
-import { Container, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { Container, LoadingOverlay, Space, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { format } from "date-fns";
@@ -90,6 +90,7 @@ export default function Progress() {
             </>
           )}
         </Container>
+        <Space h={100}/>
         <CommonFooter />
       </AuthWrapper>
     </>

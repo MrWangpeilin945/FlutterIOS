@@ -1,0 +1,34 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント
+  participant BE as バックエンド 
+  User->>FE:会場ロックボタンを押下
+  FE->>FE:会場ロックボタンの背景色を変更
+  FE->>KN:【CP0016】確認ダイアログを呼び出す
+  break
+  KN-->>FE:[キャンセル]
+  FE-->>FE:確認ダイアログを閉じる
+  end
+  opt
+  KN-->>FE:[OK]
+  FE-->>FE:確認ダイアログを閉じる
+  FE->>BE:AP1017_会場ロック状態を更新する<br>[PUT] /placeSchedules/{placeScheduleId}/placeScheduleClosingStatus
+  BE-->>FE:レスポンスを取得
+  alt httpステータスコードが200
+  FE->>KN:【CP0015】共通ダイアログを呼び出す
+  else 400エラー or 500エラー
+  FE->>KN:【CP0015】共通ダイアログを呼び出す
+  end
+  FE->>BE:AP1016_会場ロック状態を取得する<br>[GET] /placeSchedules/{placeScheduleId}/placeScheduleClosingStatus
+  BE-->>FE:レスポンスを取得（会場ロック状態）
+  alt httpステータスコードが200
+  FE->>FE:取得したデータをもとに<br>選択中の会場ロックボタン or ロック解除ボタンの色を変更 <br> 最終更新者と最終更新日を表示
+  else 400エラー or 500エラー
+  FE->>KN:【CP0015】共通ダイアログを呼び出す
+  end  
+  FE-->>User:【SC0013】会場ロック画面の表示
+  note over User,FE:取得した情報を表示
+  end

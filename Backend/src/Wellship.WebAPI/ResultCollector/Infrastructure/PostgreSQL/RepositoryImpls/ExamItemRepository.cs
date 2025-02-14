@@ -167,7 +167,7 @@ public class ExamItemRepository : IExamItemRepository
             , e.evaluation_value as EvaluationValue 
         from
             resultcollector.correlation_rules r 
-            left join resultcollector.correlation_rule_evaluations e 
+            inner join resultcollector.correlation_rule_evaluations e 
                 on r.correlation_rule_id = e.correlation_rule_id
         where
             r.exam_menu_id = @ExamMenuId;";
@@ -183,7 +183,7 @@ public class ExamItemRepository : IExamItemRepository
             , d.exam_item_detail_id as ExamItemDetailId 
         from
             resultcollector.correlation_rules r 
-            left join resultcollector.correlation_rule_exam_item_details d 
+            inner join resultcollector.correlation_rule_exam_item_details d 
                 on r.correlation_rule_id = d.correlation_rule_id
         where
             r.exam_menu_id = @ExamMenuId;";
@@ -249,7 +249,7 @@ public class ExamItemRepository : IExamItemRepository
             , e.evaluation_value as EvaluationValue 
         from
             resultcollector.decision_rules r 
-            left join resultcollector.decision_rule_evaluations e 
+            inner join resultcollector.decision_rule_evaluations e 
                 on r.decision_rule_id = e.decision_rule_id
         where
             r.exam_menu_id = @ExamMenuId;";
@@ -265,7 +265,7 @@ public class ExamItemRepository : IExamItemRepository
             , d.exam_item_detail_id as ExamItemDetailId 
         from
             resultcollector.decision_rules r 
-            left join resultcollector.decision_rule_exam_item_details d 
+            inner join resultcollector.decision_rule_exam_item_details d 
                 on r.decision_rule_id = d.decision_rule_id
         where
             r.exam_menu_id = @ExamMenuId;";

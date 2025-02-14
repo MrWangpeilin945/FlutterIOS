@@ -1,0 +1,25 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  #actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  FE->>KN:【CP1007】検査項目グループ_検査：自由入力を呼び出す
+  break 引数examItemsのpositionNumberが「1」の要素のexamItemDetailsの中にpositionNumberが「1」のexamItemDetailが無い場合
+        KN->>FE:【CP1001】検査項目グループ_検査：自由入力を表示しない
+    end
+  alt cancelReasonIdが存在する場合 or hasOrderがfalseの場合
+  KN->>KN:グレーアウトして表示
+  end
+  alt 引数.検査項目情報にexamRegistResultsが存在する場合
+  KN->>KN:エラーメッセージを表示
+  end
+  alt 引数.登録ボタンフラグがtrueの場合
+  KN->>KN:バリデーションチェック
+  alt バリデーションチェックでエラーあり
+  KN->>KN:エラーメッセージを表示
+  end
+  end
+  KN->>KN:各パラメータの表示
+  KN-->>FE:【CP1001】検査項目グループ_検査：自由入力を返す

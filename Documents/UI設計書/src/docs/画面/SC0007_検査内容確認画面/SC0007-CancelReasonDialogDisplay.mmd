@@ -1,0 +1,17 @@
+```mermaid
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor st as 職員
+  participant fr as フロントエンド
+
+  st ->> fr: 中止理由ダイアログを起動
+  loop 検査項目に設定されている中止理由分
+    fr ->> fr: 中止理由ボタンを表示
+  end
+  opt 中止理由選択済みの時
+    fr ->> fr: 中止理由ボタンを選択済みにする
+  end
+  fr -->> st: 中止理由ダイアログを表示
+
+```

@@ -304,7 +304,7 @@ export default function ExamresultExportHistory() {
           screenName="検査結果出力履歴"
           staffName={staff?.name || ""}
         />
-        <Container fluid bg="background" mb={59} p={0}>
+        <Container fluid bg="background" p={0}>
           {!isFetching && (
             <>
               {exportHistory?.exportHistories ? (
@@ -436,6 +436,7 @@ export default function ExamresultExportHistory() {
             </>
           )}
         </Container>
+        <Space h={100}/>
         <CommonFooter items={footerItems} />
       </AuthWrapper>
     </>

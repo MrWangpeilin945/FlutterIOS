@@ -1,0 +1,54 @@
+desc: EC2012-05 班IDが取得できない [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2012-05.json"
+  errorMessage: "指定されたTeamCodeがシステム上に存在しません。"
+  examDate: "20300305"
+  placeId: "e0002012-0000-0000-0000-000000000001"
+  teamId:  "c0002012-0000-0000-0000-000000000005"
+steps:
+  post:
+    desc: "班IDが取得できない"
+    req:
+      /api/v1/external/placeSchedules:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+      && len(current.res.body) == 1
+      // 班エラーがErrorObjectで返される
+      && current.res.body[0].code == "10001"
+      && current.res.body[0].inputNote == "201205-01"
+      && current.res.body[0].message startsWith vars.errorMessage
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2012-05.json
+  confirmPlaceSchedule:
+    desc: "会場日程が登録されない"
+    db:
+      query: |
+        SELECT
+          place_id::text as placeid
+          , team_id::text as teamid
+          , status
+          , to_char(exam_date, 'yyyymmdd') as examdate
+          , start_time as starttime
+        FROM
+          resultcollector.place_schedule
+        WHERE
+          exam_date = '{{ vars.examDate }}'
+    test: |
+      len(current.rows) == 1
+      // 会場コードが存在する会場日程が追加される
+      && current.rows[0].placeid == vars.placeId
+      && current.rows[0].teamid == vars.teamId
+      && current.rows[0].status == 21
+      && current.rows[0].examdate == vars.examDate
+      && current.rows[0].starttime == '1530'
