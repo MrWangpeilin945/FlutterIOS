@@ -45,3 +45,7 @@ steps:
       && current.rows[0].start_time == '1300'
       // 状況は検査中で追加される
       && current.rows[0].status == 21
+      // 元の会場日程は変更されない
+      && current.rows[1].examdate == '20250301'
+      && current.rows[1].start_time == '0830'
+      && current.rows[1].status == 31

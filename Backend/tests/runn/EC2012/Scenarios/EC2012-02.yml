@@ -29,6 +29,7 @@ steps:
       query: |
         SELECT
           status
+          , to_char(exam_date, 'yyyymmdd') as examdate
           , start_time
         FROM
           resultcollector.place_schedule
@@ -39,5 +40,7 @@ steps:
       len(current.rows) == 1
       // 状況は検査完了のまま更新されない
       && current.rows[0].status == 31
+      // 健診日は更新されない
+      && current.rows[0].examdate == '20250303'
       // 開始時刻は更新される
       && current.rows[0].start_time == '1030'
