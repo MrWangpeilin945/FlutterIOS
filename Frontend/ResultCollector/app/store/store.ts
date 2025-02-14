@@ -11,29 +11,41 @@ import type { PlaceSchedule } from "~/domain/wellship.schemas";
 export const teamState = atomWithStorage<StringIdNamedEntity | null>(
   "teamState",
   null,
+  undefined,
+  { getOnInit: true },
 );
 export const placeScheduleState = atomWithStorage<PlaceSchedule | null>(
   "placeScheduleState",
   null,
+  undefined,
+  { getOnInit: true },
 );
 export const examDateState = atomWithStorage<Date | null>(
   "examDateState",
   null,
+  undefined,
+  { getOnInit: true },
 );
 export const staffState = atomWithStorage<StringIdNamedEntity | null>(
   "staffState",
   null,
+  undefined,
+  { getOnInit: true },
 );
 export const examMenuState = atomWithStorage<NumberIdNamedEntity[] | null>(
   "examMenuState",
   null,
+  undefined,
+  { getOnInit: true },
 );
 export const connectionEquipmentState = atomWithStorage<
   ConnectionEquipment[] | null
->("connectionEquipmentState", null);
+>("connectionEquipmentState", null, undefined, { getOnInit: true });
 export const serverTimeOffsetState = atomWithStorage<number | null>(
   "serverTimeOffsetState",
   null,
+  undefined,
+  { getOnInit: true },
 );
 
 // 状態管理をクリアする(ログアウト処理で使用)
