@@ -529,6 +529,7 @@ export default function ConsultInput() {
   // 登録処理
   const callbackRegister = () => {
     setIsLoading(true);
+    closeConfirm();
     // AP1014_検査結果を登録する
     registerResults();
     setIsLoading(false);
