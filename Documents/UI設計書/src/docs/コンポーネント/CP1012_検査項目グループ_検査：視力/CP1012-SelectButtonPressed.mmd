@@ -1,0 +1,15 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  User->>KN:選択ボタンを押下
+  KN->>KN:押下された選択ボタンをもとに値を更新
+  KN-->>KN:バリデーションチェック
+   alt バリデーションチェックで異常エラーなし
+  KN-->>FE:引数.変更イベントを呼び出す
+  else バリデーションチェックでエラー
+  KN-->>KN:エラーメッセージを表示
+  end

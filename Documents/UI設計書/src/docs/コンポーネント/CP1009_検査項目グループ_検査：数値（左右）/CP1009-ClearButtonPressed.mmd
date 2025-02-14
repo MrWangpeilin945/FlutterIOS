@@ -1,0 +1,11 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  User->>KN:クリアボタンを押下
+  KN->>KN:左入力数値、右入力数値をクリア
+  KN-->>FE:引数.左変更イベントを呼び出す
+  KN-->>FE:引数.右変更イベントを呼び出す
