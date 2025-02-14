@@ -98,7 +98,7 @@ export default function ConsultInput() {
   const [initialDisplay, setInitialDisplay] = useState(true);
 
   //AP1009呼び出し用(GET系APIの定義)
-  const { refetch } = useConsultGetInputExamItemsExaminee(
+  const { isFetching, refetch } = useConsultGetInputExamItemsExaminee(
     apiVersion,
     consultNumber ?? "",
     { examMenuId: examMenuId },
@@ -121,7 +121,6 @@ export default function ConsultInput() {
       openCommon();
       return;
     }
-    setIsLoading(true);
 
     //AP1009_検査結果入力情報を取得する
     const inputExamItems = async () => {
@@ -139,14 +138,15 @@ export default function ConsultInput() {
         setCommonButtonMessage("閉じる");
         openCommon();
       }
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
     };
 
     inputExamItems();
     setCommonBrowserbackFlag(false);
   }, [consultNumber, examMenuId]);
+
+  useEffect(() => {
+    setIsLoading(isFetching);
+  }, [isFetching]);
 
   const launchConnectionEquipment = () => {
     //ローカルストレージの監視を開始
@@ -434,7 +434,7 @@ export default function ConsultInput() {
           } else if (status === 404) {
             errorMessage = getErrorMessage(errorMessages.notFound, "受診番号");
           } else if (status === 422) {
-            const response:VerifyExamItems = error.response.data;
+            const response: VerifyExamItems = error.response.data;
             // 最大 errorLevel を取得
             const maxErrorLevel = Math.max(
               ...(response.examItemGroups?.flatMap(
@@ -445,10 +445,10 @@ export default function ConsultInput() {
                         (result) => result.errorLevel ?? 0,
                       ) || [],
                   ) || [],
-              ) || []), 
+              ) || []),
               0, // データがない場合のデフォルト値
             );
-            
+
             errorBranch(maxErrorLevel);
             setExamData(error.response.data);
           } else if (status === 500) {
