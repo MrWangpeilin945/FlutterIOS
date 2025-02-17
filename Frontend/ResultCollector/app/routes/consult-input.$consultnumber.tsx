@@ -157,6 +157,7 @@ export default function ConsultInput() {
 
   useEffect(() => {
     if (!examData) return;
+    setCommonBrowserbackFlag(false); //検査結果入力情報の取得に成功しているため、ブラウザバックフラグをfalseに変更
 
     //機器ラベルとvalueが空かをチェック
     const isValueEmptyForEquipmentLabel = (): boolean => {
