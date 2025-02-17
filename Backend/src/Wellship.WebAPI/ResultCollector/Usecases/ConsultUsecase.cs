@@ -165,7 +165,7 @@ public class ConsultUsecase : IConsultUsecase
                                                   .Select(x => new ExamDecisionResult()
                                                   {
                                                       ErrorLevel = (int)InputErrorLevel.異常,
-                                                      Description = x.MenuName
+                                                      Description = $"{x.MenuName}が終わっていないため、開始できません。"
                                                   });
 
         return new ExamContent()
