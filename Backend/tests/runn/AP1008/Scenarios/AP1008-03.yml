@@ -1,0 +1,28 @@
+desc: AP1008-03 未受診検査メニュー取得_指定した受診が存在しない [404]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: true
+vars:
+  consultNumber: "0000"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  get:
+    desc: "未受診検査メニュー取得_指定した受診が存在しない"
+    req:
+      /api/v1/consult/{{ vars.consultNumber }}/unexaminedMenus:
+        get:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+    test: |
+      current.res.status == 404
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1008-03.json
+

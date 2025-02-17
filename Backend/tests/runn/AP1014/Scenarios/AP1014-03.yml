@@ -1,0 +1,30 @@
+desc: AP1014-03 結果登録_無効なアクセストークン [401]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  consultNumber: "1014"
+  request: "json://../Requests/AP1014-03.json"
+  token: "5OCwiZXhwIjoxNzM4ODIxOTc4LCJpc3MiOiJsb2NhbGhvc3Q6NTAwMCIsImF1ZCI6WyJsb2NhbGhvc3Q6NTAwMCJdfQ.gRJsyNpAcvK8vbY31lDoUjJdjAipwDRkNUvvwsKa8e8"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  post:
+    desc: "結果登録_無効なアクセストークン"
+    req:
+      /api/v1/consult/{{ vars.consultNumber }}/results:
+        post:
+          headers:
+            Authorization: "Bearer {{ vars.token }}"
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 401
+

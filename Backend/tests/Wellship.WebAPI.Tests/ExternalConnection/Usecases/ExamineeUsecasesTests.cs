@@ -9,7 +9,7 @@ using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 
 namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
@@ -28,10 +28,10 @@ namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
 
             dbConnectionProvider.Setup(x => x.GetOrOpenAsync()).ReturnsAsync(new Mock<DbConnection>().Object);
             organizationRepository.Setup(x => x.GetOrganizationsByCodesAsync(It.IsAny<List<string>>())).ReturnsAsync(new List<string> { "001" });
-            examineeRepository.Setup(x => x.UpsertExamineesAsync(It.IsAny<List<ExamineeEntity>>(), It.IsAny<DateTime>(), It.IsAny<string>())).Returns(Task.CompletedTask);
-            affiliationRepository.Setup(x => x.InsertAffiliationsAsync(It.IsAny<List<Examinee>>(), It.IsAny<DateTime>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+            examineeRepository.Setup(x => x.UpsertExamineesAsync(It.IsAny<List<ExamineeEntity>>(), It.IsAny<DateTimeOffset>(), It.IsAny<string>())).Returns(Task.CompletedTask);
+            affiliationRepository.Setup(x => x.InsertAffiliationsAsync(It.IsAny<List<Examinee>>(), It.IsAny<DateTimeOffset>(), It.IsAny<string>())).Returns(Task.CompletedTask);
 
-            _usecases = new ExamineeUsecase(dbConnectionProvider.Object, organizationRepository.Object, examineeRepository.Object, affiliationRepository.Object);
+            _usecases = new ExamineeUsecase(dbConnectionProvider.Object, organizationRepository.Object, examineeRepository.Object, affiliationRepository.Object, TimeProvider.System);
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
             // Arrange
             var examinees = new List<Examinee>
             {
-                new() { ExamineeCode = "001", Name = "Test Taro", KanaName = "テスト タロウ", Sex = Sex.男, Birthdate = new DateTime(1990, 1, 1), Affiliations = [new() { OrganizationCode = "001" }], InputNote = "001" }
+                new() { ExamineeCode = "001", Name = "Test Taro", KanaName = "テスト タロウ", Sex = Sex.男, Birthdate = new DateOnly(1990, 1, 1), Affiliations = [new() { OrganizationCode = "001" }], InputNote = "001" }
             };
 
             // Act
@@ -57,7 +57,7 @@ namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases
             // Arrange
             var examinees = new List<Examinee>
             {
-                new Examinee { ExamineeCode = "002", Name = "Test Hanako", KanaName = "テスト ハナコ", Sex = Sex.女, Birthdate = new DateTime(1991, 2, 2), Affiliations = [new() { OrganizationCode = "999" }], InputNote = "002" }
+                new Examinee { ExamineeCode = "002", Name = "Test Hanako", KanaName = "テスト ハナコ", Sex = Sex.女, Birthdate = new DateOnly(1991, 2, 2), Affiliations = [new() { OrganizationCode = "999" }], InputNote = "002" }
             };
 
             var expectedErrors = new List<ErrorObject>

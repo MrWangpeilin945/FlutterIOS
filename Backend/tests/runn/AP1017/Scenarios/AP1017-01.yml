@@ -1,0 +1,42 @@
+desc: AP1017-01 会場ロック更新_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  placeScheduleId: "aceced00-0000-0000-0000-000000000003"
+  placeScheduleLockingStatus: 31
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  put:
+    desc: "会場ロック更新_正常"
+    req:
+      /api/v1/placeSchedules/{{ vars.placeScheduleId }}/placeScheduleLockingStatus:
+        put:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              placeScheduleId: "{{ vars.placeScheduleId }}"
+              placeScheduleLockingStatus: "{{ vars.placeScheduleLockingStatus }}"
+    test: |
+      current.res.status == 200
+  selectStatus:
+    desc: "会場日程の状況を確認"
+    db:
+      query: |
+        SELECT
+          status
+        FROM
+          resultcollector.place_schedule
+        WHERE
+          place_schedule_id = '{{ vars.placeScheduleId }}';    
+    test: |
+      current.rows[0].status == vars.placeScheduleLockingStatus

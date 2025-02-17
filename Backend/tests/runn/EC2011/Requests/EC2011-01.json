@@ -1,0 +1,20 @@
+[
+    {
+        "staffCode": "201101",
+        "loginId": "S201101",
+        "name": "管理者職員",
+        "password": "P@ssw0rd",
+        "enabled": true,
+        "roleId": 20,
+        "inputNote": "2011011"
+    },
+    {
+        "staffCode": "201102",
+        "loginId": "S201102",
+        "name": "一般職員",
+        "password": "P@ssw0rd",
+        "enabled": false,
+        "roleId": 10,
+        "inputNote": "2011012"
+    }
+]

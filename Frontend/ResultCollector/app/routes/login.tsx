@@ -174,10 +174,11 @@ export default function Login() {
           <Flex columnGap={16}>
             <Group w="486" justify="flex-end">
               <Text size="sm" c="black01" ta="right">
-                職員ID
+                ログインID
               </Text>
               <TextInput
                 value={loginId}
+                autoComplete="off"
                 onChange={(e) => setLoginId(e.target.value)}
                 maxLength={20}
                 styles={{
@@ -198,6 +199,7 @@ export default function Login() {
               </Text>
               <PasswordInput
                 value={password}
+                autoComplete="one-time-code"
                 onChange={(e) => setPassword(e.target.value)}
                 maxLength={20}
                 styles={{

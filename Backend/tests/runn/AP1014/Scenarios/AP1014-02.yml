@@ -1,0 +1,29 @@
+desc: AP1014-02 結果登録_リクエストボディの形式が不正 [400]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: true
+    skipValidateResponse: true
+vars:
+  consultNumber: "1014"
+  request: "json://../Requests/AP1014-02.json"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  post:
+    desc: "結果登録_リクエストボディの形式が不正"
+    req:
+      /api/v1/consult/{{ vars.consultNumber }}/results:
+        post:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 400
+

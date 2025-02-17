@@ -1,0 +1,42 @@
+desc: EC2007-02 会場を更新_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2007-02.json"
+steps:
+  post:
+    desc: "会場を更新_正常"
+    req:
+      /api/v1/external/places:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+  confirmPlaces:
+    desc: "会場の更新を確認"
+    db:
+      query: |
+        SELECT
+          place_code, name
+        FROM
+          resultcollector.places
+        WHERE
+          place_code in ('P2007-02-1', 'P2007-02-2', 'P2007-02-3')
+        ORDER BY
+          place_code ASC;
+    test: |
+      len(current.rows) == 3
+      // リクエストの２つの会場の名称は変更されたことを確認
+      && current.rows[0].place_code == "P2007-02-1"
+      && current.rows[0].name == "新第１会場"
+      && current.rows[1].place_code == "P2007-02-2"
+      && current.rows[1].name == "新第２会場"
+      // リクエストに存在しない会場の名称は変更されないことを確認
+      && current.rows[2].place_code == "P2007-02-3"
+      && current.rows[2].name == "旧第３会場"

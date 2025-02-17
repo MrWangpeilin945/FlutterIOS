@@ -30,24 +30,25 @@ public class TicketRepository : ITicketRepository
     /// <param name="tickets">更新する受付リスト</param>
     /// <param name="createdAt">作成日時</param>
     /// <param name="createdBy">作成者</param>
-    public async Task UpsertTicketsAsync(List<TicketEntity> tickets, DateTime createdAt, string createdBy)
+    public async Task UpsertTicketsAsync(List<TicketEntity> tickets, DateTimeOffset createdAt, string createdBy)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         var transaction = await connection.BeginTransactionAsync();
         try
         {
             // 処理する受付リスト
-            var actionTickets = tickets.GroupBy(x => x.ConnectionCode, 
+            var actionTickets = tickets.GroupBy(x => x.ConnectionCode,
                                                (y, z) => z.OrderByDescending(a => a.OrderNumber).First())
                                        .ToArray();
             // 受付を更新する
             var upsertTickets = actionTickets.Where(x => x.ActionType == ActionType.登録)
-                                             .Select(x => new {
-                                                ConsultId = x.ConsultId,
-                                                TicketNumber = x.TicketNumber,
-                                                CreatedAt = createdAt,
-                                                CreatedBy = createdBy
-                                              }).ToArray();
+                                             .Select(x => new
+                                             {
+                                                 ConsultId = x.ConsultId,
+                                                 TicketNumber = x.TicketNumber,
+                                                 CreatedAt = createdAt,
+                                                 CreatedBy = createdBy
+                                             }).ToArray();
             const string mergeSql = @"
             merge
             into resultcollector.tickets as tc
@@ -86,10 +87,13 @@ public class TicketRepository : ITicketRepository
                 , created_by = @CreatedBy
             where
                 consult_id = any (@ConsultIds);";
-            await connection.ExecuteAsync(consultSql, new { ProgressStatus = (int)ConsultProgressStatus.検査中, 
-                                                            CreatedAt = createdAt,
-                                                            CreatedBy = createdBy,
-                                                            ConsultIds = upsertTickets.Select(x=> x.ConsultId).ToArray()});
+            await connection.ExecuteAsync(consultSql, new
+            {
+                ProgressStatus = (int)ConsultProgressStatus.検査中,
+                CreatedAt = createdAt,
+                CreatedBy = createdBy,
+                ConsultIds = upsertTickets.Select(x => x.ConsultId).ToArray()
+            });
 
             // 受付を削除する
             var deleteTickets = actionTickets.Where(x => x.ActionType == ActionType.削除)
@@ -101,22 +105,26 @@ public class TicketRepository : ITicketRepository
                 resultcollector.tickets
             where
                 consult_id = any (@ConsultIds);";
-            await connection.ExecuteAsync(deleteSql, new { ConsultIds = deleteTickets});
+            await connection.ExecuteAsync(deleteSql, new { ConsultIds = deleteTickets });
             // consultのprogress_statusを来場待ちに更新する
-            await connection.ExecuteAsync(consultSql, new { ProgressStatus = (int)ConsultProgressStatus.来場待ち, 
-                                                            CreatedAt = createdAt,
-                                                            CreatedBy = createdBy,
-                                                            ConsultIds = deleteTickets});
+            await connection.ExecuteAsync(consultSql, new
+            {
+                ProgressStatus = (int)ConsultProgressStatus.来場待ち,
+                CreatedAt = createdAt,
+                CreatedBy = createdBy,
+                ConsultIds = deleteTickets
+            });
 
             // 受付履歴を登録する
-            var historyItems = tickets.Select(x => new {
-                                    ConsultId = x.ConsultId,
-                                    TicketNumber = x.ActionType == ActionType.登録 ? x.TicketNumber : "",
-                                    ActionType = x.ActionType == ActionType.登録 ? "I" : "D",
-                                    OrderNumber = x.OrderNumber,
-                                    CreatedAt = createdAt,
-                                    CreatedBy = createdBy
-                                }).ToArray();
+            var historyItems = tickets.Select(x => new
+            {
+                ConsultId = x.ConsultId,
+                TicketNumber = x.ActionType == ActionType.登録 ? x.TicketNumber : "",
+                ActionType = x.ActionType == ActionType.登録 ? "I" : "D",
+                OrderNumber = x.OrderNumber,
+                CreatedAt = createdAt,
+                CreatedBy = createdBy
+            }).ToArray();
             const string historiesSql = @"
             insert into resultcollector.tickets_histories
             (
@@ -139,7 +147,7 @@ public class TicketRepository : ITicketRepository
             await connection.ExecuteAsync(historiesSql, historyItems);
             await transaction.CommitAsync();
         }
-        catch(DbException)
+        catch (DbException)
         {
             await transaction.RollbackAsync();
             throw;
@@ -153,14 +161,17 @@ public class TicketRepository : ITicketRepository
     {
         var connectionCodes = tickets.Select(x => x.ConnectionCode).ToArray();
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
-        const string sql = @"
+        // 進捗状態
+        var progressStatus = new int[] { (int)ConsultProgressStatus.来場待ち, (int)ConsultProgressStatus.検査中 };
+        var sql = $@"
         select
             consult_id as ConsultId
             , external_connection_code as ConnectionCode
         from
             resultcollector.consult
         where
-            external_connection_code = any (@ConnectionCodes);";
-        return await connection.QueryAsync<TicketConsultEntity>(sql, new { ConnectionCodes = connectionCodes });
+            external_connection_code = any (@ConnectionCodes)
+            and progress_status = any (@ProgressStatus);";
+        return await connection.QueryAsync<TicketConsultEntity>(sql, new { ConnectionCodes = connectionCodes, ProgressStatus = progressStatus });
     }
 }

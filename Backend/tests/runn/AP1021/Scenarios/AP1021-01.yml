@@ -1,0 +1,42 @@
+desc: AP1021-01 結果連携未出力_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  exportId: "f0001021-0000-0000-0000-000000000001"
+  consultId: "a0001021-0000-0000-0000-000000000001"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  post:
+    desc: "結果連携未出力_正常"
+    req:
+      /api/v1/integrations/examResults/undoExport:
+        post:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              exportId: "{{ vars.exportId }}"
+    test: |
+      current.res.status == 200
+  updateConsult:
+    desc: "受診の結果出力状況の確認"
+    db:
+      query: |
+        SELECT
+          export_status
+        FROM
+          resultcollector.consult
+        WHERE
+          consult_id = '{{ vars.consultId }}';
+    test: |
+      current.rows[0].export_status == 11
+

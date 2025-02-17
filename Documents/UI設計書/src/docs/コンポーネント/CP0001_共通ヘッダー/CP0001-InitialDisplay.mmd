@@ -1,0 +1,19 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  #actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  FE->>KN:【CP0001】共通ヘッダーを呼び出す
+  KN->>KN:パラメータの表示
+  KN-->>FE:【CP0001】共通ヘッダーを返す
+  
+  #alt ホームボタン押下の場合
+  #User->>FE:ホームボタン押下
+  #FE-->>User:ホームメニュー画面に遷移
+  #else ホームフラグが1のとき
+  #User->>FE:ホームボタン押下
+  #FE-->>User:ログイン画面に遷移
+  #end
+    

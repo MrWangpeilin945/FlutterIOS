@@ -4,6 +4,9 @@
 
 * 会場日程IDを指定して会場ロックの状態と更新情報を取得する
 * `placeScheduleLockingStatus` は会場日程状況 （ `PlaceScheduleLockingStatus` ）を使用する
+* 更新者は会場日程テーブルの `created_at` 列に格納された職員コードから以下の優先順位で取得する
+  1. 職員コードから職員の名前に変換する
+  2. 変換できなければ職員コードをそのまま出力
 
 === URI
 

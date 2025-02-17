@@ -1,0 +1,29 @@
+%%{init: {'theme': 'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント 
+  participant BE as バックエンド   
+  User->>FE:【SC0005】検査メニュー選択画面に遷移
+  
+  FE->>KN:【CP0001】共通ヘッダーを呼び出す
+  FE->>KN:【CP0002】共通フッターを呼び出す
+  FE->>BE:AP1006_検査メニュー一覧を取得する[GET] /examMenus
+  BE-->>FE:レスポンスを取得
+  
+  alt httpステータスコードが200かつ取得データが1件以上
+  FE->>FE:jotaiから選択済みの検査メニュー項目を取得
+  FE->>FE:検査メニュー項目を表示処理
+  
+   
+  else (200かつデータ件数が0件)
+  FE-->>FE:エラーメッセージを表示 
+  
+
+  else 400エラー or 500エラー
+  FE->>KN:【CP0015】共通ダイアログを呼び出す
+  end
+  
+  FE-->>User:【SC0005】検査メニュー選択画面の表示
+  note over User,FE:取得した情報を表示

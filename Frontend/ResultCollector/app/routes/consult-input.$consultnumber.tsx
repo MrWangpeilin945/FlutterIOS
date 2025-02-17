@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   type MetaFunction,
   useNavigate,
   useParams,
   useSearchParams,
 } from "@remix-run/react";
-import { Button, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { Button, LoadingOverlay, Space, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useAtom } from "jotai";
 import { type AxiosResponse, isAxiosError } from "axios";
@@ -50,7 +50,8 @@ export const meta: MetaFunction = () => {
 
 export default function ConsultInput() {
   const navigate = useNavigate();
-  const [examData, setExamData] = useState<InputExamItems>();
+  const examData = useRef<InputExamItems>();
+  const [, setRendering] = useState(false);
   // パスパラメータの取得
   const consultNumber = useParams().consultnumber ?? undefined;
   // クエリパラメータの取得
@@ -70,7 +71,7 @@ export default function ConsultInput() {
     (item) => item.examMenuId === examMenuId,
   )?.equipment;
   //ローディング管理
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   //共通ダイアログ表示管理
   const [openedCommon, { open: openCommon, close: closeCommon }] =
     useDisclosure(false);
@@ -98,7 +99,7 @@ export default function ConsultInput() {
   const [initialDisplay, setInitialDisplay] = useState(true);
 
   //AP1009呼び出し用(GET系APIの定義)
-  const { refetch } = useConsultGetInputExamItemsExaminee(
+  const { isFetching, refetch } = useConsultGetInputExamItemsExaminee(
     apiVersion,
     consultNumber ?? "",
     { examMenuId: examMenuId },
@@ -109,25 +110,25 @@ export default function ConsultInput() {
     setCommonBrowserbackFlag(true);
     //受診番号の受け取り確認
     if (!consultNumber) {
-      setCommonMessage("必要な受診番号がありません");
+      setCommonMessage("必要な受診番号がありません。");
       setCommonButtonMessage("閉じる");
       openCommon();
       return;
     }
     //検査メニューIDの受け取り確認
     if (!examMenuId) {
-      setCommonMessage("必要な検査メニューIDがありません");
+      setCommonMessage("必要な検査メニューIDがありません。");
       setCommonButtonMessage("閉じる");
       openCommon();
       return;
     }
-    setIsLoading(true);
 
     //AP1009_検査結果入力情報を取得する
     const inputExamItems = async () => {
       const result = await refetch();
       if (result.data) {
-        setExamData(result.data.data);
+        examData.current = result.data.data;
+        setRendering(true);
       } else if (result.error) {
         if (result.error.status === 400) {
           setCommonMessage(getErrorMessage(errorMessages.invalid, "受診番号"));
@@ -142,9 +143,12 @@ export default function ConsultInput() {
     };
 
     inputExamItems();
-    setIsLoading(false);
     setCommonBrowserbackFlag(false);
   }, [consultNumber, examMenuId]);
+
+  useEffect(() => {
+    setIsLoading(isFetching);
+  }, [isFetching]);
 
   const launchConnectionEquipment = () => {
     //ローカルストレージの監視を開始
@@ -155,11 +159,12 @@ export default function ConsultInput() {
 
   useEffect(() => {
     if (!examData) return;
+    setCommonBrowserbackFlag(false); //検査結果入力情報の取得に成功しているため、ブラウザバックフラグをfalseに変更
 
     //機器ラベルとvalueが空かをチェック
     const isValueEmptyForEquipmentLabel = (): boolean => {
       return (
-        examData.examItemGroups?.some((group) =>
+        examData.current?.examItemGroups?.some((group) =>
           group.examItems?.some((item) =>
             item.examItemDetails?.some(
               (detail) => detail.equipmentLabel && detail.value === "",
@@ -172,21 +177,20 @@ export default function ConsultInput() {
     // 機器連携
     const handleRemeasurementCheck = () => {
       const isEmpty = isValueEmptyForEquipmentLabel();
-
-      setVisibleRemeasurement(
+      const isConnectionEquipment =
         !!targetConnectionEquipment &&
-          !!targetConnectionEquipment.appLaunchUrl &&
-          !!targetConnectionEquipment.processingScriptUrl,
-      ); // 機器が選択されていないなら非表示
+        !!targetConnectionEquipment.appLaunchUrl &&
+        !!targetConnectionEquipment.processingScriptUrl;
+      setVisibleRemeasurement(isConnectionEquipment); // 機器が選択されていないなら非表示
       setDisabledRemeasurement(!isEmpty); // valueが全て存在する場合無効化
 
-      if (targetConnectionEquipment && isEmpty && initialDisplay) {
+      if (isConnectionEquipment && isEmpty && initialDisplay) {
         setInitialDisplay(false);
         launchConnectionEquipment();
       }
     };
     handleRemeasurementCheck();
-  }, [examData, connectionEquipment]);
+  }, [examData.current, connectionEquipment]);
 
   //測定ボタン押下時
   const handleRemeasurement = () => {
@@ -195,69 +199,88 @@ export default function ConsultInput() {
 
   //解析js呼び出し
   const dynamicScriptExecute = async (data: string, scriptPath: string) => {
-    const module = await import(/* @vite-ignore */ `${scriptPath}`);
-    const output = module.decode(data);
-    return output;
+    try {
+      const module = await import(/* @vite-ignore */ scriptPath);
+      const output = module.decode(data);
+      return output;
+    } catch {
+      return null; // エラー時は null を返す
+    }
   };
 
-  //機器連携：監視用
+  // 機器連携：監視用
   useEffect(() => {
     // StorageEventの変更を監視する関数
-    const handleStorageChange = (event: StorageEvent) => {
+    const handleStorageChange = async (event: StorageEvent) => {
+      if (event.key !== localStorageKey) return;
+
       setIsLoading(true);
-      if (event.key === localStorageKey) {
-        const base64Data = event.newValue ?? "";
-        //解析js呼び出し処理
-        const scriptUrl = targetConnectionEquipment?.processingScriptUrl;
-        const analyzedData = dynamicScriptExecute(base64Data, scriptUrl ?? "");
-        //value更新処理
-        let isUpdated = false;
-        let updatedExamData = { ...examData };
-        for (const [key, value] of Object.entries(analyzedData)) {
-          // valueがnullの場合は処理を行わない
-          if (value === null) continue;
+      const base64Data = event.newValue ?? "";
+      const scriptUrl = targetConnectionEquipment?.processingScriptUrl;
 
-          let isUpdatedInThisKey = false;
+      // 解析js呼び出し処理
+      const analyzedData = await dynamicScriptExecute(
+        base64Data,
+        scriptUrl ?? "",
+      );
 
-          // equipmentLabelが一致するvalueを更新
-          updatedExamData = {
-            ...updatedExamData,
-            examItemGroups: updatedExamData.examItemGroups?.map((group) => ({
-              ...group,
-              examItems: group.examItems?.map((item) => ({
-                ...item,
-                examItemDetails: item.examItemDetails?.map((detail) => {
-                  if (
-                    !isUpdatedInThisKey &&
-                    detail.equipmentLabel === key &&
-                    detail.hasOrder &&
-                    !detail.cancelReasonId &&
-                    !detail.value
-                  ) {
-                    isUpdated = true;
-                    isUpdatedInThisKey = true;
-                    return { ...detail, value: String(value) };
-                  }
-                  return detail;
-                }),
-              })),
-            })),
-          };
-        }
-        setExamData(updatedExamData);
-        // 変更後に監視を解除
-        if (isWatching) {
-          setIsWatching(false);
-          window.removeEventListener("storage", handleStorageChange);
-        }
-        // ローカルストレージのデータを削除
+      if (analyzedData === null) {
+        // 解析エラー発生時
+        setIsWatching(false);
+        setIsLoading(false);
         localStorage.removeItem(localStorageKey);
-        // 値を更新しなかった場合、ダイアログを表示
-        if (!isUpdated) {
-          setCommonMessage("表示可能な測定結果がありませんでした。");
-          setCommonButtonMessage("閉じる");
-          openCommon();
-        }
+        return;
+      }
+
+      // value更新処理
+      let isUpdated = false;
+      let updatedExamData = { ...examData.current };
+
+      for (const [key, value] of Object.entries(analyzedData)) {
+        // valueがnullの場合は処理を行わない
+        if (value === null) continue;
+        let isUpdatedInThisKey = false;
+
+        // equipmentLabelが一致するvalueを更新
+        updatedExamData = {
+          ...updatedExamData,
+          examItemGroups: updatedExamData.examItemGroups?.map((group) => ({
+            ...group,
+            examItems: group.examItems?.map((item) => ({
+              ...item,
+              examItemDetails: item.examItemDetails?.map((detail) => {
+                if (
+                  !isUpdatedInThisKey &&
+                  detail.equipmentLabel === key &&
+                  detail.hasOrder &&
+                  !detail.cancelReasonId &&
+                  !detail.value
+                ) {
+                  isUpdated = true;
+                  isUpdatedInThisKey = true;
+                  return { ...detail, value: String(value) };
+                }
+                return detail;
+              }),
+            })),
+          })),
+        };
+      }
+      examData.current = updatedExamData;
+      // 変更後に監視を解除
+      if (isWatching) {
+        setIsWatching(false);
+        window.removeEventListener("storage", handleStorageChange);
+      }
+
+      // ローカルストレージのデータを削除
+      localStorage.removeItem(localStorageKey);
+
+      // 値を更新しなかった場合、ダイアログを表示
+      if (!isUpdated) {
+        setCommonMessage("表示可能な測定結果がありませんでした。");
+        setCommonButtonMessage("閉じる");
+        openCommon();
       }
       setIsLoading(false);
     };
@@ -279,31 +302,16 @@ export default function ConsultInput() {
     groupIndex: number,
   ) => {
     if (newExamItems) {
-      setExamData((prevData) => {
-        if (!prevData) {
-          return {
-            examItemGroups: [],
-          };
-        }
-
-        // 初期値を設定
-        const updatedExamItemGroups = (prevData.examItemGroups || []).map(
-          (group, gIndex) => {
-            if (gIndex !== groupIndex) {
-              return group; // 他のグループはそのまま返す
-            }
-            return {
-              ...group,
-              examItems: newExamItems, // 対象のグループの examItems を更新
-            };
-          },
-        );
-
-        return {
-          ...prevData,
-          examItemGroups: updatedExamItemGroups, // 更新されたグループを反映
-        };
-      });
+      examData.current = {
+        ...examData.current,
+        examItemGroups:
+          examData.current?.examItemGroups?.map(
+            (group, gIndex) =>
+              gIndex === groupIndex
+                ? { ...group, examItems: newExamItems } // 対象のグループの `examItems` を更新
+                : group, // 他のグループはそのまま
+          ) ?? [],
+      };
     }
   };
 
@@ -339,26 +347,32 @@ export default function ConsultInput() {
     return updatedInputExamItems;
   };
 
-  //リクエストボディ作成
+  // リクエストボディ作成
   const makeBody = (): ResultsRequest => {
-    let updatedExamData = { ...examData };
+    let updatedExamData = { ...examData.current };
     //通過が存在する場合、通過のvalueを更新
     if (hasPass) {
       updatedExamData = updatedPassValue(updatedExamData);
     }
+
     if (updatedExamData) {
       const converted = {
         examMenuId: examMenuId,
         examResults: updatedExamData.examItemGroups
-          ? updatedExamData.examItemGroups?.flatMap(
+          ? updatedExamData.examItemGroups.flatMap(
               (group) =>
                 group.examItems?.map((examItem) => ({
                   examItemId: examItem.examItemId,
                   examItemDetails: examItem.examItemDetails
-                    ? examItem.examItemDetails.map((itemDetail) => ({
-                        examItemDetailId: itemDetail.examItemDetailId,
-                        value: itemDetail.value || "",
-                      }))
+                    ? examItem.examItemDetails
+                        .filter(
+                          (itemDetail) =>
+                            itemDetail.hasOrder && !itemDetail.cancelReasonId,
+                        )
+                        .map((itemDetail) => ({
+                          examItemDetailId: itemDetail.examItemDetailId,
+                          value: itemDetail.value || "",
+                        }))
                     : [],
                 })) ?? [],
             )
@@ -391,6 +405,7 @@ export default function ConsultInput() {
     if (!consultNumber) return;
 
     const postMutateAsync = async () => {
+      setIsLoading(true);
       try {
         result = await verifyMutateAsync({
           version: apiVersion,
@@ -411,25 +426,25 @@ export default function ConsultInput() {
           if (status === 400) {
             errorMessage = getErrorMessage(errorMessages.invalid, "受診番号");
           } else if (status === 404) {
-            errorMessage = getErrorMessage(errorMessages.notFound, "検査項目");
+            errorMessage = getErrorMessage(errorMessages.notFound, "受診番号");
           } else if (status === 422) {
-            setExamData(result.data);
+            const response: VerifyExamItems = error.response.data;
             // 最大 errorLevel を取得
             const maxErrorLevel = Math.max(
-              0, // デフォルト値として 0 を指定
-              ...(result?.data?.examItemGroups?.flatMap(
+              ...(response.examItemGroups?.flatMap(
                 (group) =>
                   group.examItems?.flatMap(
                     (item) =>
-                      item.examRegistResults
-                        ?.map((result) => result.errorLevel)
-                        .filter(
-                          (level): level is number => level !== undefined,
-                        ) || [],
+                      item.examRegistResults?.map(
+                        (result) => result.errorLevel ?? 0,
+                      ) || [],
                   ) || [],
               ) || []),
+              0, // データがない場合のデフォルト値
             );
+
             errorBranch(maxErrorLevel);
+            examData.current = error.response.data;
           } else if (status === 500) {
             errorMessage = getErrorMessage(errorMessages.serverError);
           }
@@ -439,6 +454,7 @@ export default function ConsultInput() {
         setCommonButtonMessage("閉じる");
         openCommon();
       }
+      setIsLoading(false);
     };
     postMutateAsync();
   };
@@ -446,20 +462,18 @@ export default function ConsultInput() {
   //検証処理
   const handleVerify = () => {
     setIsRegisterPressed(true);
-    setIsLoading(true);
     //AP1013_検査結果を検証する
     verifyResults();
-    setIsLoading(false);
   };
 
   // 検査継続処理
   const continuingExam = () => {
     if (!examMenus) return;
-    const currentIndex = examMenus.findIndex((menu) => menu === examMenuId);
+    const currentIndex = examMenus.findIndex((menu) => menu.id === examMenuId);
     if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
       //次の検査メニューIDが存在する場合、検査内容確認画面へ遷移
       const nextExam = examMenus[currentIndex + 1];
-      navigate(`/examorder-confirm/${consultNumber}?exammenuid=${nextExam}`);
+      navigate(`/examorder-confirm/${consultNumber}?exammenuid=${nextExam.id}`);
     } else {
       //最後の検査メニューの場合、受診番号入力画面へ遷移
       navigate(`/consultnumber-input?consultnumber=${consultNumber}`);
@@ -473,6 +487,7 @@ export default function ConsultInput() {
     const resultsRequest = makeBody();
     if (!consultNumber) return;
     const postMutateAsync = async () => {
+      setIsLoading(true);
       try {
         result = await registMutateAsync({
           version: apiVersion,
@@ -494,10 +509,7 @@ export default function ConsultInput() {
           } else if (status === 403) {
             errorMessage = "会場ロック中です。管理者のみ更新可能です。";
           } else if (status === 404) {
-            errorMessage = getErrorMessage(
-              errorMessages.notFound,
-              "指定した受診情報",
-            );
+            errorMessage = getErrorMessage(errorMessages.notFound, "受診番号");
           } else if (status === 500) {
             errorMessage = getErrorMessage(errorMessages.serverError);
           }
@@ -507,16 +519,16 @@ export default function ConsultInput() {
         setCommonButtonMessage("閉じる");
         openCommon();
       }
+      setIsLoading(false);
     };
     postMutateAsync();
   };
 
   // 登録処理
   const callbackRegister = () => {
-    setIsLoading(true);
+    closeConfirm();
     // AP1014_検査結果を登録する
     registerResults();
-    setIsLoading(false);
   };
 
   // 共通ダイアログ：閉じる処理
@@ -673,13 +685,15 @@ export default function ConsultInput() {
         {/* 受診者ヘッダー */}
         <ExamineeHeader
           staffName={staffData?.name ?? ""}
-          managerNo={examData?.examinee?.ticketNumber ?? ""}
-          name={examData?.examinee?.kanaName ?? ""}
-          gender={examData?.examinee?.sex ?? 0}
-          age={examData?.examinee?.examDateAge ?? 0}
+          managerNo={examData.current?.examinee?.ticketNumber ?? ""}
+          name={examData.current?.examinee?.kanaName ?? ""}
+          gender={examData.current?.examinee?.sex ?? 0}
+          age={examData.current?.examinee?.examDateAge ?? 0}
         />
         {/* ブース特記 */}
-        <BoothNote relatedExamItems={examData?.relatedExamItems ?? []} />
+        <BoothNote
+          relatedExamItems={examData.current?.relatedExamItems ?? []}
+        />
         <Stack align="center" gap={32} px={32} mt={32}>
           {/* 測定ボタン */}
           {visibleRemeasurement && (
@@ -700,7 +714,7 @@ export default function ConsultInput() {
             </Button>
           )}
           {/* 検査項目コンポーネント */}
-          {examData?.examItemGroups?.map(
+          {examData.current?.examItemGroups?.map(
             (examItemGroup: ExamItemGroup, index: number) => (
               <ExamItemRender
                 key={index}
@@ -710,7 +724,7 @@ export default function ConsultInput() {
             ),
           )}
           {/* 登録ボタン */}
-          <Button w={860} h={75} mt={24} mb={83} onClick={handleVerify}>
+          <Button w={860} h={75} mt={24} onClick={handleVerify}>
             登録する
           </Button>
         </Stack>
@@ -729,6 +743,7 @@ export default function ConsultInput() {
           isOpen={openedCommon}
           onClose={callbackCloseCommon}
         />
+        <Space h={100} />
         <CommonFooter />
       </AuthWrapper>
     </>

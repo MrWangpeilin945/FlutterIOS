@@ -42,7 +42,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard
         /// 健診日
         /// </summary>
         [JsonPropertyName("examDate")]
-        public required DateOnly ExamDate { get; init; }
+        public required string ExamDate { get; init; }
 
         /// <summary>
         /// 受診番号

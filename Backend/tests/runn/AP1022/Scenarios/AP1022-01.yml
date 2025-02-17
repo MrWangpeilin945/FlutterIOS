@@ -1,0 +1,75 @@
+desc: AP1022-01 中止理由登録_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  consultNumber: "1022"
+  consultId: "a0102200-0000-0000-0000-000000000001"
+  deleteDetailId : 721
+  insertDetailId1 : 711
+  insertDetailId2 : 712
+  updateDetailId : 1
+  cancelReasonId : 2
+  request: "json://../Requests/AP1022-01.json"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  post:
+    desc: "中止理由登録_正常"
+    req:
+      /api/v1/consult/{{ vars.consultNumber }}/executions:
+        post:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+  deleteCancel:
+    desc: "中止レコードの削除確認"
+    db:
+      query: |
+        SELECT
+          consult_id
+        FROM
+          resultcollector.exam_cancels
+        WHERE
+          consult_id = '{{ vars.consultId }}'
+          AND exam_item_detail_id = {{ vars.deleteDetailId }};    
+    test: |
+      current.rows == null
+  insertCancel:
+    desc: "中止レコードの挿入確認"
+    db:
+      query: |
+        SELECT
+          cancel_reason_id
+        FROM
+          resultcollector.exam_cancels
+        WHERE
+          consult_id = '{{ vars.consultId }}'
+          AND exam_item_detail_id in ({{ vars.insertDetailId1 }}, {{ vars.insertDetailId2 }});    
+    test: |
+      current.rows[0].cancel_reason_id == vars.cancelReasonId
+      && current.rows[1].cancel_reason_id == vars.cancelReasonId
+  updateCancel:
+    desc: "中止レコードの更新確認"
+    db:
+      query: |
+        SELECT
+          cancel_reason_id
+        FROM
+          resultcollector.exam_cancels
+        WHERE
+          consult_id = '{{ vars.consultId }}'
+          AND exam_item_detail_id = {{ vars.updateDetailId }};    
+    test: |
+      current.rows[0].cancel_reason_id == vars.cancelReasonId

@@ -4,6 +4,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
 import { format } from "date-fns";
 import { useAtom } from "jotai";
+import { getDefaultStore } from "jotai/vanilla";
 import { useEffect, useState } from "react";
 import { usePlaceScheduleGetTeams } from "~/api/wellship";
 import AuthWrapper from "~/components/AuthWrapper";
@@ -11,7 +12,7 @@ import CommonDialog from "~/components/CommonDialog";
 import CommonHeader from "~/components/CommonHeader";
 import HeadlineButton from "~/components/HeadlineButton";
 import type { PlaceScheduleTeams } from "~/domain/wellship.schemas";
-import { staffState, teamState } from "~/store/store";
+import { clearExamState, staffState, teamState } from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
 export const meta: MetaFunction = () => {
@@ -58,6 +59,10 @@ export default function Teams() {
       const teamData = { id: teamId, name: teamName };
       setTeam(teamData);
     }
+    //Jotaiを削除（会場、健診日、検査メニュー）
+    const store = getDefaultStore();
+    store.set(clearExamState);
+    //会場選択画面に遷移
     navigate("/place-select");
   };
 
@@ -69,7 +74,7 @@ export default function Teams() {
         <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
-              {teamsData?.teams ? (
+              {teamsData?.teams && teamsData.teams.length > 0 ? (
                 <Stack gap={16}>
                   {teamsData.teams.map((tm) => (
                     <HeadlineButton

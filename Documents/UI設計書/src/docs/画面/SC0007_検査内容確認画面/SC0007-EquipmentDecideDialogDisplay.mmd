@@ -1,0 +1,17 @@
+```mermaid
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor st as 職員
+  participant fr as フロントエンド
+
+  st ->> fr: 機器選択ダイアログを起動
+  loop 検査メニューに設定されている検査機器分
+    fr ->> fr: 検査機器ボタンを表示
+  end
+  opt 検査機器選択済みの時
+    fr ->> fr: 検査機器ボタンを選択済みにする
+  end
+  fr -->> st: 機器選択ダイアログを表示
+
+```

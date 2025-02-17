@@ -1,0 +1,25 @@
+desc: {{ケースID}} {{ケース名}} [{{ステータス}}]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  {{メソッド}}:
+    desc: "{{ケース名}}"
+    req:
+      /api/v1{{パス}}:
+        {{メソッド}}:
+          headers:
+            Authorization: "Bearer 「「 steps.getAccessToken.token 」」"
+    test: |
+      current.res.status == {{ステータス}}
+    dump:
+      expr: current.res.body
+      out: ../Dump/{{ケースID}}.json

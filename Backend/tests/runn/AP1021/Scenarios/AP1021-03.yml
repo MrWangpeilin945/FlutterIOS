@@ -1,0 +1,26 @@
+desc: AP1021-03 結果連携未出力_無効なアクセストークン [401]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: true
+    skipValidateResponse: true
+vars:
+  exportId: "af0971a0-186f-4b14-86a1-0c648d77c9af"
+steps:
+  post:
+    desc: "結果連携未出力_無効なアクセストークン"
+    req:
+      /api/v1/integrations/examResults/undoExport:
+        post:
+          headers:
+            Authorization: "Bearer invalidToken"
+          body:
+            application/json:
+              exportId: "{{ vars.exportId }}"
+    test: |
+      current.res.status == 401
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1021-03.json
+

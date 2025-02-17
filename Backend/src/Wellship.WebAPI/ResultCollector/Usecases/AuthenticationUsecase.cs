@@ -30,7 +30,17 @@ public class AuthenticationUsecase(IAuthService authService,
     ///<inheritdoc/>
     public async ValueTask<(string accessToken, string refreshToken)> LoginStaffAsync(string identifier, string password)
     {
-        var staff = await _staffRepository.GetStaffByLoginIdAsync(identifier);
+        Staff staff;
+        try
+        {
+            staff = await _staffRepository.GetStaffByLoginIdAsync(identifier);
+        }
+        catch (StaffNotFoundException)
+        {
+            // 職員が存在しない場合も401を返す（親切すぎるエラーメッセージを避けるため）
+            throw new WellshipAuthenticationException();
+        }
+
         var loginHasSucceeded = staff.Enabled && staff.Password.Verify(password);
         if (!loginHasSucceeded)
         {

@@ -1,11 +1,12 @@
 
 using System.Data;
+
 using Moq;
 
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
 namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases;
 
@@ -36,9 +37,9 @@ public class TeamUsecasesTest
         }).ToList();
 
         // モックのセットアップ
-        mockRepo.Setup(repo => repo.UpsertTeamsAsync(It.IsAny<List<TeamEntity>>(), It.IsAny<DateTime>(), "ExternalConnection"));
+        mockRepo.Setup(repo => repo.UpsertTeamsAsync(It.IsAny<List<TeamEntity>>(), It.IsAny<DateTimeOffset>(), "ExternalConnection"));
 
-        TeamUsecase usecases = new TeamUsecase(mockRepo.Object);
+        TeamUsecase usecases = new TeamUsecase(mockRepo.Object, TimeProvider.System);
 
         // Act
         List<ErrorObject> result = await usecases.StoreTeamsAsync(inputTeams);
@@ -52,7 +53,7 @@ public class TeamUsecasesTest
                 teamEntities[0].Name == inputTeams[0].Name &&
                 teamEntities[1].TeamCode == inputTeams[1].Code &&
                 teamEntities[1].Name == inputTeams[1].Name
-            ), It.IsAny<DateTime>(), "ExternalConnection"), Times.Once);
+            ), It.IsAny<DateTimeOffset>(), "ExternalConnection"), Times.Once);
 
         // 戻り値のエラーリストについて
         // 正常系の想定であり、エラーオブジェクトの中身が空っぽのものだけであることを確認する。

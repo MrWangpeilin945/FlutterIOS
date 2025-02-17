@@ -1,0 +1,9 @@
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor User as 職員
+  participant FE as フロントエンド
+  participant KN as コンポーネント  
+
+  User->>KN:【CP0005】見出しボタンを押下
+  KN-->>FE:引数.クリックイベントを呼び出す

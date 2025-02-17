@@ -5,6 +5,8 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  ScrollArea,
+  Space,
   Stack,
   Table,
   Text,
@@ -16,7 +18,7 @@ import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
 import { isAxiosError } from "axios";
-import { format, parse } from "date-fns";
+import { format, parse, parseISO } from "date-fns";
 import { useAtom } from "jotai";
 import {
   type ComponentProps,
@@ -115,6 +117,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
       closeOnClickOutside={false} // modalの外クリックしても消えないように
       withCloseButton={false} // closeボタンを消す
       centered
+      scrollAreaComponent={ScrollArea.Autosize}
       styles={{
         header: {
           height: 75,
@@ -138,6 +141,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
       <Flex w={800} pt={24} px={16}>
         <Flex m="0px auto">{children}</Flex>
       </Flex>
+      <Space h={136} />
       <Flex
         w={800}
         py={24}
@@ -300,7 +304,7 @@ export default function ExamresultExportHistory() {
           screenName="検査結果出力履歴"
           staffName={staff?.name || ""}
         />
-        <Container fluid bg="background" py={32} px={24}>
+        <Container fluid bg="background" p={0}>
           {!isFetching && (
             <>
               {exportHistory?.exportHistories ? (
@@ -313,31 +317,38 @@ export default function ExamresultExportHistory() {
                     c="black01"
                   >
                     <Table.Tr>
+                      <Table.Th ta="center">出力日時</Table.Th>
                       <Table.Th ta="center">出力者</Table.Th>
                       <Table.Th ta="center">健診日</Table.Th>
                       <Table.Th ta="center">会場</Table.Th>
-                      <Table.Th ta="center">件数</Table.Th>
+                      <Table.Th w={100} ta="center">
+                        件数
+                      </Table.Th>
                       <Table.Th ta="center" />
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody h={118} fz="xs" c="black01">
                     {exportHistory?.exportHistories?.map((eh) => (
                       <Table.Tr key={eh.placeScheduleId}>
-                        <Table.Td w={267} className={styles["text-wrap"]}>
+                        <Table.Td ta="center" w={160}>
+                          {eh.exportedAt &&
+                            format(parseISO(eh.exportedAt), "yyyy/MM/dd HH:mm")}
+                        </Table.Td>
+                        <Table.Td w={150} className={styles["text-wrap"]}>
                           {eh.exportedBy}
                         </Table.Td>
-                        <Table.Td ta="center">
+                        <Table.Td ta="center" w={130}>
                           {eh.examDate &&
                             format(
                               parse(eh.examDate, "yyyy-MM-dd", new Date()),
                               "yyyy/MM/dd",
                             )}
                         </Table.Td>
-                        <Table.Td w={397} className={styles["text-wrap"]}>
+                        <Table.Td w={300} className={styles["text-wrap"]}>
                           {eh.placeName}
                         </Table.Td>
                         <Table.Td ta="center">{eh.dataCount}</Table.Td>
-                        <Table.Td ta="center">
+                        <Table.Td ta="right" pr={24} w={200}>
                           <Button
                             variant="outline"
                             w={246}
@@ -367,7 +378,7 @@ export default function ExamresultExportHistory() {
               ) : (
                 <>
                   {/* エラーメッセージを表示 */}
-                  <Text size="sm" c="black01">
+                  <Text size="sm" c="black01" ml={32} mt={24}>
                     {getErrorMessage(
                       errorMessages.notFound,
                       "出力済みのデータ",
@@ -425,6 +436,7 @@ export default function ExamresultExportHistory() {
             </>
           )}
         </Container>
+        <Space h={100}/>
         <CommonFooter items={footerItems} />
       </AuthWrapper>
     </>

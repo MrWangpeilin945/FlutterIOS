@@ -149,7 +149,7 @@ export default function ExamOrderConfirm() {
 
   // 性別の色定義
   const sexThemeColors = [
-    { sex: Sex.男, color: getThemeColor("malePrimaty", theme) },
+    { sex: Sex.男, color: getThemeColor("malePrimary", theme) },
     { sex: Sex.女, color: getThemeColor("femalePrimary", theme) },
   ];
 

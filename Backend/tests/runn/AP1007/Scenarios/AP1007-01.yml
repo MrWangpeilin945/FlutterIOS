@@ -1,0 +1,31 @@
+desc: AP1007-01 受診番号検証_正常 [200]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  consultNumber: "0001"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  post:
+    desc: "受診番号検証_正常"
+    req:
+      /api/v1/consult/consultNumber/verify:
+        post:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              consultNumber: "{{ vars.consultNumber }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1007-01.json
+

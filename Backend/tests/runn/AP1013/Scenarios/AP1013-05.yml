@@ -1,0 +1,41 @@
+desc: AP1013-05 結果検証_バリデーションエラーあり [422]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  consultNumber: "1013"
+  request: "json://../Requests/AP1013-05.json"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  post:
+    desc: "結果検証_バリデーションエラーあり"
+    req:
+      /api/v1/consult/{{ vars.consultNumber }}/results/verify:
+        post:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 422
+      // 検査項目が２項目返ってくる
+      && len(current.res.body.examItemGroups[0].examItems) == 2
+      // 検査項目明細が２項目づつ返ってくる
+      && len(current.res.body.examItemGroups[0].examItems[0].examItemDetails) == 2
+      && len(current.res.body.examItemGroups[0].examItems[1].examItemDetails) == 2
+      // 検査結果登録エラーが返ってくる
+      && len(current.res.body.examItemGroups[0].examItems[0].examRegistResults) == 1
+      && current.res.body.examItemGroups[0].examItems[0].examRegistResults[0].errorLevel == 3
+      && current.res.body.examItemGroups[0].examItems[0].examRegistResults[0].description == '入力値範囲外です。'
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1013-05.json
+

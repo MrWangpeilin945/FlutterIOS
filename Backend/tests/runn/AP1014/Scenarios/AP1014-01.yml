@@ -1,0 +1,93 @@
+desc: AP1014-01 結果登録_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  consultNumber: "1014"
+  consultId: "a0101400-0000-0000-0000-000000000001"
+  request: "json://../Requests/AP1014-01.json"
+  examItemId1: 10141
+  examItemValue1: "140"
+  examItemId2: 10142
+  examItemValue2: "150"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  post:
+    desc: "結果登録_正常"
+    req:
+      /api/v1/consult/{{ vars.consultNumber }}/results:
+        post:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+  examResults_examItem1:
+    desc: "検査結果の登録確認_1"
+    db:
+      query: |
+        SELECT
+          value
+        FROM
+          resultcollector.exam_results
+        WHERE
+          consult_id = '{{ vars.consultId }}'
+          AND exam_item_detail_id = {{ vars.examItemId1 }};    
+    test: |
+      current.rows[0].value == vars.examItemValue1
+  examResults_examItem2:
+    desc: "検査結果の登録確認_2"
+    db:
+      query: |
+        SELECT
+          value
+        FROM
+          resultcollector.exam_results
+        WHERE
+          consult_id = '{{ vars.consultId }}'
+          AND exam_item_detail_id = {{ vars.examItemId2 }};    
+    test: |
+      current.rows[0].value == vars.examItemValue2
+  examResultHistories_examItem1:
+    desc: "検査結果履歴の登録確認_1"
+    db:
+      query: |
+        SELECT
+          value
+        FROM
+          resultcollector.exam_result_histories
+        WHERE
+          consult_id = '{{ vars.consultId }}'
+          AND exam_item_detail_id = {{ vars.examItemId1 }}    
+        ORDER BY
+          created_at desc; 
+    test: |
+      current.rows[0].value == vars.examItemValue1
+  examResultHistories_examItem2:
+    desc: "検査結果履歴の登録確認_2"
+    db:
+      query: |
+        SELECT
+          value
+        FROM
+          resultcollector.exam_result_histories
+        WHERE
+          consult_id = '{{ vars.consultId }}'
+          AND exam_item_detail_id = {{ vars.examItemId2 }}
+        ORDER BY
+          created_at desc;
+    test: |
+      current.rows[0].value == vars.examItemValue2
+
+
+

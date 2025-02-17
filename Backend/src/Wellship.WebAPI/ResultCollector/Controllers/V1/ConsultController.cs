@@ -14,7 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Controllers.V1;
 /// <summary>
 /// 受診コントローラー
 /// </summary>
-/// [ApiController]
+[ApiController]
 [ApiVersion("1")]
 [Authorize]
 public class ConsultController : ControllerBase
@@ -142,6 +142,14 @@ public class ConsultController : ControllerBase
     public async Task<IActionResult> VerifyResults([FromRoute][Required] string consultNumber, [FromBody] ResultsRequest results)
     {
         var response = await _consultUsecase.VerifyResults(consultNumber, results);
+
+        // responseのexamRegistResultsが一つでもあれば422を返却する。
+        var hasError = response.ExamItemGroups.SelectMany(g => g.ExamItems).Any(item => item.ExamRegistResults.Length != 0);
+
+        if (hasError)
+        {
+            return StatusCode(StatusCodes.Status422UnprocessableEntity, response);
+        }
         return Ok(response);
     }
 

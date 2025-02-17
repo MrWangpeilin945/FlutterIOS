@@ -1,0 +1,41 @@
+desc: EC2006-01 班を登録_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2006-01.json"
+steps:
+  post:
+    desc: "班を登録_正常"
+    req:
+      /api/v1/external/teams:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+  confirmTeams:
+    desc: "班の登録を確認"
+    db:
+      query: |
+        SELECT
+          team_code, name
+        FROM
+          resultcollector.teams
+        WHERE
+          team_code in ('T2006-01-1', 'T2006-01-2', 'T2006-01-3')
+        ORDER BY
+          team_code ASC;
+    test: |
+      // リクエストの３つの班が追加されたことを確認
+      len(current.rows) == 3
+      && current.rows[0].team_code == "T2006-01-1"
+      && current.rows[0].name == "１班"
+      && current.rows[1].team_code == "T2006-01-2"
+      && current.rows[1].name == "２班"
+      && current.rows[2].team_code == "T2006-01-3"
+      && current.rows[2].name == "３班"

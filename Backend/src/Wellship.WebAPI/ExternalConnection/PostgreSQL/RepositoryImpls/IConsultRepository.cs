@@ -13,7 +13,7 @@ public interface IConsultRepository
     /// <param name="consults">登録する受診のリスト</param>
     /// <param name="createdAt">作成日時</param>
     /// <param name="createdBy">作成者</param>
-    public Task UpsertConsultsAsync(List<ConsultEntity> consults, DateTime createdAt, string createdBy);
+    public Task UpsertConsultsAsync(List<ConsultEntity> consults, DateTimeOffset createdAt, string createdBy);
 
     /// <summary>
     /// 存在する検査メニュー特記コード情報（検査特記コード、検査特記名）を取得する
@@ -32,4 +32,11 @@ public interface IConsultRepository
     /// </summary>
     /// <param name="codes">連携キーのリスト</param>
     public Task<List<ExternalConnectionCodeEntity>> GetExternalConnectionCodeAsync(List<string> codes);
+
+    /// <summary>
+    /// 受診番号に紐づけられた外部連携キーを取得する
+    /// </summary>
+    /// <param name="consultNumbers">受診番号のリスト</param>
+    public Task<List<ExternalConnectionCodeEntity>> GetConsultExternalConnectionCodeAsync(List<string> consultNumbers);
+
 }

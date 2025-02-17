@@ -1,0 +1,31 @@
+desc: AP1010-01 検査内容取得_同姓同名チェック [なし]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  consultNumber: "10103"
+  examMenuId: 1
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  get:
+    desc: "検査内容取得_正常"
+    req:
+      /api/v1/consult/{{ vars.consultNumber }}/examItems?examMenuId={{ vars.examMenuId }}:
+        get:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+    test: |
+      current.res.status == 200
+      // 同姓同名なし（カナ氏名の'オ'と'ヲ'が異なる）
+      && current.res.body.examinee.sameNameAlert == false
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1010-06.json
+

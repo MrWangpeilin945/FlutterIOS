@@ -186,8 +186,13 @@ public class ConsultUsecase : IConsultUsecase
                                           ExamItemName = item.Name,
                                           HasOrder = examOrders.ExamItemDetailOrders
                                                              .Any(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId)),
+                                          // 明細単位で記録された中止を検査項目単位に丸める
+                                          // 前提：検査項目単位の中止理由が同じである
                                           CancelReasonId = examCancels.ExamItemDetailCancels
-                                                                    .SingleOrDefault(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId))?.CancelReasonId
+                                                                      .Where(x => item.ExamItemDetails.Select(d => d.ExamItemDetailId).Contains(x.ExamItemDetailId))
+                                                                      .OrderBy(x => x.ExamItemDetailId)
+                                                                      .Select(x => (int?)x.CancelReasonId)
+                                                                      .FirstOrDefault()
                                       }).ToArray(),
             ExamDecisionResults = examDecisionResults.ToArray(),
             UnexaminedItems = unexaminedItems.UnexaminedMenus.Select(x => new ExamMenu
@@ -238,8 +243,7 @@ public class ConsultUsecase : IConsultUsecase
             CancelReasonId = (int)x.CancelReasonId!,
         }).ToArray();
 
-        await _consultRepository.RemoveExamCancelsAsync(consult.ConsultId, removeTargets);
-        await _consultRepository.SaveExamCancelsAsync(consult.ConsultId, toSave);
+        await _consultRepository.SaveExamCancelsAsync(consult.ConsultId, removeTargets, toSave);
     }
 
     /// <summary>

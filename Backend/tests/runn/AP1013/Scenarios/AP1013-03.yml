@@ -1,0 +1,33 @@
+desc: AP1013-03 結果検証_無効なアクセストークン [401]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: true
+vars:
+  consultNumber: "1013"
+  request: "json://../Requests/AP1013-03.json"
+  token: "CJpc3MiOiJsb2NhbGhvc3Q6NTAwMCIsImF1ZCI6WyJsb2NhbGhvc3Q6NTAwMCJdfQ.W9Eh1-Y_5WEExK1QMQmvv9F4adMC-eoGabUC9IbELtw"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  post:
+    desc: "結果検証_無効なアクセストークン"
+    req:
+      /api/v1/consult/{{ vars.consultNumber }}/results/verify:
+        post:
+          headers:
+            Authorization: "Bearer {{ vars.token }}"
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 401
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1013-03.json
+

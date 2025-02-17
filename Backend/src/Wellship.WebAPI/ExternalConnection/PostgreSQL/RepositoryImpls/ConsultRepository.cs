@@ -1,11 +1,12 @@
-using Dapper;
 using System.Data.Common;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
-using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
-using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
+
+using Dapper;
+
 using Ryobi.Wellship.Core.Enums;
-using YamlDotNet.Core;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
+using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 
@@ -31,11 +32,11 @@ public class ConsultRepository : IConsultRepository
     /// <param name="consults">更新する受診リスト</param>
     /// <param name="createdAt">作成日時</param>
     /// <param name="createdBy">作成者</param>
-    public async Task UpsertConsultsAsync(List<ConsultEntity> consults, DateTime createdAt, string createdBy)
+    public async Task UpsertConsultsAsync(List<ConsultEntity> consults, DateTimeOffset createdAt, string createdBy)
     {
         // ConnectionCodeでグループ化しSortNoの最大のレコードを絞り込む
         var actionConsults = consults.GroupBy(x => x.ConnectionCode, 
-                                            (y, z) => z.OrderByDescending(a => a.SortNo).First())
+                                             (y, z) => z.OrderByDescending(a => a.SortNo).First())
                                      .ToArray();
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         var transaction = await connection.BeginTransactionAsync();
@@ -378,6 +379,7 @@ public class ConsultRepository : IConsultRepository
         var sql = @"
                 select
                     consult_id as ConsultId
+                    , consult_number as ConsultNumber
                     , external_connection_code as ConnectionCode
                 from
                     resultcollector.consult
@@ -387,4 +389,26 @@ public class ConsultRepository : IConsultRepository
         var result = await connection.QueryAsync<ExternalConnectionCodeEntity>(sql, new { Codes = codes });
         return result.ToList();
     }
+
+    /// <summary>
+    /// 受診番号に紐づけられた外部連携キーを取得する
+    /// </summary>
+    /// <param name="consultNumbers">受診番号のリスト</param>
+    public async Task<List<ExternalConnectionCodeEntity>> GetConsultExternalConnectionCodeAsync(List<string> consultNumbers)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        var sql = @"
+                select
+                    consult_id as ConsultId
+                    , consult_number as ConsultNumber
+                    , external_connection_code as ConnectionCode
+                from
+                    resultcollector.consult
+                where
+                    consult_number = any(@ConsultNumbers);";
+
+        var result = await connection.QueryAsync<ExternalConnectionCodeEntity>(sql, new { ConsultNumbers = consultNumbers });
+        return result.ToList();
+    }
+
 }

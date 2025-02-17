@@ -1,0 +1,37 @@
+desc: AP1013-01 結果検証_バリデーションエラーなし [200]
+runners:
+  req:
+    endpoint: ${BACKEND_URL}
+    openapi3: ${OPENAPI3_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  consultNumber: "1013"
+  request: "json://../Requests/AP1013-01.json"
+steps:
+  getAccessToken:
+    desc: "アクセストークンを取得します"
+    include:
+      path:
+        ../../Helpers/adminAccessToken.yml
+  post:
+    desc: "結果検証_バリデーションエラーなし"
+    req:
+      /api/v1/consult/{{ vars.consultNumber }}/results/verify:
+        post:
+          headers:
+            Authorization: "Bearer {{ steps.getAccessToken.token }}"
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+      // 検査項目が２項目返ってくる
+      && len(current.res.body.examItemGroups[0].examItems) == 2
+      // 検査項目明細が２項目づつ返ってくる
+      && len(current.res.body.examItemGroups[0].examItems[0].examItemDetails) == 2
+      && len(current.res.body.examItemGroups[0].examItems[1].examItemDetails) == 2
+    dump:
+      expr: current.res.body
+      out: ../Dump/AP1013-01.json
+

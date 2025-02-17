@@ -1,0 +1,47 @@
+using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
+using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
+using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
+
+namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
+/// <summary>
+/// EC2006_班を登録する
+/// </summary>
+public class TeamUsecase : ITeamUsecase
+{
+    private readonly List<ErrorObject> _errorObjects;
+    private readonly ITeamRepository _teamRepository;
+    private readonly TimeProvider _timeProvider;
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="teamRepository"></param>
+    /// <param name="timeProvider"></param>
+    public TeamUsecase(ITeamRepository teamRepository, TimeProvider timeProvider)
+    {
+        _teamRepository = teamRepository;
+        _errorObjects = new List<ErrorObject>();
+        _timeProvider = timeProvider;
+    }
+
+    /// <summary>
+    /// EC2006_班を登録する
+    /// </summary>
+    /// <param name="teams">班</param>
+    /// <returns>エラーリスト</returns>
+    public async Task<List<ErrorObject>> StoreTeamsAsync(List<Team> teams)
+    {
+        // エンティティリスト生成
+        List<TeamEntity> teamEntities = teams.Select(item => new TeamEntity
+        {
+            TeamId = Guid.NewGuid(),
+            TeamCode = item.Code,
+            Name = item.Name
+        }).ToList();
+
+        // Repository処理
+        await _teamRepository.UpsertTeamsAsync(teamEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
+
+        return _errorObjects;
+    }
+}

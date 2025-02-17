@@ -48,6 +48,7 @@ export default function ConsultNumberInput() {
   const [isBeforeNum, setIsBeforeNum] = useState(false);
   const [menu] = useAtom(examMenuState);
   const [consultNumber, setConsultNumber] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // URLのパスパラメータ
   const [searchParams] = useSearchParams();
@@ -76,6 +77,7 @@ export default function ConsultNumberInput() {
     //AP1008_未受診の検査項目を取得する
     if (consultNumberParam) {
       const fetchUnexaminedItemsSelect = async () => {
+        setIsLoading(true);
         const result = await refetch();
         if (result.data) {
           //成功時
@@ -104,6 +106,7 @@ export default function ConsultNumberInput() {
           }
           open();
         }
+        setIsLoading(false);
       };
       fetchUnexaminedItemsSelect();
     }
@@ -115,8 +118,8 @@ export default function ConsultNumberInput() {
   // テキストボックスのバリデーションチェック
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // 20文字以内
-    if (value.length <= 20) {
+    // 50文字以内
+    if (value.length <= 50) {
       setConsultNumber(value);
     }
   };
@@ -127,7 +130,7 @@ export default function ConsultNumberInput() {
     const validationSchema = z
       .string()
       .min(1, getErrorMessage(errorMessages.required, "受診番号は"))
-      .max(20, getErrorMessage(errorMessages.maxLength, "受診番号は", 20))
+      .max(50, getErrorMessage(errorMessages.maxLength, "受診番号は", 50))
       .regex(
         /^[a-zA-Z0-9]+$/,
         getErrorMessage(errorMessages.alphaNumericString, "受診番号は"),
@@ -150,6 +153,7 @@ export default function ConsultNumberInput() {
     };
 
     const postMutateAsync = async () => {
+      setIsLoading(true);
       try {
         const result = await mutateAsync({
           version: "1",
@@ -183,6 +187,7 @@ export default function ConsultNumberInput() {
           open();
         }
       }
+      setIsLoading(false);
     };
     postMutateAsync();
   };
@@ -204,7 +209,7 @@ export default function ConsultNumberInput() {
   return (
     <>
       <AuthWrapper>
-        <LoadingOverlay visible={isFetching} />
+        <LoadingOverlay visible={isLoading} />
         <CommonHeader screenName="受診番号入力" staffName={staff?.name || ""} />
         <Container fluid bg="background" py={32} px={24}>
           {!isFetching && (

@@ -350,13 +350,20 @@ export default function ExamBP2({
       }
     }
     // 平均値の計算
+    const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
+
     const averageBpHigh =
       bpHValues.length > 0
-        ? Math.round(bpHValues.reduce((a, b) => a + b, 0) / bpHValues.length)
+        ? bpHValues.length > 2
+          ? Math.round(sum(bpHValues) / 2)
+          : Math.round(sum(bpHValues) / bpHValues.length)
         : 0;
+
     const averageBpLow =
       bpLValues.length > 0
-        ? Math.round(bpLValues.reduce((a, b) => a + b, 0) / bpLValues.length)
+        ? bpLValues.length > 2
+          ? Math.round(sum(bpLValues) / 2)
+          : Math.round(sum(bpLValues) / bpLValues.length)
         : 0;
 
     // 平均値の保存
