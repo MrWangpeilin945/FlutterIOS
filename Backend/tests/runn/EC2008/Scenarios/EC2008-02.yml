@@ -1,0 +1,55 @@
+desc: EC2008-02 団体を更新_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2008-02.json"
+  organizationCode: "G200804"
+steps:
+  getOrganizations:
+    desc: "団体情報の取得"
+    db:
+      query: |
+        SELECT
+          organization_code
+          , name
+          , order_number
+        FROM
+          resultcollector.organizations
+        WHERE
+          organization_code = '{{ vars.organizationCode }}'
+    bind:
+      organizationsData: current.rows[0]
+  post:
+    desc: "団体を更新_正常"
+    req:
+      /api/v1/external/organizations:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2008-01.json
+  confirmTeams:
+    desc: "団体の更新を確認"
+    db:
+      query: |
+        SELECT
+          organization_code
+          , name
+          , order_number
+        FROM
+          resultcollector.organizations
+        WHERE
+          organization_code = '{{ vars.organizationCode }}'
+    test: |
+      len(current.rows) == 1
+      && current.rows[0].organization_code == organizationsData.organization_code
+      && current.rows[0].name == "新日本株式会社"
+      && current.rows[0].order_number == organizationsData.order_number
