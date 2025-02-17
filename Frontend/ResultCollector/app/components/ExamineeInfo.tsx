@@ -1,5 +1,6 @@
 import {
   Box,
+  Flex,
   Group,
   Paper,
   Stack,
@@ -37,11 +38,16 @@ export default function ExamineeInfo({
   }
 
   return (
-    <Stack
+    <Flex
       bg="white01"
       p={16}
       gap={16}
-      style={{ borderBottomLeftRadius: 16, borderBottomRightRadius: 16 }}
+      style={{
+        borderBottomLeftRadius: 16,
+        borderBottomRightRadius: 16,
+        width: "100%",
+      }}
+      direction="column"
     >
       <Group display="table">
         <Text
@@ -156,6 +162,6 @@ export default function ExamineeInfo({
           </Text>
         </Tooltip>
       </Group>
-    </Stack>
+    </Flex>
   );
 }

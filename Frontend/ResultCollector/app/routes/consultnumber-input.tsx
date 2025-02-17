@@ -48,6 +48,7 @@ export default function ConsultNumberInput() {
   const [isBeforeNum, setIsBeforeNum] = useState(false);
   const [menu] = useAtom(examMenuState);
   const [consultNumber, setConsultNumber] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // URLのパスパラメータ
   const [searchParams] = useSearchParams();
@@ -73,6 +74,7 @@ export default function ConsultNumberInput() {
   ];
 
   useEffect(() => {
+    setIsLoading(true);
     //AP1008_未受診の検査項目を取得する
     if (consultNumberParam) {
       const fetchUnexaminedItemsSelect = async () => {
@@ -104,6 +106,7 @@ export default function ConsultNumberInput() {
           }
           open();
         }
+        setIsLoading(false);
       };
       fetchUnexaminedItemsSelect();
     }
@@ -150,6 +153,7 @@ export default function ConsultNumberInput() {
     };
 
     const postMutateAsync = async () => {
+      setIsLoading(true);
       try {
         const result = await mutateAsync({
           version: "1",
@@ -183,6 +187,7 @@ export default function ConsultNumberInput() {
           open();
         }
       }
+      setIsLoading(false);
     };
     postMutateAsync();
   };
@@ -204,7 +209,7 @@ export default function ConsultNumberInput() {
   return (
     <>
       <AuthWrapper>
-        <LoadingOverlay visible={isFetching} />
+        <LoadingOverlay visible={isLoading} />
         <CommonHeader screenName="受診番号入力" staffName={staff?.name || ""} />
         <Container fluid bg="background" py={32} px={24}>
           {!isFetching && (
