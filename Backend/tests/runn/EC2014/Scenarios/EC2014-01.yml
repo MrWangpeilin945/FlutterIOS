@@ -1,0 +1,68 @@
+desc: EC2014-01 基準値パターンを登録_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2014-01.json"
+steps:
+  deleteInsertorganizations:
+    desc: "挿入する基準値パターンを削除する"
+    db:
+      query: |
+        DELETE
+        FROM
+          resultcollector.thresholds
+        WHERE
+          threshold_code in ('T201401', 'T201402', 'T201403')
+  getOrderNumber:
+    desc: "表示順の取得"
+    db:
+      query: |
+        SELECT
+          max(order_number)
+        FROM
+          resultcollector.thresholds
+    bind:
+      thresholdsCount: current.rows[0].max
+  post:
+    desc: "基準値パターンを登録_正常"
+    req:
+      /api/v1/external/thresholds:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2014-01.json
+  confirmTeams:
+    desc: "基準値パターンの登録を確認"
+    db:
+      query: |
+        SELECT
+          threshold_code
+          , name
+          , order_number
+        FROM
+          resultcollector.thresholds
+        WHERE
+          threshold_code in ('T201401', 'T201402', 'T201403')
+        ORDER BY
+          threshold_code ASC;
+    test: |
+      // リクエストの３つの班が追加されたことを確認
+      len(current.rows) == 3
+      && current.rows[0].threshold_code == "T201401"
+      && current.rows[0].name == "一般健診"
+      && current.rows[0].order_number == thresholdsCount + 1
+      && current.rows[1].threshold_code == "T201402"
+      && current.rows[1].name == "職員健診"
+      && current.rows[1].order_number == thresholdsCount + 2
+      && current.rows[2].threshold_code == "T201403"
+      && current.rows[2].name == "人間ドック"
+      && current.rows[2].order_number == thresholdsCount + 3
