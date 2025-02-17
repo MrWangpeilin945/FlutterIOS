@@ -175,7 +175,8 @@ public class ConsultUsecase : IConsultUsecase
                 SameNameAlert = sameNameAlert,
                 ExamDateAge = examAge.Years
             },
-            IsComplete = !unexaminedItems.UnexaminedMenus.Any(),
+            // 選択した検査メニューが未受診ならばfalseとする
+            IsComplete = !unexaminedItems.UnexaminedMenus.Select(x => x.ExamMenuId).Contains(examMenuId),
             RelatedExamItems = relatedExamItems,
             ExamItems = examItemGroups.OrderBy(group => group.ExamItemGroupId)
                                       .SelectMany(group => group.ExamItems)
