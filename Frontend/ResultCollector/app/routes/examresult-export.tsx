@@ -5,6 +5,8 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  ScrollArea,
+  Space,
   Stack,
   Table,
   Text,
@@ -119,6 +121,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
       closeOnClickOutside={false} // modalの外クリックしても消えないように
       withCloseButton={false} // closeボタンを消す
       centered
+      scrollAreaComponent={ScrollArea.Autosize}
       styles={{
         header: {
           height: 75,
@@ -142,6 +145,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
       <Flex w={800} pt={24} px={16}>
         <Flex m="0px auto">{children}</Flex>
       </Flex>
+      <Space h={136} />
       <Flex
         w={800}
         py={24}
@@ -297,7 +301,7 @@ export default function ExamresultExport() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching || isLoading} />
         <CommonHeader screenName="検査結果出力" staffName={staff?.name || ""} />
-        <Container fluid bg="background" mb={59} p={0}>
+        <Container fluid bg="background" p={0}>
           {!isFetching && (
             <>
               {exportData?.exportData ? (
@@ -316,7 +320,9 @@ export default function ExamresultExport() {
                       <Table.Th ta="center">未</Table.Th>
                       <Table.Th ta="center">保留</Table.Th>
                       <Table.Th ta="center">済</Table.Th>
-                      <Table.Th ta="right" pr={94}>出力</Table.Th>
+                      <Table.Th ta="right" pr={94}>
+                        出力
+                      </Table.Th>
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody h={118} fz="xs" c="black01">
@@ -342,7 +348,7 @@ export default function ExamresultExport() {
                             py={16}
                             px={32}
                             bd="2px solid"
-                            onClick={() => navigate("/placeschedule-lock")}
+                            onClick={() => navigate(`/placeschedule-lock?placescheduleid=${ed.placeScheduleId}`)}
                           >
                             <Text
                               size="lg"
@@ -362,19 +368,19 @@ export default function ExamresultExport() {
                             </Text>
                           </Button>
                         </Table.Td>
-                        <Table.Td ta="center">
+                        <Table.Td w={100} ta="center">
                           {ed.details?.find(
                             (d) =>
                               d.status === ConsultResultExportStatus.未出力,
                           )?.count || 0}
                         </Table.Td>
-                        <Table.Td ta="center">
+                        <Table.Td w={100} ta="center">
                           {ed.details?.find(
                             (d) =>
                               d.status === ConsultResultExportStatus.出力保留,
                           )?.count || 0}
                         </Table.Td>
-                        <Table.Td ta="center">
+                        <Table.Td w={100} ta="center">
                           {ed.details?.find(
                             (d) =>
                               d.status === ConsultResultExportStatus.出力済み,
@@ -479,6 +485,7 @@ export default function ExamresultExport() {
             </>
           )}
         </Container>
+        <Space h={100} />
         <CommonFooter items={footerItems} />
       </AuthWrapper>
     </>

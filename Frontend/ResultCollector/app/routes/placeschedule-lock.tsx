@@ -1,7 +1,5 @@
 import {
-  Box,
   Button,
-  Center,
   Container,
   Flex,
   LoadingOverlay,
@@ -10,6 +8,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
+import { useSearchParams } from "@remix-run/react";
 import { isAxiosError } from "axios";
 import { format } from "date-fns";
 import { useAtom } from "jotai";
@@ -37,6 +36,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function PlaceScheduleLock() {
+  const [searchParams] = useSearchParams();
+  const placeScheduleId = searchParams.get("placescheduleid");
   const [isLoading, setIsLoading] = useState(false);
   const [staff] = useAtom(staffState);
   const [placeSchedule] = useAtom(placeScheduleState);
@@ -65,7 +66,7 @@ export default function PlaceScheduleLock() {
   //AP1016呼び出し用(GET系APIの定義)
   const { isFetching, refetch } = usePlaceScheduleGetPlaceScheduleLockingStatus(
     "1",
-    placeSchedule?.placeScheduleId || "",
+    placeScheduleId || placeSchedule?.placeScheduleId || "",
     { query: { enabled: false } },
   );
 
@@ -166,8 +167,7 @@ export default function PlaceScheduleLock() {
               {placeScheduleLock ? (
                 <>
                   <Space h={40} />
-                  <Center>
-                    <Box ta="center">
+                    <Container ta="center" mt={40} mb={300}>
                       {statusButton?.map((button) => (
                         <Button
                           w={860}
@@ -213,16 +213,14 @@ export default function PlaceScheduleLock() {
                           </Text>
                         </Button>
                       ))}
-                    </Box>
-                  </Center>
-                  <Space h={300} />
+                    </Container>
                   <Flex justify="flex-end">
                     <Text size="xs" c="black01" ta="right">
                       最終更新者：{placeScheduleLock.updatedBy}（
                       {placeScheduleLock.updatedAt
                         ? format(
                             new Date(placeScheduleLock.updatedAt),
-                            "yyyy/MM/dd hh:mm",
+                            "yyyy/MM/dd HH:mm",
                           )
                         : ""}
                       ）&nbsp;

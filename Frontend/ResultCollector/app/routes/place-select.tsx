@@ -1,4 +1,4 @@
-import { Container, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { Container, LoadingOverlay, Space, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
@@ -129,6 +129,7 @@ export default function PlaceSelect() {
             </>
           )}
         </Container>
+        <Space h={100} />
         <CommonFooter />
       </AuthWrapper>
     </>

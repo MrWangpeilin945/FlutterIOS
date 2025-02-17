@@ -5,6 +5,8 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  ScrollArea,
+  Space,
   Stack,
   Table,
   Text,
@@ -115,6 +117,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
       closeOnClickOutside={false} // modalの外クリックしても消えないように
       withCloseButton={false} // closeボタンを消す
       centered
+      scrollAreaComponent={ScrollArea.Autosize}
       styles={{
         header: {
           height: 75,
@@ -138,6 +141,7 @@ const ResultsOutputConfirmDialog = forwardRef<Handle, Props>((props, ref) => {
       <Flex w={800} pt={24} px={16}>
         <Flex m="0px auto">{children}</Flex>
       </Flex>
+      <Space h={136} />
       <Flex
         w={800}
         py={24}
@@ -300,7 +304,7 @@ export default function ExamresultExportHistory() {
           screenName="検査結果出力履歴"
           staffName={staff?.name || ""}
         />
-        <Container fluid bg="background" mb={59} p={0}>
+        <Container fluid bg="background" p={0}>
           {!isFetching && (
             <>
               {exportHistory?.exportHistories ? (
@@ -326,25 +330,25 @@ export default function ExamresultExportHistory() {
                   <Table.Tbody h={118} fz="xs" c="black01">
                     {exportHistory?.exportHistories?.map((eh) => (
                       <Table.Tr key={eh.placeScheduleId}>
-                        <Table.Td ta="center" w={200}>
+                        <Table.Td ta="center" w={160}>
                           {eh.exportedAt &&
                             format(parseISO(eh.exportedAt), "yyyy/MM/dd HH:mm")}
                         </Table.Td>
                         <Table.Td w={150} className={styles["text-wrap"]}>
                           {eh.exportedBy}
                         </Table.Td>
-                        <Table.Td ta="center" w={190} miw={180}>
+                        <Table.Td ta="center" w={130}>
                           {eh.examDate &&
                             format(
                               parse(eh.examDate, "yyyy-MM-dd", new Date()),
                               "yyyy/MM/dd",
                             )}
                         </Table.Td>
-                        <Table.Td w={250} className={styles["text-wrap"]}>
+                        <Table.Td w={300} className={styles["text-wrap"]}>
                           {eh.placeName}
                         </Table.Td>
                         <Table.Td ta="center">{eh.dataCount}</Table.Td>
-                        <Table.Td ta="right" pr={24} w={300}>
+                        <Table.Td ta="right" pr={24} w={200}>
                           <Button
                             variant="outline"
                             w={246}
@@ -432,6 +436,7 @@ export default function ExamresultExportHistory() {
             </>
           )}
         </Container>
+        <Space h={100}/>
         <CommonFooter items={footerItems} />
       </AuthWrapper>
     </>

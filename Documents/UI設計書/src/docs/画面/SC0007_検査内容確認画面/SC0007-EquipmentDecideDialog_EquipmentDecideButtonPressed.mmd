@@ -1,0 +1,20 @@
+```mermaid
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor st as 職員
+  participant fr as フロントエンド
+  %%participant co as コンポーネント
+  %%participant ba as バックエンド
+
+  st ->> fr: 検査機器ボタン押下
+  alt 押下したボタンが未選択の時
+    opt 他のボタンが選択済みの時
+      fr ->> fr: 選択済みの他のボタンの選択を解除する
+    end
+    fr ->> fr: 押下したボタンを選択状態にする
+  else 押下したボタンが選択済みの時
+    fr ->> fr: 押下したボタンの選択を解除する
+  end
+
+```

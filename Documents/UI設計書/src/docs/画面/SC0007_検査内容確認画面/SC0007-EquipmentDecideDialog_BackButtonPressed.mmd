@@ -1,0 +1,13 @@
+```mermaid
+%%{init:{'theme':'forest'}}%%
+sequenceDiagram
+autonumber
+  actor st as 職員
+  participant fr as フロントエンド
+  %%participant co as コンポーネント
+  %%participant ba as バックエンド
+
+  st ->> fr: 戻るボタン押下
+  fr -->> st: ダイアログを閉じる<br>(変更の適用はしない)
+
+```

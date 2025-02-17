@@ -5,7 +5,7 @@ import {
   useParams,
   useSearchParams,
 } from "@remix-run/react";
-import { Button, LoadingOverlay, Stack, Text } from "@mantine/core";
+import { Button, LoadingOverlay, Space, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useAtom } from "jotai";
 import { type AxiosResponse, isAxiosError } from "axios";
@@ -71,7 +71,7 @@ export default function ConsultInput() {
     (item) => item.examMenuId === examMenuId,
   )?.equipment;
   //ローディング管理
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   //共通ダイアログ表示管理
   const [openedCommon, { open: openCommon, close: closeCommon }] =
     useDisclosure(false);
@@ -99,7 +99,7 @@ export default function ConsultInput() {
   const [initialDisplay, setInitialDisplay] = useState(true);
 
   //AP1009呼び出し用(GET系APIの定義)
-  const { refetch } = useConsultGetInputExamItemsExaminee(
+  const { isFetching, refetch } = useConsultGetInputExamItemsExaminee(
     apiVersion,
     consultNumber ?? "",
     { examMenuId: examMenuId },
@@ -110,19 +110,18 @@ export default function ConsultInput() {
     setCommonBrowserbackFlag(true);
     //受診番号の受け取り確認
     if (!consultNumber) {
-      setCommonMessage("必要な受診番号がありません");
+      setCommonMessage("必要な受診番号がありません。");
       setCommonButtonMessage("閉じる");
       openCommon();
       return;
     }
     //検査メニューIDの受け取り確認
     if (!examMenuId) {
-      setCommonMessage("必要な検査メニューIDがありません");
+      setCommonMessage("必要な検査メニューIDがありません。");
       setCommonButtonMessage("閉じる");
       openCommon();
       return;
     }
-    setIsLoading(true);
 
     //AP1009_検査結果入力情報を取得する
     const inputExamItems = async () => {
@@ -144,9 +143,12 @@ export default function ConsultInput() {
     };
 
     inputExamItems();
-    setIsLoading(false);
     setCommonBrowserbackFlag(false);
   }, [consultNumber, examMenuId]);
+
+  useEffect(() => {
+    setIsLoading(isFetching);
+  }, [isFetching]);
 
   const launchConnectionEquipment = () => {
     //ローカルストレージの監視を開始
@@ -156,7 +158,8 @@ export default function ConsultInput() {
   };
 
   useEffect(() => {
-    if (!examData.current) return;
+    if (!examData) return;
+    setCommonBrowserbackFlag(false); //検査結果入力情報の取得に成功しているため、ブラウザバックフラグをfalseに変更
 
     //機器ラベルとvalueが空かをチェック
     const isValueEmptyForEquipmentLabel = (): boolean => {
@@ -396,6 +399,7 @@ export default function ConsultInput() {
     if (!consultNumber) return;
 
     const postMutateAsync = async () => {
+      setIsLoading(true);
       try {
         result = await verifyMutateAsync({
           version: apiVersion,
@@ -444,6 +448,7 @@ export default function ConsultInput() {
         setCommonButtonMessage("閉じる");
         openCommon();
       }
+      setIsLoading(false);
     };
     postMutateAsync();
   };
@@ -451,10 +456,8 @@ export default function ConsultInput() {
   //検証処理
   const handleVerify = () => {
     setIsRegisterPressed(true);
-    setIsLoading(true);
     //AP1013_検査結果を検証する
     verifyResults();
-    setIsLoading(false);
   };
 
   // 検査継続処理
@@ -478,6 +481,7 @@ export default function ConsultInput() {
     const resultsRequest = makeBody();
     if (!consultNumber) return;
     const postMutateAsync = async () => {
+      setIsLoading(true);
       try {
         result = await registMutateAsync({
           version: apiVersion,
@@ -509,16 +513,16 @@ export default function ConsultInput() {
         setCommonButtonMessage("閉じる");
         openCommon();
       }
+      setIsLoading(false);
     };
     postMutateAsync();
   };
 
   // 登録処理
   const callbackRegister = () => {
-    setIsLoading(true);
+    closeConfirm();
     // AP1014_検査結果を登録する
     registerResults();
-    setIsLoading(false);
   };
 
   // 共通ダイアログ：閉じる処理
@@ -714,7 +718,7 @@ export default function ConsultInput() {
             ),
           )}
           {/* 登録ボタン */}
-          <Button w={860} h={75} mt={24} mb={83} onClick={handleVerify}>
+          <Button w={860} h={75} mt={24} onClick={handleVerify}>
             登録する
           </Button>
         </Stack>
@@ -733,6 +737,7 @@ export default function ConsultInput() {
           isOpen={openedCommon}
           onClose={callbackCloseCommon}
         />
+        <Space h={100} />
         <CommonFooter />
       </AuthWrapper>
     </>
