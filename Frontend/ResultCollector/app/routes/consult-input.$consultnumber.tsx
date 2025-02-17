@@ -359,26 +359,33 @@ export default function ConsultInput() {
     return updatedInputExamItems;
   };
 
-  //リクエストボディ作成
+  // リクエストボディ作成
   const makeBody = (): ResultsRequest => {
     let updatedExamData = { ...examData };
-    //通過が存在する場合、通過のvalueを更新
+
+    // 通過が存在する場合、通過のvalueを更新
     if (hasPass) {
       updatedExamData = updatedPassValue(updatedExamData);
     }
+
     if (updatedExamData) {
       const converted = {
         examMenuId: examMenuId,
         examResults: updatedExamData.examItemGroups
-          ? updatedExamData.examItemGroups?.flatMap(
+          ? updatedExamData.examItemGroups.flatMap(
               (group) =>
                 group.examItems?.map((examItem) => ({
                   examItemId: examItem.examItemId,
                   examItemDetails: examItem.examItemDetails
-                    ? examItem.examItemDetails.map((itemDetail) => ({
-                        examItemDetailId: itemDetail.examItemDetailId,
-                        value: itemDetail.value || "",
-                      }))
+                    ? examItem.examItemDetails
+                        .filter(
+                          (itemDetail) =>
+                            itemDetail.hasOrder && !itemDetail.cancelReasonId,
+                        )
+                        .map((itemDetail) => ({
+                          examItemDetailId: itemDetail.examItemDetailId,
+                          value: itemDetail.value || "",
+                        }))
                     : [],
                 })) ?? [],
             )
