@@ -70,7 +70,7 @@ export default function ConsultInput() {
     (item) => item.examMenuId === examMenuId,
   )?.equipment;
   //ローディング管理
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   //共通ダイアログ表示管理
   const [openedCommon, { open: openCommon, close: closeCommon }] =
     useDisclosure(false);
@@ -98,7 +98,7 @@ export default function ConsultInput() {
   const [initialDisplay, setInitialDisplay] = useState(true);
 
   //AP1009呼び出し用(GET系APIの定義)
-  const { refetch } = useConsultGetInputExamItemsExaminee(
+  const { isFetching, refetch } = useConsultGetInputExamItemsExaminee(
     apiVersion,
     consultNumber ?? "",
     { examMenuId: examMenuId },
@@ -121,7 +121,6 @@ export default function ConsultInput() {
       openCommon();
       return;
     }
-    setIsLoading(true);
 
     //AP1009_検査結果入力情報を取得する
     const inputExamItems = async () => {
@@ -142,9 +141,12 @@ export default function ConsultInput() {
     };
 
     inputExamItems();
-    setIsLoading(false);
     setCommonBrowserbackFlag(false);
   }, [consultNumber, examMenuId]);
+
+  useEffect(() => {
+    setIsLoading(isFetching);
+  }, [isFetching]);
 
   const launchConnectionEquipment = () => {
     //ローカルストレージの監視を開始
@@ -409,6 +411,7 @@ export default function ConsultInput() {
     if (!consultNumber) return;
 
     const postMutateAsync = async () => {
+      setIsLoading(true);
       try {
         result = await verifyMutateAsync({
           version: apiVersion,
@@ -457,6 +460,7 @@ export default function ConsultInput() {
         setCommonButtonMessage("閉じる");
         openCommon();
       }
+      setIsLoading(false);
     };
     postMutateAsync();
   };
@@ -464,10 +468,8 @@ export default function ConsultInput() {
   //検証処理
   const handleVerify = () => {
     setIsRegisterPressed(true);
-    setIsLoading(true);
     //AP1013_検査結果を検証する
     verifyResults();
-    setIsLoading(false);
   };
 
   // 検査継続処理
@@ -491,6 +493,7 @@ export default function ConsultInput() {
     const resultsRequest = makeBody();
     if (!consultNumber) return;
     const postMutateAsync = async () => {
+      setIsLoading(true);
       try {
         result = await registMutateAsync({
           version: apiVersion,
@@ -522,17 +525,16 @@ export default function ConsultInput() {
         setCommonButtonMessage("閉じる");
         openCommon();
       }
+      setIsLoading(false);
     };
     postMutateAsync();
   };
 
   // 登録処理
   const callbackRegister = () => {
-    setIsLoading(true);
     closeConfirm();
     // AP1014_検査結果を登録する
     registerResults();
-    setIsLoading(false);
   };
 
   // 共通ダイアログ：閉じる処理
