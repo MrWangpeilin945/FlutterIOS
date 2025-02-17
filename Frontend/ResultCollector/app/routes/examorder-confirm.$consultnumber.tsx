@@ -35,7 +35,7 @@ import {
   IconSquareRoundedXFilled,
   IconWifi,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useAtom } from "jotai";
 import {
@@ -697,6 +697,14 @@ export default function ExamOrderConfirm() {
     openCommonDialog();
   };
 
+  // 中止理由ダイアログのヘッダ色を取得する
+  const cancelReasonHeaderColor = useMemo(() => {
+    return (
+      sexThemeColors.find((x) => x.sex === (examContent?.examinee?.sex ?? 0))
+        ?.color || getThemeColor("green02", theme)
+    );
+  }, [examContent?.examinee?.sex]);
+
   return (
     <>
       <AuthWrapper>
@@ -1069,13 +1077,7 @@ export default function ExamOrderConfirm() {
                 closeOnClickOutside={false}
                 centered
               >
-                <Modal.Header
-                  bg={
-                    sexThemeColors.find(
-                      (x) => x.sex === (examContent?.examinee?.sex ?? 0),
-                    )?.color || getThemeColor("green02", theme)
-                  }
-                >
+                <Modal.Header bg={cancelReasonHeaderColor}>
                   <Container fluid>
                     <Text size="sm" fw={700}>
                       {cancelReasonDialogSetting?.examItemName}
