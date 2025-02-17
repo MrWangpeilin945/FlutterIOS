@@ -22,11 +22,11 @@ steps:
     db:
       query: |
         SELECT
-          count(order_number)
+          max(order_number)
         FROM
           resultcollector.organizations
     bind:
-      organizationsCount: current.rows[0].count
+      organizationsCount: current.rows[0].max
   post:
     desc: "団体を登録_正常"
     req:
