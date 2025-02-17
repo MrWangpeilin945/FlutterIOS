@@ -558,7 +558,7 @@ export default function ConsultInput() {
     // 通過フラグをリセット
     setHasPass(false);
     // 共通のコールバック関数
-    const handleChange = (updatedExamItem: InputExamItem[] | undefined) =>
+    const handleChange = (updatedExamItem: InputExamItem[] | undefined,errorLevel,number|undefined) =>
       callbackChangeValue(updatedExamItem, groupIndex);
 
     // typeによるコンポーネントの切り替え

@@ -74,10 +74,10 @@ export default function ConsultNumberInput() {
   ];
 
   useEffect(() => {
-    setIsLoading(true);
     //AP1008_未受診の検査項目を取得する
     if (consultNumberParam) {
       const fetchUnexaminedItemsSelect = async () => {
+        setIsLoading(true);
         const result = await refetch();
         if (result.data) {
           //成功時
