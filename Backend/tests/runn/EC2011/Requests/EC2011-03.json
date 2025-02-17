@@ -1,0 +1,11 @@
+[
+    {
+        "staffCode": "20110501",
+        "loginId": "S201105",
+        "name": "既存職員",
+        "password": "P@ssw0rd",
+        "enabled": true,
+        "roleId": 10,
+        "inputNote": "2011031"
+    }
+]

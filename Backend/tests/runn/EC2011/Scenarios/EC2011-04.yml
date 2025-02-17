@@ -1,0 +1,68 @@
+desc: EC2011-04 職員のログインIDを更新_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2011-04.json"
+  staffCode: "201106"
+steps:
+  getStaffs:
+    desc: "リクエスト前の職員情報を取得"
+    db:
+      query: |
+        SELECT
+          staff_code
+          , login_id
+          , name
+          , enabled
+          , role_id
+          , password_hash::text 
+          , password_salt::text
+        FROM
+          resultcollector.staffs
+        WHERE
+          staff_code = '{{ vars.staffCode }}'
+    bind:
+      staffData: current.rows[0]
+  post:
+    desc: "職員のログインIDを更新_正常"
+    req:
+      /api/v1/external/staffs:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2011-04.json
+  confirmStaffs:
+    desc: "職員情報のログインIDが変更されていることを確認"
+    db:
+      query: |
+        SELECT
+          staff_code
+          , login_id
+          , name
+          , enabled
+          , role_id
+          , password_hash::text
+          , password_salt::text
+        FROM
+          resultcollector.staffs
+        WHERE
+          staff_code = '{{ vars.staffCode }}'
+    test: |
+      len(current.rows) == 1
+      && current.rows[0].staff_code == staffData.staff_code
+      && current.rows[0].login_id == "new201106"
+      && current.rows[0].name == staffData.name
+      && current.rows[0].enabled == staffData.enabled
+      && current.rows[0].role_id == staffData.role_id
+      // パスワードハッシュ・ソルトは変更される
+      && current.rows[0].password_hash != staffData.password_hash
+      && current.rows[0].password_salt != staffData.password_salt
