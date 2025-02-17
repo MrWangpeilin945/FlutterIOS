@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   type MetaFunction,
   useNavigate,
@@ -50,7 +50,8 @@ export const meta: MetaFunction = () => {
 
 export default function ConsultInput() {
   const navigate = useNavigate();
-  const [examData, setExamData] = useState<InputExamItems>();
+  const examData = useRef<InputExamItems>();
+  const [, setRendering] = useState(false);
   // パスパラメータの取得
   const consultNumber = useParams().consultnumber ?? undefined;
   // クエリパラメータの取得
@@ -126,7 +127,8 @@ export default function ConsultInput() {
     const inputExamItems = async () => {
       const result = await refetch();
       if (result.data) {
-        setExamData(result.data.data);
+        examData.current = result.data.data;
+        setRendering(true);
       } else if (result.error) {
         if (result.error.status === 400) {
           setCommonMessage(getErrorMessage(errorMessages.invalid, "受診番号"));
@@ -157,11 +159,12 @@ export default function ConsultInput() {
 
   useEffect(() => {
     if (!examData) return;
+    setCommonBrowserbackFlag(false); //検査結果入力情報の取得に成功しているため、ブラウザバックフラグをfalseに変更
 
     //機器ラベルとvalueが空かをチェック
     const isValueEmptyForEquipmentLabel = (): boolean => {
       return (
-        examData.examItemGroups?.some((group) =>
+        examData.current?.examItemGroups?.some((group) =>
           group.examItems?.some((item) =>
             item.examItemDetails?.some(
               (detail) => detail.equipmentLabel && detail.value === "",
@@ -187,7 +190,7 @@ export default function ConsultInput() {
       }
     };
     handleRemeasurementCheck();
-  }, [examData, connectionEquipment]);
+  }, [examData.current, connectionEquipment]);
 
   //測定ボタン押下時
   const handleRemeasurement = () => {
@@ -231,7 +234,7 @@ export default function ConsultInput() {
 
       // value更新処理
       let isUpdated = false;
-      let updatedExamData = { ...examData };
+      let updatedExamData = { ...examData.current };
 
       for (const [key, value] of Object.entries(analyzedData)) {
         // valueがnullの場合は処理を行わない
@@ -263,7 +266,7 @@ export default function ConsultInput() {
           })),
         };
       }
-      setExamData(updatedExamData);
+      examData.current = updatedExamData;
       // 変更後に監視を解除
       if (isWatching) {
         setIsWatching(false);
@@ -299,31 +302,16 @@ export default function ConsultInput() {
     groupIndex: number,
   ) => {
     if (newExamItems) {
-      setExamData((prevData) => {
-        if (!prevData) {
-          return {
-            examItemGroups: [],
-          };
-        }
-
-        // 初期値を設定
-        const updatedExamItemGroups = (prevData.examItemGroups || []).map(
-          (group, gIndex) => {
-            if (gIndex !== groupIndex) {
-              return group; // 他のグループはそのまま返す
-            }
-            return {
-              ...group,
-              examItems: newExamItems, // 対象のグループの examItems を更新
-            };
-          },
-        );
-
-        return {
-          ...prevData,
-          examItemGroups: updatedExamItemGroups, // 更新されたグループを反映
-        };
-      });
+      examData.current = {
+        ...examData.current,
+        examItemGroups:
+          examData.current?.examItemGroups?.map(
+            (group, gIndex) =>
+              gIndex === groupIndex
+                ? { ...group, examItems: newExamItems } // 対象のグループの `examItems` を更新
+                : group, // 他のグループはそのまま
+          ) ?? [],
+      };
     }
   };
 
@@ -361,9 +349,8 @@ export default function ConsultInput() {
 
   // リクエストボディ作成
   const makeBody = (): ResultsRequest => {
-    let updatedExamData = { ...examData };
-
-    // 通過が存在する場合、通過のvalueを更新
+    let updatedExamData = { ...examData.current };
+    //通過が存在する場合、通過のvalueを更新
     if (hasPass) {
       updatedExamData = updatedPassValue(updatedExamData);
     }
@@ -457,7 +444,7 @@ export default function ConsultInput() {
             );
 
             errorBranch(maxErrorLevel);
-            setExamData(error.response.data);
+            examData.current = error.response.data;
           } else if (status === 500) {
             errorMessage = getErrorMessage(errorMessages.serverError);
           }
@@ -698,13 +685,15 @@ export default function ConsultInput() {
         {/* 受診者ヘッダー */}
         <ExamineeHeader
           staffName={staffData?.name ?? ""}
-          managerNo={examData?.examinee?.ticketNumber ?? ""}
-          name={examData?.examinee?.kanaName ?? ""}
-          gender={examData?.examinee?.sex ?? 0}
-          age={examData?.examinee?.examDateAge ?? 0}
+          managerNo={examData.current?.examinee?.ticketNumber ?? ""}
+          name={examData.current?.examinee?.kanaName ?? ""}
+          gender={examData.current?.examinee?.sex ?? 0}
+          age={examData.current?.examinee?.examDateAge ?? 0}
         />
         {/* ブース特記 */}
-        <BoothNote relatedExamItems={examData?.relatedExamItems ?? []} />
+        <BoothNote
+          relatedExamItems={examData.current?.relatedExamItems ?? []}
+        />
         <Stack align="center" gap={32} px={32} mt={32}>
           {/* 測定ボタン */}
           {visibleRemeasurement && (
@@ -725,7 +714,7 @@ export default function ConsultInput() {
             </Button>
           )}
           {/* 検査項目コンポーネント */}
-          {examData?.examItemGroups?.map(
+          {examData.current?.examItemGroups?.map(
             (examItemGroup: ExamItemGroup, index: number) => (
               <ExamItemRender
                 key={index}
