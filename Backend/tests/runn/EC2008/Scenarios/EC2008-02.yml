@@ -7,7 +7,6 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2008-02.json"
-  organizationCode: "G200804"
 steps:
   getOrganizations:
     desc: "団体情報の取得"
@@ -20,9 +19,11 @@ steps:
         FROM
           resultcollector.organizations
         WHERE
-          organization_code = '{{ vars.organizationCode }}'
+          organization_code in ('G200804', 'G200805')
+        ORDER BY
+          organization_code ASC
     bind:
-      organizationsData: current.rows[0]
+      organizationsData: current.rows
   post:
     desc: "団体を更新_正常"
     req:
@@ -35,7 +36,7 @@ steps:
       current.res.status == 200
     dump:
       expr: current.res.body
-      out: ../Dump/EC2008-01.json
+      out: ../Dump/EC2008-02.json
   confirmTeams:
     desc: "団体の更新を確認"
     db:
@@ -47,9 +48,16 @@ steps:
         FROM
           resultcollector.organizations
         WHERE
-          organization_code = '{{ vars.organizationCode }}'
+          organization_code in ('G200804', 'G200805')
+        ORDER BY
+          organization_code ASC
     test: |
-      len(current.rows) == 1
-      && current.rows[0].organization_code == organizationsData.organization_code
+      len(current.rows) == 2
+      // リクエストの団体の名称が変更されたことを確認
+      && current.rows[0].organization_code == organizationsData[0].organization_code
       && current.rows[0].name == "新日本株式会社"
-      && current.rows[0].order_number == organizationsData.order_number
+      && current.rows[0].order_number == organizationsData[0].order_number
+      // リクエストに存在しない団体の名称は変更されないことを確認
+      && current.rows[1].organization_code == organizationsData[1].organization_code
+      && current.rows[1].name == organizationsData[1].name
+      && current.rows[1].order_number == organizationsData[1].order_number
