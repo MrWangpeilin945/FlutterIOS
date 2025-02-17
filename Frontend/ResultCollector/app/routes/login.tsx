@@ -202,6 +202,7 @@ export default function Login() {
                 autoComplete="one-time-code"
                 onChange={(e) => setPassword(e.target.value)}
                 maxLength={20}
+                rightSectionWidth={70}
                 styles={{
                   input: {
                     height: 68,
@@ -209,6 +210,9 @@ export default function Login() {
                   },
                   innerInput: {
                     padding: "16px 32px",
+                  },
+                  visibilityToggle: {
+                    transform: "scale(2)",
                   },
                 }}
               />
