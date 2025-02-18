@@ -172,7 +172,7 @@ export default function Login() {
           <Image src="./wellship-logo.svg" w={566} h={131} />
           <Space h={128} />
           <Flex columnGap={16}>
-            <Group w="486" justify="flex-end">
+            <Group w="490" justify="flex-end">
               <Text size="sm" c="black01" ta="right">
                 ログインID
               </Text>
@@ -193,7 +193,7 @@ export default function Login() {
           </Flex>
           <Space h={16} />
           <Flex columnGap={16}>
-            <Group w="486" justify="flex-end">
+            <Group w="490" justify="flex-end">
               <Text size="sm" c="black01" ta="right">
                 パスワード
               </Text>
