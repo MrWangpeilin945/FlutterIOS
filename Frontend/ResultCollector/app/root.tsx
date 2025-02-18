@@ -30,9 +30,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
     });
   };
   useEffect(() => {
+    // 画面のスケールを計算して適用する
+    applyDisplayScale();
+
     // API呼び出し時に401が返ってきたらログアウトするための関数をaxiosInstanceに引き渡す
     setupAxiosInterceptors(handleLogout);
   }, []);
+
+  const applyDisplayScale = () => {
+    // DPRからスケールを求める
+    const scale = 1 / window.devicePixelRatio;
+
+    // metaタグのviewportのscaleを置き換える
+    let viewportMeta = document.querySelector("meta[name=viewport]");
+    if (!viewportMeta) {
+      viewportMeta = document.createElement("meta");
+      (viewportMeta as HTMLMetaElement).name = "viewport";
+      document.head.appendChild(viewportMeta);
+    }
+
+    // scaleが0未満の時、デリミタが","だとiPadで反応しないので";"にする
+    (viewportMeta as HTMLMetaElement).content =
+      `width=device-width; initial-scale=${scale}; user-scalable=no`;
+  };
 
   return (
     <html lang="ja">
