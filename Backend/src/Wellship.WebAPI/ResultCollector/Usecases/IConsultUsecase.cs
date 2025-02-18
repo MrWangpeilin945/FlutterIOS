@@ -33,7 +33,7 @@ public interface IConsultUsecase
     /// <summary>
     /// 前提検査メニューを検証する
     /// </summary>
-    public Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenus(string consultNumber, int examMenuId);
+    public Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenusAsync(string consultNumber, int examMenuId);
 
     /// <summary>
     /// AP1009_検査結果入力情報を取得する
@@ -53,7 +53,7 @@ public interface IConsultUsecase
     /// <summary>
     /// AP1014_検査結果を登録する
     /// </summary>
-    public Task RegisterResultsAsync(string consultNumber, ResultsRequest results);    
+    public Task RegisterResultsAsync(string consultNumber, ResultsRequest results);
 
     /// <summary>
     /// AP1013_検査結果を検証する

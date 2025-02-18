@@ -157,7 +157,16 @@ public class ConsultUsecase : IConsultUsecase
                                                {
                                                    ErrorLevel = (int)x.ErrorLevel,
                                                    Description = x.Message
-                                               }).ToArray();
+                                               });
+
+        // 前提検査メニューで検証する
+        var priorExamMenus = await ValidatePriorExamMenusAsync(consultNumber, examMenuId);
+        var priorExamMenusResults = priorExamMenus.OrderBy(x => x.MenuId)
+                                                  .Select(x => new ExamDecisionResult()
+                                                  {
+                                                      ErrorLevel = (int)InputErrorLevel.異常,
+                                                      Description = $"{x.MenuName}が終わっていないため、開始できません。"
+                                                  });
 
         return new ExamContent()
         {
@@ -179,7 +188,7 @@ public class ConsultUsecase : IConsultUsecase
             RelatedExamItems = relatedExamItems,
             ExamItems = examItemGroups.OrderBy(group => group.ExamItemGroupId)
                                       .SelectMany(group => group.ExamItems)
-                                      .OrderBy(Item => Item.PositionNumber)
+                                      .OrderBy(item => item.PositionNumber)
                                       .Select(item => new ExamDetail
                                       {
                                           ExamItemId = item.ExamItemId,
@@ -194,7 +203,7 @@ public class ConsultUsecase : IConsultUsecase
                                                                       .Select(x => (int?)x.CancelReasonId)
                                                                       .FirstOrDefault()
                                       }).ToArray(),
-            ExamDecisionResults = examDecisionResults.ToArray(),
+            ExamDecisionResults = priorExamMenusResults.Union(examDecisionResults).ToArray(),
             UnexaminedItems = unexaminedItems.UnexaminedMenus.Select(x => new ExamMenu
             {
                 ExamMenuId = x.ExamMenuId,
@@ -250,7 +259,7 @@ public class ConsultUsecase : IConsultUsecase
     /// 前提検査メニューを検証する
     /// 前提検査メニューのうち、未受診の検査メニューがあれば返却する
     /// </summary>
-    public async Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenus(string consultNumber, int examMenuId)
+    public async Task<IEnumerable<Domain.Models.ExamMenu>> ValidatePriorExamMenusAsync(string consultNumber, int examMenuId)
     {
         // 未受診の検査メニューを取得する
         var unexaminedList = await _consultRepository.GetUnexaminedConsultsAsync([consultNumber]);

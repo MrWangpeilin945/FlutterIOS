@@ -1833,4 +1833,106 @@ public class ConsultUsecaseTests
         // Assert
         response.Should().BeEquivalentTo(verifyExamItems);
     }
+
+    [Fact]
+    public async Task 未受診の検査メニューがない場合は空のリストを返す()
+    {
+        // Arrange
+        var consultNumber = "12345";
+        var examMenuId = 1;
+
+        // 未受診の検査メニューなし
+        _consultRepositoryMock.Setup(repo => repo.GetUnexaminedConsultsAsync(It.IsAny<string[]>()))
+                              .ReturnsAsync(new List<UnexaminedConsult>());
+
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
+                                 _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                 _staffIdentityProviderMock.Object);
+
+        // Act
+        var result = await usecase.ValidatePriorExamMenusAsync(consultNumber, examMenuId);
+
+        // Assert
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task 現在の検査メニューに対する前提検査メニューの設定がない場合は空のリストを返す()
+    {
+        // Arrange
+        var consultNumber = "12345";
+        var examMenuId = 1;
+
+        // 受診者に対する未受診の検査メニューあり
+        var unexaminedConsult = new UnexaminedConsult()
+        {
+            ExamineeId = Guid.NewGuid(),
+            ConsultId = Guid.NewGuid(),
+            ConsultNumber = consultNumber,
+            UnexaminedExamMenus = [new UnexaminedExamMenu { ExamMenuId = 2, ExamMenuName = "テストメニュー" }]
+        };
+
+        _consultRepositoryMock.Setup(repo => repo.GetUnexaminedConsultsAsync(It.IsAny<string[]>()))
+                              .ReturnsAsync(new List<UnexaminedConsult> { unexaminedConsult });
+
+        // 現在の検査メニューに対する前提検査メニューの設定なし
+        _examMenuRepositoryMock.Setup(repo => repo.GetPriorExamMenusAsync(It.IsAny<int>()))
+                               .ReturnsAsync((PriorExamMenu?)null);
+
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
+                                 _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                 _staffIdentityProviderMock.Object);
+
+        // Act
+        var result = await usecase.ValidatePriorExamMenusAsync(consultNumber, examMenuId);
+
+        // Assert
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task 前提検査メニューの設定があり未受診の検査メニューが含まれる場合はそれを返す()
+    {
+        // Arrange
+        var consultNumber = "12345";
+        var examMenuId = 1;
+
+        // 受診者に対する未受診の検査メニューあり
+        var unexaminedConsult = new UnexaminedConsult()
+        {
+            ExamineeId = Guid.NewGuid(),
+            ConsultId = Guid.NewGuid(),
+            ConsultNumber = consultNumber,
+            UnexaminedExamMenus = [
+                new UnexaminedExamMenu { ExamMenuId = 2, ExamMenuName = "テストメニュー2" },
+                new UnexaminedExamMenu { ExamMenuId = 3, ExamMenuName = "テストメニュー3" },
+                new UnexaminedExamMenu { ExamMenuId = 4, ExamMenuName = "テストメニュー4" }
+            ]
+        };
+
+        _consultRepositoryMock.Setup(repo => repo.GetUnexaminedConsultsAsync(It.IsAny<string[]>()))
+                              .ReturnsAsync([unexaminedConsult]);
+
+        // 現在の検査メニューに対する前提検査メニューの設定あり
+        var priorExamMenu = new PriorExamMenu(examMenuId, [2, 4, 6]);
+        _examMenuRepositoryMock.Setup(repo => repo.GetPriorExamMenusAsync(It.IsAny<int>()))
+                               .ReturnsAsync(priorExamMenu);
+
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
+                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                         _staffIdentityProviderMock.Object);
+
+
+        // 前提検査メニューのうち、未受診の検査メニューは2と4
+        var expectedResults = new List<ExamMenu>() {
+            new(){MenuId = 2, MenuName = "テストメニュー2"},
+            new(){MenuId = 4, MenuName = "テストメニュー4"}
+         };
+
+        // Act
+        var result = await usecase.ValidatePriorExamMenusAsync(consultNumber, examMenuId);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedResults);
+    }
 }
