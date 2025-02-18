@@ -211,7 +211,7 @@ export default function ConsultNumberInput() {
       <AuthWrapper>
         <LoadingOverlay visible={isLoading} />
         <CommonHeader screenName="受診番号入力" staffName={staff?.name || ""} />
-        <Container fluid bg="background" py={32} px={24}>
+        <Container fluid bg="background" py={32} pt={24}>
           {!isFetching && (
             <>
               <Group gap={24} wrap="nowrap">
@@ -294,6 +294,7 @@ export default function ConsultNumberInput() {
             </>
           )}
         </Container>
+        <Space h={100}/>
         <CommonFooter items={footerItems} />
       </AuthWrapper>
     </>
