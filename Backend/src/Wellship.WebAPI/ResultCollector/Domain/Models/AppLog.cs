@@ -27,12 +27,13 @@ public class AppLog
     /// <summary>
     /// 付加情報のJSON文字列
     /// </summary>
-    public string DetailsJson
+    public string DetailsJsonString
     {
         get
         {
             if (Details is null)
             {
+                // 付加情報がnullなら、jsonの空オブジェクトとする
                 return "{}";
             }
 
@@ -41,6 +42,7 @@ public class AppLog
             {
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 Converters = { new JsonStringEnumConverter() }
             };
 

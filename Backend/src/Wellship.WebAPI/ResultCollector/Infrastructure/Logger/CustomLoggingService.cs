@@ -1,3 +1,4 @@
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
@@ -28,28 +29,49 @@ public sealed class CustomLoggingService : ICustomLoggingService
     /// <inheritdoc/>
     public async Task LogInfoAsync(string message, Dictionary<string, object>? details = null)
     {
-        await LogAsync(LogLevel.Information, message, details);
+        // アラート通知用のためNLog経由で標準出力
+        // TODO: テナントキーを構造化ログに出す（CloudWatchのアラート通知フィルタ用）
+        var tenantKey = _tenantProvider.TenantKey;
+
+        await LogAsync(LogLevel.Information, ErrorCode.None, message, details);
+        _logger.LogWithDetails(LogLevel.Information, ErrorCode.None, message, tenantKey);
     }
 
     /// <inheritdoc/>
-    public async Task LogWarnAsync(string message, Dictionary<string, object>? details = null)
+    public async Task LogWarnAsync(string message, ErrorCode errorCode, Dictionary<string, object>? details = null)
     {
-        await LogAsync(LogLevel.Warning, message, details);
+        // アラート通知用のためNLog経由で標準出力
+        // TODO: テナントキーを構造化ログに出す（CloudWatchのアラート通知フィルタ用）
+        var tenantKey = _tenantProvider.TenantKey;
+
+        await LogAsync(LogLevel.Warning, errorCode, message, details);
+        _logger.LogWithDetails(LogLevel.Warning, errorCode, message, tenantKey);
     }
 
     /// <inheritdoc/>
-    public async Task LogErrorAsync(string message, Dictionary<string, object>? details = null)
+    public async Task LogErrorAsync(string message, ErrorCode errorCode, Dictionary<string, object>? details = null)
     {
-        await LogAsync(LogLevel.Error, message, details);
 
         // アラート通知用のためNLog経由で標準出力
         // TODO: テナントキーを構造化ログに出す（CloudWatchのアラート通知フィルタ用）
         var tenantKey = _tenantProvider.TenantKey;
-        _logger.LogError(message);
+
+        await LogAsync(LogLevel.Error, errorCode, message, details);
+        _logger.LogWithDetails(LogLevel.Error, errorCode, message, tenantKey);
     }
 
-    private async Task LogAsync(LogLevel level, string message, Dictionary<string, object>? details)
+    /// <summary>
+    /// データベースにログを書き込みます。
+    /// </summary>
+    private async Task LogAsync(LogLevel level, ErrorCode errorCode, string message, Dictionary<string, object>? details)
     {
+        // detailsにerrorCodeを追加。ただしdetailsにErrorCodeがキーの要素があれば上書きする
+        if (errorCode != ErrorCode.None)
+        {
+            details ??= [];
+            details["ErrorCode"] = errorCode.ToString();
+        }
+
         var log = new AppLog()
         {
             LogLevel = level,
@@ -57,7 +79,7 @@ public sealed class CustomLoggingService : ICustomLoggingService
             Details = details
         };
 
-        // データベースに書き込み
+        // データベースに書き込む
         await _logRepository.WriteLogAsync(log);
     }
 }

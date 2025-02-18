@@ -1,3 +1,5 @@
+using Ryobi.Wellship.Core.Enums;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Logger;
 
 /// <summary>
@@ -19,13 +21,15 @@ public interface ICustomLoggingService
     /// WARNログを書き込みます。
     /// </summary>
     /// <param name="message">メッセージ</param>
+    /// <param name="errorCode">エラーコード</param>
     /// <param name="details">付加情報</param>
-    Task LogWarnAsync(string message, Dictionary<string, object>? details = null);
+    Task LogWarnAsync(string message, ErrorCode errorCode, Dictionary<string, object>? details = null);
 
     /// <summary>
     /// ERRORログを書き込みます。
     /// </summary>
     /// <param name="message">メッセージ</param>
+    /// <param name="errorCode">エラーコード</param>
     /// <param name="details">付加情報</param>
-    Task LogErrorAsync(string message, Dictionary<string, object>? details = null);
+    Task LogErrorAsync(string message, ErrorCode errorCode, Dictionary<string, object>? details = null);
 }

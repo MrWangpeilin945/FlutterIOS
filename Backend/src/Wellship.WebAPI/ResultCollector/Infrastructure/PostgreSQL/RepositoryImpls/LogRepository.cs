@@ -38,9 +38,9 @@ public class LogRepository : ILogRepository
 
         await connection.ExecuteAsync(sql, new
         {
-            LogLevel = appLog.LogLevel.ToNLogLevel().ToString(),
+            LogLevel = appLog.LogLevel.ToNLogLevel().ToString().ToUpperInvariant(), // ログレベルはNLog形式の大文字とする
             Message = appLog.Message,
-            Details = appLog.DetailsJson,
+            Details = appLog.DetailsJsonString,
             CreatedBy = "logger"
         });
     }
