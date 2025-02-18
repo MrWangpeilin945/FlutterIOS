@@ -29,8 +29,6 @@ public sealed class CustomLoggingService : ICustomLoggingService
     /// <inheritdoc/>
     public async Task LogInfoAsync(string message, Dictionary<string, object>? details = null)
     {
-        // アラート通知用のためNLog経由で標準出力
-        // TODO: テナントキーを構造化ログに出す（CloudWatchのアラート通知フィルタ用）
         var tenantKey = _tenantProvider.TenantKey;
 
         await LogAsync(LogLevel.Information, ErrorCode.None, message, details);
@@ -40,8 +38,6 @@ public sealed class CustomLoggingService : ICustomLoggingService
     /// <inheritdoc/>
     public async Task LogWarnAsync(string message, ErrorCode errorCode, Dictionary<string, object>? details = null)
     {
-        // アラート通知用のためNLog経由で標準出力
-        // TODO: テナントキーを構造化ログに出す（CloudWatchのアラート通知フィルタ用）
         var tenantKey = _tenantProvider.TenantKey;
 
         await LogAsync(LogLevel.Warning, errorCode, message, details);
@@ -51,9 +47,6 @@ public sealed class CustomLoggingService : ICustomLoggingService
     /// <inheritdoc/>
     public async Task LogErrorAsync(string message, ErrorCode errorCode, Dictionary<string, object>? details = null)
     {
-
-        // アラート通知用のためNLog経由で標準出力
-        // TODO: テナントキーを構造化ログに出す（CloudWatchのアラート通知フィルタ用）
         var tenantKey = _tenantProvider.TenantKey;
 
         await LogAsync(LogLevel.Error, errorCode, message, details);
