@@ -287,7 +287,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
                 where 
                     consult_number = @ConsultNumber
                 )
-            and e.kana_name = (
+            and (e.kana_name = (
                 select 
                     e2.kana_name
                 from 
@@ -297,6 +297,16 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
                 where 
                     c2.consult_number = @ConsultNumber
             )
+            or e.name = (
+                select 
+                    e3.name
+                from 
+                    resultcollector.consult c3
+                    left join resultcollector.examinees e3
+                        on c3.examinee_id = e3.examinee_id
+                where 
+                    c3.consult_number = @ConsultNumber
+            ))
             and c.place_schedule_id = (
                 select
                     place_schedule_id

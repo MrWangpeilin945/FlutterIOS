@@ -1,4 +1,4 @@
-desc: AP1010-01 検査内容取得_同姓同名チェック [なし]
+desc: AP1010-01 検査内容取得_同姓同名チェック [漢字氏名・カナ氏名なし]
 runners:
   req:
     endpoint: ${BACKEND_URL}
