@@ -396,12 +396,18 @@ public class ConsultUsecase : IConsultUsecase
             var inputValues = rule.ExamItemDetails.OrderBy(x => x.VariableNumber)
                                                   .Select(x => x.SourceType switch
                                                   {
-                                                      SourceType.今回値 => concatenatedCurrentResults.TryGetValue(x.ExamItemDetailId, out var currVal) ? currVal : "",
-                                                      SourceType.前回値 => preResults.TryGetValue(x.ExamItemDetailId, out var prevVal) ? prevVal : "",
+                                                      SourceType.今回値 => concatenatedCurrentResults.TryGetValue(x.ExamItemDetailId, out var currVal) ? currVal : null,
+                                                      SourceType.前回値 => preResults.TryGetValue(x.ExamItemDetailId, out var prevVal) ? prevVal : null,
                                                       _ => throw new NotSupportedException(nameof(x.SourceType))
                                                   }).ToList();
 
-            var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues, conditionValues, errorLevel);
+            // 結果レコードがない場合はトリガーを無効にする
+            if (inputValues.Any(x => x is null))
+            {
+                continue;
+            }
+
+            var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues!, conditionValues, errorLevel);
 
             // トリガーの条件に一致すればエラーに追加する
             if (trigger.IsMatch())
@@ -449,12 +455,18 @@ public class ConsultUsecase : IConsultUsecase
             var inputValues = rule.ExamItemDetails.OrderBy(x => x.VariableNumber)
                                                   .Select(x => x.SourceType switch
                                                   {
-                                                      SourceType.今回値 => currentResults.TryGetValue(x.ExamItemDetailId, out var currVal) ? currVal : "",
-                                                      SourceType.前回値 => preResults.TryGetValue(x.ExamItemDetailId, out var prevVal) ? prevVal : "",
+                                                      SourceType.今回値 => currentResults.TryGetValue(x.ExamItemDetailId, out var currVal) ? currVal : null,
+                                                      SourceType.前回値 => preResults.TryGetValue(x.ExamItemDetailId, out var prevVal) ? prevVal : null,
                                                       _ => throw new NotSupportedException(nameof(x.SourceType))
                                                   }).ToList();
 
-            var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues, conditionValues, errorLevel);
+            // 結果レコードがない場合はトリガーを無効にする
+            if (inputValues.Any(x => x is null))
+            {
+                continue;
+            }
+
+            var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues!, conditionValues, errorLevel);
 
             // トリガーの条件に一致すればエラーに追加する
             if (trigger.IsMatch())
