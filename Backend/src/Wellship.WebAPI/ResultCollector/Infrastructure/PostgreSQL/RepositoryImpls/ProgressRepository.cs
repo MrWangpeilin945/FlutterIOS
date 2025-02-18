@@ -140,8 +140,14 @@ public class ProgressRepository : IProgressRepository
             検査項目集計 ag 
             left join resultcollector.exam_items items 
                 on ag.ExamItemId = items.exam_item_id 
+            left join resultcollector.exam_item_groups groups 
+                on items.exam_item_group_id = groups.exam_item_group_id 
+            left join resultcollector.exam_menus menus 
+                on groups.exam_menu_id = menus.exam_menu_id
         order by
-            items.order_number;";
+            menus.order_number
+            , groups.order_number
+            , items.order_number;";
 
         var response = await connection.QueryAsync<AggregatedProgressDetail>(sql, new { PlaceScheduleId = placeScheduleId });
 
