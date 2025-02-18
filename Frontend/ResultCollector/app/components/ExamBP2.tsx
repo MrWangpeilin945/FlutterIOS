@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -128,6 +128,9 @@ export default function ExamBP2({
     });
   };
 
+  //初期表示フラグ
+  const isInitialDisplay = useRef(true);
+
   // 初回読み込み時にAPIのエラーメッセージを保存する
   useEffect(() => {
     const backendErrorMessages: BackendValidation[] = examItems.map((item) => ({
@@ -138,10 +141,16 @@ export default function ExamBP2({
   }, []);
 
   useEffect(() => {
-    const updatedItems = examItems.map((item) => {
+    let updatedItems = examItems.map((item) => {
       const validatedData = validationCheck(item).validateResult;
       return validatedData;
     });
+    //初期表示以外は平均値を計算
+    if (!isInitialDisplay.current) {
+      updatedItems = calculateAverage(updatedItems);
+    } else {
+      isInitialDisplay.current = false;
+    }
     setExamItemsData(updatedItems);
   }, [onRegisterPressed, examItems]);
 
