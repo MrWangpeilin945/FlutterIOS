@@ -1,4 +1,4 @@
-desc: AP1010-01 検査内容取得_同姓同名チェック [カナ氏名あり]
+desc: AP1010-01 検査内容取得_同姓同名チェック [漢字氏名あり]
 runners:
   req:
     endpoint: ${BACKEND_URL}
@@ -6,7 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  consultNumber: "10101"
+  consultNumber: "10105"
   examMenuId: 1
 steps:
   getAccessToken:
@@ -23,9 +23,9 @@ steps:
             Authorization: "Bearer {{ steps.getAccessToken.token }}"
     test: |
       current.res.status == 200
-      // 同姓同名あり
+      // 漢字氏名が一致
       && current.res.body.examinee.sameNameAlert == true
     dump:
       expr: current.res.body
-      out: ../Dump/AP1010-05.json
+      out: ../Dump/AP1010-07.json
 
