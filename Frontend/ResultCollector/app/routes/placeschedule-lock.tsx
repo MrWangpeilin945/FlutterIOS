@@ -12,7 +12,7 @@ import { useSearchParams } from "@remix-run/react";
 import { isAxiosError } from "axios";
 import { format } from "date-fns";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   usePlaceScheduleGetPlaceScheduleLockingStatus,
   usePlaceScheduleUpdatePlaceScheduleLockingStatus,
@@ -25,6 +25,7 @@ import ConfirmDialog from "~/components/ConfirmDialog";
 import PlaceSchedule from "~/components/PlaceSchedule";
 import { PlaceScheduleLockingStatus } from "~/domain/enums";
 import type {
+  PlaceSchedule as PlaceScheduleType,
   PlaceScheduleLocking,
   PlaceScheduleLockingRequest,
 } from "~/domain/wellship.schemas";
@@ -41,6 +42,7 @@ export default function PlaceScheduleLock() {
   const [isLoading, setIsLoading] = useState(false);
   const [staff] = useAtom(staffState);
   const [placeSchedule] = useAtom(placeScheduleState);
+  const firstPlaceSchedule = useRef<PlaceScheduleType>();
   const [examDate] = useAtom(examDateState);
   const [opened, { open, close }] = useDisclosure(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -66,7 +68,7 @@ export default function PlaceScheduleLock() {
   //AP1016呼び出し用(GET系APIの定義)
   const { isFetching, refetch } = usePlaceScheduleGetPlaceScheduleLockingStatus(
     "1",
-    placeScheduleId || placeSchedule?.placeScheduleId || "",
+    placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
     { query: { enabled: false } },
   );
 
@@ -92,6 +94,7 @@ export default function PlaceScheduleLock() {
   };
 
   useEffect(() => {
+    firstPlaceSchedule.current = placeSchedule ?? {};
     fetchGetPlaceScheduleLocking();
   }, []);
 
@@ -114,7 +117,8 @@ export default function PlaceScheduleLock() {
   const fetchUpdateLockingStatus = async () => {
     // POST時のリクエストボディを生成する
     const body: PlaceScheduleLockingRequest = {
-      placeScheduleId: placeSchedule?.placeScheduleId || "",
+      placeScheduleId:
+        placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
       placeScheduleLockingStatus: processStatus || 0,
     };
 
@@ -167,53 +171,53 @@ export default function PlaceScheduleLock() {
               {placeScheduleLock ? (
                 <>
                   <Space h={40} />
-                    <Container ta="center" mt={40} mb={300}>
-                      {statusButton?.map((button) => (
-                        <Button
-                          w={860}
-                          h={75}
-                          px={32}
-                          py={16}
-                          bd="2px solid"
-                          variant="outline"
-                          bg={
-                            placeScheduleLock.placeScheduleLockingStatus ===
-                            button.placeScheduleLockingStatus
-                              ? "green03"
-                              : "white"
-                          }
-                          color={
+                  <Container ta="center" mt={40} mb={300}>
+                    {statusButton?.map((button) => (
+                      <Button
+                        w={860}
+                        h={75}
+                        px={32}
+                        py={16}
+                        bd="2px solid"
+                        variant="outline"
+                        bg={
+                          placeScheduleLock.placeScheduleLockingStatus ===
+                          button.placeScheduleLockingStatus
+                            ? "green03"
+                            : "white"
+                        }
+                        color={
+                          placeScheduleLock.placeScheduleLockingStatus ===
+                          button.placeScheduleLockingStatus
+                            ? "primary"
+                            : "gray03"
+                        }
+                        key={button.placeScheduleLockingStatus}
+                        onClick={() =>
+                          handleButtonClick(button.placeScheduleLockingStatus)
+                        }
+                        mb={
+                          button.placeScheduleLockingStatus ===
+                          PlaceScheduleLockingStatus.検査完了
+                            ? 32
+                            : 0
+                        }
+                      >
+                        <Text
+                          size="xl"
+                          fw={700}
+                          c={
                             placeScheduleLock.placeScheduleLockingStatus ===
                             button.placeScheduleLockingStatus
                               ? "primary"
-                              : "gray03"
-                          }
-                          key={button.placeScheduleLockingStatus}
-                          onClick={() =>
-                            handleButtonClick(button.placeScheduleLockingStatus)
-                          }
-                          mb={
-                            button.placeScheduleLockingStatus ===
-                            PlaceScheduleLockingStatus.検査完了
-                              ? 32
-                              : 0
+                              : "black01"
                           }
                         >
-                          <Text
-                            size="xl"
-                            fw={700}
-                            c={
-                              placeScheduleLock.placeScheduleLockingStatus ===
-                              button.placeScheduleLockingStatus
-                                ? "primary"
-                                : "black01"
-                            }
-                          >
-                            {button.buttonName}
-                          </Text>
-                        </Button>
-                      ))}
-                    </Container>
+                          {button.buttonName}
+                        </Text>
+                      </Button>
+                    ))}
+                  </Container>
                   <Flex justify="flex-end">
                     <Text size="xs" c="black01" ta="right">
                       最終更新者：{placeScheduleLock.updatedBy}（
