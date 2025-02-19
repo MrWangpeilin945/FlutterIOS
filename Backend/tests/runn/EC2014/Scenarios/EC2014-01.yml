@@ -8,15 +8,18 @@ runners:
 vars:
   request: "json://../Requests/EC2014-01.json"
 steps:
-  deleteInsertorganizations:
-    desc: "挿入する基準値パターンを削除する"
+  clearTable:
+    desc: "基準値パターンテーブルのクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.thresholds CASCADE
+  insertData:
+    desc: "基準値パターンテーブルに実行前データを登録"
     db:
       query: |
-        DELETE
-        FROM
+        INSERT INTO
           resultcollector.thresholds
-        WHERE
-          threshold_code in ('T201401', 'T201402', 'T201403')
+          (threshold_code, name, order_number, created_at, created_by)
+        VALUES('T201499', '婦人科検診', 99, CURRENT_TIMESTAMP, 'ex2014')
   getOrderNumber:
     desc: "表示順の取得"
     db:

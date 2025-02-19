@@ -8,6 +8,19 @@ runners:
 vars:
   request: "json://../Requests/EC2014-02.json"
 steps:
+  clearTable:
+    desc: "基準値パターンテーブルのクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.thresholds CASCADE
+  insertData:
+    desc: "基準値パターンテーブルに実行前データを登録"
+    db:
+      query: |
+        INSERT INTO
+          resultcollector.thresholds
+          (threshold_code, name, order_number, created_at, created_by)
+        VALUES('T201404', '日帰りドック', 1, CURRENT_TIMESTAMP, 'ex2014')
+        ,     ('T201405', '宿泊ドック', 2, CURRENT_TIMESTAMP, 'ex2014')
   getOrganizations:
     desc: "基準値パターン情報の取得"
     db:
