@@ -7,7 +7,8 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2009-05.json"
-  errorMessage: "キー項目が重複しています。"
+  errorMessage1: "キー項目が重複しています。Code:EC2009/EC2009HGB/男/750000/10.6"
+  errorMessage2: "キー項目が重複しています。Code:EC2009/EC2009HGB/男/0750000/10.6"
 steps:
   post:
     desc: "PKが重複するレコードが存在する"
@@ -23,10 +24,10 @@ steps:
       && len(current.res.body) == 2
       && current.res.body[0].code == "10003"
       && current.res.body[0].inputNote == "2009051"
-      && current.res.body[0].message startsWith vars.errorMessage
+      && current.res.body[0].message == vars.errorMessage1
       && current.res.body[1].code == "10003"
       && current.res.body[1].inputNote == "2009052"
-      && current.res.body[1].message startsWith vars.errorMessage
+      && current.res.body[1].message == vars.errorMessage2
     dump:
       expr: current.res.body
       out: ../Dump/EC2009-05.json

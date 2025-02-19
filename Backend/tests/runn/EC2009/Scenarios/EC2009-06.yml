@@ -7,8 +7,8 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2009-06.json"
-  errorThresholdMessage: "指定されたThresholdCdがシステム上に存在しません。"
-  errorExamItemDetailMessage: "指定されたExamItemDetailCdがシステム上に存在しません。"
+  errorThresholdMessage: "指定されたThresholdCdがシステム上に存在しません。Code:Dummy2009"
+  errorExamItemDetailMessage: "指定されたExamItemDetailCdがシステム上に存在しません。Code:Dummy2009HGB"
 steps:
   post:
     desc: "基準値パターン・検査項目明細IDが取得できない"
@@ -24,11 +24,11 @@ steps:
       // 基準値パターンエラーがErrorObjectで返される
       && current.res.body[0].code == "10001"
       && current.res.body[0].inputNote == "2009061"
-      && current.res.body[0].message startsWith vars.errorThresholdMessage
+      && current.res.body[0].message == vars.errorThresholdMessage
       // 基準値パターンエラーがErrorObjectで返される
       && current.res.body[1].code == "10001"
       && current.res.body[1].inputNote == "2009061"
-      && current.res.body[1].message startsWith vars.errorExamItemDetailMessage
+      && current.res.body[1].message == vars.errorExamItemDetailMessage
     dump:
       expr: current.res.body
       out: ../Dump/EC2009-06.json
