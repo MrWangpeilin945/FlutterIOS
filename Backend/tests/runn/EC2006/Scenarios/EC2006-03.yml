@@ -7,7 +7,6 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2006-03.json"
-  errorMessage: "キー項目が重複しています。Code:"
 steps:
   clearTable:
     desc: "班テーブルをクリア"
@@ -31,13 +30,13 @@ steps:
     test: |
       current.res.status == 200
       && len(current.res.body) == 2
-      // ログインIDがErrorObjectで返される
+      // キー重複のレコードがエラーで返される
       && current.res.body[0].code == "10003"
       && current.res.body[0].inputNote == "20060202A"
-      && current.res.body[0].message startsWith vars.errorMessage
+      && current.res.body[0].message == "キー項目が重複しています。Code:T2006-02-2"
       && current.res.body[1].code == "10003"
       && current.res.body[1].inputNote == "20060202B"
-      && current.res.body[1].message startsWith vars.errorMessage
+      && current.res.body[1].message == "キー項目が重複しています。Code:T2006-02-2"
   confirmTeams:
     desc: "班の更新を確認"
     db:
@@ -52,7 +51,7 @@ steps:
           team_code ASC;
     test: |
       len(current.rows) == 2
-      // リクエストの２つの班の名称は変更されたことを確認
+      // 重複していないリクエストの班の名称は変更されたことを確認
       && current.rows[0].team_code == "T2006-02-1"
       && current.rows[0].name == "新１班"
       // 除外された班の名称は変更されないことを確認
