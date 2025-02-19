@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -89,6 +89,9 @@ export default function ExamBody({
   // キーボードの表示インデックスを状態として管理する
   const [activeKeyboard, setActiveKeyboard] = useState<number | null>(null);
 
+  //初期表示フラグ
+  const isInitialDisplay = useRef(true);
+
   // 初回読み込み時にAPIのエラーメッセージを保存する
   useEffect(() => {
     const backendErrorMessages: BackendValidation[] = examItems.map((item) => ({
@@ -99,10 +102,16 @@ export default function ExamBody({
   }, []);
 
   useEffect(() => {
-    const updatedItems = examItems.map((item) => {
+    let updatedItems = examItems.map((item) => {
       const validatedData = validationCheck(item).validateResult;
       return validatedData;
     });
+    //初期表示以外BMIを計算
+    if (!isInitialDisplay.current) {
+      updatedItems = setBmiValue(updatedItems);
+    } else {
+      isInitialDisplay.current = false;
+    }
     setExamItemsData(updatedItems);
   }, [onRegisterPressed, examItems]);
 
@@ -222,17 +231,17 @@ export default function ExamBody({
   };
 
   // BMI計算処理
-  const setBMIValue = (updatedExamItems: InputExamItem[]): InputExamItem[] => {
+  const setBmiValue = (updatedExamItems: InputExamItem[]): InputExamItem[] => {
     // 身長、体重、BMIの明細が存在しない場合はそのまま返す
     if (!existBMI) return updatedExamItems;
 
     const heightValue =
-      examItems
+      updatedExamItems
         .find((item) => item.positionNumber === 身長)
         ?.examItemDetails?.find((detail) => detail.positionNumber === 1)
         ?.value ?? "0";
     const weightValue =
-      examItems
+      updatedExamItems
         .find((item) => item.positionNumber === 体重)
         ?.examItemDetails?.find((detail) => detail.positionNumber === 1)
         ?.value ?? "0";
@@ -298,7 +307,7 @@ export default function ExamBody({
     }
 
     // BMIの計算と設定処理
-    const bmiUpdatedExamItems = setBMIValue(updatedExamItems);
+    const bmiUpdatedExamItems = setBmiValue(updatedExamItems);
     // 更新されたデータをステートに設定
     setExamItemsData(bmiUpdatedExamItems);
 
