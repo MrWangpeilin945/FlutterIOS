@@ -72,11 +72,11 @@ steps:
           organization_code ASC
     test: |
       len(current.rows) == 2
-      // 重複していないリクエストの会場の名称は変更されたことを確認
+      // 重複していないリクエストの団体の名称は変更されたことを確認
       && current.rows[0].organization_code == organizationsData[0].organization_code
       && current.rows[0].name == "新日本株式会社"
       && current.rows[0].order_number == organizationsData[0].order_number
-      // 除外された会場の名称は変更されないことを確認
+      // 除外された団体の名称は変更されないことを確認
       && current.rows[1].organization_code == organizationsData[1].organization_code
       && current.rows[1].name == organizationsData[1].name
       && current.rows[1].order_number == organizationsData[1].order_number

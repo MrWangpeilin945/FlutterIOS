@@ -36,7 +36,6 @@ public class OrganizationUsecase : IOrganizationUsecase
         // Code 重複チェック済みのリストを取得する
         var insertOrganizationsByCodes = GetCheckedDuplicateCode(organizations);
 
-
         // 団体エンティティリスト生成
         var organizationEntities = insertOrganizationsByCodes.Select(item => new OrganizationEntity
         {
