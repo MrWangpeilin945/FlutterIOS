@@ -134,7 +134,7 @@ list.Count()  <> 0
 ==== WARNING検証
 
 * ユニークキー(Team.Code)が重複するレコードが存在する
-** Teamを以下の条件でGroupByし、複数レコードが存在する
+** Teamsを以下の条件でGroupByし、複数レコードが存在する
 **** `Team.Code`
 *** Teamの単位で該当を取り除く
 *** ErrorObject
