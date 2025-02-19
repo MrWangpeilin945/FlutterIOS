@@ -20,6 +20,16 @@ CREATE TABLE app_config (
   , CONSTRAINT app_config_PKC PRIMARY KEY (key)
 );
 
+CREATE TABLE app_logs (
+  id uuid DEFAULT gen_random_uuid() NOT NULL
+  , log_level varchar(5) NOT NULL
+  , message text NOT NULL
+  , details jsonb
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT app_logs_PKC PRIMARY KEY (id)
+);
+
 CREATE TABLE consult_notes (
   consult_id uuid NOT NULL
   , code text NOT NULL
@@ -828,6 +838,14 @@ COMMENT ON COLUMN app_config.value IS '設定値';
 COMMENT ON COLUMN app_config.description IS '説明';
 COMMENT ON COLUMN app_config.created_at IS '作成日時';
 COMMENT ON COLUMN app_config.created_by IS '作成者';
+
+COMMENT ON TABLE app_logs IS 'アプリケーションログ';
+COMMENT ON COLUMN app_logs.id IS 'ID';
+COMMENT ON COLUMN app_logs.log_level IS 'ログレベル';
+COMMENT ON COLUMN app_logs.message IS 'メッセージ';
+COMMENT ON COLUMN app_logs.details IS '付加情報';
+COMMENT ON COLUMN app_logs.created_at IS '作成日時';
+COMMENT ON COLUMN app_logs.created_by IS '作成者';
 
 COMMENT ON TABLE consult_notes IS '受診特記';
 COMMENT ON COLUMN consult_notes.consult_id IS '受診ID';
