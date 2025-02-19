@@ -133,7 +133,14 @@ list.Count()  <> 0
 
 ==== WARNING検証
 
-* None
+* ユニークキー(Organization.Code)が重複するレコードが存在する
+** Organizationsを以下の条件でGroupByし、複数レコードが存在する
+**** `Organization.Code`
+*** Organizationの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。Code:[Organization.Code]`
+**** InputNote `Organization.InputNote`
 
 ==== 処理(Repository)
 
