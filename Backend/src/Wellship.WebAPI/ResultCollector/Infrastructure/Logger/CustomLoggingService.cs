@@ -5,10 +5,9 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Logger;
 
 /// <summary>
-/// カスタムロギングサービスのインターフェース
+/// カスタムロギングサービス
 /// アプリケーションから明示的に記録したいときに使います。
 /// データベースに書き込みます。
-/// ログレベルがERRORの場合はNLog経由でも出力します。
 /// </summary>
 public sealed class CustomLoggingService : ICustomLoggingService
 {
