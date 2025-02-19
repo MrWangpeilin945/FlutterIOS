@@ -157,7 +157,7 @@ export default function PlaceScheduleLock() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching || isLoading} />
         <CommonHeader screenName="会場ロック" staffName={staff?.name || ""} />
-        <Container fluid>
+        <Container fluid py={32} px={24}>
           {!isFetching && (
             <>
               <PlaceSchedule
