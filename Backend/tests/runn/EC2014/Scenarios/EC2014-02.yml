@@ -49,6 +49,8 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
+      // レスポンスにErrorObjectが返されないことを確認
+      && len(current.res.body) == 0
     dump:
       expr: current.res.body
       out: ../Dump/EC2014-02.json
