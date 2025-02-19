@@ -181,6 +181,7 @@ export default function Login() {
                 autoComplete="off"
                 onChange={(e) => setLoginId(e.target.value)}
                 maxLength={20}
+                inputMode="email"
                 styles={{
                   input: {
                     height: "auto",
@@ -203,6 +204,7 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 maxLength={20}
                 rightSectionWidth={70}
+                inputMode="email"
                 styles={{
                   input: {
                     height: 68,
