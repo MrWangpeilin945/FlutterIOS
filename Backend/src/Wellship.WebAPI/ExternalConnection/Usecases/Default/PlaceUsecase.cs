@@ -31,17 +31,63 @@ public class PlaceUsecase : IPlaceUsecase
     /// <returns>エラーリスト</returns>
     public async Task<List<ErrorObject>> StorePlacesAsync(List<Place> places)
     {
+        _errorObjects.Clear();
+
+        // Code 重複チェック済みのリストを取得する
+        var insertPlacesByCodes = GetCheckedDuplicateCode(places);
+
         // エンティティリスト生成
-        List<PlaceEntity> placeEntities = places.Select(item => new PlaceEntity
+        var placeEntities = insertPlacesByCodes.Select(item => new PlaceEntity
         {
             PlaceId = Guid.NewGuid(),
             PlaceCode = item.Code,
             Name = item.Name
         }).ToList();
 
-        // Repository処理
+        // 会場を登録する
         await _placeRepository.UpsertPlacesAsync(placeEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
         return _errorObjects;
+    }
+
+    /// <summary>
+    /// Code 重複チェック済みのリストを取得する
+    /// </summary>
+    /// <param name="places"></param>
+    /// <returns></returns>
+    private List<Place> GetCheckedDuplicateCode(List<Place> places)
+    {
+        // WARNING検証
+        // キー重複
+        var duplicatedPlaceCodes = places.GroupBy(x => x.Code).Where(x => x.Count() > 1).Select(x => x.Key).ToHashSet();
+
+        if (duplicatedPlaceCodes.Any())
+        {
+            var duplicatedData = places.Where(x => duplicatedPlaceCodes.Contains(x.Code));
+
+            // 返却用エラーオブジェクトに追加
+            AddDuplicateDataErrorObjects(duplicatedData);
+            return places.Except(duplicatedData).ToList();
+        }
+        else
+        {
+            return new List<Place>(places);
+        }
+    }
+
+    /// エラーオブジェクトに情報追加する(キーが重複するレコード）
+    /// </summary>
+    /// <param name="duplicatedData"></param>
+    private void AddDuplicateDataErrorObjects(IEnumerable<Place> duplicatedData)
+    {
+        var errorObjects = duplicatedData
+            .Select(d => new ErrorObject
+            {
+                Code = "10003",
+                Message = $"キー項目が重複しています。Code:{d.Code}",
+                InputNote = d.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
     }
 }

@@ -133,7 +133,14 @@ list.Count()  <> 0
 
 ==== WARNING検証
 
-* None
+* ユニークキー(Place.Code)が重複するレコードが存在する
+** Placesを以下の条件でGroupByし、複数レコードが存在する
+**** `Place.Code`
+*** Placeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。Code:[Place.Code]`
+**** InputNote `Place.InputNote`
 
 ==== 処理(Repository)
 

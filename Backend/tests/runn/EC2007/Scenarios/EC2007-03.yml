@@ -1,4 +1,4 @@
-desc: EC2007-02 会場を更新_正常 [200]
+desc: EC2007-02 キー重複を除外_正常 [200]
 runners:
   db: ${DB_HOST}
   req:
@@ -6,7 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  request: "json://../Requests/EC2007-02.json"
+  request: "json://../Requests/EC2007-03.json"
 steps:
   clearTable:
     desc: "会場テーブルをクリア"
@@ -18,8 +18,7 @@ steps:
       query: |
         insert into resultcollector.places(place_code, name, order_number, created_at, created_by)
             values('P2007-02-1', '旧第１会場', 1, CURRENT_TIMESTAMP, 'ec2007')
-            ,     ('P2007-02-2', '旧第２会場', 2, CURRENT_TIMESTAMP, 'ec2007')
-            ,     ('P2007-02-3', '旧第３会場', 3, CURRENT_TIMESTAMP, 'ec2007');
+            ,     ('P2007-02-2', '旧第２会場', 2, CURRENT_TIMESTAMP, 'ec2007');
   post:
     desc: "会場を更新_正常"
     req:
@@ -30,6 +29,14 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
+      && len(current.res.body) == 2
+      // キー重複のレコードがエラーで返される
+      && current.res.body[0].code == "10003"
+      && current.res.body[0].inputNote == "2007022A"
+      && current.res.body[0].message == "キー項目が重複しています。Code:P2007-02-2"
+      && current.res.body[1].code == "10003"
+      && current.res.body[1].inputNote == "2007022B"
+      && current.res.body[1].message == "キー項目が重複しています。Code:P2007-02-2"
   confirmPlaces:
     desc: "会場の更新を確認"
     db:
@@ -39,16 +46,14 @@ steps:
         FROM
           resultcollector.places
         WHERE
-          place_code in ('P2007-02-1', 'P2007-02-2', 'P2007-02-3')
+          place_code in ('P2007-02-1', 'P2007-02-2')
         ORDER BY
           place_code ASC;
     test: |
-      len(current.rows) == 3
-      // リクエストの２つの会場の名称は変更されたことを確認
+      len(current.rows) == 2
+      // 重複していないリクエストの会場の名称は変更されたことを確認
       && current.rows[0].place_code == "P2007-02-1"
       && current.rows[0].name == "新第１会場"
+      // 除外された会場の名称は変更されないことを確認
       && current.rows[1].place_code == "P2007-02-2"
-      && current.rows[1].name == "新第２会場"
-      // リクエストに存在しない会場の名称は変更されないことを確認
-      && current.rows[2].place_code == "P2007-02-3"
-      && current.rows[2].name == "旧第３会場"
+      && current.rows[1].name == "旧第２会場"
