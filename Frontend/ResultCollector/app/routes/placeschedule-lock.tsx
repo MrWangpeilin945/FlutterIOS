@@ -117,7 +117,8 @@ export default function PlaceScheduleLock() {
   const fetchUpdateLockingStatus = async () => {
     // POST時のリクエストボディを生成する
     const body: PlaceScheduleLockingRequest = {
-      placeScheduleId: firstPlaceSchedule.current?.placeScheduleId || "",
+      placeScheduleId:
+        placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
       placeScheduleLockingStatus: processStatus || 0,
     };
 
