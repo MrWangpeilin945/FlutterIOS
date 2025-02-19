@@ -1,0 +1,84 @@
+desc: EC2001-01 受診者を登録_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2001-01.json"
+steps:
+  post:
+    desc: "受診者を登録_正常"
+    req:
+      /api/v1/external/examinees:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2008-01.json
+  confirmExaminees:
+    desc: "受診者の登録を確認"
+    db:
+      query: |
+        SELECT
+          examinee_id::text
+          , examinee_code
+          , name
+          , kana_name
+          , sex
+          , to_char(birthdate, 'yyyymmdd') as birthdate
+        FROM
+          resultcollector.examinees
+        WHERE
+          examinee_code in ('EC2001011', 'EC2001012')
+        ORDER BY
+          examinee_code ASC;
+    test: |
+      // リクエストの２名の受診者が追加されたことを確認
+      len(current.rows) == 2
+      && current.rows[0].examinee_code == "EC2001011"
+      && current.rows[0].name == "岡山　一郎"
+      && current.rows[0].kana_name == "オカヤマ　イチロウ"
+      && current.rows[0].sex == 1
+      && current.rows[0].birthdate == "19700505"
+      && current.rows[1].examinee_code == "EC2001012"
+      && current.rows[1].name == "岡山　花子"
+      && current.rows[1].kana_name == "オカヤマ　ハナコ"
+      && current.rows[1].sex == 2
+      && current.rows[1].birthdate == "19851224"
+  confirmAffiliations:
+    desc: "所属の登録を確認"
+    db:
+      query: |
+        SELECT
+          e.examinee_code
+          , o.organization_code
+        FROM
+          resultcollector.affiliations a
+        LEFT JOIN
+          resultcollector.examinees e
+            on a.examinee_id = e.examinee_id
+        LEFT JOIN
+          resultcollector.organizations o
+            on a.organization_id = o.organization_id
+        WHERE 
+          e.examinee_code in ('EC2001011', 'EC2001012')
+        ORDER BY
+          e.examinee_code ASC
+          , o.organization_code ASC
+    test: |
+      // ４件の所属レコードを確認
+      len(current.rows) == 4
+      && current.rows[0].examinee_code == "EC2001011"
+      && current.rows[0].organization_code == "ORG2001-01"
+      && current.rows[1].examinee_code == "EC2001012"
+      && current.rows[1].organization_code == "ORG2001-01"
+      && current.rows[2].examinee_code == "EC2001012"
+      && current.rows[2].organization_code == "ORG2001-02"
+      && current.rows[3].examinee_code == "EC2001012"
+      && current.rows[3].organization_code == "ORG2001-03"
