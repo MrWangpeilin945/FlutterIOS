@@ -8,6 +8,18 @@ runners:
 vars:
   request: "json://../Requests/EC2006-02.json"
 steps:
+  clearTable:
+    desc: "班テーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.teams CASCADE;
+  insertData:
+    desc: "班テーブルに実行前データを登録"
+    db: 
+      query: |
+        insert into resultcollector.teams (team_code, name , order_number , created_at, created_by)
+            values('T2006-02-1', '旧１班', 1, CURRENT_TIMESTAMP, 'ec2006')
+            ,     ('T2006-02-2', '旧２班', 2, CURRENT_TIMESTAMP, 'ec2006')
+            ,     ('T2006-02-3', '旧３班', 3, CURRENT_TIMESTAMP, 'ec2006');
   post:
     desc: "班を更新_正常"
     req:
