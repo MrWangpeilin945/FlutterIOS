@@ -117,7 +117,8 @@ export default function PlaceScheduleLock() {
   const fetchUpdateLockingStatus = async () => {
     // POST時のリクエストボディを生成する
     const body: PlaceScheduleLockingRequest = {
-      placeScheduleId: firstPlaceSchedule.current?.placeScheduleId || "",
+      placeScheduleId:
+        placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
       placeScheduleLockingStatus: processStatus || 0,
     };
 
@@ -170,53 +171,53 @@ export default function PlaceScheduleLock() {
               {placeScheduleLock ? (
                 <>
                   <Space h={40} />
-                    <Container ta="center" mt={40} mb={300}>
-                      {statusButton?.map((button) => (
-                        <Button
-                          w={860}
-                          h={75}
-                          px={32}
-                          py={16}
-                          bd="2px solid"
-                          variant="outline"
-                          bg={
-                            placeScheduleLock.placeScheduleLockingStatus ===
-                            button.placeScheduleLockingStatus
-                              ? "green03"
-                              : "white"
-                          }
-                          color={
+                  <Container ta="center" mt={40} mb={300}>
+                    {statusButton?.map((button) => (
+                      <Button
+                        w={860}
+                        h={75}
+                        px={32}
+                        py={16}
+                        bd="2px solid"
+                        variant="outline"
+                        bg={
+                          placeScheduleLock.placeScheduleLockingStatus ===
+                          button.placeScheduleLockingStatus
+                            ? "green03"
+                            : "white"
+                        }
+                        color={
+                          placeScheduleLock.placeScheduleLockingStatus ===
+                          button.placeScheduleLockingStatus
+                            ? "primary"
+                            : "gray03"
+                        }
+                        key={button.placeScheduleLockingStatus}
+                        onClick={() =>
+                          handleButtonClick(button.placeScheduleLockingStatus)
+                        }
+                        mb={
+                          button.placeScheduleLockingStatus ===
+                          PlaceScheduleLockingStatus.検査完了
+                            ? 32
+                            : 0
+                        }
+                      >
+                        <Text
+                          size="xl"
+                          fw={700}
+                          c={
                             placeScheduleLock.placeScheduleLockingStatus ===
                             button.placeScheduleLockingStatus
                               ? "primary"
-                              : "gray03"
-                          }
-                          key={button.placeScheduleLockingStatus}
-                          onClick={() =>
-                            handleButtonClick(button.placeScheduleLockingStatus)
-                          }
-                          mb={
-                            button.placeScheduleLockingStatus ===
-                            PlaceScheduleLockingStatus.検査完了
-                              ? 32
-                              : 0
+                              : "black01"
                           }
                         >
-                          <Text
-                            size="xl"
-                            fw={700}
-                            c={
-                              placeScheduleLock.placeScheduleLockingStatus ===
-                              button.placeScheduleLockingStatus
-                                ? "primary"
-                                : "black01"
-                            }
-                          >
-                            {button.buttonName}
-                          </Text>
-                        </Button>
-                      ))}
-                    </Container>
+                          {button.buttonName}
+                        </Text>
+                      </Button>
+                    ))}
+                  </Container>
                   <Flex justify="flex-end">
                     <Text size="xs" c="black01" ta="right">
                       最終更新者：{placeScheduleLock.updatedBy}（
