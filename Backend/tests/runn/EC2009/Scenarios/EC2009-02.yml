@@ -1,0 +1,91 @@
+desc: EC2009-02 検査基準値範囲を更新_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2009-02.json"
+  thresholdId: "e0002009-0000-0000-0000-000000000001"
+steps:
+  getOrganizations:
+    desc: "検査基準値範囲の取得"
+    db:
+      query: |
+        SELECT
+          name
+          , threshold_id::text
+          , exam_item_detail_id
+          , min_age
+          , max_age
+          , target_sex
+          , min_value::text
+          , max_value::text
+          , error_level
+        FROM
+          resultcollector.exam_normal_value_range
+        WHERE
+          threshold_id = '{{ vars.thresholdId }}'
+          AND exam_item_detail_id in (20094, 20095)
+        ORDER BY
+          exam_item_detail_id ASC
+    bind:
+      organizationsData: current.rows
+  post:
+    desc: "検査基準値範囲を更新_正常"
+    req:
+      /api/v1/external/examNormalValueRange:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2009-02.json
+  confirmExamNormalValueRange:
+    desc: "検査基準値範囲の更新を確認"
+    db:
+      query: |
+        SELECT
+          name
+          , threshold_id::text
+          , exam_item_detail_id
+          , min_age
+          , max_age
+          , target_sex
+          , min_value::text
+          , max_value::text
+          , error_level
+        FROM
+          resultcollector.exam_normal_value_range
+        WHERE
+          threshold_id = '{{ vars.thresholdId }}'
+          AND exam_item_detail_id in (20094, 20095)
+        ORDER BY
+          exam_item_detail_id ASC
+    test: |
+      // 洗う替えのためレコードは追加されていない
+      len(current.rows) == 2
+      // リクエストの検査基準値範囲が変更されたことを確認
+      && current.rows[0].threshold_id == organizationsData[0].threshold_id
+      && current.rows[0].exam_item_detail_id == organizationsData[0].exam_item_detail_id
+      && current.rows[0].name == "ヘモグロビン（男女）"
+      && current.rows[0].min_age == "0000000"
+      && current.rows[0].max_age == "9999999"
+      && current.rows[0].target_sex == 3
+      && current.rows[0].min_value == "8.7"
+      && current.rows[0].max_value == "10.6"
+      && current.rows[0].error_level == 2
+      // リクエストに存在しない検査基準値範囲は変更されないことを確認
+      && current.rows[1].name == organizationsData[1].name
+      && current.rows[1].threshold_id == organizationsData[1].threshold_id
+      && current.rows[1].exam_item_detail_id == organizationsData[1].exam_item_detail_id
+      && current.rows[1].min_age == organizationsData[1].min_age
+      && current.rows[1].max_age == organizationsData[1].max_age
+      && current.rows[1].target_sex == organizationsData[1].target_sex
+      && current.rows[1].min_value == organizationsData[1].min_value
+      && current.rows[1].max_value == organizationsData[1].max_value
+      && current.rows[1].error_level == organizationsData[1].error_level

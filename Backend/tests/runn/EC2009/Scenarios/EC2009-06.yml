@@ -1,0 +1,34 @@
+desc: EC2009-03 基準値パターン・検査項目明細IDが取得できない
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2009-06.json"
+  errorThresholdMessage: "指定されたThresholdCdがシステム上に存在しません。"
+  errorExamItemDetailMessage: "指定されたExamItemDetailCdがシステム上に存在しません。"
+steps:
+  post:
+    desc: "基準値パターン・検査項目明細IDが取得できない"
+    req:
+      /api/v1/external/examNormalValueRange:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+      && len(current.res.body) == 2
+      // 基準値パターンエラーがErrorObjectで返される
+      && current.res.body[0].code == "10001"
+      && current.res.body[0].inputNote == "2009061"
+      && current.res.body[0].message startsWith vars.errorThresholdMessage
+      // 基準値パターンエラーがErrorObjectで返される
+      && current.res.body[1].code == "10001"
+      && current.res.body[1].inputNote == "2009061"
+      && current.res.body[1].message startsWith vars.errorExamItemDetailMessage
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2009-06.json
