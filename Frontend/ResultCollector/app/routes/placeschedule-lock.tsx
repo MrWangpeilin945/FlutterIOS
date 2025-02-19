@@ -43,14 +43,12 @@ export default function PlaceScheduleLock() {
   const [staff] = useAtom(staffState);
   const [placeSchedule] = useAtom(placeScheduleState);
   const firstPlaceSchedule = useRef<PlaceScheduleType>();
-  const [examDate] = useAtom(examDateState);
   const [opened, { open, close }] = useDisclosure(false);
   const [message, setMessage] = useState<string | null>(null);
   const [openedConfirm, { open: openConfirm, close: closeConfirm }] =
     useDisclosure(false);
   const [processStatus, setProcessStatus] =
     useState<PlaceScheduleLockingStatus | null>();
-  const [targetDate] = useState(examDate ? format(examDate, "yyyy-MM-dd") : "");
   const [placeScheduleLock, setPlaceScheduleLock] =
     useState<PlaceScheduleLocking>();
 
@@ -165,8 +163,8 @@ export default function PlaceScheduleLock() {
           {!isFetching && (
             <>
               <PlaceSchedule
-                placeName={placeSchedule?.placeName || ""}
-                examDate={targetDate}
+                placeName={placeScheduleLock?.placeName || ""}
+                examDate={placeScheduleLock?.examDate ? format(placeScheduleLock.examDate, "yyyy-MM-dd") : ""}
               />
               {placeScheduleLock ? (
                 <>
