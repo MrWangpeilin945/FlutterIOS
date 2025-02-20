@@ -1,0 +1,76 @@
+desc: EC2014-02 基準値パターンを更新_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2014-02.json"
+steps:
+  clearTable:
+    desc: "基準値パターンテーブルのクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.thresholds CASCADE
+  insertData:
+    desc: "基準値パターンテーブルに実行前データを登録"
+    db:
+      query: |
+        INSERT INTO
+          resultcollector.thresholds
+          (threshold_code, name, order_number, created_at, created_by)
+        VALUES('T201404', '日帰りドック', 1, CURRENT_TIMESTAMP, 'ex2014')
+        ,     ('T201405', '宿泊ドック', 2, CURRENT_TIMESTAMP, 'ex2014')
+  getOrganizations:
+    desc: "基準値パターン情報の取得"
+    db:
+      query: |
+        SELECT
+          threshold_code
+          , name
+          , order_number
+        FROM
+          resultcollector.thresholds
+        WHERE
+          threshold_code in ('T201404', 'T201405')
+        ORDER BY
+          threshold_code DESC
+    bind:
+      thresholdsData: current.rows
+  post:
+    desc: "基準値パターンを更新_正常"
+    req:
+      /api/v1/external/thresholds:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2014-02.json
+  confirmTeams:
+    desc: "基準値パターンの更新を確認"
+    db:
+      query: |
+        SELECT
+          threshold_code
+          , name
+          , order_number
+        FROM
+          resultcollector.thresholds
+        WHERE
+          threshold_code in ('T201404', 'T201405')
+        ORDER BY
+          threshold_code DESC
+    test: |
+      len(current.rows) == 2
+      // リクエストの基準値パターンの名称が変更されたことを確認
+      && current.rows[0].threshold_code == thresholdsData[0].threshold_code
+      && current.rows[0].name == "一泊二日ドック"
+      && current.rows[0].order_number == thresholdsData[0].order_number
+      // リクエストに存在しない基準値パターンの名称は変更されないことを確認
+      && current.rows[1].threshold_code == thresholdsData[1].threshold_code
+      && current.rows[1].name == thresholdsData[1].name
+      && current.rows[1].order_number == thresholdsData[1].order_number

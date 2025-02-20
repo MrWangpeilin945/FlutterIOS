@@ -40,8 +40,10 @@ export default function ExamineeHeader({
         }
         justify="space-between"
         align="center"
+        pos="sticky"
         px={24}
         py={8}
+        top={0}
         style={{ zIndex: 10 }}
       >
         {/* ユーザアイコン */}
