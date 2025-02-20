@@ -7,7 +7,27 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2001-01.json"
+  examineeCode1: "EC2001011"
+  examineeCode2: "EC2001012"
 steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 受診者
+        TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 団体
+        TRUNCATE TABLE resultcollector.organizations CASCADE;
+  insertData:
+    desc: "団体テーブルに実行前データを登録"
+    db:
+      query: |
+        INSERT INTO
+          resultcollector.organizations
+          (organization_code, name, order_number, created_at, created_by)
+        VALUES('ORG2001-01', '株式会社岡山', 11, CURRENT_TIMESTAMP,'ec2001')
+        ,     ('ORG2001-02', '株式会社倉敷', 12, CURRENT_TIMESTAMP,'ec2001')
+        ,     ('ORG2001-03', '株式会社津山', 13, CURRENT_TIMESTAMP,'ec2001');      
   post:
     desc: "受診者を登録_正常"
     req:
@@ -18,9 +38,11 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
+      // レスポンスにErrorObjectが返されないことを確認
+      && len(current.res.body) == 0
     dump:
       expr: current.res.body
-      out: ../Dump/EC2008-01.json
+      out: ../Dump/EC2001-01.json
   confirmExaminees:
     desc: "受診者の登録を確認"
     db:
@@ -32,25 +54,32 @@ steps:
           , kana_name
           , sex
           , to_char(birthdate, 'yyyymmdd') as birthdate
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.examinees
         WHERE
-          examinee_code in ('EC2001011', 'EC2001012')
+          examinee_code in ('{{ vars.examineeCode1 }}', '{{ vars.examineeCode2 }}')
         ORDER BY
           examinee_code ASC;
     test: |
       // リクエストの２名の受診者が追加されたことを確認
       len(current.rows) == 2
-      && current.rows[0].examinee_code == "EC2001011"
+      && current.rows[0].examinee_code == vars.examineeCode1
       && current.rows[0].name == "岡山　一郎"
       && current.rows[0].kana_name == "オカヤマ　イチロウ"
       && current.rows[0].sex == 1
       && current.rows[0].birthdate == "19700505"
-      && current.rows[1].examinee_code == "EC2001012"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[1].examinee_code == vars.examineeCode2
       && current.rows[1].name == "岡山　花子"
       && current.rows[1].kana_name == "オカヤマ　ハナコ"
       && current.rows[1].sex == 2
       && current.rows[1].birthdate == "19851224"
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
   confirmAffiliations:
     desc: "所属の登録を確認"
     db:
@@ -58,6 +87,9 @@ steps:
         SELECT
           e.examinee_code
           , o.organization_code
+          , to_char(a.created_at, 'yyyymmdd') as created_at
+          , a.created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.affiliations a
         LEFT JOIN
@@ -67,18 +99,26 @@ steps:
           resultcollector.organizations o
             on a.organization_id = o.organization_id
         WHERE 
-          e.examinee_code in ('EC2001011', 'EC2001012')
+          e.examinee_code in ('{{ vars.examineeCode1 }}', '{{ vars.examineeCode2 }}')
         ORDER BY
           e.examinee_code ASC
           , o.organization_code ASC
     test: |
       // ４件の所属レコードを確認
       len(current.rows) == 4
-      && current.rows[0].examinee_code == "EC2001011"
+      && current.rows[0].examinee_code == vars.examineeCode1
       && current.rows[0].organization_code == "ORG2001-01"
-      && current.rows[1].examinee_code == "EC2001012"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[1].examinee_code == vars.examineeCode2
       && current.rows[1].organization_code == "ORG2001-01"
-      && current.rows[2].examinee_code == "EC2001012"
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
+      && current.rows[2].examinee_code == vars.examineeCode2
       && current.rows[2].organization_code == "ORG2001-02"
-      && current.rows[3].examinee_code == "EC2001012"
+      && current.rows[2].created_at == current.rows[2].now
+      && current.rows[2].created_by == "ExternalConnection"
+      && current.rows[3].examinee_code == vars.examineeCode2
       && current.rows[3].organization_code == "ORG2001-03"
+      && current.rows[3].created_at == current.rows[3].now
+      && current.rows[3].created_by == "ExternalConnection"

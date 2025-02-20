@@ -1,0 +1,59 @@
+desc: EC2001-03 団体が取得できない
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2001-03.json"
+  errorMessage: "指定されたOrganizationCodeがシステム上に存在しません。Code:ORG2001-33"
+steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 受診者
+        TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 団体
+        TRUNCATE TABLE resultcollector.organizations CASCADE;
+  insertData:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 団体
+        INSERT INTO
+          resultcollector.organizations
+          (organization_id, organization_code, name, order_number, created_at, created_by)
+        VALUES('a0002001-0000-0000-0003-000000000001', 'ORG2001-31', '株式会社備前', 31, CURRENT_TIMESTAMP,'ec2001')
+        ,     ('a0002001-0000-0000-0003-000000000002', 'ORG2001-32', '株式会社真庭', 32, CURRENT_TIMESTAMP,'ec2001');
+  post:
+    desc: "団体が取得できない"
+    req:
+      /api/v1/external/examinees:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+      // 受診者エラーがErrorObjectで返される
+      && len(current.res.body) == 1
+      && current.res.body[0].code == "10001"
+      && current.res.body[0].inputNote == "2001031"
+      && current.res.body[0].message == vars.errorMessage
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2001-03.json
+  confirmExaminees:
+    desc: "受診者が登録されていない確認"
+    db:
+      query: |
+        SELECT
+          count(*)
+        FROM
+          resultcollector.examinees;
+    test: |
+      // 受診者情報が登録されたいないことを確認
+      len(current.rows) == 1
+      && current.rows[0].count == 0
