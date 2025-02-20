@@ -43,6 +43,9 @@ steps:
       && current.res.body[3].code == "10003"
       && current.res.body[3].inputNote == "20060302"
       && current.res.body[3].message == "キー項目が重複しています。Code:"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2006-03.json
   confirmTeams:
     desc: "班の更新を確認"
     db:
