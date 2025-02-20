@@ -31,7 +31,7 @@ steps:
     test: |
       current.res.status == 200
       // レスポンスにErrorObjectが返されないことを確認
-      && len(current.res.body) == 0
+      && current.res.body == null
   confirmTeams:
     desc: "班の更新を確認"
     db:

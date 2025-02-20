@@ -53,7 +53,7 @@ public class TeamController : ControllerBase
         }
         else
         {
-            return Ok(result);
+            return Ok();
         }
     }
 }
