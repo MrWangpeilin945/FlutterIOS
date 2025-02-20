@@ -149,7 +149,7 @@ export default function Home() {
 
   return (
     <AuthWrapper>
-      <Box h="100vh" bg="white01">
+      <Box mih="100vh" bg="white01">
         <LoadingOverlay visible={isFetching} />
         <CommonHeader screenName="ホーム" staffName={staff?.name || ""} />
         <Container fluid py={32} px={24}>
