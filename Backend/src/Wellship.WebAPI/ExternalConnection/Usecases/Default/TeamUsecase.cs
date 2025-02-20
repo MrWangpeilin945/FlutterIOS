@@ -33,11 +33,17 @@ public class TeamUsecase : ITeamUsecase
     {
         _errorObjects.Clear();
 
+        // Code 必須チェック済みのリストを取得する
+        var insertTeamsByRequiredCodes = GetCheckedRequiredCode(teams);
+
         // Code 重複チェック済みのリストを取得する
-        var insertTeamsByCodes = GetCheckedDuplicateCode(teams);
+        var insertTeamsByDuplicateCodes = GetCheckedDuplicateCode(teams);
+
+        var commonInsertTeams = insertTeamsByRequiredCodes.Intersect(insertTeamsByDuplicateCodes)
+                                                          .ToList();
 
         // エンティティリスト生成
-        var teamEntities = insertTeamsByCodes.Select(item => new TeamEntity
+        var teamEntities = commonInsertTeams.Select(item => new TeamEntity
         {
             TeamId = Guid.NewGuid(),
             TeamCode = item.Code,
@@ -48,6 +54,30 @@ public class TeamUsecase : ITeamUsecase
         await _teamRepository.UpsertTeamsAsync(teamEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
         return _errorObjects;
+    }
+
+    /// <summary>
+    /// Code 必須チェック済みのリストを取得する
+    /// </summary>
+    /// <param name="teams"></param>
+    /// <returns></returns>
+    private List<Team> GetCheckedRequiredCode(List<Team> teams)
+    {
+        // WARNING検証
+        // キー重複
+        var requiredData = teams.Where(x => string.IsNullOrWhiteSpace(x.Code));
+
+        if (requiredData.Any())
+        {
+
+            // 返却用エラーオブジェクトに追加
+            AddrequiredRecordDataErrorObjects(requiredData);
+            return teams.Except(requiredData).ToList();
+        }
+        else
+        {
+            return new List<Team>(teams);
+        }
     }
 
     /// <summary>
@@ -73,6 +103,23 @@ public class TeamUsecase : ITeamUsecase
         {
             return new List<Team>(teams);
         }
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(必須項目エラー）
+    /// </summary>
+    /// <param name="requiredData"></param>
+    private void AddrequiredRecordDataErrorObjects(IEnumerable<Team> requiredData)
+    {
+        var errorObjects = requiredData
+            .Select(r => new ErrorObject
+            {
+                Code = "10004",
+                Message = "必須項目が不足しています。Code",
+                InputNote = r.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
     }
 
     /// <summary>
