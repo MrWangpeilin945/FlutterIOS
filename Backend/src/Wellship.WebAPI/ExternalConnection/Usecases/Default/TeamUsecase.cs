@@ -71,7 +71,7 @@ public class TeamUsecase : ITeamUsecase
         {
 
             // 返却用エラーオブジェクトに追加
-            AddRequiredRecordDataErrorObjects(requiredData);
+            AddRequiredDataErrorObjects(requiredData);
             return teams.Except(requiredData).ToList();
         }
         else
@@ -109,7 +109,7 @@ public class TeamUsecase : ITeamUsecase
     /// エラーオブジェクトに情報追加する(必須項目エラー）
     /// </summary>
     /// <param name="requiredData"></param>
-    private void AddRequiredRecordDataErrorObjects(IEnumerable<Team> requiredData)
+    private void AddRequiredDataErrorObjects(IEnumerable<Team> requiredData)
     {
         var errorObjects = requiredData
             .Select(r => new ErrorObject
