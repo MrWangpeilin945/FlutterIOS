@@ -29,7 +29,7 @@ import type {
   PlaceScheduleLocking,
   PlaceScheduleLockingRequest,
 } from "~/domain/wellship.schemas";
-import { examDateState, placeScheduleState, staffState } from "~/store/store";
+import { placeScheduleState, staffState } from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
 export const meta: MetaFunction = () => {
@@ -42,7 +42,7 @@ export default function PlaceScheduleLock() {
   const [isLoading, setIsLoading] = useState(false);
   const [staff] = useAtom(staffState);
   const [placeSchedule] = useAtom(placeScheduleState);
-  const firstPlaceSchedule = useRef<PlaceScheduleType>();
+  const firstPlaceSchedule = useRef<PlaceScheduleType>(placeSchedule);
   const [opened, { open, close }] = useDisclosure(false);
   const [message, setMessage] = useState<string | null>(null);
   const [openedConfirm, { open: openConfirm, close: closeConfirm }] =
@@ -92,7 +92,6 @@ export default function PlaceScheduleLock() {
   };
 
   useEffect(() => {
-    firstPlaceSchedule.current = placeSchedule ?? {};
     fetchGetPlaceScheduleLocking();
   }, []);
 
@@ -164,7 +163,11 @@ export default function PlaceScheduleLock() {
             <>
               <PlaceSchedule
                 placeName={placeScheduleLock?.placeName || ""}
-                examDate={placeScheduleLock?.examDate ? format(placeScheduleLock.examDate, "yyyy-MM-dd") : ""}
+                examDate={
+                  placeScheduleLock?.examDate
+                    ? format(placeScheduleLock.examDate, "yyyy-MM-dd")
+                    : ""
+                }
               />
               {placeScheduleLock ? (
                 <>
