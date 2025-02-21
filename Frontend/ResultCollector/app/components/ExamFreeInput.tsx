@@ -192,7 +192,7 @@ export default function ExamFreeInput({
     !firstPositionDetail?.hasOrder || !!firstPositionDetail.cancelReasonId;
 
   return (
-    <Flex mt={16} justify="flex-start" align="flex-start" direction="column">
+    <Flex justify="flex-start" align="flex-start" direction="column">
       <Flex gap={16} justify="flex-start" align="flex-start">
         <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
           <Text size="lg" fw={700} ta="center">
