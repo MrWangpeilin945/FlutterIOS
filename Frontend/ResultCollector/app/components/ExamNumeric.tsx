@@ -349,7 +349,7 @@ export default function ExamNumeric({
           </Group>
         );
       })}
-      <Box ml={220} mt={50}>
+      <Box ml={220}>
         {showKeyboards && (
           <div ref={closeKeyBoard}>
             {keyboard?.keyboardType === KeyboardType.テンキー ||
