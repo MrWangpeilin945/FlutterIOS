@@ -8,25 +8,10 @@ runners:
 vars:
   request: "json://../Requests/EC2008-01.json"
 steps:
-  deleteInsertorganizations:
-    desc: "挿入する団体を削除する"
+  clearTable:
+    desc: "団体テーブルをクリア"
     db:
-      query: |
-        DELETE
-        FROM
-          resultcollector.organizations
-        WHERE
-          organization_code in ('G200801', 'G200802', 'G200803')
-  getOrderNumber:
-    desc: "表示順の取得"
-    db:
-      query: |
-        SELECT
-          max(order_number)
-        FROM
-          resultcollector.organizations
-    bind:
-      organizationsCount: current.rows[0].max
+      query: TRUNCATE TABLE resultcollector.organizations CASCADE;
   post:
     desc: "団体を登録_正常"
     req:
@@ -37,11 +22,8 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
-      && len(current.res.body) == 0
-    dump:
-      expr: current.res.body
-      out: ../Dump/EC2008-01.json
-  confirmTeams:
+      && current.res.body == null
+  confirmOrganizations:
     desc: "団体の登録を確認"
     db:
       query: |
@@ -49,21 +31,28 @@ steps:
           organization_code
           , name
           , order_number
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.organizations
-        WHERE
-          organization_code in ('G200801', 'G200802', 'G200803')
         ORDER BY
           organization_code ASC;
     test: |
       // リクエストの３つの班が追加されたことを確認
       len(current.rows) == 3
-      && current.rows[0].organization_code == "G200801"
+      && current.rows[0].organization_code == "G2008-01-1"
       && current.rows[0].name == "株式会社岡山"
-      && current.rows[0].order_number == organizationsCount + 1
-      && current.rows[1].organization_code == "G200802"
+      && current.rows[0].order_number == 1
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[1].organization_code == "G2008-01-2"
       && current.rows[1].name == "株式会社倉敷"
-      && current.rows[1].order_number == organizationsCount + 2
-      && current.rows[2].organization_code == "G200803"
+      && current.rows[1].order_number == 2
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
+      && current.rows[2].organization_code == "G2008-01-3"
       && current.rows[2].name == "津山株式会社"
-      && current.rows[2].order_number == organizationsCount + 3
+      && current.rows[2].order_number == 3
+      && current.rows[2].created_at == current.rows[2].now
+      && current.rows[2].created_by == "ExternalConnection"

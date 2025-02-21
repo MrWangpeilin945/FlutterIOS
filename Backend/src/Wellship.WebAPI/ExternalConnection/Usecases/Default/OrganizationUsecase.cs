@@ -33,11 +33,17 @@ public class OrganizationUsecase : IOrganizationUsecase
     {
         _errorObjects.Clear();
 
+        // Code 必須チェック済みのリストを取得する
+        var insertOrganizationsByRequiredCodes = GetCheckedRequiredCode(organizations);
+
         // Code 重複チェック済みのリストを取得する
-        var insertOrganizationsByCodes = GetCheckedDuplicateCode(organizations);
+        var insertOrganizationsByDuplicateCodes = GetCheckedDuplicateCode(organizations);
+
+        var commonInsertPlaces = insertOrganizationsByRequiredCodes.Intersect(insertOrganizationsByDuplicateCodes)
+                                                                   .ToList();
 
         // 団体エンティティリスト生成
-        var organizationEntities = insertOrganizationsByCodes.Select(item => new OrganizationEntity
+        var organizationEntities = commonInsertPlaces.Select(item => new OrganizationEntity
         {
             OrganizationCode = item.Code,
             Name = item.Name
@@ -47,6 +53,30 @@ public class OrganizationUsecase : IOrganizationUsecase
         await _organizationRepository.UpsertOrganizationsAsync(organizationEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
         return _errorObjects;
+    }
+
+
+    /// <summary>
+    /// Code 必須チェック済みのリストを取得する
+    /// </summary>
+    /// <param name="organizations"></param>
+    /// <returns></returns>
+    private List<Organization> GetCheckedRequiredCode(List<Organization> organizations)
+    {
+        // WARNING検証
+        // キー重複
+        var requiredData = organizations.Where(x => string.IsNullOrWhiteSpace(x.Code));
+
+        if (requiredData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredData);
+            return organizations.Except(requiredData).ToList();
+        }
+        else
+        {
+            return new List<Organization>(organizations);
+        }
     }
 
     /// <summary>
@@ -74,6 +104,24 @@ public class OrganizationUsecase : IOrganizationUsecase
         }
     }
 
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(必須項目エラー）
+    /// </summary>
+    /// <param name="requiredData"></param>
+    private void AddRequiredDataErrorObjects(IEnumerable<Organization> requiredData)
+    {
+        var errorObjects = requiredData
+            .Select(r => new ErrorObject
+            {
+                Code = "10004",
+                Message = "必須項目が不足しています。Code",
+                InputNote = r.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+    /// <summary>
     /// エラーオブジェクトに情報追加する(キーが重複するレコード）
     /// </summary>
     /// <param name="duplicatedData"></param>

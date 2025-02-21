@@ -1,4 +1,4 @@
-desc: EC2008-02 必須エラーを除外_正常 [207]
+desc: EC2008-04 キー重複を除外_正常 [207]
 runners:
   db: ${DB_HOST}
   req:
@@ -6,7 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  request: "json://../Requests/EC2008-03.json"
+  request: "json://../Requests/EC2008-04.json"
 steps:
   clearTable:
     desc: "団体テーブルをクリア"
@@ -17,8 +17,8 @@ steps:
     db: 
       query: |
         insert into resultcollector.organizations(organization_code, name, order_number, created_at, created_by)
-            values('G2008-03-1', '株式会社古都岡山', 1, '2025-01-01T12:34:56.789', 'ec2008')
-            ,     ('G2008-03-2', '株式会社古都倉敷', 2, '2025-01-01T12:34:56.789', 'ec2008');
+            values('G2008-04-1', '株式会社古都岡山', 1, '2025-01-01T12:34:56.789', 'ec2008')
+            ,     ('G2008-04-2', '株式会社古都倉敷', 2, '2025-01-01T12:34:56.789', 'ec2008');
   post:
     desc: "団体を更新_正常"
     req:
@@ -29,23 +29,17 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 207
-      && len(current.res.body) == 4
-      // 必須項目不足のレコードがエラーで返される
-      && current.res.body[0].code == "10004"
-      && current.res.body[0].inputNote == "20080301"
-      && current.res.body[0].message == "必須項目が不足しています。Code"
-      && current.res.body[1].code == "10004"
-      && current.res.body[1].inputNote == "20080302"
-      && current.res.body[1].message == "必須項目が不足しています。Code"
-      && current.res.body[2].code == "10003"
-      && current.res.body[2].inputNote == "20080301"
-      && current.res.body[2].message == "キー項目が重複しています。Code:"
-      && current.res.body[3].code == "10003"
-      && current.res.body[3].inputNote == "20080302"
-      && current.res.body[3].message == "キー項目が重複しています。Code:"
+      && len(current.res.body) == 2
+      // キー重複のレコードがエラーで返される
+      && current.res.body[0].code == "10003"
+      && current.res.body[0].inputNote == "20080402A"
+      && current.res.body[0].message == "キー項目が重複しています。Code:G2008-04-2"
+      && current.res.body[1].code == "10003"
+      && current.res.body[1].inputNote == "20080402B"
+      && current.res.body[1].message == "キー項目が重複しています。Code:G2008-04-2"
     dump:
       expr: current.res.body
-      out: ../Dump/EC2008-03.json
+      out: ../Dump/EC2008-04.json
   confirmPlaces:
     desc: "団体の更新を確認"
     db:
@@ -64,12 +58,12 @@ steps:
     test: |
       len(current.rows) == 2
       // 団体が変更されないことを確認
-      && current.rows[0].organization_code == "G2008-03-1"
+      && current.rows[0].organization_code == "G2008-04-1"
       && current.rows[0].name == "株式会社古都岡山"
       && current.rows[0].order_number == 1
       && current.rows[0].created_at == "20250101"
       && current.rows[0].created_by == "ec2008"
-      && current.rows[1].organization_code == "G2008-03-2"
+      && current.rows[1].organization_code == "G2008-04-2"
       && current.rows[1].name == "株式会社古都倉敷"
       && current.rows[1].order_number == 2
       && current.rows[1].created_at == "20250101"
