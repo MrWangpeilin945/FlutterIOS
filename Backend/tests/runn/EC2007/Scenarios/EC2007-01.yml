@@ -9,7 +9,7 @@ vars:
   request: "json://../Requests/EC2007-01.json"
 steps:
   clearTable:
-    desc: "班テーブルをクリア"
+    desc: "会場テーブルをクリア"
     db:
       query: TRUNCATE TABLE resultcollector.places CASCADE;
   post:

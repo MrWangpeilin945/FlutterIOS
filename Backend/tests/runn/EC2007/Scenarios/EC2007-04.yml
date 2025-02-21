@@ -39,7 +39,7 @@ steps:
       && current.res.body[1].message == "キー項目が重複しています。Code:P2007-04-2"
     dump:
       expr: current.res.body
-      out: ../Dump/EC2006-04.json
+      out: ../Dump/EC2007-04.json
   confirmPlaces:
     desc: "会場の更新を確認"
     db:

@@ -18,7 +18,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers.V1;
 [OpenApiIgnore]
 public class PlaceController : ControllerBase
 {
-    private readonly IPlaceUsecase _administratorUsecase;
+    private readonly IPlaceUsecase _placeUsecaseUsecase;
 
     /// <summary>
     /// コンストラクタ
@@ -26,7 +26,7 @@ public class PlaceController : ControllerBase
     /// <param name="placeUsecaseUsecase">会場 ユースケース</param>
     public PlaceController(IPlaceUsecase placeUsecaseUsecase)
     {
-        _administratorUsecase = placeUsecaseUsecase;
+        _placeUsecaseUsecase = placeUsecaseUsecase;
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public class PlaceController : ControllerBase
     [Route("api/v{version:apiVersion}/external/places")]
     public async Task<IActionResult> StorePlacesAsync([FromBody] Place[] request)
     {
-        var result = await _administratorUsecase.StorePlacesAsync(request.ToList());
+        var result = await _placeUsecaseUsecase.StorePlacesAsync(request.ToList());
 
         if (result.Any())
         {
