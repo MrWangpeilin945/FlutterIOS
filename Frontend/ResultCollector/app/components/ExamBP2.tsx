@@ -34,7 +34,7 @@ import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import styles from "~/styles/common.module.css";
 import React from "react";
 
-type BP2Props = {
+type ExamBP2Props = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
   onChange: (updatedExamItem: InputExamItem[] | undefined) => void;
@@ -49,8 +49,8 @@ export type ValidationHandle = {
   triggerValidation: () => { hasError: boolean };
 };
 
-const ExamBP2 = forwardRef<ValidationHandle, BP2Props>(
-  ({ examItems, onRegisterPressed, onChange }: BP2Props, ref) => {
+const ExamBP2 = forwardRef<ValidationHandle, ExamBP2Props>(
+  ({ examItems, onRegisterPressed, onChange }: ExamBP2Props, ref) => {
     // 定数で定義
     const 血圧1回目 = 1;
     const 血圧2回目 = 2;

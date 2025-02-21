@@ -35,7 +35,7 @@ import { getErrorMessage, errorMessages } from "~/utils/getErrorMessage";
 import { setRangesErrorMessage } from "~/utils/setRangesErrorMessage";
 import styles from "~/styles/common.module.css";
 
-type VisionProps = {
+type ExamVisionProps = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
   onChange: (updatedExamItem: InputExamItem[] | undefined) => void;
@@ -50,8 +50,8 @@ export type ValidationHandle = {
   triggerValidation: () => { hasError: boolean };
 };
 
-const ExamVision = forwardRef<ValidationHandle, VisionProps>(
-  ({ examItems, onRegisterPressed, onChange }: VisionProps, ref) => {
+const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
+  ({ examItems, onRegisterPressed, onChange }: ExamVisionProps, ref) => {
     if (!examItems || examItems.length === 0) {
       return null;
     }

@@ -12,7 +12,7 @@ import type {
 } from "~/domain/wellship.schemas";
 import { InputErrorLevel } from "~/domain/enums";
 
-type SelectProps = {
+type ExamSelectProps = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
   onClick: (updatedExamItem: InputExamItem[] | undefined) => void;
@@ -27,8 +27,8 @@ export type ValidationHandle = {
   triggerValidation: () => { hasError: boolean };
 };
 
-const ExamSelect = forwardRef<ValidationHandle, SelectProps>(
-  ({ examItems, onRegisterPressed, onClick }: SelectProps, ref) => {
+const ExamSelect = forwardRef<ValidationHandle, ExamSelectProps>(
+  ({ examItems, onRegisterPressed, onClick }: ExamSelectProps, ref) => {
     if (!examItems || examItems.length === 0) {
       return null;
     }

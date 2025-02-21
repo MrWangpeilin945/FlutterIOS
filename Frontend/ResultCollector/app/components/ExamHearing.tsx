@@ -12,7 +12,7 @@ import type {
 } from "~/domain/wellship.schemas";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
-type HearingProps = {
+type ExamHearingProps = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
   onClick: (updatedExamItem: InputExamItem[] | undefined) => void;
@@ -27,8 +27,8 @@ export type ValidationHandle = {
   triggerValidation: () => { hasError: boolean };
 };
 
-const ExamHearing = forwardRef<ValidationHandle, HearingProps>(
-  ({ examItems, onRegisterPressed, onClick }: HearingProps, ref) => {
+const ExamHearing = forwardRef<ValidationHandle, ExamHearingProps>(
+  ({ examItems, onRegisterPressed, onClick }: ExamHearingProps, ref) => {
     if (!examItems || examItems.length === 0) {
       return null;
     }
