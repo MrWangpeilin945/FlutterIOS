@@ -17,9 +17,9 @@ steps:
     db: 
       query: |
         insert into resultcollector.places(place_code, name, order_number, created_at, created_by)
-            values('P2007-02-1', '旧第１会場', 1, CURRENT_TIMESTAMP, 'ec2007')
-            ,     ('P2007-02-2', '旧第２会場', 2, CURRENT_TIMESTAMP, 'ec2007')
-            ,     ('P2007-02-3', '旧第３会場', 3, CURRENT_TIMESTAMP, 'ec2007');
+            values('P2007-02-1', '旧第１会場', 1, '2025-01-01T12:34:56.789', 'ec2007')
+            ,     ('P2007-02-2', '旧第２会場', 2, '2025-01-01T12:34:56.789', 'ec2007')
+            ,     ('P2007-02-3', '旧第３会場', 3, '2025-01-01T12:34:56.789', 'ec2007');
   post:
     desc: "会場を更新_正常"
     req:
@@ -30,16 +30,21 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
+      // レスポンスにErrorObjectが返されないことを確認
+      && current.res.body == null
   confirmPlaces:
     desc: "会場の更新を確認"
     db:
       query: |
         SELECT
-          place_code, name
+          place_code
+          , name
+          , order_number
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.places
-        WHERE
-          place_code in ('P2007-02-1', 'P2007-02-2', 'P2007-02-3')
         ORDER BY
           place_code ASC;
     test: |
@@ -47,8 +52,17 @@ steps:
       // リクエストの２つの会場の名称は変更されたことを確認
       && current.rows[0].place_code == "P2007-02-1"
       && current.rows[0].name == "新第１会場"
+      && current.rows[0].order_number == 1
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
       && current.rows[1].place_code == "P2007-02-2"
       && current.rows[1].name == "新第２会場"
+      && current.rows[1].order_number == 2
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
       // リクエストに存在しない会場の名称は変更されないことを確認
       && current.rows[2].place_code == "P2007-02-3"
       && current.rows[2].name == "旧第３会場"
+      && current.rows[2].order_number == 3
+      && current.rows[2].created_at == "20250101"
+      && current.rows[2].created_by == "ec2007"
