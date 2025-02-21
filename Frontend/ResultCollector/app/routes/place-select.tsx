@@ -92,7 +92,8 @@ export default function PlaceSelect() {
         <Container fluid bg="background" pt={32} pb={32} pl={24} pr={24}>
           {!isFetching && (
             <>
-              {placesData?.placeSchedules ? (
+              {placesData?.placeSchedules &&
+              placesData.placeSchedules.length > 0 ? (
                 <Stack gap={16}>
                   {placesData.placeSchedules.map((ps) => (
                     <HeadlineButton

@@ -395,8 +395,7 @@ const ExamBody = forwardRef<ValidationHandle, BodyProps>(
               align="flex-start"
               direction="column"
               w={1038}
-              mb={16}
-            >
+              >
               <Flex align="center" gap="md">
                 <Paper
                   w={274}

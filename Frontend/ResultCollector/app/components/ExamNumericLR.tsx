@@ -324,8 +324,8 @@ const ExamNumericLR = forwardRef<ValidationHandle, ExamNumericLRProps>(
 
     return (
       <Flex justify="flex-start" align="flex-start" direction="column">
-        <Stack>
-          <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
+        <Stack gap={0}>
+          <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16} mb={16}>
             <Text size="lg" fw={700} ta="center">
               {name?.slice(0, 8)}
             </Text>
@@ -409,7 +409,7 @@ const ExamNumericLR = forwardRef<ValidationHandle, ExamNumericLRProps>(
           <Button
             w={154}
             h={64}
-            mt={40}
+            mt={48}
             ml={914}
             size="lg"
             bg="white01"

@@ -359,7 +359,7 @@ const ExamNumeric = forwardRef<ValidationHandle, ExamNumericProps>(
             </Group>
           );
         })}
-        <Box ml={220} mt={50}>
+        <Box ml={220}>
           {showKeyboards && (
             <div ref={closeKeyBoard}>
               {keyboard?.keyboardType === KeyboardType.テンキー ||
