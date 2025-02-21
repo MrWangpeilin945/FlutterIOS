@@ -33,11 +33,17 @@ public class PlaceUsecase : IPlaceUsecase
     {
         _errorObjects.Clear();
 
+        // Code 必須チェック済みのリストを取得する
+        var insertPlacesByRequiredCodes = GetCheckedRequiredCode(places);
+
         // Code 重複チェック済みのリストを取得する
-        var insertPlacesByCodes = GetCheckedDuplicateCode(places);
+        var insertPlacesByDuplicateCodes = GetCheckedDuplicateCode(places);
+
+        var commonInsertPlaces = insertPlacesByRequiredCodes.Intersect(insertPlacesByDuplicateCodes)
+                                                            .ToList();
 
         // エンティティリスト生成
-        var placeEntities = insertPlacesByCodes.Select(item => new PlaceEntity
+        var placeEntities = commonInsertPlaces.Select(item => new PlaceEntity
         {
             PlaceId = Guid.NewGuid(),
             PlaceCode = item.Code,
@@ -48,6 +54,29 @@ public class PlaceUsecase : IPlaceUsecase
         await _placeRepository.UpsertPlacesAsync(placeEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
         return _errorObjects;
+    }
+
+    /// <summary>
+    /// Code 必須チェック済みのリストを取得する
+    /// </summary>
+    /// <param name="places"></param>
+    /// <returns></returns>
+    private List<Place> GetCheckedRequiredCode(List<Place> places)
+    {
+        // WARNING検証
+        // キー重複
+        var requiredData = places.Where(x => string.IsNullOrWhiteSpace(x.Code));
+
+        if (requiredData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredData);
+            return places.Except(requiredData).ToList();
+        }
+        else
+        {
+            return new List<Place>(places);
+        }
     }
 
     /// <summary>
@@ -75,6 +104,24 @@ public class PlaceUsecase : IPlaceUsecase
         }
     }
 
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(必須項目エラー）
+    /// </summary>
+    /// <param name="requiredData"></param>
+    private void AddRequiredDataErrorObjects(IEnumerable<Place> requiredData)
+    {
+        var errorObjects = requiredData
+            .Select(r => new ErrorObject
+            {
+                Code = "10004",
+                Message = "必須項目が不足しています。Code",
+                InputNote = r.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+    /// <summary>
     /// エラーオブジェクトに情報追加する(キーが重複するレコード）
     /// </summary>
     /// <param name="duplicatedData"></param>
