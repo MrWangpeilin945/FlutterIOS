@@ -29,7 +29,7 @@ import type {
   PlaceScheduleLocking,
   PlaceScheduleLockingRequest,
 } from "~/domain/wellship.schemas";
-import { examDateState, placeScheduleState, staffState } from "~/store/store";
+import { placeScheduleState, staffState } from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
 export const meta: MetaFunction = () => {
@@ -42,15 +42,13 @@ export default function PlaceScheduleLock() {
   const [isLoading, setIsLoading] = useState(false);
   const [staff] = useAtom(staffState);
   const [placeSchedule] = useAtom(placeScheduleState);
-  const firstPlaceSchedule = useRef<PlaceScheduleType>();
-  const [examDate] = useAtom(examDateState);
+  const firstPlaceSchedule = useRef<PlaceScheduleType>(placeSchedule);
   const [opened, { open, close }] = useDisclosure(false);
   const [message, setMessage] = useState<string | null>(null);
   const [openedConfirm, { open: openConfirm, close: closeConfirm }] =
     useDisclosure(false);
   const [processStatus, setProcessStatus] =
     useState<PlaceScheduleLockingStatus | null>();
-  const [targetDate] = useState(examDate ? format(examDate, "yyyy-MM-dd") : "");
   const [placeScheduleLock, setPlaceScheduleLock] =
     useState<PlaceScheduleLocking>();
 
@@ -94,7 +92,6 @@ export default function PlaceScheduleLock() {
   };
 
   useEffect(() => {
-    firstPlaceSchedule.current = placeSchedule ?? {};
     fetchGetPlaceScheduleLocking();
   }, []);
 
@@ -165,8 +162,12 @@ export default function PlaceScheduleLock() {
           {!isFetching && (
             <>
               <PlaceSchedule
-                placeName={placeSchedule?.placeName || ""}
-                examDate={targetDate}
+                placeName={placeScheduleLock?.placeName || ""}
+                examDate={
+                  placeScheduleLock?.examDate
+                    ? format(placeScheduleLock.examDate, "yyyy-MM-dd")
+                    : ""
+                }
               />
               {placeScheduleLock ? (
                 <>
