@@ -380,7 +380,7 @@ const ExamHearing = forwardRef<ValidationHandle, HearingProps>(
               py={16}
             >
               <Text size="lg" fw={700} ta="center">
-                {examItemData.name}
+                {examItemData.name?.slice(0, 8)}
               </Text>
             </Paper>
           </Box>
