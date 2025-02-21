@@ -198,7 +198,7 @@ export default function ExamSelect({
   const selectors = examItemDetail.examItemDetailOptions || [];
 
   return (
-    <Flex w={1350} justify="flex-start" align="flex-start" direction="column">
+    <Flex maw={1350} justify="flex-start" align="flex-start" direction="column">
       <Flex mb={16} gap={16}>
         <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
           <Text size="lg" fw={700} ta="center">
