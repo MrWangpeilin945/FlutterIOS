@@ -82,9 +82,6 @@ steps:
           , created_by
         FROM
           resultcollector.exam_normal_value_range
-        WHERE
-          threshold_id = '{{ vars.thresholdId }}'
-          AND exam_item_detail_id in (20094, 20095)
         ORDER BY
           exam_item_detail_id ASC
     bind:
@@ -122,9 +119,6 @@ steps:
           , created_by
         FROM
           resultcollector.exam_normal_value_range
-        WHERE
-          threshold_id = '{{ vars.thresholdId }}'
-          AND exam_item_detail_id in (20094, 20095)
         ORDER BY
           exam_item_detail_id ASC
     test: |
