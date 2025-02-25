@@ -5,7 +5,15 @@ import {
   useParams,
   useSearchParams,
 } from "@remix-run/react";
-import { Button, LoadingOverlay, Space, Stack, Text } from "@mantine/core";
+import {
+  Button,
+  LoadingOverlay,
+  Space,
+  Stack,
+  Text,
+  getThemeColor,
+  useMantineTheme,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useAtom } from "jotai";
 import { type AxiosResponse, isAxiosError } from "axios";
@@ -21,7 +29,11 @@ import type {
   ResultsRequest,
   VerifyExamItems,
 } from "~/domain/wellship.schemas";
-import { InputErrorLevel, ExamItemGroupType } from "~/domain/enums";
+import {
+  InputErrorLevel,
+  ExamItemGroupType,
+  ExamItemDetailType,
+} from "~/domain/enums";
 import {
   connectionEquipmentState,
   examMenuState,
@@ -49,6 +61,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function ConsultInput() {
+  const theme = useMantineTheme();
   const navigate = useNavigate();
   const examData = useRef<InputExamItems>();
   const [, setRendering] = useState(false);
@@ -92,7 +105,7 @@ export default function ConsultInput() {
   //測定ボタンの表示切り替え
   const [visibleRemeasurement, setVisibleRemeasurement] = useState(true);
   //測定ボタンの無効切り替え
-  const [disabledRemeasurement, setDisabledRemeasurement] = useState(false);
+  const disabledRemeasurement = useRef<HTMLButtonElement>(null);
   //機器連携用
   const localStorageKey = "measurementResult";
   const [isWatching, setIsWatching] = useState(false); // 監視状態を管理するフラグ
@@ -169,32 +182,70 @@ export default function ConsultInput() {
     window.location.href = `${targetConnectionEquipment?.appLaunchUrl}`;
   };
 
+  //対象の検査項目明細に対して機器ラベルとvalueが空かをチェック
+  const isValueEmptyForEquipmentLabel = (): boolean => {
+    return (
+      examData.current?.examItemGroups?.some((group) =>
+        group.examItems?.some((item) =>
+          item.examItemDetails?.some(
+            (detail) =>
+              (detail.type === ExamItemDetailType.入力 ||
+                detail.type === ExamItemDetailType.選択) &&
+              detail.hasOrder &&
+              !detail.cancelReasonId &&
+              detail.equipmentLabel &&
+              detail.value === "",
+          ),
+        ),
+      ) || false
+    );
+  };
+
+  //[測定する]ボタンの活性化切り替え
+  const checkRemeasurementDisabled = () => {
+    const isDisabled = !isValueEmptyForEquipmentLabel();
+    if (disabledRemeasurement.current) {
+      if (isDisabled) {
+        disabledRemeasurement.current.disabled = true;
+        disabledRemeasurement.current.style.backgroundColor = getThemeColor(
+          "gray03",
+          theme,
+        );
+        disabledRemeasurement.current.style.color = getThemeColor(
+          "gray02",
+          theme,
+        );
+        disabledRemeasurement.current.style.border = "";
+      } else {
+        disabledRemeasurement.current.disabled = false;
+        disabledRemeasurement.current.style.backgroundColor = getThemeColor(
+          "white01",
+          theme,
+        );
+        disabledRemeasurement.current.style.color = getThemeColor(
+          "black01",
+          theme,
+        );
+        disabledRemeasurement.current.style.border = `2px solid ${getThemeColor("gray03", theme)}`;
+      }
+    }
+    return isDisabled;
+  };
+
   useEffect(() => {
     if (!examData.current) return;
-    setCommonBrowserbackFlag(false); //検査結果入力情報の取得に成功しているため、ブラウザバックフラグをfalseに変更
 
-    //機器ラベルとvalueが空かをチェック
-    const isValueEmptyForEquipmentLabel = (): boolean => {
-      return (
-        examData.current?.examItemGroups?.some((group) =>
-          group.examItems?.some((item) =>
-            item.examItemDetails?.some(
-              (detail) => detail.equipmentLabel && detail.value === "",
-            ),
-          ),
-        ) || false
-      );
-    };
+    setCommonBrowserbackFlag(false); //検査結果入力情報の取得に成功しているため、ブラウザバックフラグをfalseに変更
 
     // 機器連携
     const handleRemeasurementCheck = () => {
-      const isEmpty = isValueEmptyForEquipmentLabel();
       const isConnectionEquipment =
         !!targetConnectionEquipment &&
         !!targetConnectionEquipment.appLaunchUrl &&
         !!targetConnectionEquipment.processingScriptUrl;
       setVisibleRemeasurement(isConnectionEquipment); // 機器が選択されていないなら非表示
-      setDisabledRemeasurement(!isEmpty); // valueが全て存在する場合無効化
+      // valueが全て存在する場合、[測定する]ボタンを無効化
+      const isEmpty = !checkRemeasurementDisabled();
 
       if (isConnectionEquipment && isEmpty && initialDisplay) {
         setInitialDisplay(false);
@@ -284,6 +335,8 @@ export default function ConsultInput() {
         setIsWatching(false);
         window.removeEventListener("storage", handleStorageChange);
       }
+      // valueが全て存在する場合、[測定する]ボタンを無効化
+      checkRemeasurementDisabled();
 
       // ローカルストレージのデータを削除
       localStorage.removeItem(localStorageKey);
@@ -333,6 +386,8 @@ export default function ConsultInput() {
           ) ?? [],
       };
     }
+    // valueが全て存在する場合、[測定する]ボタンを無効化
+    checkRemeasurementDisabled();
   };
 
   //通過のvalueを更新
@@ -744,15 +799,12 @@ export default function ConsultInput() {
           {visibleRemeasurement && (
             <Button
               ml="auto"
-              disabled={disabledRemeasurement}
+              ref={disabledRemeasurement}
               w={184}
               h={75}
               size="lg"
               fw={700}
               variant="outline"
-              bg="white"
-              c="black"
-              bd={`2px solid ${disabledRemeasurement ? "" : "gray03"}`}
               onClick={handleRemeasurement}
             >
               測定する
