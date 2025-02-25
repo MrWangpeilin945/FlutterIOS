@@ -51,7 +51,6 @@ const ExamFreeInput = forwardRef<ValidationHandle, ExamFreeInputProps>(
     ) {
       return null;
     }
-    
 
     const [examItemsData, setExamItemsData] = useState(examItems);
     // APIからのエラーメッセージを保存する
