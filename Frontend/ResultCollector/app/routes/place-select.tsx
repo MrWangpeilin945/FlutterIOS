@@ -99,7 +99,7 @@ export default function PlaceSelect() {
                     <HeadlineButton
                       key={ps.placeId}
                       title={ps.placeName || ""}
-                      elements={ps.startTime ? [ps.startTime] : undefined}
+                      elements={ps.startTime ? [`${ps.startTime}開始`] : undefined}
                       selected={placeSchedule?.placeId === ps.placeId}
                       onClick={() =>
                         callbackClick(
