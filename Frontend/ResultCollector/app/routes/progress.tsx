@@ -42,6 +42,12 @@ export default function Progress() {
       if (result.data) {
         setProgressData(result.data.data);
       } else if (result.error) {
+        if (result.error.status === 400) {
+          setErrorMessage(getErrorMessage(errorMessages.invalid,"パラメータ"));
+        }
+        if (result.error.status === 404) {
+          setErrorMessage(getErrorMessage(errorMessages.notFound,"該当する会場日程"));
+        }
         if (result.error.status === 500) {
           setErrorMessage(getErrorMessage(errorMessages.serverError));
         }
