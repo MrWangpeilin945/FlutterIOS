@@ -33,8 +33,6 @@ steps:
           , created_by
         FROM
           resultcollector.thresholds
-        WHERE
-          threshold_code in ('T201404', 'T201405')
         ORDER BY
           threshold_code DESC
     bind:
@@ -66,8 +64,6 @@ steps:
           , created_by
         FROM
           resultcollector.thresholds
-        WHERE
-          threshold_code in ('T201404', 'T201405')
         ORDER BY
           threshold_code DESC
     test: |
