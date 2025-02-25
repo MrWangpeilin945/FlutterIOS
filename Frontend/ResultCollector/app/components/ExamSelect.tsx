@@ -206,7 +206,12 @@ const ExamSelect = forwardRef<ValidationHandle, ExamSelectProps>(
     const selectors = examItemDetail.examItemDetailOptions || [];
 
     return (
-      <Flex maw={1350} justify="flex-start" align="flex-start" direction="column">
+      <Flex
+        maw={1350}
+        justify="flex-start"
+        align="flex-start"
+        direction="column"
+      >
         <Flex mb={16} gap={16}>
           <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
             <Text size="lg" fw={700} ta="center">
@@ -247,7 +252,7 @@ const ExamSelect = forwardRef<ValidationHandle, ExamSelectProps>(
                   isDisabled ? "" : isSelected ? "primary" : "gray03"
                 }`}
                 bg={isDisabled ? "gray03" : isSelected ? "green03" : "white"}
-                c={isDisabled ? "gray02" : isSelected ? "primary" : "gray02"}
+                c={isDisabled ? "gray02" : isSelected ? "primary" : "black01"}
                 disabled={isDisabled}
               >
                 {selector.name?.slice(0, 8)}
