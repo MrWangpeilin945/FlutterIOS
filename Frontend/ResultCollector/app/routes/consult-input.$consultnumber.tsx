@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   type MetaFunction,
   useNavigate,
@@ -33,7 +33,7 @@ import ExamineeHeader from "~/components/ExamineeHeader";
 import BoothNote from "~/components/BoothNote";
 import CommonDialog from "~/components/CommonDialog";
 import ConfirmDialog from "~/components/ConfirmDialog";
-import ExamNumeric from "~/components/ExamNumeric";
+import ExamNumeric, { type ValidationHandle } from "~/components/ExamNumeric";
 import ExamSelect from "~/components/ExamSelect";
 import ExamBP2 from "~/components/ExamBP2";
 import ExamFreeInput from "~/components/ExamFreeInput";
@@ -97,6 +97,23 @@ export default function ConsultInput() {
   const localStorageKey = "measurementResult";
   const [isWatching, setIsWatching] = useState(false); // 監視状態を管理するフラグ
   const [initialDisplay, setInitialDisplay] = useState(true);
+  //コンポーネント由来のエラー管理
+  const examItemRefs = useRef<{
+    [key: string]: React.RefObject<ValidationHandle>;
+  }>({});
+
+  //共通ダイアログ表示
+  const openCommonDialog = (message: string, buttonMessage: string) => {
+    setCommonMessage(message);
+    setCommonButtonMessage(buttonMessage);
+    openCommon();
+  };
+
+  //確認ダイアログ表示
+  const openConfirmDialog = (message: string) => {
+    setConfirmMessage(message);
+    openConfirm();
+  };
 
   //AP1009呼び出し用(GET系APIの定義)
   const { isFetching, refetch } = useConsultGetInputExamItemsExaminee(
@@ -110,16 +127,12 @@ export default function ConsultInput() {
     setCommonBrowserbackFlag(true);
     //受診番号の受け取り確認
     if (!consultNumber) {
-      setCommonMessage("必要な受診番号がありません。");
-      setCommonButtonMessage("閉じる");
-      openCommon();
+      openCommonDialog("必要な受診番号がありません。", "閉じる");
       return;
     }
     //検査メニューIDの受け取り確認
     if (!examMenuId) {
-      setCommonMessage("必要な検査メニューIDがありません。");
-      setCommonButtonMessage("閉じる");
-      openCommon();
+      openCommonDialog("必要な検査メニューIDがありません。", "閉じる");
       return;
     }
 
@@ -130,20 +143,19 @@ export default function ConsultInput() {
         examData.current = result.data.data;
         setRendering(true);
       } else if (result.error) {
+        let message = "";
         if (result.error.status === 400) {
-          setCommonMessage(getErrorMessage(errorMessages.invalid, "受診番号"));
+          message = getErrorMessage(errorMessages.invalid, "受診番号");
         } else if (result.error.status === 404) {
-          setCommonMessage(getErrorMessage(errorMessages.notFound, "検査項目"));
+          message = getErrorMessage(errorMessages.notFound, "検査項目");
         } else if (result.error.status === 500) {
-          setCommonMessage(getErrorMessage(errorMessages.serverError));
+          message = getErrorMessage(errorMessages.serverError);
         }
-        setCommonButtonMessage("閉じる");
-        openCommon();
+        openCommonDialog(message, "閉じる");
       }
     };
 
     inputExamItems();
-    setCommonBrowserbackFlag(false);
   }, [consultNumber, examMenuId]);
 
   useEffect(() => {
@@ -158,7 +170,7 @@ export default function ConsultInput() {
   };
 
   useEffect(() => {
-    if (!examData) return;
+    if (!examData.current) return;
     setCommonBrowserbackFlag(false); //検査結果入力情報の取得に成功しているため、ブラウザバックフラグをfalseに変更
 
     //機器ラベルとvalueが空かをチェック
@@ -278,9 +290,7 @@ export default function ConsultInput() {
 
       // 値を更新しなかった場合、ダイアログを表示
       if (!isUpdated) {
-        setCommonMessage("表示可能な測定結果がありませんでした。");
-        setCommonButtonMessage("閉じる");
-        openCommon();
+        openCommonDialog("表示可能な測定結果がありませんでした。", "閉じる");
       }
       setIsLoading(false);
     };
@@ -305,11 +315,21 @@ export default function ConsultInput() {
       examData.current = {
         ...examData.current,
         examItemGroups:
-          examData.current?.examItemGroups?.map(
-            (group, gIndex) =>
-              gIndex === groupIndex
-                ? { ...group, examItems: newExamItems } // 対象のグループの `examItems` を更新
-                : group, // 他のグループはそのまま
+          examData.current?.examItemGroups?.map((group, gIndex) =>
+            gIndex === groupIndex
+              ? {
+                  ...group,
+                  examItems: newExamItems.map((newItem) => {
+                    const existingItem = group.examItems?.find(
+                      (item) => item.examItemId === newItem.examItemId,
+                    );
+                    return {
+                      ...newItem,
+                      examRegistResults: existingItem?.examRegistResults ?? [],
+                    };
+                  }),
+                }
+              : group,
           ) ?? [],
       };
     }
@@ -386,12 +406,9 @@ export default function ConsultInput() {
   //エラーレベルによる分岐処理
   const errorBranch = (errorLevel?: number) => {
     if (errorLevel === InputErrorLevel.異常) {
-      setCommonMessage("エラーがあります。内容を確認してください");
-      setCommonButtonMessage("閉じる");
-      openCommon();
+      openCommonDialog("エラーがあります。内容を確認してください。", "閉じる");
     } else if (errorLevel === InputErrorLevel.警告) {
-      setConfirmMessage("ワーニングがありますが、登録します。よろしいですか。");
-      openConfirm();
+      openConfirmDialog("ワーニングがありますが、登録します。よろしいですか。");
     } else {
       return;
     }
@@ -414,8 +431,7 @@ export default function ConsultInput() {
         });
         if (result.status === 200) {
           // 正常時の処理
-          setConfirmMessage("登録します。よろしいですか。");
-          openConfirm();
+          openConfirmDialog("登録します。よろしいですか。");
         }
       } catch (error) {
         let errorMessage = "";
@@ -450,20 +466,37 @@ export default function ConsultInput() {
           }
         }
         // 共通ダイアログにエラーメッセージを表示
-        setCommonMessage(errorMessage);
-        setCommonButtonMessage("閉じる");
-        openCommon();
+        openCommonDialog(errorMessage, "閉じる");
       }
       setIsLoading(false);
     };
     postMutateAsync();
   };
 
+  const handleComponentValidationCheck = () => {
+    let hasCompError = false; // 初期状態では全てバリデーションが成功と仮定
+
+    // `examItemRefs` 内の全ての `ref` に対して `triggerValidation` を実行
+    for (const ref of Object.values(examItemRefs.current)) {
+      const result = ref.current?.triggerValidation();
+      if (result?.hasError) {
+        hasCompError = true;
+      }
+    }
+
+    return hasCompError;
+  };
+
   //検証処理
   const handleVerify = () => {
     setIsRegisterPressed(true);
-    //AP1013_検査結果を検証する
-    verifyResults();
+    const hasCompError = handleComponentValidationCheck();
+    if (!hasCompError) {
+      //AP1013_検査結果を検証する
+      verifyResults();
+    } else {
+      openCommonDialog("エラーがあります。内容を確認してください。", "閉じる");
+    }
   };
 
   // 検査継続処理
@@ -515,9 +548,7 @@ export default function ConsultInput() {
           }
         }
         // 共通ダイアログにエラーメッセージを表示
-        setCommonMessage(errorMessage);
-        setCommonButtonMessage("閉じる");
-        openCommon();
+        openCommonDialog(errorMessage, "閉じる");
       }
       setIsLoading(false);
     };
@@ -564,14 +595,22 @@ export default function ConsultInput() {
     // 通過フラグをリセット
     setHasPass(false);
     // 共通のコールバック関数
-    const handleChange = (updatedExamItem: InputExamItem[] | undefined) =>
+    const handleChange = (updatedExamItem: InputExamItem[] | undefined) => {
       callbackChangeValue(updatedExamItem, groupIndex);
+    };
+
+    // コンポーネントのレンダリング時にrefを管理
+    // `ref` がまだ作成されていない場合は作成
+    if (!examItemRefs.current[groupIndex]) {
+      examItemRefs.current[groupIndex] = React.createRef();
+    }
 
     // typeによるコンポーネントの切り替え
     switch (type) {
       case ExamItemGroupType.数値:
         return (
           <ExamNumeric
+            ref={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -581,6 +620,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.選択:
         return (
           <ExamSelect
+            ref={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -590,6 +630,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.血圧2回:
         return (
           <ExamBP2
+            ref={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -599,6 +640,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.自由入力:
         return (
           <ExamFreeInput
+            ref={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -608,6 +650,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.数値_左右:
         return (
           <ExamNumericLR
+            ref={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -617,6 +660,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.選択_左右:
         return (
           <ExamSelectLR
+            ref={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -626,6 +670,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.身体計測:
         return (
           <ExamBody
+            ref={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -635,6 +680,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.視力:
         return (
           <ExamVision
+            ref={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -644,6 +690,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.聴力:
         return (
           <ExamHearing
+            ref={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -665,12 +712,10 @@ export default function ConsultInput() {
 
         // メッセージの設定
         if (detailValue === 実施済み) {
-          setConfirmMessage("実施済みです。取消してよろしいですか。");
+          openConfirmDialog("実施済みです。取消してよろしいですか。");
         } else {
-          setConfirmMessage("登録します。よろしいですか。");
+          openConfirmDialog("登録します。よろしいですか。");
         }
-
-        openConfirm();
         return;
       }
       default:

@@ -124,7 +124,7 @@ export default function PlaceScheduleLock() {
       try {
         const result = await mutateAsync({
           version: "1",
-          placeScheduleId: placeSchedule?.placeScheduleId || "",
+          placeScheduleId: placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
           data: body,
         });
         if (result.status === 200) {
