@@ -5,9 +5,16 @@ import {
   useParams,
   useSearchParams,
 } from "@remix-run/react";
-import { Button, LoadingOverlay, Space, Stack, Text } from "@mantine/core";
+import {
+  Button,
+  LoadingOverlay,
+  Space,
+  Stack,
+  Text,
+  getThemeColor,
+  useMantineTheme,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { getThemeColor, useMantineTheme } from "@mantine/core";
 import { useAtom } from "jotai";
 import { type AxiosResponse, isAxiosError } from "axios";
 import {
