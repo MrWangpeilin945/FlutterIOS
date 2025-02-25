@@ -1,4 +1,4 @@
-desc: EC2001-02 受診者を更新_正常 [200]
+desc: EC2001-04 除外されてないものは追加更新_正常
 runners:
   db: ${DB_HOST}
   req:
@@ -6,9 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  request: "json://../Requests/EC2001-02.json"
-  examineeCode1: "EC2001021"
-  examineeCode2: "EC2001022"
+  request: "json://../Requests/EC2001-04.json"
 steps:
   clearTable:
     desc: "関連テーブルのクリア"
@@ -22,26 +20,28 @@ steps:
     desc: "関連テーブルに実行前データを登録"
     db:
       query: |
-        -- 受診
+        -- 受診者
         INSERT INTO
           resultcollector.examinees
           (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
-        VALUES('e0002001-0000-0000-0002-000000000001','EC2001021', '岡山　二郎', 'オカヤマ　ジロウ', 1, '1978-10-31', CURRENT_TIMESTAMP, 'ec2001')
-        ,     ('e0002001-0000-0000-0002-000000000002','EC2001022', '岡山　さくら', 'オカヤマ　サクラ', 2, '1980-12-20', CURRENT_TIMESTAMP, 'ec2001');
+        VALUES('e0002001-0000-0000-0004-000000000001','EC2001041', '笠岡　太郎', 'カサオカ　タロウ', 1, '1978-10-31', CURRENT_TIMESTAMP, 'ec2001')
+        ,     ('e0002001-0000-0000-0004-000000000002','EC2001042', '新見　花子', 'ニイミ　ハナコ', 1, '1984-11-30', CURRENT_TIMESTAMP, 'ec2001');
         -- 団体
         INSERT INTO
           resultcollector.organizations
           (organization_id, organization_code, name, order_number, created_at, created_by)
-        VALUES('a0002001-0000-0000-0002-000000000001', 'ORG2001-21', '株式会社備前', 21, CURRENT_TIMESTAMP,'ec2001')
-        ,     ('a0002001-0000-0000-0002-000000000002', 'ORG2001-22', '株式会社真庭', 22, CURRENT_TIMESTAMP,'ec2001')
-        ,     ('a0002001-0000-0000-0002-000000000003', 'ORG2001-23', '株式会社新見', 23, CURRENT_TIMESTAMP,'ec2001');
+        VALUES('a0002001-0000-0000-0004-000000000001', 'ORG2001-41', '株式会社笠岡', 41, CURRENT_TIMESTAMP,'ec2001')
+        ,     ('a0002001-0000-0000-0004-000000000002', 'ORG2001-42', '株式会社井原', 42, CURRENT_TIMESTAMP,'ec2001')
+        ,     ('a0002001-0000-0000-0004-000000000003', 'ORG2001-43', '株式会社高梁', 43, CURRENT_TIMESTAMP,'ec2001')
+        ,     ('a0002001-0000-0000-0004-000000000004', 'ORG2001-44', '株式会社新見', 44, CURRENT_TIMESTAMP,'ec2001')
+        ,     ('a0002001-0000-0000-0004-000000000005', 'ORG2001-45', '株式会社玉野', 45, CURRENT_TIMESTAMP,'ec2001');
         -- 所属
         INSERT INTO
           resultcollector.affiliations
           (examinee_id, organization_id, created_at, created_by)
-        VALUES('e0002001-0000-0000-0002-000000000001','a0002001-0000-0000-0002-000000000001', CURRENT_TIMESTAMP,'ec2001')
-        ,     ('e0002001-0000-0000-0002-000000000001','a0002001-0000-0000-0002-000000000002', CURRENT_TIMESTAMP,'ec2001')
-        ,     ('e0002001-0000-0000-0002-000000000002','a0002001-0000-0000-0002-000000000003', CURRENT_TIMESTAMP,'ec2001');
+        VALUES('e0002001-0000-0000-0004-000000000001','a0002001-0000-0000-0004-000000000001', CURRENT_TIMESTAMP,'ec2001')
+        ,     ('e0002001-0000-0000-0004-000000000001','a0002001-0000-0000-0004-000000000004', CURRENT_TIMESTAMP,'ec2001')
+        ,     ('e0002001-0000-0000-0004-000000000002','a0002001-0000-0000-0004-000000000005', CURRENT_TIMESTAMP,'ec2001');
   getExaminees:
     desc: "受診者情報の取得"
     db:
@@ -53,7 +53,7 @@ steps:
           , kana_name
           , sex
           , to_char(birthdate, 'yyyymmdd') as birthdate
-          , created_at
+          , to_char(created_at, 'yyyymmdd') as created_at
           , created_by
         FROM
           resultcollector.examinees
@@ -81,11 +81,11 @@ steps:
             on a.organization_id = o.organization_id
         ORDER BY
           e.examinee_code ASC
-          , o.organization_code ASC;
+          , o.organization_code ASC
     bind:
       affiliationsData: current.rows
   post:
-    desc: "受診者を更新_正常"
+    desc: "除外されてないものは追加更新_正常"
     req:
       /api/v1/external/examinees:
         post:
@@ -94,13 +94,16 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
-      // レスポンスにErrorObjectが返されないことを確認
-      && len(current.res.body) == 0
+      // レスポンスに1件のErrorObjectが返されることを確認
+      && len(current.res.body) == 1
+      && current.res.body[0].code == "10001"
+      && current.res.body[0].inputNote == "2001041"
+      && current.res.body[0].message == "指定されたOrganizationCodeがシステム上に存在しません。Code:ORG2001-99"
     dump:
       expr: current.res.body
-      out: ../Dump/EC2001-02.json
+      out: ../Dump/EC2001-04.json
   confirmExaminees:
-    desc: "受診者の更新を確認"
+    desc: "除外されてない受診者が追加更新登録されているかを確認"
     db:
       query: |
         SELECT
@@ -110,32 +113,45 @@ steps:
           , kana_name
           , sex
           , to_char(birthdate, 'yyyymmdd') as birthdate
-          , created_at
+          , to_char(created_at, 'yyyymmdd') as created_at
           , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.examinees
         ORDER BY
           examinee_code ASC;
     test: |
-      // リクエストの受診者情報が変更されたことを確認
-      len(current.rows) == 2
+      // 受診者情報が登録されたことを確認
+      len(current.rows) == 3
       && current.rows[0].examinee_id == examineesData[0].examinee_id
       && current.rows[0].examinee_code == examineesData[0].examinee_code
-      && current.rows[0].name == "岡山　花子"
-      && current.rows[0].kana_name == "オカヤマ　ハナコ"
-      && current.rows[0].sex == 2
-      && current.rows[0].birthdate == "19600401"
-      && current.rows[0].created_at > examineesData[0].created_at
+      // 氏名が変更されていることを確認
+      && current.rows[0].name != examineesData[0].name
+      // カナ氏名が変更されていることを確認
+      && current.rows[0].kana_name != examineesData[0].kana_name
+      // 生年月日が変更されていることを確認
+      && current.rows[0].birthdate != examineesData[0].birthdate
+      // 性別が変更されていないことを確認
+      && current.rows[0].sex == examineesData[0].sex
+      && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
-      // リクエストに存在しない受診者情報は変更されないことを確認
+      // リクエストに含まれないので変更がないことを確認
       && current.rows[1].examinee_id == examineesData[1].examinee_id
       && current.rows[1].examinee_code == examineesData[1].examinee_code
       && current.rows[1].name == examineesData[1].name
       && current.rows[1].kana_name == examineesData[1].kana_name
-      && current.rows[1].sex == examineesData[1].sex
       && current.rows[1].birthdate == examineesData[1].birthdate
+      && current.rows[1].sex == examineesData[1].sex
       && current.rows[1].created_at == examineesData[1].created_at
       && current.rows[1].created_by == examineesData[1].created_by
+      // 新規登録
+      && current.rows[2].examinee_code == "EC2001043"
+      && current.rows[2].name == "岡山　太郎"
+      && current.rows[2].kana_name == "オカヤマ　タロウ"
+      && current.rows[2].birthdate == "19740912"
+      && current.rows[2].sex == 1
+      && current.rows[2].created_at == current.rows[2].now
+      && current.rows[2].created_by == "ExternalConnection"
   confirmAffiliations:
     desc: "所属の更新を確認"
     db:
@@ -156,17 +172,22 @@ steps:
             on a.organization_id = o.organization_id
         ORDER BY
           e.examinee_code ASC
-          , o.organization_code ASC;
+          , o.organization_code ASC
     test: |
       // ２件の所属レコードを確認
-      len(current.rows) == 2
+      len(current.rows) == 3
       // リクエストの受診者の所属情報が洗い替えされたことを確認
-      && current.rows[0].examinee_code == vars.examineeCode1
-      && current.rows[0].organization_code == "ORG2001-23"
+      && current.rows[0].examinee_code == "EC2001041"
+      && current.rows[0].organization_code == "ORG2001-42"
       && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
       // リクエストに存在しない受診者の所属情報は変更されないことを確認
-      && current.rows[1].examinee_id == affiliationsData[2].examinee_id
-      && current.rows[1].organization_id == affiliationsData[2].organization_id
+      && current.rows[1].examinee_code == affiliationsData[2].examinee_code
+      && current.rows[1].organization_code == affiliationsData[2].organization_code
       && current.rows[1].created_at == affiliationsData[2].created_at
       && current.rows[1].created_by == affiliationsData[2].created_by
+      // リクエストに受診者の所属情報が追加されたことを確認
+      && current.rows[2].examinee_code == "EC2001043"
+      && current.rows[2].organization_code == "ORG2001-43"
+      && current.rows[2].created_at == current.rows[2].now
+      && current.rows[2].created_by == "ExternalConnection"
