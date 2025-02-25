@@ -307,7 +307,8 @@ export default function ExamresultExportHistory() {
         <Container fluid bg="background" p={0}>
           {!isFetching && (
             <>
-              {exportHistory?.exportHistories ? (
+              {exportHistory?.exportHistories &&
+              exportHistory.exportHistories.length > 0 ? (
                 <Table bg="white01" striped="even" stripedColor="stripe">
                   <Table.Thead
                     h={80}
@@ -436,7 +437,7 @@ export default function ExamresultExportHistory() {
             </>
           )}
         </Container>
-        <Space h={100}/>
+        <Space h={100} />
         <CommonFooter items={footerItems} />
       </AuthWrapper>
     </>
