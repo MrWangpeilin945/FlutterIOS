@@ -290,7 +290,7 @@ const ExamSelectLR = forwardRef<ValidationHandle, ExamSelectLRProps>(
                               ? "gray02"
                               : isSelected
                                 ? "primary"
-                                : "gray02"
+                                : "black01"
                           }
                           size="xl"
                           fw={700}
