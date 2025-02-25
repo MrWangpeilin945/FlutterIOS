@@ -7,6 +7,7 @@ import {
 } from "@remix-run/react";
 import { Button, LoadingOverlay, Space, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { getThemeColor, useMantineTheme } from "@mantine/core";
 import { useAtom } from "jotai";
 import { type AxiosResponse, isAxiosError } from "axios";
 import {
@@ -53,6 +54,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function ConsultInput() {
+  const theme = useMantineTheme();
   const navigate = useNavigate();
   const examData = useRef<InputExamItems>();
   const [, setRendering] = useState(false);
@@ -186,14 +188,26 @@ export default function ConsultInput() {
     if (disabledRemeasurement.current) {
       if (isDisabled) {
         disabledRemeasurement.current.disabled = true;
-        disabledRemeasurement.current.style.backgroundColor = "#CECECE";
-        disabledRemeasurement.current.style.color = "#949494";
+        disabledRemeasurement.current.style.backgroundColor = getThemeColor(
+          "gray03",
+          theme,
+        );
+        disabledRemeasurement.current.style.color = getThemeColor(
+          "gray02",
+          theme,
+        );
         disabledRemeasurement.current.style.border = "";
       } else {
         disabledRemeasurement.current.disabled = false;
-        disabledRemeasurement.current.style.backgroundColor = "white";
-        disabledRemeasurement.current.style.color = "black";
-        disabledRemeasurement.current.style.border = "2px solid #CECECE";
+        disabledRemeasurement.current.style.backgroundColor = getThemeColor(
+          "white01",
+          theme,
+        );
+        disabledRemeasurement.current.style.color = getThemeColor(
+          "black01",
+          theme,
+        );
+        disabledRemeasurement.current.style.border = `2px solid ${getThemeColor("gray03", theme)}`;
       }
     }
     return isDisabled;
@@ -210,7 +224,7 @@ export default function ConsultInput() {
         !!targetConnectionEquipment &&
         !!targetConnectionEquipment.appLaunchUrl &&
         !!targetConnectionEquipment.processingScriptUrl;
-      setVisibleRemeasurement(true); // 機器が選択されていないなら非表示
+      setVisibleRemeasurement(isConnectionEquipment); // 機器が選択されていないなら非表示
       // valueが全て存在する場合、[測定する]ボタンを無効化
       const isEmpty = !checkRemeasurementDisabled();
 
