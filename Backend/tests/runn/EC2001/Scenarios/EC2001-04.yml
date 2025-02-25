@@ -66,7 +66,9 @@ steps:
     db:
       query: |
         SELECT
-          e.examinee_code
+          a.examinee_id::text
+          , a.organization_id::text
+          , e.examinee_code
           , o.organization_code
           , to_char(a.created_at, 'yyyymmdd') as created_at
           , a.created_by
@@ -120,6 +122,8 @@ steps:
           resultcollector.examinees
         ORDER BY
           examinee_code ASC;
+    bind:
+      entryExaminees: current.rows
     test: |
       // 受診者情報が登録されたことを確認
       len(current.rows) == 3
@@ -157,7 +161,9 @@ steps:
     db:
       query: |
         SELECT
-          e.examinee_code
+          a.examinee_id::text
+          , a.organization_id::text
+          , e.examinee_code
           , o.organization_code
           , to_char(a.created_at, 'yyyymmdd') as created_at
           , a.created_by
@@ -178,16 +184,22 @@ steps:
       len(current.rows) == 3
       // リクエストの受診者の所属情報が洗い替えされたことを確認
       && current.rows[0].examinee_code == "EC2001041"
+      && current.rows[0].examinee_id == entryExaminees[0].examinee_id
       && current.rows[0].organization_code == "ORG2001-42"
+      && current.rows[0].organization_id == "a0002001-0000-0000-0004-000000000002"
       && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
       // リクエストに存在しない受診者の所属情報は変更されないことを確認
       && current.rows[1].examinee_code == affiliationsData[2].examinee_code
+      && current.rows[1].examinee_id == affiliationsData[2].examinee_id
       && current.rows[1].organization_code == affiliationsData[2].organization_code
+      && current.rows[1].organization_id == affiliationsData[2].organization_id
       && current.rows[1].created_at == affiliationsData[2].created_at
       && current.rows[1].created_by == affiliationsData[2].created_by
       // リクエストに受診者の所属情報が追加されたことを確認
       && current.rows[2].examinee_code == "EC2001043"
+      && current.rows[2].examinee_id == entryExaminees[2].examinee_id
       && current.rows[2].organization_code == "ORG2001-43"
+      && current.rows[2].organization_id == "a0002001-0000-0000-0004-000000000003"
       && current.rows[2].created_at == current.rows[2].now
       && current.rows[2].created_by == "ExternalConnection"

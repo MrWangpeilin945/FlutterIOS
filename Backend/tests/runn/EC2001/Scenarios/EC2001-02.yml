@@ -7,8 +7,6 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2001-02.json"
-  examineeCode1: "EC2001021"
-  examineeCode2: "EC2001022"
 steps:
   clearTable:
     desc: "関連テーブルのクリア"
@@ -66,7 +64,9 @@ steps:
     db:
       query: |
         SELECT
-          e.examinee_code
+          a.examinee_id::text
+          , a.organization_id::text
+          , e.examinee_code
           , o.organization_code
           , to_char(a.created_at, 'yyyymmdd') as created_at
           , a.created_by
@@ -141,7 +141,9 @@ steps:
     db:
       query: |
         SELECT
-          e.examinee_code
+          a.examinee_id::text
+          , a.organization_id::text
+          , e.examinee_code
           , o.organization_code
           , to_char(a.created_at, 'yyyymmdd') as created_at
           , a.created_by
@@ -161,12 +163,16 @@ steps:
       // ２件の所属レコードを確認
       len(current.rows) == 2
       // リクエストの受診者の所属情報が洗い替えされたことを確認
-      && current.rows[0].examinee_code == vars.examineeCode1
+      && current.rows[0].examinee_id == "e0002001-0000-0000-0002-000000000001"
+      && current.rows[0].organization_id == "a0002001-0000-0000-0002-000000000003"
+      && current.rows[0].examinee_code == "EC2001021"
       && current.rows[0].organization_code == "ORG2001-23"
       && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
       // リクエストに存在しない受診者の所属情報は変更されないことを確認
       && current.rows[1].examinee_id == affiliationsData[2].examinee_id
       && current.rows[1].organization_id == affiliationsData[2].organization_id
+      && current.rows[1].examinee_code == affiliationsData[2].examinee_code
+      && current.rows[1].organization_code == affiliationsData[2].organization_code
       && current.rows[1].created_at == affiliationsData[2].created_at
       && current.rows[1].created_by == affiliationsData[2].created_by

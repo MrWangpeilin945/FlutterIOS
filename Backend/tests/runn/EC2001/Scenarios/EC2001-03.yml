@@ -50,10 +50,9 @@ steps:
     db:
       query: |
         SELECT
-          count(*)
+          examinee_code
         FROM
           resultcollector.examinees;
     test: |
-      // 受診者情報が登録されたいないことを確認
-      len(current.rows) == 1
-      && current.rows[0].count == 0
+      // 受診者情報が登録されていないこと確認
+      len(current.rows) == 0
