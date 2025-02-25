@@ -69,7 +69,7 @@ export default function Progress() {
           />
           {!isFetching && (
             <>
-              {progressData?.progress ? (
+              {progressData?.progress && progressData.progress.length > 0 ? (
                 <Stack gap={16} pt={24}>
                   {progressData?.progress?.map((p) => (
                     <ExamItemProgress
@@ -96,7 +96,7 @@ export default function Progress() {
             </>
           )}
         </Container>
-        <Space h={100}/>
+        <Space h={100} />
         <CommonFooter />
       </AuthWrapper>
     </>
