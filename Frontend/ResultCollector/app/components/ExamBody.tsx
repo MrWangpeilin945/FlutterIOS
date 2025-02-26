@@ -56,6 +56,8 @@ const ExamBody = forwardRef<ValidationHandle, ExamBodyProps>(
     if (!examItems || examItems.length === 0) {
       return null;
     }
+    //登録ボタンプレスフラグを制御するための変数
+    let isRegisterPressed = onRegisterPressed;
 
     // 定数で定義
     const 身長 = 1;
@@ -103,6 +105,7 @@ const ExamBody = forwardRef<ValidationHandle, ExamBodyProps>(
     // 画面からバリデーションチェックを行う
     useImperativeHandle(ref, () => ({
       triggerValidation: () => {
+        isRegisterPressed = true;
         let hasError = false;
         for (const item of examItemsData) {
           const { hasCallback } = validationCheck(item);
@@ -189,7 +192,7 @@ const ExamBody = forwardRef<ValidationHandle, ExamBodyProps>(
               ? "体脂肪率は"
               : "";
       // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
-      const schema = onRegisterPressed
+      const schema = isRegisterPressed
         ? z
             .string()
             .min(

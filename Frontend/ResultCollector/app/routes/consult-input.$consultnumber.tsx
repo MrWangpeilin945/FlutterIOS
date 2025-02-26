@@ -155,8 +155,22 @@ export default function ConsultInput() {
     const inputExamItems = async () => {
       const result = await refetch();
       if (result.data) {
-        examData.current = result.data.data;
-        setRendering(true);
+        const responseData = result.data.data;
+        // examItemGroups 内のすべての examItems が空でないことを確認
+        const hasExamItems = responseData.examItemGroups?.some((group) =>
+          group.examItems?.some((item) => Object.keys(item).length > 0),
+        );
+        //examItemGroupsとexamItemsに要素が存在するかをチェック
+        if (
+          responseData.examItemGroups &&
+          responseData.examItemGroups?.length > 0 &&
+          hasExamItems
+        ) {
+          examData.current = responseData;
+          setRendering(true);
+        } else {
+          openCommonDialog("入力可能な項目がありません。", "閉じる");
+        }
       } else if (result.error) {
         let message = "";
         if (result.error.status === 400) {

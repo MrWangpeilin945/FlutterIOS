@@ -376,7 +376,6 @@ const ExamHearing = forwardRef<ValidationHandle, ExamHearingProps>(
               bg="gray02"
               c="white"
               radius="itemName"
-              px={32}
               py={16}
             >
               <Text size="lg" fw={700} ta="center">

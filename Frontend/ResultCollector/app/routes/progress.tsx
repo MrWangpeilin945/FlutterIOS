@@ -42,6 +42,12 @@ export default function Progress() {
       if (result.data) {
         setProgressData(result.data.data);
       } else if (result.error) {
+        if (result.error.status === 400) {
+          setErrorMessage(getErrorMessage(errorMessages.invalid,"パラメータ"));
+        }
+        if (result.error.status === 404) {
+          setErrorMessage(getErrorMessage(errorMessages.notFound,"該当する会場日程"));
+        }
         if (result.error.status === 500) {
           setErrorMessage(getErrorMessage(errorMessages.serverError));
         }
@@ -63,7 +69,7 @@ export default function Progress() {
           />
           {!isFetching && (
             <>
-              {progressData?.progress ? (
+              {progressData?.progress && progressData.progress.length > 0 ? (
                 <Stack gap={16} pt={24}>
                   {progressData?.progress?.map((p) => (
                     <ExamItemProgress
@@ -90,7 +96,7 @@ export default function Progress() {
             </>
           )}
         </Container>
-        <Space h={100}/>
+        <Space h={100} />
         <CommonFooter />
       </AuthWrapper>
     </>

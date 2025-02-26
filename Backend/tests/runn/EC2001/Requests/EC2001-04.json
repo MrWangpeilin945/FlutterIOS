@@ -1,0 +1,41 @@
+[
+    {
+        "examineeCode": "EC2001049",
+        "name": "岡山　花子",
+        "kanaName": "オカヤマ　ハナコ",
+        "sex": 2,
+        "birthdate": "1985-12-24",
+        "affiliations": [
+            {
+                "organizationCode": "ORG2001-99"
+            }
+        ],
+        "inputNote": "2001041"
+    },
+    {
+        "examineeCode": "EC2001041",
+        "name": "笠岡　一太郎",
+        "kanaName": "イバラギ　イチタロウ",
+        "sex": 1,
+        "birthdate": "1985-10-10",
+        "affiliations": [
+            {
+                "organizationCode": "ORG2001-42"
+            }
+        ],
+        "inputNote": "2001042"
+    },
+    {
+        "examineeCode": "EC2001043",
+        "name": "岡山　太郎",
+        "kanaName": "オカヤマ　タロウ",
+        "sex": 1,
+        "birthdate": "1974-09-12",
+        "affiliations": [
+            {
+                "organizationCode": "ORG2001-43"
+            }
+        ],
+        "inputNote": "2001043"
+    }
+]

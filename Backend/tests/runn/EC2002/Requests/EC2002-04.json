@@ -1,0 +1,30 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "EX2002041",
+        "actionType": 0,
+        "ticketNumber": "T2002041",
+        "inputNote": "2002041"
+    },
+    {
+        "sortNo": 2,
+        "connectionCode": "EX2002042",
+        "actionType": 0,
+        "ticketNumber": "T2002042",
+        "inputNote": "2002042"
+    },
+    {
+        "sortNo": 3,
+        "connectionCode": "EX2002043",
+        "actionType": 0,
+        "ticketNumber": "T2002043",
+        "inputNote": "2002043"
+    },
+    {
+        "sortNo": 4,
+        "connectionCode": "EX2002044",
+        "actionType": 0,
+        "ticketNumber": "T2002044",
+        "inputNote": "2002044"
+    }
+]

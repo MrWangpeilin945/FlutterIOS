@@ -1,0 +1,74 @@
+[
+    {
+        "name": "ヘモグロビン（男女）",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "EC2009HGB",
+        "maxAge": "9999999",
+        "minAge": "0000000",
+        "targetSex": 3,
+        "MaxValue": "10.6",
+        "MinValue": "8.7",
+        "errorLevel": 2,
+        "inputNote": "2009071"
+    },
+    {
+        "name": "ヘモグロビン（基準値パターンが取得できない）",
+        "thresholdCd": "Dummy2009",
+        "examItemDetailCd": "EC2009HGB",
+        "maxAge": "9999999",
+        "minAge": "0000000",
+        "targetSex": 3,
+        "MaxValue": "10.6",
+        "MinValue": "8.7",
+        "errorLevel": 1,
+        "inputNote": "2009072"
+    },
+    {
+        "name": "ヘモグロビン（検査項目明細IDが取得できない）",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "Dummy2009HGB",
+        "maxAge": "9999999",
+        "minAge": "0000000",
+        "targetSex": 3,
+        "MaxValue": "10.6",
+        "MinValue": "8.7",
+        "errorLevel": 1,
+        "inputNote": "2009073"
+    },
+    {
+        "name": "ヘモグロビン１（PKが重複するレコードが存在する）",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "EC2009HGB",
+        "maxAge": "750000",
+        "minAge": "0000000",
+        "targetSex": 1,
+        "MaxValue": "10.6",
+        "MinValue": "8.7",
+        "errorLevel": 1,
+        "inputNote": "2009074"
+    },
+    {
+        "name": "ヘモグロビン２（PKが重複するレコードが存在する）",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "EC2009HGB",
+        "maxAge": "0750000",
+        "minAge": "0000000",
+        "targetSex": 1,
+        "MaxValue": "10.6",
+        "MinValue": "5.7",
+        "errorLevel": 3,
+        "inputNote": "2009075"
+    },
+    {
+        "name": "ヘモグロビン（基準値パターン・検査項目明細IDが取得できない）",
+        "thresholdCd": "Dummy2009",
+        "examItemDetailCd": "Dummy2009HGB",
+        "maxAge": "9999999",
+        "minAge": "0000000",
+        "targetSex": 3,
+        "MaxValue": "10.6",
+        "MinValue": "8.7",
+        "errorLevel": 1,
+        "inputNote": "2009076"
+    }
+]

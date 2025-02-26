@@ -55,6 +55,9 @@ const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
     if (!examItems || examItems.length === 0) {
       return null;
     }
+    //登録ボタンプレスフラグを制御するための変数
+    let isRegisterPressed = onRegisterPressed;
+
     // 定数で定義
     const 裸眼 = 1;
     const 矯正 = 2;
@@ -96,6 +99,7 @@ const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
     // 画面からバリデーションチェックを行う
     useImperativeHandle(ref, () => ({
       triggerValidation: () => {
+        isRegisterPressed = true;
         let hasError = false;
         // 必須チェック
         const hasRequiredError = requiredCheck(examItems);
@@ -318,7 +322,7 @@ const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
         }
 
         // 矯正チェック
-        if (onRegisterPressed) {
+        if (isRegisterPressed) {
           const result = collectionCheck(
             item,
             detail.positionNumber ?? 0,

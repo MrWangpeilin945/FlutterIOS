@@ -304,7 +304,7 @@ export default function ExamresultExport() {
         <Container fluid bg="background" p={0}>
           {!isFetching && (
             <>
-              {exportData?.exportData ? (
+              {exportData?.exportData && exportData.exportData.length > 0 ? (
                 <Table bg="white01" striped="even" stripedColor="stripe">
                   <Table.Thead
                     h={80}
@@ -348,7 +348,11 @@ export default function ExamresultExport() {
                             py={16}
                             px={32}
                             bd="2px solid"
-                            onClick={() => navigate(`/placeschedule-lock?placescheduleid=${ed.placeScheduleId}`)}
+                            onClick={() =>
+                              navigate(
+                                `/placeschedule-lock?placescheduleid=${ed.placeScheduleId}`,
+                              )
+                            }
                           >
                             <Text
                               size="lg"

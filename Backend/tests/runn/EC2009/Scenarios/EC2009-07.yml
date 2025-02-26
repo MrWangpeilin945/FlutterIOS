@@ -1,0 +1,171 @@
+desc: EC2009-07 除外されてないものは追加更新_正常
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2009-07.json"
+steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 基準値パターン
+        TRUNCATE TABLE resultcollector.thresholds CASCADE;
+        -- 検査基準値範囲
+        TRUNCATE TABLE resultcollector.exam_normal_value_range CASCADE;
+        -- 外部検査項目明細
+        TRUNCATE TABLE resultcollector.external_exam_item_details CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
+  insertExamMenus:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 検査メニュー
+        INSERT INTO
+          resultcollector.exam_menus
+          (exam_menu_id, name, order_number, enabled, created_at, created_by)
+        VALUES(2009, '血液検査', 2009, true, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目グループ
+        INSERT INTO
+          resultcollector.exam_item_groups
+          (exam_item_group_id, name, exam_menu_id, type, order_number, created_at, created_by)
+        VALUES(2009, '血液検査', 2009, 1, 1, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目
+        INSERT INTO
+          resultcollector.exam_items
+          (exam_item_id, name, exam_item_group_id, position_number, unit, order_number, created_at, created_by)
+        VALUES(20094, 'ヘモグロビン', 2009, 4, 'g/dL',4, CURRENT_TIMESTAMP,'ec2009')
+        ,     (20095, 'ヘマトクリット', 2009, 5, '%',5, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目明細
+        INSERT INTO
+          resultcollector.exam_item_details
+          (exam_item_detail_id, exam_item_id, name, order_number, position_number, type, keyboard_type, integer_length, decimal_length, equipment_label, created_at, created_by)
+        VALUES(20094, 20094, 'ヘモグロビン', 4, 4, 1, 1, 3, 1, null, CURRENT_TIMESTAMP,'ec2009')
+        ,     (20095, 20095, 'ヘマトクリット', 5, 5, 1, 1, 3, 1, null, CURRENT_TIMESTAMP,'ec2009');
+        -- 外部検査項目明細
+        INSERT INTO
+          resultcollector.external_exam_item_details
+          (exam_item_detail_id, external_exam_item_detail_code, created_at, created_by)
+        VALUES(20094, 'EC2009HGB', CURRENT_TIMESTAMP,'ec2009')
+        ,     (20095, 'EC2009HCT', CURRENT_TIMESTAMP,'ec2009');
+        -- 基準値パターン
+        INSERT INTO
+          resultcollector.thresholds
+          (threshold_id, threshold_code, name, order_number, created_at, created_by)
+        VALUES('e0002009-0000-0000-0007-000000000001', 'EC2009', 'EC2009血液検査', 1, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査基準値範囲
+        INSERT INTO
+          resultcollector.exam_normal_value_range
+          (name, threshold_id, exam_item_detail_id, min_age, max_age, target_sex, min_value, max_value, error_level, created_at, created_by)
+        VALUES('ヘモグロビン', 'e0002009-0000-0000-0007-000000000001', 20094, '0400000', '0750000', 3, 13.7, 16.8, 1, CURRENT_TIMESTAMP,'ec2009')
+        ,     ('ヘマトクリット', 'e0002009-0000-0000-0007-000000000001', 20095, '0400000', '0750000', 3, 40.7, 50.1, 1, CURRENT_TIMESTAMP,'ec2009');
+  getOrganizations:
+    desc: "検査基準値範囲の取得"
+    db:
+      query: |
+        SELECT
+          name
+          , threshold_id::text
+          , exam_item_detail_id
+          , min_age
+          , max_age
+          , target_sex
+          , min_value::text
+          , max_value::text
+          , error_level
+          , created_at
+          , created_by
+        FROM
+          resultcollector.exam_normal_value_range
+        ORDER BY
+          exam_item_detail_id ASC
+    bind:
+      organizationsData: current.rows
+  post:
+    desc: "除外されてないものは追加更新_正常"
+    req:
+      /api/v1/external/examNormalValueRange:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+      // レスポンスにErrorObjectが返されないことを確認
+      && len(current.res.body) == 6
+      && current.res.body[0].code == "10001"
+      && current.res.body[0].inputNote == "2009072"
+      && current.res.body[0].message == "指定されたThresholdCdがシステム上に存在しません。Code:Dummy2009"
+      && current.res.body[1].code == "10001"
+      && current.res.body[1].inputNote == "2009076"
+      && current.res.body[1].message == "指定されたThresholdCdがシステム上に存在しません。Code:Dummy2009"
+      && current.res.body[2].code == "10001"
+      && current.res.body[2].inputNote == "2009073"
+      && current.res.body[2].message == "指定されたExamItemDetailCdがシステム上に存在しません。Code:Dummy2009HGB"
+      && current.res.body[3].code == "10001"
+      && current.res.body[3].inputNote == "2009076"
+      && current.res.body[3].message == "指定されたExamItemDetailCdがシステム上に存在しません。Code:Dummy2009HGB"
+      && current.res.body[4].code == "10003"
+      && current.res.body[4].inputNote == "2009074"
+      && current.res.body[4].message == "キー項目が重複しています。Code:EC2009/EC2009HGB/男/750000/10.6"
+      && current.res.body[5].code == "10003"
+      && current.res.body[5].inputNote == "2009075"
+      && current.res.body[5].message == "キー項目が重複しています。Code:EC2009/EC2009HGB/男/0750000/10.6"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2009-07.json
+  confirmExamNormalValueRange:
+    desc: "検査基準値範囲の更新を確認"
+    db:
+      query: |
+        SELECT
+          name
+          , threshold_id::text
+          , exam_item_detail_id
+          , min_age
+          , max_age
+          , target_sex
+          , min_value::text
+          , max_value::text
+          , error_level
+          , created_at
+          , created_by
+        FROM
+          resultcollector.exam_normal_value_range
+        ORDER BY
+          exam_item_detail_id ASC
+    test: |
+      // 以下の除外されたリクエストは検査基準値範囲に登録されない
+      //  - 基準値パターンが取得できない
+      //  - 検査項目明細IDが取得できない
+      //  - PKが重複するレコードが存在する
+      // 洗い替えのためレコードは追加されていない
+      len(current.rows) == 2
+      // リクエストの検査基準値範囲が変更されたことを確認
+      && current.rows[0].name == "ヘモグロビン（男女）"
+      && current.rows[0].threshold_id == organizationsData[0].threshold_id
+      && current.rows[0].exam_item_detail_id == organizationsData[0].exam_item_detail_id
+      && current.rows[0].min_age == "0000000"
+      && current.rows[0].max_age == "9999999"
+      && current.rows[0].target_sex == 3
+      && current.rows[0].min_value == "8.7"
+      && current.rows[0].max_value == "10.6"
+      && current.rows[0].error_level == 2
+      && current.rows[0].created_at > organizationsData[0].created_at
+      && current.rows[0].created_by == "ExternalConnection"
+      // リクエストに存在しない検査基準値範囲は変更されないことを確認
+      && current.rows[1].name == organizationsData[1].name
+      && current.rows[1].threshold_id == organizationsData[1].threshold_id
+      && current.rows[1].exam_item_detail_id == organizationsData[1].exam_item_detail_id
+      && current.rows[1].min_age == organizationsData[1].min_age
+      && current.rows[1].max_age == organizationsData[1].max_age
+      && current.rows[1].target_sex == organizationsData[1].target_sex
+      && current.rows[1].min_value == organizationsData[1].min_value
+      && current.rows[1].max_value == organizationsData[1].max_value
+      && current.rows[1].error_level == organizationsData[1].error_level
+      && current.rows[1].created_at == organizationsData[1].created_at
+      && current.rows[1].created_by == organizationsData[1].created_by

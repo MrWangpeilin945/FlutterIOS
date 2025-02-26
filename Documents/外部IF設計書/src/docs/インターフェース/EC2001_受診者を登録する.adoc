@@ -299,10 +299,6 @@ list.Count()  <> 0
 |`[DB]organizations.organization_id`
 |`[DB]organizations(団体).organization_code(団体コード) == Examinee.Affiliations.OrganizationCode`で検索し、`organization_id`を登録する
 
-|priority
-|Examinee.Affiliations のIndex
-|
-
 |created_at
 |system.datetime.now()
 |
