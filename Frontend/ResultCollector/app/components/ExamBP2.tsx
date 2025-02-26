@@ -51,6 +51,9 @@ export type ValidationHandle = {
 
 const ExamBP2 = forwardRef<ValidationHandle, ExamBP2Props>(
   ({ examItems, onRegisterPressed, onChange }: ExamBP2Props, ref) => {
+    //登録ボタンプレスフラグを制御するための変数
+    let isRegisterPressed = onRegisterPressed;
+
     // 定数で定義
     const 血圧1回目 = 1;
     const 血圧2回目 = 2;
@@ -140,6 +143,7 @@ const ExamBP2 = forwardRef<ValidationHandle, ExamBP2Props>(
     // 画面からバリデーションチェックを行う
     useImperativeHandle(ref, () => ({
       triggerValidation: () => {
+        isRegisterPressed = true;
         let hasError = false;
         for (const item of examItemsData) {
           const { hasCallback } = validationCheck(item);
@@ -284,15 +288,12 @@ const ExamBP2 = forwardRef<ValidationHandle, ExamBP2Props>(
       // コールバック判断用のコンポーネントのエラーメッセージ
       let componentErrorMessage: ExamRegistResult[] = [];
       // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
-      for (const {
-        positionNumber,
-        value,
-      } of item.examItemDetails ?? []) {
+      for (const { positionNumber, value } of item.examItemDetails ?? []) {
         if (positionNumber !== 上 && positionNumber !== 下) {
           continue; // 対象のpositionNumberでない場合、処理をスキップする
         }
         // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
-        const schema = onRegisterPressed
+        const schema = isRegisterPressed
           ? z
               .string()
               .min(1, getErrorMessage(errorMessages.required, "血圧は")) // 必須チェック
