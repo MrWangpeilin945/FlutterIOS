@@ -1,0 +1,48 @@
+desc: EC2009-05 PKが重複するレコードが存在する
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2009-05.json"
+steps:
+  clearTable:
+    desc: "検査基準値範囲テーブルのクリア"
+    db:
+      query: |
+        -- 検査基準値範囲
+        TRUNCATE TABLE resultcollector.exam_normal_value_range CASCADE;
+  post:
+    desc: "PKが重複するレコードが存在する"
+    req:
+      /api/v1/external/examNormalValueRange:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+      // 重複エラーがErrorObjectで返される
+      && len(current.res.body) == 2
+      && current.res.body[0].code == "10003"
+      && current.res.body[0].inputNote == "2009051"
+      && current.res.body[0].message == "キー項目が重複しています。Code:EC2009/EC2009HGB/男/750000/10.6"
+      && current.res.body[1].code == "10003"
+      && current.res.body[1].inputNote == "2009052"
+      && current.res.body[1].message == "キー項目が重複しています。Code:EC2009/EC2009HGB/男/0750000/10.6"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2009-05.json
+  confirmExamNormalValueRange:
+    desc: "検査基準値範囲の登録を確認"
+    db:
+      query: |
+        SELECT
+          range_id::text
+        FROM
+          resultcollector.exam_normal_value_range
+    test: |
+      // 検査基準値範囲が登録されていないことを確認
+      len(current.rows) == 0

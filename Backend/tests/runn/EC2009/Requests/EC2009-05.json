@@ -1,0 +1,26 @@
+[
+    {
+        "name": "ヘモグロビン１",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "EC2009HGB",
+        "maxAge": "750000",
+        "minAge": "0000000",
+        "targetSex": 1,
+        "MaxValue": "10.6",
+        "MinValue": "8.7",
+        "errorLevel": 1,
+        "inputNote": "2009051"
+    },
+    {
+        "name": "ヘモグロビン２",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "EC2009HGB",
+        "maxAge": "0750000",
+        "minAge": "0000000",
+        "targetSex": 1,
+        "MaxValue": "10.6",
+        "MinValue": "5.7",
+        "errorLevel": 3,
+        "inputNote": "2009052"
+    }
+]
