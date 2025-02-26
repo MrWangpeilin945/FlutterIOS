@@ -35,6 +35,7 @@ import styles from "~/styles/common.module.css";
 type ExamBodyProps = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
+  isInitialDisplay: boolean;
   onChange: (updatedExamItem: InputExamItem[] | undefined) => void;
 };
 
@@ -48,7 +49,10 @@ export type ValidationHandle = {
 };
 
 const ExamBody = forwardRef<ValidationHandle, ExamBodyProps>(
-  ({ examItems, onRegisterPressed, onChange }: ExamBodyProps, ref) => {
+  (
+    { examItems, onRegisterPressed, isInitialDisplay, onChange }: ExamBodyProps,
+    ref,
+  ) => {
     if (!examItems || examItems.length === 0) {
       return null;
     }
@@ -111,9 +115,6 @@ const ExamBody = forwardRef<ValidationHandle, ExamBodyProps>(
       },
     }));
 
-    //初期表示フラグ
-    const isInitialDisplay = useRef(true);
-
     // 初回読み込み時にAPIのエラーメッセージを保存する
     useEffect(() => {
       const backendErrorMessages: BackendValidation[] = examItems.map(
@@ -131,10 +132,8 @@ const ExamBody = forwardRef<ValidationHandle, ExamBodyProps>(
         return validatedData;
       });
       //初期表示以外BMIを計算
-      if (!isInitialDisplay.current) {
+      if (!isInitialDisplay) {
         updatedItems = setBmiValue(updatedItems);
-      } else {
-        isInitialDisplay.current = false;
       }
       setExamItemsData(updatedItems);
     }, [onRegisterPressed, examItems]);
@@ -395,7 +394,7 @@ const ExamBody = forwardRef<ValidationHandle, ExamBodyProps>(
               align="flex-start"
               direction="column"
               w={1038}
-              >
+            >
               <Flex align="center" gap="md">
                 <Paper
                   w={274}
