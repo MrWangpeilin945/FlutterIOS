@@ -1,4 +1,4 @@
-desc: EC2009-02 検査基準値範囲を更新_正常 [200]
+desc: EC2009-07 除外されてないものは追加更新_正常
 runners:
   db: ${DB_HOST}
   req:
@@ -6,7 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  request: "json://../Requests/EC2009-02.json"
+  request: "json://../Requests/EC2009-07.json"
 steps:
   clearTable:
     desc: "関連テーブルのクリア"
@@ -56,13 +56,13 @@ steps:
         INSERT INTO
           resultcollector.thresholds
           (threshold_id, threshold_code, name, order_number, created_at, created_by)
-        VALUES('e0002009-0000-0000-0000-000000000001', 'EC2009', 'EC2009血液検査', 1, CURRENT_TIMESTAMP,'ec2009');
+        VALUES('e0002009-0000-0000-0007-000000000001', 'EC2009', 'EC2009血液検査', 1, CURRENT_TIMESTAMP,'ec2009');
         -- 検査基準値範囲
         INSERT INTO
           resultcollector.exam_normal_value_range
           (name, threshold_id, exam_item_detail_id, min_age, max_age, target_sex, min_value, max_value, error_level, created_at, created_by)
-        VALUES('ヘモグロビン', 'e0002009-0000-0000-0000-000000000001', 20094, '0400000', '0750000', 3, 13.7, 16.8, 1, CURRENT_TIMESTAMP,'ec2009')
-        ,     ('ヘマトクリット', 'e0002009-0000-0000-0000-000000000001', 20095, '0400000', '0750000', 3, 40.7, 50.1, 1, CURRENT_TIMESTAMP,'ec2009');
+        VALUES('ヘモグロビン', 'e0002009-0000-0000-0007-000000000001', 20094, '0400000', '0750000', 3, 13.7, 16.8, 1, CURRENT_TIMESTAMP,'ec2009')
+        ,     ('ヘマトクリット', 'e0002009-0000-0000-0007-000000000001', 20095, '0400000', '0750000', 3, 40.7, 50.1, 1, CURRENT_TIMESTAMP,'ec2009');
   getOrganizations:
     desc: "検査基準値範囲の取得"
     db:
@@ -86,7 +86,7 @@ steps:
     bind:
       organizationsData: current.rows
   post:
-    desc: "検査基準値範囲を更新_正常"
+    desc: "除外されてないものは追加更新_正常"
     req:
       /api/v1/external/examNormalValueRange:
         post:
@@ -96,10 +96,28 @@ steps:
     test: |
       current.res.status == 200
       // レスポンスにErrorObjectが返されないことを確認
-      && len(current.res.body) == 0
+      && len(current.res.body) == 6
+      && current.res.body[0].code == "10001"
+      && current.res.body[0].inputNote == "2009072"
+      && current.res.body[0].message == "指定されたThresholdCdがシステム上に存在しません。Code:Dummy2009"
+      && current.res.body[1].code == "10001"
+      && current.res.body[1].inputNote == "2009076"
+      && current.res.body[1].message == "指定されたThresholdCdがシステム上に存在しません。Code:Dummy2009"
+      && current.res.body[2].code == "10001"
+      && current.res.body[2].inputNote == "2009073"
+      && current.res.body[2].message == "指定されたExamItemDetailCdがシステム上に存在しません。Code:Dummy2009HGB"
+      && current.res.body[3].code == "10001"
+      && current.res.body[3].inputNote == "2009076"
+      && current.res.body[3].message == "指定されたExamItemDetailCdがシステム上に存在しません。Code:Dummy2009HGB"
+      && current.res.body[4].code == "10003"
+      && current.res.body[4].inputNote == "2009074"
+      && current.res.body[4].message == "キー項目が重複しています。Code:EC2009/EC2009HGB/男/750000/10.6"
+      && current.res.body[5].code == "10003"
+      && current.res.body[5].inputNote == "2009075"
+      && current.res.body[5].message == "キー項目が重複しています。Code:EC2009/EC2009HGB/男/0750000/10.6"
     dump:
       expr: current.res.body
-      out: ../Dump/EC2009-02.json
+      out: ../Dump/EC2009-07.json
   confirmExamNormalValueRange:
     desc: "検査基準値範囲の更新を確認"
     db:
@@ -121,6 +139,10 @@ steps:
         ORDER BY
           exam_item_detail_id ASC
     test: |
+      // 以下の除外されたリクエストは検査基準値範囲に登録されない
+      //  - 基準値パターンが取得できない
+      //  - 検査項目明細IDが取得できない
+      //  - PKが重複するレコードが存在する
       // 洗い替えのためレコードは追加されていない
       len(current.rows) == 2
       // リクエストの検査基準値範囲が変更されたことを確認

@@ -8,6 +8,12 @@ runners:
 vars:
   request: "json://../Requests/EC2009-04.json"
 steps:
+  clearTable:
+    desc: "検査基準値範囲テーブルのクリア"
+    db:
+      query: |
+        -- 検査基準値範囲
+        TRUNCATE TABLE resultcollector.exam_normal_value_range CASCADE;
   post:
     desc: "検査項目明細IDが取得できない"
     req:
@@ -25,3 +31,14 @@ steps:
     dump:
       expr: current.res.body
       out: ../Dump/EC2009-04.json
+  confirmExamNormalValueRange:
+    desc: "検査基準値範囲の登録を確認"
+    db:
+      query: |
+        SELECT
+          range_id::text
+        FROM
+          resultcollector.exam_normal_value_range
+    test: |
+      // 検査基準値範囲が登録されていないことを確認
+      len(current.rows) == 0
