@@ -1,0 +1,32 @@
+[
+    {
+        "code": "T2014-05-1",
+        "name": "New)一般健診",
+        "inputNote": "20140501"
+    },
+    {
+        "code": "",
+        "name": "New)職員健診",
+        "inputNote": "20140502"
+    },
+    {
+        "code": "T2014-05-3",
+        "name": "New)人間ドック",
+        "inputNote": "20140503"
+    },
+    {
+        "code": "",
+        "name": "New)日帰りドック",
+        "inputNote": "20140504"
+    },
+    {
+        "code": "T2014-05-3",
+        "name": "New)宿泊ドック",
+        "inputNote": "20140505"
+    },
+    {
+        "code": "T2014-05-6",
+        "name": "New)国保ドック",
+        "inputNote": "20140506"
+    }
+]
