@@ -1,0 +1,15 @@
+[
+    {
+        "examineeCode": "EC2001021",
+        "name": "岡山　花子",
+        "kanaName": "オカヤマ　ハナコ",
+        "sex": 2,
+        "birthdate": "1960-04-01",
+        "affiliations": [
+            {
+                "organizationCode": "ORG2001-23"
+            }
+        ],
+        "inputNote": "2001021"
+    }
+]
