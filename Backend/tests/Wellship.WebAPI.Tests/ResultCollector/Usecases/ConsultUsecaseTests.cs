@@ -1034,6 +1034,24 @@ public class ConsultUsecaseTests
                                         new ExamItemDetailResult{ ExamItemId = 23, ExamItemDetailId = 230, Value = "30" }
                                     ]
                                 });
+
+        // 検査項目明細マスタ一覧を取得
+        _examItemRepositoryMock.Setup(x => x.GetExamItemDetailChildrenAsync(new int[] { 230 })).ReturnsAsync([
+            new ExamItemDetailChild{
+                ExamItemDetailId = 230,
+                Name = "検査メニュー特記用明細",
+                PositionNumber = 0,
+                EquipmentLabel = "",
+                Unit = "",
+                Type = ExamItemDetailType.入力,
+                IntegerLength = 3,
+                DecimalLength = 0,
+                KeyboardType = KeyboardType.テンキー,
+                Keyboards = [],
+                DetailOptions = []
+            }
+        ]);
+
         // 検査実施判断ルールで検証する
         _examItemRepositoryMock.Setup(x => x.GetDecisionRulesAsync(examMenuId))
                                 .ReturnsAsync([
@@ -1220,53 +1238,49 @@ public class ConsultUsecaseTests
                                                             ]
                                 });
         // 検査項目明細マスタ一覧を取得
-        _examItemRepositoryMock.Setup(x => x.GetExamItemDetailChildrenAsync(new int[] { 1, 2 }))
-        .ReturnsAsync([
-        new ExamItemDetailChild
-        {
-            ExamItemDetailId = 1,
-            Name = "身長",
-            PositionNumber = 1,
-            EquipmentLabel = "height",
-            Unit = "cm",
-            Type = ExamItemDetailType.入力,
-            IntegerLength = 3,
-            DecimalLength = 0,
-            KeyboardType = KeyboardType.テンキー,
-            Keyboards = [
-                new Keyboard{
-                    OptionId = 1,
-                    ExamItemDetailId = 1,
-                    Value = "80"
-                },
-                new Keyboard{
-                    OptionId = 2,
-                    ExamItemDetailId = 1,
-                    Value = "100"
-                },
-                new Keyboard{
-                    OptionId = 3,
-                    ExamItemDetailId = 1,
-                    Value = "200"
-                }
-            ],
-            DetailOptions = []
-        },
-
-        new ExamItemDetailChild
-        {
-            ExamItemDetailId = 2,
-            Name = "体重",
-            PositionNumber = 2,
-            EquipmentLabel = "weight",
-            Unit = "cm",
-            Type = ExamItemDetailType.入力,
-            IntegerLength = 3,
-            DecimalLength = 0,
-            KeyboardType = KeyboardType.テンキー,
-            Keyboards = [],
-            DetailOptions = []
-        }
+        _examItemRepositoryMock.Setup(x => x.GetExamItemDetailChildrenAsync(new int[] { 1, 230 })).ReturnsAsync([
+            new ExamItemDetailChild{
+                ExamItemDetailId = 1,
+                Name = "身長",
+                PositionNumber = 1,
+                EquipmentLabel = "height",
+                Unit = "cm",
+                Type = ExamItemDetailType.入力,
+                IntegerLength = 3,
+                DecimalLength = 0,
+                KeyboardType = KeyboardType.テンキー,
+                Keyboards = [
+                    new Keyboard{
+                        OptionId = 1,
+                        ExamItemDetailId = 1,
+                        Value = "80"
+                    },
+                    new Keyboard{
+                        OptionId = 2,
+                        ExamItemDetailId = 1,
+                        Value = "100"
+                    },
+                    new Keyboard{
+                        OptionId = 3,
+                        ExamItemDetailId = 1,
+                        Value = "200"
+                    }
+                ],
+                DetailOptions = []
+            },
+            new ExamItemDetailChild{
+                ExamItemDetailId = 230,
+                Name = "検査メニュー特記用明細",
+                PositionNumber = 0,
+                EquipmentLabel = "",
+                Unit = "",
+                Type = ExamItemDetailType.入力,
+                IntegerLength = 3,
+                DecimalLength = 0,
+                KeyboardType = KeyboardType.テンキー,
+                Keyboards = [],
+                DetailOptions = []
+            }
         ]);
         // 検査メニュー特記一覧を取得
         _examMenuRepositoryMock.Setup(x => x.GetMenuNotesAsync(examMenuId))
@@ -1633,54 +1647,6 @@ public class ConsultUsecaseTests
                                                                 new ExamItemDetailResult{ ExamItemId = 2, ExamItemDetailId = 2, Value  = "100.5" }
                                                             ]
                                 });
-        // 検査項目明細マスタ一覧を取得
-        _examItemRepositoryMock.Setup(x => x.GetExamItemDetailChildrenAsync(new int[] { 1, 2 }))
-        .ReturnsAsync([
-        new ExamItemDetailChild
-        {
-            ExamItemDetailId = 1,
-            Name = "身長",
-            PositionNumber = 1,
-            EquipmentLabel = "height",
-            Unit = "cm",
-            Type = ExamItemDetailType.入力,
-            IntegerLength = 3,
-            DecimalLength = 0,
-            KeyboardType = KeyboardType.テンキー,
-            Keyboards = [
-                new Keyboard{
-                    OptionId = 1,
-                    ExamItemDetailId = 1,
-                    Value = "80"
-                },
-                new Keyboard{
-                    OptionId = 2,
-                    ExamItemDetailId = 1,
-                    Value = "100"
-                },
-                new Keyboard{
-                    OptionId = 3,
-                    ExamItemDetailId = 1,
-                    Value = "200"
-                }
-            ],
-            DetailOptions = []
-        },
-        new ExamItemDetailChild
-        {
-            ExamItemDetailId = 2,
-            Name = "体重",
-            PositionNumber = 2,
-            EquipmentLabel = "weight",
-            Unit = "cm",
-            Type = ExamItemDetailType.入力,
-            IntegerLength = 3,
-            DecimalLength = 0,
-            KeyboardType = KeyboardType.テンキー,
-            Keyboards = [],
-            DetailOptions = []
-        }
-        ]);
 
         // 検査結果相関ルールマスタを取得する
         _examItemRepositoryMock.Setup(x => x.GetCorrelationRulesAsync(examMenuId))
