@@ -486,6 +486,42 @@ export default function ConsultInput() {
     }
   };
 
+  //現在のデータと新しいデータを結合
+  const mergeExamData = (
+    prevData: InputExamItems,
+    newData: VerifyExamItems,
+  ) => {
+    if (!prevData || !newData) return;
+    // レスポンスを今回値のvalueで更新
+    return {
+      consultNumber: prevData.consultNumber,
+      examinee: prevData.examinee,
+      relatedExamItems: prevData.relatedExamItems,
+      examItemGroups: newData.examItemGroups?.map((newGroup, groupIndex) => {
+        const prevGroup = prevData.examItemGroups?.[groupIndex];
+        return {
+          ...newGroup,
+          examItems: newGroup.examItems?.map((newItem) => {
+            const prevItem =
+              prevGroup?.examItems?.find(
+                (i) => i.positionNumber === newItem.positionNumber,
+              ) || {};
+            return {
+              ...newItem,
+              examItemDetails: newItem.examItemDetails?.map((newDetail) => {
+                const prevDetail =
+                  (prevItem.examItemDetails || []).find(
+                    (d) => d.positionNumber === newDetail.positionNumber,
+                  ) || {};
+                return { ...newDetail, value: prevDetail.value };
+              }),
+            };
+          }),
+        };
+      }),
+    };
+  };
+
   //AP1013_検査結果を検証する
   const verifyMutateAsync = useConsultVerifyResults().mutateAsync;
   const verifyResults = async () => {
@@ -502,6 +538,9 @@ export default function ConsultInput() {
           data: resultsRequest,
         });
         if (result.status === 200) {
+          // 今回値とレスポンスを結合
+          const prevData = examData.current ?? {};
+          examData.current = mergeExamData(prevData, result.data);
           // 正常時の処理
           openConfirmDialog("登録します。よろしいですか。");
         }
@@ -530,11 +569,12 @@ export default function ConsultInput() {
               ) || []),
               0, // データがない場合のデフォルト値
             );
+            // 今回値とレスポンスを結合
+            const prevData = examData.current ?? {};
+            examData.current = mergeExamData(prevData, response);
 
+            // 最大エラーレベルをもとに処理を分岐
             errorBranch(maxErrorLevel);
-            if (examData.current) {
-              examData.current.examItemGroups = response.examItemGroups;
-            }
           } else if (status === 500) {
             errorMessage = getErrorMessage(errorMessages.serverError);
           }
