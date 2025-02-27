@@ -144,7 +144,7 @@ public class ConsultUsecase : IConsultUsecase
 
         // 検査メニュー特記一覧を取得
         var menuNotes = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
-        var menuNoteDetailIds = menuNotes.SelectMany(note => note.ExamResults).Select(r => r.ExamItemDetailId).ToHashSet();
+        var menuNoteDetailIds = menuNotes.SelectMany(note => note.ExamResults).Select(r => r.ExamItemDetailId).Distinct().ToArray();
         var menuNoteDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(menuNoteDetailIds);
         var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, menuNoteDetailChildren, examResults, previousResults, consultNotes)).ToArray();
 
@@ -324,7 +324,7 @@ public class ConsultUsecase : IConsultUsecase
 
         // 検査メニュー特記一覧を取得
         var menuNotes = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
-        var menuNoteDetailIds = menuNotes.SelectMany(note => note.ExamResults).Select(r => r.ExamItemDetailId).ToHashSet();
+        var menuNoteDetailIds = menuNotes.SelectMany(note => note.ExamResults).Select(r => r.ExamItemDetailId).Distinct().ToArray();
         var menuNoteDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(menuNoteDetailIds);
         var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, menuNoteDetailChildren, examResults, previousResults, consultNotes)).ToArray();
 
