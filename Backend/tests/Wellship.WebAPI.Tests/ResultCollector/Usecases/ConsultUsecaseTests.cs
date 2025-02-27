@@ -1172,8 +1172,9 @@ public class ConsultUsecaseTests
                                     ConsultId = consultId,
                                     ExamDate = new DateOnly(2023, 04, 10),
                                     ExamItemDetailResults = [
-                                                                      new ExamItemDetailResult{ ExamItemId = 2, ExamItemDetailId = 2, Value  = "70.0" }
-                                                                  ]
+                                        new ExamItemDetailResult{ ExamItemId = 2, ExamItemDetailId = 2, Value  = "70.0" },
+                                        new ExamItemDetailResult{ ExamItemId = 23, ExamItemDetailId = 230, Value  = "20" }
+                                    ]
                                 });
         // 検査メニュー特記一覧を取得
         _examMenuRepositoryMock.Setup(x => x.GetMenuNotesAsync(examMenuId))
@@ -1184,17 +1185,49 @@ public class ConsultUsecaseTests
                                                         new MenuNoteConsult{ Code = "ST02" }
                                                   ],
                                         ExamResults = []
+                                    },
+                                    new MenuNote{ MenuNoteId = 2, Name = "検査メニュー特記用", ExamMenuId = 2, Suffix = "",
+                                                  ConsultNotes = [],
+                                                  ExamResults = [
+                                                    new  MenuNoteExamResult{
+                                                        ExamItemDetailId = 230,
+                                                        SourceType = SourceType.今回値
+                                                    },
+                                                    new  MenuNoteExamResult{
+                                                        ExamItemDetailId = 230,
+                                                        SourceType = SourceType.前回値
+                                                    }
+                                                  ]
                                     }
                                 ]);
-        // 関連検査項目を取得
+        // 検査結果を取得
         _consultRepositoryMock.Setup(x => x.GetExamResultsAsync(consultId))
                                 .ReturnsAsync(new ExamResult
                                 {
                                     ConsultId = consultId,
                                     ExamItemDetailResults = [
-                                        new ExamItemDetailResult{ ExamItemId = 2, ExamItemDetailId = 2, Value = "160.5" }
+                                        new ExamItemDetailResult{ ExamItemId = 2, ExamItemDetailId = 2, Value = "160.5" },
+                                        new ExamItemDetailResult{ ExamItemId = 23, ExamItemDetailId = 230, Value = "30" }
                                     ]
                                 });
+
+        // 検査項目明細マスタ一覧を取得
+        _examItemRepositoryMock.Setup(x => x.GetExamItemDetailChildrenAsync(new int[] { 230 })).ReturnsAsync([
+            new ExamItemDetailChild{
+                ExamItemDetailId = 230,
+                Name = "検査メニュー特記用明細",
+                PositionNumber = 0,
+                EquipmentLabel = "",
+                Unit = "",
+                Type = ExamItemDetailType.入力,
+                IntegerLength = 3,
+                DecimalLength = 0,
+                KeyboardType = KeyboardType.テンキー,
+                Keyboards = [],
+                DetailOptions = []
+            }
+        ]);
+
         // 検査実施判断ルールで検証する
         _examItemRepositoryMock.Setup(x => x.GetDecisionRulesAsync(examMenuId))
                                 .ReturnsAsync([
@@ -1227,7 +1260,8 @@ public class ConsultUsecaseTests
                 },
             IsComplete = false,
             RelatedExamItems = [
-                new APIModels.Responses.RelatedExamItem{ ExamItemName = "撮影番号/○○番号", ExamResult = "01-001/02-001番" }
+                new APIModels.Responses.RelatedExamItem{ ExamItemName = "撮影番号/○○番号", ExamResult = "01-001/02-001番" },
+                new APIModels.Responses.RelatedExamItem{ ExamItemName = "検査メニュー特記用", ExamResult = "30(20)" }
             ],
             ExamItems = [
                 new APIModels.Responses.ExamDetail{ ExamItemId = 71, ExamItemName = "血圧1", HasOrder = true, CancelReasonId = null},
@@ -1359,6 +1393,11 @@ public class ConsultUsecaseTests
                     ExamItemId = 2,
                     ExamItemDetailId = 2,
                     Value = "70"
+                },
+                new ExamItemDetailResult{
+                    ExamItemId = 23,
+                    ExamItemDetailId = 230,
+                    Value = "30"
                 }
             ]
         });
@@ -1370,57 +1409,54 @@ public class ConsultUsecaseTests
                                     ExamDate = new DateOnly(2023, 04, 10),
                                     ExamItemDetailResults = [
                                                                 new ExamItemDetailResult{ ExamItemId = 1, ExamItemDetailId = 1, Value  = "175.4" },
-                                                                new ExamItemDetailResult{ ExamItemId = 2, ExamItemDetailId = 2, Value  = "100.5" }
+                                                                new ExamItemDetailResult{ ExamItemId = 2, ExamItemDetailId = 2, Value  = "100.5" },
+                                                                new ExamItemDetailResult{ ExamItemId = 23, ExamItemDetailId = 230, Value  = "20" }
                                                             ]
                                 });
         // 検査項目明細マスタ一覧を取得
-        _examItemRepositoryMock.Setup(x => x.GetExamItemDetailChildrenAsync(new int[] { 1, 2 }))
-        .ReturnsAsync([
-        new ExamItemDetailChild
-        {
-            ExamItemDetailId = 1,
-            Name = "身長",
-            PositionNumber = 1,
-            EquipmentLabel = "height",
-            Unit = "cm",
-            Type = ExamItemDetailType.入力,
-            IntegerLength = 3,
-            DecimalLength = 0,
-            KeyboardType = KeyboardType.テンキー,
-            Keyboards = [
-                new Keyboard{
-                    OptionId = 1,
-                    ExamItemDetailId = 1,
-                    Value = "80"
-                },
-                new Keyboard{
-                    OptionId = 2,
-                    ExamItemDetailId = 1,
-                    Value = "100"
-                },
-                new Keyboard{
-                    OptionId = 3,
-                    ExamItemDetailId = 1,
-                    Value = "200"
-                }
-            ],
-            DetailOptions = []
-        },
-
-        new ExamItemDetailChild
-        {
-            ExamItemDetailId = 2,
-            Name = "体重",
-            PositionNumber = 2,
-            EquipmentLabel = "weight",
-            Unit = "cm",
-            Type = ExamItemDetailType.入力,
-            IntegerLength = 3,
-            DecimalLength = 0,
-            KeyboardType = KeyboardType.テンキー,
-            Keyboards = [],
-            DetailOptions = []
-        }
+        _examItemRepositoryMock.Setup(x => x.GetExamItemDetailChildrenAsync(new int[] { 1, 230 })).ReturnsAsync([
+            new ExamItemDetailChild{
+                ExamItemDetailId = 1,
+                Name = "身長",
+                PositionNumber = 1,
+                EquipmentLabel = "height",
+                Unit = "cm",
+                Type = ExamItemDetailType.入力,
+                IntegerLength = 3,
+                DecimalLength = 0,
+                KeyboardType = KeyboardType.テンキー,
+                Keyboards = [
+                    new Keyboard{
+                        OptionId = 1,
+                        ExamItemDetailId = 1,
+                        Value = "80"
+                    },
+                    new Keyboard{
+                        OptionId = 2,
+                        ExamItemDetailId = 1,
+                        Value = "100"
+                    },
+                    new Keyboard{
+                        OptionId = 3,
+                        ExamItemDetailId = 1,
+                        Value = "200"
+                    }
+                ],
+                DetailOptions = []
+            },
+            new ExamItemDetailChild{
+                ExamItemDetailId = 230,
+                Name = "検査メニュー特記用明細",
+                PositionNumber = 0,
+                EquipmentLabel = "",
+                Unit = "",
+                Type = ExamItemDetailType.入力,
+                IntegerLength = 3,
+                DecimalLength = 0,
+                KeyboardType = KeyboardType.テンキー,
+                Keyboards = [],
+                DetailOptions = []
+            }
         ]);
         // 検査メニュー特記一覧を取得
         _examMenuRepositoryMock.Setup(x => x.GetMenuNotesAsync(examMenuId))
@@ -1438,6 +1474,23 @@ public class ConsultUsecaseTests
                         },
                         new  MenuNoteExamResult{
                             ExamItemDetailId = 1,
+                            SourceType = SourceType.前回値
+                        }
+                    ]
+                },
+                new MenuNote{
+                    MenuNoteId = 2,
+                    Name = "検査メニュー特記用",
+                    ExamMenuId = 2,
+                    Suffix = "",
+                    ConsultNotes = [],
+                    ExamResults = [
+                        new  MenuNoteExamResult{
+                            ExamItemDetailId = 230,
+                            SourceType = SourceType.今回値
+                        },
+                        new  MenuNoteExamResult{
+                            ExamItemDetailId = 230,
                             SourceType = SourceType.前回値
                         }
                     ]
@@ -1533,7 +1586,8 @@ public class ConsultUsecaseTests
                     ExamDateAge = 48
                 },
             RelatedExamItems = [
-                new APIModels.Responses.RelatedExamItem{ ExamItemName = "身長", ExamResult = "178(175.4)cm" }
+                new APIModels.Responses.RelatedExamItem{ ExamItemName = "身長", ExamResult = "178(175.4)cm" },
+                new APIModels.Responses.RelatedExamItem{ ExamItemName = "検査メニュー特記用", ExamResult = "30(20)" }
             ],
             ExamItemGroups = [
                 new APIModels.Responses.ExamItemGroup{
@@ -1769,75 +1823,7 @@ public class ConsultUsecaseTests
                                                                 new ExamItemDetailResult{ ExamItemId = 2, ExamItemDetailId = 2, Value  = "100.5" }
                                                             ]
                                 });
-        // 検査項目明細マスタ一覧を取得
-        _examItemRepositoryMock.Setup(x => x.GetExamItemDetailChildrenAsync(new int[] { 1, 2 }))
-        .ReturnsAsync([
-        new ExamItemDetailChild
-        {
-            ExamItemDetailId = 1,
-            Name = "身長",
-            PositionNumber = 1,
-            EquipmentLabel = "height",
-            Unit = "cm",
-            Type = ExamItemDetailType.入力,
-            IntegerLength = 3,
-            DecimalLength = 0,
-            KeyboardType = KeyboardType.テンキー,
-            Keyboards = [
-                new Keyboard{
-                    OptionId = 1,
-                    ExamItemDetailId = 1,
-                    Value = "80"
-                },
-                new Keyboard{
-                    OptionId = 2,
-                    ExamItemDetailId = 1,
-                    Value = "100"
-                },
-                new Keyboard{
-                    OptionId = 3,
-                    ExamItemDetailId = 1,
-                    Value = "200"
-                }
-            ],
-            DetailOptions = []
-        },
-        new ExamItemDetailChild
-        {
-            ExamItemDetailId = 2,
-            Name = "体重",
-            PositionNumber = 2,
-            EquipmentLabel = "weight",
-            Unit = "cm",
-            Type = ExamItemDetailType.入力,
-            IntegerLength = 3,
-            DecimalLength = 0,
-            KeyboardType = KeyboardType.テンキー,
-            Keyboards = [],
-            DetailOptions = []
-        }
-        ]);
-        // 検査メニュー特記一覧を取得
-        _examMenuRepositoryMock.Setup(x => x.GetMenuNotesAsync(examMenuId))
-            .ReturnsAsync([
-                new MenuNote{
-                    MenuNoteId = 1,
-                    Name = "身長",
-                    ExamMenuId = examMenuId,
-                    Suffix = "cm",
-                    ConsultNotes = [],
-                    ExamResults = [
-                        new  MenuNoteExamResult{
-                            ExamItemDetailId = 1,
-                            SourceType = SourceType.今回値
-                        },
-                        new  MenuNoteExamResult{
-                            ExamItemDetailId = 1,
-                            SourceType = SourceType.前回値
-                        }
-                    ]
-                }
-            ]);
+
         // 検査結果相関ルールマスタを取得する
         _examItemRepositoryMock.Setup(x => x.GetCorrelationRulesAsync(examMenuId))
         .ReturnsAsync([

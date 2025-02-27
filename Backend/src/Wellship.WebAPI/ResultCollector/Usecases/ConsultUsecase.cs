@@ -135,14 +135,19 @@ public class ConsultUsecase : IConsultUsecase
                                               .ToArray();
         // 受診特記一覧を取得
         var consultNotes = await _consultRepository.GetConsultNotesAsync(consult.ConsultId);
-        // 検査項目明細マスタ一覧を取得
-        var examItemDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(examItemDetailIds);
+
+        // 検査結果を取得
+        var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
+
         // 過去検査結果を取得
         var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
+
         // 検査メニュー特記一覧を取得
         var menuNotes = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
-        var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
-        var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, examItemDetailChildren, examResults, previousResults, consultNotes)).ToArray();
+        var menuNoteDetailIds = menuNotes.SelectMany(note => note.ExamResults).Select(r => r.ExamItemDetailId).Distinct().ToArray();
+        var menuNoteDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(menuNoteDetailIds);
+        var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, menuNoteDetailChildren, examResults, previousResults, consultNotes)).ToArray();
+
         // 関連検査項目を取得
         var relatedExamItems = examNoteResults.Select(x => new RelatedExamItem()
         {
@@ -316,11 +321,13 @@ public class ConsultUsecase : IConsultUsecase
         var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
         // 受診特記一覧を取得
         var consultNotes = await _consultRepository.GetConsultNotesAsync(consult.ConsultId);
-        // 検査項目明細マスタ一覧を取得
-        var examItemDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(examItemDetailIds);
+
         // 検査メニュー特記一覧を取得
         var menuNotes = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
-        var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, examItemDetailChildren, examResults, previousResults, consultNotes)).ToArray();
+        var menuNoteDetailIds = menuNotes.SelectMany(note => note.ExamResults).Select(r => r.ExamItemDetailId).Distinct().ToArray();
+        var menuNoteDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(menuNoteDetailIds);
+        var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, menuNoteDetailChildren, examResults, previousResults, consultNotes)).ToArray();
+
         // 関連検査項目を取得
         var relatedExamItems = examNoteResults.Select(x => new RelatedExamItem()
         {
