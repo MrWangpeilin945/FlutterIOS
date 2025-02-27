@@ -34,6 +34,9 @@ const ExamSelectLR = forwardRef<ValidationHandle, ExamSelectLRProps>(
       return null;
     }
 
+    //登録ボタンプレスフラグを制御するための変数
+    let isRegisterPressed = onRegisterPressed;
+
     const [examItemsData, setExamItemsData] = useState(examItems);
     // APIからのエラーメッセージを保存する
     const [backendValidation, setBackendValidation] = useState<
@@ -51,6 +54,7 @@ const ExamSelectLR = forwardRef<ValidationHandle, ExamSelectLRProps>(
     // 画面からバリデーションチェックを行う
     useImperativeHandle(ref, () => ({
       triggerValidation: () => {
+        isRegisterPressed = true;
         let hasError = false;
         for (const item of examItemsData) {
           const { hasCallback } = validationCheck(item);
@@ -109,7 +113,7 @@ const ExamSelectLR = forwardRef<ValidationHandle, ExamSelectLRProps>(
         );
 
         // バリデーションが失敗した場合
-        if (hasOrder && !cancelReasonId && !value) {
+        if (hasOrder && !cancelReasonId && !value && isRegisterPressed) {
           componentErrorMessage.push({
             description: requiredMessage,
             errorLevel: InputErrorLevel.異常,
@@ -151,10 +155,8 @@ const ExamSelectLR = forwardRef<ValidationHandle, ExamSelectLRProps>(
     useEffect(() => {
       const updatedItems = examItems.map((item) => {
         let validatedData = item;
-        // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-        if (onRegisterPressed) {
-          validatedData = validationCheck(validatedData)?.validateResult;
-        }
+        // validationCheckを実行
+        validatedData = validationCheck(validatedData)?.validateResult;
 
         return validatedData;
       });
