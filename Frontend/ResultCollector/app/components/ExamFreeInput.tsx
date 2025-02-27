@@ -52,6 +52,9 @@ const ExamFreeInput = forwardRef<ValidationHandle, ExamFreeInputProps>(
       return null;
     }
 
+    //登録ボタンプレスフラグを制御するための変数
+    let isRegisterPressed = onRegisterPressed;
+
     const [examItemsData, setExamItemsData] = useState(examItems);
     // APIからのエラーメッセージを保存する
     const [backendValidation, setBackendValidation] = useState<
@@ -61,6 +64,7 @@ const ExamFreeInput = forwardRef<ValidationHandle, ExamFreeInputProps>(
     // 画面からバリデーションチェックを行う
     useImperativeHandle(ref, () => ({
       triggerValidation: () => {
+        isRegisterPressed = true;
         let hasError = false;
         for (const item of examItemsData) {
           const { hasCallback } = validationCheck(item);
@@ -89,9 +93,8 @@ const ExamFreeInput = forwardRef<ValidationHandle, ExamFreeInputProps>(
         // positionNumberが1のアイテムのみに対してバリデーションチェックを実行
         if (item.positionNumber === 1) {
           let validatedData: InputExamItem = item;
-          if (onRegisterPressed) {
-            validatedData = validationCheck(item).validateResult;
-          }
+          validatedData = validationCheck(item).validateResult;
+
           return validatedData;
         }
         return item;
@@ -136,15 +139,17 @@ const ExamFreeInput = forwardRef<ValidationHandle, ExamFreeInputProps>(
       // コールバック判断用のコンポーネントのエラーメッセージ
       const componentErrorMessage: ExamRegistResult[] = [];
       // 必須チェック行うスキーマ
-      const schema = z
-        .string()
-        .min(
-          1,
-          getErrorMessage(
-            errorMessages.required,
-            item.name ? `${item.name}は` : "",
-          ),
-        ); // 必須チェック
+      const schema = isRegisterPressed
+        ? z
+            .string()
+            .min(
+              1,
+              getErrorMessage(
+                errorMessages.required,
+                item.name ? `${item.name}は` : "",
+              ),
+            )
+        : z.string(); // バリデーションなし
       // バリデーション対象データを取得
       const valueToValidate =
         item.examItemDetails?.find((item) => item.positionNumber === 1)

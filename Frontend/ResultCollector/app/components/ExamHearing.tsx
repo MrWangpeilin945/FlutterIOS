@@ -37,6 +37,9 @@ const ExamHearing = forwardRef<ValidationHandle, ExamHearingProps>(
       return null;
     }
 
+    //登録ボタンプレスフラグを制御するための変数
+    let isRegisterPressed = onRegisterPressed;
+
     const 左1000Hz = 1;
     const 左4000Hz = 2;
     const 右1000Hz = 3;
@@ -59,6 +62,7 @@ const ExamHearing = forwardRef<ValidationHandle, ExamHearingProps>(
     // 画面からバリデーションチェックを行う
     useImperativeHandle(ref, () => ({
       triggerValidation: () => {
+        isRegisterPressed = true;
         let hasError = false;
         const { hasCallback } = validationCheck(examItemData);
         if (!hasCallback) {
@@ -103,10 +107,8 @@ const ExamHearing = forwardRef<ValidationHandle, ExamHearingProps>(
         },
         validatedData,
       );
-      // onRegisterPressedがtrueの場合のみバリデーションを実行
-      if (onRegisterPressed) {
-        validatedData = validationCheck(validatedData).validateResult;
-      }
+      // バリデーションを実行
+      validatedData = validationCheck(validatedData).validateResult;
       // 状態を更新
       setExamItemData(validatedData);
     }, [onRegisterPressed, examItems]);
@@ -137,6 +139,9 @@ const ExamHearing = forwardRef<ValidationHandle, ExamHearingProps>(
 
     // 必須チェック
     const validationCheck = (item: InputExamItem) => {
+      // 登録ボタンが押されていない場合はバリデーションチェックを実行しない
+      if (!isRegisterPressed)
+        return { validateResult: item, hasCallback: true };
       // APIエラーメッセージで初期化
       resetErrorMessages(item);
       // コールバック判断用のコンポーネントのエラーメッセージ

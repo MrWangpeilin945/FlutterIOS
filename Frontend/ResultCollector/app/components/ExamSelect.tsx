@@ -33,6 +33,9 @@ const ExamSelect = forwardRef<ValidationHandle, ExamSelectProps>(
       return null;
     }
 
+    //登録ボタンプレスフラグを制御するための変数
+    let isRegisterPressed = onRegisterPressed;
+
     const [examItemsData, setExamItemsData] = useState(examItems);
     const examItem = examItemsData.find((item) => item.positionNumber === 1);
     if (!examItem?.examItemDetails?.length) {
@@ -51,6 +54,7 @@ const ExamSelect = forwardRef<ValidationHandle, ExamSelectProps>(
     // 画面からバリデーションチェックを行う
     useImperativeHandle(ref, () => ({
       triggerValidation: () => {
+        isRegisterPressed = true;
         let hasError = false;
         for (const item of examItemsData) {
           const { hasCallback } = validationCheck(item);
@@ -113,7 +117,7 @@ const ExamSelect = forwardRef<ValidationHandle, ExamSelectProps>(
         );
 
         // バリデーションが失敗した場合
-        if (hasOrder && !cancelReasonId && !value) {
+        if (hasOrder && !cancelReasonId && !value && isRegisterPressed) {
           componentErrorMessage.push({
             description: requiredMessage,
             errorLevel: InputErrorLevel.異常,
@@ -154,10 +158,8 @@ const ExamSelect = forwardRef<ValidationHandle, ExamSelectProps>(
     useEffect(() => {
       const updatedItems = examItems.map((item) => {
         let validatedData = item;
-        // onRegisterPressedがtrueの場合のみvalidationCheckを実行
-        if (onRegisterPressed) {
-          validatedData = validationCheck(validatedData)?.validateResult;
-        }
+        // validationCheckを実行
+        validatedData = validationCheck(validatedData)?.validateResult;
 
         return validatedData;
       });

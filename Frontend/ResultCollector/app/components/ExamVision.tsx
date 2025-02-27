@@ -129,10 +129,9 @@ const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
     }, []);
 
     useEffect(() => {
-      // 登録ボタンフラグがtrueの場合、必須チェック
-      if (onRegisterPressed) {
-        requiredCheck(examItems);
-      }
+      // 必須チェック
+      requiredCheck(examItems);
+
       const validatedItems = examItems.map((item) => {
         return validationCheck(item).validateResult;
       });
@@ -174,10 +173,14 @@ const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
 
     // 1項目でも入力されているかをチェック
     const requiredCheck = (examItems: InputExamItem[]) => {
+      if (!isRegisterPressed) return false;
       const anyFilled = examItems.some((item) =>
-        (item.examItemDetails ?? []).some((detail) => detail.value),
+        (item.examItemDetails ?? []).some(
+          (detail) => detail.value && !detail.hasOrder && detail.cancelReasonId,
+        ),
       );
-      return !anyFilled;
+      setShowRequiredError(!anyFilled);
+      return !anyFilled
     };
 
     // 半角数字チェック
@@ -210,6 +213,7 @@ const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
       hasOrder: boolean,
       cancelReasonId: number,
     ): ExamRegistResult | undefined => {
+      if (!isRegisterPressed) return undefined;
       //矯正以外の項目、矯正の両眼の場合はチェックを行わない
       if (examItem.positionNumber !== 矯正 || detailNumber === 矯正入力値_両眼)
         return undefined;
@@ -322,17 +326,15 @@ const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
         }
 
         // 矯正チェック
-        if (isRegisterPressed) {
-          const result = collectionCheck(
-            item,
-            detail.positionNumber ?? 0,
-            detail.value ?? "",
-            detail.hasOrder ?? false,
-            detail.cancelReasonId ?? 1,
-          );
-          if (result !== undefined) {
-            componentErrorMessage.push(result);
-          }
+        const result = collectionCheck(
+          item,
+          detail.positionNumber ?? 0,
+          detail.value ?? "",
+          detail.hasOrder ?? false,
+          detail.cancelReasonId ?? 1,
+        );
+        if (result !== undefined) {
+          componentErrorMessage.push(result);
         }
       }
 
@@ -421,8 +423,7 @@ const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
 
       setExamItemsData(updatedExamItems);
       // 必須チェック
-      const hasRequiredError = requiredCheck(updatedExamItems);
-      setShowRequiredError(hasRequiredError);
+      requiredCheck(updatedExamItems);
 
       onChange(updatedExamItems);
     };
