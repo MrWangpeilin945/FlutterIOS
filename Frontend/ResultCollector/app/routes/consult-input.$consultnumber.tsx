@@ -504,14 +504,14 @@ export default function ConsultInput() {
           examItems: newGroup.examItems?.map((newItem) => {
             const prevItem =
               prevGroup?.examItems?.find(
-                (i) => i.positionNumber === newItem.positionNumber,
+                (i) => i.examItemId === newItem.examItemId,
               ) || {};
             return {
               ...newItem,
               examItemDetails: newItem.examItemDetails?.map((newDetail) => {
                 const prevDetail =
                   (prevItem.examItemDetails || []).find(
-                    (d) => d.positionNumber === newDetail.positionNumber,
+                    (d) => d.examItemDetailId === newDetail.examItemDetailId,
                   ) || {};
                 return { ...newDetail, value: prevDetail.value };
               }),
