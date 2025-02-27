@@ -35,6 +35,7 @@ public class ProgressController : ControllerBase
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlaceScheduleProgress))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
     [Route("api/v{version:apiVersion}/progress/{placeScheduleId}")]
     public async Task<IActionResult> GetProgress([FromRoute][Required] Guid placeScheduleId)
