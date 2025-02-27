@@ -72,6 +72,8 @@ export default function ConsultInput() {
   const examMenuId = Number(searchParams.get("exammenuid"));
   // 登録ボタンフラグ
   const [isRegisterPressed, setIsRegisterPressed] = useState(false);
+  //初期表示フラグ
+  const [isInitialDisplay, setIsInitialDisplay] = useState(true);
   //APIのバージョン
   const apiVersion = "1";
   //職員の状態管理
@@ -183,6 +185,7 @@ export default function ConsultInput() {
     };
 
     inputExamItems();
+    setIsInitialDisplay(false);
   }, [consultNumber, examMenuId]);
 
   useEffect(() => {
@@ -529,13 +532,17 @@ export default function ConsultInput() {
             );
 
             errorBranch(maxErrorLevel);
-            examData.current = error.response.data;
+            if (examData.current) {
+              examData.current.examItemGroups = response.examItemGroups;
+            }
           } else if (status === 500) {
             errorMessage = getErrorMessage(errorMessages.serverError);
           }
+          // 共通ダイアログにエラーメッセージを表示
+          if (error.response.status !== 422) {
+            openCommonDialog(errorMessage, "閉じる");
+          }
         }
-        // 共通ダイアログにエラーメッセージを表示
-        openCommonDialog(errorMessage, "閉じる");
       }
       setIsLoading(false);
     };
@@ -703,6 +710,7 @@ export default function ConsultInput() {
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
+            isInitialDisplay={isInitialDisplay}
             onChange={handleChange}
           />
         );
@@ -743,6 +751,7 @@ export default function ConsultInput() {
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
+            isInitialDisplay={isInitialDisplay}
             onChange={handleChange}
           />
         );

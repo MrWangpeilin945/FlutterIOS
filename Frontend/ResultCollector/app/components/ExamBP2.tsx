@@ -37,6 +37,7 @@ import React from "react";
 type ExamBP2Props = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
+  isInitialDisplay: boolean;
   onChange: (updatedExamItem: InputExamItem[] | undefined) => void;
 };
 
@@ -50,7 +51,10 @@ export type ValidationHandle = {
 };
 
 const ExamBP2 = forwardRef<ValidationHandle, ExamBP2Props>(
-  ({ examItems, onRegisterPressed, onChange }: ExamBP2Props, ref) => {
+  (
+    { examItems, onRegisterPressed, isInitialDisplay, onChange }: ExamBP2Props,
+    ref,
+  ) => {
     //登録ボタンプレスフラグを制御するための変数
     let isRegisterPressed = onRegisterPressed;
 
@@ -156,9 +160,6 @@ const ExamBP2 = forwardRef<ValidationHandle, ExamBP2Props>(
       },
     }));
 
-    //初期表示フラグ
-    const isInitialDisplay = useRef(true);
-
     // 初回読み込み時にAPIのエラーメッセージを保存する
     useEffect(() => {
       const backendErrorMessages: BackendValidation[] = examItems.map(
@@ -176,10 +177,8 @@ const ExamBP2 = forwardRef<ValidationHandle, ExamBP2Props>(
         return validatedData;
       });
       //初期表示以外は平均値を計算
-      if (!isInitialDisplay.current) {
+      if (!isInitialDisplay) {
         updatedItems = calculateAverage(updatedItems);
-      } else {
-        isInitialDisplay.current = false;
       }
       setExamItemsData(updatedItems);
     }, [onRegisterPressed, examItems]);
