@@ -1,0 +1,28 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "CCD-200413",
+        "actionType": 0,
+        "placeCode": "P2004-13",
+        "teamCode": "T2004-13",
+        "examDate": "2025-03-03",
+        "consultNumber": "No-200413-1",
+        "examineeCd": "E2004131",
+        "note": "特記事項2004131",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+            {
+                "examItemDetailCd": "ORDER-2004-13-1"
+            },
+            {
+                "examItemDetailCd": "ORDER-2004-13-2"
+            }
+        ],
+        "inputNote": "2004131"
+    }
+]

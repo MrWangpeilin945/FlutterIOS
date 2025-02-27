@@ -1,0 +1,220 @@
+desc: EC2004-01 受診を登録_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2004-01.json"
+steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 受診
+        TRUNCATE TABLE resultcollector.consult CASCADE;
+        -- 会場
+        TRUNCATE TABLE resultcollector.places CASCADE; 
+        -- 班
+        TRUNCATE TABLE resultcollector.teams CASCADE;
+        -- 受診者
+        TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 検査特記
+        TRUNCATE TABLE resultcollector.exam_menu_note_codes CASCADE;
+        -- 基準値パターン
+        TRUNCATE TABLE resultcollector.thresholds CASCADE;
+        -- 外部検査項目明細
+        TRUNCATE TABLE resultcollector.external_exam_item_details CASCADE;
+  insertData:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 班
+        INSERT INTO
+          resultcollector.teams
+          (team_id, team_code, name, order_number, created_at, created_by)
+        VALUES('f0002004-0000-0000-0001-000000000001', 'T2004-01', '甲班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 会場
+        INSERT INTO
+          resultcollector.places
+          (place_id, place_code, name, order_number, created_at, created_by)
+        VALUES('b0002004-0000-0000-0001-000000000001', 'P2004-01', '甲会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 会場日程
+        INSERT INTO
+          resultcollector.place_schedule
+          (place_schedule_id, place_id, team_id, status, exam_date, start_time, created_at, created_by)
+        VALUES('a0002004-0000-0000-0001-000000000001', 'b0002004-0000-0000-0001-000000000001', 'f0002004-0000-0000-0001-000000000001', 31, '2025/03/03', '1500', CURRENT_TIMESTAMP, 'ec2004')
+        ,     ('a0002004-0000-0000-0001-000000000002', 'b0002004-0000-0000-0001-000000000001', 'f0002004-0000-0000-0001-000000000001', 31, '2025/03/13', '1500', CURRENT_TIMESTAMP, 'ec2004')
+        ,     ('a0002004-0000-0000-0001-000000000003', 'b0002004-0000-0000-0001-000000000001', 'f0002004-0000-0000-0001-000000000001', 31, '2025/03/23', '1500', CURRENT_TIMESTAMP, 'ec2004');
+        -- 受診者
+        INSERT INTO
+          resultcollector.examinees
+          (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
+        VALUES('e0002004-0000-0000-0001-000000000001', 'E2004011', '両備　太郎', 'リョウビ　タロウ', 1, '1991-01-30', CURRENT_TIMESTAMP,'ec2004');
+        -- 検査特記
+        INSERT INTO
+          resultcollector.exam_menu_note_codes
+          (code, name, created_at, created_by)
+        VALUES('NOTE-T2004011', '検査特記2004-01', CURRENT_TIMESTAMP, 'ec2004');
+        -- 基準値パターン
+        INSERT INTO
+          resultcollector.thresholds
+          (threshold_id, threshold_code, name, order_number, created_at, created_by)
+        VALUES('ec002004-0000-0000-0001-000000000001', 'TID-EC2004', 'EC2004基準値', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 外部検査項目明細
+        INSERT INTO
+          resultcollector.external_exam_item_details
+          (exam_item_detail_id, external_exam_item_detail_code, created_at, created_by)
+        VALUES(2004011, 'PREVI-200401', CURRENT_TIMESTAMP,'ec2004')
+        ,     (2004012, 'ORDER-200401', CURRENT_TIMESTAMP,'ec2004'); 
+  post:
+    desc: "受診を登録_正常"
+    req:
+      /api/v1/external/consult:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+      // レスポンスにErrorObjectが返されないことを確認
+      && len(current.res.body) == 0
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2004-01.json
+  confirmConsult:
+    desc: "受診の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+          , consult_number
+          , progress_status
+          , export_status
+          , place_schedule_id::text
+          , note
+          , examinee_id::text
+          , external_connection_code
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.consult
+        ORDER BY
+          consult_number ASC;
+    bind:
+      entryConsult: current.rows
+    test: |
+      // sortNoが大きいリクエストが処理されることを確認
+      len(current.rows) == 1
+      && current.rows[0].consult_number == "No-200401-2"
+      && current.rows[0].progress_status == 11
+      && current.rows[0].export_status == 11
+      && current.rows[0].place_schedule_id == "a0002004-0000-0000-0001-000000000003"
+      && current.rows[0].note == "特記事項2004012"
+      && current.rows[0].examinee_id == "e0002004-0000-0000-0001-000000000001"
+      && current.rows[0].external_connection_code == "CCD-200401"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+  confirmConsultNotes:
+    desc: "受診特記の登録を確認"
+    db:
+      query: |
+        SELECT
+          cn.consult_id::text
+          , cn.code
+          , cn.note
+          , to_char(cn.created_at, 'yyyymmdd') as created_at
+          , cn.created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.consult_notes cn
+        LEFT JOIN
+          resultcollector.consult c
+            on cn.consult_id = c.consult_id
+        ORDER BY
+          c.consult_number ASC;
+    test: |
+      len(current.rows) == 1
+      && current.rows[0].consult_id == entryConsult[0].consult_id
+      && current.rows[0].code == "NOTE-T2004011"
+      && current.rows[0].note == "受診特記200401-2"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+  confirmExamItemDetailOrders:
+    desc: "検査項目明細依頼の登録を確認"
+    db:
+      query: |
+        SELECT
+          e.consult_id::text
+          , e.exam_item_detail_id
+          , e.external_exam_item_detail_code
+          , to_char(e.created_at, 'yyyymmdd') as created_at
+          , e.created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.exam_item_detail_orders e
+        LEFT JOIN
+          resultcollector.consult c
+            on e.consult_id = c.consult_id
+        ORDER BY
+          c.consult_number ASC;
+    test: |
+      len(current.rows) == 1
+      && current.rows[0].consult_id == entryConsult[0].consult_id
+      && current.rows[0].exam_item_detail_id == 2004012
+      && current.rows[0].external_exam_item_detail_code == "ORDER-200401"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+  confirmConsultThresholds:
+    desc: "基準値の登録を確認"
+    db:
+      query: |
+        SELECT
+          ct.threshold_id::text
+          , ct.consult_id::text
+          , priority
+          , to_char(ct.created_at, 'yyyymmdd') as created_at
+          , ct.created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.consult_thresholds ct
+        LEFT JOIN
+          resultcollector.consult c
+            on ct.consult_id = c.consult_id
+        ORDER BY
+          c.consult_number ASC;
+    test: |
+      len(current.rows) == 1
+      && current.rows[0].consult_id == entryConsult[0].consult_id
+      && current.rows[0].priority == 1
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+  confirmPreviousResults:
+    desc: "過去検査結果の登録を確認"
+    db:
+      query: |
+        SELECT
+          p.consult_id::text
+          , to_char(p.exam_date, 'yyyymmdd') as exam_date
+          , p.exam_item_detail_id
+          , p.value
+          , to_char(p.created_at, 'yyyymmdd') as created_at
+          , p.created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.previous_results p
+        LEFT JOIN
+          resultcollector.consult c
+            on p.consult_id = c.consult_id
+        ORDER BY
+          c.consult_number ASC;
+    test: |
+      len(current.rows) == 1
+      && current.rows[0].consult_id == entryConsult[0].consult_id
+      && current.rows[0].exam_date == "20241122"
+      && current.rows[0].exam_item_detail_id == 2004011
+      && current.rows[0].value == "300"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"      
