@@ -64,7 +64,6 @@ export default function ConsultInput() {
   const theme = useMantineTheme();
   const navigate = useNavigate();
   const examData = useRef<InputExamItems>();
-  const [, setRendering] = useState(false);
   // パスパラメータの取得
   const consultNumber = useParams().consultnumber ?? undefined;
   // クエリパラメータの取得
@@ -167,7 +166,8 @@ export default function ConsultInput() {
           hasExamItems
         ) {
           examData.current = responseData;
-          setRendering(true);
+          setCommonBrowserbackFlag(false); //検査結果入力情報の取得に成功しているため、ブラウザバックフラグをfalseに変更
+          checkEquipment();
         } else {
           openCommonDialog("入力可能な項目がありません。", "閉じる");
         }
@@ -249,12 +249,8 @@ export default function ConsultInput() {
     return isDisabled;
   };
 
-  useEffect(() => {
-    if (!examData.current) return;
-
-    setCommonBrowserbackFlag(false); //検査結果入力情報の取得に成功しているため、ブラウザバックフラグをfalseに変更
-
-    // 機器連携
+  const checkEquipment = () =>{
+    // [測定する]ボタンの表示を制御
     const handleRemeasurementCheck = () => {
       const isConnectionEquipment =
         !!targetConnectionEquipment &&
@@ -270,7 +266,7 @@ export default function ConsultInput() {
       }
     };
     handleRemeasurementCheck();
-  }, [examData.current, connectionEquipment]);
+  };
 
   //測定ボタン押下時
   const handleRemeasurement = () => {
