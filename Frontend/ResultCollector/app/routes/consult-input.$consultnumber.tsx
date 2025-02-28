@@ -249,7 +249,7 @@ export default function ConsultInput() {
     return isDisabled;
   };
 
-  const checkEquipment = () =>{
+  const checkEquipment = () => {
     // [測定する]ボタンの表示を制御
     const handleRemeasurementCheck = () => {
       const isConnectionEquipment =
