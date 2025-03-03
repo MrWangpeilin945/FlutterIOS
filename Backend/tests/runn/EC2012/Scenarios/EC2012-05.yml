@@ -1,4 +1,4 @@
-desc: EC2012-05 班IDが取得できない [200]
+desc: EC2012-05 班IDが取得できない [207]
 runners:
   db: ${DB_HOST}
   req:
@@ -7,11 +7,25 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2012-05.json"
-  errorMessage: "指定されたTeamCodeがシステム上に存在しません。"
-  examDate: "20300305"
-  placeId: "e0002012-0000-0000-0000-000000000001"
-  teamId:  "c0002012-0000-0000-0000-000000000005"
 steps:
+  clearTable:
+    desc: "基準値パターンテーブルをクリア"
+    db:
+      query: |
+        -- 会場
+        TRUNCATE TABLE resultcollector.places CASCADE; 
+        -- 班
+        TRUNCATE TABLE resultcollector.teams CASCADE;
+  insertData:
+    desc: "基準値パターンテーブルに実行前データを登録"
+    db: 
+      query: |
+             -- 班
+             insert into resultcollector.teams (team_id, team_code, name, order_number, created_at, created_by)
+                 values('c0002012-0000-0000-0000-000000000005', 'T2012-05', 'Ⅴ班', 5, '2025-01-01T12:34:56.789', 'ec2012');
+             -- 会場
+             insert into resultcollector.places (place_id, place_code, name, order_number, created_at, created_by)
+                 values('e0002012-0000-0000-0000-000000000001', 'P2012-01', '第Ⅰ会場', 1, '2025-01-01T12:34:56.789', 'ec2012');
   post:
     desc: "班IDが取得できない"
     req:
@@ -21,12 +35,12 @@ steps:
             application/json:
               "{{ vars.request }}"
     test: |
-      current.res.status == 200
+      current.res.status == 207
       && len(current.res.body) == 1
       // 班エラーがErrorObjectで返される
       && current.res.body[0].code == "10001"
       && current.res.body[0].inputNote == "201205-01"
-      && current.res.body[0].message startsWith vars.errorMessage
+      && current.res.body[0].message == "指定されたTeamCodeがシステム上に存在しません。Code:T2012-07"
     dump:
       expr: current.res.body
       out: ../Dump/EC2012-05.json
@@ -35,20 +49,37 @@ steps:
     db:
       query: |
         SELECT
-          place_id::text as placeid
-          , team_id::text as teamid
+          ps1.place_schedule_id::text
+          , ps1.place_id::text
+          , p1.place_code
+          , ps1.team_id::text
+          , t1.team_code
           , status
           , to_char(exam_date, 'yyyymmdd') as examdate
-          , start_time as starttime
+          , start_time
+          , concat(ps1.place_id::text, ps1.team_id::text) as placeTeam
+          , to_char(ps1.created_at, 'yyyymmdd') as created_at
+          , ps1.created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
-          resultcollector.place_schedule
-        WHERE
-          exam_date = '{{ vars.examDate }}'
+          resultcollector.place_schedule ps1
+        JOIN
+          resultcollector.teams t1
+        ON 
+          ps1.team_id = t1.team_id
+        JOIN
+          resultcollector.places p1
+        ON 
+          ps1.place_id = p1.place_id
     test: |
       len(current.rows) == 1
-      // 会場コードが存在する会場日程が追加される
-      && current.rows[0].placeid == vars.placeId
-      && current.rows[0].teamid == vars.teamId
+      // 班コードが存在する会場日程が追加される
+      && current.rows[0].place_id == "e0002012-0000-0000-0000-000000000001"
+      && current.rows[0].place_code == "P2012-01"
+      && current.rows[0].team_id == "c0002012-0000-0000-0000-000000000005"
+      && current.rows[0].team_code == "T2012-05"
+      && current.rows[0].examdate == '20300305'
+      && current.rows[0].start_time == '1530'
       && current.rows[0].status == 21
-      && current.rows[0].examdate == vars.examDate
-      && current.rows[0].starttime == '1530'
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
