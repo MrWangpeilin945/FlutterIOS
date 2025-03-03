@@ -11,8 +11,6 @@ export class HomePage extends BasePage {
     const loadTime = endTime - startTime;
 
     //結果をログに出力
-		console.log(
-			`${loadTime < 3000 ? "✅" : "❌"} SC0004_ホーム画面：${loadTime.toFixed(2)}ms`,
-		);
+    this.outputLog("SC0004_ホーム画面", loadTime);
   }
 }

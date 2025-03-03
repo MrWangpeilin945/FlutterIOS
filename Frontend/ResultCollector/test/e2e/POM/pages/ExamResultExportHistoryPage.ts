@@ -12,8 +12,8 @@ export class ExamResultExportHistoryPage extends BasePage {
     const loadTime = endTime - startTime;
 
     //結果をログに出力
-    console.log(
-      `${loadTime < 3000 ? "✅" : "❌"} SC0012_検査結果出力履歴画面：${loadTime.toFixed(2)}ms`,
-    );
+    this.outputLog("SC0020_検査結果出力履歴画面", loadTime);
+
+    //TODO:未出力に変更時の計測
   }
 }
