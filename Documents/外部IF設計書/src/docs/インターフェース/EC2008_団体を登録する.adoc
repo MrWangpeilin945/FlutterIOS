@@ -134,12 +134,19 @@ list.Count()  <> 0
 ==== WARNING検証
 
 * 必須項目(Organization.Code)が空値
-** ※存在しない場合は `400 Bad Request`
 ** `Organization.Code` が `string.IsNullOrWhiteSpace` に該当する 
 *** Organizationの単位で該当を取り除く
 *** ErrorObject
 **** Code `10004`
 **** Message `必須項目が不足しています。Code`
+**** InputNote `Organization.InputNote`
+
+* 必須項目(Organization.Name)が空値
+** `Organization.Name` が `string.IsNullOrWhiteSpace` に該当する 
+*** Organizationの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。Name`
 **** InputNote `Organization.InputNote`
 
 * ユニークキー(Organization.Code)が重複するレコードが存在する

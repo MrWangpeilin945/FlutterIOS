@@ -33,14 +33,14 @@ public class OrganizationUsecase : IOrganizationUsecase
     {
         _errorObjects.Clear();
 
-        // Code 必須チェック済みのリストを取得する
-        var insertOrganizationsByRequiredCodes = GetCheckedRequiredCode(organizations);
+        // 必須チェック済みのリストを取得する
+        var insertOrganizationsByRequired = GetCheckedRequired(organizations);
 
-        // Code 重複チェック済みのリストを取得する
-        var insertOrganizationsByDuplicateCodes = GetCheckedDuplicateCode(organizations);
+        // 重複チェック済みのリストを取得する
+        var insertOrganizationsByDuplicated = GetCheckedDuplicated(organizations);
 
-        var commonInsertPlaces = insertOrganizationsByRequiredCodes.Intersect(insertOrganizationsByDuplicateCodes)
-                                                                   .ToList();
+        var commonInsertPlaces = insertOrganizationsByRequired.Intersect(insertOrganizationsByDuplicated)
+                                                              .ToList();
 
         // 団体エンティティリスト生成
         var organizationEntities = commonInsertPlaces.Select(item => new OrganizationEntity
@@ -57,34 +57,40 @@ public class OrganizationUsecase : IOrganizationUsecase
 
 
     /// <summary>
-    /// Code 必須チェック済みのリストを取得する
+    /// 必須チェック済みのリストを取得する
     /// </summary>
     /// <param name="organizations"></param>
     /// <returns></returns>
-    private List<Organization> GetCheckedRequiredCode(List<Organization> organizations)
+    private List<Organization> GetCheckedRequired(List<Organization> organizations)
     {
         // WARNING検証
-        // キー重複
-        var requiredData = organizations.Where(x => string.IsNullOrWhiteSpace(x.Code));
-
-        if (requiredData.Any())
+        // 未入力(Code)
+        var requiredCodeData = organizations.Where(x => string.IsNullOrWhiteSpace(x.Code));
+        if (requiredCodeData.Any())
         {
             // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredData);
-            return organizations.Except(requiredData).ToList();
+            AddRequiredDataErrorObjects(requiredCodeData, "Code");
         }
-        else
+
+        // 未入力(Name)
+        var requiredNameData = organizations.Where(x => string.IsNullOrWhiteSpace(x.Name));
+        if (requiredNameData.Any())
         {
-            return new List<Organization>(organizations);
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredNameData, "Name");
         }
+
+        return organizations.Except(requiredCodeData)
+                            .Except(requiredNameData)
+                            .ToList();
     }
 
     /// <summary>
-    /// Code 重複チェック済みのリストを取得する
+    /// 重複チェック済みのリストを取得する
     /// </summary>
     /// <param name="organizations"></param>
     /// <returns></returns>
-    private List<Organization> GetCheckedDuplicateCode(List<Organization> organizations)
+    private List<Organization> GetCheckedDuplicated(List<Organization> organizations)
     {
         // WARNING検証
         // キー重複
@@ -108,13 +114,13 @@ public class OrganizationUsecase : IOrganizationUsecase
     /// エラーオブジェクトに情報追加する(必須項目エラー）
     /// </summary>
     /// <param name="requiredData"></param>
-    private void AddRequiredDataErrorObjects(IEnumerable<Organization> requiredData)
+    private void AddRequiredDataErrorObjects(IEnumerable<Organization> requiredData, string itemName)
     {
         var errorObjects = requiredData
             .Select(r => new ErrorObject
             {
                 Code = "10004",
-                Message = "必須項目が不足しています。Code",
+                Message = $"必須項目が不足しています。{itemName}",
                 InputNote = r.InputNote
             }).ToList();
 
