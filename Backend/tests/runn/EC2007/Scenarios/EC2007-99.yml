@@ -1,0 +1,62 @@
+desc: EC2007-99 会場の負荷テスト
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  recordCount: 10000
+steps:
+  clearTable:
+    desc: "会場テーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.places CASCADE;
+  createUniqueKeys:
+    desc: "ユニークなキーの作成"
+    db:
+      query: |
+        WITH RECURSIVE numbers AS (
+          SELECT 1 AS num
+          UNION ALL
+          SELECT num + 1
+          FROM numbers
+          WHERE num < {{ vars.recordCount}}
+        )
+        SELECT
+          'Code-' || num AS code
+        FROM
+          numbers;
+    bind:
+      uniqueCode: current.rows
+  createRequest:
+    desc: "リクエストデータの作成"
+    loop:
+      count: vars.recordCount
+    bind:
+      requestBody:
+        -
+          code: uniqueCode[i].code
+          name: "'負荷テスト_会場テーブル'"
+          inputNote: "'inputNote2007-99'"
+  startBatch:
+    desc: "処理の開始時間"
+    bind:
+      startTime: now()
+  post:
+    desc: "会場の登録"
+    req:
+      /api/v1/external/places:
+        post:
+          body:
+            application/json:
+              "{{ requestBody }}"
+    test: |
+      current.res.status == 200
+      && current.res.body == null
+  endBatch:
+    desc: "処理の終了時間（秒）"
+    dump:
+      expr: now().Sub(startTime).Seconds() 
+      out: ../Dump/EC2007-99.json
+
