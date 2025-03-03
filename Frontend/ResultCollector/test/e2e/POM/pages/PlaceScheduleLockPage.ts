@@ -40,6 +40,7 @@ export class PlaceScheduleLockPage extends BasePage {
   }
 
   async placeScheduleLock() {
+    await this.goto("placeschedule-lock");
     //初期表示
     await this.getElement();
     //会場ロック状態を更新
