@@ -1,0 +1,125 @@
+desc: EC2004-14 削除の連携キーの取得に失敗
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2004-14.json"
+steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 受診
+        TRUNCATE TABLE resultcollector.consult CASCADE;
+        -- 会場
+        TRUNCATE TABLE resultcollector.places CASCADE; 
+        -- 班
+        TRUNCATE TABLE resultcollector.teams CASCADE;
+        -- 受診者
+        TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 検査特記
+        TRUNCATE TABLE resultcollector.exam_menu_note_codes CASCADE;
+        -- 基準値パターン
+        TRUNCATE TABLE resultcollector.thresholds CASCADE;
+        -- 外部検査項目明細
+        TRUNCATE TABLE resultcollector.external_exam_item_details CASCADE;
+  insertData:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 班
+        INSERT INTO
+          resultcollector.teams
+          (team_id, team_code, name, order_number, created_at, created_by)
+        VALUES('f0002004-0000-0000-0014-000000000001', 'T2004-14', '甲班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 会場
+        INSERT INTO
+          resultcollector.places
+          (place_id, place_code, name, order_number, created_at, created_by)
+        VALUES('b0002004-0000-0000-0014-000000000001', 'P2004-14', '甲会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 会場日程
+        INSERT INTO
+          resultcollector.place_schedule
+          (place_schedule_id, place_id, team_id, status, exam_date, start_time, created_at, created_by)
+        VALUES('a0002004-0000-0000-0014-000000000001', 'b0002004-0000-0000-0014-000000000001', 'f0002004-0000-0000-0014-000000000001', 31, '2025/03/03', '1500', CURRENT_TIMESTAMP, 'ec2004');
+        -- 受診者
+        INSERT INTO
+          resultcollector.examinees
+          (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
+        VALUES('e0002004-0000-0000-0014-000000000001', 'E2004141', '両備　太郎', 'リョウビ　タロウ', 1, '1991-01-30', CURRENT_TIMESTAMP,'ec2004');
+  post:
+    desc: "削除の連携キーの取得に失敗"
+    req:
+      /api/v1/external/consult:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+      // レスポンスに1件のErrorObjectが返されることを確認
+      && len(current.res.body) == 1
+      && current.res.body[0].code == "10001"
+      && current.res.body[0].inputNote == "2004141"
+      && current.res.body[0].message == "指定されたConnectionCodeがシステム上に存在しません。Code:CCD-200415"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2004-14.json
+  confirmConsult:
+    desc: "受診の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.consult;
+    test: |
+      // 受診が登録されていないことを確認
+      len(current.rows) == 0
+  confirmConsultNotes:
+    desc: "受診特記の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.consult_notes;
+    test: |
+      // 受診特記が登録されていないことを確認
+      len(current.rows) == 0
+  confirmExamItemDetailOrders:
+    desc: "検査項目明細依頼の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.exam_item_detail_orders;
+    test: |
+      // 検査項目明細依頼が登録されていないことを確認
+      len(current.rows) == 0
+  confirmConsultThresholds:
+    desc: "基準値の登録を確認"
+    db:
+      query: |
+        SELECT
+          threshold_id::text
+        FROM
+          resultcollector.consult_thresholds;
+    test: |
+      // 基準値が登録されていないことを確認
+      len(current.rows) == 0
+  confirmPreviousResults:
+    desc: "過去検査結果の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.previous_results;
+    test: |
+      // 過去検査結果が登録されていないことを確認
+      len(current.rows) == 0

@@ -1,0 +1,168 @@
+desc: EC2004-03 受診番号が異なる連携キーで登録されている
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2004-03.json"
+steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 受診
+        TRUNCATE TABLE resultcollector.consult CASCADE;
+        -- 会場
+        TRUNCATE TABLE resultcollector.places CASCADE; 
+        -- 班
+        TRUNCATE TABLE resultcollector.teams CASCADE;
+        -- 受診者
+        TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 検査特記
+        TRUNCATE TABLE resultcollector.exam_menu_note_codes CASCADE;
+        -- 基準値パターン
+        TRUNCATE TABLE resultcollector.thresholds CASCADE;
+        -- 外部検査項目明細
+        TRUNCATE TABLE resultcollector.external_exam_item_details CASCADE;
+  insertData:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 班
+        INSERT INTO
+          resultcollector.teams
+          (team_id, team_code, name, order_number, created_at, created_by)
+        VALUES('f0002004-0000-0000-0003-000000000001', 'T2004-03', '甲班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 会場
+        INSERT INTO
+          resultcollector.places
+          (place_id, place_code, name, order_number, created_at, created_by)
+        VALUES('b0002004-0000-0000-0003-000000000001', 'P2004-03', '甲会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 会場日程
+        INSERT INTO
+          resultcollector.place_schedule
+          (place_schedule_id, place_id, team_id, status, exam_date, start_time, created_at, created_by)
+        VALUES('a0002004-0000-0000-0003-000000000001', 'b0002004-0000-0000-0003-000000000001', 'f0002004-0000-0000-0003-000000000001', 31, '2025/03/03', '1500', CURRENT_TIMESTAMP, 'ec2004');
+        -- 受診者
+        INSERT INTO
+          resultcollector.examinees
+          (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
+        VALUES('e0002004-0000-0000-0003-000000000001', 'E2004031', '両備　太郎', 'リョウビ　タロウ', 1, '1991-01-30', CURRENT_TIMESTAMP,'ec2004');
+        -- 受診
+        INSERT INTO
+          resultcollector.consult
+          (consult_id, consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
+        VALUES('c0002004-0000-0000-0003-000000000001', 'No-200403-1', 11, 11, 'a0002004-0000-0000-0003-000000000001', '特記事項2004031', 'e0002004-0000-0000-0003-000000000001', 'CCS-2004-9999', CURRENT_TIMESTAMP, 'ec2004');
+  getConsult:
+    desc: "受診情報を取得する"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+          , consult_number
+          , progress_status
+          , export_status
+          , place_schedule_id::text
+          , note
+          , examinee_id::text
+          , external_connection_code
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+        FROM
+          resultcollector.consult
+    bind:
+      consultData: current.rows
+  post:
+    desc: "受診番号が異なる連携キーで登録されている"
+    req:
+      /api/v1/external/consult:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+      // レスポンスに1件のErrorObjectが返されることを確認
+      && len(current.res.body) == 1
+      && current.res.body[0].code == "10002"
+      && current.res.body[0].inputNote == "2004031"
+      && current.res.body[0].message == "指定されたConsultNumberが既に登録済みです。Code:No-200403-1"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2004-03.json
+  confirmConsult:
+    desc: "受診の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+          , consult_number
+          , progress_status
+          , export_status
+          , place_schedule_id::text
+          , note
+          , examinee_id::text
+          , external_connection_code
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+        FROM
+          resultcollector.consult;
+    test: |
+      // 実行前の1件が変更されずに存在する
+      len(current.rows) == 1
+      && current.rows[0].consult_id == consultData[0].consult_id
+      && current.rows[0].consult_number == consultData[0].consult_number
+      && current.rows[0].progress_status == consultData[0].progress_status
+      && current.rows[0].export_status == consultData[0].export_status
+      && current.rows[0].place_schedule_id == consultData[0].place_schedule_id
+      && current.rows[0].note == consultData[0].note
+      && current.rows[0].examinee_id == consultData[0].examinee_id
+      && current.rows[0].external_connection_code == consultData[0].external_connection_code
+      && current.rows[0].created_at == consultData[0].created_at
+      && current.rows[0].created_by == consultData[0].created_by
+  confirmConsultNotes:
+    desc: "受診特記の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.consult_notes;
+    test: |
+      // 受診特記が登録されていないことを確認
+      len(current.rows) == 0
+  confirmExamItemDetailOrders:
+    desc: "検査項目明細依頼の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.exam_item_detail_orders;
+    test: |
+      // 検査項目明細依頼が登録されていないことを確認
+      len(current.rows) == 0
+  confirmConsultThresholds:
+    desc: "基準値の登録を確認"
+    db:
+      query: |
+        SELECT
+          threshold_id::text
+        FROM
+          resultcollector.consult_thresholds;
+    test: |
+      // 基準値が登録されていないことを確認
+      len(current.rows) == 0
+  confirmPreviousResults:
+    desc: "過去検査結果の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.previous_results;
+    test: |
+      // 過去検査結果が登録されていないことを確認
+      len(current.rows) == 0
