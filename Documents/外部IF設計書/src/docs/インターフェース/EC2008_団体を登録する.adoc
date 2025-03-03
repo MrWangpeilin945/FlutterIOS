@@ -94,7 +94,7 @@ list.Count()  <> 0
 |団体名
 
 |InputNote
-|Yes
+|
 |string
 |エラーオブジェクトに登録する入力項目Noなど
 
@@ -117,7 +117,7 @@ list.Count()  <> 0
 |エラーメッセージ
 
 |InputNote
-|Yes
+|
 |string
 |入力項目Noなど
 
