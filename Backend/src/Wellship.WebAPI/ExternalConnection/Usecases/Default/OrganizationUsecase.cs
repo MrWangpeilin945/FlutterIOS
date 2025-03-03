@@ -114,6 +114,7 @@ public class OrganizationUsecase : IOrganizationUsecase
     /// エラーオブジェクトに情報追加する(必須項目エラー）
     /// </summary>
     /// <param name="requiredData"></param>
+    /// <param name="itemName"></param>
     private void AddRequiredDataErrorObjects(IEnumerable<Organization> requiredData, string itemName)
     {
         var errorObjects = requiredData
