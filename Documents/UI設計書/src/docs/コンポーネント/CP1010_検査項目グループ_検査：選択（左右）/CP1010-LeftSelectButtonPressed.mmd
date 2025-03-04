@@ -7,4 +7,7 @@ autonumber
 
   User->>KN:左選択ボタンを押下
   KN->>KN:押下された左選択ボタンをもとに値を更新
+  alt onRegisterPressedがtrue
+  KN->>KN:バリデーションチェック
+  end
   KN-->>FE:引数.変更イベントを呼び出す
