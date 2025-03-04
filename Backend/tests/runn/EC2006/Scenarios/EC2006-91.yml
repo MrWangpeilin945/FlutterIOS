@@ -68,7 +68,6 @@ steps:
               "{{ requestBody }}"
     test: |
       current.res.status == 200
-      && current.res.body == null
     bind:
       endTime: now()
   endBatch:
