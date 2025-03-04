@@ -5,6 +5,12 @@ autonumber
   participant FE as フロントエンド
   participant KN as コンポーネント  
 
-  User->>KN:クリアボタンを押下
+  User->>KN:クリアボタンの押下
   KN->>KN:入力値を更新
-  KN-->>FE:引数.変更イベントを呼び出す
+  alt onRegisterPressedがtrueの時
+  KN-->>KN:バリデーションチェック
+  alt バリデーションチェックでエラーあり
+  KN->>KN:エラーメッセージを表示
+  end
+  KN->>FE:引数.変更イベントを呼び出す
+end
