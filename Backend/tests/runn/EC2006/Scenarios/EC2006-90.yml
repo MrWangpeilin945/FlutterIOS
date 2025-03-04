@@ -38,7 +38,7 @@ steps:
         -
           code: uniqueCode[i].code
           name: "'負荷テスト_班'"
-          inputNote: "'inputNote2006-90'"
+          inputNote: "'2006-90'"
   startBatch:
     desc: "処理の開始時間"
     bind:

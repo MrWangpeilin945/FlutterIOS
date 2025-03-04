@@ -53,13 +53,13 @@ steps:
         -
           code: uniqueCode[i].code
           name: "'負荷テスト_新班名称'"
-          inputNote: "'inputNote2006-90'"
+          inputNote: "'2006-91'"
   startBatch:
     desc: "処理の開始時間"
     bind:
       startTime: now()
   post:
-    desc: "班の登録"
+    desc: "班の更新"
     req:
       /api/v1/external/teams:
         post:
@@ -72,12 +72,12 @@ steps:
     bind:
       endTime: now()
   endBatch:
-    desc: "班の登録POST"
+    desc: "処理の終了時間"
     bind:
       timeKeeper:
         startTime: startTime.Format("2006-01-02T15:04:05Z07:00")
         endTime: endTime.Format("2006-01-02T15:04:05Z07:00")
-        processingSeconds: endTime.Sub(startTime).Seconds() 
+        interval: endTime.Sub(startTime).Seconds() 
   confirmTeams:
     desc: "班の更新を確認"
     db:
@@ -89,7 +89,9 @@ steps:
           , to_char(created_at, 'yyyymmdd') as created_at
           , created_by
         FROM
-          resultcollector.teams;
+          resultcollector.teams
+        ORDER BY
+          team_code;
     test: |
       len(current.rows) == vars.recordCount
       && current.rows[0].name == "負荷テスト_新班名称"

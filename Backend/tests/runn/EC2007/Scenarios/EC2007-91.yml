@@ -1,4 +1,4 @@
-desc: EC2007-90 会場の登録負荷テスト
+desc: EC2007-91 会場の更新負荷テスト
 runners:
   db: ${DB_HOST}
   req:
@@ -29,6 +29,21 @@ steps:
           numbers;
     bind:
       uniqueCode: current.rows
+  insertData:
+    desc: "会場テーブルに実行前データを登録"
+    loop: vars.recordCount
+    db: 
+      query: |
+        INSERT INTO
+          resultcollector.places (place_code, name , order_number , created_at, created_by)
+        VALUES
+          (
+            '{{ uniqueCode[i].code }}' 
+            , '負荷テスト_旧会場名称'
+            , {{ i + 1 }}
+            , '2025-01-01T12:34:56.789'
+            , 'ec2007'
+          );
   createRequest:
     desc: "リクエストデータの作成"
     loop:
@@ -37,14 +52,14 @@ steps:
       requestBody:
         -
           code: uniqueCode[i].code
-          name: "'負荷テスト_会場'"
-          inputNote: "'inputNote2007-90'"
+          name: "'負荷テスト_新会場名称'"
+          inputNote: "'200791'"
   startBatch:
     desc: "処理の開始時間"
     bind:
       startTime: now()
   post:
-    desc: "会場の登録"
+    desc: "会場の更新"
     req:
       /api/v1/external/places:
         post:
@@ -63,17 +78,28 @@ steps:
         startTime: startTime.Format("2006-01-02T15:04:05Z07:00")
         endTime: endTime.Format("2006-01-02T15:04:05Z07:00")
         interval: endTime.Sub(startTime).Seconds() 
-
   confirmPlaces:
-    desc: "会場の登録を確認"
+    desc: "会場の更新を確認"
     db:
       query: |
         SELECT
           place_code
+          , name
+          , order_number
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
         FROM
-          resultcollector.places;
+          resultcollector.places
+        ORDER BY
+          place_code;
     test: |
       len(current.rows) == vars.recordCount
+      && current.rows[0].name == "負荷テスト_新会場名称"
+      && current.rows[0].created_at > "20250101"
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[vars.recordCount - 1].name == "負荷テスト_新会場名称"
+      && current.rows[vars.recordCount - 1].created_at > "20250101"
+      && current.rows[vars.recordCount - 1].created_by == "ExternalConnection"
     dump:
       expr: timeKeeper
-      out: ../Dump/EC2007-90.json
+      out: ../Dump/EC2007-91.json
