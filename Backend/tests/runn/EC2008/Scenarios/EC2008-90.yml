@@ -1,4 +1,4 @@
-desc: EC2007-90 会場の登録負荷テスト
+desc: EC2008-90 団体の登録負荷テスト
 runners:
   db: ${DB_HOST}
   req:
@@ -9,9 +9,9 @@ vars:
   recordCount: 10000
 steps:
   clearTable:
-    desc: "会場テーブルをクリア"
+    desc: "団体テーブルをクリア"
     db:
-      query: TRUNCATE TABLE resultcollector.places CASCADE;
+      query: TRUNCATE TABLE resultcollector.organizations CASCADE;
   createUniqueKeys:
     desc: "ユニークなキーの作成"
     db:
@@ -37,16 +37,16 @@ steps:
       requestBody:
         -
           code: uniqueCode[i].code
-          name: "'負荷テスト_会場'"
-          inputNote: "'2007-90'"
+          name: "'負荷テスト_団体'"
+          inputNote: "'2008-90'"
   startBatch:
     desc: "処理の開始時間"
     bind:
       startTime: now()
   post:
-    desc: "会場の登録"
+    desc: "団体の登録"
     req:
-      /api/v1/external/places:
+      /api/v1/external/organizations:
         post:
           body:
             application/json:
@@ -64,16 +64,16 @@ steps:
         endTime: endTime.Format("2006-01-02T15:04:05Z07:00")
         interval: endTime.Sub(startTime).Seconds() 
 
-  confirmPlaces:
-    desc: "会場の登録を確認"
+  confirmOrganizations:
+    desc: "団体の登録を確認"
     db:
       query: |
         SELECT
-          place_code
+          organization_code
         FROM
-          resultcollector.places;
+          resultcollector.organizations;
     test: |
       len(current.rows) == vars.recordCount
     dump:
       expr: timeKeeper
-      out: ../Dump/EC2007-90.json
+      out: ../Dump/EC2008-90.json
