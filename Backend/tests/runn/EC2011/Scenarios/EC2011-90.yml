@@ -30,7 +30,6 @@ steps:
           numbers;
     bind:
       uniqueCode: current.rows
-    dump: "'ユニークなキーの作成'"
   createRequest:
     desc: "リクエストデータの作成"
     loop:
@@ -49,7 +48,6 @@ steps:
     desc: "処理の開始時間"
     bind:
       startTime: now()
-    dump: "'処理の開始時間'"
   post:
     desc: "職員の登録"
     req:
@@ -62,7 +60,6 @@ steps:
       current.res.status == 200
     bind:
       endTime: now()
-    dump: "'職員の登録'"
   endBatch:
     desc: "処理の終了時間"
     bind:
