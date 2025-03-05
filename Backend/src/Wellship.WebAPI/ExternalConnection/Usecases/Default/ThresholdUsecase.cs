@@ -33,17 +33,17 @@ public class ThresholdUsecase : IThresholdUsecase
     {
         _errorObjects.Clear();
 
-        // Code 必須チェック済みのリストを取得する
-        var insertThresholdsByRequiredCodes = GetCheckedRequiredCode(thresholds);
+        // 必須チェック済みのリストを取得する
+        var insertThresholdsByRequireds = GetCheckedRequired(thresholds);
 
-        // Code 重複チェック済みのリストを取得する
-        var insertThresholdsByDuplicateCodes = GetCheckedDuplicateCode(thresholds);
+        // 重複チェック済みのリストを取得する
+        var insertThresholdsByDuplicateds = GetCheckedDuplicated(thresholds);
 
-        var commonInsertThresholds = insertThresholdsByRequiredCodes.Intersect(insertThresholdsByDuplicateCodes)
-                                                                    .ToList();
+        var commonInsertThresholds = insertThresholdsByRequireds.Intersect(insertThresholdsByDuplicateds)
+                                                                .ToList();
 
         // エンティティリスト生成
-        List <ThresholdEntity> thresholdEntities = commonInsertThresholds.Select(item => new ThresholdEntity
+        List<ThresholdEntity> thresholdEntities = commonInsertThresholds.Select(item => new ThresholdEntity
         {
             ThresholdId = Guid.NewGuid(),
             ThresholdCode = item.Code,
@@ -57,34 +57,40 @@ public class ThresholdUsecase : IThresholdUsecase
     }
 
     /// <summary>
-    /// Code 必須チェック済みのリストを取得する
+    /// 必須チェック済みのリストを取得する
     /// </summary>
     /// <param name="thresholds"></param>
     /// <returns></returns>
-    private List<Threshold> GetCheckedRequiredCode(List<Threshold> thresholds)
+    private List<Threshold> GetCheckedRequired(List<Threshold> thresholds)
     {
         // WARNING検証
-        // キー重複
-        var requiredData = thresholds.Where(x => string.IsNullOrWhiteSpace(x.Code));
-
-        if (requiredData.Any())
+        // 未入力(Code)
+        var requiredCodeData = thresholds.Where(x => string.IsNullOrWhiteSpace(x.Code));
+        if (requiredCodeData.Any())
         {
             // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredData);
-            return thresholds.Except(requiredData).ToList();
+            AddRequiredDataErrorObjects(requiredCodeData, "Code");
         }
-        else
+
+        // 未入力(Name)
+        var requiredNameData = thresholds.Where(x => string.IsNullOrWhiteSpace(x.Name));
+        if (requiredNameData.Any())
         {
-            return new List<Threshold>(thresholds);
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredNameData, "Name");
         }
+
+        return thresholds.Except(requiredCodeData)
+                         .Except(requiredNameData)
+                         .ToList();
     }
 
     /// <summary>
-    /// Code 重複チェック済みのリストを取得する
+    /// 重複チェック済みのリストを取得する
     /// </summary>
     /// <param name="thresholds"></param>
     /// <returns></returns>
-    private List<Threshold> GetCheckedDuplicateCode(List<Threshold> thresholds)
+    private List<Threshold> GetCheckedDuplicated(List<Threshold> thresholds)
     {
         // WARNING検証
         // キー重複
@@ -108,13 +114,14 @@ public class ThresholdUsecase : IThresholdUsecase
     /// エラーオブジェクトに情報追加する(必須項目エラー）
     /// </summary>
     /// <param name="requiredData"></param>
-    private void AddRequiredDataErrorObjects(IEnumerable<Threshold> requiredData)
+    /// <param name="itemName"></param>
+    private void AddRequiredDataErrorObjects(IEnumerable<Threshold> requiredData, string itemName)
     {
         var errorObjects = requiredData
             .Select(r => new ErrorObject
             {
                 Code = "10004",
-                Message = "必須項目が不足しています。Code",
+                Message = $"必須項目が不足しています。{itemName}",
                 InputNote = r.InputNote
             }).ToList();
 

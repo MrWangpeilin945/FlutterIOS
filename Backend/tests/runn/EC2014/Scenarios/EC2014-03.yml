@@ -29,20 +29,26 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 207
-      && len(current.res.body) == 4
+      && len(current.res.body) == 6
       // 必須項目不足のレコードがエラーで返される
       && current.res.body[0].code == "10004"
       && current.res.body[0].inputNote == "20140301"
       && current.res.body[0].message == "必須項目が不足しています。Code"
       && current.res.body[1].code == "10004"
-      && current.res.body[1].inputNote == "20140302"
+      && current.res.body[1].inputNote == "20140303"
       && current.res.body[1].message == "必須項目が不足しています。Code"
-      && current.res.body[2].code == "10003"
-      && current.res.body[2].inputNote == "20140301"
-      && current.res.body[2].message == "キー項目が重複しています。Code:"
-      && current.res.body[3].code == "10003"
-      && current.res.body[3].inputNote == "20140302"
-      && current.res.body[3].message == "キー項目が重複しています。Code:"
+      && current.res.body[2].code == "10004"
+      && current.res.body[2].inputNote == "20140302"
+      && current.res.body[2].message == "必須項目が不足しています。Name"
+      && current.res.body[3].code == "10004"
+      && current.res.body[3].inputNote == "20140303"
+      && current.res.body[3].message == "必須項目が不足しています。Name"
+      && current.res.body[4].code == "10003"
+      && current.res.body[4].inputNote == "20140301"
+      && current.res.body[4].message == "キー項目が重複しています。Code:"
+      && current.res.body[5].code == "10003"
+      && current.res.body[5].inputNote == "20140303"
+      && current.res.body[5].message == "キー項目が重複しています。Code:"
     dump:
       expr: current.res.body
       out: ../Dump/EC2014-03.json
