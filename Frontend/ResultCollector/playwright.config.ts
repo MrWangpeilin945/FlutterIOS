@@ -8,8 +8,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [["html", { open: "never" }]],
+  // レポートの出力を無効化
+  reporter: "null",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -17,7 +17,6 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
-    viewport: { width: 800, height: 1280 },
   },
   //タイムアウト時間を100秒に設定
   timeout: 100000,
