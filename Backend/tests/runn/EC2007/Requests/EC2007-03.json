@@ -5,8 +5,13 @@
         "inputNote": "20070301"
     },
     {
-        "code": "",
-        "name": "第２会場",
+        "code": "P2007-03-2",
+        "name": "",
         "inputNote": "20070302"
+    },
+    {
+        "code": "",
+        "name": "",
+        "inputNote": "20070303"
     }
 ]
