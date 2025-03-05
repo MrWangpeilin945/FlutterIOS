@@ -56,7 +56,7 @@ steps:
           WHERE num < {{ vars.recordCount}}
         )
         SELECT
-          'External' || num AS code
+          'E-' || lpad(cast(num as character varying), 6, '0') AS code
           , num AS id
         FROM
           numbers;

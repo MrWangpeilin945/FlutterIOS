@@ -24,7 +24,7 @@ steps:
           WHERE num < {{ vars.recordCount}}
         )
         SELECT
-          'Code-' || num AS code
+          'Code-' || lpad(cast(num as character varying), 6, '0') AS code
         FROM
           numbers;
     bind:
