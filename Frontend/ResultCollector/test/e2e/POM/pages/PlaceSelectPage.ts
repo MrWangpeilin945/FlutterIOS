@@ -3,12 +3,12 @@ import settings from "../../testSetting";
 import { BasePage } from "./base/BasePage";
 
 export class PlaceSelectPage extends BasePage {
-  readonly placeSelectButton: Locator;
+  readonly startTime: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.placeSelectButton = page.getByRole("button", {
-      name: settings.placeName,
+    this.startTime = page.getByRole("button", {
+      name: settings.startTime,
     });
   }
 
@@ -16,7 +16,7 @@ export class PlaceSelectPage extends BasePage {
     //開始時間を計測
     const startTime = await super.getTime();
     //ページが読み込まれるまで待機
-    await super.waitForDOMChange();
+    await this.startTime.waitFor({state:"visible"});
     //終了時間を計測
     const endTime = await super.getTime();
     const loadTime = endTime - startTime;
@@ -25,6 +25,6 @@ export class PlaceSelectPage extends BasePage {
     this.outputLog("SC0003_会場選択画面", loadTime);
 
     //ホーム画面へ遷移
-    await this.placeSelectButton.click();
+    await this.startTime.click();
   }
 }

@@ -15,7 +15,8 @@ export class ConsultInputPage extends BasePage {
     //開始時間を計測
     const startTime = await super.getTime();
     //ページが読み込まれるまで待機
-    await super.waitForDOMChange();
+    await super.waitUrl(/consult-input\/\w+\?exammenuid=\d+/);
+    await this.registerButton.waitFor({ state: "visible" });
     //終了時間を計測
     const endTime = await super.getTime();
     const loadTime = endTime - startTime;
@@ -27,8 +28,9 @@ export class ConsultInputPage extends BasePage {
   async verifyExamItems() {
     //開始時間を計測
     const startTime = await super.getTime();
-    //ページが読み込まれるまで待機
+    //ダイアログが読み込まれるまで待機
     await this.dialog.waitFor({ state: "visible" });
+    await this.confirmButton.waitFor({ state: "visible" });
     //終了時間を計測
     const endTime = await super.getTime();
     const loadTime = endTime - startTime;

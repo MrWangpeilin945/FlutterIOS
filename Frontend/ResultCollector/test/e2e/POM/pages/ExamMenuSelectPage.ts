@@ -13,10 +13,11 @@ export class ExamMenuSelectPage extends BasePage {
   }
 
   async examMenuSelect() {
+    await super.goto("exammenu-select");
     //開始時間を計測
     const startTime = await super.getTime();
     //ページが読み込まれるまで待機
-    await super.waitForDOMChange();
+    await this.examMenuSelectButton.waitFor({ state: "visible" });
     //終了時間を計測
     const endTime = await super.getTime();
     const loadTime = endTime - startTime;

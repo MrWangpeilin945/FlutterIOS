@@ -20,7 +20,7 @@ export class BasePage {
     this.dialog = page.locator('div[class*="mantine-Modal-body"]');
   }
 
-  async outputLog(name: string,loadTime:number) {
+  async outputLog(name: string, loadTime: number) {
     console.log(
       `${loadTime < testSettings.baseProcessingTime ? "✅" : "❌"} ${name}：${loadTime.toFixed(2)}ms`,
     );
@@ -40,6 +40,10 @@ export class BasePage {
 
   async getTime() {
     return await this.page.evaluate(() => performance.now());
+  }
+
+  async waitUrl(url: string | RegExp) {
+    return await this.page.waitForURL(url);
   }
 
   // DOM の変化を待機するメソッド

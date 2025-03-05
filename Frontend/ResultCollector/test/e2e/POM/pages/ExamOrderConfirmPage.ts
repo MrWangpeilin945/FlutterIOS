@@ -1,3 +1,4 @@
+import type { Locator, Page } from "@playwright/test";
 import { BasePage } from "./base/BasePage";
 
 export class ExamOrderConfirmPage extends BasePage {
@@ -5,7 +6,7 @@ export class ExamOrderConfirmPage extends BasePage {
     //開始時間を計測
     const startTime = await super.getTime();
     //ページが読み込まれるまで待機
-    await super.waitForDOMChange();
+    await this.startButton.waitFor({ state: "visible" });
     //終了時間を計測
     const endTime = await super.getTime();
     const loadTime = endTime - startTime;

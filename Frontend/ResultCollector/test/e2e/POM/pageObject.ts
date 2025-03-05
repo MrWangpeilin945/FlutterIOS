@@ -35,8 +35,8 @@ export class PageObject {
 
 		//➀結果登録処理を任意の回数繰り返し
 		for (let i = 0; i < testSetting.examTestLoopCount; i++) {
-			console.log(`------------------- ${i + 1}回目 -------------------`);
 			await this.executeExamProcess();
 		}
+    await this.page.goto("home");
 	}
 }

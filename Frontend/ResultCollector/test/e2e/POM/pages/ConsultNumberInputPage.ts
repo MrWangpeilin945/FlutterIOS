@@ -1,20 +1,20 @@
+import type { Locator, Page } from "@playwright/test";
 import testSettings from "../../testSetting";
 import { BasePage } from "./base/BasePage";
 
 export class ConsultNumberInputPage extends BasePage {
+  readonly consultNumberLabel: Locator;
+
+  constructor(page: Page) {
+    super(page);
+    this.consultNumberLabel = page.getByText("受診番号", { exact: true });
+  }
+
   async consultNumberInput() {
-    // 現在の URL を取得
-    const currentURL = await this.page.url();
-    const urlParams = new URLSearchParams(new URL(currentURL).search);
-    
     //開始時間を計測
     const startTime = await super.getTime();
     //ページが読み込まれるまで待機
-    if (urlParams.has("consultnumber")) {
-      await this.waitForDOMChange();
-    } else {
-      await this.page.waitForURL(/consultnumber-input(\?.*)?$/);
-    }
+    await this.consultNumberLabel.waitFor({ state: "visible" });
     //終了時間を計測
     const endTime = await super.getTime();
     const loadTime = endTime - startTime;
