@@ -347,4 +347,64 @@ public class MenuNoteResultTest
         // Assert
         actual.Should().Be(expected);
     }
+
+    [Fact]
+    public void 検査項目明細種別が入力と選択以外の場合は空文字()
+    {
+        // Arrange
+
+        var menuNote = new MenuNote()
+        {
+            MenuNoteId = 1,
+            Name = "入力と選択以外",
+            ExamMenuId = 1,
+            Suffix = "",
+            ConsultNotes = [],
+            ExamResults = [
+                new() { ExamItemDetailId = 12, SourceType = Core.Enums.SourceType.今回値}
+            ]
+        };
+
+        List<ExamItemDetailChild> detailChildren = [
+            new(){
+                ExamItemDetailId = 12,
+                IntegerLength = 3,
+                DecimalLength = 1,
+                Name = "演算系の明細",
+                PositionNumber = 1,
+                EquipmentLabel = "",
+                Unit = "cm",
+                Type = Core.Enums.ExamItemDetailType.演算値,
+                KeyboardType = Core.Enums.KeyboardType.テンキー,
+                Keyboards = [],
+                DetailOptions = []
+            }
+        ];
+
+        ExamResult examResult = new()
+        {
+            ConsultId = Guid.Parse("823f1cfd-39d6-4e41-b2fa-38027009a4d1"),
+            ExamItemDetailResults = [
+                new(){ ExamItemId = 1, ExamItemDetailId = 12, Value = "999" }
+            ]
+        };
+
+        PreviousResult previousResult = new()
+        {
+            ConsultId = Guid.Parse("823f1cfd-39d6-4e41-b2fa-38027009a4d1"),
+            ExamDate = new DateOnly(2024, 12, 30),
+            ExamItemDetailResults = []
+        };
+
+        List<ConsultNote> consultNotes = [];
+
+        var menuNoteResult = new MenuNoteResult(menuNote, detailChildren, examResult, previousResult, consultNotes);
+        var expected = "()";
+
+        // Act
+        var actual = menuNoteResult.GetDisplayText();
+
+        // Assert
+        actual.Should().Be(expected);
+    }
 }
