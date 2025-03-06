@@ -192,7 +192,7 @@ steps:
       && current.rows[0].max_value == 200
       && current.rows[0].min_value == 10
       && current.rows[0].error_level == 3
-      && current.rows[0].created_at > "20250301"
+      && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
       && current.rows[vars.recordCount - 1].name == "負荷テスト_新検査基準値範囲"
       && current.rows[vars.recordCount - 1].max_age == "0750000"
@@ -201,7 +201,7 @@ steps:
       && current.rows[vars.recordCount - 1].max_value == 200
       && current.rows[vars.recordCount - 1].min_value == 10
       && current.rows[vars.recordCount - 1].error_level == 3
-      && current.rows[vars.recordCount - 1].created_at > "20250301"
+      && current.rows[vars.recordCount - 1].created_at == current.rows[vars.recordCount - 1].now
       && current.rows[vars.recordCount - 1].created_by == "ExternalConnection"
     dump:
       expr: timeKeeper

@@ -127,6 +127,7 @@ steps:
           , start_time
           , to_char(created_at, 'yyyymmdd') as created_at
           , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.place_schedule
         ORDER BY
@@ -135,11 +136,11 @@ steps:
       len(current.rows) == vars.recordCount
       && current.rows[0].status == 21
       && current.rows[0].start_time == "0830"
-      && current.rows[0].created_at > "20250301"
+      && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
       && current.rows[vars.recordCount - 1].status == 21
       && current.rows[vars.recordCount - 1].start_time == "0830"
-      && current.rows[vars.recordCount - 1].created_at > "20250301"
+      && current.rows[vars.recordCount - 1].created_at == current.rows[vars.recordCount - 1].now
       && current.rows[vars.recordCount - 1].created_by == "ExternalConnection"
     dump:
       expr: timeKeeper
