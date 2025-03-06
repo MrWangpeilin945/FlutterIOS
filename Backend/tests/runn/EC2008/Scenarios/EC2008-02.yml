@@ -8,22 +8,18 @@ runners:
 vars:
   request: "json://../Requests/EC2008-02.json"
 steps:
-  getOrganizations:
-    desc: "団体情報の取得"
+  clearTable:
+    desc: "団体テーブルをクリア"
     db:
+      query: TRUNCATE TABLE resultcollector.organizations CASCADE;
+  insertData:
+    desc: "団体テーブルに実行前データを登録"
+    db: 
       query: |
-        SELECT
-          organization_code
-          , name
-          , order_number
-        FROM
-          resultcollector.organizations
-        WHERE
-          organization_code in ('G200804', 'G200805')
-        ORDER BY
-          organization_code ASC
-    bind:
-      organizationsData: current.rows
+        insert into resultcollector.organizations(organization_code, name, order_number, created_at, created_by)
+            values('G2008-02-1', '株式会社古都岡山', 1, '2025-01-01T12:34:56.789', 'ec2008')
+            ,     ('G2008-02-2', '株式会社古都倉敷', 2, '2025-01-01T12:34:56.789', 'ec2008')
+            ,     ('G2008-02-3', '古都津山株式会社', 3, '2025-01-01T12:34:56.789', 'ec2008');
   post:
     desc: "団体を更新_正常"
     req:
@@ -34,10 +30,9 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
-    dump:
-      expr: current.res.body
-      out: ../Dump/EC2008-02.json
-  confirmTeams:
+      // レスポンスにErrorObjectが返されないことを確認
+      && current.res.body == null
+  confirmPlaces:
     desc: "団体の更新を確認"
     db:
       query: |
@@ -45,19 +40,29 @@ steps:
           organization_code
           , name
           , order_number
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.organizations
-        WHERE
-          organization_code in ('G200804', 'G200805')
         ORDER BY
-          organization_code ASC
+          organization_code ASC;
     test: |
-      len(current.rows) == 2
-      // リクエストの団体の名称が変更されたことを確認
-      && current.rows[0].organization_code == organizationsData[0].organization_code
-      && current.rows[0].name == "新日本株式会社"
-      && current.rows[0].order_number == organizationsData[0].order_number
+      len(current.rows) == 3
+      // リクエストの２つの団体の名称は変更されたことを確認
+      && current.rows[0].organization_code == "G2008-02-1"
+      && current.rows[0].name == "株式会社新岡山"
+      && current.rows[0].order_number == 1
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[1].organization_code == "G2008-02-2"
+      && current.rows[1].name == "株式会社新倉敷"
+      && current.rows[1].order_number == 2
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
       // リクエストに存在しない団体の名称は変更されないことを確認
-      && current.rows[1].organization_code == organizationsData[1].organization_code
-      && current.rows[1].name == organizationsData[1].name
-      && current.rows[1].order_number == organizationsData[1].order_number
+      && current.rows[2].organization_code == "G2008-02-3"
+      && current.rows[2].name == "古都津山株式会社"
+      && current.rows[2].order_number == 3
+      && current.rows[2].created_at == "20250101"
+      && current.rows[2].created_by == "ec2008"
