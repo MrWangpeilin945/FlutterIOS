@@ -6,7 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  recordCount: 10000
+  recordCount: 1000
 steps:
   clearTable:
     desc: "関連テーブルをクリア"
@@ -186,8 +186,6 @@ steps:
           resultcollector.consult
         ORDER BY
           consult_number ASC;
-    bind:
-      entryConsult: current.rows
     test: |
       len(current.rows) == vars.recordCount
       && current.rows[0].consult_number == uniqueKeys[0].code

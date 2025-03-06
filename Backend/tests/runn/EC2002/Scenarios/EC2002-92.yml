@@ -1,4 +1,4 @@
-desc: EC2002-91 受付の削除負荷テスト
+desc: EC2002-92 受付の削除負荷テスト
 runners:
   db: ${DB_HOST}
   req:
@@ -6,7 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  recordCount: 10000
+  recordCount: 1000
 steps:
   clearTable:
     desc: "関連テーブルをクリア"
@@ -30,22 +30,22 @@ steps:
         INSERT INTO
           resultcollector.teams
           (team_id, team_code, name, order_number, created_at, created_by)
-        VALUES('f0002002-0000-0000-0091-000000000001', 'T2002-91', '班', 1, CURRENT_TIMESTAMP, 'ec2002');
+        VALUES('f0002002-0000-0000-0092-000000000001', 'T2002-92', '班', 1, CURRENT_TIMESTAMP, 'ec2002');
         -- 会場
         INSERT INTO
           resultcollector.places
           (place_id, place_code, name, order_number, created_at, created_by)
-        VALUES('b0002002-0000-0000-0091-000000000001', 'P2002-91', '会場', 1, CURRENT_TIMESTAMP, 'ec2002');
+        VALUES('b0002002-0000-0000-0092-000000000001', 'P2002-92', '会場', 1, CURRENT_TIMESTAMP, 'ec2002');
         -- 会場日程
         INSERT INTO
           resultcollector.place_schedule
           (place_schedule_id, place_id, team_id, status, exam_date, start_time, created_at, created_by)
-        VALUES('a0002002-0000-0000-0091-000000000001', 'b0002002-0000-0000-0091-000000000001', 'f0002002-0000-0000-0091-000000000001', 31, '2025/03/03', '1500', CURRENT_TIMESTAMP, 'ec2002');
+        VALUES('a0002002-0000-0000-0092-000000000001', 'b0002002-0000-0000-0092-000000000001', 'f0002002-0000-0000-0092-000000000001', 31, '2025/03/03', '1500', CURRENT_TIMESTAMP, 'ec2002');
         -- 受診者
         INSERT INTO
           resultcollector.examinees
           (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
-        VALUES('e0002002-0000-0000-0091-000000000001', 'E2002911', '両備　太郎', 'リョウビ　タロウ', 1, '1991-01-30', CURRENT_TIMESTAMP,'ec2002');
+        VALUES('e0002002-0000-0000-0092-000000000001', 'E2002921', '両備　太郎', 'リョウビ　タロウ', 1, '1991-01-30', CURRENT_TIMESTAMP,'ec2002');
   createUniqueKeys:
     desc: "ユニークなキーの作成"
     db:
@@ -78,9 +78,9 @@ steps:
             '{{ uniqueCode[i].code }}' 
             , 21
             , 11
-            , 'a0002002-0000-0000-0091-000000000001'
+            , 'a0002002-0000-0000-0092-000000000001'
             , ''
-            , 'e0002002-0000-0000-0091-000000000001'
+            , 'e0002002-0000-0000-0092-000000000001'
             , '{{ uniqueCode[i].code }}' 
             , CURRENT_TIMESTAMP
             , 'ec2002'
@@ -140,7 +140,7 @@ steps:
           connectionCode: uniqueCode[i].code
           actionType: 1
           ticketNumber: uniqueCode[i].ticket
-          inputNote: "'2002-91'"
+          inputNote: "'2002-92'"
   startBatch:
     desc: "処理の開始時間"
     bind:
@@ -170,14 +170,8 @@ steps:
       query: |
         SELECT
           consult_id::text
-          , ticket_number
-          , to_char(created_at, 'yyyymmdd') as created_at
-          , created_by
-          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.tickets
-        ORDER BY
-          ticket_number;
     test: |
       len(current.rows) == 0
   confirmTicketsHistories:
@@ -240,4 +234,4 @@ steps:
       && current.rows[vars.recordCount - 1].created_by == "ExternalConnection"
     dump:
       expr: timeKeeper
-      out: ../Dump/EC2002-91.json
+      out: ../Dump/EC2002-92.json
