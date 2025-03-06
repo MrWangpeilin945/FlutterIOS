@@ -98,10 +98,28 @@ public class AbsoluteLessThanOrEqualTest
     }
 
     [Fact]
-    public void 入力値が数値でない_対象外()
+    public void 入力1が数値でない_対象外()
     {
         // Arrange
         var inputValues = new List<string> { "abc", "200" };
+        var conditionValues = new List<string> { "50" };
+        var ruleTriggerType = RuleTriggerType.AbsoluteLessThanOrEqual;
+        var trigger = TriggerFactory.CreateTrigger(ruleTriggerType, inputValues, conditionValues, InputErrorLevel.異常);
+
+        // Act
+        var matchResult = trigger.IsMatch();
+        var errorLevel = trigger.GetErrorLevel();
+
+        // Assert
+        matchResult.Should().BeFalse();
+        errorLevel.Should().Be(InputErrorLevel.正常);
+    }
+
+    [Fact]
+    public void 入力2が数値でない_対象外()
+    {
+        // Arrange
+        var inputValues = new List<string> { "200", "abc" };
         var conditionValues = new List<string> { "50" };
         var ruleTriggerType = RuleTriggerType.AbsoluteLessThanOrEqual;
         var trigger = TriggerFactory.CreateTrigger(ruleTriggerType, inputValues, conditionValues, InputErrorLevel.異常);

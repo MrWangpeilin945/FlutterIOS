@@ -76,10 +76,27 @@ public class NumericInputLessThanTest
     }
 
     [Fact]
-    public void 入力値が数値でない_対象外()
+    public void 入力1が数値でない_対象外()
     {
         // Arrange
         var inputValues = new List<string> { "abc", "100.50" };
+        var ruleTriggerType = RuleTriggerType.NumericInputLessThan;
+        var trigger = TriggerFactory.CreateTrigger(ruleTriggerType, inputValues, new List<string>(), InputErrorLevel.異常);
+
+        // Act
+        var matchResult = trigger.IsMatch();
+        var errorLevel = trigger.GetErrorLevel();
+
+        // Assert
+        matchResult.Should().BeFalse();
+        errorLevel.Should().Be(InputErrorLevel.正常);
+    }
+
+    [Fact]
+    public void 入力2が数値でない_対象外()
+    {
+        // Arrange
+        var inputValues = new List<string> { "100.50", "abc" };
         var ruleTriggerType = RuleTriggerType.NumericInputLessThan;
         var trigger = TriggerFactory.CreateTrigger(ruleTriggerType, inputValues, new List<string>(), InputErrorLevel.異常);
 
