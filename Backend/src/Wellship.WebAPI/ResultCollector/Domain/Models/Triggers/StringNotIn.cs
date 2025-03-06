@@ -30,6 +30,10 @@ public sealed class StringNotIn : TriggerBase
         {
             return false;
         }
+        if (_conditionValues.Count < 1)
+        {
+            return false;
+        }
 
         return !_conditionValues.Contains(_inputValues[0]);
     }
