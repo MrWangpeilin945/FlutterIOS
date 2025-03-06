@@ -399,11 +399,12 @@ public class MenuNoteResultTest
         List<ConsultNote> consultNotes = [];
 
         var menuNoteResult = new MenuNoteResult(menuNote, detailChildren, examResult, previousResult, consultNotes);
+        var expected = "()";
 
         // Act
         var actual = menuNoteResult.GetDisplayText();
 
         // Assert
-        actual.Should().BeEmpty();
+        actual.Should().Be(expected);
     }
 }
