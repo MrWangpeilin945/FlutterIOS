@@ -9,11 +9,8 @@ autonumber
   KN->>KN:入力値を更新
   alt onRegisterPressedがtrueの時
   KN-->>KN:バリデーションチェック
-  alt バリデーションチェックでエラーなし
-  KN-->>FE:引数.変更イベントを表示
-  else バリデーションチェックでエラーあり
+  alt バリデーションチェックでエラーあり
   KN->>KN:エラーメッセージを表示
   end
-  else onRegisterPressedがfalseの時
-KN->>FE:引数.変更イベントを呼び出す
+  KN->>FE:引数.変更イベントを呼び出す
 end

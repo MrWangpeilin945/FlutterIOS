@@ -102,7 +102,7 @@ const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
         isRegisterPressed = true;
         let hasError = false;
         // 必須チェック
-        const hasRequiredError = requiredCheck(examItems);
+        const hasRequiredError = requiredCheck(examItemsData);
         // バリデーションエラーがあれば、hasErrorをtrueに
         for (const item of examItemsData) {
           const { hasError: hasValidateError } = validationCheck(item);
@@ -174,13 +174,13 @@ const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
     // 1項目でも入力されているかをチェック
     const requiredCheck = (examItems: InputExamItem[]) => {
       if (!isRegisterPressed) return false;
-      const anyFilled = examItems.some((item) =>
+      const hasValue = examItems.some((item) =>
         (item.examItemDetails ?? []).some(
-          (detail) => detail.value && !detail.hasOrder && detail.cancelReasonId,
+          (detail) => detail.value && detail.hasOrder && !detail.cancelReasonId,
         ),
       );
-      setShowRequiredError(!anyFilled);
-      return !anyFilled
+      setShowRequiredError(!hasValue);
+      return !hasValue
     };
 
     // 半角数字チェック
