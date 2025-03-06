@@ -143,4 +143,17 @@ public class AuthenticationUsecaseTests
         returnedAccessToken.Should().Be(newAccessToken);
         returnedRefreshToken.Should().NotBeNullOrWhiteSpace();
     }
+
+    [Fact]
+    public async Task 職員が存在しない場合認証例外が発生する()
+    {
+        // Arrange
+        _staffRepository.Setup(x => x.GetStaffByLoginIdAsync(It.IsAny<string>())).ThrowsAsync(new StaffNotFoundException());
+
+        var usecase = new AuthenticationUsecase(_authService.Object, _authSettings, _staffRepository.Object,
+                                                _refreshTokenRepository.Object, _staffLoginHistoryRepository.Object, _timeProvider);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<WellshipAuthenticationException>(async () => await usecase.LoginStaffAsync("S001", "password"));
+    }
 }
