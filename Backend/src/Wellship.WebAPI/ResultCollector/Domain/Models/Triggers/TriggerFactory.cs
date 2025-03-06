@@ -5,7 +5,7 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models.Triggers;
 /// <summary>
 /// トリガーのファクトリ
 /// </summary>
-public class TriggerFactory
+public static class TriggerFactory
 {
     /// <summary>
     /// 種別に応じてトリガーを生成します。
