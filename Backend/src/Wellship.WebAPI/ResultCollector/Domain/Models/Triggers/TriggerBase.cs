@@ -17,17 +17,4 @@ public abstract class TriggerBase : ITrigger
     /// 入力値を検証して入力エラーレベルを取得します。
     /// </summary>
     public abstract InputErrorLevel GetErrorLevel();
-
-    /// <summary>
-    /// 文字列を数値型に変換します。
-    /// </summary>
-    /// <param name="inputString"></param>
-    public decimal StringToDecimal(string inputString)
-    {
-        if (decimal.TryParse(inputString, out var decimalValue))
-        {
-            return decimalValue;
-        }
-        throw new ArgumentException(inputString, "文字列を数値型に変換できません。");
-    }
 }
