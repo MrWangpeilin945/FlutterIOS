@@ -6,7 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  recordCount: 100
+  recordCount: 1000
 steps:
   clearTable:
     desc: "関連テーブルをクリア"
@@ -191,7 +191,7 @@ steps:
             , 'ec2004'
           );
   createPreviousResults:
-    desc: "過去検査結果のレコードを作成する"
+    desc: "事前に過去検査結果のレコードを作成する"
     loop: vars.recordCount
     db:
       query: |
@@ -342,3 +342,6 @@ steps:
           resultcollector.previous_results
     test: |
       len(current.rows) == 0
+    dump:
+      expr: timeKeeper
+      out: ../Dump/EC2004-92.json      
