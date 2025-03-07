@@ -1,4 +1,4 @@
-desc: EC2006-03 キー重複を除外_正常 [207]
+desc: EC2006-04 キー重複を除外_正常 [207]
 runners:
   db: ${DB_HOST}
   req:
