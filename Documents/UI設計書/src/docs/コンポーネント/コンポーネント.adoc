@@ -4,29 +4,30 @@
 
 === 初期表示
 
-[mermaid,CP0001-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0001-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0001_共通ヘッダー/CP0001-初期表示.mmd[]
+include::./CP0001_共通ヘッダー/CP0001-InitialDisplay.mmd[]
 ....
 
 === ユーザーアイコンボタン押下
 
-[mermaid,CP0001-ユーザーアイコンボタン押下,png,scale=3,pdfwidth=100%]
+[mermaid,CP0001-UserIconButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0001_共通ヘッダー/CP0001-ユーザーアイコンボタン押下.mmd[]
+include::./CP0001_共通ヘッダー/CP0001-UserIconButtonPressed.mmd[]
 ....
 
 === ログアウトボタン押下
 
-[mermaid,CP0001-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0001-LogoutButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0001_共通ヘッダー/CP0001-初期表示.mmd[]
+include::./CP0001_共通ヘッダー/CP0001-LogoutButtonPressed.mmd[]
 ....
 
 === ホームボタン押下
-[mermaid,CP0001-初期表示,png,scale=3,pdfwidth=100%]
+
+[mermaid,CP0001-HomeButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0001_共通ヘッダー/CP0001-初期表示.mmd[]
+include::./CP0001_共通ヘッダー/CP0001-HomeButtonPressed.mmd[]
 ....
 
 <<<
@@ -34,16 +35,23 @@ include::./CP0001_共通ヘッダー/CP0001-初期表示.mmd[]
 
 === 初期表示
 
-[mermaid,CP0002-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0002-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0002_共通フッター/CP0002-初期表示.mmd[]
+include::./CP0002_共通フッター/CP0002-InitialDisplay.mmd[]
 ....
 
 === 戻るボタン押下
 
-[mermaid,CP0002-戻るボタン押下,png,scale=3,pdfwidth=100%]
+[mermaid,CP0002-BackButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0002_共通フッター/CP0002-戻るボタン押下.mmd[]
+include::./CP0002_共通フッター/CP0002-BackButtonPressed.mmd[]
+....
+
+=== 要素ボタン押下
+
+[mermaid,CP0002-ElementButtonPressed,png,scale=3,pdfwidth=100%]
+....
+include::./CP0002_共通フッター/CP0002-ElementButtonPressed.mmd[]
 ....
 
 <<<
@@ -51,16 +59,23 @@ include::./CP0002_共通フッター/CP0002-戻るボタン押下.mmd[]
 
 === 初期表示
 
-[mermaid,CP0003-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0003-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0003_受診者ヘッダー/CP0003-初期表示.mmd[]
+include::./CP0003_受診者ヘッダー/CP0003-InitialDisplay.mmd[]
+....
+
+=== ユーザーアイコンボタン押下
+
+[mermaid,CP0003-UserIconButtonPressed,png,scale=3,pdfwidth=100%]
+....
+include::./CP0001_共通ヘッダー/CP0003-UserIconButtonPressed.mmd[]
 ....
 
 === ホームボタン押下
 
-[mermaid,CP0003-ホームボタン押下,png,scale=3,pdfwidth=100%]
+[mermaid,CP0003-HomeButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0003_受診者ヘッダー/CP0003-ホームボタン押下.mmd[]
+include::./CP0003_受診者ヘッダー/CP0003-HomeButtonPressed.mmd[]
 ....
 
 
@@ -72,16 +87,16 @@ include::./CP0003_受診者ヘッダー/CP0003-ホームボタン押下.mmd[]
 
 === 初期表示
 
-[mermaid,CP0005-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0005-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0005_見出しボタン/CP0005-初期表示.mmd[]
+include::./CP0005_見出しボタン/CP0005-InitialDisplay.mmd[]
 ....
 
 === 見出しボタンを押下時
 
-[mermaid,CP0005-見出しボタンを押下時,png,scale=3,pdfwidth=100%]
+[mermaid,CP0005-HeadlineButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0005_見出しボタン/CP0005-見出しボタンを押下時.mmd[]
+include::./CP0005_見出しボタン/CP0005-HeadlineButtonPressed.mmd[]
 ....
 
 <<<
@@ -89,16 +104,16 @@ include::./CP0005_見出しボタン/CP0005-見出しボタンを押下時.mmd[]
 
 === 初期表示
 
-[mermaid,CP0006-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0006-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0006_検査項目進捗/CP0006-初期表示.mmd[]
+include::./CP0006_検査項目進捗/CP0006-InitialDisplay.mmd[]
 ....
 
 === 状態名称ボタン押下
 
-[mermaid,CP0006-状態名称ボタン押下,png,scale=3,pdfwidth=100%]
+[mermaid,CP0006-StatusNameButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0006_検査項目進捗/CP0006-状態名称ボタン押下.mmd[]
+include::./CP0006_検査項目進捗/CP0006-StatusNameButtonPressed.mmd[]
 ....
 
 <<<
@@ -106,9 +121,9 @@ include::./CP0006_検査項目進捗/CP0006-状態名称ボタン押下.mmd[]
 
 === 初期表示
 
-[mermaid,CP0007-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0007-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0007_会場日程/CP0007-初期表示.mmd[]
+include::./CP0007_会場日程/CP0007-InitialDisplay.mmd[]
 ....
 
 <<<
@@ -116,22 +131,29 @@ include::./CP0007_会場日程/CP0007-初期表示.mmd[]
 
 === 初期表示
 
-[mermaid,CP0008-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0008-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0008_個人属性情報/CP0008-初期表示.mmd[]
+include::./CP0008_個人属性情報/CP0008-InitialDisplay.mmd[]
 ....
 
 <<<
 == CP0009_ブース特記
+
+=== 初期表示
+
+[mermaid,CP0009-InitialDisplay,png,scale=3,pdfwidth=100%]
+....
+include::./CP0009_ブース特記/CP0009-InitialDisplay.mmd[]
+....
 
 <<<
 == CP0011_未実施検査項目
 
 === 初期表示
 
-[mermaid,CP0011-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0011-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0011_未実施検査項目/CP0011-初期表示.mmd[]
+include::./CP0011_未実施検査項目/CP0011-InitialDisplay.mmd[]
 ....
 
 <<<
@@ -139,30 +161,30 @@ include::./CP0011_未実施検査項目/CP0011-初期表示.mmd[]
 
 === 初期表示
 
-[mermaid,CP0012-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0012-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0012_キーボード(整数)/CP0012-初期表示.mmd[]
+include::./CP0012_キーボード(整数)/CP0012-InitialDisplay.mmd[]
 ....
 
 === 数字ボタン押下時
 
-[mermaid,CP0012-数字ボタン押下時,png,scale=3,pdfwidth=100%]
+[mermaid,CP0012-NumericButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0012_キーボード(整数)/CP0012-数字ボタン押下時.mmd[]
+include::./CP0012_キーボード(整数)/CP0012-NumericButtonPressed.mmd[]
 ....
 
 === ACボタン押下時
 
-[mermaid,CP0012-ACボタン押下時,png,scale=3,pdfwidth=100%]
+[mermaid,CP0012-AllClearButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0012_キーボード(整数)/CP0012-ACボタン押下時.mmd[]
+include::./CP0012_キーボード(整数)/CP0012-AllClearButtonPressed.mmd[]
 ....
 
 === 確定ボタン押下時
 
-[mermaid,CP0012-確定ボタン押下時,png,scale=3,pdfwidth=100%]
+[mermaid,CP0012-ConfirmButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0012_キーボード(整数)/CP0012-確定ボタン押下時.mmd[]
+include::./CP0012_キーボード(整数)/CP0012-ConfirmButtonPressed.mmd[]
 ....
 
 <<<
@@ -170,9 +192,16 @@ include::./CP0012_キーボード(整数)/CP0012-確定ボタン押下時.mmd[]
 
 === 初期表示
 
-[mermaid,CP0013-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0013-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0013_キーボード(選択)/CP0013-初期表示.mmd[]
+include::./CP0013_キーボード(選択)/CP0013-InitialDisplay.mmd[]
+....
+
+=== カスタムボタン押下時
+
+[mermaid,CP0013-CustomButtonPressed,png,scale=3,pdfwidth=100%]
+....
+include::./CP0013_キーボード(選択)/CP0013-CustomButtonPressed.mmd[]
 ....
 
 <<<
@@ -180,9 +209,9 @@ include::./CP0013_キーボード(選択)/CP0013-初期表示.mmd[]
 
 === 初期表示
 
-[mermaid,CP0014-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0014-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0014_検査項目結果表示/CP0014-初期表示.mmd[]
+include::./CP0014_検査項目結果表示/CP0014-InitialDisplay.mmd[]
 ....
 
 <<<
@@ -190,16 +219,16 @@ include::./CP0014_検査項目結果表示/CP0014-初期表示.mmd[]
 
 === 初期表示
 
-[mermaid,CP0015-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0015-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0015_共通ダイアログ/CP0015-初期表示.mmd[]
+include::./CP0015_共通ダイアログ/CP0015-InitialDisplay.mmd[]
 ....
 
-=== ボタン押下
+=== 閉じるボタン押下
 
-[mermaid,CP0015-ボタン押下,png,scale=3,pdfwidth=100%]
+[mermaid,CP0015-CloseButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0015_共通ダイアログ/CP0015-ボタン押下.mmd[]
+include::./CP0015_共通ダイアログ/CP0015-CloseButtonPressed.mmd[]
 ....
 
 <<<
@@ -207,23 +236,23 @@ include::./CP0015_共通ダイアログ/CP0015-ボタン押下.mmd[]
 
 === 初期表示
 
-[mermaid,CP0016-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP0016-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0016_確認ダイアログ/CP0016-初期表示.mmd[]
+include::./CP0016_確認ダイアログ/CP0016-InitialDisplay.mmd[]
 ....
 
 === 実行ボタン押下
 
-[mermaid,CP0016-実行ボタン押下,png,scale=3,pdfwidth=100%]
+[mermaid,CP0016-ExecuteButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0016_確認ダイアログ/CP0016-実行ボタン押下.mmd[]
+include::./CP0016_確認ダイアログ/CP0016-ExecuteButtonPressed.mmd[]
 ....
 
 === 取り消しボタン押下
 
-[mermaid,CP0016-取り消しボタン押下,png,scale=3,pdfwidth=100%]
+[mermaid,CP0016-CancelButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0016_確認ダイアログ/CP0016-取り消しボタン押下.mmd[]
+include::./CP0016_確認ダイアログ/CP0016-CancelButtonPressed.mmd[]
 ....
 
 <<<
@@ -231,23 +260,23 @@ include::./CP0016_確認ダイアログ/CP0016-取り消しボタン押下.mmd[]
 
 === 初期表示
 
-[mermaid,CP1001-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP1001-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1001_検査項目グループ_検査：数値/CP1001-初期表示.mmd[]
+include::./CP1001_検査項目グループ_検査：数値/CP1001-InitialDisplay.mmd[]
 ....
 
 === 入力値テキストボックス押下
 
-[mermaid,CP1001-入力値テキストボックス押下,png,scale=3,pdfwidth=100%]
+[mermaid,CP1001-TextboxPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1001_検査項目グループ_検査：数値/CP1001-入力値テキストボックス押下.mmd[]
+include::./CP1001_検査項目グループ_検査：数値/CP1001-TextboxPressed.mmd[]
 ....
 
 === クリアボタン押下
 
-[mermaid,CP1001-クリアボタン押下,png,scale=3,pdfwidth=100%]
+[mermaid,CP1001-ClearButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1001_検査項目グループ_検査：数値/CP1001-クリアボタン押下.mmd[]
+include::./CP1001_検査項目グループ_検査：数値/CP1001-ClearButtonPressed.mmd[]
 ....
 
 <<<
@@ -255,149 +284,181 @@ include::./CP1001_検査項目グループ_検査：数値/CP1001-クリアボ�
 
 === 初期表示
 
-[mermaid,CP1002-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP1002-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1002_検査項目グループ_検査：選択/CP1002-初期表示.mmd[]
+include::./CP1002_検査項目グループ_検査：選択/CP1002-InitialDisplay.mmd[]
+....
+
+=== 選択ボタン押下時
+
+[mermaid,CP1002-SelectButtonPressed,png,scale=3,pdfwidth=100%]
+....
+include::./CP1002_検査項目グループ_検査：選択/CP1002-SelectButtonPressed.mmd[]
 ....
 
 <<<
 == CP1003_検査項目グループ_検査：尿検査
 
+////
 === 初期表示
 
 [mermaid,CP1003-初期表示,png,scale=3,pdfwidth=100%]
 ....
 include::./CP1003_検査項目グループ_検査：尿検査/CP1003-初期表示.mmd[]
 ....
+////
 
+////
 === 選択ボタン押下
 
 [mermaid,CP1003-選択ボタン押下,png,scale=3,pdfwidth=100%]
 ....
 include::./CP1003_検査項目グループ_検査：尿検査/CP1003-選択ボタン押下.mmd[]
 ....
+////
 
+////
 === クリアボタン押下
 
 [mermaid,CP1003-クリアボタン押下,png,scale=3,pdfwidth=100%]
 ....
 include::./CP1003_検査項目グループ_検査：尿検査/CP1003-クリアボタン押下.mmd[]
 ....
+////
 
 <<<
 == CP1004_検査項目グループ_検査：インクリメント
 
+////
 === 初期表示
 
 [mermaid,CP1004-初期表示,png,scale=3,pdfwidth=100%]
 ....
 include::./CP1004_検査項目グループ_検査：インクリメント/CP1004-初期表示.mmd[]
 ....
+////
 
+////
 === クリアボタン押下
 
 [mermaid,CP1004-クリアボタン押下,png,scale=3,pdfwidth=100%]
 ....
 include::./CP1004_検査項目グループ_検査：インクリメント/CP1004-クリアボタン押下.mmd[]
 ....
+////
 
 <<<
 == CP1005_検査項目グループ_検査：血圧1回
 
+////
 === 初期表示
 
 [mermaid,CP1005-初期表示,png,scale=3,pdfwidth=100%]
 ....
 include::./CP1005_検査項目グループ_検査：血圧1回/CP1005-初期表示.mmd[]
 ....
+////
 
+////
 === 血圧入力の値変更
 
 [mermaid,CP1005-血圧入力の値変更,png,scale=3,pdfwidth=100%]
 ....
 include::./CP1005_検査項目グループ_検査：血圧1回/CP1005-血圧入力の値変更.mmd[]
 ....
+////
 
+////
 === クリアボタン押下
 
 [mermaid,CP1005-クリアボタン押下,png,scale=3,pdfwidth=100%]
 ....
 include::./CP1005_検査項目グループ_検査：血圧1回/CP1005-クリアボタン押下.mmd[]
 ....
+////
 
 <<<
 == CP1006_検査項目グループ_検査：血圧2回
 
 === 初期表示
 
-[mermaid,CP1006-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP1006-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1006_検査項目グループ_検査：血圧2回/CP1006-初期表示.mmd[]
+include::./CP1006_検査項目グループ_検査：血圧2回/CP1006-InitialDisplay.mmd[]
 ....
 
 === 血圧入力の値変更
 
-[mermaid,CP1006-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP1006-TextboxPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1006_検査項目グループ_検査：血圧2回/CP1006-初期表示.mmd[]
-....
-
-=== クリアボタン(1回目)押下
-
-[mermaid,CP1006-クリアボタン(1回目)押下,png,scale=3,pdfwidth=100%]
-....
-include::./CP1006_検査項目グループ_検査：血圧2回/CP1006-クリアボタン(1回目)押下.mmd[]
+include::./CP1006_検査項目グループ_検査：血圧2回/CP1006-TextboxPressed.mmd[]
 ....
 
-=== クリアボタン(2回目)押下
+=== クリアボタン押下
 
-[mermaid,CP1006-クリアボタン(2回目)押下,png,scale=3,pdfwidth=100%]
+[mermaid,CP1006-ClearButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1006_検査項目グループ_検査：血圧2回/CP1006-クリアボタン(2回目)押下.mmd[]
+include::./CP1006_検査項目グループ_検査：血圧2回/CP1006-ClearButtonPressed.mmd[]
 ....
 
 <<<
 == CP1007_検査項目グループ_検査：自由入力
 
+=== 初期表示
+
+[mermaid,CP1007-InitialDisplay,png,scale=3,pdfwidth=100%]
+....
+include::./CP1007_検査項目グループ_検査：自由入力/CP1007-InitialDisplay.mmd[]
+....
+
+=== テキストボックス押下時
+
+[mermaid,CP1007-TextboxPressed,png,scale=3,pdfwidth=100%]
+....
+include::./CP1007_検査項目グループ_検査：自由入力/CP1007-TextboxPressed.mmd[]
+....
+
+=== クリアボタン押下
+
+[mermaid,CP1007-ClearButtonPressed,png,scale=3,pdfwidth=100%]
+....
+include::./CP1007_検査項目グループ_検査：自由入力/CP1007-ClearButtonPressed.mmd[]
+....
+
 <<<
 == CP1008_検査項目グループ_検査：測定時刻
 
+////
 === 初期表示
 
 [mermaid,CP1008-初期表示,png,scale=3,pdfwidth=100%]
 ....
 include::./CP1008_検査項目グループ_検査：測定時刻/CP1008-初期表示.mmd[]
 ....
+////
 
 <<<
 == CP1009_検査項目グループ_検査：数値（左右）
 
 === 初期表示
 
-[mermaid,CP1009-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP1009-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1009_検査項目グループ_検査：数値（左右）/CP1009-初期表示.mmd[]
-....
-
-=== 右入力値テキストボックスを押下
-
-[mermaid,CP1009-右入力値テキストボックスを押下,png,scale=3,pdfwidth=100%]
-....
-include::./CP1009_検査項目グループ_検査：数値（左右）/CP1009-右入力値テキストボックスを押下.mmd[]
+include::./CP1009_検査項目グループ_検査：数値（左右）/CP1009-InitialDisplay.mmd[]
 ....
 
-=== 左入力値テキストボックスを押下時
+=== 入力値テキストボックスを押下
 
-[mermaid,CP1009-左入力値テキストボックスを押下時,png,scale=3,pdfwidth=100%]
+[mermaid,CP1009-TextboxPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1009_検査項目グループ_検査：数値（左右）/CP1009-左入力値テキストボックスを押下時.mmd[]
+include::./CP1009_検査項目グループ_検査：数値（左右）/CP1009-TextboxPressed.mmd[]
 ....
 
 === クリアボタン押下時
 
-[mermaid,CP1009-クリアボタン押下時,png,scale=3,pdfwidth=100%]
+[mermaid,CP1009-ClearButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1009_検査項目グループ_検査：数値（左右）/CP1009-クリアボタン押下時.mmd[]
+include::./CP1009_検査項目グループ_検査：数値（左右）/CP1009-ClearButtonPressed.mmd[]
 ....
 
 <<<
@@ -405,23 +466,23 @@ include::./CP1009_検査項目グループ_検査：数値（左右）/CP1009-�
 
 === 初期表示
 
-[mermaid,CP1010-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP1010-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1010_検査項目グループ_検査：選択（左右）/CP1010-初期表示.mmd[]
+include::./CP1010_検査項目グループ_検査：選択（左右）/CP1010-InitialDisplay.mmd[]
 ....
 
 === 右選択ボタンを押下時
 
-[mermaid,CP1010-右選択ボタンを押下時,png,scale=3,pdfwidth=100%]
+[mermaid,CP1010-RightSelectButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1010_検査項目グループ_検査：選択（左右）/CP1010-右選択ボタンを押下時.mmd[]
+include::./CP1010_検査項目グループ_検査：選択（左右）/CP1010-RightSelectButtonPressed.mmd[]
 ....
 
 === 左選択ボタンを押下時
 
-[mermaid,CP1010-左選択ボタンを押下時,png,scale=3,pdfwidth=100%]
+[mermaid,CP1010-LeftSelectButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1010_検査項目グループ_検査：選択（左右）/CP1010-左選択ボタンを押下時.mmd[]
+include::./CP1010_検査項目グループ_検査：選択（左右）/CP1010-LeftSelectButtonPressed.mmd[]
 ....
 
 <<<
@@ -429,57 +490,71 @@ include::./CP1010_検査項目グループ_検査：選択（左右）/CP1010-�
 
 === 初期表示
 
-[mermaid,CP1011-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP1011-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1011_検査項目グループ_検査：身体計測/CP1011-初期表示.mmd[]
-....
-
-=== 身長クリアボタン押下時
-
-[mermaid,CP1011-身長クリアボタン押下時,png,scale=3,pdfwidth=100%]
-....
-include::./CP1011_検査項目グループ_検査：身体計測/CP1011-身長クリアボタン押下時.mmd[]
+include::./CP1011_検査項目グループ_検査：身体計測/CP1011-InitialDisplay.mmd[]
 ....
 
-=== 体脂肪率クリアボタン押下時
+=== 各クリアボタン押下時
 
-[mermaid,CP1011-体脂肪率クリアボタン押下時,png,scale=3,pdfwidth=100%]
+[mermaid,CP1011-ClearButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1011_検査項目グループ_検査：身体計測/CP1011-体脂肪率クリアボタン押下時.mmd[]
+include::./CP1011_検査項目グループ_検査：身体計測/CP1011-ClearButtonPressed.mmd[]
 ....
 
-=== 体重クリアボタン押下時
+=== 各テキストボックス押下時
 
-[mermaid,CP1011-体重クリアボタン押下時,png,scale=3,pdfwidth=100%]
+[mermaid,CP1011-TextboxPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1011_検査項目グループ_検査：身体計測/CP1011-体重クリアボタン押下時.mmd[]
+include::./CP1011_検査項目グループ_検査：身体計測/CP1011-TextboxPressed.mmd[]
 ....
 
 <<<
 == CP1012_検査項目グループ_検査：視力
+
+=== 初期表示
+
+[mermaid,CP1012-InitialDisplay,png,scale=3,pdfwidth=100%]
+....
+include::./CP1012_検査項目グループ_検査：視力/CP1012-InitialDisplay.mmd[]
+....
+
+=== 選択ボタン押下時
+
+[mermaid,CP1012-SelectButtonPressed,png,scale=3,pdfwidth=100%]
+....
+include::./CP1012_検査項目グループ_検査：視力/CP1012-SelectButtonPressed.mmd[]
+....
+
+=== 各テキストボックス押下時
+
+[mermaid,CP1012-TextboxPressed,png,scale=3,pdfwidth=100%]
+....
+include::./CP1012_検査項目グループ_検査：視力/CP1012-TextboxPressed.mmd[]
+....
 
 <<<
 == CP1013_検査項目グループ_検査：聴力
 
 === 初期表示
 
-[mermaid,CP1013-初期表示,png,scale=3,pdfwidth=100%]
+[mermaid,CP1013-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1013_検査項目グループ_検査：聴力/CP1013-初期表示.mmd[]
-....
-
-=== 右入力値テキストボックスを押下
-
-[mermaid,CP1013-右入力値テキストボックスを押下,png,scale=3,pdfwidth=100%]
-....
-include::./CP1013_検査項目グループ_検査：聴力/CP1013-右入力値テキストボックスを押下.mmd[]
+include::./CP1013_検査項目グループ_検査：聴力/CP1013-InitialDisplay.mmd[]
 ....
 
-=== 左入力値テキストボックスを押下時
+=== 所見なしボタン押下時
 
-[mermaid,CP1013-左入力値テキストボックスを押下時,png,scale=3,pdfwidth=100%]
+[mermaid,CP1013-NoFindingButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1013_検査項目グループ_検査：聴力/CP1013-左入力値テキストボックスを押下時.mmd[]
+include::./CP1013_検査項目グループ_検査：聴力/CP1013-NoFindingButtonPressed.mmd[]
+....
+
+=== 所見ありボタン押下時
+
+[mermaid,CP1013-FindingButtonPressed,png,scale=3,pdfwidth=100%]
+....
+include::./CP1013_検査項目グループ_検査：聴力/CP1013-FindingButtonPressed.mmd[]
 ....
 
 <<<
