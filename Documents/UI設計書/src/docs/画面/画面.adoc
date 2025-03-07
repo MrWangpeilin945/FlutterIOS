@@ -183,9 +183,9 @@ include::./SC0007_検査内容確認画面/SC0007-CancelReasonDialogDisplay.mmd[
 
 == 中止理由ダイアログの中止理由ボタン押下時
 
-[mermaid,SC0007-CancelReasonDialog_CancelResonButtonPreesed,png,scale=3,pdfwidth=100%]
+[mermaid,SC0007-CancelReasonDialog_CancelReasonButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./SC0007_検査内容確認画面/SC0007-CancelReasonDialog_CancelResonButtonPreesed.mmd[]
+include::./SC0007_検査内容確認画面/SC0007-CancelReasonDialog_CancelReasonButtonPressed.mmd[]
 ....
 
 == 中止理由ダイアログの戻るボタン押下時
