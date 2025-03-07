@@ -73,9 +73,9 @@ include::./CP0001_共通ヘッダー/CP0003-UserIconButtonPressed.mmd[]
 
 === ホームボタン押下
 
-[mermaid,CP0003-ホームボタン押下,png,scale=3,pdfwidth=100%]
+[mermaid,CP0003-HomeButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0003_受診者ヘッダー/CP0003-ホームボタン押下.mmd[]
+include::./CP0003_受診者ヘッダー/CP0003-HomeButtonPressed.mmd[]
 ....
 
 
@@ -396,7 +396,7 @@ include::./CP1006_検査項目グループ_検査：血圧2回/CP1006-TextboxPre
 
 === クリアボタン押下
 
-[mermaid,CP1006-ClearButtonPressedClearButtonPressed,png,scale=3,pdfwidth=100%]
+[mermaid,CP1006-ClearButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./CP1006_検査項目グループ_検査：血圧2回/CP1006-ClearButtonPressed.mmd[]
 ....
@@ -415,14 +415,14 @@ include::./CP1007_検査項目グループ_検査：自由入力/CP1007-InitialD
 
 [mermaid,CP1007-TextboxPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1007_検査項目グループ_検査：自由入力/CP1006-TextboxPressed.mmd[]
+include::./CP1007_検査項目グループ_検査：自由入力/CP1007-TextboxPressed.mmd[]
 ....
 
 === クリアボタン押下
 
-[mermaid,CP1007-ClearButtonPressedClearButtonPressed,png,scale=3,pdfwidth=100%]
+[mermaid,CP1007-ClearButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP1007_検査項目グループ_検査：自由入力/CP1006-ClearButtonPressed.mmd[]
+include::./CP1007_検査項目グループ_検査：自由入力/CP1007-ClearButtonPressed.mmd[]
 ....
 
 <<<
