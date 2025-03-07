@@ -40,7 +40,7 @@ test("シナリオ➀", async ({ page }) => {
 
 test("シナリオ➁", async ({ page }) => {
   const targetTeamSelectButton = new TeamSelectPage(page).teamSelectButton;
-  const targetPlaceSelectButton = new PlaceSelectPage(page).startTime;
+  const targetPlaceSelectButton = new PlaceSelectPage(page).placeName;
   //班を選択
   await targetTeamSelectButton.click();
   await page.waitForURL("place-select");
