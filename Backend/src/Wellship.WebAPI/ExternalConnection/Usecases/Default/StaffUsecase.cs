@@ -2,6 +2,7 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+using System.Text.RegularExpressions;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -9,7 +10,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// </summary>
 public class StaffUsecase : IStaffUsecase
 {
-    private readonly IDbConnectionProvider _dbConnectionProvider;
     private readonly List<ErrorObject> _errorObjects;
     private readonly IStaffRepository _staffRepository;
     private readonly TimeProvider _timeProvider;
@@ -23,7 +23,6 @@ public class StaffUsecase : IStaffUsecase
     public StaffUsecase(IDbConnectionProvider dbConnectionProvider, IStaffRepository staffRepository,
                         TimeProvider timeProvider)
     {
-        _dbConnectionProvider = dbConnectionProvider;
         _errorObjects = new List<ErrorObject>();
         _staffRepository = staffRepository;
         _timeProvider = timeProvider;
@@ -36,10 +35,26 @@ public class StaffUsecase : IStaffUsecase
     /// <returns></returns>
     public async Task<List<ErrorObject>> StoreStaffsAsync(List<Model.Standard.Staff> staffs)
     {
+        _errorObjects.Clear();
+
+        // 必須の確認
+        var insertStaffsByRequireds = GetCheckedRequired(staffs);
+
+        // 形式の確認
+        var insertStaffsByFormat = GetCheckedFormat(staffs);
+
+        // キー重複の確認
+        var insertStaffsByLoginId = GetCheckedDuplicated(staffs);
+
         // ログインIDの確認
         var insertStaffs = await GetCheckedStaffs(staffs);
 
-        List<PostgreSQL.Entities.StaffEntity> staffEntities = insertStaffs.Select(s =>
+        var commonInsertStaffs = insertStaffsByRequireds.Intersect(insertStaffsByFormat)
+                                                        .Intersect(insertStaffsByLoginId)
+                                                        .Intersect(insertStaffs)
+                                                        .ToList();
+
+        List<PostgreSQL.Entities.StaffEntity> staffEntities = commonInsertStaffs.Select(s =>
         {
             // パスワードからハッシュとソルトを取得
             Password password = Password.Create(s.Password);
@@ -63,6 +78,137 @@ public class StaffUsecase : IStaffUsecase
         await _staffRepository.UpsertStaffAsync(staffEntities, createdAt, createdBy);
 
         return _errorObjects;
+    }
+
+    /// <summary>
+    /// 必須チェック済みのリストを取得する
+    /// </summary>
+    /// <param name="staffs"></param>
+    /// <returns></returns>
+    private List<Model.Standard.Staff> GetCheckedRequired(List<Model.Standard.Staff> staffs)
+    {
+        // WARNING検証
+        // 未入力(StaffCode)
+        var requiredStaffCodeData = staffs.Where(x => string.IsNullOrWhiteSpace(x.StaffCode));
+        if (requiredStaffCodeData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredStaffCodeData, "StaffCode");
+        }
+
+        // 未入力(LoginId)
+        var requiredLoginIdData = staffs.Where(x => string.IsNullOrWhiteSpace(x.LoginId));
+        if (requiredLoginIdData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredLoginIdData, "LoginId");
+        }
+
+        // 未入力(Password)
+        var requirePasswordData = staffs.Where(x => string.IsNullOrWhiteSpace(x.Password));
+        if (requirePasswordData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requirePasswordData, "Password");
+        }
+
+        // 未入力(Name)
+        var requiredNameData = staffs.Where(x => string.IsNullOrWhiteSpace(x.Name));
+        if (requiredNameData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredNameData, "Name");
+        }
+
+        return staffs.Except(requiredStaffCodeData)
+                     .Except(requiredLoginIdData)
+                     .Except(requirePasswordData)
+                     .Except(requiredNameData)
+                     .ToList();
+    }
+
+
+
+    /// <summary>
+    /// 必須チェック済みのリストを取得する
+    /// </summary>
+    /// <param name="staffs"></param>
+    /// <returns></returns>
+    private List<Model.Standard.Staff> GetCheckedLength(List<Model.Standard.Staff> staffs)
+    {
+        // WARNING検証
+        // 未入力(LoginId)
+        var requiredLoginIdData = staffs.Where(x => x.LoginId.Length > 20);
+        if (requiredLoginIdData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredLoginIdData, "LoginId");
+        }
+
+        // 未入力(Password)
+        var requirePasswordData = staffs.Where(x => x.Password.Length > 20);
+        if (requirePasswordData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requirePasswordData, "Password");
+        }
+
+        return staffs.Except(requiredLoginIdData)
+                     .Except(requirePasswordData)
+                     .ToList();
+    }
+
+    /// <summary>
+    /// 形式チェック済みのリストを取得する
+    /// </summary>
+    /// <param name="staffs"></param>
+    /// <returns></returns>
+    private List<Model.Standard.Staff> GetCheckedFormat(List<Model.Standard.Staff> staffs)
+    {
+        // WARNING検証
+        // 形式(Password)
+        var requiredLoginId2Data = staffs.Where(x => Regex.IsMatch(x.LoginId, @"^[a-zA-Z0-9]+$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(500)));
+        if (requiredLoginId2Data.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredLoginId2Data, "LoginId");
+        }
+
+        return staffs.Except(requiredLoginId2Data)
+                     .ToList();
+    }
+    /// <summary>
+    /// 重複チェック済みのリストを取得する
+    /// </summary>
+    /// <param name="staffs"></param>
+    /// <returns></returns>
+    private List<Model.Standard.Staff> GetCheckedDuplicated(List<Model.Standard.Staff> staffs)
+    {
+        // WARNING検証
+        // キー重複(StaffCode)
+        var duplicatedStaffCodes = staffs.GroupBy(x => x.StaffCode).Where(x => x.Count() > 1).Select(x => x.Key).ToHashSet();
+        if (duplicatedStaffCodes.Any())
+        {
+            var duplicatedData = staffs.Where(x => duplicatedStaffCodes.Contains(x.StaffCode));
+
+            // 返却用エラーオブジェクトに追加
+            AddDuplicateStaffCodeErrorObjects(duplicatedData);
+        }
+
+        // キー重複(LoginId)
+        var duplicatedLoginIdCodes = staffs.GroupBy(x => x.LoginId).Where(x => x.Count() > 1).Select(x => x.Key).ToHashSet();
+        if (duplicatedLoginIdCodes.Any())
+        {
+            var duplicatedData = staffs.Where(x => duplicatedLoginIdCodes.Contains(x.LoginId));
+
+            // 返却用エラーオブジェクトに追加
+            AddDuplicateLoginIdErrorObjects(duplicatedData);
+        }
+
+        return staffs.Where(x => !duplicatedStaffCodes.Contains(x.StaffCode))
+                     .Where(x => !duplicatedLoginIdCodes.Contains(x.LoginId))
+                     .ToList();
+
     }
 
     /// <summary>
@@ -108,6 +254,60 @@ public class StaffUsecase : IStaffUsecase
         return results;
     }
 
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(必須項目エラー）
+    /// </summary>
+    /// <param name="requiredData"></param>
+    /// <param name="itemName"></param>
+    private void AddRequiredDataErrorObjects(IEnumerable<Model.Standard.Staff> requiredData, string itemName)
+    {
+        var errorObjects = requiredData
+            .Select(r => new ErrorObject
+            {
+                Code = "10004",
+                Message = $"必須項目が不足しています。{itemName}",
+                InputNote = r.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(必須項目エラー）
+    /// </summary>
+    /// <param name="requiredData"></param>
+    /// <param name="itemName"></param>
+    private void AddFormatDataErrorObjects(IEnumerable<Model.Standard.Staff> requiredData, string itemName)
+    {
+        var errorObjects = requiredData
+            .Select(r => new ErrorObject
+            {
+                Code = "10004",
+                Message = $"必須項目が不足しています。{itemName}",
+                InputNote = r.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(必須項目エラー）
+    /// </summary>
+    /// <param name="requiredData"></param>
+    /// <param name="itemName"></param>
+    private void AddFormatDataErrorObjects(IEnumerable<Model.Standard.Staff> requiredData, string itemName)
+    {
+        var errorObjects = requiredData
+            .Select(r => new ErrorObject
+            {
+                Code = "10004",
+                Message = $"必須項目が不足しています。{itemName}",
+                InputNote = r.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
 
     /// <summary>
     /// エラーオブジェクトに情報追加する
@@ -124,6 +324,40 @@ public class StaffUsecase : IStaffUsecase
                 Code = "10002",
                 Message = $"指定されたLoginIdが既に登録済みです。Code:{staff.LoginId}",
                 InputNote = staff.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(キーが重複するレコード）
+    /// </summary>
+    /// <param name="duplicatedData"></param>
+    private void AddDuplicateStaffCodeErrorObjects(IEnumerable<Model.Standard.Staff> duplicatedData)
+    {
+        var errorObjects = duplicatedData
+            .Select(d => new ErrorObject
+            {
+                Code = "10003",
+                Message = $"キー項目が重複しています。StaffCode:{d.StaffCode}",
+                InputNote = d.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(キーが重複するレコード）
+    /// </summary>
+    /// <param name="duplicatedData"></param>
+    private void AddDuplicateLoginIdErrorObjects(IEnumerable<Model.Standard.Staff> duplicatedData)
+    {
+        var errorObjects = duplicatedData
+            .Select(d => new ErrorObject
+            {
+                Code = "10003",
+                Message = $"キー項目が重複しています。LoginId:{d.LoginId}",
+                InputNote = d.InputNote
             }).ToList();
 
         _errorObjects.AddRange(errorObjects);
