@@ -108,7 +108,7 @@ steps:
       && current.rows[vars.recordCount - 1].kana_name == "フカテスト　タロウ"
       && current.rows[vars.recordCount - 1].sex == 1
       && current.rows[vars.recordCount - 1].birthdate == "19751010"
-      && current.rows[vars.recordCount - 1].created_at == current.rows[0].now
+      && current.rows[vars.recordCount - 1].created_at == current.rows[vars.recordCount - 1].now
       && current.rows[vars.recordCount - 1].created_by == "ExternalConnection"
   confirmAffiliations:
     desc: "所属の登録を確認"
