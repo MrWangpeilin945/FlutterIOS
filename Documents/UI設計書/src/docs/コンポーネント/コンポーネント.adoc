@@ -68,7 +68,7 @@ include::./CP0003_受診者ヘッダー/CP0003-InitialDisplay.mmd[]
 
 [mermaid,CP0003-UserIconButtonPressed,png,scale=3,pdfwidth=100%]
 ....
-include::./CP0001_共通ヘッダー/CP0003-UserIconButtonPressed.mmd[]
+include::./CP0003_受診者ヘッダー/CP0003-UserIconButtonPressed.mmd[]
 ....
 
 === ホームボタン押下
@@ -80,6 +80,8 @@ include::./CP0003_受診者ヘッダー/CP0003-HomeButtonPressed.mmd[]
 
 <<<
 == CP0004_受診者フッター
+
+共通フッターとの機能差がないため不要
 
 <<<
 == CP0005_見出しボタン
