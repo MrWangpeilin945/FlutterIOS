@@ -1,8 +1,7 @@
-using Ryobi.Wellship.Core.Enums;
+using System.Text.RegularExpressions;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
-using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -10,7 +9,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// </summary>
 public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
 {
-    private readonly IDbConnectionProvider _dbConnectionProvider;
     private readonly List<ErrorObject> _errorObjects;
     private readonly IExamNormalValueRangeRepository _examNormalValueRangeRepository;
     private readonly IThresholdRepository _thresholdRepository;
@@ -20,16 +18,14 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     /// <summary>
     /// ユースケースを作成する
     /// </summary>
-    /// <param name="dbConnectionProvider"></param>
     /// <param name="examNormalValueRangeRepository"></param>
     /// <param name="thresholdRepository"></param>
     /// <param name="externalExamItemDetailsRepository"></param>
     /// <param name="timeProvider"></param>
-    public ExamNormalValueRangeUsecase(IDbConnectionProvider dbConnectionProvider, IExamNormalValueRangeRepository examNormalValueRangeRepository, 
+    public ExamNormalValueRangeUsecase(IExamNormalValueRangeRepository examNormalValueRangeRepository, 
                                        IThresholdRepository thresholdRepository, IExternalExamItemDetailsRepository externalExamItemDetailsRepository,
                                        TimeProvider timeProvider)
     {
-        _dbConnectionProvider = dbConnectionProvider;
         _errorObjects = new List<ErrorObject>();
         _examNormalValueRangeRepository = examNormalValueRangeRepository;
         _thresholdRepository = thresholdRepository;
@@ -44,11 +40,32 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     /// <returns></returns>
     public async Task<List<ErrorObject>> StoreExamNormalValueRangeAsync(List<ExamNormalValueRange> examNormalValueRanges)
     {
+        _errorObjects.Clear();
+
+        // 必須チェック済みのリストを取得する
+        var insertExamNormalValueRangeByRequired = GetCheckedRequired(examNormalValueRanges);
+
+        // キー重複の確認
+        var insertExamNormalValueRangeByDuplicated = GetCheckedDuplicateKey(examNormalValueRanges);
+
         // 基準値パターンコードの確認
         var insertExamNormalValueRangesByThresholdCodes = await GetCheckedThresholdCodes(examNormalValueRanges);
 
         // 検査項目明細IDの確認
         var insertExamNormalValueRangesByExamItemDetails = await GetCheckedExamItemDetails(examNormalValueRanges);
+
+        // 年齢の形式確認
+        var insertExamNormalValueRangesByAgeInvalid = GetCheckedAgeInvalid(examNormalValueRanges);
+
+        // 値の大小確認
+        var insertExamNormalValueRangeByCompared = GetCheckedCompareValue(examNormalValueRanges);
+
+        var commonInsertExamNormalValueRanges = insertExamNormalValueRangeByRequired.Intersect(insertExamNormalValueRangesByThresholdCodes)
+                                                                       .Intersect(insertExamNormalValueRangesByExamItemDetails)
+                                                                       .Intersect(insertExamNormalValueRangeByDuplicated)
+                                                                       .Intersect(insertExamNormalValueRangesByAgeInvalid)
+                                                                       .Intersect(insertExamNormalValueRangeByCompared)
+                                                                       .ToList();
 
         // 基準値パターンIDの取得
         var thresholds = await _thresholdRepository.GetThresholdsByCodesAsync(examNormalValueRanges.Select(c => c.ThresholdCd).ToList());
@@ -56,16 +73,10 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
         // 検査項目明細IDの取得
         var externalExamItemDetails = await _externalExamItemDetailsRepository.GetDetailsByCodesAsync(examNormalValueRanges.Select(c => c.ExamItemDetailCd).ToList());
 
-        var commonInsertExamNormalValueRanges = insertExamNormalValueRangesByThresholdCodes
-            .Intersect(insertExamNormalValueRangesByExamItemDetails)
-            .ToList();
-
-        // 主キーの重複確認
-        var insertExamNormalValueRanges = await CheckDuplicateExamNormalValueRanges(commonInsertExamNormalValueRanges, thresholds, externalExamItemDetails);
 
 
         // 基準値範囲エンティティリストを生成
-        var examNormalValueRangeEntities = insertExamNormalValueRanges.Select(examNormalValueRange => new ExamNormalValueRangeEntity
+        var examNormalValueRangeEntities = commonInsertExamNormalValueRanges.Select(examNormalValueRange => new ExamNormalValueRangeEntity
         {
             Name = examNormalValueRange.Name,
             ThresholdId = thresholds.Where(t => t.ThresholdCode == examNormalValueRange.ThresholdCd).Select(t => t.ThresholdId).FirstOrDefault(),
@@ -85,6 +96,141 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
         await _examNormalValueRangeRepository.UpsertExamNormalValueRangeAsync(examNormalValueRangeEntities, createdAt, createdBy);
 
         return _errorObjects;
+    }
+
+    /// <summary>
+    /// 必須チェック済みのリストを取得する
+    /// </summary>
+    /// <param name="examNormalValueRanges"></param>
+    /// <returns></returns>
+    private List<ExamNormalValueRange> GetCheckedRequired(List<ExamNormalValueRange> examNormalValueRanges)
+    {
+        // WARNING検証
+        // 未入力
+        var requiredNameData = examNormalValueRanges.Where(x => string.IsNullOrWhiteSpace(x.Name));
+        if (requiredNameData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredNameData, "Name");
+        }
+
+        // 未入力
+        var requiredThresholdCdData = examNormalValueRanges.Where(x => string.IsNullOrWhiteSpace(x.ThresholdCd));
+        if (requiredThresholdCdData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredThresholdCdData, "ThresholdCd");
+        }
+
+        // 未入力
+        var requiredExamItemDetailCdData = examNormalValueRanges.Where(x => string.IsNullOrWhiteSpace(x.ExamItemDetailCd));
+        if (requiredExamItemDetailCdData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredExamItemDetailCdData, "ExamItemDetailCd");
+        }
+
+        // 未入力
+        var requiredMaxAgeData = examNormalValueRanges.Where(x => string.IsNullOrWhiteSpace(x.MaxAge));
+        if (requiredMaxAgeData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredMaxAgeData, "MaxAge");
+        }
+
+        // 未入力
+        var requiredMinAgeData = examNormalValueRanges.Where(x => string.IsNullOrWhiteSpace(x.MinAge));
+        if (requiredMinAgeData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredMinAgeData, "MinAge");
+        }
+
+        return examNormalValueRanges.Except(requiredNameData)
+                                    .Except(requiredThresholdCdData)
+                                    .Except(requiredExamItemDetailCdData)
+                                    .Except(requiredMaxAgeData)
+                                    .ToList();
+    }
+
+    /// <summary>
+    /// キー重複の確認
+    /// </summary>
+    /// <param name="examNormalValueRanges"></param>
+    /// <returns></returns>
+    private List<ExamNormalValueRange> GetCheckedDuplicateKey(List<ExamNormalValueRange> examNormalValueRanges)
+    {
+        // キー重複
+        var duplicateKeys = examNormalValueRanges.GroupBy(x => new { x.ThresholdCd, x.ExamItemDetailCd, x.TargetSex, MaxAge = x.MaxAge.PadLeft(7, '0'), x.MaxValue })
+                                                 .Where(x => x.Count() > 1)
+                                                 .Select(x => x.Key).ToHashSet();
+        if (duplicateKeys.Any())
+        {
+            var duplicatedData = examNormalValueRanges.Where(x => duplicateKeys.Contains(new { x.ThresholdCd, x.ExamItemDetailCd, x.TargetSex, MaxAge = x.MaxAge.PadLeft(7, '0'), x.MaxValue }));
+            // 返却用エラーオブジェクトに追加
+            AddDuplicateErrorObjects(duplicatedData.ToList());
+            return examNormalValueRanges.Except(duplicatedData).ToList();
+        }
+        else
+        {
+            return new List<ExamNormalValueRange>(examNormalValueRanges);
+        }
+    }
+
+    /// <summary>
+    /// 年齢の形式確認
+    /// </summary>
+    /// <param name="examNormalValueRanges"></param>
+    /// <returns></returns>
+    private List<ExamNormalValueRange> GetCheckedAgeInvalid(List<ExamNormalValueRange> examNormalValueRanges)
+    {
+        string pattern = @"^[0-9]{3}(0[0-9]|1[01])([012][0-9]|30)$";
+
+        var invalidMaxAgeData = examNormalValueRanges.Where(x => !Regex.IsMatch(x.MaxAge, pattern));
+        if (invalidMaxAgeData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddMaxAgeErrorObjects(invalidMaxAgeData.ToList());
+        }
+
+        var invalidMinAgeData = examNormalValueRanges.Where(x => !Regex.IsMatch(x.MinAge, pattern));
+        if (invalidMinAgeData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddMinAgeErrorObjects(invalidMinAgeData.ToList());
+        }
+
+        return examNormalValueRanges.Except(invalidMaxAgeData)
+                                    .Except(invalidMinAgeData)
+                                    .ToList();
+    }
+
+    /// <summary>
+    /// 上下限の大小比較の確認
+    /// </summary>
+    /// <param name="examNormalValueRanges"></param>
+    /// <returns></returns>
+    private List<ExamNormalValueRange> GetCheckedCompareValue(List<ExamNormalValueRange> examNormalValueRanges)
+    {
+        // 年齢大小
+        var compareErrorAgeData = examNormalValueRanges.Where(x => x.MinAge.PadLeft(7, '0').CompareTo(x.MaxAge.PadLeft(7, '0')) >= 0 );
+        if (compareErrorAgeData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddAgeCompareErrorObjects(compareErrorAgeData.ToList());
+        }
+
+        // 基準値大小
+        var compareErrorValueData = examNormalValueRanges.Where(x => x.MinValue >= x.MaxValue);
+        if (compareErrorValueData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddValueCompareErrorObjects(compareErrorValueData.ToList());
+        }
+
+        return examNormalValueRanges.Except(compareErrorAgeData)
+                                    .Except(compareErrorValueData)
+                                    .ToList();
     }
 
     /// <summary>
@@ -146,32 +292,6 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     }
 
     /// <summary>
-    /// PKが重複するレコードの確認
-    /// </summary>
-    /// <param name="examNormalValueRanges"></param>
-    /// <param name="thresholds"></param>
-    /// <param name="externalExamItemDetails"></param>
-    /// <returns></returns>
-    private async Task<List<ExamNormalValueRange>> CheckDuplicateExamNormalValueRanges(List<ExamNormalValueRange> examNormalValueRanges, List<ThresholdEntity> thresholds, List<ExternalExamItemDetailEntity> externalExamItemDetails)
-    {
-        var results = new List<ExamNormalValueRange>();
-
-        var duplicatedData = await GetDuplicatedData(examNormalValueRanges, thresholds, externalExamItemDetails);
-
-        if (duplicatedData.Count > 0)
-        {
-            // 返却用エラーオブジェクトに追加
-            AddDuplicateDataErrorObjects(duplicatedData);
-            results = examNormalValueRanges.Except(duplicatedData).ToList();
-        }
-        else
-        {
-            results = new List<ExamNormalValueRange>(examNormalValueRanges);
-        }
-        return results;
-    }
-
-    /// <summary>
     /// 基準値コードの取得
     /// </summary>
     /// <param name="examNormalValueRanges"></param>
@@ -221,45 +341,21 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     }
 
     /// <summary>
-    /// 重複チェック
+    /// エラーオブジェクトに情報追加する(必須項目エラー）
     /// </summary>
-    /// <param name="examNormalValueRanges"></param>
-    /// <param name="thresholds"></param>
-    /// <param name="externalExamItemDetails"></param>
-    /// <returns></returns>
-    private Task<List<ExamNormalValueRange>> GetDuplicatedData(List<ExamNormalValueRange> examNormalValueRanges, List<ThresholdEntity> thresholds, List<ExternalExamItemDetailEntity> externalExamItemDetails)
+    /// <param name="requiredData"></param>
+    /// <param name="itemName"></param>
+    private void AddRequiredDataErrorObjects(IEnumerable<ExamNormalValueRange> requiredData, string itemName)
     {
-        // ThresholdCode と ThresholdId のマッピングを作成
-        var thresholdMap = thresholds.ToDictionary(t => t.ThresholdCode, t => t.ThresholdId);
-
-        // ExternalExamItemDetailCode と ExamItemDetailId のマッピングを作成
-        var examItemDetailMap = externalExamItemDetails.ToDictionary(e => e.ExternalExamItemDetailCode, e => e.ExamItemDetailId);
-
-        // 重複データを検索
-        var duplicateDataKeys = examNormalValueRanges
-            .GroupBy(range => new
+        var errorObjects = requiredData
+            .Select(r => new ErrorObject
             {
-                ThresholdId = thresholdMap.TryGetValue(range.ThresholdCd, out var thresholdId) ? thresholdId : Guid.Empty,
-                ExamItemDetailId = examItemDetailMap.TryGetValue(range.ExamItemDetailCd, out var examItemDetailId) ? examItemDetailId : 0,
-                range.TargetSex,
-                MaxAge = range.MaxAge.PadLeft(7, '0'), // MaxAgeを左ゼロ埋めで7桁に整形
-                range.MaxValue
-            })
-            .Where(g => g.Count() > 1) // 重複しているグループのみ
-            .Select(g => g.Key) // 重複の条件キーを取得
-            .ToList();
+                Code = "10004",
+                Message = $"必須項目が不足しています。{itemName}",
+                InputNote = r.InputNote
+            }).ToList();
 
-        // 重複条件に一致するExamNormalValueRangeを抽出
-        var duplicateData = examNormalValueRanges
-            .Where(range => duplicateDataKeys.Any(key =>
-                thresholdMap.TryGetValue(range.ThresholdCd, out var thresholdId) && thresholdId == key.ThresholdId &&
-                examItemDetailMap.TryGetValue(range.ExamItemDetailCd, out var examItemDetailId) && examItemDetailId == key.ExamItemDetailId &&
-                range.TargetSex == key.TargetSex &&
-                range.MaxAge.PadLeft(7, '0') == key.MaxAge &&
-                range.MaxValue == key.MaxValue))
-            .ToList();
-
-        return Task.FromResult(duplicateData); ;
+        _errorObjects.AddRange(errorObjects);
     }
 
     /// <summary>
@@ -306,16 +402,85 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     /// エラーオブジェクトに情報追加する(PKが重複するレコード）
     /// </summary>
     /// <param name="duplicatedData"></param>
-    private void AddDuplicateDataErrorObjects(List<ExamNormalValueRange> duplicatedData)
+    private void AddDuplicateErrorObjects(List<ExamNormalValueRange> duplicatedData)
     {
         var errorObjects = duplicatedData
             .Select(d => new ErrorObject
             {
                 Code = "10003",
-                Message = $"キー項目が重複しています。Code:{d.ThresholdCd}/{d.ExamItemDetailCd}/{d.TargetSex}/{d.MaxAge}/{d.MaxValue}",
+                Message = $"キー項目が重複しています。ThresholdCd:{d.ThresholdCd}/ExamItemDetailCd:{d.ExamItemDetailCd}/TargetSex:{d.TargetSex}/MaxAge:{d.MaxAge}/MaxValue:{d.MaxValue}",
                 InputNote = d.InputNote
             }).ToList();
 
         _errorObjects.AddRange(errorObjects);
     }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(年齢上限の形式が無効）
+    /// </summary>
+    /// <param name="examNormalValueRanges"></param>
+    private void AddMaxAgeErrorObjects(List<ExamNormalValueRange> examNormalValueRanges)
+    {
+        var errorObjects = examNormalValueRanges
+            .Select(d => new ErrorObject
+            {
+                Code = "10006",
+                Message = $"値の形式が無効です。MaxAge:{d.MaxAge}",
+                InputNote = d.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(年齢下限の形式が無効）
+    /// </summary>
+    /// <param name="examNormalValueRanges"></param>
+    private void AddMinAgeErrorObjects(List<ExamNormalValueRange> examNormalValueRanges)
+    {
+        var errorObjects = examNormalValueRanges
+            .Select(d => new ErrorObject
+            {
+                Code = "10006",
+                Message = $"値の形式が無効です。MinAge:{d.MinAge}",
+                InputNote = d.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(年齢大小）
+    /// </summary>
+    /// <param name="examNormalValueRanges"></param>
+    private void AddAgeCompareErrorObjects(List<ExamNormalValueRange> examNormalValueRanges)
+    {
+        var errorObjects = examNormalValueRanges
+            .Select(d => new ErrorObject
+            {
+                Code = "10007",
+                Message = $"値の範囲が無効です。MinAge:{d.MinAge}/MaxAge:{d.MaxAge}",
+                InputNote = d.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(基準値大小）
+    /// </summary>
+    /// <param name="examNormalValueRanges"></param>
+    private void AddValueCompareErrorObjects(List<ExamNormalValueRange> examNormalValueRanges)
+    {
+        var errorObjects = examNormalValueRanges
+            .Select(d => new ErrorObject
+            {
+                Code = "10007",
+                Message = $"値の範囲が無効です。MinValue:{d.MinValue}/MaxValue:{d.MaxValue}",
+                InputNote = d.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
 }
