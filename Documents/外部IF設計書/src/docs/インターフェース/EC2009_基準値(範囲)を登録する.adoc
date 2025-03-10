@@ -103,12 +103,12 @@ list.Count() <> 0
 |MaxAge
 |Yes
 |string
-|対象年齢上限
+|対象年齢上限 形式：yyyMMdd(年齢月齢日齢)
 
 |MinAge
 |Yes
 |string
-|対象年齢下限
+|対象年齢下限 形式：yyyMMdd(年齢月齢日齢)
 
 |TargetSex
 |Yes
@@ -132,7 +132,7 @@ list.Count() <> 0
 
 |InputNote
 |Yes
-|string
+|No
 |エラーオブジェクトに登録する入力項目Noなど
 
 |===
@@ -154,7 +154,7 @@ list.Count() <> 0
 |エラーメッセージ
 
 |InputNote
-|Yes
+|No
 |string
 |入力項目Noなど
 
@@ -169,6 +169,82 @@ list.Count() <> 0
 * None
 
 ==== WARNING検証
+
+* 必須項目(ExamNormalValueRange.Name)が空値
+** `ExamNormalValueRange.Name` が `string.IsNullOrWhiteSpace` に該当する 
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。Name`
+**** InputNote `ExamNormalValueRange.InputNote`
+
+* 必須項目(ExamNormalValueRange.ThresholdCd)が空値
+** `ExamNormalValueRange.ThresholdCd` が `string.IsNullOrWhiteSpace` に該当する 
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。ThresholdCd`
+**** InputNote `ExamNormalValueRange.InputNote`
+
+* 必須項目(ExamNormalValueRange.ExamItemDetailCd)が空値
+** `ExamNormalValueRange.ExamItemDetailCd` が `string.IsNullOrWhiteSpace` に該当する 
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。ExamItemDetailCd`
+**** InputNote `ExamNormalValueRange.InputNote`
+
+* 必須項目(ExamNormalValueRange.MaxAge)が空値
+** `ExamNormalValueRange.MaxAge` が `string.IsNullOrWhiteSpace` に該当する 
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。MaxAge`
+**** InputNote `ExamNormalValueRange.InputNote`
+
+* 必須項目(ExamNormalValueRange.MinAge)が空値
+** `ExamNormalValueRange.MinAge` が `string.IsNullOrWhiteSpace` に該当する 
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。MinAge`
+**** InputNote `ExamNormalValueRange.InputNote`
+
+* 項目(ExamNormalValueRange.MaxAge)制限：形式
+** `ExamNormalValueRange.MaxAge` が `^[0-9]{3}(0[0-9]|1[01])([012][0-9]|30)$` に一致しない
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10006`
+**** Message `値の形式が無効です。MaxAge:[ExamNormalValueRange.MaxAge]`
+**** InputNote `ExamNormalValueRange.InputNote`
+** 補足：正常範囲　`0000000` `9991130`
+
+* 項目(ExamNormalValueRange.MinAge)制限：形式
+** `ExamNormalValueRange.MinAge` が `^[0-9]{3}(0[0-9]|1[01])([012][0-9]|30)$` に一致しない
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10006`
+**** Message `値の形式が無効です。MinAge:[ExamNormalValueRange.MinAge]`
+**** InputNote `ExamNormalValueRange.InputNote`
+** 補足：正常範囲　`0000000` `9991130`
+
+* 項目制限：年齢大小
+** `ExamNormalValueRange.MinAge` < `ExamNormalValueRange.MaxAge` に一致しない
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10007`
+**** Message `値の範囲が無効です。MinAge:[ExamNormalValueRange.MinAge]/MaxAge:[ExamNormalValueRange.MaxAge]
+**** InputNote `ExamNormalValueRange.InputNote`
+** 補足：範囲は　Min以上 Max未満となるため、`=(一致)` はエラーとする
+
+* 項目制限：基準値大小
+** `ExamNormalValueRange.MinValue` < `ExamNormalValueRange.MaxValue` に一致しない
+*** ExamNormalValueRangeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10007`
+**** Message `値の範囲が無効です。MinValue:[ExamNormalValueRange.MinValue]/MaxValue:[ExamNormalValueRange.MaxValue]
+**** InputNote `ExamNormalValueRange.InputNote`
+** 補足：範囲は　Min以上 Max未満となるため、`=(一致)` はエラーとする
 
 * 基準値パターンが取得できない
 ** `[DB]thresholds(基準値パターン).threshold_code(基準値パターンコード)` == `ExamNormalValueRange.ThresholdCd` が存在しない
