@@ -34,13 +34,13 @@ public class TeamUsecase : ITeamUsecase
         _errorObjects.Clear();
 
         // Code 必須チェック済みのリストを取得する
-        var insertTeamsByRequiredCodes = GetCheckedRequiredCode(teams);
+        var insertTeamsByRequired = GetCheckedRequired(teams);
 
         // Code 重複チェック済みのリストを取得する
-        var insertTeamsByDuplicateCodes = GetCheckedDuplicateCode(teams);
+        var insertTeamsByDuplicated = GetCheckedDuplicated(teams);
 
-        var commonInsertTeams = insertTeamsByRequiredCodes.Intersect(insertTeamsByDuplicateCodes)
-                                                          .ToList();
+        var commonInsertTeams = insertTeamsByRequired.Intersect(insertTeamsByDuplicated)
+                                                     .ToList();
 
         // エンティティリスト生成
         var teamEntities = commonInsertTeams.Select(item => new TeamEntity
@@ -57,35 +57,40 @@ public class TeamUsecase : ITeamUsecase
     }
 
     /// <summary>
-    /// Code 必須チェック済みのリストを取得する
+    /// 必須チェック済みのリストを取得する
     /// </summary>
     /// <param name="teams"></param>
     /// <returns></returns>
-    private List<Team> GetCheckedRequiredCode(List<Team> teams)
+    private List<Team> GetCheckedRequired(List<Team> teams)
     {
         // WARNING検証
-        // キー重複
-        var requiredData = teams.Where(x => string.IsNullOrWhiteSpace(x.Code));
-
-        if (requiredData.Any())
+        // 未入力(Code)
+        var requiredCodeData = teams.Where(x => string.IsNullOrWhiteSpace(x.Code));
+        if (requiredCodeData.Any())
         {
-
             // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredData);
-            return teams.Except(requiredData).ToList();
+            AddRequiredDataErrorObjects(requiredCodeData, "Code");
         }
-        else
+
+        // 未入力(Name)
+        var requiredNameData = teams.Where(x => string.IsNullOrWhiteSpace(x.Name));
+        if (requiredNameData.Any())
         {
-            return new List<Team>(teams);
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredNameData, "Name");
         }
+
+        return teams.Except(requiredCodeData)
+                    .Except(requiredNameData)
+                    .ToList();
     }
 
     /// <summary>
-    /// Code 重複チェック済みのリストを取得する
+    /// 重複チェック済みのリストを取得する
     /// </summary>
     /// <param name="teams"></param>
     /// <returns></returns>
-    private List<Team> GetCheckedDuplicateCode(List<Team> teams)
+    private List<Team> GetCheckedDuplicated(List<Team> teams)
     {
         // WARNING検証
         // キー重複
@@ -109,13 +114,14 @@ public class TeamUsecase : ITeamUsecase
     /// エラーオブジェクトに情報追加する(必須項目エラー）
     /// </summary>
     /// <param name="requiredData"></param>
-    private void AddRequiredDataErrorObjects(IEnumerable<Team> requiredData)
+    /// <param name="itemName"></param>
+    private void AddRequiredDataErrorObjects(IEnumerable<Team> requiredData, string itemName)
     {
         var errorObjects = requiredData
             .Select(r => new ErrorObject
             {
                 Code = "10004",
-                Message = "必須項目が不足しています。Code",
+                Message = $"必須項目が不足しています。{itemName}",
                 InputNote = r.InputNote
             }).ToList();
 
