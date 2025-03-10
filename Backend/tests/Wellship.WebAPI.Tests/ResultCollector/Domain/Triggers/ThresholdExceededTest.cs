@@ -61,16 +61,34 @@ public class ThresholdExceededTest
 
         // Act
         var result = trigger.IsMatch();
+        var errorLevel = trigger.GetErrorLevel();
+
+        // Assert
+        result.Should().BeFalse();
+        errorLevel.Should().Be(InputErrorLevel.正常);
+    }
+
+    [Fact]
+    public void 入力1が不正な場合_条件を満たさない()
+    {
+        // Arrange
+        var inputValues = new List<string>() { "invalid", "20" };
+        var conditionValues = new List<string>() { "5" };
+        var ruleTriggerType = RuleTriggerType.ThresholdExceeded;
+        var trigger = TriggerFactory.CreateTrigger(ruleTriggerType, inputValues, conditionValues, InputErrorLevel.異常);
+
+        // Act
+        var result = trigger.IsMatch();
 
         // Assert
         result.Should().BeFalse();
     }
 
     [Fact]
-    public void 入力値が不正な場合_条件を満たさない()
+    public void 入力2が不正な場合_条件を満たさない()
     {
         // Arrange
-        var inputValues = new List<string>() { "invalid", "20" };
+        var inputValues = new List<string>() { "20", "invalid" };
         var conditionValues = new List<string>() { "5" };
         var ruleTriggerType = RuleTriggerType.ThresholdExceeded;
         var trigger = TriggerFactory.CreateTrigger(ruleTriggerType, inputValues, conditionValues, InputErrorLevel.異常);

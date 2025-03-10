@@ -53,8 +53,6 @@ steps:
           , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.teams
-        WHERE
-          team_code in ('T2006-04-1', 'T2006-04-2')
         ORDER BY
           team_code ASC;
     test: |

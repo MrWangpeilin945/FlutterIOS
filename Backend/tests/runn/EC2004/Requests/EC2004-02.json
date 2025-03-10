@@ -72,7 +72,7 @@
         "inputNote": "2004022"
     },
     {
-        "sortNo": 13,
+        "sortNo": 9,
         "connectionCode": "CCS-200402-3",
         "actionType": 0,
         "placeCode": "P2004-02",
@@ -106,5 +106,21 @@
             }
         ],
         "inputNote": "20024023"
+    },
+    {
+        "sortNo": 5,
+        "connectionCode": "CCS-200402-4",
+        "actionType": 0,
+        "placeCode": "P2004-02",
+        "teamCode": "T2004-02",
+        "examDate": "2025-03-31",
+        "consultNumber": "No-200402-4",
+        "examineeCd": "E2004024",
+        "note": "特記事項2004024",
+        "previousResults": [],
+        "consultThresholds": [],
+        "consultNotes": [],
+        "examItemDetailOrders": [],
+        "inputNote": "2004024"
     }
 ]

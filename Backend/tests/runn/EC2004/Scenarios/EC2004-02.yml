@@ -46,7 +46,8 @@ steps:
           (place_schedule_id, place_id, team_id, status, exam_date, start_time, created_at, created_by)
         VALUES('a0002004-0000-0000-0002-000000000001', 'b0002004-0000-0000-0002-000000000001', 'f0002004-0000-0000-0002-000000000001', 31, '2025/03/03', '1500', CURRENT_TIMESTAMP, 'ec2004')
         ,     ('a0002004-0000-0000-0002-000000000002', 'b0002004-0000-0000-0002-000000000001', 'f0002004-0000-0000-0002-000000000001', 31, '2025/03/13', '1500', CURRENT_TIMESTAMP, 'ec2004')
-        ,     ('a0002004-0000-0000-0002-000000000003', 'b0002004-0000-0000-0002-000000000001', 'f0002004-0000-0000-0002-000000000001', 31, '2025/03/23', '1500', CURRENT_TIMESTAMP, 'ec2004');
+        ,     ('a0002004-0000-0000-0002-000000000003', 'b0002004-0000-0000-0002-000000000001', 'f0002004-0000-0000-0002-000000000001', 31, '2025/03/23', '1500', CURRENT_TIMESTAMP, 'ec2004')
+        ,     ('a0002004-0000-0000-0002-000000000004', 'b0002004-0000-0000-0002-000000000001', 'f0002004-0000-0000-0002-000000000001', 31, '2025/03/31', '1500', CURRENT_TIMESTAMP, 'ec2004');
         -- 受診者
         INSERT INTO
           resultcollector.examinees
@@ -54,7 +55,8 @@ steps:
         VALUES('e0002004-0000-0000-0002-000000000001', 'E2004021', '両備　太郎', 'リョウビ　タロウ', 1, '1991-01-30', CURRENT_TIMESTAMP,'ec2004')
         ,     ('e0002004-0000-0000-0002-000000000002', 'E2004022', '両備　花子', 'リョウビ　ハナコ', 2, '1997-11-10', CURRENT_TIMESTAMP,'ec2004')
         ,     ('e0002004-0000-0000-0002-000000000003', 'E2004023', '両備　四郎', 'リョウビ　シロウ', 1, '1982-08-15', CURRENT_TIMESTAMP,'ec2004')
-        ,     ('e0002004-0000-0000-0002-000000000004', 'E2004024', '両備　五郎丸', 'リョウビ　ゴロウマル', 1, '1972-12-31', CURRENT_TIMESTAMP,'ec2004');
+        ,     ('e0002004-0000-0000-0002-000000000004', 'E2004024', '両備　五郎', 'リョウビ　ゴロウ', 1, '1972-12-31', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0002-000000000005', 'E2004025', '両備　幸子', 'リョウビ　サチコ', 2, '1978-07-07', CURRENT_TIMESTAMP,'ec2004');
         -- 検査特記
         INSERT INTO
           resultcollector.exam_menu_note_codes
@@ -87,8 +89,9 @@ steps:
         INSERT INTO
           resultcollector.consult
           (consult_id, consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
-        VALUES('c0002004-0000-0000-0002-000000000001', 'No-200402-1', 11, 11, 'a0002004-0000-0000-0002-000000000001', '特記事項2004021', 'e0002004-0000-0000-0002-000000000001', 'CCS-200402-1', CURRENT_TIMESTAMP, 'ec2004')
-        ,     ('c0002004-0000-0000-0002-000000000002', 'No-200402-2', 11, 11, 'a0002004-0000-0000-0002-000000000002', '特記事項2004022', 'e0002004-0000-0000-0002-000000000002', 'CCS-200402-2', CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('c0002004-0000-0000-0002-000000000001', 'No-200402-1', 11, 21, 'a0002004-0000-0000-0002-000000000001', '特記事項2004021', 'e0002004-0000-0000-0002-000000000001', 'CCS-200402-1', CURRENT_TIMESTAMP, 'ec2004')
+        ,     ('c0002004-0000-0000-0002-000000000002', 'No-200402-2', 11, 21, 'a0002004-0000-0000-0002-000000000002', '特記事項2004022', 'e0002004-0000-0000-0002-000000000002', 'CCS-200402-2', CURRENT_TIMESTAMP, 'ec2004')
+        ,     ('c0002004-0000-0000-0002-000000000004', 'No-200402-4', 41, 21, 'a0002004-0000-0000-0002-000000000004', '特記事項2004024', 'e0002004-0000-0000-0002-000000000004', 'CCS-200402-4', CURRENT_TIMESTAMP, 'ec2004');
         -- 受診特記
         INSERT INTO
           resultcollector.consult_notes
@@ -254,8 +257,8 @@ steps:
         ORDER BY
           consult_number ASC;
     test: |
-      // 3件の受付情報が更新されたことを確認
-      len(current.rows) == 3
+      // 4件の受診情報が更新されたことを確認
+      len(current.rows) == 4
       // 受診の更新
       && current.rows[0].consult_id == consultData[0].consult_id
       && current.rows[0].consult_number == "No-200402-100"
@@ -281,7 +284,7 @@ steps:
       && current.rows[1].note == consultData[1].note
       && current.rows[1].examinee_id == consultData[1].examinee_id
       && current.rows[1].external_connection_code == consultData[1].external_connection_code
-      && current.rows[1].created_at == current.rows[0].now
+      && current.rows[1].created_at == current.rows[1].now
       && current.rows[1].created_by == "ExternalConnection"
 
       // 受診の登録
@@ -292,8 +295,20 @@ steps:
       && current.rows[2].note == "特記事項2004-02-3"
       && current.rows[2].examinee_id == "e0002004-0000-0000-0002-000000000003"
       && current.rows[2].external_connection_code == "CCS-200402-3"
-      && current.rows[2].created_at == current.rows[0].now
+      && current.rows[2].created_at == current.rows[2].now
       && current.rows[2].created_by == "ExternalConnection"
+
+      // 受診の更新 進捗状況がキャンセル(41)は来場待ち(11)に更新されたことを確認する
+      && current.rows[3].consult_id == consultData[2].consult_id
+      && current.rows[3].consult_number == consultData[2].consult_number
+      && current.rows[3].progress_status == 11
+      && current.rows[3].export_status == consultData[2].export_status
+      && current.rows[3].place_schedule_id == consultData[2].place_schedule_id
+      && current.rows[3].note == consultData[2].note
+      && current.rows[3].examinee_id == consultData[2].examinee_id
+      && current.rows[3].external_connection_code == consultData[2].external_connection_code
+      && current.rows[3].created_at == current.rows[3].now
+      && current.rows[3].created_by == "ExternalConnection"
 
   confirmConsultNotes:
     desc: "受診特記の登録を確認"

@@ -9,6 +9,14 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 /// </summary>
 public class AppLog
 {
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new JsonStringEnumConverter() }
+    };
+
     /// <summary>
     /// ログレベル
     /// </summary>
@@ -37,16 +45,7 @@ public class AppLog
                 return "{}";
             }
 
-            // 付加情報はJSON型に変換して格納
-            var options = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                Converters = { new JsonStringEnumConverter() }
-            };
-
-            return JsonSerializer.Serialize(Details, options);
+            return JsonSerializer.Serialize(Details, JsonSerializerOptions);
         }
     }
 }

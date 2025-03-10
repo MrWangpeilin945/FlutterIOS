@@ -74,12 +74,10 @@ steps:
           , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.teams
-        WHERE
-          team_code in ('T2006-05-1', 'T2006-05-2', 'T2006-05-3', 'T2006-05-4', 'T2006-05-5', 'T2006-05-6')
         ORDER BY
           team_code ASC;
     test: |
-      len(current.rows) == 4
+      len(current.rows) == 5
       // エラーの無いリクエストの班が追加・変更されたことを確認
       && current.rows[0].team_code == "T2006-05-1"
       && current.rows[0].name == "新１班"
@@ -102,3 +100,8 @@ steps:
       && current.rows[2].order_number == 3
       && current.rows[2].created_at == "20250101"
       && current.rows[2].created_by == "ec2006"
+      && current.rows[4].team_code == "T2006-05-99"
+      && current.rows[4].name == "旧９９班"
+      && current.rows[4].order_number == 99
+      && current.rows[4].created_at == "20250101"
+      && current.rows[4].created_by == "ec2006"
