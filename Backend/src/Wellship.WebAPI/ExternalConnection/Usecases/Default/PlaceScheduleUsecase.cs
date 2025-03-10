@@ -26,7 +26,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// <param name="placeRepository"></param>
     /// <param name="teamRepository"></param>
     /// <param name="timeProvider"></param>
-    public PlaceScheduleUsecase(IDbConnectionProvider dbConnectionProvider, IPlaceScheduleRepository placeScheduleRepository, 
+    public PlaceScheduleUsecase(IDbConnectionProvider dbConnectionProvider, IPlaceScheduleRepository placeScheduleRepository,
                                 IPlaceRepository placeRepository, ITeamRepository teamRepository,
                                 TimeProvider timeProvider)
     {
@@ -45,13 +45,24 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// <returns></returns>
     public async Task<List<ErrorObject>> StorePlaceSchedulesAsync(List<PlaceSchedule> placeSchedules)
     {
+        _errorObjects.Clear();
+
+        // 必須チェック済みのリストを取得する
+        var insertPlaceSchedulesByRequired = GetCheckedRequired(placeSchedules);
+
+        // キー重複の確認
+        var insertPlaceSchedulesByDuplicated = GetCheckedDuplicateKey(placeSchedules);
+
         // 既存会場コードの確認
         var insertPlaceSchedulesByPlaces = await GetCheckedPlaceCodes(placeSchedules);
 
         // 既存班コードの確認
         var insertPlaceSchedulesByTeams = await GetCheckedTeamCodes(placeSchedules);
 
-        var commonInsertPlaceSchedules = insertPlaceSchedulesByPlaces.Intersect(insertPlaceSchedulesByTeams).ToList();
+        var commonInsertPlaceSchedules = insertPlaceSchedulesByRequired.Intersect(insertPlaceSchedulesByPlaces)
+                                                                       .Intersect(insertPlaceSchedulesByTeams)
+                                                                       .Intersect(insertPlaceSchedulesByDuplicated)
+                                                                       .ToList();
 
         // 会場IDの取得
         var places = await _placeRepository.GetPlaceInfoAsync(commonInsertPlaceSchedules.Select(p => p.PlaceCode).ToList());
@@ -76,6 +87,62 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
         await _placeScheduleRepository.UpsertPlaceScheduleAsync(placeScheduleEntities, createdAt, createdBy);
 
         return _errorObjects;
+    }
+
+    /// <summary>
+    /// 必須チェック済みのリストを取得する
+    /// </summary>
+    /// <param name="placeSchedules"></param>
+    /// <returns></returns>
+    private List<PlaceSchedule> GetCheckedRequired(List<PlaceSchedule> placeSchedules)
+    {
+        // WARNING検証
+        // 未入力
+        var requiredPlaceCodeData = placeSchedules.Where(x => string.IsNullOrWhiteSpace(x.PlaceCode));
+        if (requiredPlaceCodeData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredPlaceCodeData, "PlaceCode");
+        }
+
+        // 未入力
+        var requiredTeamCodeData = placeSchedules.Where(x => string.IsNullOrWhiteSpace(x.TeamCode));
+        if (requiredTeamCodeData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredTeamCodeData, "TeamCode");
+        }
+
+        return placeSchedules.Except(requiredPlaceCodeData)
+                             .Except(requiredTeamCodeData)
+                             .ToList();
+    }
+
+    /// <summary>
+    /// キー重複チェック処理済の会場日程リストを取得する。
+    /// </summary>
+    /// <param name="placeSchedules"></param>
+    /// <returns></returns>
+    private List<PlaceSchedule> GetCheckedDuplicateKey(List<PlaceSchedule> placeSchedules)
+    {
+        // WARNING検証
+        // キー重複
+        var duplicateKeys = placeSchedules.GroupBy(x => new { x.TeamCode, x.PlaceCode, ExamDate = DateOnly.FromDateTime(x.ExamDate) })
+                                          .Where(x => x.Count() > 1)
+                                          .Select(x => x.Key).ToHashSet();
+
+        if (duplicateKeys.Any())
+        {
+            var duplicatedData = placeSchedules.Where(x => duplicateKeys.Contains(new { x.TeamCode, x.PlaceCode, ExamDate = DateOnly.FromDateTime(x.ExamDate) }));
+
+            // 返却用エラーオブジェクトに追加
+            AddDuplicateErrorObjects(duplicatedData);
+            return placeSchedules.Except(duplicatedData).ToList();
+        }
+        else
+        {
+            return new List<PlaceSchedule>(placeSchedules);
+        }
     }
 
     /// <summary>
@@ -180,6 +247,41 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
         results = teamCodes.Except(existTeamCodes).ToList();
 
         return results;
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(必須項目エラー）
+    /// </summary>
+    /// <param name="requiredData"></param>
+    /// <param name="itemName"></param>
+    private void AddRequiredDataErrorObjects(IEnumerable<PlaceSchedule> requiredData, string itemName)
+    {
+        var errorObjects = requiredData
+            .Select(r => new ErrorObject
+            {
+                Code = "10004",
+                Message = $"必須項目が不足しています。{itemName}",
+                InputNote = r.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する
+    /// </summary>
+    /// <param name="duplicatedData"></param>
+    private void AddDuplicateErrorObjects(IEnumerable<PlaceSchedule> duplicatedData)
+    {
+        var errorObjects = duplicatedData
+            .Select(d => new ErrorObject
+            {
+                Code = "10003",
+                Message = $"キー項目が重複しています。TeamCode:{d.TeamCode}/PlaceCode:{d.PlaceCode}/ExamDate:{d.ExamDate}",
+                InputNote = d.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
     }
 
     /// <summary>
