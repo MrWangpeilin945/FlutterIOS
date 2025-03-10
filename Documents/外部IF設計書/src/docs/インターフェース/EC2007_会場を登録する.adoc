@@ -94,7 +94,7 @@ list.Count()  <> 0
 |会場名
 
 |InputNote
-|Yes
+|No
 |string
 |エラーオブジェクトに登録する入力項目Noなど
 
@@ -117,7 +117,7 @@ list.Count()  <> 0
 |エラーメッセージ
 
 |InputNote
-|Yes
+|No
 |string
 |入力項目Noなど
 
@@ -133,7 +133,30 @@ list.Count()  <> 0
 
 ==== WARNING検証
 
-* None
+* 必須項目(Place.Code)が空値
+** `Place.Code` が `string.IsNullOrWhiteSpace` に該当する 
+*** Placeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。Code`
+**** InputNote `Place.InputNote`
+
+* 必須項目(Place.Name)が空値
+** `Place.Name` が `string.IsNullOrWhiteSpace` に該当する 
+*** Placeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。Name`
+**** InputNote `Place.InputNote`
+
+* ユニークキー(Place.Code)が重複するレコードが存在する
+** Placesを以下の条件でGroupByし、複数レコードが存在する
+**** `Place.Code`
+*** Placeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。Code:[Place.Code]`
+**** InputNote `Place.InputNote`
 
 ==== 処理(Repository)
 
