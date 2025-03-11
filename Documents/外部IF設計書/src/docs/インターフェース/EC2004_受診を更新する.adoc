@@ -419,7 +419,7 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 **** InputNote `Consult.InputNote`
 
 * 項目(Consult.ConsultNumber)制限：文字数
-** `Consult.Password` の文字数 `> 50` に該当する 
+** `Consult.ConsultNumber` の文字数 `> 50` に該当する 
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10005`
