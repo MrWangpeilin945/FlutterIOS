@@ -192,7 +192,9 @@ public class ConsultUsecase : IConsultUsecase
             // 選択した検査メニューが未受診ならばfalseとする
             IsComplete = !unexaminedItems.UnexaminedMenus.Select(x => x.ExamMenuId).Contains(examMenuId),
             RelatedExamItems = relatedExamItems,
-            ExamItems = examItemGroups.SelectMany(group => group.ExamItems)
+            ExamItems = examItemGroups.OrderBy(group => group.ExamItemGroupId)
+                                      .SelectMany(group => group.ExamItems)
+                                      .OrderBy(item => item.PositionNumber)
                                       .Select(item => new ExamDetail
                                       {
                                           ExamItemId = item.ExamItemId,

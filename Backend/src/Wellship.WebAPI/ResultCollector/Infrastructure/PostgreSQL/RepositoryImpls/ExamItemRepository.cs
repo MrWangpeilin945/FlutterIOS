@@ -52,8 +52,9 @@ public class ExamItemRepository : IExamItemRepository
             on d.exam_item_id = i.exam_item_id
         where g.exam_menu_id=@ExamMenuId
         order by
-            g.order_number
-            , i.order_number
+            g.exam_item_group_id
+            , i.position_number
+            , i.exam_item_id
             , d.order_number;";
 
         var results = await connection.QueryAsync<ExamItemGroupEntity>(sql, new { ExamMenuId = examMenuId });

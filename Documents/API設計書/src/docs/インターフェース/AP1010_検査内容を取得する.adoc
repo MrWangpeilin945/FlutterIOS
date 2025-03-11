@@ -114,6 +114,6 @@
 
 * examinee.organizations（団体.表示順の昇順）
 * relatedExamItems（検査メニュー特記.表示順の昇順）
-* examItems（検査項目.表示順の昇順）
+* examItems（画面用にIDや配置番号などを組み合わせている）
 * examDecisionResults（エラーレベルの降順）
 * unexaminedItems（検査メニュー.表示順の昇順）
