@@ -495,7 +495,7 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
-**** Message `キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:[Consult.PreviousResults.ExamItemDetailCd]/PreviousResults.ExamDate:[Consult.PreviousResults.ExamDate]`
+**** Message `キー項目が重複しています。PreviousResults.ExamItemDetailCd:[Consult.PreviousResults.ExamItemDetailCd]/PreviousResults.ExamDate:[Consult.PreviousResults.ExamDate]`
 **** InputNote `Consult.InputNote`
 
 * 検査項目明細IDが取得できない(ExamItemDetailOrders)
@@ -513,7 +513,7 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
-**** Message `キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:[Consult.ExamItemDetailOrders.ExamItemDetailCd]`
+**** Message `キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCd:[Consult.ExamItemDetailOrders.ExamItemDetailCd]`
 **** InputNote `Consult.InputNote`
 
 ===== `Consult.ActionType` == `ActionType.削除`
