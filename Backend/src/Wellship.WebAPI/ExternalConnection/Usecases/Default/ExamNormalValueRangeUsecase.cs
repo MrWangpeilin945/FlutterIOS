@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
@@ -22,7 +23,7 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     /// <param name="thresholdRepository"></param>
     /// <param name="externalExamItemDetailsRepository"></param>
     /// <param name="timeProvider"></param>
-    public ExamNormalValueRangeUsecase(IExamNormalValueRangeRepository examNormalValueRangeRepository, 
+    public ExamNormalValueRangeUsecase(IExamNormalValueRangeRepository examNormalValueRangeRepository,
                                        IThresholdRepository thresholdRepository, IExternalExamItemDetailsRepository externalExamItemDetailsRepository,
                                        TimeProvider timeProvider)
     {
@@ -213,7 +214,7 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     private List<ExamNormalValueRange> GetCheckedCompareValue(List<ExamNormalValueRange> examNormalValueRanges)
     {
         // 年齢大小
-        var compareErrorAgeData = examNormalValueRanges.Where(x => x.MinAge.PadLeft(7, '0').CompareTo(x.MaxAge.PadLeft(7, '0')) >= 0 );
+        var compareErrorAgeData = examNormalValueRanges.Where(x => x.MinAge.PadLeft(7, '0').CompareTo(x.MaxAge.PadLeft(7, '0')) >= 0);
         if (compareErrorAgeData.Any())
         {
             // 返却用エラーオブジェクトに追加
