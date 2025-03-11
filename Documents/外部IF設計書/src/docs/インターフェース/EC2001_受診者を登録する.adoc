@@ -114,11 +114,11 @@ list.Count()  <> 0
 
 |Affiliations
 |Yes
-|List<Affiliation> 
+|List<Affiliation>
 |所属
 
 |InputNote
-|Yes
+|No
 |string
 |エラーオブジェクトに登録する入力項目Noなど
 
@@ -154,7 +154,7 @@ list.Count()  <> 0
 |エラーメッセージ
 
 |InputNote
-|Yes
+|No
 |string
 |入力項目Noなど
 
@@ -169,6 +169,57 @@ list.Count()  <> 0
 * None
 
 ==== WARNING検証
+
+* 必須項目(Examinee.ExamineeCode)が空値
+** `Examinee.ExamineeCode` が `string.IsNullOrWhiteSpace` に該当する 
+*** Examineeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。ExamineeCode`
+**** InputNote `[Examinee.InputNote]`
+
+* 必須項目(Examinee.Name)が空値
+** `Examinee.Name` が `string.IsNullOrWhiteSpace` に該当する 
+*** Examineeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。Name`
+**** InputNote `[Examinee.InputNote]`
+
+* 必須項目(Examinee.KanaName)が空値
+** `Examinee.KanaName` が `string.IsNullOrWhiteSpace` に該当する 
+*** Examineeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。KanaName`
+**** InputNote `[Examinee.InputNote]`
+
+* 必須項目(Examinee.Affiliations.OrganizationCode)が空値
+** `Examinee.Affiliations.OrganizationCode` が `string.IsNullOrWhiteSpace` に該当する 
+*** Examineeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。Affiliations.OrganizationCode`
+**** InputNote `[Examinee.InputNote]`
+**** 補足：Examinee.Affiliationsが空(要素数0)はエラーとしない
+
+* ユニークキー(Examinee.ExamineeCode)が重複するレコードが存在する
+** Examineesを以下の条件でGroupByし、複数レコードが存在する
+**** `Examinee.ExamineeCode`
+*** Examineeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。ExamineeCode:[Examinee.ExamineeCode]`
+**** InputNote `[Examinee.InputNote]`
+
+* キー(Examinee.Affiliations.OrganizationCode)が重複するレコードが存在する
+** Examinee.Affiliationsを以下の条件でGroupByし、複数レコードが存在する
+**** `Examinee.Affiliations.OrganizationCode`
+*** Examineeの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。Affiliations.OrganizationCode:[Affiliations.OrganizationCode]`
+**** InputNote `[Examinee.InputNote]`
 
 * 団体が取得できない
 ** `[DB]organizations(団体).organization_code(団体コード) == Examinee.Affiliations.OrganizationCode` が存在しない
