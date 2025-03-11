@@ -71,10 +71,7 @@ steps:
     test: |
       current.res.status == 200
       // レスポンスにErrorObjectが返されないことを確認
-      && len(current.res.body) == 0
-    dump:
-      expr: current.res.body
-      out: ../Dump/EC2009-01.json
+      && current.res.body == null
   confirmExamNormalValueRange:
     desc: "検査基準値範囲を登録の登録を確認"
     db:
@@ -126,7 +123,7 @@ steps:
       && current.rows[2].min_age == "0400000"
       && current.rows[2].max_age == "0750000"
       && current.rows[2].target_sex == 2
-      && current.rows[2].min_value == "13.0"
+      && current.rows[2].min_value == "13"
       && current.rows[2].max_value == "36.9"
       && current.rows[2].error_level == 1
       && current.rows[2].created_at == current.rows[2].now

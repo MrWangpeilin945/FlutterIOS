@@ -1,0 +1,62 @@
+[
+    {
+        "name": "下限年齢が７桁未満",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "EC2009WBC",
+        "maxAge": "0500000",
+        "minAge": "420000",
+        "targetSex": 1,
+        "MaxValue": 10.6,
+        "MinValue": 8.7,
+        "errorLevel": 1,
+        "inputNote": "2009091"
+    },
+    {
+        "name": "下限年齢の月齢が12以上",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "EC2009WBC",
+        "maxAge": "0600000",
+        "minAge": "0301200",
+        "targetSex": 2,
+        "MaxValue": 10.6,
+        "MinValue": 8.7,
+        "errorLevel": 1,
+        "inputNote": "2009092"
+    },
+    {
+        "name": "下限年齢の日齢が31以上",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "EC2009WBC",
+        "maxAge": "0600000",
+        "minAge": "0301031",
+        "targetSex": 3,
+        "MaxValue": 10.6,
+        "MinValue": 8.7,
+        "errorLevel": 1,
+        "inputNote": "2009093"
+    },
+    {
+        "name": "上限年齢が８桁以上",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "EC2009WBC",
+        "maxAge": "99990000",
+        "minAge": "0400000",
+        "targetSex": 1,
+        "MaxValue": 10.6,
+        "MinValue": 8.7,
+        "errorLevel": 1,
+        "inputNote": "2009094"
+    },
+    {
+        "name": "上限年齢が9999999",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "EC2009WBC",
+        "maxAge": "9999999",
+        "minAge": "0000000",
+        "targetSex": 2,
+        "MaxValue": 10.6,
+        "MinValue": 8.7,
+        "errorLevel": 1,
+        "inputNote": "2009095"
+    }
+]

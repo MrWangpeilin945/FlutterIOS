@@ -1,4 +1,4 @@
-desc: EC2009-05 PKが重複するレコードが存在する
+desc: EC2009-09 年齢の形式が一致しない
 runners:
   db: ${DB_HOST}
   req:
@@ -6,7 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  request: "json://../Requests/EC2009-05.json"
+  request: "json://../Requests/EC2009-09.json"
 steps:
   clearTable:
     desc: "検査基準値範囲テーブルのクリア"
@@ -55,7 +55,7 @@ steps:
           (threshold_id, threshold_code, name, order_number, created_at, created_by)
         VALUES('e0002009-0000-0000-0000-000000000001', 'EC2009', 'EC2009血液検査', 1, CURRENT_TIMESTAMP,'ec2009');
   post:
-    desc: "PKが重複するレコードが存在する"
+    desc: "年齢の形式が一致しない"
     req:
       /api/v1/external/examNormalValueRange:
         post:
@@ -64,17 +64,26 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 207
-      // 重複エラーがErrorObjectで返される
-      && len(current.res.body) == 2
-      && current.res.body[0].code == "10003"
-      && current.res.body[0].inputNote == "2009051"
-      && current.res.body[0].message == "キー項目が重複しています。ThresholdCd:EC2009/ExamItemDetailCd:EC2009WBC/TargetSex:男/MaxAge:0750000/MaxValue:10.6"
-      && current.res.body[1].code == "10003"
-      && current.res.body[1].inputNote == "2009052"
-      && current.res.body[1].message == "キー項目が重複しています。ThresholdCd:EC2009/ExamItemDetailCd:EC2009WBC/TargetSex:男/MaxAge:0750000/MaxValue:10.6"
+      // 形式エラーがErrorObjectで返される
+      && len(current.res.body) == 5
+      && current.res.body[0].code == "10006"
+      && current.res.body[0].inputNote == "2009094"
+      && current.res.body[0].message == "値の形式が無効です。MaxAge:99990000"
+      && current.res.body[1].code == "10006"
+      && current.res.body[1].inputNote == "2009095"
+      && current.res.body[1].message == "値の形式が無効です。MaxAge:9999999"
+      && current.res.body[2].code == "10006"
+      && current.res.body[2].inputNote == "2009091"
+      && current.res.body[2].message == "値の形式が無効です。MinAge:420000"
+      && current.res.body[3].code == "10006"
+      && current.res.body[3].inputNote == "2009092"
+      && current.res.body[3].message == "値の形式が無効です。MinAge:0301200"
+      && current.res.body[4].code == "10006"
+      && current.res.body[4].inputNote == "2009093"
+      && current.res.body[4].message == "値の形式が無効です。MinAge:0301031"
     dump:
       expr: current.res.body
-      out: ../Dump/EC2009-05.json
+      out: ../Dump/EC2009-09.json
   confirmExamNormalValueRange:
     desc: "検査基準値範囲の登録を確認"
     db:

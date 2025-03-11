@@ -45,9 +45,6 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
         // 必須チェック済みのリストを取得する
         var insertExamNormalValueRangeByRequired = GetCheckedRequired(examNormalValueRanges);
 
-        // キー重複の確認
-        var insertExamNormalValueRangeByDuplicated = GetCheckedDuplicateKey(examNormalValueRanges);
-
         // 基準値パターンコードの確認
         var insertExamNormalValueRangesByThresholdCodes = await GetCheckedThresholdCodes(examNormalValueRanges);
 
@@ -59,6 +56,9 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
 
         // 値の大小確認
         var insertExamNormalValueRangeByCompared = GetCheckedCompareValue(examNormalValueRanges);
+
+        // キー重複の確認
+        var insertExamNormalValueRangeByDuplicated = GetCheckedDuplicateKey(examNormalValueRanges);
 
         var commonInsertExamNormalValueRanges = insertExamNormalValueRangeByRequired.Intersect(insertExamNormalValueRangesByThresholdCodes)
                                                                        .Intersect(insertExamNormalValueRangesByExamItemDetails)
