@@ -163,7 +163,7 @@ list.Count()  <> 0
 *** ErrorObject
 **** Code `10003`
 **** Message `キー項目が重複しています。TeamCode:{PlaceSchedule.TeamCode}/PlaceCode:{PlaceSchedule.PlaceCode}/ExamDate:{PlaceSchedule.ExamDate}`
-**** InputNote `Threshold.InputNote`
+**** InputNote `PlaceSchedule.InputNote`
 
 * 会場IDが取得できない
 ** `[DB]places(会場).place_code(会場コード)` == `PlaceSchedule.PlaceCode` が存在しない
