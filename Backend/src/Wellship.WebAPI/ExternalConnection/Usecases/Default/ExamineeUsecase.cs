@@ -46,8 +46,18 @@ public class ExamineeUsecase : IExamineeUsecase
     /// <returns>エラーオブジェクトリスト</returns>
     public async Task<List<ErrorObject>> StoreExamineesAsync(List<Examinee> examinees)
     {
-        // WARNING検証後、登録対象受診者リスト取得
-        var insertExaminees = await GetCheckedExaminees(examinees);
+        // 必須チェック済みのリストを取得する
+        var insertExamineesByRequired = GetCheckedRequired(examinees);
+
+        // キー重複の確認
+        var insertExamineesByDuplicated = GetCheckedDuplicateKey(examinees);
+
+        // 団体の確認
+        var insertExamineesByOrganizations = await GetCheckedOrganizations(examinees);
+
+        var insertExaminees = insertExamineesByRequired.Intersect(insertExamineesByOrganizations)
+                                                                .ToList();
+
 
         // 受診者エンティティリストを生成
         var examineeEntities = insertExaminees.Select(examinee => new ExamineeEntity
@@ -89,7 +99,7 @@ public class ExamineeUsecase : IExamineeUsecase
     /// </summary>
     /// <param name="examinees">受診者リスト</param>
     /// <returns>受診者リスト</returns>
-    private async Task<List<Examinee>> GetCheckedExaminees(List<Examinee> examinees)
+    private async Task<List<Examinee>> GetCheckedOrganizations(List<Examinee> examinees)
     {
         var results = new List<Examinee>();
 
@@ -159,4 +169,137 @@ public class ExamineeUsecase : IExamineeUsecase
 
         _errorObjects.AddRange(errorObjects);
     }
+
+    /// <summary>
+    /// 必須チェック済みのリストを取得する
+    /// </summary>
+    /// <param name="examinees"></param>
+    /// <returns></returns>
+    private List<Examinee> GetCheckedRequired(List<Examinee> examinees)
+    {
+        // WARNING検証
+        // 未入力
+        var requiredExamineeCodeData = examinees.Where(x => string.IsNullOrWhiteSpace(x.ExamineeCode));
+        if (requiredExamineeCodeData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredExamineeCodeData, "ExamineeCode");
+        }
+
+        // 未入力
+        var requiredNameData = examinees.Where(x => string.IsNullOrWhiteSpace(x.Name));
+        if (requiredNameData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredNameData, "Name");
+        }
+
+        // 未入力
+        var requiredKanaNameData = examinees.Where(x => string.IsNullOrWhiteSpace(x.KanaName));
+        if (requiredKanaNameData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredKanaNameData, "KanaName");
+        }
+
+        // 未入力
+        var requiredOrganizationCodeData = examinees.Where(x => x.Affiliations
+                                                                 .Any(a => string.IsNullOrWhiteSpace(a.OrganizationCode)));
+        if (requiredOrganizationCodeData.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddRequiredDataErrorObjects(requiredOrganizationCodeData, "OrganizationCode");
+        }
+
+        return examinees.Except(requiredExamineeCodeData)
+                        .Except(requiredNameData)
+                        .Except(requiredKanaNameData)
+                        .Except(requiredOrganizationCodeData)
+                        .ToList();
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(必須項目エラー）
+    /// </summary>
+    /// <param name="requiredData"></param>
+    /// <param name="itemName"></param>
+    private void AddRequiredDataErrorObjects(IEnumerable<Examinee> requiredData, string itemName)
+    {
+        var errorObjects = requiredData
+            .Select(r => new ErrorObject
+            {
+                Code = "10004",
+                Message = $"必須項目が不足しています。{itemName}",
+                InputNote = r.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+    /// <summary>
+    /// キー重複の確認
+    /// </summary>
+    /// <param name="examinees"></param>
+    /// <returns></returns>
+    private List<Examinee> GetCheckedDuplicateKey(List<Examinee> examinees)
+    {
+        // キー重複
+        var duplicateExamineeCodes = examinees.GroupBy(x => x.ExamineeCode)
+                                              .Where(x => x.Count() > 1)
+                                              .SelectMany(x => x);
+        if (duplicateExamineeCodes.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddDuplicateExamineeCodeErrorObjects(duplicateExamineeCodes.ToList());
+        }
+
+        // キー重複
+        var duplicateOrganizationCodes = examinees.Where(x => x.Affiliations
+                                                               .GroupBy(a => a.OrganizationCode)
+                                                               .Any(g => g.Count() > 1));
+        if (duplicateOrganizationCodes.Any())
+        {
+            // 返却用エラーオブジェクトに追加
+            AddDuplicateOrganizationCodeErrorObjects(duplicateOrganizationCodes.ToList());
+        }
+
+        return examinees.Except(duplicateExamineeCodes)
+                        .Except(duplicateOrganizationCodes)
+                        .ToList();
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(受診者コード重複エラー）
+    /// </summary>
+    /// <param name="duplicatedData"></param>
+    private void AddDuplicateExamineeCodeErrorObjects(IEnumerable<Examinee> duplicatedData)
+    {
+        var errorObjects = duplicatedData
+            .Select(d => new ErrorObject
+            {
+                Code = "10003",
+                Message = $"キー項目が重複しています。ExamineeCode:{d.ExamineeCode}",
+                InputNote = d.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
+    /// <summary>
+    /// エラーオブジェクトに情報追加する(受診者コード重複エラー）
+    /// </summary>
+    /// <param name="duplicatedData"></param>
+    private void AddDuplicateOrganizationCodeErrorObjects(IEnumerable<Examinee> duplicatedData)
+    {
+        var errorObjects = duplicatedData
+            .Select(d => new ErrorObject
+            {
+                Code = "10003",
+                Message = $"キー項目が重複しています。Affiliations.OrganizationCode:{d.ExamineeCode}",
+                InputNote = d.InputNote
+            }).ToList();
+
+        _errorObjects.AddRange(errorObjects);
+    }
+
 }

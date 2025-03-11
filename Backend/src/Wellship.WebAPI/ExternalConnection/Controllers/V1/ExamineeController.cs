@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using System.Text.Json;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,13 +33,26 @@ public class ExamineeController : ControllerBase
     /// </summary>
     /// <param name="request">連携データ</param>
     /// <returns></returns>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ErrorObject))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
     [Route("api/v{version:apiVersion}/external/examinees")]
     public async Task<IActionResult> StoreExamineesAsync([FromBody] Examinee[] request)
     {
         var result = await _examineeUsecases.StoreExamineesAsync(request.ToList());
 
-        return Ok(result);
+        if (result.Any())
+        {
+            return new ContentResult
+            {
+                Content = JsonSerializer.Serialize(result),
+                ContentType = "application/json",
+                StatusCode = (int)StatusCodes.Status207MultiStatus,
+            };
+        }
+        else
+        {
+            return Ok();
+        }
     }
 }
