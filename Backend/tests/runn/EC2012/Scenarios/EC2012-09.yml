@@ -1,0 +1,213 @@
+desc: EC2012-09 除外されてないものは追加更新_正常 [207]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2012-09.json"
+steps:
+  clearTable:
+    desc: "基準値パターンテーブルをクリア"
+    db:
+      query: |
+        -- 会場
+        TRUNCATE TABLE resultcollector.places CASCADE; 
+        -- 班
+        TRUNCATE TABLE resultcollector.teams CASCADE;
+  insertData:
+    desc: "基準値パターンテーブルに実行前データを登録"
+    db: 
+      query: |
+             -- 班
+             insert into resultcollector.teams (team_id, team_code, name, order_number, created_at, created_by)
+                 values('c0002012-0000-0000-0000-000000000001', 'T2012-01', 'Ⅰ班',    1, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000002', 'T2012-02', 'Ⅱ班',    2, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000003', 'T2012-03', 'Ⅲ班',    3, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000004', 'T2012-04', 'Ⅳ班',    4, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000005', 'T2012-05', 'Ⅴ班',    5, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000006', 'T2012-06', 'Ⅵ班',    6, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000007', 'T2012-07', 'Ⅶ班',    7, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000008', 'T2012-08', 'Ⅷ班',    8, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000009', 'T2012-09', 'Ⅸ班',    9, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000010', 'T2012-10', 'Ⅹ班',   10, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000011', 'T2012-11', 'ⅩⅠ班', 11, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000012', 'T2012-12', 'ⅩⅡ班', 12, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000013', 'T2012-13', 'ⅩⅢ班', 13, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('c0002012-0000-0000-0000-000000000014', 'T2012-14', 'ⅩⅣ班', 14, '2025-01-01T12:34:56.789', 'ec2012');
+             -- 会場
+             insert into resultcollector.places (place_id, place_code, name, order_number, created_at, created_by)
+                 values('e0002012-0000-0000-0000-000000000001', 'P2012-01', '第壱会場',    1, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000002', 'P2012-02', '第弐会場',    2, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000003', 'P2012-03', '第参会場',    3, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000004', 'P2012-04', '第肆会場',    4, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000005', 'P2012-05', '第伍会場',    5, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000006', 'P2012-06', '第六会場',    6, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000007', 'P2012-07', '第七会場',    7, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000008', 'P2012-08', '第八会場',    8, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000009', 'P2012-09', '第九会場',    9, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000010', 'P2012-10', '第拾会場',   10, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000011', 'P2012-11', '第拾壱会場', 11, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000012', 'P2012-12', '第拾弐会場', 12, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000013', 'P2012-13', '第拾参会場', 13, '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('e0002012-0000-0000-0000-000000000014', 'P2012-14', '第拾肆会場', 14, '2025-01-01T12:34:56.789', 'ec2012');
+             -- 会場日程
+             insert into resultcollector.place_schedule(place_schedule_id, place_id, team_id, status, exam_date, start_time, created_at, created_by)
+                 values('ec002012-0000-0000-0000-000000000099', 'e0002012-0000-0000-0000-000000000001', 'c0002012-0000-0000-0000-000000000001', 31, '2030/09/30', '2359', '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('ec002012-0000-0000-0000-000000000002', 'e0002012-0000-0000-0000-000000000002', 'c0002012-0000-0000-0000-000000000002', 31, '2030/09/02', '2359', '2025-01-01T12:34:56.789', 'ec2012')
+                 ,     ('ec002012-0000-0000-0000-000000000014', 'e0002012-0000-0000-0000-000000000014', 'c0002012-0000-0000-0000-000000000014', 31, '2030/09/14', '2359', '2025-01-01T12:34:56.789', 'ec2012');
+
+  post:
+    desc: "会場IDと班IDが取得できない"
+    req:
+      /api/v1/external/placeSchedules:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      && len(current.res.body) == 20
+      && current.res.body[0].code == "10004"
+      && current.res.body[0].inputNote == "201209-05"
+      && current.res.body[0].message == "必須項目が不足しています。PlaceCode"
+      && current.res.body[1].code == "10004"
+      && current.res.body[1].inputNote == "201209-07"
+      && current.res.body[1].message == "必須項目が不足しています。PlaceCode"
+      && current.res.body[2].code == "10004"
+      && current.res.body[2].inputNote == "201209-09"
+      && current.res.body[2].message == "必須項目が不足しています。PlaceCode"
+      && current.res.body[3].code == "10004"
+      && current.res.body[3].inputNote == "201209-03"
+      && current.res.body[3].message == "必須項目が不足しています。TeamCode"
+      && current.res.body[4].code == "10004"
+      && current.res.body[4].inputNote == "201209-08"
+      && current.res.body[4].message == "必須項目が不足しています。TeamCode"
+      && current.res.body[5].code == "10004"
+      && current.res.body[5].inputNote == "201209-09"
+      && current.res.body[5].message == "必須項目が不足しています。TeamCode"
+      && current.res.body[6].code == "10003"
+      && current.res.body[6].inputNote == "201209-11"
+      && current.res.body[6].message == "キー項目が重複しています。TeamCode:T2012-11/PlaceCode:P2012-11/ExamDate:2030/09/11 11:11:00"
+      && current.res.body[7].code == "10003"
+      && current.res.body[7].inputNote == "201209-12"
+      && current.res.body[7].message == "キー項目が重複しています。TeamCode:T2012-11/PlaceCode:P2012-11/ExamDate:2030/09/11 12:12:00"
+      && current.res.body[8].code == "10001"
+      && current.res.body[8].inputNote == "201209-05"
+      && current.res.body[8].message == "指定されたPlaceCodeがシステム上に存在しません。Code:"
+      && current.res.body[9].code == "10001"
+      && current.res.body[9].inputNote == "201209-06"
+      && current.res.body[9].message == "指定されたPlaceCodeがシステム上に存在しません。Code:P2012-99"
+      && current.res.body[10].code == "10001"
+      && current.res.body[10].inputNote == "201209-07"
+      && current.res.body[10].message == "指定されたPlaceCodeがシステム上に存在しません。Code:"
+      && current.res.body[11].code == "10001"
+      && current.res.body[11].inputNote == "201209-08"
+      && current.res.body[11].message == "指定されたPlaceCodeがシステム上に存在しません。Code:P2012-99"
+      && current.res.body[12].code == "10001"
+      && current.res.body[12].inputNote == "201209-09"
+      && current.res.body[12].message == "指定されたPlaceCodeがシステム上に存在しません。Code:"
+      && current.res.body[13].code == "10001"
+      && current.res.body[13].inputNote == "201209-10"
+      && current.res.body[13].message == "指定されたPlaceCodeがシステム上に存在しません。Code:P2012-99"
+      && current.res.body[14].code == "10001"
+      && current.res.body[14].inputNote == "201209-03"
+      && current.res.body[14].message == "指定されたTeamCodeがシステム上に存在しません。Code:"
+      && current.res.body[15].code == "10001"
+      && current.res.body[15].inputNote == "201209-04"
+      && current.res.body[15].message == "指定されたTeamCodeがシステム上に存在しません。Code:T2012-99"
+      && current.res.body[16].code == "10001"
+      && current.res.body[16].inputNote == "201209-07"
+      && current.res.body[16].message == "指定されたTeamCodeがシステム上に存在しません。Code:T2012-99"
+      && current.res.body[17].code == "10001"
+      && current.res.body[17].inputNote == "201209-08"
+      && current.res.body[17].message == "指定されたTeamCodeがシステム上に存在しません。Code:"
+      && current.res.body[18].code == "10001"
+      && current.res.body[18].inputNote == "201209-09"
+      && current.res.body[18].message == "指定されたTeamCodeがシステム上に存在しません。Code:"
+      && current.res.body[19].code == "10001"
+      && current.res.body[19].inputNote == "201209-10"
+      && current.res.body[19].message == "指定されたTeamCodeがシステム上に存在しません。Code:T2012-99"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2012-09.json
+  confirmPlaceSchedule:
+    desc: "会場日程が登録されない"
+    db:
+      query: |
+        SELECT
+          ps1.place_schedule_id::text
+          , ps1.place_id::text
+          , p1.place_code
+          , ps1.team_id::text
+          , t1.team_code
+          , status
+          , to_char(exam_date, 'yyyymmdd') as examdate
+          , start_time
+          , to_char(ps1.created_at, 'yyyymmdd') as created_at
+          , ps1.created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.place_schedule ps1
+        JOIN
+          resultcollector.teams t1
+        ON 
+          ps1.team_id = t1.team_id
+        JOIN
+          resultcollector.places p1
+        ON 
+          ps1.place_id = p1.place_id
+        ORDER BY
+          ps1.exam_date, ps1.start_time;
+    test: |
+      len(current.rows) == 5
+      // エラーのない会場日程が追加される
+      && current.rows[0].place_id == "e0002012-0000-0000-0000-000000000001"
+      && current.rows[0].place_code == "P2012-01"
+      && current.rows[0].team_id == "c0002012-0000-0000-0000-000000000001"
+      && current.rows[0].team_code == "T2012-01"
+      && current.rows[0].examdate == '20300901'
+      && current.rows[0].start_time == '0101'
+      && current.rows[0].status == 21
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[2].place_id == "e0002012-0000-0000-0000-000000000013"
+      && current.rows[2].place_code == "P2012-13"
+      && current.rows[2].team_id == "c0002012-0000-0000-0000-000000000013"
+      && current.rows[2].team_code == "T2012-13"
+      && current.rows[2].examdate == '20300913'
+      && current.rows[2].start_time == '1313'
+      && current.rows[2].status == 21
+      && current.rows[2].created_at == current.rows[2].now
+      && current.rows[2].created_by == "ExternalConnection"
+      // エラーのない会場日程が更新される
+      && current.rows[1].place_schedule_id == "ec002012-0000-0000-0000-000000000002"
+      && current.rows[1].place_id == "e0002012-0000-0000-0000-000000000002"
+      && current.rows[1].place_code == "P2012-02"
+      && current.rows[1].team_id == "c0002012-0000-0000-0000-000000000002"
+      && current.rows[1].team_code == "T2012-02"
+      && current.rows[1].examdate == '20300902'
+      && current.rows[1].start_time == '0202'
+      && current.rows[1].status == 31
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
+      && current.rows[3].place_schedule_id == "ec002012-0000-0000-0000-000000000014"
+      && current.rows[3].place_id == "e0002012-0000-0000-0000-000000000014"
+      && current.rows[3].place_code == "P2012-14"
+      && current.rows[3].team_id == "c0002012-0000-0000-0000-000000000014"
+      && current.rows[3].team_code == "T2012-14"
+      && current.rows[3].examdate == '20300914'
+      && current.rows[3].start_time == '1414'
+      && current.rows[3].status == 31
+      && current.rows[3].created_at == current.rows[1].now
+      && current.rows[3].created_by == "ExternalConnection"
+      // 追加更新対象でないレコードは変更されないこと
+      && current.rows[4].place_schedule_id == "ec002012-0000-0000-0000-000000000099"
+      && current.rows[4].place_id == "e0002012-0000-0000-0000-000000000001"
+      && current.rows[4].team_id == "c0002012-0000-0000-0000-000000000001"
+      && current.rows[4].examdate == '20300930'
+      && current.rows[4].start_time == '2359'
+      && current.rows[4].status == 31
+      && current.rows[4].created_at == "20250101"
+      && current.rows[4].created_by == "ec2012"

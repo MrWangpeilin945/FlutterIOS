@@ -1,0 +1,16 @@
+[
+    { "teamCode": "T2012-01", "placeCode": "P2012-01", "examDate": "2030-09-01T01:01:00", "inputNote": "201209-01" },
+    { "teamCode": "T2012-02", "placeCode": "P2012-02", "examDate": "2030-09-02T02:02:00", "inputNote": "201209-02" },
+    { "teamCode": "",         "placeCode": "P2012-03", "examDate": "2030-09-03T03:03:00", "inputNote": "201209-03" },
+    { "teamCode": "T2012-99", "placeCode": "P2012-04", "examDate": "2030-09-04T04:04:00", "inputNote": "201209-04" },
+    { "teamCode": "T2012-05", "placeCode": "",         "examDate": "2030-09-05T05:05:00", "inputNote": "201209-05" },
+    { "teamCode": "T2012-06", "placeCode": "P2012-99", "examDate": "2030-09-06T06:06:00", "inputNote": "201209-06" },
+    { "teamCode": "T2012-99", "placeCode": "",         "examDate": "2030-09-07T07:07:00", "inputNote": "201209-07" },
+    { "teamCode": "",         "placeCode": "P2012-99", "examDate": "2030-09-08T08:08:00", "inputNote": "201209-08" },
+    { "teamCode": "",         "placeCode": "",         "examDate": "2030-09-09T09:09:00", "inputNote": "201209-09" },
+    { "teamCode": "T2012-99", "placeCode": "P2012-99", "examDate": "2030-09-10T10:10:00", "inputNote": "201209-10" },
+    { "teamCode": "T2012-11", "placeCode": "P2012-11", "examDate": "2030-09-11T11:11:00", "inputNote": "201209-11" },
+    { "teamCode": "T2012-11", "placeCode": "P2012-11", "examDate": "2030-09-11T12:12:00", "inputNote": "201209-12" },
+    { "teamCode": "T2012-13", "placeCode": "P2012-13", "examDate": "2030-09-13T13:13:00", "inputNote": "201209-13" },
+    { "teamCode": "T2012-14", "placeCode": "P2012-14", "examDate": "2030-09-14T14:14:00", "inputNote": "201209-14" }
+]

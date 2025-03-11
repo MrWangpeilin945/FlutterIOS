@@ -5,8 +5,13 @@
         "inputNote": "20060301"
     },
     {
-        "code": "",
-        "name": "２班",
+        "code": "T2006-03-02",
+        "name": "",
         "inputNote": "20060302"
+    },
+    {
+        "code": "",
+        "name": "",
+        "inputNote": "20060303"
     }
 ]

@@ -31,27 +31,33 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 207
-      && len(current.res.body) == 6
+      && len(current.res.body) == 8
       // 必須項目不足のレコードがエラーで返される
       && current.res.body[0].code == "10004"
       && current.res.body[0].inputNote == "20060502"
       && current.res.body[0].message == "必須項目が不足しています。Code"
       && current.res.body[1].code == "10004"
-      && current.res.body[1].inputNote == "20060504"
+      && current.res.body[1].inputNote == "20060507"
       && current.res.body[1].message == "必須項目が不足しています。Code"
+      && current.res.body[2].code == "10004"
+      && current.res.body[2].inputNote == "20060504"
+      && current.res.body[2].message == "必須項目が不足しています。Name"
+      && current.res.body[3].code == "10004"
+      && current.res.body[3].inputNote == "20060507"
+      && current.res.body[3].message == "必須項目が不足しています。Name"
       // キー重複のレコードがエラーで返される
-      && current.res.body[2].code == "10003"
-      && current.res.body[2].inputNote == "20060502"
-      && current.res.body[2].message == "キー項目が重複しています。Code:"
-      && current.res.body[3].code == "10003"
-      && current.res.body[3].inputNote == "20060503"
-      && current.res.body[3].message == "キー項目が重複しています。Code:T2006-05-03"
       && current.res.body[4].code == "10003"
-      && current.res.body[4].inputNote == "20060504"
+      && current.res.body[4].inputNote == "20060502"
       && current.res.body[4].message == "キー項目が重複しています。Code:"
       && current.res.body[5].code == "10003"
-      && current.res.body[5].inputNote == "20060505"
+      && current.res.body[5].inputNote == "20060503"
       && current.res.body[5].message == "キー項目が重複しています。Code:T2006-05-03"
+      && current.res.body[6].code == "10003"
+      && current.res.body[6].inputNote == "20060505"
+      && current.res.body[6].message == "キー項目が重複しています。Code:T2006-05-03"
+      && current.res.body[7].code == "10003"
+      && current.res.body[7].inputNote == "20060507"
+      && current.res.body[7].message == "キー項目が重複しています。Code:"
     dump:
       expr: current.res.body
       out: ../Dump/EC2006-05.json
@@ -68,12 +74,10 @@ steps:
           , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.teams
-        WHERE
-          team_code in ('T2006-05-1', 'T2006-05-2', 'T2006-05-3', 'T2006-05-4', 'T2006-05-5', 'T2006-05-6')
         ORDER BY
           team_code ASC;
     test: |
-      len(current.rows) == 4
+      len(current.rows) == 5
       // エラーの無いリクエストの班が追加・変更されたことを確認
       && current.rows[0].team_code == "T2006-05-1"
       && current.rows[0].name == "新１班"
@@ -96,3 +100,8 @@ steps:
       && current.rows[2].order_number == 3
       && current.rows[2].created_at == "20250101"
       && current.rows[2].created_by == "ec2006"
+      && current.rows[4].team_code == "T2006-05-99"
+      && current.rows[4].name == "旧９９班"
+      && current.rows[4].order_number == 99
+      && current.rows[4].created_at == "20250101"
+      && current.rows[4].created_by == "ec2006"
