@@ -294,6 +294,10 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 
 ==== WARNING検証
 
+* 補足： `string` 型以外の必須チェックについては、下記理由にてUsecaseでの検証対象としない
+** WebAPI経由にてUsecaseを呼出す場合は、型の検証にてエラーとなる
+** 外部IFでのUsecaseを直接呼び出す場合は、インスタンス生成が必要な為、 `Null` とならない
+
 ===== 共通
 
 * 必須項目(Consult.ConnectionCode)が空値
@@ -320,6 +324,14 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 *** ErrorObject
 **** Code `10004`
 **** Message `必須項目が不足しています。TeamCode`
+**** InputNote `Consult.InputNote`
+
+* 必須項目(Consult.ConsultNumber)が空値
+** `Consult.ConsultNumber` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。ConsultNumber`
 **** InputNote `Consult.InputNote`
 
 * 必須項目(Consult.ExamineeCd)が空値
