@@ -157,7 +157,7 @@ public class ConsultUsecase : IConsultUsecase
 
         // 検査実施判断ルールで検証する
         var decisionRules = await ValidateDecisionRuleAsync(examMenuId, examResults, previousResults);
-        var examDecisionResults = decisionRules.OrderBy(x => x.ErrorLevel)
+        var examDecisionResults = decisionRules.OrderByDescending(x => x.ErrorLevel)
                                                .Select(x => new ExamDecisionResult()
                                                {
                                                    ErrorLevel = (int)x.ErrorLevel,
@@ -192,9 +192,7 @@ public class ConsultUsecase : IConsultUsecase
             // 選択した検査メニューが未受診ならばfalseとする
             IsComplete = !unexaminedItems.UnexaminedMenus.Select(x => x.ExamMenuId).Contains(examMenuId),
             RelatedExamItems = relatedExamItems,
-            ExamItems = examItemGroups.OrderBy(group => group.ExamItemGroupId)
-                                      .SelectMany(group => group.ExamItems)
-                                      .OrderBy(item => item.PositionNumber)
+            ExamItems = examItemGroups.SelectMany(group => group.ExamItems)
                                       .Select(item => new ExamDetail
                                       {
                                           ExamItemId = item.ExamItemId,
