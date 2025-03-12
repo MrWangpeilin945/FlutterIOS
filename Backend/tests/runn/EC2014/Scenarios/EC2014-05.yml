@@ -1,0 +1,107 @@
+desc: EC2014-05 除外されてないものは追加更新_正常 [207]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2014-05.json"
+steps:
+  clearTable:
+    desc: "基準値パターンテーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.thresholds CASCADE;
+  insertData:
+    desc: "基準値パターンテーブルに実行前データを登録"
+    db: 
+      query: |
+        insert into resultcollector.thresholds (threshold_code, name, order_number, created_at, created_by)
+            values('T2014-05-1', '一般健診', 1, '2025-01-01T12:34:56.789', 'ec2014') 
+            ,     ('T2014-05-2', '職員健診', 2, '2025-01-01T12:34:56.789', 'ec2014')
+            ,     ('T2014-05-3', '人間ドック', 3, '2025-01-01T12:34:56.789', 'ec2014')
+            ,     ('T2014-05-99', '健保ドック', 99, '2025-01-01T12:34:56.789', 'ec2014');
+  post:
+    desc: "基準値パターンを更新_正常"
+    req:
+      /api/v1/external/thresholds:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      && len(current.res.body) == 8
+      // 必須項目不足のレコードがエラーで返される
+      && current.res.body[0].code == "10004"
+      && current.res.body[0].inputNote == "20140502"
+      && current.res.body[0].message == "必須項目が不足しています。Code"
+      && current.res.body[1].code == "10004"
+      && current.res.body[1].inputNote == "20140507"
+      && current.res.body[1].message == "必須項目が不足しています。Code"
+      && current.res.body[2].code == "10004"
+      && current.res.body[2].inputNote == "20140504"
+      && current.res.body[2].message == "必須項目が不足しています。Name"
+      && current.res.body[3].code == "10004"
+      && current.res.body[3].inputNote == "20140507"
+      && current.res.body[3].message == "必須項目が不足しています。Name"
+      // キー重複のレコードがエラーで返される
+      && current.res.body[4].code == "10003"
+      && current.res.body[4].inputNote == "20140502"
+      && current.res.body[4].message == "キー項目が重複しています。Code:"
+      && current.res.body[5].code == "10003"
+      && current.res.body[5].inputNote == "20140503"
+      && current.res.body[5].message == "キー項目が重複しています。Code:T2014-05-3"
+      && current.res.body[6].code == "10003"
+      && current.res.body[6].inputNote == "20140505"
+      && current.res.body[6].message == "キー項目が重複しています。Code:T2014-05-3"
+      && current.res.body[7].code == "10003"
+      && current.res.body[7].inputNote == "20140507"
+      && current.res.body[7].message == "キー項目が重複しています。Code:"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2014-05.json
+  confirmThresholds:
+    desc: "基準値パターンの更新を確認"
+    db:
+      query: |
+        SELECT
+          threshold_code
+          , name
+          , order_number
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.thresholds
+        ORDER BY
+          threshold_code ASC;
+    test: |
+      len(current.rows) == 5
+      // エラーの無いリクエストの基準値パターンが追加・変更されたことを確認
+      && current.rows[0].threshold_code == "T2014-05-1"
+      && current.rows[0].name == "New)一般健診"
+      && current.rows[0].order_number == 1
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[3].threshold_code == "T2014-05-6"
+      && current.rows[3].name == "New)国保ドック"
+      && current.rows[3].order_number == 101
+      && current.rows[3].created_at == current.rows[3].now
+      && current.rows[3].created_by == "ExternalConnection"
+      // 除外された基準値パターンの名称は変更されないことを確認
+      && current.rows[1].threshold_code == "T2014-05-2"
+      && current.rows[1].name == "職員健診"
+      && current.rows[1].order_number == 2
+      && current.rows[1].created_at == "20250101"
+      && current.rows[1].created_by == "ec2014"
+      && current.rows[2].threshold_code == "T2014-05-3"
+      && current.rows[2].name == "人間ドック"
+      && current.rows[2].order_number == 3
+      && current.rows[2].created_at == "20250101"
+      && current.rows[2].created_by == "ec2014"
+      && current.rows[4].threshold_code == "T2014-05-99"
+      && current.rows[4].name == "健保ドック"
+      && current.rows[4].order_number == 99
+      && current.rows[4].created_at == "20250101"
+      && current.rows[4].created_by == "ec2014"

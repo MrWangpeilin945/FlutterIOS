@@ -32,9 +32,7 @@ flowchart TD
     N --> O["Insert(一括):[DB]consult_thresholds(基準値)"]
     O --> P["Dalete(一括):[DB]previous_results(過去検査結果)"]
     P --> Q["Insert(一括):[DB]previous_results(過去検査結果)"]
-    Q --> R["Dalete(一括):[DB]tickets_histories(受付履歴)"]
-    R --> S["Insert(一括):[DB]tickets_histories(受付履歴)"]
-    S --> Commit[Commit]
+    Q --> Commit[Commit]
     H -.Exception.-> ROLLBACK[ROLLBACK]
     I -.Exception.-> ROLLBACK
     J -.Exception.-> ROLLBACK
@@ -45,8 +43,6 @@ flowchart TD
     O -.Exception.-> ROLLBACK
     P -.Exception.-> ROLLBACK
     Q -.Exception.-> ROLLBACK
-    R -.Exception.-> ROLLBACK
-    S -.Exception.-> ROLLBACK
     Commit --> RepositoryEND[[END]]
     ROLLBACK .-> RepositoryEND
 ----
@@ -146,7 +142,7 @@ list.Count()  <> 0
 |受診者コード
 
 |Note
-|Yes
+|No
 |string
 |受診.特記事項
 
@@ -230,7 +226,7 @@ list.Count()  <> 0
 |検査特記コード
 
 |Note
-|Yes
+|No
 |string
 |特記事項
 
@@ -298,7 +294,145 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 
 ==== WARNING検証
 
+* 補足： `string` 型以外の必須チェックについては、下記理由にてUsecaseでの検証対象としない
+** WebAPI経由にてUsecaseを呼出す場合は、型の検証にてエラーとなる
+** 外部IFでのUsecaseを直接呼び出す場合は、インスタンス生成が必要な為、 `Null` とならない
+
+===== 共通
+
+* 必須項目(Consult.ConnectionCode)が空値
+** `Consult.ConnectionCode` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。ConnectionCode`
+**** InputNote `Consult.InputNote`
+
 ===== `Consult.ActionType` == `ActionType.登録`
+
+* 必須項目(Consult.PlaceCode)が空値
+** `Consult.PlaceCode` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。PlaceCode`
+**** InputNote `Consult.InputNote`
+
+* 必須項目(Consult.TeamCode)が空値
+** `Consult.TeamCode` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。TeamCode`
+**** InputNote `Consult.InputNote`
+
+* 必須項目(Consult.ConsultNumber)が空値
+** `Consult.ConsultNumber` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。ConsultNumber`
+**** InputNote `Consult.InputNote`
+
+* 必須項目(Consult.ExamineeCd)が空値
+** `Consult.ExamineeCd` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。ExamineeCd`
+**** InputNote `Consult.InputNote`
+
+* 必須項目(Consult.PreviousResults.ExamItemDetailCd)が空値
+** `Consult.PreviousResults.ExamItemDetailCd` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。PreviousResults.ExamItemDetailCd`
+**** InputNote `Consult.InputNote
+
+* 必須項目(Consult.PreviousResults.Value)が空値
+** `Consult.PreviousResults.Value` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。PreviousResults.Value`
+**** InputNote `Consult.InputNote
+
+* 必須項目(Consult.ConsultThresholds.ThresholdCode)が空値
+** `Consult.ConsultThresholds.ThresholdCode` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。ConsultThresholds.ThresholdCode`
+**** InputNote `Consult.InputNote`
+
+* 必須項目(Consult.ConsultNotes.Code)が空値
+** `Consult.ConsultNotes.Code` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。ConsultNotes.Code`
+**** InputNote `Consult.InputNote`
+
+* 必須項目(Consult.ExamItemDetailOrders.ExamItemDetailCd)が空値
+** `Consult.ExamItemDetailOrders.ExamItemDetailCd` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。ExamItemDetailOrders.ExamItemDetailCd`
+**** InputNote `Consult.InputNote`
+
+* ユニークキー(Consult.SortNo)が重複するレコードが存在する
+** Consultsを以下の条件でGroupByし、複数レコードが存在する
+**** `Consult.SortNo`
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。SortNo:[Consult.SortNo]`
+**** InputNote `Consult.InputNote`
+
+* キー(Consult.ConsultThresholds.ThresholdCode)が重複するレコードが存在する
+** Consult.ConsultThresholdsを以下の条件でGroupByし、複数レコードが存在する
+**** `Consult.ConsultThresholds.ThresholdCode`
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。ConsultThresholds.ThresholdCode:[ConsultThresholds.ThresholdCode]`
+**** InputNote `Consult.InputNote`
+
+* キー(Consult.ConsultThresholds.Priority)が重複するレコードが存在する
+** Consult.ConsultThresholdsを以下の条件でGroupByし、複数レコードが存在する
+**** `Consult.ConsultThresholds.Priority`
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。ConsultThresholds.Priority:[ConsultThresholds.Priority]`
+**** InputNote `Consult.InputNote`
+
+* キー(Consult.ConsultNotes.Code)が重複するレコードが存在する
+** Consult.ConsultNotesを以下の条件でGroupByし、複数レコードが存在する
+**** `Consult.ConsultNotes.Code`
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。ConsultNotes.Code:[ConsultNotes.Code]`
+**** InputNote `Consult.InputNote`
+
+* 項目(Consult.ConsultNumber)制限：文字数
+** `Consult.ConsultNumber` の文字数 `> 50` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10005`
+**** Message `制限数を超えています。ConsultNumber:[Consult.ConsultNumber]`
+**** InputNote `Consult.InputNote`
+
+* 項目(Consult.ConsultNumber)制限：形式
+** `Consult.ConsultNumber` の `a-zA-Z0-9` 以外の文字を含む 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10006`
+**** Message `値の形式が無効です。ConsultNumber:[Consult.ConsultNumber]`
+**** InputNote `Consult.InputNote`
 
 * 受診番号が異なる連携キーで登録されている
 ** `[DB]consult.consult_number (受診番号)` == `Consult.ConsultNumber` && `[DB]consult.external_connection_code(連携キー)` != `Consult.ConnectionCode` が存在する
@@ -373,7 +507,7 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
-**** Message `キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:[Consult.PreviousResults.ExamItemDetailCd]/PreviousResults.ExamDate:[Consult.PreviousResults.ExamDate]`
+**** Message `キー項目が重複しています。PreviousResults.ExamItemDetailCd:[Consult.PreviousResults.ExamItemDetailCd]/PreviousResults.ExamDate:[Consult.PreviousResults.ExamDate]`
 **** InputNote `Consult.InputNote`
 
 * 検査項目明細IDが取得できない(ExamItemDetailOrders)
@@ -391,7 +525,7 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
-**** Message `キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:[Consult.ExamItemDetailOrders.ExamItemDetailCd]`
+**** Message `キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCd:[Consult.ExamItemDetailOrders.ExamItemDetailCd]`
 **** InputNote `Consult.InputNote`
 
 ===== `Consult.ActionType` == `ActionType.削除`

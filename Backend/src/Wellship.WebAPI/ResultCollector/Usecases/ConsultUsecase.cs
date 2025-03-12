@@ -157,7 +157,7 @@ public class ConsultUsecase : IConsultUsecase
 
         // 検査実施判断ルールで検証する
         var decisionRules = await ValidateDecisionRuleAsync(examMenuId, examResults, previousResults);
-        var examDecisionResults = decisionRules.OrderBy(x => x.ErrorLevel)
+        var examDecisionResults = decisionRules.OrderByDescending(x => x.ErrorLevel)
                                                .Select(x => new ExamDecisionResult()
                                                {
                                                    ErrorLevel = (int)x.ErrorLevel,

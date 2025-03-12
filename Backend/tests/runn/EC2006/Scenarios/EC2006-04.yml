@@ -1,4 +1,4 @@
-desc: EC2006-03 キー重複を除外_正常 [207]
+desc: EC2006-04 キー重複を除外_正常 [207]
 runners:
   db: ${DB_HOST}
   req:
@@ -53,8 +53,6 @@ steps:
           , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.teams
-        WHERE
-          team_code in ('T2006-04-1', 'T2006-04-2')
         ORDER BY
           team_code ASC;
     test: |

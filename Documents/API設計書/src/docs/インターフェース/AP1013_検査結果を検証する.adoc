@@ -126,3 +126,13 @@
 ** 指定した受診が存在しない
 * 422 Unprocessable
 ** バリデーションエラー
+
+=== 並び順
+
+* examItemGroups（検査項目グループ.表示順の昇順）
+** examItems（検査項目.表示順の昇順）
+*** examItemDetails（検査項目明細.表示順の昇順）
+**** keyboard.values（キーボード入力値リスト.IDの昇順）
+**** examItemDetailOptions（検査項目明細_選択肢.表示順の昇順）
+**** examNormalValueRanges（受診_基準値.優先度の昇順＞エラーレベルの降順）
+*** examRegistResults（エラーレベルの降順）

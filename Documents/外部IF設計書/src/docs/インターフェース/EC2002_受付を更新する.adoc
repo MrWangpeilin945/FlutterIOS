@@ -111,7 +111,7 @@ list.Count()  <> 0
 |受付番号
 
 |InputNote
-|Yes
+|No
 |string
 |エラーオブジェクトに登録する入力項目Noなど
 
@@ -134,7 +134,7 @@ list.Count()  <> 0
 |エラーメッセージ
 
 |InputNote
-|Yes
+|No
 |string
 |入力項目Noなど
 
@@ -165,6 +165,31 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 * None
 
 ==== WARNING検証
+
+* 必須項目(Ticket.ConnectionCode)が空値
+** `ConnectionCode` が `string.IsNullOrWhiteSpace` に該当する 
+*** Ticketの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。ConnectionCode`
+**** InputNote `Ticket.InputNote`
+
+* 必須項目(Ticket.TicketNumber)が空値
+** `ActionType` == `登録` && `TicketNumber` が `string.IsNullOrWhiteSpace` に該当する 
+*** Ticketの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。TicketNumber`
+**** InputNote `Ticket.InputNote`
+
+* ユニークキー(Ticket.SortNo)が重複するレコードが存在する
+** Ticketsを以下の条件でGroupByし、複数レコードが存在する
+**** `Ticket.SortNo`
+*** Ticketの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。SortNo:[Ticket.SortNo]`
+**** InputNote `Ticket.InputNote`
 
 * 連携キーの取得に失敗
 ** `[DB]consult(受診).external_connection_code(外部連携キー)` == `Ticket.ConnectionCode` And `[DB]consult(受診).progress_status(進捗状況)` In  (`11` (ConsultProgressStatus.来場待ち) , `21` (ConsultProgressStatus.検査中)) が存在しない
