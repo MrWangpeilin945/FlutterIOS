@@ -5,7 +5,7 @@
 :doctype: book
 :lang: ja
 :toc: left
-:toc-levels: 3
+:toclevels: 4
 :toc-title: 目次
 :icons: font
 :imagesdir: images
