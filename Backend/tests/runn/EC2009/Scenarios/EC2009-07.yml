@@ -68,21 +68,25 @@ steps:
     db:
       query: |
         SELECT
-          name
-          , threshold_id::text
-          , exam_item_detail_id
-          , min_age
-          , max_age
-          , target_sex
-          , min_value::text
-          , max_value::text
-          , error_level
-          , to_char(created_at, 'yyyymmdd') as created_at
-          , created_by
+          e.name
+          , e.threshold_id::text
+          , t.threshold_code
+          , e.exam_item_detail_id
+          , e.min_age
+          , e.max_age
+          , e.target_sex
+          , e.min_value::text
+          , e.max_value::text
+          , e.error_level
+          , to_char(e.created_at, 'yyyymmdd') as created_at
+          , e.created_by
         FROM
-          resultcollector.exam_normal_value_range
+          resultcollector.exam_normal_value_range e
+        LEFT JOIN
+          resultcollector.thresholds t
+            on t.threshold_id = e.threshold_id
         ORDER BY
-          exam_item_detail_id ASC
+          e.exam_item_detail_id ASC
     bind:
       organizationsData: current.rows
   post:
@@ -165,22 +169,26 @@ steps:
     db:
       query: |
         SELECT
-          name
-          , threshold_id::text
-          , exam_item_detail_id
-          , min_age
-          , max_age
-          , target_sex
-          , min_value::text
-          , max_value::text
-          , error_level
-          , to_char(created_at, 'yyyymmdd') as created_at
-          , created_by
+          e.name
+          , e.threshold_id::text
+          , t.threshold_code
+          , e.exam_item_detail_id
+          , e.min_age
+          , e.max_age
+          , e.target_sex
+          , e.min_value::text
+          , e.max_value::text
+          , e.error_level
+          , to_char(e.created_at, 'yyyymmdd') as created_at
+          , e.created_by
           , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
-          resultcollector.exam_normal_value_range
+          resultcollector.exam_normal_value_range e
+        LEFT JOIN
+          resultcollector.thresholds t
+            on t.threshold_id = e.threshold_id
         ORDER BY
-          exam_item_detail_id ASC
+          e.exam_item_detail_id ASC
     test: |
       // 以下の除外されたリクエストは検査基準値範囲に登録されない
       //  - 基準値パターンが取得できない
@@ -191,24 +199,27 @@ steps:
       // リクエストの検査基準値範囲が変更されたことを確認
       && current.rows[0].name == "白血球数（男女）"
       && current.rows[0].threshold_id == organizationsData[0].threshold_id
-      && current.rows[0].exam_item_detail_id == organizationsData[0].exam_item_detail_id
-      && current.rows[0].min_age == "0000000"
+      && current.rows[0].threshold_code == "EC2009"
+      // "examItemDetailCd": "EC2009WBC"
+      && current.rows[0].exam_item_detail_id == 20091
       && current.rows[0].max_age == "9990000"
+      && current.rows[0].min_age == "0000000"
       && current.rows[0].target_sex == 3
-      && current.rows[0].min_value == "8.7"
       && current.rows[0].max_value == "10.6"
+      && current.rows[0].min_value == "8.7"
       && current.rows[0].error_level == 2
       && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
       // リクエストに存在しない検査基準値範囲は変更されないことを確認
       && current.rows[1].name == organizationsData[1].name
       && current.rows[1].threshold_id == organizationsData[1].threshold_id
+      && current.rows[1].threshold_code == organizationsData[1].threshold_code
       && current.rows[1].exam_item_detail_id == organizationsData[1].exam_item_detail_id
-      && current.rows[1].min_age == organizationsData[1].min_age
       && current.rows[1].max_age == organizationsData[1].max_age
+      && current.rows[1].min_age == organizationsData[1].min_age
       && current.rows[1].target_sex == organizationsData[1].target_sex
-      && current.rows[1].min_value == organizationsData[1].min_value
       && current.rows[1].max_value == organizationsData[1].max_value
+      && current.rows[1].min_value == organizationsData[1].min_value
       && current.rows[1].error_level == organizationsData[1].error_level
       && current.rows[1].created_at == "20250101"
       && current.rows[1].created_by == organizationsData[1].created_by

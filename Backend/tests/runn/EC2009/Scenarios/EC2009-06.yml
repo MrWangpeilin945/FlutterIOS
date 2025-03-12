@@ -32,11 +32,11 @@ steps:
     test: |
       current.res.status == 207
       && len(current.res.body) == 2
-      // 基準値パターンエラーがErrorObjectで返される
+      // 基準値パターンCDエラーがErrorObjectで返される
       && current.res.body[0].code == "10001"
       && current.res.body[0].inputNote == "2009061"
       && current.res.body[0].message == "指定されたThresholdCdがシステム上に存在しません。Code:Dummy2009"
-      // 基準値パターンエラーがErrorObjectで返される
+      // 検査項目明細CDエラーがErrorObjectで返される
       && current.res.body[1].code == "10001"
       && current.res.body[1].inputNote == "2009061"
       && current.res.body[1].message == "指定されたExamItemDetailCdがシステム上に存在しません。Code:Dummy2009WBC"
