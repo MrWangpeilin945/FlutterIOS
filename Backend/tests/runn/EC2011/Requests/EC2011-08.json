@@ -1,0 +1,22 @@
+[
+ { "staffCode": "20110801",   "loginId": "S201101",               "name": "職員01",   "password": "P@ssw0rd01",            "enabled": false, "roleId": 10, "inputNote": "20110801" },
+ { "staffCode": "20110802",   "loginId": "NewS201102",            "name": "新職員02", "password": "P@ssw0rd02",            "enabled": true,  "roleId": 10, "inputNote": "20110802" },
+ { "staffCode": "",           "loginId": "S201103",               "name": "職員03",   "password": "P@ssw0rd03",            "enabled": true,  "roleId": 10, "inputNote": "20110803" },
+ { "staffCode": "20110804",   "loginId": "",                      "name": "職員04",   "password": "P@ssw0rd04",            "enabled": true,  "roleId": 10, "inputNote": "20110804" },
+ { "staffCode": "20110805",   "loginId": "S201105",               "name": "",         "password": "P@ssw0rd05",            "enabled": true,  "roleId": 10, "inputNote": "20110805" },
+ { "staffCode": "20110806",   "loginId": "S201106",               "name": "職員06",   "password": "",                      "enabled": true,  "roleId": 10, "inputNote": "20110806" },
+ { "staffCode": "",           "loginId": "",                      "name": "",         "password": "",                      "enabled": true,  "roleId": 10, "inputNote": "20110807" },
+ { "staffCode": "20110808",   "loginId": "S20110889012345678901", "name": "職員08",   "password": "P@ssw0rd081234567890",  "enabled": true,  "roleId": 10, "inputNote": "20110808" },
+ { "staffCode": "20110809",   "loginId": "S2011098901234567890",  "name": "職員09",   "password": "P@ssw0rd0912345678901", "enabled": true,  "roleId": 10, "inputNote": "20110809" },
+ { "staffCode": "20110810",   "loginId": "S20111089012345678901", "name": "職員10",   "password": "P@ssw0rd1012345678901", "enabled": true,  "roleId": 10, "inputNote": "20110810" },
+ { "staffCode": "20110811",   "loginId": "S201111$",              "name": "職員11",   "password": "P@ssw0rd11",            "enabled": true,  "roleId": 10, "inputNote": "20110811" },
+ { "staffCode": "20110812",   "loginId": "S201112$",              "name": "職員12",   "password": "P@ssw0rd1212345678901", "enabled": true,  "roleId": 10, "inputNote": "20110812" },
+ { "staffCode": "201108134",  "loginId": "S201113",               "name": "職員13",   "password": "P@ssw0rd13",            "enabled": true,  "roleId": 10, "inputNote": "20110813" },
+ { "staffCode": "201108134",  "loginId": "S2011145",              "name": "職員14",   "password": "P@ssw0rd14",            "enabled": true,  "roleId": 10, "inputNote": "20110814" },
+ { "staffCode": "20110815",   "loginId": "S2011145",              "name": "職員15",   "password": "P@ssw0rd15",            "enabled": true,  "roleId": 10, "inputNote": "20110815" },
+ { "staffCode": "20110816",   "loginId": "S999900",               "name": "職員16",   "password": "P@ssw0rd16",            "enabled": true,  "roleId": 10, "inputNote": "20110816" },
+ { "staffCode": "20110817",   "loginId": "S999901",               "name": "職員17",   "password": "P@ssw0rd17",            "enabled": true,  "roleId": 10, "inputNote": "20110817" },
+ { "staffCode": "20110818",   "loginId": "S999901",               "name": "職員18",   "password": "P@ssw0rd18",            "enabled": true,  "roleId": 10, "inputNote": "20110818" },
+ { "staffCode": "20110819",   "loginId": "S201119",               "name": "職員19",   "password": "P@ssw0rd19",            "enabled": true,  "roleId": 20, "inputNote": "20110819" },
+ { "staffCode": "20110820",   "loginId": "NewS201120",            "name": "新職員20", "password": "P@ssw0rd20",            "enabled": false, "roleId": 20, "inputNote": "20110820" }
+]

@@ -8,6 +8,10 @@ runners:
 vars:
   request: "json://../Requests/EC2011-01.json"
 steps:
+  clearTable:
+    desc: "職員テーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.staffs CASCADE;
   post:
     desc: "職員を登録_正常"
     req:
@@ -18,9 +22,7 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
-    dump:
-      expr: current.res.body
-      out: ../Dump/EC2011-01.json
+      && current.res.body == null
   confirmStaffs:
     desc: "職員の登録を確認"
     db:
@@ -31,10 +33,13 @@ steps:
           , name
           , enabled
           , role_id
+          , password_hash::text
+          , password_salt::text
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.staffs
-        WHERE
-          staff_code in ('201101', '201102')
         ORDER BY
           staff_code ASC;
     test: |
@@ -45,8 +50,12 @@ steps:
       && current.rows[0].name == "管理者職員"
       && current.rows[0].enabled == true
       && current.rows[0].role_id == 20
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
       && current.rows[1].staff_code == "201102"
       && current.rows[1].login_id == "S201102"
       && current.rows[1].name == "一般職員"
       && current.rows[1].enabled == false
       && current.rows[1].role_id == 10
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"

@@ -1,0 +1,145 @@
+desc: EC2011-08 除外されてないものは追加更新_正常 [207]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2011-08.json"
+steps:
+  clearTable:
+    desc: "職員テーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.staffs CASCADE;
+  insertData:
+    desc: "職員テーブルに実行前データを登録"
+    db: 
+      query: |
+        insert into resultcollector.staffs(staff_id, staff_code, login_id, name, password_hash, password_salt, enabled, role_id, created_at, created_by)
+            values('c0002012-0000-0000-0000-000000000002', '20110802','S201102', '管理職員　甲', '00', '00' , false, 20, '2025-01-01T12:34:56.789', 'ex2011')
+            ,     ('c0002012-0000-0000-0000-000000000020', '20110820','S201120', '一般職員　乙', '00', '00' , false, 10, '2025-01-01T12:34:56.789', 'ex2011')
+            ,     ('c0002012-0000-0000-0000-000000009900', '20110890','S999900', '既存職員　松', '00', '00' , false, 20, '2025-01-01T12:34:56.789', 'ex2011')
+            ,     ('c0002012-0000-0000-0000-000000009901', '20110891','S999901', '既存職員　竹', '00', '00' , true,  10, '2025-01-01T12:34:56.789', 'ex2011')
+            ,     ('c0002012-0000-0000-0000-000000009902', '20110892','S999902', '既存職員　梅', '00', '00' , false, 10, '2025-01-01T12:34:56.789', 'ex2011');
+  post:
+    desc: "制限：文字種類エラーを除外"
+    req:
+      /api/v1/external/staffs:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      && len(current.res.body) == 28
+      && current.res.body[00].code == "10004" && current.res.body[00].message == "必須項目が不足しています。StaffCode"                  && current.res.body[00].inputNote == "20110803"
+      && current.res.body[01].code == "10004" && current.res.body[01].message == "必須項目が不足しています。StaffCode"                  && current.res.body[01].inputNote == "20110807"
+      && current.res.body[02].code == "10004" && current.res.body[02].message == "必須項目が不足しています。LoginId"                    && current.res.body[02].inputNote == "20110804"
+      && current.res.body[03].code == "10004" && current.res.body[03].message == "必須項目が不足しています。LoginId"                    && current.res.body[03].inputNote == "20110807"
+      && current.res.body[04].code == "10004" && current.res.body[04].message == "必須項目が不足しています。Password"                   && current.res.body[04].inputNote == "20110806"
+      && current.res.body[05].code == "10004" && current.res.body[05].message == "必須項目が不足しています。Password"                   && current.res.body[05].inputNote == "20110807"
+      && current.res.body[06].code == "10004" && current.res.body[06].message == "必須項目が不足しています。Name"                       && current.res.body[06].inputNote == "20110805"
+      && current.res.body[07].code == "10004" && current.res.body[07].message == "必須項目が不足しています。Name"                       && current.res.body[07].inputNote == "20110807"
+      && current.res.body[08].code == "10005" && current.res.body[08].message == "制限数を超えています。LoginId:S20110889012345678901"  && current.res.body[08].inputNote == "20110808"
+      && current.res.body[09].code == "10005" && current.res.body[09].message == "制限数を超えています。LoginId:S20111089012345678901"  && current.res.body[09].inputNote == "20110810"
+      && current.res.body[10].code == "10005" && current.res.body[10].message == "制限数を超えています。Password:P@ssw0rd0912345678901" && current.res.body[10].inputNote == "20110809"
+      && current.res.body[11].code == "10005" && current.res.body[11].message == "制限数を超えています。Password:P@ssw0rd1012345678901" && current.res.body[11].inputNote == "20110810"
+      && current.res.body[12].code == "10005" && current.res.body[12].message == "制限数を超えています。Password:P@ssw0rd1212345678901" && current.res.body[12].inputNote == "20110812"
+      && current.res.body[13].code == "10006" && current.res.body[13].message == "値の形式が無効です。LoginId:"                         && current.res.body[13].inputNote == "20110804"
+      && current.res.body[14].code == "10006" && current.res.body[14].message == "値の形式が無効です。LoginId:"                         && current.res.body[14].inputNote == "20110807"
+      && current.res.body[15].code == "10006" && current.res.body[15].message == "値の形式が無効です。LoginId:S201111$"                 && current.res.body[15].inputNote == "20110811"
+      && current.res.body[16].code == "10006" && current.res.body[16].message == "値の形式が無効です。LoginId:S201112$"                 && current.res.body[16].inputNote == "20110812"
+      && current.res.body[17].code == "10003" && current.res.body[17].message == "キー項目が重複しています。StaffCode:"                 && current.res.body[17].inputNote == "20110803"
+      && current.res.body[18].code == "10003" && current.res.body[18].message == "キー項目が重複しています。StaffCode:"                 && current.res.body[18].inputNote == "20110807"
+      && current.res.body[19].code == "10003" && current.res.body[19].message == "キー項目が重複しています。StaffCode:201108134"        && current.res.body[19].inputNote == "20110813"
+      && current.res.body[20].code == "10003" && current.res.body[20].message == "キー項目が重複しています。StaffCode:201108134"        && current.res.body[20].inputNote == "20110814"
+      && current.res.body[21].code == "10003" && current.res.body[21].message == "キー項目が重複しています。LoginId:"                   && current.res.body[21].inputNote == "20110804"
+      && current.res.body[22].code == "10003" && current.res.body[22].message == "キー項目が重複しています。LoginId:"                   && current.res.body[22].inputNote == "20110807"
+      && current.res.body[23].code == "10003" && current.res.body[23].message == "キー項目が重複しています。LoginId:S2011145"           && current.res.body[23].inputNote == "20110814"
+      && current.res.body[24].code == "10003" && current.res.body[24].message == "キー項目が重複しています。LoginId:S2011145"           && current.res.body[24].inputNote == "20110815"
+      && current.res.body[25].code == "10003" && current.res.body[25].message == "キー項目が重複しています。LoginId:S999901"            && current.res.body[25].inputNote == "20110817"
+      && current.res.body[26].code == "10003" && current.res.body[26].message == "キー項目が重複しています。LoginId:S999901"            && current.res.body[26].inputNote == "20110818"
+      && current.res.body[27].code == "10002" && current.res.body[27].message == "指定されたLoginIdが既に登録済みです。Code:S999900"    && current.res.body[27].inputNote == "20110816"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2011-08.json
+  confirmStaffs:
+    desc: "エラーの職員情報が登録されていないことを確認"
+    db:
+      query: |
+        SELECT
+          staff_id::text
+          , staff_code
+          , login_id
+          , name
+          , enabled
+          , role_id
+          , password_hash::text
+          , password_salt::text
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.staffs
+        ORDER BY
+          staff_code
+    test: |
+      len(current.rows) == 7
+      // エラーの無いレコードは追加される
+      && current.rows[0].staff_code == "20110801"
+      && current.rows[0].login_id == "S201101"
+      && current.rows[0].name == "職員01"
+      && current.rows[0].enabled == false
+      && current.rows[0].role_id == 10
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[2].staff_code == "20110819"
+      && current.rows[2].login_id == "S201119"
+      && current.rows[2].name == "職員19"
+      && current.rows[2].enabled == true
+      && current.rows[2].role_id == 20
+      && current.rows[2].created_at == current.rows[2].now
+      && current.rows[2].created_by == "ExternalConnection"
+      // エラーの無いレコードは更新される
+      && current.rows[1].staff_id == "c0002012-0000-0000-0000-000000000002"
+      && current.rows[1].staff_code == "20110802"
+      && current.rows[1].login_id == "NewS201102"
+      && current.rows[1].name == "新職員02"
+      && current.rows[1].enabled == true
+      && current.rows[1].role_id == 10
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
+      && current.rows[3].staff_id == "c0002012-0000-0000-0000-000000000020"
+      && current.rows[3].staff_code == "20110820"
+      && current.rows[3].login_id == "NewS201120"
+      && current.rows[3].name == "新職員20"
+      && current.rows[3].enabled == false
+      && current.rows[3].role_id == 20
+      && current.rows[3].created_at == current.rows[1].now
+      && current.rows[3].created_by == "ExternalConnection"
+      // 対象外の職員は更新されない
+      && current.rows[4].staff_id == "c0002012-0000-0000-0000-000000009900"
+      && current.rows[4].staff_code == "20110890"
+      && current.rows[4].login_id == "S999900"
+      && current.rows[4].name == "既存職員　松"
+      && current.rows[4].enabled == false
+      && current.rows[4].role_id == 20
+      && current.rows[4].created_at == "20250101"
+      && current.rows[4].created_by == "ex2011"
+      && current.rows[5].staff_id == "c0002012-0000-0000-0000-000000009901"
+      && current.rows[5].staff_code == "20110891"
+      && current.rows[5].login_id == "S999901"
+      && current.rows[5].name == "既存職員　竹"
+      && current.rows[5].enabled == true
+      && current.rows[5].role_id == 10
+      && current.rows[5].created_at == "20250101"
+      && current.rows[5].created_by == "ex2011"
+      && current.rows[6].staff_id == "c0002012-0000-0000-0000-000000009902"
+      && current.rows[6].staff_code == "20110892"
+      && current.rows[6].login_id == "S999902"
+      && current.rows[6].name == "既存職員　梅"
+      && current.rows[6].enabled == false
+      && current.rows[6].role_id == 10
+      && current.rows[6].created_at == "20250101"
+      && current.rows[6].created_by == "ex2011"

@@ -49,10 +49,10 @@ steps:
       && current.rows[1].team_code == "T2006-01-2"
       && current.rows[1].name == "２班"
       && current.rows[1].order_number == 2
-      && current.rows[1].created_at == current.rows[0].now
+      && current.rows[1].created_at == current.rows[1].now
       && current.rows[1].created_by == "ExternalConnection"
       && current.rows[2].team_code == "T2006-01-3"
       && current.rows[2].name == "３班"
       && current.rows[2].order_number == 3
-      && current.rows[2].created_at == current.rows[0].now
+      && current.rows[2].created_at == current.rows[2].now
       && current.rows[2].created_by == "ExternalConnection"
