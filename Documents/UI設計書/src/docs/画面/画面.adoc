@@ -19,7 +19,7 @@ include::./SC0001_ログイン画面/SC0001-LoginButtonPressed.mmd[]
 <<<
 == SC0002_班選択画面
 
-== 初期表示
+=== 初期表示
 
 [mermaid,SC0002-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
@@ -36,7 +36,7 @@ include::./SC0002_班選択画面/SC0002-HeadlineButtonPressed.mmd[]
 <<<
 == SC0003_会場選択画面
 
-== 初期表示
+=== 初期表示
 
 [mermaid,SC0003-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
@@ -53,28 +53,28 @@ include::./SC0003_会場選択画面/SC0003-HeadlineButtonPressed.mmd[]
 <<<
 == SC0004_ホーム画面
 
-== 初期表示
+=== 初期表示
 
 [mermaid,SC0004-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0004_ホーム画面/SC0004-InitialDisplay.mmd[]
 ....
 
-== 班名ボタン押下
+=== 班名ボタン押下
 
 [mermaid,SC0004-TeamNameButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0004_ホーム画面/SC0004-TeamNameButtonPressed.mmd[]
 ....
 
-== 会場名ボタン押下
+=== 会場名ボタン押下
 
 [mermaid,SC0004-PlaceNameButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0004_ホーム画面/SC0004-PlaceNameButtonPressed.mmd[]
 ....
 
-== ホームメニューボタン押下
+=== ホームメニューボタン押下
 
 [mermaid,SC0004-HomeMenuButtonPressed,png,scale=3,pdfwidth=100%]
 ....
@@ -84,21 +84,21 @@ include::./SC0004_ホーム画面/SC0004-HomeMenuButtonPressed.mmd[]
 <<<
 == SC0005_検査メニュー選択画面
 
-== 初期表示
+=== 初期表示
 
 [mermaid,SC0005-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0005_検査メニュー選択画面/SC0005-InitialDisplay.mmd[]
 ....
 
-== 検査メニュー項目ボタン押下
+=== 検査メニュー項目ボタン押下
 
 [mermaid,SC0005-ExamMenuButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0005_検査メニュー選択画面/SC0005-ExamMenuButtonPressed.mmd[]
 ....
 
-== 開始ボタン押下
+=== 開始ボタン押下
 
 [mermaid,SC0005-StartButtonPressed,png,scale=3,pdfwidth=100%]
 ....
@@ -108,14 +108,14 @@ include::./SC0005_検査メニュー選択画面/SC0005-StartButtonPressed.mmd[]
 <<<
 == SC0006_受診番号入力画面
 
-== 初期表示
+=== 初期表示
 
 [mermaid,SC0006-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0006_受診番号入力画面/SC0006-InitialDisplay.mmd[]
 ....
 
-== バーコードリーダー読み込み
+=== バーコードリーダー読み込み
 
 [mermaid,SC0006-BarcodeReader,png,scale=3,pdfwidth=100%]
 ....
@@ -125,105 +125,105 @@ include::./SC0006_受診番号入力画面/SC0006-BarcodeReader.mmd[]
 <<<
 == SC0007_検査内容確認画面
 
-== 初期表示
+=== 初期表示
 
 [mermaid,SC0007-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-InitialDisplay.mmd[]
 ....
 
-== 検査実施スイッチ切り替え時：「しない」に変更したとき
+=== 検査実施スイッチ切り替え時：「しない」に変更したとき
 
 [mermaid,SC0007-ExamItemPerformingSwitched(No),png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-ExamItemPerformingSwitched(No).mmd[]
 ....
 
-== 検査実施スイッチ切り替え時：「する」に変更したとき
+=== 検査実施スイッチ切り替え時：「する」に変更したとき
 
 [mermaid,SC0007-ExamItemPerformingSwitched(Yes),png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-ExamItemPerformingSwitched(Yes).mmd[]
 ....
 
-== 中止理由ボタン押下時
+=== 中止理由ボタン押下時
 
 [mermaid,SC0007-CancelReasonButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-CancelReasonButtonPressed.mmd[]
 ....
 
-== この項目をスキップするボタン押下時
+=== この項目をスキップするボタン押下時
 
 [mermaid,SC0007-SkipItemButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-SkipItemButtonPressed.mmd[]
 ....
 
-== 開始するボタン押下時
+=== 開始するボタン押下時
 
 [mermaid,SC0007-StartExamButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-StartExamButtonPressed.mmd[]
 ....
 
-== 受診ボタン押下時
+=== 受診ボタン押下時
 
 [mermaid,SC0007-EquipmentButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-EquipmentButtonPressed.mmd[]
 ....
 
-== 中止理由ダイアログ表示時
+=== 中止理由ダイアログ表示時
 
 [mermaid,SC0007-CancelReasonDialogDisplay,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-CancelReasonDialogDisplay.mmd[]
 ....
 
-== 中止理由ダイアログの中止理由ボタン押下時
+=== 中止理由ダイアログの中止理由ボタン押下時
 
 [mermaid,SC0007-CancelReasonDialog_CancelReasonButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-CancelReasonDialog_CancelReasonButtonPressed.mmd[]
 ....
 
-== 中止理由ダイアログの戻るボタン押下時
+=== 中止理由ダイアログの戻るボタン押下時
 
 [mermaid,SC0007-CancelReasonDialog_BackButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-CancelReasonDialog_BackButtonPressed.mmd[]
 ....
 
-== 中止理由ダイアログの決定ボタン押下時
+=== 中止理由ダイアログの決定ボタン押下時
 
 [mermaid,SC0007-CancelReasonDialog_ConfirmButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-CancelReasonDialog_ConfirmButtonPressed.mmd[]
 ....
 
-== 機器選択ダイアログ表示時
+=== 機器選択ダイアログ表示時
 
 [mermaid,SC0007-EquipmentDecideDialogDisplay,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-EquipmentDecideDialogDisplay.mmd[]
 ....
 
-== 機器選択ダイアログの検査機器ボタン押下時
+=== 機器選択ダイアログの検査機器ボタン押下時
 
 [mermaid,SC0007-EquipmentDecideDialog_EquipmentDecideButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-EquipmentDecideDialog_EquipmentDecideButtonPressed.mmd[]
 ....
 
-== 機器選択ダイアログの戻るボタン押下時
+=== 機器選択ダイアログの戻るボタン押下時
 
 [mermaid,SC0007-EquipmentDecideDialog_BackButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0007_検査内容確認画面/SC0007-EquipmentDecideDialog_BackButtonPressed.mmd[]
 ....
 
-== 機器選択ダイアログの決定ボタン押下時
+=== 機器選択ダイアログの決定ボタン押下時
 
 [mermaid,SC0007-EquipmentDecideDialog_ConfirmButtonPressed,png,scale=3,pdfwidth=100%]
 ....
@@ -233,28 +233,28 @@ include::./SC0007_検査内容確認画面/SC0007-EquipmentDecideDialog_ConfirmB
 <<<
 == SC0008_検査結果入力画面
 
-== 　初期表示
+=== 初期表示
 
 [mermaid,SC0008-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0008_検査結果入力画面/SC0008-InitialDisplay.mmd[]
 ....
 
-== 　機器測定する
+=== 機器測定する
 
 [mermaid,SC0008-ConnectionEquipment,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0008_検査結果入力画面/SC0008-ConnectionEquipment.mmd[]
 ....
 
-== 　検証する
+=== 検証する
 
 [mermaid,SC0008-Verify,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0008_検査結果入力画面/SC0008-Verify.mmd[]
 ....
 
-== 　登録する
+=== 登録する
 
 [mermaid,SC0008-Register,png,scale=3,pdfwidth=100%]
 ....
@@ -269,14 +269,14 @@ SC0008_検査結果入力画面に統合のため不要
 <<<
 == SC0010_進捗画面
 
-== 初期表示
+=== 初期表示
 
 [mermaid,SC0010-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0010_進捗画面/SC0010-InitialDisplay.mmd[]
 ....
 
-== 検査項目進捗ボタン押下時
+=== 検査項目進捗ボタン押下時
 
 [mermaid,SC0010-ExamItemProgressButtonPressed,png,scale=3,pdfwidth=100%]
 ....
@@ -286,21 +286,21 @@ include::./SC0010_進捗画面/SC0010-ExamItemProgressButtonPressed.mmd[]
 <<<
 == SC0013_会場ロック画面
 
-== 初期表示
+=== 初期表示
 
 [mermaid,SC0013-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0013_会場ロック画面/SC0013-InitialDisplay.mmd[]
 ....
 
-== 会場ロックボタン押下時
+=== 会場ロックボタン押下時
 
 [mermaid,SC0013-PlaceLockButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0013_会場ロック画面/SC0013-PlaceLockButtonPressed.mmd[]
 ....
 
-== ロック解除ボタン押下時
+=== ロック解除ボタン押下時
 
 [mermaid,SC0013-UnlockButtonPressed,png,scale=3,pdfwidth=100%]
 ....
@@ -310,21 +310,21 @@ include::./SC0013_会場ロック画面/SC0013-UnlockButtonPressed.mmd[]
 <<<
 == SC0019_検査結果出力画面
 
-== 初期表示
+=== 初期表示
 
 [mermaid,SC0019-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0019_検査結果出力画面/SC0019-InitialDisplay.mmd[]
 ....
 
-== 出力ボタン押下時
+=== 出力ボタン押下時
 
 [mermaid,SC0019-ExportButtonPressed,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0019_検査結果出力画面/SC0019-ExportButtonPressed.mmd[]
 ....
 
-== 会場ロックボタン押下時
+=== 会場ロックボタン押下時
 
 [mermaid,SC0019-PlaceLockButtonPressed,png,scale=3,pdfwidth=100%]
 ....
@@ -334,14 +334,14 @@ include::./SC0019_検査結果出力画面/SC0019-PlaceLockButtonPressed.mmd[]
 <<<
 == SC0020_検査結果出力履歴画面
 
-== 初期表示
+=== 初期表示
 
 [mermaid,SC0020-InitialDisplay,png,scale=3,pdfwidth=100%]
 ....
 include::./SC0020_検査結果出力履歴画面/SC0020-InitialDisplay.mmd[]
 ....
 
-== 未出力ボタン押下時
+=== 未出力ボタン押下時
 
 [mermaid,SC0020-NotExportButtonPressed,png,scale=3,pdfwidth=100%]
 ....
