@@ -24,24 +24,24 @@ steps:
         INSERT INTO
           resultcollector.examinees
           (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
-        VALUES('e0002001-0000-0000-0004-000000000001','EC2001041', '笠岡　太郎', 'カサオカ　タロウ', 1, '1978-10-31', CURRENT_TIMESTAMP, 'ec2001')
-        ,     ('e0002001-0000-0000-0004-000000000002','EC2001042', '新見　花子', 'ニイミ　ハナコ', 1, '1984-11-30', CURRENT_TIMESTAMP, 'ec2001');
+        VALUES('e0002001-0000-0000-0004-000000000001','EC2001041', '笠岡　太郎', 'カサオカ　タロウ', 1, '1978-10-31', '2025-01-01T12:34:56.789', 'ec2001')
+        ,     ('e0002001-0000-0000-0004-000000000002','EC2001042', '新見　花子', 'ニイミ　ハナコ', 1, '1984-11-30', '2025-01-01T12:34:56.789', 'ec2001');
         -- 団体
         INSERT INTO
           resultcollector.organizations
           (organization_id, organization_code, name, order_number, created_at, created_by)
-        VALUES('a0002001-0000-0000-0004-000000000001', 'ORG2001-41', '株式会社笠岡', 41, CURRENT_TIMESTAMP,'ec2001')
-        ,     ('a0002001-0000-0000-0004-000000000002', 'ORG2001-42', '株式会社井原', 42, CURRENT_TIMESTAMP,'ec2001')
-        ,     ('a0002001-0000-0000-0004-000000000003', 'ORG2001-43', '株式会社高梁', 43, CURRENT_TIMESTAMP,'ec2001')
-        ,     ('a0002001-0000-0000-0004-000000000004', 'ORG2001-44', '株式会社新見', 44, CURRENT_TIMESTAMP,'ec2001')
-        ,     ('a0002001-0000-0000-0004-000000000005', 'ORG2001-45', '株式会社玉野', 45, CURRENT_TIMESTAMP,'ec2001');
+        VALUES('a0002001-0000-0000-0004-000000000001', 'ORG2001-41', '株式会社笠岡', 41, CURRENT_TIMESTAMP, 'ec2001')
+        ,     ('a0002001-0000-0000-0004-000000000002', 'ORG2001-42', '株式会社井原', 42, CURRENT_TIMESTAMP, 'ec2001')
+        ,     ('a0002001-0000-0000-0004-000000000003', 'ORG2001-43', '株式会社高梁', 43, CURRENT_TIMESTAMP, 'ec2001')
+        ,     ('a0002001-0000-0000-0004-000000000004', 'ORG2001-44', '株式会社新見', 44, CURRENT_TIMESTAMP, 'ec2001')
+        ,     ('a0002001-0000-0000-0004-000000000005', 'ORG2001-45', '株式会社玉野', 45, CURRENT_TIMESTAMP, 'ec2001');
         -- 所属
         INSERT INTO
           resultcollector.affiliations
           (examinee_id, organization_id, created_at, created_by)
-        VALUES('e0002001-0000-0000-0004-000000000001','a0002001-0000-0000-0004-000000000001', CURRENT_TIMESTAMP,'ec2001')
-        ,     ('e0002001-0000-0000-0004-000000000001','a0002001-0000-0000-0004-000000000004', CURRENT_TIMESTAMP,'ec2001')
-        ,     ('e0002001-0000-0000-0004-000000000002','a0002001-0000-0000-0004-000000000005', CURRENT_TIMESTAMP,'ec2001');
+        VALUES('e0002001-0000-0000-0004-000000000001','a0002001-0000-0000-0004-000000000001', '2025-01-01T12:34:56.789', 'ec2001')
+        ,     ('e0002001-0000-0000-0004-000000000001','a0002001-0000-0000-0004-000000000004', '2025-01-01T12:34:56.789', 'ec2001')
+        ,     ('e0002001-0000-0000-0004-000000000002','a0002001-0000-0000-0004-000000000005', '2025-01-01T12:34:56.789', 'ec2001');
   getExaminees:
     desc: "受診者情報の取得"
     db:
@@ -95,12 +95,42 @@ steps:
             application/json:
               "{{ vars.request }}"
     test: |
-      current.res.status == 200
+      current.res.status == 207
       // レスポンスに1件のErrorObjectが返されることを確認
-      && len(current.res.body) == 1
-      && current.res.body[0].code == "10001"
-      && current.res.body[0].inputNote == "2001041"
-      && current.res.body[0].message == "指定されたOrganizationCodeがシステム上に存在しません。Code:ORG2001-99"
+      && len(current.res.body) == 11
+      && current.res.body[0].code == "10004"
+      && current.res.body[0].inputNote == "2001044"
+      && current.res.body[0].message == "必須項目が不足しています。ExamineeCode"
+      && current.res.body[1].code == "10004"
+      && current.res.body[1].inputNote == "2001044"
+      && current.res.body[1].message == "必須項目が不足しています。Name"
+      && current.res.body[2].code == "10004"
+      && current.res.body[2].inputNote == "2001044"
+      && current.res.body[2].message == "必須項目が不足しています。KanaName"
+      && current.res.body[3].code == "10004"
+      && current.res.body[3].inputNote == "2001044"
+      && current.res.body[3].message == "必須項目が不足しています。Affiliations.OrganizationCode"
+      && current.res.body[4].code == "10003"
+      && current.res.body[4].inputNote == "2001045"
+      && current.res.body[4].message == "キー項目が重複しています。ExamineeCode:EC2001999"
+      && current.res.body[5].code == "10003"
+      && current.res.body[5].inputNote == "2001046"
+      && current.res.body[5].message == "キー項目が重複しています。ExamineeCode:EC2001999"
+      && current.res.body[6].code == "10003"
+      && current.res.body[6].inputNote == "2001046"
+      && current.res.body[6].message == "キー項目が重複しています。Affiliations.OrganizationCode:ORG2001-41"
+      && current.res.body[7].code == "10003"
+      && current.res.body[7].inputNote == "2001046"
+      && current.res.body[7].message == "キー項目が重複しています。Affiliations.OrganizationCode:ORG2001-43"
+      && current.res.body[8].code == "10003"
+      && current.res.body[8].inputNote == "2001046"
+      && current.res.body[8].message == "キー項目が重複しています。Affiliations.OrganizationCode:ORG2001-42"
+      && current.res.body[9].code == "10001"
+      && current.res.body[9].inputNote == "2001041"
+      && current.res.body[9].message == "指定されたOrganizationCodeがシステム上に存在しません。Code:ORG2001-99"
+      && current.res.body[10].code == "10001"
+      && current.res.body[10].inputNote == "2001044"
+      && current.res.body[10].message == "指定されたOrganizationCodeがシステム上に存在しません。Code:"
     dump:
       expr: current.res.body
       out: ../Dump/EC2001-04.json

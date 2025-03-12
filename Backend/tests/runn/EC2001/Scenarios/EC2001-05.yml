@@ -1,0 +1,59 @@
+desc: EC2001-05 必須項目が空値
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2001-05.json"
+steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 受診者
+        TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 団体
+        TRUNCATE TABLE resultcollector.organizations CASCADE;
+  post:
+    desc: "必須項目が空値"
+    req:
+      /api/v1/external/examinees:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      // 受診者エラーがErrorObjectで返される
+      && len(current.res.body) == 5
+      && current.res.body[0].code == "10004"
+      && current.res.body[0].inputNote == "2001051"
+      && current.res.body[0].message == "必須項目が不足しています。ExamineeCode"
+      && current.res.body[1].code == "10004"
+      && current.res.body[1].inputNote == "2001052"
+      && current.res.body[1].message == "必須項目が不足しています。Name"
+      && current.res.body[2].code == "10004"
+      && current.res.body[2].inputNote == "2001053"
+      && current.res.body[2].message == "必須項目が不足しています。KanaName"
+      && current.res.body[3].code == "10004"
+      && current.res.body[3].inputNote == "2001054"
+      && current.res.body[3].message == "必須項目が不足しています。Affiliations.OrganizationCode"
+      && current.res.body[4].code == "10001"
+      && current.res.body[4].inputNote == "2001054"
+      && current.res.body[4].message == "指定されたOrganizationCodeがシステム上に存在しません。Code:"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2001-05.json
+  confirmExaminees:
+    desc: "受診者が登録されていない確認"
+    db:
+      query: |
+        SELECT
+          examinee_code
+        FROM
+          resultcollector.examinees;
+    test: |
+      // 受診者情報が登録されていないこと確認
+      len(current.rows) == 0

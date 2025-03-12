@@ -24,22 +24,22 @@ steps:
         INSERT INTO
           resultcollector.examinees
           (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
-        VALUES('e0002001-0000-0000-0002-000000000001','EC2001021', '岡山　二郎', 'オカヤマ　ジロウ', 1, '1978-10-31', CURRENT_TIMESTAMP, 'ec2001')
-        ,     ('e0002001-0000-0000-0002-000000000002','EC2001022', '岡山　さくら', 'オカヤマ　サクラ', 2, '1980-12-20', CURRENT_TIMESTAMP, 'ec2001');
+        VALUES('e0002001-0000-0000-0002-000000000001','EC2001021', '岡山　二郎', 'オカヤマ　ジロウ', 1, '1978-10-31', '2025-01-01T12:34:56.789', 'ec2001')
+        ,     ('e0002001-0000-0000-0002-000000000002','EC2001022', '岡山　さくら', 'オカヤマ　サクラ', 2, '1980-12-20', '2025-01-01T12:34:56.789', 'ec2001');
         -- 団体
         INSERT INTO
           resultcollector.organizations
           (organization_id, organization_code, name, order_number, created_at, created_by)
-        VALUES('a0002001-0000-0000-0002-000000000001', 'ORG2001-21', '株式会社備前', 21, CURRENT_TIMESTAMP,'ec2001')
-        ,     ('a0002001-0000-0000-0002-000000000002', 'ORG2001-22', '株式会社真庭', 22, CURRENT_TIMESTAMP,'ec2001')
-        ,     ('a0002001-0000-0000-0002-000000000003', 'ORG2001-23', '株式会社新見', 23, CURRENT_TIMESTAMP,'ec2001');
+        VALUES('a0002001-0000-0000-0002-000000000001', 'ORG2001-21', '株式会社備前', 21, CURRENT_TIMESTAMP, 'ec2001')
+        ,     ('a0002001-0000-0000-0002-000000000002', 'ORG2001-22', '株式会社真庭', 22, CURRENT_TIMESTAMP, 'ec2001')
+        ,     ('a0002001-0000-0000-0002-000000000003', 'ORG2001-23', '株式会社新見', 23, CURRENT_TIMESTAMP, 'ec2001');
         -- 所属
         INSERT INTO
           resultcollector.affiliations
           (examinee_id, organization_id, created_at, created_by)
-        VALUES('e0002001-0000-0000-0002-000000000001','a0002001-0000-0000-0002-000000000001', CURRENT_TIMESTAMP,'ec2001')
-        ,     ('e0002001-0000-0000-0002-000000000001','a0002001-0000-0000-0002-000000000002', CURRENT_TIMESTAMP,'ec2001')
-        ,     ('e0002001-0000-0000-0002-000000000002','a0002001-0000-0000-0002-000000000003', CURRENT_TIMESTAMP,'ec2001');
+        VALUES('e0002001-0000-0000-0002-000000000001','a0002001-0000-0000-0002-000000000001', '2025-01-01T12:34:56.789','ec2001')
+        ,     ('e0002001-0000-0000-0002-000000000001','a0002001-0000-0000-0002-000000000002', '2025-01-01T12:34:56.789','ec2001')
+        ,     ('e0002001-0000-0000-0002-000000000002','a0002001-0000-0000-0002-000000000003', '2025-01-01T12:34:56.789','ec2001');
   getExaminees:
     desc: "受診者情報の取得"
     db:
@@ -51,7 +51,7 @@ steps:
           , kana_name
           , sex
           , to_char(birthdate, 'yyyymmdd') as birthdate
-          , created_at
+          , to_char(created_at, 'yyyymmdd') as created_at
           , created_by
         FROM
           resultcollector.examinees
@@ -70,7 +70,6 @@ steps:
           , o.organization_code
           , to_char(a.created_at, 'yyyymmdd') as created_at
           , a.created_by
-          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.affiliations a
         LEFT JOIN
@@ -95,10 +94,7 @@ steps:
     test: |
       current.res.status == 200
       // レスポンスにErrorObjectが返されないことを確認
-      && len(current.res.body) == 0
-    dump:
-      expr: current.res.body
-      out: ../Dump/EC2001-02.json
+      && current.res.body == null
   confirmExaminees:
     desc: "受診者の更新を確認"
     db:
@@ -110,8 +106,9 @@ steps:
           , kana_name
           , sex
           , to_char(birthdate, 'yyyymmdd') as birthdate
-          , created_at
+          , to_char(created_at, 'yyyymmdd') as created_at
           , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.examinees
         ORDER BY
@@ -125,7 +122,7 @@ steps:
       && current.rows[0].kana_name == "オカヤマ　ハナコ"
       && current.rows[0].sex == 2
       && current.rows[0].birthdate == "19600401"
-      && current.rows[0].created_at > examineesData[0].created_at
+      && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
       // リクエストに存在しない受診者情報は変更されないことを確認
       && current.rows[1].examinee_id == examineesData[1].examinee_id

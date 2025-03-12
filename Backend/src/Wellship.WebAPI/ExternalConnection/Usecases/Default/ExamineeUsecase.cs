@@ -55,9 +55,10 @@ public class ExamineeUsecase : IExamineeUsecase
         // 団体の確認
         var insertExamineesByOrganizations = await GetCheckedOrganizations(examinees);
 
-        var insertExaminees = insertExamineesByRequired.Intersect(insertExamineesByOrganizations)
-                                                                .ToList();
-
+        var insertExaminees = insertExamineesByRequired.Intersect(insertExamineesByRequired)
+                                                       .Intersect(insertExamineesByDuplicated)
+                                                       .Intersect(insertExamineesByOrganizations)
+                                                       .ToList();
 
         // 受診者エンティティリストを生成
         var examineeEntities = insertExaminees.Select(examinee => new ExamineeEntity
@@ -208,7 +209,7 @@ public class ExamineeUsecase : IExamineeUsecase
         if (requiredOrganizationCodeData.Any())
         {
             // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredOrganizationCodeData, "OrganizationCode");
+            AddRequiredDataErrorObjects(requiredOrganizationCodeData, "Affiliations.OrganizationCode");
         }
 
         return examinees.Except(requiredExamineeCodeData)
@@ -286,20 +287,26 @@ public class ExamineeUsecase : IExamineeUsecase
     }
 
     /// <summary>
-    /// エラーオブジェクトに情報追加する(受診者コード重複エラー）
+    /// エラーオブジェクトに情報追加する(所属重複エラー）
     /// </summary>
     /// <param name="duplicatedData"></param>
     private void AddDuplicateOrganizationCodeErrorObjects(IEnumerable<Examinee> duplicatedData)
     {
-        var errorObjects = duplicatedData
+        // OrganizationCodeが重複したレコードをExamineeCode単位にマージする        
+        var duplicateWithExamineeCode = duplicatedData
+                                            .SelectMany(x => x.Affiliations.Select(a => new { x.ExamineeCode, x.InputNote, a.OrganizationCode }))
+                                            .GroupBy(x => new { x.ExamineeCode, x.InputNote, x.OrganizationCode })
+                                            .Where(x => x.Count() > 1)
+                                            .Select(x => new { x.Key.ExamineeCode, x.Key.InputNote, x.Key.OrganizationCode })
+                                            .Distinct();
+        var errorObjects = duplicateWithExamineeCode
             .Select(d => new ErrorObject
             {
                 Code = "10003",
-                Message = $"キー項目が重複しています。Affiliations.OrganizationCode:{d.ExamineeCode}",
+                Message = $"キー項目が重複しています。Affiliations.OrganizationCode:{d.OrganizationCode}",
                 InputNote = d.InputNote
             }).ToList();
 
         _errorObjects.AddRange(errorObjects);
     }
-
 }
