@@ -157,19 +157,21 @@ steps:
     test: |
       // 受診者情報が登録されたことを確認
       len(current.rows) == 3
+      // 更新（"inputNote": "2001042" examinee_code=EC2001041：笠岡　太郎）
+      && current.rows[0].examinee_code == "EC2001041"
       && current.rows[0].examinee_id == examineesData[0].examinee_id
-      && current.rows[0].examinee_code == examineesData[0].examinee_code
       // 氏名が変更されていることを確認
-      && current.rows[0].name != examineesData[0].name
+      && current.rows[0].name == "笠岡　一二三"
       // カナ氏名が変更されていることを確認
-      && current.rows[0].kana_name != examineesData[0].kana_name
+      && current.rows[0].kana_name == "カサオカ　ヒフミ"
       // 生年月日が変更されていることを確認
-      && current.rows[0].birthdate != examineesData[0].birthdate
+      && current.rows[0].birthdate == "19851010"
       // 性別が変更されていないことを確認
-      && current.rows[0].sex == examineesData[0].sex
+      && current.rows[0].sex == 1
       && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
-      // リクエストに含まれないので変更がないことを確認
+
+      // リクエストに含まれないので変更がないことを確認（examinee_code=EC2001042：新見　花子）
       && current.rows[1].examinee_id == examineesData[1].examinee_id
       && current.rows[1].examinee_code == examineesData[1].examinee_code
       && current.rows[1].name == examineesData[1].name
@@ -178,7 +180,8 @@ steps:
       && current.rows[1].sex == examineesData[1].sex
       && current.rows[1].created_at == examineesData[1].created_at
       && current.rows[1].created_by == examineesData[1].created_by
-      // 新規登録
+
+      // 新規登録（"inputNote": "2001043"）
       && current.rows[2].examinee_code == "EC2001043"
       && current.rows[2].name == "岡山　太郎"
       && current.rows[2].kana_name == "オカヤマ　タロウ"
@@ -212,21 +215,23 @@ steps:
     test: |
       // ２件の所属レコードを確認
       len(current.rows) == 3
-      // リクエストの受診者の所属情報が洗い替えされたことを確認
+      // リクエストの受診者の所属情報が洗い替えされたことを確認（"inputNote": "2001042"）
       && current.rows[0].examinee_code == "EC2001041"
       && current.rows[0].examinee_id == entryExaminees[0].examinee_id
       && current.rows[0].organization_code == "ORG2001-42"
       && current.rows[0].organization_id == "a0002001-0000-0000-0004-000000000002"
       && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
+
       // リクエストに存在しない受診者の所属情報は変更されないことを確認
-      && current.rows[1].examinee_code == affiliationsData[2].examinee_code
-      && current.rows[1].examinee_id == affiliationsData[2].examinee_id
+      && current.rows[1].examinee_code == "EC2001042"
+      && current.rows[1].examinee_id == entryExaminees[1].examinee_id
       && current.rows[1].organization_code == affiliationsData[2].organization_code
       && current.rows[1].organization_id == affiliationsData[2].organization_id
       && current.rows[1].created_at == affiliationsData[2].created_at
       && current.rows[1].created_by == affiliationsData[2].created_by
-      // リクエストに受診者の所属情報が追加されたことを確認
+
+      // リクエストに受診者の所属情報が追加されたことを確認（"inputNote": "2001043"）
       && current.rows[2].examinee_code == "EC2001043"
       && current.rows[2].examinee_id == entryExaminees[2].examinee_id
       && current.rows[2].organization_code == "ORG2001-43"
