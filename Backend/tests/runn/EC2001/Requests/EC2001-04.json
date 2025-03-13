@@ -14,8 +14,8 @@
     },
     {
         "examineeCode": "EC2001041",
-        "name": "笠岡　一太郎",
-        "kanaName": "イバラギ　イチタロウ",
+        "name": "笠岡　一二三",
+        "kanaName": "カサオカ　ヒフミ",
         "sex": 1,
         "birthdate": "1985-10-10",
         "affiliations": [
@@ -37,5 +37,65 @@
             }
         ],
         "inputNote": "2001043"
+    },
+    {
+        "examineeCode": "",
+        "name": "",
+        "kanaName": "",
+        "sex": 1,
+        "birthdate": "1974-09-12",
+        "affiliations": [
+            {
+                "organizationCode": ""
+            }
+        ],
+        "inputNote": "2001044"
+    },
+    {
+        "examineeCode": "EC2001999",
+        "name": "岡山　五郎",
+        "kanaName": "オカヤマ　ゴロウ",
+        "sex": 1,
+        "birthdate": "1974-09-05",
+        "affiliations": [
+            {
+                "organizationCode": "ORG2001-41"
+            },
+            {
+                "organizationCode": "ORG2001-43"
+            }
+        ],
+        "inputNote": "2001045"
+    },
+    {
+        "examineeCode": "EC2001999",
+        "name": "岡山　六郎",
+        "kanaName": "オカヤマ　ロクロウ",
+        "sex": 1,
+        "birthdate": "1974-09-06",
+        "affiliations": [
+            {
+                "organizationCode": "ORG2001-41"
+            },
+            {
+                "organizationCode": "ORG2001-43"
+            },
+            {
+                "organizationCode": "ORG2001-43"
+            },
+            {
+                "organizationCode": "ORG2001-41"
+            },
+            {
+                "organizationCode": "ORG2001-42"
+            },
+            {
+                "organizationCode": "ORG2001-42"
+            },
+            {
+                "organizationCode": "ORG2001-41"
+            }
+        ],
+        "inputNote": "2001046"
     }
 ]

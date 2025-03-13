@@ -98,12 +98,14 @@ steps:
           resultcollector.examinees;
     test: |
       len(current.rows) == vars.recordCount
+      && current.rows[0].examinee_code == uniqueCode[0].code
       && current.rows[0].name == "負荷テスト　太郎"
       && current.rows[0].kana_name == "フカテスト　タロウ"
       && current.rows[0].sex == 1
       && current.rows[0].birthdate == "19751010"
       && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[vars.recordCount - 1].examinee_code == uniqueCode[vars.recordCount - 1].code
       && current.rows[vars.recordCount - 1].name == "負荷テスト　太郎"
       && current.rows[vars.recordCount - 1].kana_name == "フカテスト　タロウ"
       && current.rows[vars.recordCount - 1].sex == 1
