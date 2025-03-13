@@ -650,7 +650,7 @@ export default function ConsultInput() {
           const status = error.response.status;
           // エラー処理
           if (status === 400) {
-            errorMessage = getErrorMessage(errorMessages.invalid, "回答登録の");
+            errorMessage = getErrorMessage(errorMessages.invalid, "回答登録");
           } else if (status === 403) {
             errorMessage = "会場ロック中です。管理者のみ更新可能です。";
           } else if (status === 404) {

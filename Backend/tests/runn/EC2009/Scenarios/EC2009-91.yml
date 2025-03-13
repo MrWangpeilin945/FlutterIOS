@@ -132,8 +132,8 @@ steps:
           name: "'負荷テスト_新検査基準値範囲'"
           thresholdCd: "'Threshold2009'"
           examItemDetailCd: uniqueKeys[i].code
-          maxAge: "'750000'"
-          minAge: "'400000'"
+          maxAge: "'0750000'"
+          minAge: "'0400000'"
           targetSex: 1
           maxValue: 200
           minValue: 10
