@@ -60,7 +60,6 @@ export default function ConfirmDialog({
               bg="white01"
               color="primary"
               py={16}
-              px={32}
               bd="2px solid"
               onClick={onCancel}
             >
