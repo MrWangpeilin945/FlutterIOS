@@ -32,7 +32,7 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 207
-      && len(current.res.body) == 28
+      && len(current.res.body) == 30
       && current.res.body[00].code == "10004" && current.res.body[00].message == "必須項目が不足しています。StaffCode"                  && current.res.body[00].inputNote == "20110803"
       && current.res.body[01].code == "10004" && current.res.body[01].message == "必須項目が不足しています。StaffCode"                  && current.res.body[01].inputNote == "20110807"
       && current.res.body[02].code == "10004" && current.res.body[02].message == "必須項目が不足しています。LoginId"                    && current.res.body[02].inputNote == "20110804"
@@ -61,6 +61,8 @@ steps:
       && current.res.body[25].code == "10003" && current.res.body[25].message == "キー項目が重複しています。LoginId:S999901"            && current.res.body[25].inputNote == "20110817"
       && current.res.body[26].code == "10003" && current.res.body[26].message == "キー項目が重複しています。LoginId:S999901"            && current.res.body[26].inputNote == "20110818"
       && current.res.body[27].code == "10002" && current.res.body[27].message == "指定されたLoginIdが既に登録済みです。Code:S999900"    && current.res.body[27].inputNote == "20110816"
+      && current.res.body[28].code == "10002" && current.res.body[28].message == "指定されたLoginIdが既に登録済みです。Code:S999901"    && current.res.body[28].inputNote == "20110817"
+      && current.res.body[29].code == "10002" && current.res.body[29].message == "指定されたLoginIdが既に登録済みです。Code:S999901"    && current.res.body[29].inputNote == "20110818"
     dump:
       expr: current.res.body
       out: ../Dump/EC2011-08.json

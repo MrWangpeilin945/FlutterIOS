@@ -49,15 +49,16 @@ public class StaffUsecase : IStaffUsecase
         // キー重複の確認
         var insertStaffsByLoginId = GetCheckedDuplicated(staffs);
 
+        // ログインIDの確認
+        var insertStaffs = await GetCheckedStaffs(staffs);
+
         var commonInsertStaffs = insertStaffsByRequireds.Intersect(insertStaffsByLength)
                                                         .Intersect(insertStaffsByFormat)
                                                         .Intersect(insertStaffsByLoginId)
+                                                        .Intersect(insertStaffs)
                                                         .ToList();
 
-        // ログインIDの確認
-        var insertStaffs = await GetCheckedStaffs(commonInsertStaffs);
-
-        List<PostgreSQL.Entities.StaffEntity> staffEntities = insertStaffs.Select(s =>
+        List<PostgreSQL.Entities.StaffEntity> staffEntities = commonInsertStaffs.Select(s =>
         {
             // パスワードからハッシュとソルトを取得
             Password password = Password.Create(s.Password);
