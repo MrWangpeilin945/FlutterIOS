@@ -2,7 +2,6 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
-using System;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -10,7 +9,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// </summary>
 public class ConsultUsecase : IConsultUsecase
 {
-    private List<ErrorObject> _errorObjects;
+    private readonly List<ErrorObject> _errorObjects;
     private readonly IConsultRepository _consultRepository;
     private readonly ITeamRepository _teamRepository;
     private readonly IPlaceRepository _placeRepository;
