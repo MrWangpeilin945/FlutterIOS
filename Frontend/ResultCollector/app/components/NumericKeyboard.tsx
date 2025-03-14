@@ -52,19 +52,17 @@ export default function NumericKeyboard(props: KeyboardProps) {
     decimalLength: number,
   ): string => {
     if (!value || integerLength < 0 || decimalLength < 0) return value;
+    if (Number.parseInt(value) === 0) return "0";
+
     const totalLength = integerLength + decimalLength;
     const paddedValue = value.padStart(totalLength, "0");
-    const integerPart = paddedValue.slice(0, integerLength);
+    const integerPart = paddedValue.slice(0, integerLength) || "0";
     const decimalPart = paddedValue.slice(integerLength, totalLength);
-    let formattedValue = `${integerPart ? integerPart : 0}${decimalLength === 0 ? "" : "."}${decimalPart}`;
-    // 整数部が1未満の場合、整数部に0を1つ付ける
-    if (Number.parseInt(formattedValue) < 1) {
-      formattedValue = `0.${decimalPart}`;
-    } else {
-      // 整数部の先頭にゼロがついている場合、それを除去
-      formattedValue = formattedValue.replace(/^0+/, "");
-    }
-    return formattedValue;
+
+    const formattedValue =
+      decimalLength === 0 ? integerPart : `${integerPart}.${decimalPart}`;
+
+    return formattedValue.replace(/^0+(\d)/, "$1"); // 先頭の余分なゼロを削除
   };
 
   //バリデーションチェック(整数)
