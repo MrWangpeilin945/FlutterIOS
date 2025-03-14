@@ -59,12 +59,22 @@ steps:
             application/json:
               "{{ vars.request }}"
     test: |
-      current.res.status == 200
+      current.res.status == 207
       // レスポンスに1件のErrorObjectが返されることを確認
-      && len(current.res.body) == 1
+      && len(current.res.body) == 4
       && current.res.body[0].code == "10001"
       && current.res.body[0].inputNote == "2004121"
-      && current.res.body[0].message == "指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:ORDER-200412"
+      && current.res.body[0].message == "指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:ORDER-200412-1"
+      && current.res.body[1].code == "10001"
+      && current.res.body[1].inputNote == "2004121"
+      && current.res.body[1].message == "指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:ORDER-200412-2"
+      && current.res.body[2].code == "10001"
+      && current.res.body[2].inputNote == "2004121"
+      && current.res.body[2].message == "指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:ORDER-200412-3"
+      // ExamItemDetailOrders.ExamItemDetailCdが重複している場合でも「検査項目明細依頼の検査項目明細IDが取得できない」ErrorObjectは出力される
+      && current.res.body[3].code == "10001"
+      && current.res.body[3].inputNote == "2004121"
+      && current.res.body[3].message == "指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:ORDER-200412-2"
     dump:
       expr: current.res.body
       out: ../Dump/EC2004-12.json

@@ -11,7 +11,22 @@
         "note": "特記事項2004101",
         "previousResults": [
             {
-                "examItemDetailCd": "PREVI-200401-10",
+                "examItemDetailCd": "PREVI-200401-10-1",
+                "examDate": "2024-11-22",
+                "value": "100"
+            },
+            {
+                "examItemDetailCd": "PREVI-200401-10-1",
+                "examDate": "2024-11-22",
+                "value": "100"
+            },
+            {
+                "examItemDetailCd": "PREVI-200401-10-2",
+                "examDate": "2024-11-22",
+                "value": "100"
+            },
+            {
+                "examItemDetailCd": "PREVI-200401-10-3",
                 "examDate": "2024-11-22",
                 "value": "100"
             }

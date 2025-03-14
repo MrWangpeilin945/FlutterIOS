@@ -13,8 +13,20 @@
         ],
         "consultThresholds": [
             {
-                "thresholdCode": "TID-EC20049",
+                "thresholdCode": "TID-EC20049A",
                 "priority": 1
+            },
+            {
+                "thresholdCode": "TID-EC20049B",
+                "priority": 2
+            },
+            {
+                "thresholdCode": "TID-EC20049A",
+                "priority": 3
+            },
+            {
+                "thresholdCode": "TID-EC20049C",
+                "priority": 4
             }
         ],
         "consultNotes": [

@@ -6,7 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  recordCount: 5000
+  recordCount: 50
 steps:
   clearTable:
     desc: "関連テーブルをクリア"

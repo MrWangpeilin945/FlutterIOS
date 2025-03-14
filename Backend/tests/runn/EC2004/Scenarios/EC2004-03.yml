@@ -83,7 +83,7 @@ steps:
             application/json:
               "{{ vars.request }}"
     test: |
-      current.res.status == 200
+      current.res.status == 207
       // レスポンスに1件のErrorObjectが返されることを確認
       && len(current.res.body) == 1
       && current.res.body[0].code == "10002"

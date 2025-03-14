@@ -19,6 +19,21 @@
                 "examItemDetailCd": "PREVI-2004-11-2",
                 "examDate": "2024-11-22",
                 "value": "80"
+            },
+            {
+                "examItemDetailCd": "PREVI-2004-11-1",
+                "examDate": "2024-11-22",
+                "value": "80"
+            },
+            {
+                "examItemDetailCd": "PREVI-2004-11-3",
+                "examDate": "2024-10-10",
+                "value": "100"
+            },
+            {
+                "examItemDetailCd": "PREVI-2004-11-3",
+                "examDate": "2024-10-10",
+                "value": "200"
             }
         ],
         "consultThresholds": [

@@ -50,6 +50,8 @@ public class ConsultUsecase : IConsultUsecase
     /// <returns>エラーリスト</returns>
     public async Task<List<ErrorObject>> StoreConsultAsync(List<Consult> consults)
     {
+        _errorObjects.Clear();
+
         var placeCodes = consults.Select(x => x.PlaceCode).ToList();
         var teamCodes = consults.Select(x => x.TeamCode).ToList();
         // 会場コードに紐づく会場IDを取得する
@@ -81,6 +83,11 @@ public class ConsultUsecase : IConsultUsecase
 
         // WARNING検証
         var warningConsult = new List<Consult>();
+        // 必須項目の空値のチェック
+        // キー重複チェック
+        // 文字数チェック
+        // 文字形式チェック
+
         // 受診番号が異なる連携キーで登録されている
         foreach (var warning in consults.Where(x => x.ActionType == ActionType.登録))
         {
@@ -162,7 +169,6 @@ public class ConsultUsecase : IConsultUsecase
                     Message = $"指定されたConsultNotes.Codeがシステム上に存在しません。Code:{warning.Code}",
                     InputNote = consult.InputNote
                 });
-                break;
             }
         }
         // 基準値パターンが取得できない
@@ -177,7 +183,6 @@ public class ConsultUsecase : IConsultUsecase
                     Message = $"指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:{warning.ThresholdCode}",
                     InputNote = consult.InputNote
                 });
-                break;
             }
         }
         // 検査項目明細ID（PreviousResults）
@@ -193,25 +198,51 @@ public class ConsultUsecase : IConsultUsecase
                     Message = $"指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:{warning.ExamItemDetailCd}",
                     InputNote = consult.InputNote
                 });
-                break;
             }
             // PKが重複するレコードが存在する
-            foreach (var previousResults in consult.PreviousResults)
+            // ExamItemDetailCd+ExamDateで重複する
+            var duplicateExamItemDetailCds = consult.PreviousResults
+                                                    .GroupBy(x => new { x.ExamItemDetailCd, x.ExamDate })
+                                                    .Where(x => x.Count() > 1)
+                                                    .Select(x => x);
+            foreach (var warning in duplicateExamItemDetailCds)
             {
-                var previousResultId = externalExamItemDetails.Where(x => x.ExternalExamItemDetailCode == previousResults.ExamItemDetailCd)
-                                                              .Select(x => x.ExamItemDetailId).FirstOrDefault();
-                var externalExamItemDetailCode = externalExamItemDetails.Where(x => x.ExamItemDetailId == previousResultId)
-                                                                        .Select(x => x.ExternalExamItemDetailCode).ToList();
-                if (consult.PreviousResults.Count(x => x.ExamDate == previousResults.ExamDate && externalExamItemDetailCode.Contains(x.ExamItemDetailCd)) > 1)
+                warningConsult.Add(consult);
+                _errorObjects.Add(new ErrorObject
                 {
-                    warningConsult.Add(consult);
-                    _errorObjects.Add(new ErrorObject
-                    {
-                        Code = "10003",
-                        Message = $"キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:{previousResults.ExamItemDetailCd}/PreviousResults.ExamDate:{previousResults.ExamDate}",
-                        InputNote = consult.InputNote
-                    });
-                }
+                    Code = "10003",
+                    Message = $"キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:{warning.Key.ExamItemDetailCd}/PreviousResults.ExamDate:{warning.Key.ExamDate}",
+                    InputNote = consult.InputNote
+                });
+            }
+            // ExamItemDetailId+ExamDateで重複する
+            var examItemDetail = from p in consult.PreviousResults
+                                 join e in externalExamItemDetails
+                                 on p.ExamItemDetailCd equals e.ExternalExamItemDetailCode
+                                 select new
+                                 {
+                                     // external_exam_item_detailsのexam_item_detail_idを連結する
+                                     ExamItemDetailId = e.ExamItemDetailId,
+                                     ExamItemDetailCd = p.ExamItemDetailCd,
+                                     ExamDate = p.ExamDate
+                                 };
+            var duplicateExamItemDetailIds = examItemDetail
+                                                // ExamItemDetailCd+ExamDateの重複を取り除く
+                                                .GroupBy(x => new { x.ExamItemDetailCd, x.ExamDate })
+                                                .Select(x => x.First())
+                                                // ExamItemDetailId+ExamDateの重複を取得する
+                                                .GroupBy(x => new { x.ExamItemDetailId, x.ExamDate })
+                                                .Where(x => x.Count() > 1)
+                                                .SelectMany(x => x);
+            foreach (var warning in duplicateExamItemDetailIds)
+            {
+                warningConsult.Add(consult);
+                _errorObjects.Add(new ErrorObject
+                {
+                    Code = "10003",
+                    Message = $"キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:{warning.ExamItemDetailCd}/PreviousResults.ExamDate:{warning.ExamDate}",
+                    InputNote = consult.InputNote
+                });
             }
         }
         // 検査項目明細ID（ExamItemDetailOrders）
@@ -227,24 +258,50 @@ public class ConsultUsecase : IConsultUsecase
                     Message = $"指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:{warning.ExamItemDetailCd}",
                     InputNote = consult.InputNote
                 });
-                break;
             }
             // PKが重複するレコードが存在する
-            var examItemDetailOrders = consult.ExamItemDetailOrders.Select(x => x.ExamItemDetailCd).ToList();
-            foreach (var examItemDetailOrderCd in examItemDetailOrders)
+            // ExamItemDetailCd+ExamDateで重複する
+            var duplicateExamItemDetailCds = consult.ExamItemDetailOrders
+                                                    .GroupBy(x => new { x.ExamItemDetailCd})
+                                                    .Where(x => x.Count() > 1)
+                                                    .Select(x => x);
+            foreach (var warning in duplicateExamItemDetailCds)
             {
-                var examItemDetailOrderId = externalExamItemDetails.Where(x => x.ExternalExamItemDetailCode == examItemDetailOrderCd)
-                                                              .Select(x => x.ExamItemDetailId).FirstOrDefault();
-                if (externalExamItemDetails.Count(x => x.ExamItemDetailId == examItemDetailOrderId && examItemDetailOrders.Contains(x.ExternalExamItemDetailCode)) > 1)
+                warningConsult.Add(consult);
+                _errorObjects.Add(new ErrorObject
                 {
-                    warningConsult.Add(consult);
-                    _errorObjects.Add(new ErrorObject
-                    {
-                        Code = "10003",
-                        Message = $"キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:{examItemDetailOrderCd}",
-                        InputNote = consult.InputNote
-                    });
-                }
+                    Code = "10003",
+                    Message = $"キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:{warning.Key.ExamItemDetailCd}",
+                    InputNote = consult.InputNote
+                });
+            }
+            // ExamItemDetailId+ExamDateで重複する
+            var examItemDetail = from p in consult.ExamItemDetailOrders
+                                 join e in externalExamItemDetails
+                                 on p.ExamItemDetailCd equals e.ExternalExamItemDetailCode
+                                 select new
+                                 {
+                                     // external_exam_item_detailsのexam_item_detail_idを連結する
+                                     ExamItemDetailId = e.ExamItemDetailId,
+                                     ExamItemDetailCd = p.ExamItemDetailCd,
+                                 };
+            var duplicateExamItemDetailIds = examItemDetail
+                                                // ExamItemDetailCd+ExamDateの重複を取り除く
+                                                .GroupBy(x => new { x.ExamItemDetailCd })
+                                                .Select(x => x.First())
+                                                // ExamItemDetailId+ExamDateの重複を取得する
+                                                .GroupBy(x => new { x.ExamItemDetailId })
+                                                .Where(x => x.Count() > 1)
+                                                .SelectMany(x => x);
+            foreach (var warning in duplicateExamItemDetailIds)
+            {
+                warningConsult.Add(consult);
+                _errorObjects.Add(new ErrorObject
+                {
+                    Code = "10003",
+                    Message = $"キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:{warning.ExamItemDetailCd}",
+                    InputNote = consult.InputNote
+                });
             }
         }
         // 削除

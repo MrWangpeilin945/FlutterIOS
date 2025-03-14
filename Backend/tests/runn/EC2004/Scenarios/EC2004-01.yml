@@ -79,10 +79,7 @@ steps:
     test: |
       current.res.status == 200
       // レスポンスにErrorObjectが返されないことを確認
-      && len(current.res.body) == 0
-    dump:
-      expr: current.res.body
-      out: ../Dump/EC2004-01.json
+      && current.res.body == null
   confirmConsult:
     desc: "受診の登録を確認"
     db:

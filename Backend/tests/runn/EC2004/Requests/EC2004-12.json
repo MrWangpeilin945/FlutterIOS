@@ -17,7 +17,16 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-200412"
+                "examItemDetailCd": "ORDER-200412-1"
+            },
+            {
+                "examItemDetailCd": "ORDER-200412-2"
+            },
+            {
+                "examItemDetailCd": "ORDER-200412-3"
+            },
+            {
+                "examItemDetailCd": "ORDER-200412-2"
             }
         ],
         "inputNote": "2004121"
