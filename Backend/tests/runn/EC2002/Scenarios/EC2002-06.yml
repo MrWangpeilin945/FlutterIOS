@@ -179,5 +179,5 @@ steps:
       && current.rows[1].consult_id == "c0002002-0000-0000-0006-000000000002"
       && current.rows[1].external_connection_code == "EX2002062"
       && current.rows[1].progress_status == 21
-      && current.rows[1].created_at == current.rows[0].now
+      && current.rows[1].created_at == current.rows[1].now
       && current.rows[1].created_by == "ExternalConnection"
