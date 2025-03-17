@@ -36,7 +36,8 @@ public class DataImportController : ControllerBase
     [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(ErrorObject))]
     [HttpPost]
     [Route("api/v{version:apiVersion}/external/dataImport/constantlyData")]
-    public IActionResult StoreConstantlyDataAsync([FromBody] S3EventRequest s3EventRequest)
+    //public IActionResult StoreConstantlyDataAsync([FromBody] S3EventRequest s3EventRequest)
+    public async Task<IActionResult> StoreConstantlyDataAsync([FromBody] S3EventRequest s3EventRequest)
     {
         // DBとバケットの検証
 
@@ -45,7 +46,8 @@ public class DataImportController : ControllerBase
             return BadRequest();
         }
 
-        var task = Task.Run(() => _dataImportUsecase.StoreConstantlyDataAsync(s3EventRequest.BucketName, s3EventRequest.ObjectKey)); // 別スレッドで非同期メソッドを実行
+        var result = await _dataImportUsecase.StoreConstantlyDataAsync(s3EventRequest.BucketName, s3EventRequest.ObjectKey);
+        //var task = Task.Run(() => _dataImportUsecase.StoreConstantlyDataAsync(s3EventRequest.BucketName, s3EventRequest.ObjectKey)); // 別スレッドで非同期メソッドを実行
 
         return Accepted();
 
@@ -59,14 +61,16 @@ public class DataImportController : ControllerBase
     [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(ErrorObject))]
     [HttpPost]
     [Route("api/v{version:apiVersion}/external/dataImport/dailyData")]
-    public IActionResult StoreDailyDataAsync([FromBody] S3EventRequest s3EventRequest)
+    //public IActionResult StoreDailyDataAsync([FromBody] S3EventRequest s3EventRequest)
+    public async Task<IActionResult> StoreDailyDataAsync([FromBody] S3EventRequest s3EventRequest)
     {
         if (string.IsNullOrWhiteSpace(s3EventRequest.BucketName))
         {
             return BadRequest();
         }
 
-        var task = Task.Run(() => _dataImportUsecase.StoreDailyDataAsync(s3EventRequest.BucketName)); // 別スレッドで非同期メソッドを実行
+        var result = await _dataImportUsecase.StoreDailyDataAsync(s3EventRequest.BucketName);
+        //var task = Task.Run(() => _dataImportUsecase.StoreDailyDataAsync(s3EventRequest.BucketName)); // 別スレッドで非同期メソッドを実行
 
         return Accepted();
 
