@@ -3,6 +3,8 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 
+using System.Collections;
+
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
 /// EC2004_受診を更新する
@@ -81,14 +83,72 @@ public class ConsultUsecase : IConsultUsecase
         var consultExternalConnectionCodes = await _consultRepository.GetConsultExternalConnectionCodeAsync(consults.Select(x => x.ConsultNumber).ToList());
 
         // WARNING検証
-        var warningConsult = new List<Consult>();
-        // 必須項目の空値のチェック
+        var warningConsults = new List<Consult>();
+
+        // 連携モードが登録のみを抽出
+        var registeConsults = consults.Where(x => x.ActionType == ActionType.登録);
+
+        // 必須項目の空値のチェック       連携キー, 会場コード, 班コード, 受診番号, 受診者コード
+        var consultProperties = new[] { "ConnectionCode", "PlaceCode", "TeamCode", "ConsultNumber", "ExamineeCd" };
+        foreach (var warning in registeConsults)
+        {
+            foreach (var propertyName in consultProperties)
+            {
+                var propertyValue = warning.GetType().GetProperty(propertyName)?.GetValue(warning)?.ToString();
+                if (string.IsNullOrWhiteSpace(propertyValue))
+                {
+                    warningConsults.Add(warning);
+                    _errorObjects.Add(new ErrorObject
+                    {
+                        Code = "10004",
+                        Message = $"必須項目が不足しています。{propertyName}",
+                        InputNote = warning.InputNote
+                    });
+                }
+            }
+        }
+        var childProperties = new List<(string ParentProperty, string ChildProperty)>
+        {
+            ("PreviousResults", "ExamItemDetailCd"),        // 過去検査結果->検査項目明細CD
+            ("PreviousResults", "Value"),                   // 過去検査結果->結果値
+            ("ConsultThresholds", "ThresholdCode"),         // 基準値判定->基準値判定コード
+            ("ConsultNotes", "Code"),                       // 受診特記->検査特記コード
+            ("ExamItemDetailOrders", "ExamItemDetailCd")    // 検査項目明細依頼->検査項目明細CD
+        };
+        foreach (var warning in registeConsults)
+        {
+            foreach (var (parentProperty, childProperty) in childProperties)
+            {
+                var parentObj = warning.GetType().GetProperty(parentProperty)?.GetValue(warning);
+                if (parentObj != null)
+                {
+                    if (parentObj is IEnumerable parentEnumerable)
+                    {
+                        foreach (var item in parentEnumerable)
+                        {
+                            var propertyValue = item.GetType().GetProperty(childProperty)?.GetValue(item)?.ToString();
+                            if (string.IsNullOrWhiteSpace(propertyValue))
+                            {
+                                warningConsults.Add(warning);
+                                _errorObjects.Add(new ErrorObject
+                                {
+                                    Code = "10004",
+                                    Message = $"必須項目が不足しています。{parentProperty}.{childProperty}",
+                                    InputNote = warning.InputNote
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // キー重複チェック
         // 文字数チェック
         // 文字形式チェック
 
         // 受診番号が異なる連携キーで登録されている
-        foreach (var warning in consults.Where(x => x.ActionType == ActionType.登録))
+        foreach (var warning in registeConsults)
         {
             // 受診番号に紐づいている連携キーを取得する
             var connectionCode = consultExternalConnectionCodes.Where(x => x.ConsultNumber == warning.ConsultNumber)
@@ -96,7 +156,7 @@ public class ConsultUsecase : IConsultUsecase
                                                                .FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(connectionCode) && connectionCode != warning.ConnectionCode)
             {
-                warningConsult.Add(warning);
+                warningConsults.Add(warning);
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10002",
@@ -106,10 +166,9 @@ public class ConsultUsecase : IConsultUsecase
             }
         }
         // 会場IDが取得できない
-        foreach (var warning in consults.Where(x => x.ActionType == ActionType.登録)
-                                        .Where(x => !places.Select(p => p.PlaceCode).Contains(x.PlaceCode)))
+        foreach (var warning in registeConsults.Where(x => !places.Select(p => p.PlaceCode).Contains(x.PlaceCode)))
         {
-            warningConsult.Add(warning);
+            warningConsults.Add(warning);
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
@@ -118,10 +177,9 @@ public class ConsultUsecase : IConsultUsecase
             });
         }
         // 班IDが取得できない
-        foreach (var warning in consults.Where(x => x.ActionType == ActionType.登録)
-                                        .Where(x => !teams.Select(p => p.TeamCode).Contains(x.TeamCode)))
+        foreach (var warning in registeConsults.Where(x => !teams.Select(p => p.TeamCode).Contains(x.TeamCode)))
         {
-            warningConsult.Add(warning);
+            warningConsults.Add(warning);
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
@@ -130,13 +188,12 @@ public class ConsultUsecase : IConsultUsecase
             });
         }
         // 会場日程IDが取得できない
-        foreach (var warning in consults.Where(x => x.ActionType == ActionType.登録)
-                                        .Where(x => !placeSchedules.Any(ps => x.PlaceCode == ps.PlaceCode &&
-                                                                              x.TeamCode == ps.TeamCode &&
-                                                                              !string.IsNullOrWhiteSpace(x.ExamDate) &&
-                                                                              DateOnly.Parse(x.ExamDate) == ps.ExamDate)))
+        foreach (var warning in registeConsults.Where(x => !placeSchedules.Any(ps => x.PlaceCode == ps.PlaceCode &&
+                                                        x.TeamCode == ps.TeamCode &&
+                                                        !string.IsNullOrWhiteSpace(x.ExamDate) &&
+                                                        DateOnly.Parse(x.ExamDate) == ps.ExamDate)))
         {
-            warningConsult.Add(warning);
+            warningConsults.Add(warning);
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
@@ -145,10 +202,9 @@ public class ConsultUsecase : IConsultUsecase
             });
         }
         // 受診者IDが取得できない
-        foreach (var warning in consults.Where(x => x.ActionType == ActionType.登録)
-                                        .Where(x => !examinees.Select(e => e.ExamineeCode).Contains(x.ExamineeCd)))
+        foreach (var warning in registeConsults.Where(x => !examinees.Select(e => e.ExamineeCode).Contains(x.ExamineeCd)))
         {
-            warningConsult.Add(warning);
+            warningConsults.Add(warning);
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
@@ -157,11 +213,11 @@ public class ConsultUsecase : IConsultUsecase
             });
         }
         // 検査特記が存在しない
-        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録))
+        foreach (var consult in registeConsults)
         {
             foreach (var warning in consult.ConsultNotes.Where(x => !examMenuNodeCodes.Select(e => e.Code).Contains(x.Code)))
             {
-                warningConsult.Add(consult);
+                warningConsults.Add(consult);
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
@@ -171,11 +227,11 @@ public class ConsultUsecase : IConsultUsecase
             }
         }
         // 基準値パターンが取得できない
-        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録))
+        foreach (var consult in registeConsults)
         {
             foreach (var warning in consult.ConsultThresholds.Where(x => !thresholds.Select(t => t.ThresholdCode).Contains(x.ThresholdCode)))
             {
-                warningConsult.Add(consult);
+                warningConsults.Add(consult);
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
@@ -185,12 +241,12 @@ public class ConsultUsecase : IConsultUsecase
             }
         }
         // 検査項目明細ID（PreviousResults）
-        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録))
+        foreach (var consult in registeConsults)
         {
             // 検査項目明細IDが取得できない
             foreach (var warning in consult.PreviousResults.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCd)))
             {
-                warningConsult.Add(consult);
+                warningConsults.Add(consult);
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
@@ -206,7 +262,7 @@ public class ConsultUsecase : IConsultUsecase
                                                     .Select(x => x);
             foreach (var warning in duplicateExamItemDetailCds)
             {
-                warningConsult.Add(consult);
+                warningConsults.Add(consult);
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
@@ -235,7 +291,7 @@ public class ConsultUsecase : IConsultUsecase
                                                 .SelectMany(x => x);
             foreach (var warning in duplicateExamItemDetailIds)
             {
-                warningConsult.Add(consult);
+                warningConsults.Add(consult);
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
@@ -245,12 +301,12 @@ public class ConsultUsecase : IConsultUsecase
             }
         }
         // 検査項目明細ID（ExamItemDetailOrders）
-        foreach (var consult in consults.Where(x => x.ActionType == ActionType.登録))
+        foreach (var consult in registeConsults)
         {
             // 検査項目明細IDが取得できない
             foreach (var warning in consult.ExamItemDetailOrders.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCd)))
             {
-                warningConsult.Add(consult);
+                warningConsults.Add(consult);
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
@@ -266,7 +322,7 @@ public class ConsultUsecase : IConsultUsecase
                                                     .Select(x => x);
             foreach (var warning in duplicateExamItemDetailCds)
             {
-                warningConsult.Add(consult);
+                warningConsults.Add(consult);
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
@@ -285,16 +341,16 @@ public class ConsultUsecase : IConsultUsecase
                                      ExamItemDetailCd = p.ExamItemDetailCd,
                                  };
             var duplicateExamItemDetailIds = examItemDetail
-                                                // ExamItemDetailCd+ExamDateの重複を取り除く
+                                                // ExamItemDetailCdの重複を取り除く
                                                 .GroupBy(x => new { x.ExamItemDetailCd })
                                                 .Select(x => x.First())
-                                                // ExamItemDetailId+ExamDateの重複を取得する
+                                                // ExamItemDetailIdの重複を取得する
                                                 .GroupBy(x => new { x.ExamItemDetailId })
                                                 .Where(x => x.Count() > 1)
                                                 .SelectMany(x => x);
             foreach (var warning in duplicateExamItemDetailIds)
             {
-                warningConsult.Add(consult);
+                warningConsults.Add(consult);
                 _errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
@@ -307,7 +363,7 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var warning in consults.Where(x => x.ActionType == ActionType.削除)
                                         .Where(x => !externalConnectionCodes.Select(x => x.ConnectionCode).Contains(x.ConnectionCode)))
         {
-            warningConsult.Add(warning);
+            warningConsults.Add(warning);
             _errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
@@ -315,8 +371,8 @@ public class ConsultUsecase : IConsultUsecase
                 InputNote = warning.InputNote
             });
         }
-        // 受診を更新するリストを取得する
-        var validConsults = consults.Where(x => !warningConsult.Select(w => w.ConnectionCode).Contains(x.ConnectionCode))
+        // 受診を更新するエンティティを作成する
+        var validConsults = consults.Except(warningConsults)
                                     .Select(x => new ConsultEntity
                                     {
                                         ActionType = x.ActionType,
