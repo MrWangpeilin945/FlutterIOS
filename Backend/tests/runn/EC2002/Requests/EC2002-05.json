@@ -1,0 +1,16 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "",
+        "actionType": 0,
+        "ticketNumber": "T2002051",
+        "inputNote": "2002051"
+    },
+    {
+        "sortNo": 2,
+        "connectionCode": "EX2002052",
+        "actionType": 0,
+        "ticketNumber": "",
+        "inputNote": "2002052"
+    }
+]
