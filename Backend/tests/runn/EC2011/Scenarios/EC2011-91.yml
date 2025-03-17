@@ -25,7 +25,7 @@ steps:
         )
         SELECT
           'CD-' || lpad(cast(num as character varying), 6, '0') AS code
-          , 'ID-' || lpad(cast(num as character varying), 6, '0') AS id
+          , 'ID' || lpad(cast(num as character varying), 6, '0') AS id
         FROM
           numbers;
     bind:

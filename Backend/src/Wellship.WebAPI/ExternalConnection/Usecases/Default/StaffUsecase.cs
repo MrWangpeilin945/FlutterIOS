@@ -169,7 +169,7 @@ public class StaffUsecase : IStaffUsecase
     {
         // WARNING検証
         // 形式(LoginId)
-        var formatLoginIdData = staffs.Where(x => !Regex.IsMatch(x.LoginId, @"^[a-zA-Z0-9]+$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(500)));
+        var formatLoginIdData = staffs.Where(x => !Regex.IsMatch(x.LoginId, @"^[a-zA-Z0-9]+$"));
         if (formatLoginIdData.Any())
         {
             // 返却用エラーオブジェクトに追加

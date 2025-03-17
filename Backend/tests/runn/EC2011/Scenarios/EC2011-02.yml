@@ -51,9 +51,7 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
-    dump:
-      expr: current.res.body
-      out: ../Dump/EC2011-02.json
+      && current.res.body == null
   confirmStaffs:
     desc: "職員の更新を確認"
     db:
