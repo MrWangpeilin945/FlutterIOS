@@ -1,0 +1,58 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "EX2002041",
+        "actionType": 0,
+        "ticketNumber": "T2002041",
+        "inputNote": "2002041"
+    },
+    {
+        "sortNo": 2,
+        "connectionCode": "EX2002042",
+        "actionType": 0,
+        "ticketNumber": "T2002042",
+        "inputNote": "2002042"
+    },
+    {
+        "sortNo": 3,
+        "connectionCode": "EX2002043",
+        "actionType": 0,
+        "ticketNumber": "T2002043",
+        "inputNote": "2002043"
+    },
+    {
+        "sortNo": 4,
+        "connectionCode": "EX2002044",
+        "actionType": 0,
+        "ticketNumber": "T2002044",
+        "inputNote": "2002044"
+    },
+    {
+        "sortNo": 5,
+        "connectionCode": "",
+        "actionType": 0,
+        "ticketNumber": "",
+        "inputNote": "2002045"
+    },
+    {
+        "sortNo": 10,
+        "connectionCode": "EX2002046",
+        "actionType": 0,
+        "ticketNumber": "EX2002046",
+        "inputNote": "2002046"
+    },
+    {
+        "sortNo": 10,
+        "connectionCode": "EX2002047",
+        "actionType": 0,
+        "ticketNumber": "EX2002047",
+        "inputNote": "2002047"
+    },
+    {
+        "sortNo": 10,
+        "connectionCode": "EX2002048",
+        "actionType": 0,
+        "ticketNumber": "EX2002048",
+        "inputNote": "2002048"
+    }
+]

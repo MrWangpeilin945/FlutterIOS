@@ -1,0 +1,14 @@
+[
+    {
+        "name": "白血球数（男女）",
+        "thresholdCd": "EC2009",
+        "examItemDetailCd": "EC2009WBC",
+        "maxAge": "9990000",
+        "minAge": "0000000",
+        "targetSex": 3,
+        "MaxValue": 10.6,
+        "MinValue": 8.7,
+        "errorLevel": 2,
+        "inputNote": "2009021"
+    }
+]

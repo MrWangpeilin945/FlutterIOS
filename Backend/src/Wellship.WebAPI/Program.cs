@@ -20,6 +20,7 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ResultCollector.Middlewares;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 using Ryobi.Wellship.WebAPI.ResultCollector.Utilities;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Logger;
 
 namespace Ryobi.Wellship.WebAPI;
 
@@ -61,6 +62,7 @@ public class Program
         builder.Services.AddScoped<IStaffIdentityProvider, StaffIdentityFromHttpContextProvider>();
         builder.Services.AddScoped<ITenantProvider, TenantProvider>();
         builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddScoped<ICustomLoggingService, CustomLoggingService>();
 
         builder.Services.AddOpenApiDocument(options =>
         {
@@ -110,6 +112,17 @@ public class Program
         app.UseAuthorization();
         app.MapControllers();
 
+        // TODO: 負荷テストによるエラーに対応するために暫定的に設定します。
+        // チューニングが必要です。
+
+        ThreadPool.GetMinThreads(out var workMin, out var ioMin);
+        ThreadPool.GetMaxThreads(out var workMax, out var ioMax);
+
+        Console.WriteLine($"MinThreads work={workMin}, i/o={ioMin}");
+        Console.WriteLine($"MaxThreads work={workMax}, i/o={ioMax}");
+
+        ThreadPool.SetMinThreads(100, 4);
+
         app.Run();
     }
 }
@@ -139,6 +152,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IExamItemRepository, ExamItemRepository>();
         services.AddScoped<IResultRepository, ResultRepository>();
         services.AddScoped<IAppConfigRepository, AppConfigRepository>();
+        services.AddScoped<ILogRepository, LogRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IOrganizationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.OrganizationRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExamineeRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExamineeRepository>();

@@ -1,0 +1,22 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "CCD-200406",
+        "actionType": 0,
+        "placeCode": "P2004-06",
+        "teamCode": "T2004-06",
+        "examDate": "2025-03-31",
+        "consultNumber": "No-200406-1",
+        "examineeCd": "E2004061",
+        "note": "特記事項2004061",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "2004061"
+    }
+]

@@ -9,8 +9,9 @@
 - [API設計書](http://10.191.26.49/wellship-docs/webapi-design/)
 - [機器連携アプリ設計書](http://10.191.26.49/wellship-docs/mobileapp-design/)
 - [機器連携設計書](http://10.191.26.49/wellship-docs/equipment-design/)
-- [WebAPI仕様書（自動生成）](http://10.191.26.49/wellship/redoc/)
-- [WebAPIカバレッジレポート](http://10.191.26.49/wellship-tests/)
+- [WebAPI仕様書（Redoc自動生成）](http://10.191.26.49/wellship/redoc/)
+- [テーブル定義書](http://10.191.26.49/wellship-docs/database/definition/)
+- [ER図](http://10.191.26.49/wellship-docs/database/erd/wellship-erd-both.pdf)
 
 ## 使用技術
 

@@ -1,0 +1,137 @@
+desc: EC2001-90 受診者の登録負荷テスト
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  recordCount: 10000
+steps:
+  clearTable:
+    desc: "関連テーブルをクリア"
+    db:
+      query: |
+        -- 受診者
+        TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 団体
+        TRUNCATE TABLE resultcollector.organizations CASCADE;
+  insertTable:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 団体
+        INSERT INTO
+          resultcollector.organizations
+            (organization_id, organization_code, name, order_number, created_at, created_by)
+        VALUES('a0002001-0000-0000-0090-000000000001', 'O-2001', '負荷テスト団体', 1, CURRENT_TIMESTAMP, 'ec2009');
+  createUniqueKeys:
+    desc: "ユニークなキーの作成"
+    db:
+      query: |
+        WITH RECURSIVE numbers AS (
+          SELECT 1 AS num
+          UNION ALL
+          SELECT num + 1
+          FROM numbers
+          WHERE num < {{ vars.recordCount}}
+        )
+        SELECT
+          'E-' || lpad(cast(num as character varying), 6, '0') AS code
+        FROM
+          numbers;
+    bind:
+      uniqueCode: current.rows
+  createRequest:
+    desc: "リクエストデータの作成"
+    loop:
+      count: vars.recordCount
+    bind:
+      requestBody:
+        -
+          examineeCode: uniqueCode[i].code
+          name: "'負荷テスト　太郎'"
+          kanaName: "'フカテスト　タロウ'"
+          sex: 1
+          birthdate: "'1975-10-10'"
+          affiliations:
+            -
+              organizationCode: "'O-2001'"
+          inputNote: "'2001-90'"
+  startBatch:
+    desc: "処理の開始時間"
+    bind:
+      startTime: now()
+  post:
+    desc: "受診者の登録"
+    req:
+      /api/v1/external/examinees:
+        post:
+          body:
+            application/json:
+              "{{ requestBody }}"
+    test: |
+      current.res.status == 200
+    bind:
+      endTime: now()
+  endBatch:
+    desc: "処理の終了時間"
+    bind:
+      timeKeeper:
+        startTime: startTime.Format("2006-01-02T15:04:05Z07:00")
+        endTime: endTime.Format("2006-01-02T15:04:05Z07:00")
+        interval: endTime.Sub(startTime).Seconds() 
+  confirmExaminees:
+    desc: "受診者の登録を確認"
+    db:
+      query: |
+        SELECT
+          examinee_code
+          , name
+          , kana_name
+          , sex
+          , to_char(birthdate, 'yyyymmdd') as birthdate
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.examinees;
+    test: |
+      len(current.rows) == vars.recordCount
+      && current.rows[0].examinee_code == uniqueCode[0].code
+      && current.rows[0].name == "負荷テスト　太郎"
+      && current.rows[0].kana_name == "フカテスト　タロウ"
+      && current.rows[0].sex == 1
+      && current.rows[0].birthdate == "19751010"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[vars.recordCount - 1].examinee_code == uniqueCode[vars.recordCount - 1].code
+      && current.rows[vars.recordCount - 1].name == "負荷テスト　太郎"
+      && current.rows[vars.recordCount - 1].kana_name == "フカテスト　タロウ"
+      && current.rows[vars.recordCount - 1].sex == 1
+      && current.rows[vars.recordCount - 1].birthdate == "19751010"
+      && current.rows[vars.recordCount - 1].created_at == current.rows[vars.recordCount - 1].now
+      && current.rows[vars.recordCount - 1].created_by == "ExternalConnection"
+  confirmAffiliations:
+    desc: "所属の登録を確認"
+    db:
+      query: |
+        SELECT
+          examinee_id::text
+          , organization_id::text
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.affiliations;
+    test: |
+      len(current.rows) == vars.recordCount
+      && current.rows[0].organization_id == "a0002001-0000-0000-0090-000000000001"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[vars.recordCount - 1].organization_id == "a0002001-0000-0000-0090-000000000001"
+      && current.rows[vars.recordCount - 1].created_at == current.rows[vars.recordCount - 1].now
+      && current.rows[vars.recordCount - 1].created_by == "ExternalConnection"
+    dump:
+      expr: timeKeeper
+      out: ../Dump/EC2001-90.json

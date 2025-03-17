@@ -12,7 +12,7 @@ import { useSearchParams } from "@remix-run/react";
 import { isAxiosError } from "axios";
 import { format } from "date-fns";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   usePlaceScheduleGetPlaceScheduleLockingStatus,
   usePlaceScheduleUpdatePlaceScheduleLockingStatus,
@@ -25,10 +25,11 @@ import ConfirmDialog from "~/components/ConfirmDialog";
 import PlaceSchedule from "~/components/PlaceSchedule";
 import { PlaceScheduleLockingStatus } from "~/domain/enums";
 import type {
+  PlaceSchedule as PlaceScheduleType,
   PlaceScheduleLocking,
   PlaceScheduleLockingRequest,
 } from "~/domain/wellship.schemas";
-import { examDateState, placeScheduleState, staffState } from "~/store/store";
+import { placeScheduleState, staffState } from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
 export const meta: MetaFunction = () => {
@@ -41,14 +42,13 @@ export default function PlaceScheduleLock() {
   const [isLoading, setIsLoading] = useState(false);
   const [staff] = useAtom(staffState);
   const [placeSchedule] = useAtom(placeScheduleState);
-  const [examDate] = useAtom(examDateState);
+  const firstPlaceSchedule = useRef<PlaceScheduleType>(placeSchedule);
   const [opened, { open, close }] = useDisclosure(false);
   const [message, setMessage] = useState<string | null>(null);
   const [openedConfirm, { open: openConfirm, close: closeConfirm }] =
     useDisclosure(false);
   const [processStatus, setProcessStatus] =
     useState<PlaceScheduleLockingStatus | null>();
-  const [targetDate] = useState(examDate ? format(examDate, "yyyy-MM-dd") : "");
   const [placeScheduleLock, setPlaceScheduleLock] =
     useState<PlaceScheduleLocking>();
 
@@ -66,7 +66,7 @@ export default function PlaceScheduleLock() {
   //AP1016呼び出し用(GET系APIの定義)
   const { isFetching, refetch } = usePlaceScheduleGetPlaceScheduleLockingStatus(
     "1",
-    placeScheduleId || placeSchedule?.placeScheduleId || "",
+    placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
     { query: { enabled: false } },
   );
 
@@ -114,7 +114,8 @@ export default function PlaceScheduleLock() {
   const fetchUpdateLockingStatus = async () => {
     // POST時のリクエストボディを生成する
     const body: PlaceScheduleLockingRequest = {
-      placeScheduleId: placeSchedule?.placeScheduleId || "",
+      placeScheduleId:
+        placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
       placeScheduleLockingStatus: processStatus || 0,
     };
 
@@ -123,7 +124,7 @@ export default function PlaceScheduleLock() {
       try {
         const result = await mutateAsync({
           version: "1",
-          placeScheduleId: placeSchedule?.placeScheduleId || "",
+          placeScheduleId: placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
           data: body,
         });
         if (result.status === 200) {
@@ -157,63 +158,67 @@ export default function PlaceScheduleLock() {
       <AuthWrapper>
         <LoadingOverlay visible={isFetching || isLoading} />
         <CommonHeader screenName="会場ロック" staffName={staff?.name || ""} />
-        <Container fluid>
+        <Container fluid py={32} px={24}>
           {!isFetching && (
             <>
               <PlaceSchedule
-                placeName={placeSchedule?.placeName || ""}
-                examDate={targetDate}
+                placeName={placeScheduleLock?.placeName || ""}
+                examDate={
+                  placeScheduleLock?.examDate
+                    ? format(placeScheduleLock.examDate, "yyyy-MM-dd")
+                    : ""
+                }
               />
               {placeScheduleLock ? (
                 <>
                   <Space h={40} />
-                    <Container ta="center" mt={40} mb={300}>
-                      {statusButton?.map((button) => (
-                        <Button
-                          w={860}
-                          h={75}
-                          px={32}
-                          py={16}
-                          bd="2px solid"
-                          variant="outline"
-                          bg={
-                            placeScheduleLock.placeScheduleLockingStatus ===
-                            button.placeScheduleLockingStatus
-                              ? "green03"
-                              : "white"
-                          }
-                          color={
+                  <Container ta="center" mt={40} mb={300}>
+                    {statusButton?.map((button) => (
+                      <Button
+                        w={860}
+                        h={75}
+                        px={32}
+                        py={16}
+                        bd="2px solid"
+                        variant="outline"
+                        bg={
+                          placeScheduleLock.placeScheduleLockingStatus ===
+                          button.placeScheduleLockingStatus
+                            ? "green03"
+                            : "white"
+                        }
+                        color={
+                          placeScheduleLock.placeScheduleLockingStatus ===
+                          button.placeScheduleLockingStatus
+                            ? "primary"
+                            : "gray03"
+                        }
+                        key={button.placeScheduleLockingStatus}
+                        onClick={() =>
+                          handleButtonClick(button.placeScheduleLockingStatus)
+                        }
+                        mb={
+                          button.placeScheduleLockingStatus ===
+                          PlaceScheduleLockingStatus.検査完了
+                            ? 32
+                            : 0
+                        }
+                      >
+                        <Text
+                          size="xl"
+                          fw={700}
+                          c={
                             placeScheduleLock.placeScheduleLockingStatus ===
                             button.placeScheduleLockingStatus
                               ? "primary"
-                              : "gray03"
-                          }
-                          key={button.placeScheduleLockingStatus}
-                          onClick={() =>
-                            handleButtonClick(button.placeScheduleLockingStatus)
-                          }
-                          mb={
-                            button.placeScheduleLockingStatus ===
-                            PlaceScheduleLockingStatus.検査完了
-                              ? 32
-                              : 0
+                              : "black01"
                           }
                         >
-                          <Text
-                            size="xl"
-                            fw={700}
-                            c={
-                              placeScheduleLock.placeScheduleLockingStatus ===
-                              button.placeScheduleLockingStatus
-                                ? "primary"
-                                : "black01"
-                            }
-                          >
-                            {button.buttonName}
-                          </Text>
-                        </Button>
-                      ))}
-                    </Container>
+                          {button.buttonName}
+                        </Text>
+                      </Button>
+                    ))}
+                  </Container>
                   <Flex justify="flex-end">
                     <Text size="xs" c="black01" ta="right">
                       最終更新者：{placeScheduleLock.updatedBy}（

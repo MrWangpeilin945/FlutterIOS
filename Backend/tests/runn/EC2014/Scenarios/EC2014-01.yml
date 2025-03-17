@@ -1,0 +1,58 @@
+desc: EC2014-01 基準値パターンを登録_正常 [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2014-01.json"
+steps:
+  clearTable:
+    desc: "基準値パターンテーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.thresholds CASCADE
+  post:
+    desc: "基準値パターンを登録_正常"
+    req:
+      /api/v1/external/thresholds:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+      && current.res.body == null
+  confirmThresholds:
+    desc: "基準値パターンの登録を確認"
+    db:
+      query: |
+        SELECT
+          threshold_code
+          , name
+          , order_number
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.thresholds
+        ORDER BY
+          threshold_code ASC;
+    test: |
+      // リクエストの３つの基準値パターンが追加されたことを確認
+      len(current.rows) == 3
+      && current.rows[0].threshold_code == "T2014-01-1"
+      && current.rows[0].name == "一般健診"
+      && current.rows[0].order_number == 1
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[1].threshold_code == "T2014-01-2"
+      && current.rows[1].name == "職員健診"
+      && current.rows[1].order_number == 2
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
+      && current.rows[2].threshold_code == "T2014-01-3"
+      && current.rows[2].name == "人間ドック"
+      && current.rows[2].order_number == 3
+      && current.rows[2].created_at == current.rows[2].now
+      && current.rows[2].created_by == "ExternalConnection"

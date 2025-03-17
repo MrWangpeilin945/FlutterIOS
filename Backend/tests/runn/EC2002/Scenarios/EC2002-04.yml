@@ -1,0 +1,269 @@
+desc: EC2002-04 除外されてないものは追加更新
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2002-04.json"
+  connectionCode1: "EX2002021"
+  connectionCode2: "EX2002022"
+steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 受付
+        TRUNCATE TABLE resultcollector.tickets CASCADE;
+        -- 受付履歴
+        TRUNCATE TABLE resultcollector.tickets_histories CASCADE;
+        -- 受診者
+        TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 会場
+        TRUNCATE TABLE resultcollector.places CASCADE;
+        -- 班
+        TRUNCATE TABLE resultcollector.teams CASCADE;
+  insertData:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 班
+        INSERT INTO
+          resultcollector.teams
+          (team_id, team_code, name, order_number, created_at, created_by)
+        VALUES('f0002002-0000-0000-0004-000000000001', 'T2002-04', '丁班', 1, CURRENT_TIMESTAMP, 'ec2002');
+        -- 会場
+        INSERT INTO
+          resultcollector.places
+          (place_id, place_code, name, order_number, created_at, created_by)
+        VALUES('b0002002-0000-0000-0004-000000000001', 'P2002-04', '丁班会場', 1, CURRENT_TIMESTAMP, 'ec2002');
+        -- 会場日程
+        INSERT INTO
+          resultcollector.place_schedule
+          (place_schedule_id, place_id, team_id, status, exam_date, start_time, created_at, created_by)
+        VALUES('a0002002-0000-0000-0004-000000000001', 'b0002002-0000-0000-0004-000000000001', 'f0002002-0000-0000-0004-000000000001', 31, '2025/03/03', '1500', CURRENT_TIMESTAMP, 'ec2002');
+        -- 受診者
+        INSERT INTO
+          resultcollector.examinees
+          (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
+        VALUES('e0002002-0000-0000-0004-000000000001', 'E2002041', '両備　太郎', 'リョウビ　タロウ', 1, '1991-01-30', CURRENT_TIMESTAMP,'ec2002')
+        ,     ('e0002002-0000-0000-0004-000000000002', 'E2002042', '両備　花子', 'リョウビ　ハナコ', 2, '1989-03-15', CURRENT_TIMESTAMP,'ec2002')
+        ,     ('e0002002-0000-0000-0004-000000000003', 'E2002043', '両備　二郎', 'リョウビ　ジロウ', 1, '1991-12-30', CURRENT_TIMESTAMP,'ec2002')
+        ,     ('e0002002-0000-0000-0004-000000000004', 'E2002044', '両備　四郎', 'リョウビ　シロウ', 1, '1989-10-15', CURRENT_TIMESTAMP,'ec2002')
+        ,     ('e0002002-0000-0000-0004-000000000005', 'E2002045', '両備　五郎', 'リョウビ　ゴロウ', 1, '1975-12-25', CURRENT_TIMESTAMP,'ec2002')
+        ,     ('e0002002-0000-0000-0004-000000000006', 'E2002046', '両備　六郎', 'リョウビ　ロクロウ', 1, '1970-06-12', CURRENT_TIMESTAMP,'ec2002')
+        ,     ('e0002002-0000-0000-0004-000000000007', 'E2002047', '両備　七郎', 'リョウビ　ヒチロウ', 1, '1963-03-10', CURRENT_TIMESTAMP,'ec2002')
+        ,     ('e0002002-0000-0000-0004-000000000008', 'E2002048', '両備　八郎', 'リョウビ　ハチロウ', 1, '1977-07-07', CURRENT_TIMESTAMP,'ec2002');
+        -- 受診
+        INSERT INTO
+          resultcollector.consult
+          (consult_id, consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
+        VALUES('c0002002-0000-0000-0004-000000000001', 'C2002041', 10, 11, 'a0002002-0000-0000-0004-000000000001','','e0002002-0000-0000-0004-000000000001','EX2002041', '2025-01-01T12:34:56.789', 'ec2002')
+        ,     ('c0002002-0000-0000-0004-000000000002', 'C2002042', 11, 11, 'a0002002-0000-0000-0004-000000000001','','e0002002-0000-0000-0004-000000000002','EX2002042', '2025-01-01T12:34:56.789', 'ec2002')
+        ,     ('c0002002-0000-0000-0004-000000000003', 'C2002043', 20, 11, 'a0002002-0000-0000-0004-000000000001','','e0002002-0000-0000-0004-000000000003','EX2002043', '2025-01-01T12:34:56.789', 'ec2002')
+        ,     ('c0002002-0000-0000-0004-000000000004', 'C2002044', 11, 11, 'a0002002-0000-0000-0004-000000000001','','e0002002-0000-0000-0004-000000000004','EX2002044', '2025-01-01T12:34:56.789', 'ec2002')
+        ,     ('c0002002-0000-0000-0004-000000000005', 'C2002045', 11, 11, 'a0002002-0000-0000-0004-000000000001','','e0002002-0000-0000-0004-000000000005','EX2002045', '2025-01-01T12:34:56.789', 'ec2002')
+        ,     ('c0002002-0000-0000-0004-000000000006', 'C2002046', 11, 11, 'a0002002-0000-0000-0004-000000000001','','e0002002-0000-0000-0004-000000000006','EX2002046', '2025-01-01T12:34:56.789', 'ec2002')
+        ,     ('c0002002-0000-0000-0004-000000000007', 'C2002047', 11, 11, 'a0002002-0000-0000-0004-000000000001','','e0002002-0000-0000-0004-000000000007','EX2002047', '2025-01-01T12:34:56.789', 'ec2002')
+        ,     ('c0002002-0000-0000-0004-000000000008', 'C2002048', 11, 11, 'a0002002-0000-0000-0004-000000000001','','e0002002-0000-0000-0004-000000000008','EX2002048', '2025-01-01T12:34:56.789', 'ec2002');
+  getConsult:
+    desc: "受診情報の取得"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+          , external_connection_code
+          , progress_status
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+        FROM
+          resultcollector.consult
+        ORDER BY
+          external_connection_code ASC;
+    bind: 
+      consultData: current.rows
+  post:
+    desc: "除外されてないものは追加更新"
+    req:
+      /api/v1/external/tickets:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      // レスポンスに2件のErrorObjectが返されることを確認
+      && len(current.res.body) == 8
+      && current.res.body[0].code == "10004"
+      && current.res.body[0].message == "必須項目が不足しています。ConnectionCode"
+      && current.res.body[0].inputNote == "2002045"
+      && current.res.body[1].code == "10004"
+      && current.res.body[1].message == "必須項目が不足しています。TicketNumber"
+      && current.res.body[1].inputNote == "2002045"
+      && current.res.body[2].code == "10003"
+      && current.res.body[2].message == "キー項目が重複しています。SortNo:10"
+      && current.res.body[2].inputNote == "2002046"
+      && current.res.body[3].code == "10003"
+      && current.res.body[3].message == "キー項目が重複しています。SortNo:10"
+      && current.res.body[3].inputNote == "2002047"
+      && current.res.body[4].code == "10003"
+      && current.res.body[4].message == "キー項目が重複しています。SortNo:10"
+      && current.res.body[4].inputNote == "2002048"
+      && current.res.body[5].code == "10001"
+      && current.res.body[5].message == "指定されたConnectionCodeがシステム上に存在しません。Code:EX2002041"
+      && current.res.body[5].inputNote == "2002041"
+      && current.res.body[6].code == "10001"
+      && current.res.body[6].message == "指定されたConnectionCodeがシステム上に存在しません。Code:EX2002043"
+      && current.res.body[6].inputNote == "2002043"
+      && current.res.body[7].code == "10001"
+      && current.res.body[7].message == "指定されたConnectionCodeがシステム上に存在しません。Code:"
+      && current.res.body[7].inputNote == "2002045"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2002-04.json
+  confirmTickets:
+    desc: "受付の登録を確認"
+    db:
+      query: |
+        SELECT
+          t.consult_id::text
+          , t.ticket_number
+          , c.external_connection_code
+          , to_char(t.created_at, 'yyyymmdd') as created_at
+          , t.created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.tickets t
+        LEFT JOIN
+          resultcollector.consult c
+            on t.consult_id = c.consult_id
+        ORDER BY
+          c.external_connection_code ASC;
+    test: |
+      // 除外されないリクエスト2件の受付が追加されたことを確認
+      len(current.rows) == 2
+      && current.rows[0].external_connection_code == "EX2002042"
+      && current.rows[0].consult_id == "c0002002-0000-0000-0004-000000000002"
+      && current.rows[0].ticket_number == "T2002042"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+
+      && current.rows[1].external_connection_code == "EX2002044"
+      && current.rows[1].consult_id == "c0002002-0000-0000-0004-000000000004"
+      && current.rows[1].ticket_number == "T2002044"
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
+  confirmTicketsHistories:
+    desc: "受付履歴の登録を確認"
+    db:
+      query: |
+        SELECT
+          t.consult_id::text
+          , t.ticket_number
+          , t.action_type
+          , t.order_number
+          , c.external_connection_code
+          , to_char(t.created_at, 'yyyymmdd') as created_at
+          , t.created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.tickets_histories t
+        LEFT JOIN
+          resultcollector.consult c
+            on t.consult_id = c.consult_id
+        ORDER BY
+          t.order_number ASC;
+    test: |
+      // 除外されないリクエスト2件の受付履歴が追加されたことを確認
+      len(current.rows) == 2
+      && current.rows[0].order_number == 2
+      && current.rows[0].external_connection_code == "EX2002042"
+      && current.rows[0].consult_id == "c0002002-0000-0000-0004-000000000002"
+      && current.rows[0].ticket_number == "T2002042"
+      && current.rows[0].action_type == "I"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+
+      && current.rows[1].order_number == 4
+      && current.rows[1].external_connection_code == "EX2002044"
+      && current.rows[1].consult_id == "c0002002-0000-0000-0004-000000000004"
+      && current.rows[1].ticket_number == "T2002044"
+      && current.rows[1].action_type == "I"
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
+        
+  confirmConsult:
+    desc: "受診の更新を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+          , external_connection_code
+          , progress_status
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+          , created_by
+        FROM
+          resultcollector.consult
+        ORDER BY
+          external_connection_code ASC;
+    test: |
+      // 2件の受診情報が更新されていないことを確認
+      len(current.rows) == 8
+      // 除外されないリクエストは更新されたことを確認
+      && current.rows[1].external_connection_code == "EX2002042"
+      && current.rows[1].consult_id == "c0002002-0000-0000-0004-000000000002"
+      && current.rows[1].progress_status == 21
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
+
+      && current.rows[3].external_connection_code == "EX2002044"
+      && current.rows[3].consult_id == "c0002002-0000-0000-0004-000000000004"
+      && current.rows[3].progress_status == 21
+      && current.rows[3].created_at == current.rows[3].now
+      && current.rows[3].created_by == "ExternalConnection"
+
+      // 除外されたリクエストは更新されていないこと確認
+      && current.rows[0].external_connection_code == "EX2002041"
+      && current.rows[0].consult_id == "c0002002-0000-0000-0004-000000000001"
+      // current.rows[0].progress_status == consultData[0].progress_status
+      && current.rows[0].progress_status == 10
+      && current.rows[0].created_at == consultData[0].created_at
+      && current.rows[0].created_by == consultData[0].created_by
+      
+      && current.rows[2].external_connection_code == "EX2002043"
+      && current.rows[2].consult_id == "c0002002-0000-0000-0004-000000000003"
+      // current.rows[2].progress_status == consultData[2].progress_status
+      && current.rows[2].progress_status == 20
+      && current.rows[2].created_at == consultData[2].created_at
+      && current.rows[2].created_by == consultData[2].created_by
+
+      && current.rows[4].external_connection_code == "EX2002045"
+      && current.rows[4].consult_id == "c0002002-0000-0000-0004-000000000005"
+      // current.rows[4].progress_status == consultData[4].progress_status
+      && current.rows[4].progress_status == 11
+      && current.rows[4].created_at == consultData[4].created_at
+      && current.rows[4].created_by == consultData[4].created_by
+
+      && current.rows[5].external_connection_code == "EX2002046"
+      && current.rows[5].consult_id == "c0002002-0000-0000-0004-000000000006"
+      // current.rows[5].progress_status == consultData[5].progress_status
+      && current.rows[5].progress_status == 11
+      && current.rows[5].created_at == consultData[5].created_at
+      && current.rows[5].created_by == consultData[5].created_by
+
+      && current.rows[6].external_connection_code == "EX2002047"
+      && current.rows[6].consult_id == "c0002002-0000-0000-0004-000000000007"
+      // current.rows[6].progress_status == consultData[6].progress_status
+      && current.rows[6].progress_status == 11
+      && current.rows[6].created_at == consultData[6].created_at
+      && current.rows[6].created_by == consultData[6].created_by
+
+      && current.rows[7].external_connection_code == "EX2002048"
+      && current.rows[7].consult_id == "c0002002-0000-0000-0004-000000000008"
+      // current.rows[7].progress_status == consultData[7].progress_status
+      && current.rows[7].progress_status == 11
+      && current.rows[7].created_at == consultData[7].created_at
+      && current.rows[7].created_by == consultData[7].created_by
+

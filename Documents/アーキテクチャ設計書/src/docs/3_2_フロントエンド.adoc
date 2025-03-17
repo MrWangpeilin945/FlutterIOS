@@ -181,6 +181,7 @@ export default function Hoge() {
 * 各画面、コンポーネント内にCSSを直接記述しない
 * URL組み立て時、文字列結合を使用せずURLオブジェクトを使用する
 * 状態管理に格納するものは制限する(なんでもかんでも入れない)
+* 画面表示時とAPI使用時は処理が完了するまでLoadingOverlayを表示する
 
 == Mantineのテーマカラー
 [options="header"]

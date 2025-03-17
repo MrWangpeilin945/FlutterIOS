@@ -44,4 +44,21 @@ public class PriorExamMenuTests
         // Assert
         actual.Should().BeEquivalentTo(expected);
     }
+
+    [Fact]
+    public void 現在の検査メニューIDを取得する()
+    {
+        // Arrange
+
+        // 前提検査メニューの設定
+        var currentExamMenuId = 6;
+        var priorExamMenuIdList = new List<int>() { 1, 2, 3, 5 };
+        var priorExamMenu = new PriorExamMenu(currentExamMenuId, priorExamMenuIdList);
+
+        // Act
+        var actual = priorExamMenu.CurrentExamMenuId;
+
+        // Assert
+        actual.Should().Be(currentExamMenuId);
+    }
 }

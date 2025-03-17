@@ -1,0 +1,82 @@
+desc: EC2006-03 必須エラーを除外_正常 [207]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2006-03.json"
+steps:
+  clearTable:
+    desc: "班テーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.teams CASCADE;
+  insertData:
+    desc: "班テーブルに実行前データを登録"
+    db: 
+      query: |
+        insert into resultcollector.teams (team_code, name , order_number , created_at, created_by) 
+            values('T2006-03-1', '旧１班', 1, '2025-01-01T12:34:56.789', 'ec2006') 
+            ,     ('T2006-03-2', '旧２班', 2, '2025-01-01T12:34:56.789', 'ec2006');
+  post:
+    desc: "班を更新_正常"
+    req:
+      /api/v1/external/teams:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      && len(current.res.body) == 6
+      // 必須項目不足のレコードがエラーで返される
+      && current.res.body[0].code == "10004"
+      && current.res.body[0].inputNote == "20060301"
+      && current.res.body[0].message == "必須項目が不足しています。Code"
+      && current.res.body[1].code == "10004"
+      && current.res.body[1].inputNote == "20060303"
+      && current.res.body[1].message == "必須項目が不足しています。Code"
+      && current.res.body[2].code == "10004"
+      && current.res.body[2].inputNote == "20060302"
+      && current.res.body[2].message == "必須項目が不足しています。Name"
+      && current.res.body[3].code == "10004"
+      && current.res.body[3].inputNote == "20060303"
+      && current.res.body[3].message == "必須項目が不足しています。Name"
+      && current.res.body[4].code == "10003"
+      && current.res.body[4].inputNote == "20060301"
+      && current.res.body[4].message == "キー項目が重複しています。Code:"
+      && current.res.body[5].code == "10003"
+      && current.res.body[5].inputNote == "20060303"
+      && current.res.body[5].message == "キー項目が重複しています。Code:"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2006-03.json
+  confirmTeams:
+    desc: "班の更新を確認"
+    db:
+      query: |
+        SELECT
+          team_code
+          , name
+          , order_number
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.teams
+        ORDER BY
+          team_code ASC;
+    test: |
+      len(current.rows) == 2
+      // 班が変更されないことを確認
+      && current.rows[0].team_code == "T2006-03-1"
+      && current.rows[0].name == "旧１班"
+      && current.rows[0].order_number == 1
+      && current.rows[0].created_at == "20250101"
+      && current.rows[0].created_by == "ec2006"
+      && current.rows[1].team_code == "T2006-03-2"
+      && current.rows[1].name == "旧２班"
+      && current.rows[1].order_number == 2
+      && current.rows[1].created_at == "20250101"
+      && current.rows[1].created_by == "ec2006"

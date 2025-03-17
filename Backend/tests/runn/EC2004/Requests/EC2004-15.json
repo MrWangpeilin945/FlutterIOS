@@ -1,0 +1,206 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "CCD-2004151",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-03",
+        "consultNumber": "No-200415-1",
+        "examineeCd": "E2004151",
+        "note": "特記事項2004151",
+        "previousResults": [],
+        "consultThresholds": [],
+        "consultNotes": [],
+        "examItemDetailOrders": [],
+        "inputNote": "2004151"
+    },
+    {
+        "sortNo": 2,
+        "connectionCode": "CCD-2004152",
+        "actionType": 0,
+        "placeCode": "P2004-15-2",
+        "teamCode": "T2004-15-2",
+        "examDate": "2025-03-03",
+        "consultNumber": "No-2004152",
+        "examineeCd": "E2004152",
+        "note": "特記事項2004152",
+        "previousResults": [],
+        "consultThresholds": [],
+        "consultNotes": [],
+        "examItemDetailOrders": [],
+        "inputNote": "2004152"
+    },
+    {
+        "sortNo": 3,
+        "connectionCode": "CCD-2004153",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-03",
+        "consultNumber": "No-2004153",
+        "examineeCd": "E2004153-1",
+        "note": "特記事項2004153",
+        "previousResults": [],
+        "consultThresholds": [],
+        "consultNotes": [],
+        "examItemDetailOrders": [],
+        "inputNote": "2004153"
+    },
+    {
+        "sortNo": 4,
+        "connectionCode": "CCD-2004154",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-03",
+        "consultNumber": "No-2004153",
+        "examineeCd": "E2004151",
+        "note": "特記事項2004154",
+        "previousResults": [
+            {
+                "examItemDetailCd": "PREVI-200415",
+                "examDate": "2024-11-22",
+                "value": "100"
+            },
+            {
+                "examItemDetailCd": "PREVI-200415-X",
+                "examDate": "2024-11-22",
+                "value": "110"
+            },
+            {
+                "examItemDetailCd": "PREVI-200415-Y",
+                "examDate": "2024-11-22",
+                "value": "120"
+            }
+        ],
+        "consultThresholds": [
+            {
+                "thresholdCode": "TID-EC2004-15",
+                "priority": 1
+            }
+        ],
+        "consultNotes": [
+            {
+                "code": "NOTE-T200415-99",
+                "note": "受診特記200415-1"
+            }
+        ],
+        "examItemDetailOrders": [
+            {
+                "examItemDetailCd": "ORDER-200415"
+            },
+            {
+                "examItemDetailCd": "ORDER-200415-X"
+            },
+            {
+                "examItemDetailCd": "ORDER-200415-Y"
+            }
+        ],
+        "inputNote": "2004154"
+    },
+    {
+        "sortNo": 5,
+        "connectionCode": "CCD-200415",
+        "actionType": 1,
+        "placeCode": "",
+        "teamCode": "",
+        "examDate": "",
+        "consultNumber": "",
+        "examineeCd": "",
+        "note": "",
+        "previousResults": [],
+        "consultThresholds": [],
+        "consultNotes": [],
+        "examItemDetailOrders": [],
+        "inputNote": "2004155"
+    },
+    {
+        "sortNo": 6,
+        "connectionCode": "CCS-200415-1",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "No-200415-100",
+        "examineeCd": "E2004154",
+        "note": "特記事項2004-15-1",
+        "previousResults": [
+            {
+                "examItemDetailCd": "PREVI-200415-3",
+                "examDate": "2024-06-20",
+                "value": "25"
+            }
+        ],
+        "consultThresholds": [
+            {
+                "thresholdCode": "TID-EC2004-15-5",
+                "priority": 10
+            }
+        ],
+        "consultNotes": [
+            {
+                "code": "NOTE-T200415-5",
+                "note": "受診特記200415-5"
+            }
+        ],
+        "examItemDetailOrders": [
+            {
+                "examItemDetailCd": "ORDER-200415-3"
+            }
+        ],
+        "inputNote": "2004156"
+    },
+    {
+        "sortNo": 7,
+        "connectionCode": "CCS-200415-2",
+        "actionType": 1,
+        "placeCode": "",
+        "teamCode": "",
+        "examDate": "",
+        "consultNumber": "",
+        "examineeCd": "",
+        "note": "",
+        "previousResults": [],
+        "consultThresholds": [],
+        "consultNotes": [],
+        "examItemDetailOrders": [],
+        "inputNote": "2004157"
+    },
+    {
+        "sortNo": 8,
+        "connectionCode": "CCS-200415-3",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "No-200415-300",
+        "examineeCd": "E2004153",
+        "note": "特記事項2004-15-3",
+        "previousResults": [
+            {
+                "examItemDetailCd": "PREVI-200415-3",
+                "examDate": "2024-04-05",
+                "value": "80"
+            }
+        ],
+        "consultThresholds": [
+            {
+                "thresholdCode": "TID-EC2004-15-5",
+                "priority": 5
+            }
+        ],
+        "consultNotes": [
+            {
+                "code": "NOTE-T200415-5",
+                "note": "受診特記200415-555"
+            }
+        ],
+        "examItemDetailOrders": [
+            {
+                "examItemDetailCd": "ORDER-200415-3"
+            }
+        ],
+        "inputNote": "2024158"
+    }
+]

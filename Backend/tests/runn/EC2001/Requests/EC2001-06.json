@@ -1,0 +1,99 @@
+[
+    {
+        "examineeCode": "EC2001061",
+        "name": "岡山　一郎",
+        "kanaName": "オカヤマ　イチロウ",
+        "sex": 1,
+        "birthdate": "1985-12-21",
+        "affiliations": [
+            {
+                "organizationCode": "ORG2001-61"
+            },
+            {
+                "organizationCode": "ORG2001-62"
+            },
+            {
+                "organizationCode": "ORG2001-63"
+            }
+        ],
+        "inputNote": "2001061"
+    },
+    {
+        "examineeCode": "EC2001061",
+        "name": "岡山　二郎",
+        "kanaName": "オカヤマ　ジロウ",
+        "sex": 1,
+        "birthdate": "1985-12-22",
+        "affiliations": [
+            {
+                "organizationCode": "ORG2001-61"
+            },
+            {
+                "organizationCode": "ORG2001-61"
+            }
+        ],
+        "inputNote": "2001062"
+    },
+    {
+        "examineeCode": "EC2001063",
+        "name": "岡山　三郎",
+        "kanaName": "オカヤマ　サブロウ",
+        "sex": 1,
+        "birthdate": "1985-12-23",
+        "affiliations": [
+            {
+                "organizationCode": "ORG2001-63"
+            },
+            {
+                "organizationCode": "ORG2001-61"
+            },
+            {
+                "organizationCode": "ORG2001-61"
+            },
+            {
+                "organizationCode": "ORG2001-61"
+            },
+            {
+                "organizationCode": "ORG2001-63"
+            },
+            {
+                "organizationCode": "ORG2001-63"
+            },
+            {
+                "organizationCode": "ORG2001-62"
+            }
+        ],
+        "inputNote": "2001063"
+    },
+    {
+        "examineeCode": "EC2001064",
+        "name": "岡山　四郎",
+        "kanaName": "オカヤマ　シロウ",
+        "sex": 1,
+        "birthdate": "1985-12-24",
+        "affiliations": [
+            {
+                "organizationCode": "ORG2001-63"
+            },
+            {
+                "organizationCode": "ORG2001-61"
+            },
+            {
+                "organizationCode": "ORG2001-62"
+            },
+            {
+                "organizationCode": "ORG2001-61"
+            },
+            {
+                "organizationCode": "ORG2001-63"
+            },
+            {
+                "organizationCode": "ORG2001-63"
+            },
+            {
+                "organizationCode": "ORG2001-62"
+            }
+        ],
+        "inputNote": "2001064"
+    }
+]

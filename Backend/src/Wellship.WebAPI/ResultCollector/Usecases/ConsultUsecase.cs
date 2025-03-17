@@ -135,14 +135,19 @@ public class ConsultUsecase : IConsultUsecase
                                               .ToArray();
         // 受診特記一覧を取得
         var consultNotes = await _consultRepository.GetConsultNotesAsync(consult.ConsultId);
-        // 検査項目明細マスタ一覧を取得
-        var examItemDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(examItemDetailIds);
+
+        // 検査結果を取得
+        var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
+
         // 過去検査結果を取得
         var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
+
         // 検査メニュー特記一覧を取得
         var menuNotes = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
-        var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
-        var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, examItemDetailChildren, examResults, previousResults, consultNotes)).ToArray();
+        var menuNoteDetailIds = menuNotes.SelectMany(note => note.ExamResults).Select(r => r.ExamItemDetailId).Distinct().ToArray();
+        var menuNoteDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(menuNoteDetailIds);
+        var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, menuNoteDetailChildren, examResults, previousResults, consultNotes)).ToArray();
+
         // 関連検査項目を取得
         var relatedExamItems = examNoteResults.Select(x => new RelatedExamItem()
         {
@@ -152,7 +157,7 @@ public class ConsultUsecase : IConsultUsecase
 
         // 検査実施判断ルールで検証する
         var decisionRules = await ValidateDecisionRuleAsync(examMenuId, examResults, previousResults);
-        var examDecisionResults = decisionRules.OrderBy(x => x.ErrorLevel)
+        var examDecisionResults = decisionRules.OrderByDescending(x => x.ErrorLevel)
                                                .Select(x => new ExamDecisionResult()
                                                {
                                                    ErrorLevel = (int)x.ErrorLevel,
@@ -316,11 +321,13 @@ public class ConsultUsecase : IConsultUsecase
         var previousResults = await _consultRepository.GetPreviousResultsAsync(consult.ConsultId, examDate);
         // 受診特記一覧を取得
         var consultNotes = await _consultRepository.GetConsultNotesAsync(consult.ConsultId);
-        // 検査項目明細マスタ一覧を取得
-        var examItemDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(examItemDetailIds);
+
         // 検査メニュー特記一覧を取得
         var menuNotes = await _examMenuRepository.GetMenuNotesAsync(examMenuId);
-        var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, examItemDetailChildren, examResults, previousResults, consultNotes)).ToArray();
+        var menuNoteDetailIds = menuNotes.SelectMany(note => note.ExamResults).Select(r => r.ExamItemDetailId).Distinct().ToArray();
+        var menuNoteDetailChildren = await _examItemRepository.GetExamItemDetailChildrenAsync(menuNoteDetailIds);
+        var examNoteResults = menuNotes.Select(x => new Domain.Models.MenuNoteResult(x, menuNoteDetailChildren, examResults, previousResults, consultNotes)).ToArray();
+
         // 関連検査項目を取得
         var relatedExamItems = examNoteResults.Select(x => new RelatedExamItem()
         {
@@ -406,12 +413,18 @@ public class ConsultUsecase : IConsultUsecase
             var inputValues = rule.ExamItemDetails.OrderBy(x => x.VariableNumber)
                                                   .Select(x => x.SourceType switch
                                                   {
-                                                      SourceType.今回値 => concatenatedCurrentResults.TryGetValue(x.ExamItemDetailId, out var currVal) ? currVal : "",
-                                                      SourceType.前回値 => preResults.TryGetValue(x.ExamItemDetailId, out var prevVal) ? prevVal : "",
+                                                      SourceType.今回値 => concatenatedCurrentResults.TryGetValue(x.ExamItemDetailId, out var currVal) ? currVal : null,
+                                                      SourceType.前回値 => preResults.TryGetValue(x.ExamItemDetailId, out var prevVal) ? prevVal : null,
                                                       _ => throw new NotSupportedException(nameof(x.SourceType))
                                                   }).ToList();
 
-            var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues, conditionValues, errorLevel);
+            // 結果レコードがない場合はトリガーを無効にする
+            if (inputValues.Any(x => x is null))
+            {
+                continue;
+            }
+
+            var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues!, conditionValues, errorLevel);
 
             // トリガーの条件に一致すればエラーに追加する
             if (trigger.IsMatch())
@@ -459,12 +472,18 @@ public class ConsultUsecase : IConsultUsecase
             var inputValues = rule.ExamItemDetails.OrderBy(x => x.VariableNumber)
                                                   .Select(x => x.SourceType switch
                                                   {
-                                                      SourceType.今回値 => currentResults.TryGetValue(x.ExamItemDetailId, out var currVal) ? currVal : "",
-                                                      SourceType.前回値 => preResults.TryGetValue(x.ExamItemDetailId, out var prevVal) ? prevVal : "",
+                                                      SourceType.今回値 => currentResults.TryGetValue(x.ExamItemDetailId, out var currVal) ? currVal : null,
+                                                      SourceType.前回値 => preResults.TryGetValue(x.ExamItemDetailId, out var prevVal) ? prevVal : null,
                                                       _ => throw new NotSupportedException(nameof(x.SourceType))
                                                   }).ToList();
 
-            var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues, conditionValues, errorLevel);
+            // 結果レコードがない場合はトリガーを無効にする
+            if (inputValues.Any(x => x is null))
+            {
+                continue;
+            }
+
+            var trigger = TriggerFactory.CreateTrigger(triggerType, inputValues!, conditionValues, errorLevel);
 
             // トリガーの条件に一致すればエラーに追加する
             if (trigger.IsMatch())

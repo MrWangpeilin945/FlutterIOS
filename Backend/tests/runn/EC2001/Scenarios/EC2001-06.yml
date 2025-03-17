@@ -1,0 +1,80 @@
+desc: EC2001-06 キーが重複する
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2001-06.json"
+steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 受診者
+        TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 団体
+        TRUNCATE TABLE resultcollector.organizations CASCADE;
+  insertData:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 団体
+        INSERT INTO
+          resultcollector.organizations
+          (organization_id, organization_code, name, order_number, created_at, created_by)
+        VALUES('a0002001-0000-0000-0006-000000000001', 'ORG2001-61', '株式会社岡山', 21, CURRENT_TIMESTAMP, 'ec2001')
+        ,     ('a0002001-0000-0000-0006-000000000002', 'ORG2001-62', '株式会社倉敷', 22, CURRENT_TIMESTAMP, 'ec2001')
+        ,     ('a0002001-0000-0000-0006-000000000003', 'ORG2001-63', '株式会社備前', 23, CURRENT_TIMESTAMP, 'ec2001');
+  post:
+    desc: "キーが重複する"
+    req:
+      /api/v1/external/examinees:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      // 受診者エラーがErrorObjectで返される
+      && len(current.res.body) == 8
+      && current.res.body[0].code == "10003"
+      && current.res.body[0].inputNote == "2001061"
+      && current.res.body[0].message == "キー項目が重複しています。ExamineeCode:EC2001061"
+      && current.res.body[1].code == "10003"
+      && current.res.body[1].inputNote == "2001062"
+      && current.res.body[1].message == "キー項目が重複しています。ExamineeCode:EC2001061"
+      && current.res.body[2].code == "10003"
+      && current.res.body[2].inputNote == "2001062"
+      && current.res.body[2].message == "キー項目が重複しています。Affiliations.OrganizationCode:ORG2001-61"
+      && current.res.body[3].code == "10003"
+      && current.res.body[3].inputNote == "2001063"
+      && current.res.body[3].message == "キー項目が重複しています。Affiliations.OrganizationCode:ORG2001-63"
+      && current.res.body[4].code == "10003"
+      && current.res.body[4].inputNote == "2001063"
+      && current.res.body[4].message == "キー項目が重複しています。Affiliations.OrganizationCode:ORG2001-61"
+      && current.res.body[5].code == "10003"
+      && current.res.body[5].inputNote == "2001064"
+      && current.res.body[5].message == "キー項目が重複しています。Affiliations.OrganizationCode:ORG2001-63"
+      && current.res.body[6].code == "10003"
+      && current.res.body[6].inputNote == "2001064"
+      && current.res.body[6].message == "キー項目が重複しています。Affiliations.OrganizationCode:ORG2001-61"
+      && current.res.body[7].code == "10003"
+      && current.res.body[7].inputNote == "2001064"
+      && current.res.body[7].message == "キー項目が重複しています。Affiliations.OrganizationCode:ORG2001-62"
+
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2001-06.json
+  confirmExaminees:
+    desc: "受診者が登録されていない確認"
+    db:
+      query: |
+        SELECT
+          examinee_code
+        FROM
+          resultcollector.examinees;
+    test: |
+      // 受診者情報が登録されていないこと確認
+      len(current.rows) == 0

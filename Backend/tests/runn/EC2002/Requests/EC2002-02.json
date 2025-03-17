@@ -1,0 +1,44 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "EX2002021",
+        "actionType": 0,
+        "ticketNumber": "T2002011",
+        "inputNote": "2002021"
+    },
+    {
+        "sortNo": 12,
+        "connectionCode": "EX2002022",
+        "actionType": 0,
+        "ticketNumber": "T2002999",
+        "inputNote": "2002022"
+    },
+    {
+        "sortNo": 10,
+        "connectionCode": "EX2002021",
+        "actionType": 0,
+        "ticketNumber": "T2002013",
+        "inputNote": "2002023"
+    },
+    {
+        "sortNo": 4,
+        "connectionCode": "EX2002022",
+        "actionType": 0,
+        "ticketNumber": "T2002014",
+        "inputNote": "2002024"
+    },
+    {
+        "sortNo": 15,
+        "connectionCode": "EX2002021",
+        "actionType": 1,
+        "ticketNumber": "T2002015",
+        "inputNote": "2002025"
+    },
+    {
+        "sortNo": 2,
+        "connectionCode": "EX2002022",
+        "actionType": 1,
+        "ticketNumber": "T2002016",
+        "inputNote": "2002026"
+    }
+]

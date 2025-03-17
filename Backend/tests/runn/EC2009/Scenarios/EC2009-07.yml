@@ -1,0 +1,225 @@
+desc: EC2009-07 除外されてないものは追加更新_正常
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2009-07.json"
+steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 基準値パターン
+        TRUNCATE TABLE resultcollector.thresholds CASCADE;
+        -- 検査基準値範囲
+        TRUNCATE TABLE resultcollector.exam_normal_value_range CASCADE;
+        -- 外部検査項目明細
+        TRUNCATE TABLE resultcollector.external_exam_item_details CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
+  insertExamMenus:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 検査メニュー
+        INSERT INTO
+          resultcollector.exam_menus
+          (exam_menu_id, name, order_number, enabled, created_at, created_by)
+        VALUES(2009, '血液検査', 2009, true, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目グループ
+        INSERT INTO
+          resultcollector.exam_item_groups
+          (exam_item_group_id, name, exam_menu_id, type, order_number, created_at, created_by)
+        VALUES(2009, '血液検査', 2009, 1, 1, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目
+        INSERT INTO
+          resultcollector.exam_items
+          (exam_item_id, name, exam_item_group_id, position_number, unit, order_number, created_at, created_by)
+        VALUES(20091, '白血球数', 2009, 1, '1000/ul', 1, CURRENT_TIMESTAMP,'ec2009')
+        ,     (20092, '赤血球数', 2009, 1, '1000/ul', 2, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目明細
+        INSERT INTO
+          resultcollector.exam_item_details
+          (exam_item_detail_id, exam_item_id, name, order_number, position_number, type, keyboard_type, integer_length, decimal_length, equipment_label, created_at, created_by)
+        VALUES(20091, 20091, '白血球数', 1, 1, 1, 1, 3, 2, null, CURRENT_TIMESTAMP,'ec2009')
+        ,     (20092, 20092, '赤血球数', 1, 1, 1, 1, 3, 2, null, CURRENT_TIMESTAMP,'ec2009');
+        -- 外部検査項目明細
+        INSERT INTO
+          resultcollector.external_exam_item_details
+          (exam_item_detail_id, external_exam_item_detail_code, created_at, created_by)
+        VALUES(20091, 'EC2009WBC', CURRENT_TIMESTAMP,'ec2009')
+        ,     (20092, 'EC2009RBC', CURRENT_TIMESTAMP,'ec2009');
+        -- 基準値パターン
+        INSERT INTO
+          resultcollector.thresholds
+          (threshold_id, threshold_code, name, order_number, created_at, created_by)
+        VALUES('e0002009-0000-0000-0000-000000000001', 'EC2009', 'EC2009血液検査', 1, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査基準値範囲
+        INSERT INTO
+          resultcollector.exam_normal_value_range
+          (name, threshold_id, exam_item_detail_id, min_age, max_age, target_sex, min_value, max_value, error_level, created_at, created_by)
+        VALUES('白血球数', 'e0002009-0000-0000-0000-000000000001', 20091, '0400000', '0750000', 3, 13.7, 16.8, 1, '2025-01-01T12:34:56.789','ec2009')
+        ,     ('赤血球数', 'e0002009-0000-0000-0000-000000000001', 20092, '0400000', '0750000', 3, 40.7, 50.1, 1, '2025-01-01T12:34:56.789','ec2009');
+  getOrganizations:
+    desc: "検査基準値範囲の取得"
+    db:
+      query: |
+        SELECT
+          e.name
+          , e.threshold_id::text
+          , t.threshold_code
+          , e.exam_item_detail_id
+          , e.min_age
+          , e.max_age
+          , e.target_sex
+          , e.min_value::text
+          , e.max_value::text
+          , e.error_level
+          , to_char(e.created_at, 'yyyymmdd') as created_at
+          , e.created_by
+        FROM
+          resultcollector.exam_normal_value_range e
+        LEFT JOIN
+          resultcollector.thresholds t
+            on t.threshold_id = e.threshold_id
+        ORDER BY
+          e.exam_item_detail_id ASC
+    bind:
+      organizationsData: current.rows
+  post:
+    desc: "除外されてないものは追加更新_正常"
+    req:
+      /api/v1/external/examNormalValueRange:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      // レスポンスにErrorObjectが返されないことを確認
+      && len(current.res.body) == 20
+      && current.res.body[0].code == "10004"
+      && current.res.body[0].inputNote == "2009077"
+      && current.res.body[0].message == "必須項目が不足しています。Name"
+      && current.res.body[1].code == "10004"
+      && current.res.body[1].inputNote == "2009077"
+      && current.res.body[1].message == "必須項目が不足しています。ThresholdCd"
+      && current.res.body[2].code == "10004"
+      && current.res.body[2].inputNote == "2009077"
+      && current.res.body[2].message == "必須項目が不足しています。ExamItemDetailCd"
+      && current.res.body[3].code == "10004"
+      && current.res.body[3].inputNote == "2009077"
+      && current.res.body[3].message == "必須項目が不足しています。MaxAge"
+      && current.res.body[4].code == "10004"
+      && current.res.body[4].inputNote == "2009077"
+      && current.res.body[4].message == "必須項目が不足しています。MinAge"
+      && current.res.body[5].code == "10001"
+      && current.res.body[5].inputNote == "2009072"
+      && current.res.body[5].message == "指定されたThresholdCdがシステム上に存在しません。Code:Dummy2009"
+      && current.res.body[6].code == "10001"
+      && current.res.body[6].inputNote == "2009076"
+      && current.res.body[6].message == "指定されたThresholdCdがシステム上に存在しません。Code:Dummy2009"
+      && current.res.body[7].code == "10001"
+      && current.res.body[7].inputNote == "2009077"
+      && current.res.body[7].message == "指定されたThresholdCdがシステム上に存在しません。Code:"
+      && current.res.body[8].code == "10001"
+      && current.res.body[8].inputNote == "2009073"
+      && current.res.body[8].message == "指定されたExamItemDetailCdがシステム上に存在しません。Code:Dummy2009WBC"
+      && current.res.body[9].code == "10001"
+      && current.res.body[9].inputNote == "2009076"
+      && current.res.body[9].message == "指定されたExamItemDetailCdがシステム上に存在しません。Code:Dummy2009WBC"
+      && current.res.body[10].code == "10001"
+      && current.res.body[10].inputNote == "2009077"
+      && current.res.body[10].message == "指定されたExamItemDetailCdがシステム上に存在しません。Code:"
+      && current.res.body[11].code == "10006"
+      && current.res.body[11].inputNote == "2009077"
+      && current.res.body[11].message == "値の形式が無効です。MaxAge:"
+      && current.res.body[12].code == "10006"
+      && current.res.body[12].inputNote == "2009078"
+      && current.res.body[12].message == "値の形式が無効です。MaxAge:9999999"
+      && current.res.body[13].code == "10006"
+      && current.res.body[13].inputNote == "2009077"
+      && current.res.body[13].message == "値の形式が無効です。MinAge:"
+      && current.res.body[14].code == "10006"
+      && current.res.body[14].inputNote == "2009078"
+      && current.res.body[14].message == "値の形式が無効です。MinAge:000000"
+      && current.res.body[15].code == "10007"
+      && current.res.body[15].inputNote == "2009077"
+      && current.res.body[15].message == "値の範囲が無効です。MinAge:/MaxAge:"
+      && current.res.body[16].code == "10007"
+      && current.res.body[16].inputNote == "2009079"
+      && current.res.body[16].message == "値の範囲が無効です。MinAge:0500000/MaxAge:0450000"
+      && current.res.body[17].code == "10007"
+      && current.res.body[17].inputNote == "200907A"
+      && current.res.body[17].message == "値の範囲が無効です。MinValue:108.7/MaxValue:99.6"
+      && current.res.body[18].code == "10003"
+      && current.res.body[18].inputNote == "2009074"
+      && current.res.body[18].message == "キー項目が重複しています。ThresholdCd:EC2009/ExamItemDetailCd:EC2009WBC/TargetSex:男/MaxAge:0750000/MaxValue:10.6"
+      && current.res.body[19].code == "10003"
+      && current.res.body[19].inputNote == "2009075"
+      && current.res.body[19].message == "キー項目が重複しています。ThresholdCd:EC2009/ExamItemDetailCd:EC2009WBC/TargetSex:男/MaxAge:0750000/MaxValue:10.6"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2009-07.json
+  confirmExamNormalValueRange:
+    desc: "検査基準値範囲の更新を確認"
+    db:
+      query: |
+        SELECT
+          e.name
+          , e.threshold_id::text
+          , t.threshold_code
+          , e.exam_item_detail_id
+          , e.min_age
+          , e.max_age
+          , e.target_sex
+          , e.min_value::text
+          , e.max_value::text
+          , e.error_level
+          , to_char(e.created_at, 'yyyymmdd') as created_at
+          , e.created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.exam_normal_value_range e
+        LEFT JOIN
+          resultcollector.thresholds t
+            on t.threshold_id = e.threshold_id
+        ORDER BY
+          e.exam_item_detail_id ASC
+    test: |
+      // 以下の除外されたリクエストは検査基準値範囲に登録されない
+      //  - 基準値パターンが取得できない
+      //  - 検査項目明細IDが取得できない
+      //  - PKが重複するレコードが存在する
+      // 洗い替えのためレコードは追加されていない
+      len(current.rows) == 2
+      // リクエストの検査基準値範囲が変更されたことを確認
+      && current.rows[0].name == "白血球数（男女）"
+      && current.rows[0].threshold_id == organizationsData[0].threshold_id
+      && current.rows[0].threshold_code == "EC2009"
+      // "examItemDetailCd": "EC2009WBC"
+      && current.rows[0].exam_item_detail_id == 20091
+      && current.rows[0].max_age == "9990000"
+      && current.rows[0].min_age == "0000000"
+      && current.rows[0].target_sex == 3
+      && current.rows[0].max_value == "10.6"
+      && current.rows[0].min_value == "8.7"
+      && current.rows[0].error_level == 2
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      // リクエストに存在しない検査基準値範囲は変更されないことを確認
+      && current.rows[1].name == organizationsData[1].name
+      && current.rows[1].threshold_id == organizationsData[1].threshold_id
+      && current.rows[1].threshold_code == organizationsData[1].threshold_code
+      && current.rows[1].exam_item_detail_id == organizationsData[1].exam_item_detail_id
+      && current.rows[1].max_age == organizationsData[1].max_age
+      && current.rows[1].min_age == organizationsData[1].min_age
+      && current.rows[1].target_sex == organizationsData[1].target_sex
+      && current.rows[1].max_value == organizationsData[1].max_value
+      && current.rows[1].min_value == organizationsData[1].min_value
+      && current.rows[1].error_level == organizationsData[1].error_level
+      && current.rows[1].created_at == "20250101"
+      && current.rows[1].created_by == organizationsData[1].created_by

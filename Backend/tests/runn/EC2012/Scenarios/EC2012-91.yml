@@ -1,0 +1,147 @@
+desc: EC2012-91 会場日程の更新負荷テスト
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  recordCount: 10000
+steps:
+  clearTable:
+    desc: "会場日程テーブルをクリア"
+    db:
+      query: |
+        TRUNCATE TABLE resultcollector.teams CASCADE;
+        TRUNCATE TABLE resultcollector.places CASCADE;
+        TRUNCATE TABLE resultcollector.place_schedule CASCADE;
+  createTeams:
+    desc: "班のレコードを追加"
+    db:
+      query: |
+        INSERT INTO
+          resultcollector.teams
+            (team_id, team_code, name, order_number, created_at, created_by)
+        VALUES
+            (
+              'c0002012-0000-0000-0091-000000000001'
+              , 'T2012-91'
+              , 'Ⅰ班'
+              , 1
+              , CURRENT_TIMESTAMP
+              , 'ec2012'
+            );
+  createPlaces:
+    desc: "会場のレコードを追加"
+    db:
+      query: |
+        INSERT INTO
+          resultcollector.places
+            (place_id, place_code, name, order_number, created_at, created_by)
+        VALUES
+            (
+              'e0002012-0000-0000-0091-000000000001'
+              , 'P2012-91'
+              , '第Ⅰ会場'
+              , 1
+              , CURRENT_TIMESTAMP
+              , 'ec2012'
+            );
+  getExamdate:
+    desc: "ユニークな健診日の作成"
+    db:
+      query: |
+        WITH RECURSIVE numbers AS (
+          SELECT 1 AS num
+          UNION ALL
+          SELECT num + 1
+          FROM numbers
+          WHERE num < {{ vars.recordCount}}
+        )
+        SELECT
+          to_char('2025-01-01'::DATE + INTERVAL '1 day' * num ,'YYYY-MM-DDT08:30:00') AS destDate
+          , to_char('2025-01-01'::DATE + INTERVAL '1 day' * num,'YYYY/MM/DD') AS sourceDate
+        FROM
+          numbers;
+    bind:
+      uniqueDate: current.rows
+  insertData:
+    desc: "会場日程テーブルに実行前データを登録"
+    loop: vars.recordCount
+    db: 
+      query: |
+        INSERT INTO
+          resultcollector.place_schedule
+            (place_id, team_id, status, exam_date, start_time, created_at, created_by)
+        VALUES
+          (
+            'e0002012-0000-0000-0091-000000000001'
+            , 'c0002012-0000-0000-0091-000000000001'
+            , 21
+            , '{{ uniqueDate[i].sourcedate }}'
+            , '1300'
+            , '2025-01-01T12:34:56.789'
+            , 'ec2012'
+          );
+  createRequest:
+    desc: "リクエストデータの作成"
+    loop:
+      count: vars.recordCount
+    bind:
+      requestBody:
+        -
+          teamCode: "'T2012-91'"
+          placeCode: "'P2012-91'"
+          examDate: uniqueDate[i].destdate
+          inputNote: "'2012-91'"
+  startBatch:
+    desc: "処理の開始時間"
+    bind:
+      startTime: now()
+  post:
+    desc: "会場日程の登録"
+    req:
+      /api/v1/external/placeSchedules:
+        post:
+          body:
+            application/json:
+              "{{ requestBody }}"
+    test: |
+      current.res.status == 200
+    bind:
+      endTime: now()
+  endBatch:
+    desc: "処理の終了時間"
+    bind:
+      timeKeeper:
+        startTime: startTime.Format("2006-01-02T15:04:05Z07:00")
+        endTime: endTime.Format("2006-01-02T15:04:05Z07:00")
+        interval: endTime.Sub(startTime).Seconds() 
+  confirmPlaceSchedules:
+    desc: "会場日程の登録を確認"
+    db:
+      query: |
+        SELECT
+          place_schedule_id::text
+          , status
+          , start_time
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.place_schedule
+        ORDER BY
+          exam_date
+    test: |
+      len(current.rows) == vars.recordCount
+      && current.rows[0].status == 21
+      && current.rows[0].start_time == "0830"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[vars.recordCount - 1].status == 21
+      && current.rows[vars.recordCount - 1].start_time == "0830"
+      && current.rows[vars.recordCount - 1].created_at == current.rows[vars.recordCount - 1].now
+      && current.rows[vars.recordCount - 1].created_by == "ExternalConnection"
+    dump:
+      expr: timeKeeper
+      out: ../Dump/EC2012-91.json

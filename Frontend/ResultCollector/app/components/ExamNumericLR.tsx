@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import {
   Group,
   Stack,
@@ -37,437 +37,458 @@ interface BackendValidation {
   examRegistResults: ExamRegistResult[];
 }
 
-export default function ExamNumericLR({
-  examItems,
-  onRegisterPressed,
-  onChange,
-}: ExamNumericLRProps) {
-  // 定数で定義
-  const 左 = 1;
-  const 右 = 2;
+export type ValidationHandle = {
+  triggerValidation: () => { hasError: boolean };
+};
 
-  // 引数のチェック
-  if (!examItems || examItems.length === 0) {
-    return null;
-  }
-  // positionNumberが1のexamItemの、examItemDetailsの中に
-  // positionNumberが1か2のexamItemDetailが存在することをチェック
-  const firstPosition = examItems.find((item) => item.positionNumber === 1);
+const ExamNumericLR = forwardRef<ValidationHandle, ExamNumericLRProps>(
+  ({ examItems, onRegisterPressed, onChange }: ExamNumericLRProps, ref) => {
+    //登録ボタンプレスフラグを制御するための変数
+    let isRegisterPressed = onRegisterPressed;
 
-  if (
-    !firstPosition?.examItemDetails?.some(
-      (detail) => detail.positionNumber === 左,
-    ) &&
-    !firstPosition?.examItemDetails?.some(
-      (detail) => detail.positionNumber === 右,
-    )
-  ) {
-    return null;
-  }
-  const [examItemsData, setExamItemsData] = useState(examItems);
+    // 定数で定義
+    const 左 = 1;
+    const 右 = 2;
 
-  // APIからのエラーメッセージを保存する
-  const [backendValidation, setBackendValidation] = useState<
-    BackendValidation[]
-  >([]);
+    // 引数のチェック
+    if (!examItems || examItems.length === 0) {
+      return null;
+    }
+    // positionNumberが1のexamItemの、examItemDetailsの中に
+    // positionNumberが1か2のexamItemDetailが存在することをチェック
+    const firstPosition = examItems.find((item) => item.positionNumber === 1);
 
-  // キーボードの表示インデックスを状態として管理する
-  const [showKeyboards, setShowKeyboards] = useState<{
-    left: boolean;
-    right: boolean;
-  }>({
-    left: false,
-    right: false,
-  });
+    if (
+      !firstPosition?.examItemDetails?.some(
+        (detail) => detail.positionNumber === 左,
+      ) &&
+      !firstPosition?.examItemDetails?.some(
+        (detail) => detail.positionNumber === 右,
+      )
+    ) {
+      return null;
+    }
+    const [examItemsData, setExamItemsData] = useState(examItems);
 
-  // キーボードの表示/非表示をトグルする関数
-  const toggleKeyboard = (detailPositionNumber: number) => {
-    setShowKeyboards((prevKeyboards) => {
-      // positionNumberによって切り替えるフラグを制御する
-      if (detailPositionNumber === 左 || detailPositionNumber === 右) {
-        return {
-          ...prevKeyboards,
-          left:
-            detailPositionNumber === 左
-              ? !prevKeyboards.left
-              : prevKeyboards.left,
-          right:
-            detailPositionNumber === 右
-              ? !prevKeyboards.right
-              : prevKeyboards.right,
-        };
-      }
-      return prevKeyboards;
+    // APIからのエラーメッセージを保存する
+    const [backendValidation, setBackendValidation] = useState<
+      BackendValidation[]
+    >([]);
+
+    // キーボードの表示インデックスを状態として管理する
+    const [showKeyboards, setShowKeyboards] = useState<{
+      left: boolean;
+      right: boolean;
+    }>({
+      left: false,
+      right: false,
     });
-  };
-  // キーボードの確定ボタン押下時にキーボードを非表示にする
-  const handleConfirm = () => {
-    setShowKeyboards({ left: false, right: false });
-  };
-  const closeKeyBoard = useClickOutside(() =>
-    setShowKeyboards({ left: false, right: false }),
-  );
 
-  const sortErrorMessage = (item: InputExamItem): InputExamItem => {
-    if (item.examRegistResults) {
-      // エラーレベルが高い順にソート
-      item.examRegistResults.sort((a, b) => {
-        const levelA = a.errorLevel ?? 0;
-        const levelB = b.errorLevel ?? 0;
-        return levelB - levelA;
+    // キーボードの表示/非表示をトグルする関数
+    const toggleKeyboard = (detailPositionNumber: number) => {
+      setShowKeyboards((prevKeyboards) => {
+        // positionNumberによって切り替えるフラグを制御する
+        if (detailPositionNumber === 左 || detailPositionNumber === 右) {
+          return {
+            ...prevKeyboards,
+            left:
+              detailPositionNumber === 左
+                ? !prevKeyboards.left
+                : prevKeyboards.left,
+            right:
+              detailPositionNumber === 右
+                ? !prevKeyboards.right
+                : prevKeyboards.right,
+          };
+        }
+        return prevKeyboards;
       });
-    }
-    return item;
-  };
-
-  // 初回読み込み時にAPIのエラーメッセージを保存する
-  useEffect(() => {
-    const backendErrorMessages: BackendValidation[] = examItems.map((item) => ({
-      itemPositionNumber: item.positionNumber ?? 0,
-      examRegistResults: item.examRegistResults ?? [],
-    }));
-    setBackendValidation(backendErrorMessages);
-  }, []);
-
-  // APIのエラーメッセージ以外を削除する
-  const resetErrorMessages = (item: InputExamItem) => {
-    const targetError = backendValidation.find(
-      (error) => error.itemPositionNumber === item.positionNumber,
+    };
+    // キーボードの確定ボタン押下時にキーボードを非表示にする
+    const handleConfirm = () => {
+      setShowKeyboards({ left: false, right: false });
+    };
+    const closeKeyBoard = useClickOutside(() =>
+      setShowKeyboards({ left: false, right: false }),
     );
-    if (targetError) {
-      item.examRegistResults = targetError.examRegistResults;
-    }
-    return item;
-  };
 
-  const validationCheck = (item: InputExamItem) => {
-    // コンポーネント由来のエラーメッセージを削除
-    resetErrorMessages(item);
-    // コールバック判断用のコンポーネントのエラーメッセージ
-    const componentErrorMessage: ExamRegistResult[] = [];
-    // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
-    for (const {
-      name,
-      positionNumber,
-      value,
-      hasOrder,
-      cancelReasonId,
-    } of item.examItemDetails ?? []) {
-      if (positionNumber !== 左 && positionNumber !== 右) {
-        continue; // 対象のpositionNumberでない場合、処理をスキップする
+    // 画面からバリデーションチェックを行う
+    useImperativeHandle(ref, () => ({
+      triggerValidation: () => {
+        isRegisterPressed = true;
+        let hasError = false;
+        for (const item of examItemsData) {
+          const { hasCallback } = validationCheck(item);
+          if (!hasCallback) {
+            hasError = true;
+            break;
+          }
+        }
+        return { hasError };
+      },
+    }));
+
+    const sortErrorMessage = (item: InputExamItem): InputExamItem => {
+      if (item.examRegistResults) {
+        // エラーレベルが高い順にソート
+        item.examRegistResults.sort((a, b) => {
+          const levelA = a.errorLevel ?? 0;
+          const levelB = b.errorLevel ?? 0;
+          return levelB - levelA;
+        });
       }
-      if (!hasOrder || !!cancelReasonId) {
-        continue; // disableの場合、処理をスキップする
+      return item;
+    };
+
+    // 初回読み込み時にAPIのエラーメッセージを保存する
+    useEffect(() => {
+      const backendErrorMessages: BackendValidation[] = examItems.map(
+        (item) => ({
+          itemPositionNumber: item.positionNumber ?? 0,
+          examRegistResults: item.examRegistResults ?? [],
+        }),
+      );
+      setBackendValidation(backendErrorMessages);
+    }, []);
+
+    // APIのエラーメッセージ以外を削除する
+    const resetErrorMessages = (item: InputExamItem) => {
+      const targetError = backendValidation.find(
+        (error) => error.itemPositionNumber === item.positionNumber,
+      );
+      if (targetError) {
+        item.examRegistResults = targetError.examRegistResults;
       }
-      // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
-      const schema = onRegisterPressed
-        ? z
-            .string()
-            .min(
-              1,
-              getErrorMessage(
-                errorMessages.required,
-                `${name || (positionNumber === 左 ? "左" : "右")}は`,
-              ),
-            ) // 必須チェック
-            .refine((value) => /^\d+$/.test(value), {
+      return item;
+    };
+
+    const validationCheck = (item: InputExamItem) => {
+      // コンポーネント由来のエラーメッセージを削除
+      resetErrorMessages(item);
+      // コールバック判断用のコンポーネントのエラーメッセージ
+      const componentErrorMessage: ExamRegistResult[] = [];
+      // detailsのpositionNumberが1と2のものについてバリデーションチェックを行う
+      for (const {
+        name,
+        positionNumber,
+        value,
+        hasOrder,
+        cancelReasonId,
+      } of item.examItemDetails ?? []) {
+        if (positionNumber !== 左 && positionNumber !== 右) {
+          continue; // 対象のpositionNumberでない場合、処理をスキップする
+        }
+        if (!hasOrder || !!cancelReasonId) {
+          continue; // disableの場合、処理をスキップする
+        }
+        // [登録する]が押されたときは必須・半角数字チェック、その他は半角数字チェックのみ行う。
+        const schema = isRegisterPressed
+          ? z
+              .string()
+              .min(
+                1,
+                getErrorMessage(
+                  errorMessages.required,
+                  `${name || (positionNumber === 左 ? "左" : "右")}は`,
+                ),
+              ) // 必須チェック
+              .refine((value) => /^\d+$/.test(value), {
+                message: getErrorMessage(
+                  errorMessages.numericString,
+                  `${name || (positionNumber === 左 ? "左" : "右")}は`,
+                ),
+              })
+          : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
               message: getErrorMessage(
                 errorMessages.numericString,
                 `${name || (positionNumber === 左 ? "左" : "右")}は`,
               ),
-            })
-        : z.string().refine((value) => /^(\d+(\.\d+)?|)$/.test(value), {
-            message: getErrorMessage(
-              errorMessages.numericString,
-              `${name || (positionNumber === 左 ? "左" : "右")}は`,
-            ),
+            });
+
+        // バリデーション対象データを取得
+        const valueToValidate = value;
+        const result = schema.safeParse(valueToValidate);
+
+        // バリデーションが失敗した場合
+        if (!result.success) {
+          const error = result.error.errors[0]; // 最初のエラーだけ取得
+          componentErrorMessage.push({
+            description: error.message,
+            errorLevel: InputErrorLevel.異常,
           });
-
-      // バリデーション対象データを取得
-      const valueToValidate = value;
-      const result = schema.safeParse(valueToValidate);
-
-      // バリデーションが失敗した場合
-      if (!result.success) {
-        const error = result.error.errors[0]; // 最初のエラーだけ取得
-        componentErrorMessage.push({
-          description: error.message,
-          errorLevel: InputErrorLevel.異常,
-        });
-      }
-    }
-
-    // 基準値によるエラーメッセージを追加
-    componentErrorMessage.push(...setRangesErrorMessage(item));
-    // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
-    const isCallback = !componentErrorMessage.some(
-      (error) => error.errorLevel === InputErrorLevel.異常,
-    );
-    // エラーメッセージをexamItemに保存
-    const resultItem: InputExamItem = {
-      ...item,
-      examRegistResults: item.examRegistResults
-        ? item.examRegistResults.concat(componentErrorMessage)
-        : componentErrorMessage,
-    };
-    // バリデーションチェックを行ったexamItemと、
-    // コールバックを判断するフラグを返す
-    const ValidationResult = {
-      validateResult: sortErrorMessage(resultItem),
-      hasCallback: isCallback,
-    };
-    return ValidationResult;
-  };
-
-  useEffect(() => {
-    const updatedItems = examItems.map((item) => {
-      const validatedData = validationCheck(item).validateResult;
-      return validatedData;
-    });
-    setExamItemsData(updatedItems);
-  }, [onRegisterPressed, examItems]);
-
-  //変更イベント
-  const handleChange = (
-    value: string,
-    positionNumber: number | undefined,
-    detailsPositionNumber?: number,
-  ) => {
-    // 対象のpositionNumberか確認
-    if (positionNumber !== 1) {
-      return null;
-    }
-    const updatedExamItems = [...examItemsData];
-    // examItemsに異常エラーメッセージがあるかをチェックするフラグ変数
-    let hasValidationError = true;
-
-    // 該当するアイテムを更新
-    for (const item of updatedExamItems) {
-      if (item.positionNumber === positionNumber) {
-        // クリアボタン用の処理
-        if (detailsPositionNumber === undefined) {
-          item.examItemDetails = item.examItemDetails?.map((detail) => ({
-            ...detail,
-            value:
-              detail.hasOrder && !detail.cancelReasonId ? value : detail.value,
-          }));
-        } else {
-          // 該当するdetailの値を更新
-          item.examItemDetails = item.examItemDetails?.map((detail) =>
-            detail.positionNumber === detailsPositionNumber
-              ? { ...detail, value: value }
-              : detail,
-          );
         }
       }
-      // バリデーションチェックを実施
-      const { validateResult, hasCallback } = validationCheck(item);
-      if (!hasCallback) {
-        // falseのexamItemがあればコールバックを行わない
-        hasValidationError = false;
+
+      // 基準値によるエラーメッセージを追加
+      componentErrorMessage.push(...setRangesErrorMessage(item));
+      // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
+      const isCallback = !componentErrorMessage.some(
+        (error) => error.errorLevel === InputErrorLevel.異常,
+      );
+      // エラーメッセージをexamItemに保存
+      const resultItem: InputExamItem = {
+        ...item,
+        examRegistResults: item.examRegistResults
+          ? item.examRegistResults.concat(componentErrorMessage)
+          : componentErrorMessage,
+      };
+      // バリデーションチェックを行ったexamItemと、
+      // コールバックを判断するフラグを返す
+      const ValidationResult = {
+        validateResult: sortErrorMessage(resultItem),
+        hasCallback: isCallback,
+      };
+      return ValidationResult;
+    };
+
+    useEffect(() => {
+      const updatedItems = examItems.map((item) => {
+        const validatedData = validationCheck(item).validateResult;
+        return validatedData;
+      });
+      setExamItemsData(updatedItems);
+    }, [onRegisterPressed, examItems]);
+
+    //変更イベント
+    const handleChange = (
+      value: string,
+      positionNumber: number | undefined,
+      detailsPositionNumber?: number,
+    ) => {
+      // 対象のpositionNumberか確認
+      if (positionNumber !== 1) {
+        return null;
       }
-      // バリデーション結果を反映
-      Object.assign(item, validateResult);
-    }
-    // 更新されたデータをステートに設定
-    setExamItemsData(updatedExamItems);
+      const updatedExamItems = [...examItemsData];
 
-    if (hasValidationError) {
+      // 該当するアイテムを更新
+      for (const item of updatedExamItems) {
+        if (item.positionNumber === positionNumber) {
+          // クリアボタン用の処理
+          if (detailsPositionNumber === undefined) {
+            item.examItemDetails = item.examItemDetails?.map((detail) => ({
+              ...detail,
+              value:
+                detail.hasOrder && !detail.cancelReasonId
+                  ? value
+                  : detail.value,
+            }));
+          } else {
+            // 該当するdetailの値を更新
+            item.examItemDetails = item.examItemDetails?.map((detail) =>
+              detail.positionNumber === detailsPositionNumber
+                ? { ...detail, value: value }
+                : detail,
+            );
+          }
+        }
+        // バリデーションチェックを実施
+        const { validateResult } = validationCheck(item);
+
+        // バリデーション結果を反映
+        Object.assign(item, validateResult);
+      }
+      // 更新されたデータをステートに設定
+      setExamItemsData(updatedExamItems);
+
       onChange(updatedExamItems);
+    };
+
+    // positionNumberが1のexamItem
+    const firstPositionItem = examItemsData.find(
+      (item) => item.positionNumber === 1,
+    );
+    const { positionNumber, examItemDetails, examRegistResults, name } =
+      firstPositionItem ?? {};
+
+    // 対象のexamItemの中の、positionNumberが1のexamItemDetail
+    let leftItemDetail = examItemDetails?.find(
+      (detail) => detail.positionNumber === 左,
+    );
+    if (!leftItemDetail) {
+      leftItemDetail = {
+        positionNumber: 左,
+        name: "左",
+      };
     }
-  };
+    //  対象のexamItemの中の、positionNumberが2のexamItemDetail
+    let rightItemDetail = examItemDetails?.find(
+      (detail) => detail.positionNumber === 右,
+    );
+    if (!rightItemDetail) {
+      rightItemDetail = {
+        positionNumber: 右,
+        name: "右",
+      };
+    }
+    const isDisableItem =
+      (!leftItemDetail?.hasOrder || !!leftItemDetail.cancelReasonId) &&
+      (!rightItemDetail?.hasOrder || !!rightItemDetail.cancelReasonId);
+    const targetDetails = [leftItemDetail, rightItemDetail];
 
-  // positionNumberが1のexamItem
-  const firstPositionItem = examItemsData.find(
-    (item) => item.positionNumber === 1,
-  );
-  const { positionNumber, examItemDetails, examRegistResults, name } =
-    firstPositionItem ?? {};
-
-  // 対象のexamItemの中の、positionNumberが1のexamItemDetail
-  let leftItemDetail = examItemDetails?.find(
-    (detail) => detail.positionNumber === 左,
-  );
-  if (!leftItemDetail) {
-    leftItemDetail = {
-      positionNumber: 左,
-      name: "左",
-    };
-  }
-  //  対象のexamItemの中の、positionNumberが2のexamItemDetail
-  let rightItemDetail = examItemDetails?.find(
-    (detail) => detail.positionNumber === 右,
-  );
-  if (!rightItemDetail) {
-    rightItemDetail = {
-      positionNumber: 右,
-      name: "右",
-    };
-  }
-  const isDisableItem =
-    (!leftItemDetail?.hasOrder || !!leftItemDetail.cancelReasonId) &&
-    (!rightItemDetail?.hasOrder || !!rightItemDetail.cancelReasonId);
-  const targetDetails = [leftItemDetail, rightItemDetail];
-
-  return (
-    <Flex justify="flex-start" align="flex-start" direction="column">
-      <Stack>
-        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
-          <Text size="lg" fw={700} ta="center">
-            {name?.slice(0, 8)}
-          </Text>
-        </Paper>
-        <Group gap={16}>
-          {targetDetails?.map((detail) => {
-            const {
-              hasOrder,
-              positionNumber: detailPositionNumber,
-              name: detailName,
-              value,
-              prevValue,
-              unit,
-              cancelReasonId,
-            } = detail;
-            const isDisabled = !hasOrder || !!cancelReasonId;
-            const examPosition =
-              detailPositionNumber === 左
-                ? "左"
-                : detailPositionNumber === 右
-                  ? "右"
-                  : "";
-            return (
-              <Stack key={detailPositionNumber}>
-                <Paper w={524} h={51} bg="gray02" c="white" radius="itemName">
-                  <Text size="lg" fw={700} ta="center">
-                    {detailName?.slice(0, 14) || examPosition}
-                  </Text>
-                </Paper>
-                <Group>
-                  <TextInput
-                    classNames={{
-                      input: `${styles["input-textbox"]} ${
-                        isDisabled
-                          ? ""
-                          : firstPositionItem?.examRegistResults?.some(
-                                (x) => x.errorLevel === InputErrorLevel.異常,
-                              )
-                            ? `${styles["input-error"]}`
-                            : firstPositionItem?.examRegistResults?.some(
-                                  (x) => x.errorLevel === InputErrorLevel.警告,
-                                )
-                              ? `${styles["input-warning"]}`
-                              : ""
-                      }`,
-                    }}
-                    w={340}
-                    radius="md"
-                    size="inputComponent"
-                    value={value}
-                    onClick={() => toggleKeyboard(detailPositionNumber ?? 0)}
-                    onChange={(e) =>
-                      handleChange(
-                        e.currentTarget.value,
-                        positionNumber ?? 0,
-                        detailPositionNumber ?? 0,
-                      )
-                    }
-                    disabled={isDisabled}
-                  />
-                  <Stack w={173} h={80} gap={4} justify="space-between">
-                    <Box>
-                      {prevValue && (
-                        <Text fw={700} mt={0}>
-                          (前回：{prevValue})
-                        </Text>
-                      )}
-                    </Box>
-                    <Box>
-                      <Text size="xs" mb={0}>
-                        {unit}
-                      </Text>
-                    </Box>
-                  </Stack>
-                </Group>
-              </Stack>
-            );
-          })}
-        </Group>
-        <Button
-          w={154}
-          h={64}
-          mt={40}
-          ml={914}
-          size="lg"
-          bg="white01"
-          variant="outline"
-          bd={"2px,solid"}
-          onClick={() => handleChange("", positionNumber)}
-          tabIndex={-1}
-          disabled={isDisableItem}
-        >
-          クリア
-        </Button>
-        {/* エラーメッセージの表示 */}
+    return (
+      <Flex justify="flex-start" align="flex-start" direction="column">
         <Stack gap={0}>
-          {(examRegistResults || []).map((error, index) => {
-            const isWarning = error.errorLevel === InputErrorLevel.警告;
-            return (
-              <Group key={index} c={isWarning ? "warning" : "error"}>
-                {isWarning ? (
-                  <IconExclamationCircleFilled size={32} />
-                ) : (
-                  <IconSquareRoundedXFilled size={32} />
-                )}
-                <Text size="sm" fw={700}>
-                  {error.description}
-                </Text>
-              </Group>
-            );
-          })}
-        </Stack>
-      </Stack>
-      <Group>
-        {targetDetails?.map((detail) => (
-          <Stack key={detail.positionNumber}>
-            <Box w={540}>
-              {showKeyboards[
-                detail.positionNumber === 左 ? "left" : "right"
-              ] && (
-                <div ref={closeKeyBoard}>
-                  {detail?.keyboard?.keyboardType === KeyboardType.テンキー ||
-                  detail?.keyboard?.keyboardType === undefined ? (
-                    <NumericKeyboard
-                      value={detail?.value ?? ""}
-                      integerLength={detail.integerLength}
-                      decimalLength={detail.decimalLength}
-                      onChange={(newValue) =>
+          <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16} mb={16}>
+            <Text size="lg" fw={700} ta="center">
+              {name?.slice(0, 8)}
+            </Text>
+          </Paper>
+          <Group gap={16}>
+            {targetDetails?.map((detail) => {
+              const {
+                hasOrder,
+                positionNumber: detailPositionNumber,
+                name: detailName,
+                value,
+                prevValue,
+                unit,
+                cancelReasonId,
+              } = detail;
+              const isDisabled = !hasOrder || !!cancelReasonId;
+              const examPosition =
+                detailPositionNumber === 左
+                  ? "左"
+                  : detailPositionNumber === 右
+                    ? "右"
+                    : "";
+              return (
+                <Stack key={detailPositionNumber}>
+                  <Paper w={524} h={51} bg="gray02" c="white" radius="itemName">
+                    <Text size="lg" fw={700} ta="center">
+                      {detailName?.slice(0, 14) || examPosition}
+                    </Text>
+                  </Paper>
+                  <Group>
+                    <TextInput
+                      classNames={{
+                        input: `${styles["input-textbox"]} ${
+                          isDisabled
+                            ? ""
+                            : firstPositionItem?.examRegistResults?.some(
+                                  (x) => x.errorLevel === InputErrorLevel.異常,
+                                )
+                              ? `${styles["input-error"]}`
+                              : firstPositionItem?.examRegistResults?.some(
+                                    (x) =>
+                                      x.errorLevel === InputErrorLevel.警告,
+                                  )
+                                ? `${styles["input-warning"]}`
+                                : ""
+                        }`,
+                      }}
+                      w={340}
+                      radius="md"
+                      size="inputComponent"
+                      value={value}
+                      onClick={() => toggleKeyboard(detailPositionNumber ?? 0)}
+                      onChange={(e) =>
                         handleChange(
-                          newValue,
+                          e.currentTarget.value,
                           positionNumber ?? 0,
-                          detail.positionNumber ?? 0,
+                          detailPositionNumber ?? 0,
                         )
                       }
-                      onConfirm={handleConfirm}
+                      disabled={isDisabled}
                     />
+                    <Stack w={173} h={80} gap={4} justify="space-between">
+                      <Box>
+                        {prevValue && (
+                          <Text fw={700} mt={0}>
+                            (前回：{prevValue})
+                          </Text>
+                        )}
+                      </Box>
+                      <Box>
+                        <Text size="xs" mb={0}>
+                          {unit}
+                        </Text>
+                      </Box>
+                    </Stack>
+                  </Group>
+                </Stack>
+              );
+            })}
+          </Group>
+          <Button
+            w={154}
+            h={64}
+            mt={48}
+            ml={914}
+            size="lg"
+            bg="white01"
+            variant="outline"
+            bd={"2px,solid"}
+            onClick={() => handleChange("", positionNumber)}
+            tabIndex={-1}
+            disabled={isDisableItem}
+          >
+            クリア
+          </Button>
+          {/* エラーメッセージの表示 */}
+          <Stack gap={0}>
+            {(examRegistResults || []).map((error, index) => {
+              const isWarning = error.errorLevel === InputErrorLevel.警告;
+              return (
+                <Group key={index} c={isWarning ? "warning" : "error"}>
+                  {isWarning ? (
+                    <IconExclamationCircleFilled size={32} />
                   ) : (
-                    <CollectionKeyboard
-                      value={detail?.value ?? ""}
-                      keyboardValues={detail.keyboard?.values ?? []}
-                      onChange={(newValue) =>
-                        handleChange(
-                          newValue,
-                          positionNumber,
-                          detail.positionNumber,
-                        )
-                      }
-                    />
+                    <IconSquareRoundedXFilled size={32} />
                   )}
-                </div>
-              )}
-            </Box>
+                  <Text size="sm" fw={700}>
+                    {error.description}
+                  </Text>
+                </Group>
+              );
+            })}
           </Stack>
-        ))}
-      </Group>
-    </Flex>
-  );
-}
+        </Stack>
+        <Group>
+          {targetDetails?.map((detail) => (
+            <Stack key={detail.positionNumber}>
+              <Box w={540}>
+                {showKeyboards[
+                  detail.positionNumber === 左 ? "left" : "right"
+                ] && (
+                  <div ref={closeKeyBoard}>
+                    {detail?.keyboard?.keyboardType === KeyboardType.テンキー ||
+                    detail?.keyboard?.keyboardType === undefined ? (
+                      <NumericKeyboard
+                        value={detail?.value ?? ""}
+                        integerLength={detail.integerLength}
+                        decimalLength={detail.decimalLength}
+                        onChange={(newValue) =>
+                          handleChange(
+                            newValue,
+                            positionNumber ?? 0,
+                            detail.positionNumber ?? 0,
+                          )
+                        }
+                        onConfirm={handleConfirm}
+                      />
+                    ) : (
+                      <CollectionKeyboard
+                        value={detail?.value ?? ""}
+                        keyboardValues={detail.keyboard?.values ?? []}
+                        onChange={(newValue) =>
+                          handleChange(
+                            newValue,
+                            positionNumber,
+                            detail.positionNumber,
+                          )
+                        }
+                      />
+                    )}
+                  </div>
+                )}
+              </Box>
+            </Stack>
+          ))}
+        </Group>
+      </Flex>
+    );
+  },
+);
+
+export default ExamNumericLR;

@@ -99,7 +99,7 @@ list.Count()  <> 0
 |健診日/開始時刻
 
 |InputNote
-|Yes
+|No
 |string
 |エラーオブジェクトに登録する入力項目Noなど
 
@@ -123,7 +123,7 @@ list.Count()  <> 0
 
 |InputNote
 |Yes
-|string
+|No
 |入力項目Noなど
 
 |===
@@ -137,6 +137,33 @@ list.Count()  <> 0
 * None
 
 ==== WARNING検証
+
+* 必須項目(PlaceSchedule.TeamCode)が空値
+** `PlaceSchedule.TeamCode` が `string.IsNullOrWhiteSpace` に該当する 
+*** PlaceScheduleの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。TeamCode`
+**** InputNote `PlaceSchedule.InputNote`
+
+* 必須項目(PlaceSchedule.PlaceCode)が空値
+** `PlaceSchedule.PlaceCode` が `string.IsNullOrWhiteSpace` に該当する 
+*** PlaceScheduleの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。PlaceCode`
+**** InputNote `PlaceSchedule.InputNote`
+
+* ユニークキーが重複するレコードが存在する
+** Thresholdsを以下の条件でGroupByし、複数レコードが存在する
+**** `PlaceSchedule.PlaceCode`
+**** `PlaceSchedule.TeamCode`
+**** `PlaceSchedule.ExamDate` ※DateOnly型にパース
+*** PlaceScheduleの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。TeamCode:{PlaceSchedule.TeamCode}/PlaceCode:{PlaceSchedule.PlaceCode}/ExamDate:{PlaceSchedule.ExamDate}`
+**** InputNote `PlaceSchedule.InputNote`
 
 * 会場IDが取得できない
 ** `[DB]places(会場).place_code(会場コード)` == `PlaceSchedule.PlaceCode` が存在しない
