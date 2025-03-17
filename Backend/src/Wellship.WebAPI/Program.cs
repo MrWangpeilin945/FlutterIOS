@@ -193,6 +193,8 @@ public static class IServiceCollectionExtension
         services.AddScoped<ExternalConnection.Usecases.Default.IPlaceScheduleUsecase, ExternalConnection.Usecases.Default.PlaceScheduleUsecase>();
         services.AddScoped<ExternalConnection.Usecases.Default.IStaffUsecase, ExternalConnection.Usecases.Default.StaffUsecase>();
         services.AddScoped<ExternalConnection.Usecases.Default.IExamNormalValueRangeUsecase, ExternalConnection.Usecases.Default.ExamNormalValueRangeUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.IDataImportUsecase, ExternalConnection.Usecases.KitashinagawaClinic.DataImportUsecase>();
+
         return services;
     }
     /// <summary>
