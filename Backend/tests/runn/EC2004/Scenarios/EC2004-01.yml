@@ -105,7 +105,7 @@ steps:
     test: |
       // sortNoが大きいリクエストが処理されることを確認
       len(current.rows) == 1
-      && current.rows[0].consult_number == "No-200401-2"
+      && current.rows[0].consult_number == "No2004012"
       && current.rows[0].progress_status == 11
       && current.rows[0].export_status == 11
       && current.rows[0].place_schedule_id == "a0002004-0000-0000-0001-000000000003"

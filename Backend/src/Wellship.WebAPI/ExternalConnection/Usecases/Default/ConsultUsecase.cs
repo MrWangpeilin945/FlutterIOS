@@ -2,8 +2,12 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
-
+using Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
+using System.Text.RegularExpressions;
 using System.Collections;
+using NJsonSchema.Validation;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -84,69 +88,100 @@ public class ConsultUsecase : IConsultUsecase
 
         // WARNING検証
         var warningConsults = new List<Consult>();
-
         // 連携モードが登録のみを抽出
         var registeConsults = consults.Where(x => x.ActionType == ActionType.登録);
 
-        // 必須項目の空値のチェック       連携キー, 会場コード, 班コード, 受診番号, 受診者コード
-        var consultProperties = new[] { "ConnectionCode", "PlaceCode", "TeamCode", "ConsultNumber", "ExamineeCd" };
-        foreach (var warning in registeConsults)
+        // 必須項目の空値のチェック
+        var spaceCheckProperties = new[]
         {
-            foreach (var propertyName in consultProperties)
+            "ConnectionCode",    // 連携キー
+            "PlaceCode",         // 会場コード
+            "TeamCode",          // 班コード
+            "ConsultNumber",     // 受診番号
+            "ExamineeCd"         // 受診者コード
+        };
+        // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
+        foreach (var warning in ValidationChecker.SpaceCheckProperties(registeConsults, spaceCheckProperties, _errorObjects))
+        {
+            // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
+            if (warning is Consult consult)
             {
-                var propertyValue = warning.GetType().GetProperty(propertyName)?.GetValue(warning)?.ToString();
-                if (string.IsNullOrWhiteSpace(propertyValue))
-                {
-                    warningConsults.Add(warning);
-                    _errorObjects.Add(new ErrorObject
-                    {
-                        Code = "10004",
-                        Message = $"必須項目が不足しています。{propertyName}",
-                        InputNote = warning.InputNote
-                    });
-                }
+                warningConsults.Add(consult);
             }
         }
-        var childProperties = new List<(string ParentProperty, string ChildProperty)>
+        var spaceCheckChildrenProperties = new List<(string ParentProperty, string ChildProperty)>
         {
-            ("PreviousResults", "ExamItemDetailCd"),        // 過去検査結果->検査項目明細CD
-            ("PreviousResults", "Value"),                   // 過去検査結果->結果値
-            ("ConsultThresholds", "ThresholdCode"),         // 基準値判定->基準値判定コード
-            ("ConsultNotes", "Code"),                       // 受診特記->検査特記コード
+            ("PreviousResults",      "ExamItemDetailCd"),   // 過去検査結果->検査項目明細CD
+            ("PreviousResults",      "Value"),              // 過去検査結果->結果値
+            ("ConsultThresholds",    "ThresholdCode"),      // 基準値判定->基準値判定コード
+            ("ConsultNotes",         "Code"),               // 受診特記->検査特記コード
             ("ExamItemDetailOrders", "ExamItemDetailCd")    // 検査項目明細依頼->検査項目明細CD
         };
-        foreach (var warning in registeConsults)
+        // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
+        foreach (var warning in ValidationChecker.SpaceCheckChildrenProperties(registeConsults, spaceCheckChildrenProperties, _errorObjects))
         {
-            foreach (var (parentProperty, childProperty) in childProperties)
+            // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
+            if (warning is Consult consult)
             {
-                var parentObj = warning.GetType().GetProperty(parentProperty)?.GetValue(warning);
-                if (parentObj != null)
-                {
-                    if (parentObj is IEnumerable parentEnumerable)
-                    {
-                        foreach (var item in parentEnumerable)
-                        {
-                            var propertyValue = item.GetType().GetProperty(childProperty)?.GetValue(item)?.ToString();
-                            if (string.IsNullOrWhiteSpace(propertyValue))
-                            {
-                                warningConsults.Add(warning);
-                                _errorObjects.Add(new ErrorObject
-                                {
-                                    Code = "10004",
-                                    Message = $"必須項目が不足しています。{parentProperty}.{childProperty}",
-                                    InputNote = warning.InputNote
-                                });
-                            }
-                        }
-                    }
-                }
+                warningConsults.Add(consult);
             }
         }
 
         // キー重複チェック
-        // 文字数チェック
-        // 文字形式チェック
-
+        var duplicateCheckProperties = new[]
+        {
+            "SortNo"            // 処理順
+        };
+        // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
+        foreach (var warning in ValidationChecker.DuplicateCheckProperties(registeConsults, duplicateCheckProperties, _errorObjects))
+        {
+            // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
+            if (warning is Consult consult)
+            {
+                warningConsults.Add(consult);
+            }
+        }
+        var duplicateCheckChildProperties = new List<(string ParentProperty, string ChildProperty)>
+        {
+            ("ConsultThresholds",  "ThresholdCode"),        // 基準値判定->基準値判定コード
+            ("ConsultThresholds",  "Priority"),             // 基準値判定->優先
+            ("ConsultNotes",       "Code"),                 // 受診特記->検査特記コード
+        };
+        // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
+        foreach (var warning in ValidationChecker.DuplicateCheckChildrenProperties(registeConsults, duplicateCheckChildProperties, _errorObjects))
+        {
+            // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
+            if (warning is Consult consult)
+            {
+                warningConsults.Add(consult);
+            }
+        }
+        // 文字数のチェック
+        var stringLengthCheckProperties = new[]
+        {
+            "ConsultNumber"            // 受診番号
+        };
+        var maxLengths = new [] { 50 };
+        // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
+        foreach (var warning in ValidationChecker.StringLengthCheckProperties(registeConsults, spaceCheckProperties, maxLengths, _errorObjects))
+        {
+            // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
+            if (warning is Consult consult)
+            {
+                warningConsults.Add(consult);
+            }
+        }
+        // 形式のチェック
+        foreach (var warning in registeConsults.Where(x => !Regex.IsMatch(x.ConsultNumber, @"^[a-zA-Z0-9]+$")))
+        {
+            warningConsults.Add(warning);
+            _errorObjects.Add(new ErrorObject
+            {
+                Code = "10006",
+                Message = $"値の形式が無効です。ConsultNumber:{warning.ConsultNumber}",
+                InputNote = warning.InputNote
+            });
+        }
         // 受診番号が異なる連携キーで登録されている
         foreach (var warning in registeConsults)
         {
@@ -317,7 +352,7 @@ public class ConsultUsecase : IConsultUsecase
             // PKが重複するレコードが存在する
             // ExamItemDetailCd+ExamDateで重複する
             var duplicateExamItemDetailCds = consult.ExamItemDetailOrders
-                                                    .GroupBy(x => new { x.ExamItemDetailCd})
+                                                    .GroupBy(x => new { x.ExamItemDetailCd })
                                                     .Where(x => x.Count() > 1)
                                                     .Select(x => x);
             foreach (var warning in duplicateExamItemDetailCds)
