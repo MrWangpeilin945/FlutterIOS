@@ -5,12 +5,12 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 public interface IDataImportUsecase
 {
     /// <summary>
-    /// C1001_ファイル取り込みを実行する_随時
+    /// EC1001_ファイル取り込みを実行する_随時
     /// </summary>
     /// <param name="bucketName">バケット名</param>
-    /// <param name="fileKey">オブジェクト名</param>
+    /// <param name="objectKey">オブジェクト名</param>
     /// <returns>エラーリスト</returns>
-    public Task<Boolean> StoreConstantlyDataAsync(string bucketName, string fileKey);
+    public Task<Boolean> StoreConstantlyDataAsync(string bucketName, string objectKey);
 
     /// <summary>
     /// EC1002_ファイル取り込みを実行する_日次

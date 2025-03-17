@@ -1,4 +1,6 @@
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
@@ -7,7 +9,7 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.KitashinagawaClinic;
 
 /// <summary>
-/// 
+/// 北品川クリニック様向け　データ取り込み処理
 /// </summary>
 public class DataImportUsecase : IDataImportUsecase
 {
@@ -40,7 +42,7 @@ public class DataImportUsecase : IDataImportUsecase
     /// <param name="consultUsecase">EC2004_受診を更新する</param>
     /// <param name="ticketUsecase">EC2002_受付を更新する</param>
     public DataImportUsecase(ITeamUsecase teamUsecase, IPlaceUsecase placeUsecase, IPlaceScheduleUsecase placeScheduleUsecase, IStaffUsecase staffUsecase,
- 　                          IOrganizationUsecase organizationUsecase, IThresholdUsecase thresholdUsecase, IExamNormalValueRangeUsecase examNormalValueRangeUsecase,
+                             IOrganizationUsecase organizationUsecase, IThresholdUsecase thresholdUsecase, IExamNormalValueRangeUsecase examNormalValueRangeUsecase,
                              IExamineeUsecase examineeUsecase, IConsultUsecase consultUsecase, ITicketUsecase ticketUsecase)
     {
         _teamUsecase = teamUsecase;
@@ -59,17 +61,26 @@ public class DataImportUsecase : IDataImportUsecase
     /// EC1001_ファイル取り込みを実行する_随時(北品川)
     /// </summary>
     /// <param name="bucketName">バケット名</param>
-    /// <param name="fileKey">オブジェクト名</param>
+    /// <param name="objectKey">オブジェクト名</param>
     /// <returns></returns>
-    public async Task<Boolean> StoreConstantlyDataAsync(string bucketName, string fileKey)
+    public async Task<Boolean> StoreConstantlyDataAsync(string bucketName, string objectKey)
     {
         var s3ZipFileLister = new S3ConnectUtility();
 
         var errorObjects = new List<ErrorObject>();
 
+        // Dummy 開始時刻
+        errorObjects.Add(new ErrorObject
+        {
+            Code = "00000",
+            Message = "開始日時",
+            InputNote = DateTime.Now.ToString("yyyyMMdd HHmmss"),
+        }
+    );
+
         try
         {
-            var getFileData = await s3ZipFileLister.DownloadToMemoryAsync(bucketName, fileKey);
+            var getFileData = await s3ZipFileLister.DownloadToMemoryAsync(bucketName, objectKey);
 
             var ec2001s = ZipFileProcessor.SearchFilesInZipStream(getFileData, "ec2001*.json");
             if (ec2001s.Any())
@@ -123,17 +134,40 @@ public class DataImportUsecase : IDataImportUsecase
             }
 
             // ファイルを移動
-            await s3ZipFileLister.MoveFileAsync(bucketName, fileKey, $"Backup/ConstantlyData/{DateTime.Now.ToString("yyyyMMdd_HHmmssfff")}/");
+            await s3ZipFileLister.MoveFileAsync(bucketName, objectKey, $"Backup/ConstantlyData/{DateTime.Now.ToString("yyyyMMdd_HHmmssfff")}");
         }
         catch (Exception ex)
         {
+            // Todo 例外を握りつぶす(Jsonの型エラーとかが飛んでくる可能性があるため)
+            errorObjects.Add(new ErrorObject
+            {
+                Code = "99999",
+                Message = ex.Message,
+                InputNote = ex.GetType().Name,
+            }
+                );
         }
+
+        // Dummy 終了時刻
+        errorObjects.Add(new ErrorObject
+        {
+            Code = "00000",
+            Message = "終了日時",
+            InputNote = DateTime.Now.ToString("yyyyMMdd HHmmss"),
+        }
+    );
 
         if (errorObjects.Any())
         {
+            var options = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                WriteIndented = true
+            };
+
             var fileContents = new Dictionary<string, byte[]>
             {
-                { $"ErrorRec{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.json", JsonSerializer.SerializeToUtf8Bytes(errorObjects) }
+                { $"ErrorRec{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.json", JsonSerializer.SerializeToUtf8Bytes(errorObjects,options) }
             };
 
             var uploadFile = $"FromWELLSHIP/StoreDailyData/{DateTime.Now.ToString("yyyyMMdd")}/ErrorRec{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.zip";
@@ -155,6 +189,15 @@ public class DataImportUsecase : IDataImportUsecase
         var s3SharchFiles = await s3ZipFileLister.ListFilesInFolderAsync(bucketName, "ToWELLSHIP/", "ToWELLSHIP*.Zip");
 
         var errorObjects = new List<ErrorObject>();
+
+        // Dummy 開始時刻
+        errorObjects.Add(new ErrorObject
+        {
+            Code = "00000",
+            Message = "開始日時",
+            InputNote = DateTime.Now.ToString("yyyyMMdd HHmmss"),
+        }
+    );
 
         try
         {
@@ -333,18 +376,42 @@ public class DataImportUsecase : IDataImportUsecase
                 }
 
                 // ファイルを移動
-                await s3ZipFileLister.MoveFileAsync(bucketName, zipFile, $"Backup/StoreDailyData/{DateTime.Now.ToString("yyyyMMdd")}/");
+                await s3ZipFileLister.MoveFileAsync(bucketName, zipFile, $"Backup/StoreDailyData/{DateTime.Now.ToString("yyyyMMdd")}");
             }
         }
         catch (Exception ex)
         {
+            // Todo 例外を握りつぶす(Jsonの型エラーとかが飛んでくる可能性があるため)
+            errorObjects.Add(new ErrorObject
+            {
+                Code = "99999",
+                Message = ex.Message,
+                InputNote = ex.GetType().Name,
+            }
+                );
         }
+
+        // Dummy 終了時刻
+        errorObjects.Add(new ErrorObject
+        {
+            Code = "00000",
+            Message = "終了日時",
+            InputNote = DateTime.Now.ToString("yyyyMMdd HHmmss"),
+        }
+    );
 
         if (errorObjects.Any())
         {
+
+            var options = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All), 
+                WriteIndented = true 
+            };
+
             var fileContents = new Dictionary<string, byte[]>
             {
-                { $"ErrorRec{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.json", JsonSerializer.SerializeToUtf8Bytes(errorObjects) }
+                { $"ErrorRec{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.json", JsonSerializer.SerializeToUtf8Bytes(errorObjects,options) }
             };
 
             var uploadFile = $"FromWELLSHIP/StoreDailyData/{DateTime.Now.ToString("yyyyMMdd")}/ErrorRec{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.zip";

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using NSwag.Annotations;
 
+using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
@@ -30,22 +31,21 @@ public class DataImportController : ControllerBase
     /// <summary>
     /// EC1001_ファイル取り込みを実行する_随時
     /// </summary>
-    /// <param name="bucketName">バケット名</param>
-    /// <param name="fileKey">オブジェクト名</param>
+    /// <param name="s3EventRequest">S3イベントのリクエストモデル</param>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(ErrorObject))]
     [HttpPost]
     [Route("api/v{version:apiVersion}/external/dataImport/constantlyData")]
-    public IActionResult StoreDailyDataAsync([FromHeader] string? テナントキー ,[FromBody] string? bucketName ,[FromQuery] string? fileKey)
+    public IActionResult StoreConstantlyDataAsync([FromBody] S3EventRequest s3EventRequest)
     {
         // DBとバケットの検証
 
-        if (bucketName == null || fileKey == null)
+        if (string.IsNullOrWhiteSpace(s3EventRequest.BucketName) || string.IsNullOrWhiteSpace(s3EventRequest.ObjectKey))
         {
             return BadRequest();
         }
 
-        var task = Task.Run(() => _dataImportUsecase.StoreConstantlyDataAsync(bucketName, fileKey)); // 別スレッドで非同期メソッドを実行
+        var task = Task.Run(() => _dataImportUsecase.StoreConstantlyDataAsync(s3EventRequest.BucketName, s3EventRequest.ObjectKey)); // 別スレッドで非同期メソッドを実行
 
         return Accepted();
 
@@ -54,19 +54,19 @@ public class DataImportController : ControllerBase
     /// <summary>
     /// EC1002_ファイル取り込みを実行する_日次
     /// </summary>
-    /// <param name="bucketName">バケット名</param>
+    /// <param name="s3EventRequest">S3イベントのリクエストモデル</param>
     /// <returns></returns>
     [ProducesResponseType(StatusCodes.Status202Accepted, Type = typeof(ErrorObject))]
     [HttpPost]
     [Route("api/v{version:apiVersion}/external/dataImport/dailyData")]
-    public IActionResult StoreDailyDataAsync([FromBody] string? bucketName)
+    public IActionResult StoreDailyDataAsync([FromBody] S3EventRequest s3EventRequest)
     {
-        if (bucketName == null)
+        if (string.IsNullOrWhiteSpace(s3EventRequest.BucketName))
         {
             return BadRequest();
         }
 
-        var task = Task.Run(() => _dataImportUsecase.StoreDailyDataAsync(bucketName)); // 別スレッドで非同期メソッドを実行
+        var task = Task.Run(() => _dataImportUsecase.StoreDailyDataAsync(s3EventRequest.BucketName)); // 別スレッドで非同期メソッドを実行
 
         return Accepted();
 
