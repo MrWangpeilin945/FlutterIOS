@@ -1,7 +1,7 @@
 = WELLSHIPアーキテクチャ設計書
 :author: 両備システムズ ヘルスケアソリューションカンパニー ウェルネスビジネス事業部
-:revdate: 2025-02-12
-:revnumber: 0.6
+:revdate: 2025-03-18
+:revnumber: 0.8
 :doctype: book
 :lang: ja
 :toc: left
@@ -25,4 +25,5 @@ include::docs/1_はじめに.adoc[leveloffset=+1]
 include::docs/2_システムアーキテクチャ.adoc[leveloffset=+1]
 include::docs/3_1_アプリケーションアーキテクチャ.adoc[leveloffset=+1]
 // include::docs/4_基盤共通機能.adoc[leveloffset=+1]
+include::docs/5_CICDパイプライン.adoc[leveloffset=+1]
 include::docs/改版履歴.adoc[leveloffset=+1]
