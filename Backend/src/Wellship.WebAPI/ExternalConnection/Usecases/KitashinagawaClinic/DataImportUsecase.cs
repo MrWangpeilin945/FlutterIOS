@@ -186,7 +186,7 @@ public class DataImportUsecase : IDataImportUsecase
     {
         var s3ZipFileLister = new S3ConnectUtility();
 
-        var s3SharchFiles = await s3ZipFileLister.ListFilesInFolderAsync(bucketName, "ToWELLSHIP/", "ToWELLSHIP*.Zip");
+        var s3SharchFiles = await s3ZipFileLister.ListFilesInFolderAsync(bucketName, "ToWELLSHIP/Daily/", "ToWELLSHIP*.Zip");
 
         var errorObjects = new List<ErrorObject>();
 
