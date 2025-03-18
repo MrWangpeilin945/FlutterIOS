@@ -54,7 +54,7 @@ steps:
         INSERT INTO
           resultcollector.consult
           (consult_id, consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
-        VALUES('c0002004-0000-0000-0003-000000000001', 'No-200403-1', 11, 11, 'a0002004-0000-0000-0003-000000000001', '特記事項2004031', 'e0002004-0000-0000-0003-000000000001', 'CCS-2004-9999', CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('c0002004-0000-0000-0003-000000000001', 'No2004031', 11, 11, 'a0002004-0000-0000-0003-000000000001', '特記事項2004031', 'e0002004-0000-0000-0003-000000000001', 'CCS-2004-9999', CURRENT_TIMESTAMP, 'ec2004');
   getConsult:
     desc: "受診情報を取得する"
     db:
@@ -88,7 +88,7 @@ steps:
       && len(current.res.body) == 1
       && current.res.body[0].code == "10002"
       && current.res.body[0].inputNote == "2004031"
-      && current.res.body[0].message == "指定されたConsultNumberが既に登録済みです。Code:No-200403-1"
+      && current.res.body[0].message == "指定されたConsultNumberが既に登録済みです。Code:No2004031"
     dump:
       expr: current.res.body
       out: ../Dump/EC2004-03.json

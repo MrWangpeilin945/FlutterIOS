@@ -91,8 +91,8 @@ steps:
         INSERT INTO
           resultcollector.consult
           (consult_id, consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
-        VALUES('c0002004-0000-0000-0015-000000000001', 'No-200415-1', 11, 11, 'a0002004-0000-0000-0015-000000000001', '特記事項2004151', 'e0002004-0000-0000-0015-000000000001', 'CCS-200415-1', CURRENT_TIMESTAMP, 'ec2004')
-        ,     ('c0002004-0000-0000-0015-000000000002', 'No-200415-2', 11, 11, 'a0002004-0000-0000-0015-000000000002', '特記事項2004152', 'e0002004-0000-0000-0015-000000000002', 'CCS-200415-2', CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('c0002004-0000-0000-0015-000000000001', 'No200415a1', 11, 11, 'a0002004-0000-0000-0015-000000000001', '特記事項2004151', 'e0002004-0000-0000-0015-000000000001', 'CCS-200415-1', CURRENT_TIMESTAMP, 'ec2004')
+        ,     ('c0002004-0000-0000-0015-000000000002', 'No200415a2', 11, 11, 'a0002004-0000-0000-0015-000000000002', '特記事項2004152', 'e0002004-0000-0000-0015-000000000002', 'CCS-200415-2', CURRENT_TIMESTAMP, 'ec2004');
         -- 受診特記
         INSERT INTO
           resultcollector.consult_notes
@@ -236,7 +236,7 @@ steps:
       && len(current.res.body) == 14
       && current.res.body[0].code == "10002"
       && current.res.body[0].inputNote == "2004151"
-      && current.res.body[0].message == "指定されたConsultNumberが既に登録済みです。Code:No-200415-1"
+      && current.res.body[0].message == "指定されたConsultNumberが既に登録済みです。Code:No200415a1"
       && current.res.body[1].code == "10001"
       && current.res.body[1].inputNote == "2004152"
       && current.res.body[1].message == "指定されたPlaceCodeがシステム上に存在しません。Code:P2004-15-2"
@@ -305,7 +305,7 @@ steps:
       len(current.rows) == 3
       // 受診の更新
       && current.rows[0].consult_id == consultData[0].consult_id
-      && current.rows[0].consult_number == "No-200415-100"
+      && current.rows[0].consult_number == "No200415a100"
       && current.rows[0].progress_status == 11
       // 結果出力状況の変更がないことを確認
       && current.rows[0].export_status == consultData[0].export_status
@@ -332,7 +332,7 @@ steps:
       && current.rows[1].created_by == "ExternalConnection"
 
       // 受診の登録
-      && current.rows[2].consult_number == "No-200415-300"
+      && current.rows[2].consult_number == "No200415a300"
       && current.rows[2].progress_status == 11
       && current.rows[2].export_status == 11
       && current.rows[2].place_schedule_id == "a0002004-0000-0000-0015-000000000003"
