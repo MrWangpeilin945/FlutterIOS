@@ -67,9 +67,7 @@ public class EnvironmentVariableConnectionStringProvider() : IConnectionStringPr
             Username = userId,
             Password = password,
             Database = key,
-            ApplicationName = $"Wellship.ResultCollector ({key})",
-            // TODO テスト用に100→400にプールサイズを上げています。試験後削除します。
-            MaxPoolSize = 400
+            ApplicationName = $"Wellship.ResultCollector ({key})"
         };
         var connectionString = builder.ToString();
         return Task.FromResult(connectionString);
