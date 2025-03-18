@@ -258,7 +258,7 @@ steps:
       len(current.rows) == 4
       // 受診の更新
       && current.rows[0].consult_id == consultData[0].consult_id
-      && current.rows[0].consult_number == "No-200402-100"
+      && current.rows[0].consult_number == "No200402100"
       && current.rows[0].progress_status == 11
       // 結果出力状況の変更がないことを確認
       && current.rows[0].export_status == consultData[0].export_status
@@ -285,7 +285,7 @@ steps:
       && current.rows[1].created_by == "ExternalConnection"
 
       // 受診の登録
-      && current.rows[2].consult_number == "No-200402-300"
+      && current.rows[2].consult_number == "No200402300"
       && current.rows[2].progress_status == 11
       && current.rows[2].export_status == 11
       && current.rows[2].place_schedule_id == "a0002004-0000-0000-0002-000000000003"
