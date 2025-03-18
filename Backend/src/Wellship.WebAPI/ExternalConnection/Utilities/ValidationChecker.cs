@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
@@ -198,6 +199,41 @@ public static class ValidationChecker
                     {
                         Code = "10005",
                         Message = $"制限数を超えています。{propertyName}:{propertyValue}",
+                        InputNote = inputNote ?? ""
+                    });
+                }
+            }
+            index++;
+        }
+        return warningList;
+    }
+
+    /// <summary>
+    /// 文字形式のチェック
+    /// </summary>
+    /// <param name="requestCollection">リクエストクラスのコレクション</param>
+    /// <param name="properties">チェック対象のプロパティ名一覧</param>
+    /// <param name="patterns">文字パターン一覧</param>
+    /// <param name="errorObjects">エラーオブジェクト</param>
+    public static List<object> StringPatternCheckProperties(IEnumerable<object> requestCollection, string[] properties, string[] patterns, List<ErrorObject> errorObjects)
+    {
+        var warningList = new List<object>();
+
+        foreach (var request in requestCollection)
+        {
+            int index = 0; 
+            // プロパティ単位にチェックする
+            foreach (var propertyName in properties)
+            {
+                var propertyValue = request.GetType().GetProperty(propertyName)?.GetValue(request)?.ToString();
+                if (!string.IsNullOrEmpty(propertyValue) && !Regex.IsMatch(propertyValue, patterns[index]))
+                {
+                    var inputNote = request.GetType().GetProperty("InputNote")?.GetValue(request)?.ToString();
+                    warningList.Add(request);
+                    errorObjects.Add(new ErrorObject
+                    {
+                        Code = "10006",
+                        Message = $"値の形式が無効です。{propertyName}:{propertyValue}",
                         InputNote = inputNote ?? ""
                     });
                 }

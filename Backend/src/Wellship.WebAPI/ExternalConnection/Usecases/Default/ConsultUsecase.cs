@@ -4,10 +4,6 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
 using System.Text.RegularExpressions;
-using System.Collections;
-using NJsonSchema.Validation;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -163,7 +159,7 @@ public class ConsultUsecase : IConsultUsecase
         };
         var maxLengths = new [] { 50 };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
-        foreach (var warning in ValidationChecker.StringLengthCheckProperties(registeConsults, spaceCheckProperties, maxLengths, _errorObjects))
+        foreach (var warning in ValidationChecker.StringLengthCheckProperties(registeConsults, stringLengthCheckProperties, maxLengths, _errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
             if (warning is Consult consult)
@@ -171,16 +167,19 @@ public class ConsultUsecase : IConsultUsecase
                 warningConsults.Add(consult);
             }
         }
-        // 形式のチェック
-        foreach (var warning in registeConsults.Where(x => !Regex.IsMatch(x.ConsultNumber, @"^[a-zA-Z0-9]+$")))
+        // 文字形式のチェック
+        var stringPatternsCheckProperties = new[]
         {
-            warningConsults.Add(warning);
-            _errorObjects.Add(new ErrorObject
+            "ConsultNumber"            // 受診番号
+        };
+        var patterns = new [] { @"^[a-zA-Z0-9]+$" };
+        foreach (var warning in ValidationChecker.StringPatternCheckProperties(registeConsults, stringPatternsCheckProperties, patterns, _errorObjects))
+        {
+            // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
+            if (warning is Consult consult)
             {
-                Code = "10006",
-                Message = $"値の形式が無効です。ConsultNumber:{warning.ConsultNumber}",
-                InputNote = warning.InputNote
-            });
+                warningConsults.Add(consult);
+            }
         }
         // 受診番号が異なる連携キーで登録されている
         foreach (var warning in registeConsults)
