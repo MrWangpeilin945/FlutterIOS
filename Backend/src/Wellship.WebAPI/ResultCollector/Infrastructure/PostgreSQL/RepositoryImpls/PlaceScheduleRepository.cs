@@ -241,7 +241,7 @@ public class PlaceScheduleRepository : IPlaceScheduleRepository
 
         const string sql = @"
         insert 
-        into resultcollector.place_schedule_lock_histoies( 
+        into resultcollector.place_schedule_lock_histories( 
             place_schedule_id
             , status
             , created_at
