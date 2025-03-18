@@ -1,5 +1,3 @@
-using System.Data.Common;
-
 using Dapper;
 
 using Ryobi.Wellship.Core.Enums;
@@ -7,6 +5,7 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Transaction;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 
@@ -35,297 +34,297 @@ public class ConsultRepository : IConsultRepository
     public async Task UpsertConsultsAsync(List<ConsultEntity> consults, DateTimeOffset createdAt, string createdBy)
     {
         // ConnectionCodeでグループ化しSortNoの最大のレコードを絞り込む
-        var actionConsults = consults.GroupBy(x => x.ConnectionCode, 
+        var actionConsults = consults.GroupBy(x => x.ConnectionCode,
                                              (y, z) => z.OrderByDescending(a => a.SortNo).First())
                                      .ToArray();
-        var connection = await _dbConnectionProvider.GetOrOpenAsync();
-        var transaction = await connection.BeginTransactionAsync();
-        try
+        using var scope = TransactionScopeHelper.GetTransactionScope();
         {
-            // 更新処理
-            if (actionConsults.Any(x => x.ActionType == ActionType.登録))
+            using var connection = await _dbConnectionProvider.GetOrOpenAsync();
             {
-                var upsertConsults = actionConsults.Where(x => x.ActionType == ActionType.登録)
-                                                   .Select(x => new {
-                                                        ConsultId = Guid.NewGuid()
-                                                        , ConsultNumber = x.ConsultNumber
-                                                        , ProgressStatus = (int)ConsultProgressStatus.来場待ち
-                                                        , ExportStatus = (int)ConsultResultExportStatus.未出力
-                                                        , PlaceScheduleId = x.PlaceScheduleId
-                                                        , Note = x.Note
-                                                        , ExamineeId = x.ExamineeId
-                                                        , ExternalConnectionCode = x.ConnectionCode
-                                                        , CreatedAt = createdAt
-                                                        , CreatedBy = createdBy
-                                                        , CancelStatus = (int)ConsultProgressStatus.キャンセル
-                                                        , WaitStatus = (int)ConsultProgressStatus.来場待ち
-                                                   }).ToArray();       
-                // consult（受診）
-                const string mergeConsultSql = @"
-                merge
-                into resultcollector.consult as cs
-                    using (values (@ConsultId, @ConsultNumber, @ProgressStatus, @ExportStatus, @PlaceScheduleId, @Note, 
-                                   @ExamineeId, @ExternalConnectionCode, @CreatedAt, @CreatedBy)) as new_data(
-                        consult_id
-                        , consult_number
-                        , progress_status
-                        , export_status
-                        , place_schedule_id
-                        , note
-                        , examinee_id
-                        , external_connection_code
-                        , created_at
-                        , created_by
-                    )
-                    on cs.external_connection_code = new_data.external_connection_code
-                when matched then 
-                    update set
-                        consult_number = new_data.consult_number
-                        , note = new_data.note
-                        , external_connection_code = new_data.external_connection_code
-                        , place_schedule_id = new_data.place_schedule_id
-                        , examinee_id = new_data.examinee_id
-                        , created_at = new_data.created_at
-                        , created_by = new_data.created_by 
-                        , progress_status =
-                            CASE
-                                WHEN cs.progress_status = @CancelStatus THEN @WaitStatus
-                                ELSE cs.progress_status
-                            END
-                when not matched then
-                    insert (
-                        consult_id
-                        , consult_number
-                        , progress_status
-                        , export_status
-                        , place_schedule_id
-                        , note
-                        , examinee_id
-                        , external_connection_code
-                        , created_at
-                        , created_by
-                    )
-                    values (
-                        new_data.consult_id
-                        , new_data.consult_number
-                        , new_data.progress_status
-                        , new_data.export_status
-                        , new_data.place_schedule_id
-                        , new_data.note
-                        , new_data.examinee_id
-                        , new_data.external_connection_code
-                        , new_data.created_at
-                        , new_data.created_by
-                    );";
-                await connection.ExecuteAsync(mergeConsultSql, upsertConsults);
-            }
+                // 更新処理
+                if (actionConsults.Any(x => x.ActionType == ActionType.登録))
+                {
+                    var upsertConsults = actionConsults.Where(x => x.ActionType == ActionType.登録)
+                                                       .Select(x => new
+                                                       {
+                                                           ConsultId = Guid.NewGuid(),
+                                                           ConsultNumber = x.ConsultNumber,
+                                                           ProgressStatus = (int)ConsultProgressStatus.来場待ち,
+                                                           ExportStatus = (int)ConsultResultExportStatus.未出力,
+                                                           PlaceScheduleId = x.PlaceScheduleId,
+                                                           Note = x.Note,
+                                                           ExamineeId = x.ExamineeId,
+                                                           ExternalConnectionCode = x.ConnectionCode,
+                                                           CreatedAt = createdAt,
+                                                           CreatedBy = createdBy,
+                                                           CancelStatus = (int)ConsultProgressStatus.キャンセル,
+                                                           WaitStatus = (int)ConsultProgressStatus.来場待ち
+                                                       }).ToArray();
+                    // consult（受診）
+                    const string mergeConsultSql = @"
+                    merge
+                    into resultcollector.consult as cs
+                        using (values (@ConsultId, @ConsultNumber, @ProgressStatus, @ExportStatus, @PlaceScheduleId, @Note, 
+                                       @ExamineeId, @ExternalConnectionCode, @CreatedAt, @CreatedBy)) as new_data(
+                            consult_id
+                            , consult_number
+                            , progress_status
+                            , export_status
+                            , place_schedule_id
+                            , note
+                            , examinee_id
+                            , external_connection_code
+                            , created_at
+                            , created_by
+                        )
+                        on cs.external_connection_code = new_data.external_connection_code
+                    when matched then 
+                        update set
+                            consult_number = new_data.consult_number
+                            , note = new_data.note
+                            , external_connection_code = new_data.external_connection_code
+                            , place_schedule_id = new_data.place_schedule_id
+                            , examinee_id = new_data.examinee_id
+                            , created_at = new_data.created_at
+                            , created_by = new_data.created_by 
+                            , progress_status =
+                                CASE
+                                    WHEN cs.progress_status = @CancelStatus THEN @WaitStatus
+                                    ELSE cs.progress_status
+                                END
+                    when not matched then
+                        insert (
+                            consult_id
+                            , consult_number
+                            , progress_status
+                            , export_status
+                            , place_schedule_id
+                            , note
+                            , examinee_id
+                            , external_connection_code
+                            , created_at
+                            , created_by
+                        )
+                        values (
+                            new_data.consult_id
+                            , new_data.consult_number
+                            , new_data.progress_status
+                            , new_data.export_status
+                            , new_data.place_schedule_id
+                            , new_data.note
+                            , new_data.examinee_id
+                            , new_data.external_connection_code
+                            , new_data.created_at
+                            , new_data.created_by
+                        );";
+                    await connection.ExecuteAsync(mergeConsultSql, upsertConsults);
+                }
 
-            // 削除処理
-            if (actionConsults.Any(x => x.ActionType == ActionType.削除))
-            {
-                // consult（受診）
-                var deleteConsults = actionConsults.Where(x => x.ActionType == ActionType.削除)
-                                                   .Select(x => x.ConnectionCode)
-                                                   .ToArray();
-                const string updateConsultSql = @"
-                update resultcollector.consult 
-                set
-                    progress_status = @ProgressStatus
-                    , created_at = @CreatedAt
-                    , created_by = @CreatedBy
-                where
-                    external_connection_code = any (@ConnectionCodes);";
-                await connection.ExecuteAsync(updateConsultSql, new { ProgressStatus = (int)ConsultProgressStatus.キャンセル 
-                                                                      , CreatedAt = createdAt
-                                                                      , CreatedBy = createdBy
-                                                                      , ConnectionCodes = deleteConsults});
-            }
+                // 削除処理
+                if (actionConsults.Any(x => x.ActionType == ActionType.削除))
+                {
+                    // consult（受診）
+                    var deleteConsults = actionConsults.Where(x => x.ActionType == ActionType.削除)
+                                                       .Select(x => x.ConnectionCode)
+                                                       .ToArray();
+                    const string updateConsultSql = @"
+                    update resultcollector.consult 
+                    set
+                        progress_status = @ProgressStatus
+                        , created_at = @CreatedAt
+                        , created_by = @CreatedBy
+                    where
+                        external_connection_code = any (@ConnectionCodes);";
+                    await connection.ExecuteAsync(updateConsultSql, new
+                    {
+                        ProgressStatus = (int)ConsultProgressStatus.キャンセル,
+                        CreatedAt = createdAt,
+                        CreatedBy = createdBy,
+                        ConnectionCodes = deleteConsults
+                    });
+                }
 
-            var consultIds = actionConsults.Select(x => x.ConsultId).ToList();
-            // consult_notes（受診特記）
-            const string deleteConsultNotesSql = @"
-            delete from 
-                resultcollector.consult_notes 
-            where
-                consult_id = any (@ConsultIds);";
-            await connection.ExecuteAsync(deleteConsultNotesSql, new { ConsultIds = consultIds });
-
-            // exam_item_detail_orders（検査項目明細依頼）
-            const string deleteExamItemDetailOrdersSql = @"
-            delete from
-                resultcollector.exam_item_detail_orders 
-            where
-                consult_id = any (@ConsultIds);";
-            await connection.ExecuteAsync(deleteExamItemDetailOrdersSql, new { ConsultIds = consultIds });
-
-            // consult_thresholds（基準値）
-            const string deleteConsultThresholdsSql = @"
-            delete from
-                resultcollector.consult_thresholds 
-            where
-                consult_id = any (@ConsultIds);";
-            await connection.ExecuteAsync(deleteConsultThresholdsSql, new { ConsultIds = consultIds });
-
-            // previous_results（過去検査結果）
-            const string deletePreviousResultsSql = @"
-            delete from 
-                resultcollector.previous_results
-            where
-                consult_id = any (@ConsultIds);";
-            await connection.ExecuteAsync(deletePreviousResultsSql, new { ConsultIds = consultIds });
-            
-            if (actionConsults.Any(x => x.ActionType == ActionType.登録))
-            {
-                // 外部連携キーから受診IDを取得
-                var consultConnectionCodes = actionConsults.Where(x => x.ActionType == ActionType.登録)
-                                                           .Select(x => x.ConnectionCode).ToList(); 
-                const string selectConsultSQL = @"
-                select
-                    consult_id as ConsultId
-                    , external_connection_code as ExternalConnectionCode
-                from 
-                    resultcollector.consult 
-                where 
-                    external_connection_code = any (@ConnectionCodes);";
-                var consultExternalConnection = await connection.QueryAsync<ConsultExternalConnectionCodeEntity>(selectConsultSQL, new {ConnectionCodes = consultConnectionCodes});
-                var upsertConsults = actionConsults.Where(x => x.ActionType == ActionType.登録)
-                                                   .Select(x => new ConsultEntity
-                                                    {
-                                                        ActionType = x.ActionType
-                                                        , ConsultId = consultExternalConnection.Where(ex => ex.ExternalConnectionCode == x.ConnectionCode)
-                                                                                               .Select(ex => ex.ConsultId).FirstOrDefault()
-                                                        , ConsultNumber = x.ConsultNumber
-                                                        , PlaceScheduleId = x.PlaceScheduleId
-                                                        , Note = x.Note
-                                                        , ExamineeId = x.ExamineeId
-                                                        , ConnectionCode = x.ConnectionCode
-                                                        , SortNo = x.SortNo
-                                                        , ConsultNotes = x.ConsultNotes
-                                                        , ExamItemDetailOrders = x.ExamItemDetailOrders
-                                                        , ConsultThresholds = x.ConsultThresholds
-                                                        , PreviousResults = x.PreviousResults
-                                                    });
+                var consultIds = actionConsults.Select(x => x.ConsultId).ToList();
                 // consult_notes（受診特記）
-                var consultNotes = upsertConsults.SelectMany(x => x.ConsultNotes.Select(cn => new 
-                                                            {
-                                                                ConsultId = x.ConsultId
-                                                                , Code = cn.Code
-                                                                , Note = cn.Note
-                                                                , CreatedAt = createdAt
-                                                                , CreatedBy = createdBy
-                                                            }));
-                const string insertConsultNotesSql = @"
-                insert into resultcollector.consult_notes 
-                (
-                    consult_id
-                    , code
-                    , note
-                    , created_at
-                    , created_by
-                ) 
-                values
-                (
-                    @ConsultId
-                    , @Code
-                    , @Note
-                    , @CreatedAt
-                    , @CreatedBy
-                );";
-                await connection.ExecuteAsync(insertConsultNotesSql, consultNotes);
+                const string deleteConsultNotesSql = @"
+                delete from 
+                    resultcollector.consult_notes 
+                where
+                    consult_id = any (@ConsultIds);";
+                await connection.ExecuteAsync(deleteConsultNotesSql, new { ConsultIds = consultIds });
 
                 // exam_item_detail_orders（検査項目明細依頼）
-                var examItemDetailOrders = upsertConsults.SelectMany(x => x.ExamItemDetailOrders.Select(eo => new
-                                                                    {
-                                                                        ConsultId = x.ConsultId
-                                                                        , ExamItemDetailId = eo.ExamItemDetailId
-                                                                        , ExternalExamItemDetailCode = eo.ExamItemDetailCd
-                                                                        , CreatedAt = createdAt
-                                                                        , CreatedBy = createdBy
-                                                                    }));
-                const string insertExamItemDetailOrdersSql = @"
-                insert into resultcollector.exam_item_detail_orders 
-                (
-                    consult_id
-                    , exam_item_detail_id
-                    , external_exam_item_detail_code
-                    , created_at
-                    , created_by
-                ) 
-                values
-                (
-                    @ConsultId
-                    , @ExamItemDetailId
-                    , @ExternalExamItemDetailCode
-                    , @CreatedAt
-                    , @CreatedBy
-                );";
-                await connection.ExecuteAsync(insertExamItemDetailOrdersSql, examItemDetailOrders);
+                const string deleteExamItemDetailOrdersSql = @"
+                delete from
+                    resultcollector.exam_item_detail_orders 
+                where
+                    consult_id = any (@ConsultIds);";
+                await connection.ExecuteAsync(deleteExamItemDetailOrdersSql, new { ConsultIds = consultIds });
 
                 // consult_thresholds（基準値）
-                var consultThresholds = upsertConsults.SelectMany(x => x.ConsultThresholds.Select(ct => new
-                                                                {
-                                                                    ThresholdId = ct.ThresholdId
-                                                                    , ConsultId = x.ConsultId
-                                                                    , Priority = ct.Priority
-                                                                    , CreatedAt = createdAt
-                                                                    , CreatedBy = createdBy
-                                                                }));
-                const string insertConsultThresholdsSql = @"
-                insert into resultcollector.consult_thresholds 
-                (
-                    threshold_id
-                    , consult_id
-                    , priority
-                    , created_at
-                    , created_by
-                ) 
-                values
-                (
-                    @ThresholdId
-                    , @ConsultId
-                    , @Priority
-                    , @CreatedAt
-                    , @CreatedBy
-                );";
-                await connection.ExecuteAsync(insertConsultThresholdsSql, consultThresholds);
+                const string deleteConsultThresholdsSql = @"
+                delete from
+                    resultcollector.consult_thresholds 
+                where
+                    consult_id = any (@ConsultIds);";
+                await connection.ExecuteAsync(deleteConsultThresholdsSql, new { ConsultIds = consultIds });
 
                 // previous_results（過去検査結果）
-                var previousResults = upsertConsults.SelectMany(x => x.PreviousResults.Select(pr => new
-                                                                {
-                                                                    ConsultId = x.ConsultId
-                                                                    , ExamDate =  DateTime.Parse(pr.ExamDate.ToString())
-                                                                    , ExamItemDetailId = pr.ExamItemDetailId
-                                                                    , Value = pr.Value
-                                                                    , CreatedAt = createdAt
-                                                                    , CreatedBy = createdBy
-                                                                }));
-                const string insertPreviousResultsSql = @"
-                insert into resultcollector.previous_results 
-                (
-                    consult_id
-                    , exam_date
-                    , exam_item_detail_id
-                    , value
-                    , created_at
-                    , created_by
-                ) 
-                values
-                (
-                    @ConsultId
-                    , @ExamDate
-                    , @ExamItemDetailId
-                    , @Value
-                    , @CreatedAt
-                    , @CreatedBy
-                );";
-                await connection.ExecuteAsync(insertPreviousResultsSql, previousResults);
+                const string deletePreviousResultsSql = @"
+                delete from 
+                    resultcollector.previous_results
+                where
+                    consult_id = any (@ConsultIds);";
+                await connection.ExecuteAsync(deletePreviousResultsSql, new { ConsultIds = consultIds });
+
+                if (actionConsults.Any(x => x.ActionType == ActionType.登録))
+                {
+                    // 外部連携キーから受診IDを取得
+                    var consultConnectionCodes = actionConsults.Where(x => x.ActionType == ActionType.登録)
+                                                               .Select(x => x.ConnectionCode).ToList();
+                    const string selectConsultSQL = @"
+                    select
+                        consult_id as ConsultId
+                        , external_connection_code as ExternalConnectionCode
+                    from 
+                        resultcollector.consult 
+                    where 
+                        external_connection_code = any (@ConnectionCodes);";
+                    var consultExternalConnection = await connection.QueryAsync<ConsultExternalConnectionCodeEntity>(selectConsultSQL, new { ConnectionCodes = consultConnectionCodes });
+                    var upsertConsults = actionConsults.Where(x => x.ActionType == ActionType.登録)
+                                                       .Select(x => new ConsultEntity
+                                                       {
+                                                           ActionType = x.ActionType,
+                                                           ConsultId = consultExternalConnection.Where(ex => ex.ExternalConnectionCode == x.ConnectionCode)
+                                                                                                .Select(ex => ex.ConsultId).FirstOrDefault(),
+                                                           ConsultNumber = x.ConsultNumber,
+                                                           PlaceScheduleId = x.PlaceScheduleId,
+                                                           Note = x.Note,
+                                                           ExamineeId = x.ExamineeId,
+                                                           ConnectionCode = x.ConnectionCode,
+                                                           SortNo = x.SortNo,
+                                                           ConsultNotes = x.ConsultNotes,
+                                                           ExamItemDetailOrders = x.ExamItemDetailOrders,
+                                                           ConsultThresholds = x.ConsultThresholds,
+                                                           PreviousResults = x.PreviousResults
+                                                       });
+                    // consult_notes（受診特記）
+                    var consultNotes = upsertConsults.SelectMany(x => x.ConsultNotes.Select(cn => new
+                    {
+                        ConsultId = x.ConsultId,
+                        Code = cn.Code,
+                        Note = cn.Note,
+                        CreatedAt = createdAt,
+                        CreatedBy = createdBy
+                    }));
+                    const string insertConsultNotesSql = @"
+                    insert into resultcollector.consult_notes 
+                    (
+                        consult_id
+                        , code
+                        , note
+                        , created_at
+                        , created_by
+                    ) 
+                    values
+                    (
+                        @ConsultId
+                        , @Code
+                        , @Note
+                        , @CreatedAt
+                        , @CreatedBy
+                    );";
+                    await connection.ExecuteAsync(insertConsultNotesSql, consultNotes);
+
+                    // exam_item_detail_orders（検査項目明細依頼）
+                    var examItemDetailOrders = upsertConsults.SelectMany(x => x.ExamItemDetailOrders.Select(eo => new
+                    {
+                        ConsultId = x.ConsultId,
+                        ExamItemDetailId = eo.ExamItemDetailId,
+                        ExternalExamItemDetailCode = eo.ExamItemDetailCd,
+                        CreatedAt = createdAt,
+                        CreatedBy = createdBy
+                    }));
+                    const string insertExamItemDetailOrdersSql = @"
+                    insert into resultcollector.exam_item_detail_orders 
+                    (
+                        consult_id
+                        , exam_item_detail_id
+                        , external_exam_item_detail_code
+                        , created_at
+                        , created_by
+                    ) 
+                    values
+                    (
+                        @ConsultId
+                        , @ExamItemDetailId
+                        , @ExternalExamItemDetailCode
+                        , @CreatedAt
+                        , @CreatedBy
+                    );";
+                    await connection.ExecuteAsync(insertExamItemDetailOrdersSql, examItemDetailOrders);
+
+                    // consult_thresholds（基準値）
+                    var consultThresholds = upsertConsults.SelectMany(x => x.ConsultThresholds.Select(ct => new
+                    {
+                        ThresholdId = ct.ThresholdId,
+                        ConsultId = x.ConsultId,
+                        Priority = ct.Priority,
+                        CreatedAt = createdAt,
+                        CreatedBy = createdBy
+                    }));
+                    const string insertConsultThresholdsSql = @"
+                    insert into resultcollector.consult_thresholds 
+                    (
+                        threshold_id
+                        , consult_id
+                        , priority
+                        , created_at
+                        , created_by
+                    ) 
+                    values
+                    (
+                        @ThresholdId
+                        , @ConsultId
+                        , @Priority
+                        , @CreatedAt
+                        , @CreatedBy
+                    );";
+                    await connection.ExecuteAsync(insertConsultThresholdsSql, consultThresholds);
+
+                    // previous_results（過去検査結果）
+                    var previousResults = upsertConsults.SelectMany(x => x.PreviousResults.Select(pr => new
+                    {
+                        ConsultId = x.ConsultId,
+                        ExamDate = DateTime.Parse(pr.ExamDate.ToString()),
+                        ExamItemDetailId = pr.ExamItemDetailId,
+                        Value = pr.Value,
+                        CreatedAt = createdAt,
+                        CreatedBy = createdBy
+                    }));
+                    const string insertPreviousResultsSql = @"
+                    insert into resultcollector.previous_results 
+                    (
+                        consult_id
+                        , exam_date
+                        , exam_item_detail_id
+                        , value
+                        , created_at
+                        , created_by
+                    ) 
+                    values
+                    (
+                        @ConsultId
+                        , @ExamDate
+                        , @ExamItemDetailId
+                        , @Value
+                        , @CreatedAt
+                        , @CreatedBy
+                    );";
+                    await connection.ExecuteAsync(insertPreviousResultsSql, previousResults);
+                }
+                scope.Complete();
             }
-            await transaction.CommitAsync();
-        }
-        catch(DbException)
-        {
-            await transaction.RollbackAsync();
-            throw;
         }
     }
 

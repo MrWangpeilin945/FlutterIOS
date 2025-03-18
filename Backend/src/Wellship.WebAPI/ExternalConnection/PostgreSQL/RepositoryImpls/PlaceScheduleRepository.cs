@@ -1,9 +1,6 @@
-using System.Data.Common;
-using System.Transactions;
 using Dapper;
+
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
-using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Helper;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Transaction;
 
@@ -34,11 +31,11 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <returns></returns>
         public async Task UpsertPlaceScheduleAsync(List<PlaceScheduleEntity> placeScheduleEntities, DateTimeOffset createdAt, string createdBy)
         {
-            var connection = await _dbConnectionProvider.GetOrOpenAsync();
-            var transaction = await connection.BeginTransactionAsync();
-            try
+            using var scope = TransactionScopeHelper.GetTransactionScope();
             {
-                var upsertItems = placeScheduleEntities.Select(p => new
+                using var connection = await _dbConnectionProvider.GetOrOpenAsync();
+                {
+                    var upsertItems = placeScheduleEntities.Select(p => new
                     {
                         PlaceId = p.PlaceId,
                         TeamId = p.TeamId,
@@ -49,7 +46,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                         CreatedBy = createdBy
                     }).ToArray();
 
-                // Upsert文を実行
+                    // Upsert文を実行
                     string mergeSql = @"
                         merge
                         into resultcollector.place_schedule as ps
@@ -88,13 +85,9 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                             new_data.created_by
                         );";
 
-                await connection.ExecuteAsync(mergeSql, upsertItems);
-                await transaction.CommitAsync();
-            }
-            catch(DbException)
-            {
-                await transaction.RollbackAsync();
-                throw;
+                    await connection.ExecuteAsync(mergeSql, upsertItems);
+                }
+                scope.Complete();
             }
         }
         /// <summary>
@@ -103,7 +96,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="placeCodes">会場コードのリスト</param>
         /// <param name="teamCodes">班コードのリスト</param>
         /// <param name="examDates">健診日のリスト</param>
-        public async Task<List<PlaceScheduleEntity>> GetPlaceScheduleInfoAsync(List<string> placeCodes, List<string> teamCodes, List<DateOnly>  examDates)
+        public async Task<List<PlaceScheduleEntity>> GetPlaceScheduleInfoAsync(List<string> placeCodes, List<string> teamCodes, List<DateOnly> examDates)
         {
             var connection = await _dbConnectionProvider.GetOrOpenAsync();
             var sql = @"
