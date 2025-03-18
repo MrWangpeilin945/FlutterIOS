@@ -65,7 +65,7 @@ steps:
       && current.res.body[29].code == "10002" && current.res.body[29].message == "指定されたLoginIdが既に登録済みです。Code:S999901"    && current.res.body[29].inputNote == "20110918"
     dump:
       expr: current.res.body
-      out: ../Dump/EC2011-08.json
+      out: ../Dump/EC2011-09.json
   confirmStaffs:
     desc: "エラーの職員情報が登録されていないことを確認"
     db:
@@ -118,7 +118,7 @@ steps:
       && current.rows[3].name == "新職員20"
       && current.rows[3].enabled == false
       && current.rows[3].role_id == 20
-      && current.rows[3].created_at == current.rows[1].now
+      && current.rows[3].created_at == current.rows[3].now
       && current.rows[3].created_by == "ExternalConnection"
       // 対象外の職員は更新されない
       && current.rows[4].staff_id == "c0002012-0000-0000-0000-000000009900"

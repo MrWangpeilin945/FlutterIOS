@@ -12,7 +12,7 @@ steps:
     desc: "職員テーブルをクリア"
     db:
       query: TRUNCATE TABLE resultcollector.staffs CASCADE;
- post:
+  post:
     desc: "キー重複のレコードがエラーで返される"
     req:
       /api/v1/external/staffs:

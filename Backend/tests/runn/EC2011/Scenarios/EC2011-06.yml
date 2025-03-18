@@ -38,7 +38,7 @@ steps:
       && current.res.body[3].inputNote == "20110604"
     dump:
       expr: current.res.body
-      out: ../Dump/EC2011-05.json
+      out: ../Dump/EC2011-06.json
   confirmStaffs:
     desc: "職員情報が変更されていないことを確認"
     db:

@@ -7,7 +7,6 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2011-03.json"
-  errorMessage: "指定されたLoginIdが既に登録済みです。"
 steps:
   clearTable:
     desc: "職員テーブルをクリア"
@@ -74,13 +73,13 @@ steps:
           resultcollector.staffs
     test: |
       len(current.rows) == 1
-      && current.rows[0].staff_code == staffData.staff_code
-      && current.rows[0].login_id == staffData.login_id
-      && current.rows[0].name == staffData.name
-      && current.rows[0].enabled == staffData.enabled
-      && current.rows[0].role_id == staffData.role_id
+      && current.rows[0].staff_code == "201105"
+      && current.rows[0].login_id == "S201105"
+      && current.rows[0].name == "既存ログインID"
+      && current.rows[0].enabled == true
+      && current.rows[0].role_id == 10
       && current.rows[0].password_hash == staffData.password_hash
       && current.rows[0].password_salt == staffData.password_salt
-      && current.rows[0].created_at == staffData.created_at
-      && current.rows[0].created_by == staffData.created_by
+      && current.rows[0].created_at == "20250101"
+      && current.rows[0].created_by == "ex2011"
 
