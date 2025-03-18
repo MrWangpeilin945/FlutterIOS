@@ -5,6 +5,10 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
 
 /// <summary>
 /// 妥当性チェッカー
+///     ・必須項目の空値のチェック
+///     ・キー重複チェック
+///     ・文字数のチェック
+///     ・文字形式のチェック
 /// </summary>
 public static class ValidationChecker
 {
@@ -202,8 +206,54 @@ public static class ValidationChecker
                         InputNote = inputNote ?? ""
                     });
                 }
+                index++;
             }
-            index++;
+        }
+        return warningList;
+    }
+
+    /// <summary>
+    /// 子プロパティの文字数のチェック
+    /// </summary>
+    /// <param name="requestCollection">リクエストクラスのコレクション</param>
+    /// <param name="properties">チェック対象のプロパティ名一覧（親プロパティ名, 子プロパティ名）</param>
+    /// <param name="maxLengths">最大文字長一覧</param>
+    /// <param name="errorObjects">エラーオブジェクト</param>
+    public static List<object> StringLengthChildrenProperties(IEnumerable<object> requestCollection, List<(string ParentProperty, string ChildrenProperty)> properties, int[] maxLengths, List<ErrorObject> errorObjects)
+    {
+
+        var warningList = new List<object>();
+
+        foreach (var request in requestCollection)
+        {
+            int index = 0; 
+            // プロパティ単位にチェックする
+            foreach (var (parentProperty, childrenProperty) in properties)
+            {
+                var parentObj = request.GetType().GetProperty(parentProperty)?.GetValue(request);
+                if (parentObj != null)
+                {
+                    if (parentObj is IEnumerable<object> parentEnumerable)
+                    {
+                        foreach (var item in parentEnumerable)
+                        {
+                            var propertyValue = item.GetType().GetProperty(childrenProperty)?.GetValue(item)?.ToString();
+                            if (propertyValue?.Length > maxLengths[index])
+                            {
+                                var inputNote = request.GetType().GetProperty("InputNote")?.GetValue(request)?.ToString();
+                                warningList.Add(request);
+                                errorObjects.Add(new ErrorObject
+                                {
+                                    Code = "10005",
+                                    Message = $"制限数を超えています。{parentProperty}.{childrenProperty}:{propertyValue}",
+                                    InputNote = inputNote ?? ""
+                                });
+                            }
+                        }
+                    }
+                }
+                index++;
+            }
         }
         return warningList;
     }
@@ -237,10 +287,55 @@ public static class ValidationChecker
                         InputNote = inputNote ?? ""
                     });
                 }
+                index++;
             }
-            index++;
         }
         return warningList;
     }
 
+    /// <summary>
+    /// 子プロパティの文字形式のチェック
+    /// </summary>
+    /// <param name="requestCollection">リクエストクラスのコレクション</param>
+    /// <param name="properties">チェック対象のプロパティ名一覧（親プロパティ名, 子プロパティ名）</param>
+    /// <param name="patterns">文字パターン一覧</param>
+    /// <param name="errorObjects">エラーオブジェクト</param>
+    public static List<object> StringPatternChildrenProperties(IEnumerable<object> requestCollection, List<(string ParentProperty, string ChildrenProperty)> properties, string[] patterns, List<ErrorObject> errorObjects)
+    {
+
+        var warningList = new List<object>();
+
+        foreach (var request in requestCollection)
+        {
+            int index = 0; 
+            // プロパティ単位にチェックする
+            foreach (var (parentProperty, childrenProperty) in properties)
+            {
+                var parentObj = request.GetType().GetProperty(parentProperty)?.GetValue(request);
+                if (parentObj != null)
+                {
+                    if (parentObj is IEnumerable<object> parentEnumerable)
+                    {
+                        foreach (var item in parentEnumerable)
+                        {
+                            var propertyValue = item.GetType().GetProperty(childrenProperty)?.GetValue(item)?.ToString();
+                            if (!string.IsNullOrEmpty(propertyValue) && !Regex.IsMatch(propertyValue, patterns[index]))
+                            {
+                                var inputNote = request.GetType().GetProperty("InputNote")?.GetValue(request)?.ToString();
+                                warningList.Add(request);
+                                errorObjects.Add(new ErrorObject
+                                {
+                                    Code = "10006",
+                                    Message = $"値の形式が無効です。{parentProperty}.{childrenProperty}:{propertyValue}",
+                                    InputNote = inputNote ?? ""
+                                });
+                            }
+                        }
+                    }
+                }
+                index++;
+            }
+        }
+        return warningList;
+    }
 }

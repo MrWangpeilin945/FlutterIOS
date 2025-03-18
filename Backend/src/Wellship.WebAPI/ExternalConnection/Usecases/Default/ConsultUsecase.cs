@@ -141,7 +141,7 @@ public class ConsultUsecase : IConsultUsecase
         {
             ("ConsultThresholds",  "ThresholdCode"),        // 基準値判定->基準値判定コード
             ("ConsultThresholds",  "Priority"),             // 基準値判定->優先
-            ("ConsultNotes",       "Code"),                 // 受診特記->検査特記コード
+            ("ConsultNotes",       "Code")                  // 受診特記->検査特記コード
         };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
         foreach (var warning in ValidationChecker.DuplicateCheckChildrenProperties(registeConsults, duplicateCheckChildProperties, _errorObjects))
@@ -152,6 +152,7 @@ public class ConsultUsecase : IConsultUsecase
                 warningConsults.Add(consult);
             }
         }
+
         // 文字数のチェック
         var stringLengthCheckProperties = new[]
         {
@@ -167,13 +168,14 @@ public class ConsultUsecase : IConsultUsecase
                 warningConsults.Add(consult);
             }
         }
+
         // 文字形式のチェック
-        var stringPatternsCheckProperties = new[]
+        var stringPatternCheckProperties = new[]
         {
             "ConsultNumber"            // 受診番号
         };
         var patterns = new [] { @"^[a-zA-Z0-9]+$" };
-        foreach (var warning in ValidationChecker.StringPatternCheckProperties(registeConsults, stringPatternsCheckProperties, patterns, _errorObjects))
+        foreach (var warning in ValidationChecker.StringPatternCheckProperties(registeConsults, stringPatternCheckProperties, patterns, _errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
             if (warning is Consult consult)
@@ -181,6 +183,7 @@ public class ConsultUsecase : IConsultUsecase
                 warningConsults.Add(consult);
             }
         }
+        
         // 受診番号が異なる連携キーで登録されている
         foreach (var warning in registeConsults)
         {
