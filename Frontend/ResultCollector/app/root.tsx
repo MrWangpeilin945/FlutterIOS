@@ -1,11 +1,4 @@
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useNavigate,
-} from "@remix-run/react";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useNavigate } from "react-router";
 import { useEffect } from "react";
 import "@mantine/core/styles.css";
 import "./styles/global.css";
