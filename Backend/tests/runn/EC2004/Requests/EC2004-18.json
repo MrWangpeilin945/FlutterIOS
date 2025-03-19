@@ -1,0 +1,42 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "C20211801",
+        "actionType": 0,
+        "placeCode": "P2004-18",
+        "teamCode": "T2004-18",
+        "examDate": "2025-03-03",
+        "consultNumber": "123456789012345678901234567890123456789012345678901",
+        "examineeCd": "E20041801",
+        "note": "受診番号が51文字でエラー",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041801"
+    },
+    {
+        "sortNo": 2,
+        "connectionCode": "C20211802",
+        "actionType": 0,
+        "placeCode": "P2004-18",
+        "teamCode": "T2004-18",
+        "examDate": "2025-03-03",
+        "consultNumber": "12345678901234567890123456789012345678901234567890",
+        "examineeCd": "E20041802",
+        "note": "受診番号が50文字で登録可",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041802"
+    }
+]

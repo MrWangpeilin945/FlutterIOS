@@ -8,7 +8,7 @@
         "examDate": "2025-03-03",
         "consultNumber": "No2004111",
         "examineeCd": "E2004111",
-        "note": "特記事項2004111",
+        "note": "過去検査結果のPKが重複（examItemDetailIdId・examItemDetailCd）",
         "previousResults": [
             {
                 "examItemDetailCd": "PREVI-2004-11-1",

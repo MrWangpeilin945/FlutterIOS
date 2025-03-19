@@ -8,7 +8,7 @@
         "examDate": "2025-03-03",
         "consultNumber": "No2004131",
         "examineeCd": "E2004131",
-        "note": "特記事項2004131",
+        "note": "検査項目明細依頼のPKが重複（examItemDetailId・examItemDetailCd）",
         "previousResults": [
         ],
         "consultThresholds": [

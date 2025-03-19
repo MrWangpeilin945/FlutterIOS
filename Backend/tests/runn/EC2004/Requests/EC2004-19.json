@@ -1,0 +1,62 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "C20211901",
+        "actionType": 0,
+        "placeCode": "P2004-19",
+        "teamCode": "T2004-19",
+        "examDate": "2025-03-03",
+        "consultNumber": "No-1234567890$",
+        "examineeCd": "E20041901",
+        "note": "受診番号に記号が含まれる",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041901"
+    },
+    {
+        "sortNo": 2,
+        "connectionCode": "C20211902",
+        "actionType": 0,
+        "placeCode": "P2004-19",
+        "teamCode": "T2004-19",
+        "examDate": "2025-03-03",
+        "consultNumber": "No 123456780",
+        "examineeCd": "E20041902",
+        "note": "受診番号が空白が含まれる",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041902"
+    },
+    {
+        "sortNo": 3,
+        "connectionCode": "C20211903",
+        "actionType": 0,
+        "placeCode": "P2004-19",
+        "teamCode": "T2004-19",
+        "examDate": "2025-03-03",
+        "consultNumber": "No123456780a",
+        "examineeCd": "E20041903",
+        "note": "受診番号が英字と数字のみで登録可",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041903"
+    }
+]

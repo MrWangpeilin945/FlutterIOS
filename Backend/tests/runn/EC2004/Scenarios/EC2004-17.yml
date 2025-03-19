@@ -1,4 +1,4 @@
-desc: EC2004-11 過去検査結果のPKが重複するレコードが存在する
+desc: EC2004-17 キー重複チェック
 runners:
   db: ${DB_HOST}
   req:
@@ -6,7 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  request: "json://../Requests/EC2004-11.json"
+  request: "json://../Requests/EC2004-17.json"
 steps:
   clearTable:
     desc: "関連テーブルのクリア"
@@ -34,31 +34,39 @@ steps:
         INSERT INTO
           resultcollector.teams
           (team_id, team_code, name, order_number, created_at, created_by)
-        VALUES('f0002004-0000-0000-0011-000000000001', 'T2004-11', '班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('f0002004-0000-0000-0017-000000000001', 'T2004-17', '班', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場
         INSERT INTO
           resultcollector.places
           (place_id, place_code, name, order_number, created_at, created_by)
-        VALUES('b0002004-0000-0000-0011-000000000001', 'P2004-11', '会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('b0002004-0000-0000-0017-000000000001', 'P2004-17', '会場', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場日程
         INSERT INTO
           resultcollector.place_schedule
           (place_schedule_id, place_id, team_id, status, exam_date, start_time, created_at, created_by)
-        VALUES('a0002004-0000-0000-0011-000000000001', 'b0002004-0000-0000-0011-000000000001', 'f0002004-0000-0000-0011-000000000001', 31, '2025/03/03', '1500', CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('a0002004-0000-0000-0017-000000000001', 'b0002004-0000-0000-0017-000000000001', 'f0002004-0000-0000-0017-000000000001', 31, '2025/03/03', '1500', CURRENT_TIMESTAMP, 'ec2004');
         -- 受診者
         INSERT INTO
           resultcollector.examinees
           (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
-        VALUES('e0002004-0000-0000-0011-000000000001', 'E2004111', '両備　太郎', 'リョウビ　タロウ', 1, '1991-01-30', CURRENT_TIMESTAMP,'ec2004');
-        -- 外部検査項目明細
+        VALUES('e0002004-0000-0000-0017-000000000001', 'E20041701', '両備　一郎', 'リョウビ　イチロウ',   1, '1991-01-01', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0017-000000000002', 'E20041702', '両備　ニ郎', 'リョウビ　ジロウ',     1, '1992-02-02', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0017-000000000003', 'E20041703', '両備　三郎', 'リョウビ　サブロウ',   1, '1993-03-03', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0017-000000000004', 'E20041704', '両備　四郎', 'リョウビ　シロウ',     1, '1994-04-04', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0017-000000000005', 'E20041705', '両備　五郎', 'リョウビ　ゴロウ',     1, '1995-05-05', CURRENT_TIMESTAMP,'ec2004');
+        -- 検査特記
         INSERT INTO
-          resultcollector.external_exam_item_details
-          (exam_item_detail_id, external_exam_item_detail_code, created_at, created_by)
-        VALUES(200411, 'PREVI-2004-11-1', CURRENT_TIMESTAMP, 'ec2004')
-        ,     (200411, 'PREVI-2004-11-2', CURRENT_TIMESTAMP, 'ec2004')
-        ,     (200413, 'PREVI-2004-11-3', CURRENT_TIMESTAMP, 'ec2004');
+          resultcollector.exam_menu_note_codes
+          (code, name, created_at, created_by)
+        VALUES('NOTE-T200417-1', '検査特記2004-17-01', CURRENT_TIMESTAMP, 'ec2004');
+        -- 基準値パターン
+        INSERT INTO
+          resultcollector.thresholds
+          (threshold_id, threshold_code, name, order_number, created_at, created_by)
+        VALUES('ec002004-0000-0000-0017-000000000001', 'TID-EC2004-1', 'EC2004基準値-1', 1, CURRENT_TIMESTAMP, 'ec2004')
+        ,     ('ec002004-0000-0000-0017-000000000002', 'TID-EC2004-2', 'EC2004基準値-2', 1, CURRENT_TIMESTAMP, 'ec2004');
   post:
-    desc: "過去検査結果のPKが重複するレコードが存在する"
+    desc: "キー重複チェック"
     req:
       /api/v1/external/consult:
         post:
@@ -67,23 +75,26 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 207
-      // レスポンスに4件のErrorObjectが返されることを確認
-      && len(current.res.body) == 4
+      // レスポンスに5件のErrorObjectが返されることを確認
+      && len(current.res.body) == 5
       && current.res.body[0].code == "10003"
-      && current.res.body[0].inputNote == "2004111"
-      && current.res.body[0].message == "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:PREVI-2004-11-1/PreviousResults.ExamDate:2024/11/22"
+      && current.res.body[0].inputNote == "20041701"
+      && current.res.body[0].message == "キー項目が重複しています。SortNo: 1"
       && current.res.body[1].code == "10003"
-      && current.res.body[1].inputNote == "2004111"
-      && current.res.body[1].message == "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:PREVI-2004-11-3/PreviousResults.ExamDate:2024/10/10"
+      && current.res.body[1].inputNote == "20041702"
+      && current.res.body[1].message == "キー項目が重複しています。SortNo: 1"
       && current.res.body[2].code == "10003"
-      && current.res.body[2].inputNote == "2004111"
-      && current.res.body[2].message == "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:PREVI-2004-11-1/PreviousResults.ExamDate:2024/11/22"
+      && current.res.body[2].inputNote == "20041703"
+      && current.res.body[2].message == "キー項目が重複しています。ConsultThresholds.ThresholdCode: TID-EC2004-1"
       && current.res.body[3].code == "10003"
-      && current.res.body[3].inputNote == "2004111"
-      && current.res.body[3].message == "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:PREVI-2004-11-2/PreviousResults.ExamDate:2024/11/22"
+      && current.res.body[3].inputNote == "20041704"
+      && current.res.body[3].message == "キー項目が重複しています。ConsultThresholds.Priority: 1"
+      && current.res.body[4].code == "10003"
+      && current.res.body[4].inputNote == "20041705"
+      && current.res.body[4].message == "キー項目が重複しています。ConsultNotes.Code: NOTE-T200417-1"
     dump:
       expr: current.res.body
-      out: ../Dump/EC2004-11.json
+      out: ../Dump/EC2004-17.json
   confirmConsult:
     desc: "受診の登録を確認"
     db:

@@ -34,12 +34,12 @@ steps:
         INSERT INTO
           resultcollector.teams
           (team_id, team_code, name, order_number, created_at, created_by)
-        VALUES('f0002004-0000-0000-0002-000000000001', 'T2004-02', '甲班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('f0002004-0000-0000-0002-000000000001', 'T2004-02', '班', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場
         INSERT INTO
           resultcollector.places
           (place_id, place_code, name, order_number, created_at, created_by)
-        VALUES('b0002004-0000-0000-0002-000000000001', 'P2004-02', '甲会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('b0002004-0000-0000-0002-000000000001', 'P2004-02', '会場', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場日程
         INSERT INTO
           resultcollector.place_schedule

@@ -34,12 +34,12 @@ steps:
         INSERT INTO
           resultcollector.teams
           (team_id, team_code, name, order_number, created_at, created_by)
-        VALUES('f0002004-0000-0000-0009-000000000001', 'T2004-09', '甲班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('f0002004-0000-0000-0009-000000000001', 'T2004-09', '班', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場
         INSERT INTO
           resultcollector.places
           (place_id, place_code, name, order_number, created_at, created_by)
-        VALUES('b0002004-0000-0000-0009-000000000001', 'P2004-09', '甲会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('b0002004-0000-0000-0009-000000000001', 'P2004-09', '会場', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場日程
         INSERT INTO
           resultcollector.place_schedule
@@ -60,7 +60,7 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 207
-      // レスポンスに1件のErrorObjectが返されることを確認
+      // レスポンスに5件のErrorObjectが返されることを確認
       && len(current.res.body) == 5
       && current.res.body[0].code == "10003"
       && current.res.body[0].inputNote == "2004091"
