@@ -931,7 +931,7 @@ TermPos2=R
 ZOrder=56
 
 [Entity]
-PName=place_schedule_lock_histoies
+PName=place_schedule_lock_histories
 LName=会場ロック履歴
 Comment=
 TableInnerOption=
@@ -951,7 +951,7 @@ ZOrder=57
 
 [Relation]
 Entity1=place_schedule
-Entity2=place_schedule_lock_histoies
+Entity2=place_schedule_lock_histories
 RelationType1=2
 RelationType2=3
 Fields1=place_schedule_id
