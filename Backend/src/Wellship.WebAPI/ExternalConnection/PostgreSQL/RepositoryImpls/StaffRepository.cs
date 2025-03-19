@@ -1,7 +1,8 @@
 using Dapper;
-using System.Data.Common;
+
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Transaction;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
 {
@@ -30,28 +31,50 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <returns></returns>
         public async Task UpsertStaffAsync(List<StaffEntity> staffEntities, DateTimeOffset createdAt, string createdBy)
         {
-            var connection = await _dbConnectionProvider.GetOrOpenAsync();
-            var transaction = await connection.BeginTransactionAsync();
-            try
+            using var scope = TransactionScopeHelper.GetTransactionScope();
             {
-                var upsertItems = staffEntities.Select(s => new
+                using var connection = await _dbConnectionProvider.GetOrOpenAsync();
                 {
-                    StaffCode = s.StaffCode,
-                    LoginId = s.LoginId,
-                    Name = s.Name,
-                    PasswordHash = s.PasswordHash,
-                    PasswordSalt = s.PasswordSalt,
-                    Enabled = s.Enabled,
-                    RoleId = (int)s.RoleId,
-                    CreatedAt = createdAt,
-                    CreatedBy = createdBy
-                }).ToArray();
+                    var upsertItems = staffEntities.Select(s => new
+                    {
+                        StaffCode = s.StaffCode,
+                        LoginId = s.LoginId,
+                        Name = s.Name,
+                        PasswordHash = s.PasswordHash,
+                        PasswordSalt = s.PasswordSalt,
+                        Enabled = s.Enabled,
+                        RoleId = (int)s.RoleId,
+                        CreatedAt = createdAt,
+                        CreatedBy = createdBy
+                    }).ToArray();
 
-                // Upsert文を実行
-                string mergeSql = @"
-                        merge
-                        into resultcollector.staffs as s
-                            using (values (@StaffCode, @LoginId, @Name, @PasswordHash, @PasswordSalt, @Enabled, @RoleId, @CreatedAt, @CreatedBy)) as new_data (
+                    // Upsert文を実行
+                    string mergeSql = @"
+                            merge
+                            into resultcollector.staffs as s
+                                using (values (@StaffCode, @LoginId, @Name, @PasswordHash, @PasswordSalt, @Enabled, @RoleId, @CreatedAt, @CreatedBy)) as new_data (
+                                    staff_code,
+                                    login_id,
+                                    name,
+                                    password_hash,
+                                    password_salt,
+                                    enabled,
+                                    role_id,
+                                    created_at,
+                                    created_by
+                                )
+                                    on s.staff_code = new_data.staff_code
+                            when matched then update
+                            set
+                                login_id = new_data.login_id,
+                                name = new_data.name,
+                                password_hash = new_data.password_hash,
+                                password_salt = new_data.password_salt,
+                                enabled = new_data.enabled,
+                                role_id = new_data.role_id,
+                                created_at = new_data.created_at,
+                                created_by = new_data.created_by when not matched then
+                            insert (
                                 staff_code,
                                 login_id,
                                 name,
@@ -62,47 +85,20 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                                 created_at,
                                 created_by
                             )
-                                on s.staff_code = new_data.staff_code
-                        when matched then update
-                        set
-                            login_id = new_data.login_id,
-                            name = new_data.name,
-                            password_hash = new_data.password_hash,
-                            password_salt = new_data.password_salt,
-                            enabled = new_data.enabled,
-                            role_id = new_data.role_id,
-                            created_at = new_data.created_at,
-                            created_by = new_data.created_by when not matched then
-                        insert (
-                            staff_code,
-                            login_id,
-                            name,
-                            password_hash,
-                            password_salt,
-                            enabled,
-                            role_id,
-                            created_at,
-                            created_by
-                        )
-                        values (
-                            new_data.staff_code,
-                            new_data.login_id,
-                            new_data.name,
-                            new_data.password_hash,
-                            new_data.password_salt,
-                            new_data.enabled,
-                            new_data.role_id,
-                            new_data.created_at,
-                            new_data.created_by
-                        );";
-
-                await connection.ExecuteAsync(mergeSql, upsertItems);
-                await transaction.CommitAsync();
-            }
-            catch (DbException)
-            {
-                await transaction.RollbackAsync();
-                throw;
+                            values (
+                                new_data.staff_code,
+                                new_data.login_id,
+                                new_data.name,
+                                new_data.password_hash,
+                                new_data.password_salt,
+                                new_data.enabled,
+                                new_data.role_id,
+                                new_data.created_at,
+                                new_data.created_by
+                            );";
+                    await connection.ExecuteAsync(mergeSql, upsertItems);
+                }
+                scope.Complete();
             }
         }
 

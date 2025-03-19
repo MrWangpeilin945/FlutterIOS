@@ -288,13 +288,13 @@ CREATE TABLE organizations (
 ALTER TABLE organizations ADD CONSTRAINT organizations_IX1
   UNIQUE (organization_code) ;
 
-CREATE TABLE place_schedule_lock_histoies (
+CREATE TABLE place_schedule_lock_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , place_schedule_id uuid NOT NULL
   , status integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
-  , CONSTRAINT place_schedule_lock_histoies_PKC PRIMARY KEY (id)
+  , CONSTRAINT place_schedule_lock_histories_PKC PRIMARY KEY (id)
 );
 
 CREATE TABLE previous_results (
@@ -786,8 +786,8 @@ ALTER TABLE place_schedule
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
-ALTER TABLE place_schedule_lock_histoies
-  ADD CONSTRAINT place_schedule_lock_histoies_FK1 FOREIGN KEY (place_schedule_id) REFERENCES place_schedule(place_schedule_id)
+ALTER TABLE place_schedule_lock_histories
+  ADD CONSTRAINT place_schedule_lock_histories_FK1 FOREIGN KEY (place_schedule_id) REFERENCES place_schedule(place_schedule_id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -1059,12 +1059,12 @@ COMMENT ON COLUMN organizations.order_number IS '表示順';
 COMMENT ON COLUMN organizations.created_at IS '作成日時';
 COMMENT ON COLUMN organizations.created_by IS '作成者';
 
-COMMENT ON TABLE place_schedule_lock_histoies IS '会場ロック履歴';
-COMMENT ON COLUMN place_schedule_lock_histoies.id IS 'ID';
-COMMENT ON COLUMN place_schedule_lock_histoies.place_schedule_id IS '会場日程ID';
-COMMENT ON COLUMN place_schedule_lock_histoies.status IS '状況';
-COMMENT ON COLUMN place_schedule_lock_histoies.created_at IS '作成日時';
-COMMENT ON COLUMN place_schedule_lock_histoies.created_by IS '作成者';
+COMMENT ON TABLE place_schedule_lock_histories IS '会場ロック履歴';
+COMMENT ON COLUMN place_schedule_lock_histories.id IS 'ID';
+COMMENT ON COLUMN place_schedule_lock_histories.place_schedule_id IS '会場日程ID';
+COMMENT ON COLUMN place_schedule_lock_histories.status IS '状況';
+COMMENT ON COLUMN place_schedule_lock_histories.created_at IS '作成日時';
+COMMENT ON COLUMN place_schedule_lock_histories.created_by IS '作成者';
 
 COMMENT ON TABLE previous_results IS '過去検査結果';
 COMMENT ON COLUMN previous_results.consult_id IS '受診ID';
