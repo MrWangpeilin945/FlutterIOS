@@ -400,6 +400,7 @@ CREATE TABLE cancel_reasons (
 CREATE TABLE consult (
   consult_id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_number text NOT NULL
+  , age varchar(7) NOT NULL
   , progress_status integer NOT NULL
   , export_status integer NOT NULL
   , place_schedule_id uuid NOT NULL
@@ -1142,6 +1143,7 @@ COMMENT ON COLUMN cancel_reasons.created_by IS '作成者';
 COMMENT ON TABLE consult IS '受診';
 COMMENT ON COLUMN consult.consult_id IS '受診ID';
 COMMENT ON COLUMN consult.consult_number IS '受診番号';
+COMMENT ON COLUMN consult.age IS '年齢';
 COMMENT ON COLUMN consult.progress_status IS '進捗状況';
 COMMENT ON COLUMN consult.export_status IS '結果出力状況';
 COMMENT ON COLUMN consult.place_schedule_id IS '会場日程ID';
