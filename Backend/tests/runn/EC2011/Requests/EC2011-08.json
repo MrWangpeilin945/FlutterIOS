@@ -1,0 +1,5 @@
+[
+ { "staffCode": "201108012", "loginId": "S201101",  "name": "職員01",   "password": "P@ssw0rd01", "enabled": true,  "roleId": 10, "inputNote": "20110801" },
+ { "staffCode": "201108012", "loginId": "S2011023", "name": "職員02",   "password": "P@ssw0rd02", "enabled": true,  "roleId": 10, "inputNote": "20110802" },
+ { "staffCode": "20110803",  "loginId": "S2011023", "name": "職員03",   "password": "P@ssw0rd03", "enabled": true,  "roleId": 10, "inputNote": "20110803" }
+]

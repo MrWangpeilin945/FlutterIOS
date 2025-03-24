@@ -1,0 +1,12 @@
+[
+ { "staffCode": "20110601", "loginId": "S2011018901234567890",  "name": "職員01", "password": "P@ssw0rd011234567890",  "enabled": true, "roleId": 10, "inputNote": "20110601" },
+ { "staffCode": "20110602", "loginId": "S20110289012345678901", "name": "職員02", "password": "P@ssw0rd021234567890",  "enabled": true, "roleId": 10, "inputNote": "20110602" },
+ { "staffCode": "20110603", "loginId": "S2011038901234567890",  "name": "職員03", "password": "P@ssw0rd0312345678901", "enabled": true, "roleId": 10, "inputNote": "20110603" },
+ { "staffCode": "20110604", "loginId": "S20110489012345678901", "name": "職員04", "password": "P@ssw0rd0412345678901", "enabled": true, "roleId": 10, "inputNote": "20110604" },
+ { "staffCode": "5",        "loginId": "5",                     "name": "5",      "password": "5",                     "enabled": true, "roleId": 10, "inputNote": "20110605" },
+ { "staffCode": "staffCode_abcdefghijklmnopqrstuvwxyABCDEFGHIJKLMNOPQRSTUVWXY0123456789　 012345678901234567890123456789",
+   "loginId":   "S201106",
+   "name":      "name_abcdefghijklmnopqrstuvwxyABCDEFGHIJKLMNOPQRSTUVWXY0123456789　 012345678901234567890123456789",
+   "password":  "P@ssw0rd06", "enabled": true, "roleId": 10, 
+   "inputNote": "20110606_abcdefghijklmnopqrstuvwxyABCDEFGHIJKLMNOPQRSTUVWXY0123456789　 012345678901234567890123456789" } 
+]
