@@ -26,6 +26,12 @@ public static class TriggerFactory
             RuleTriggerType.NumericInputGreaterThanOrEqual => new NumericInputGreaterThanOrEqual(inputValues, errorLevel),
             RuleTriggerType.NumericInputLessThan => new NumericInputLessThan(inputValues, errorLevel),
             RuleTriggerType.NumericInputLessThanOrEqual => new NumericInputLessThanOrEqual(inputValues, errorLevel),
+            RuleTriggerType.NumericConditionEqual => new NumericConditionEqual(inputValues, conditionValues, errorLevel),
+            RuleTriggerType.NumericConditionNotEqual => new NumericConditionNotEqual(inputValues, conditionValues, errorLevel),
+            RuleTriggerType.NumericConditionGreaterThan => new NumericConditionGreaterThan(inputValues, conditionValues, errorLevel),
+            RuleTriggerType.NumericConditionGreaterThanOrEqual => new NumericConditionGreaterThanOrEqual(inputValues, conditionValues, errorLevel),
+            RuleTriggerType.NumericConditionLessThan => new NumericConditionLessThan(inputValues, conditionValues, errorLevel),
+            RuleTriggerType.NumericConditionLessThanOrEqual => new NumericConditionLessThanOrEqual(inputValues, conditionValues, errorLevel),
             RuleTriggerType.AbsoluteGreaterThan => new AbsoluteGreaterThan(inputValues, conditionValues, errorLevel),
             RuleTriggerType.AbsoluteGreaterThanOrEqual => new AbsoluteGreaterThanOrEqual(inputValues, conditionValues, errorLevel),
             RuleTriggerType.AbsoluteLessThan => new AbsoluteLessThan(inputValues, conditionValues, errorLevel),
@@ -34,6 +40,7 @@ public static class TriggerFactory
             RuleTriggerType.StringNotIn => new StringNotIn(inputValues, conditionValues, errorLevel),
             RuleTriggerType.AllStringsEqual => new AllStringsEqual(inputValues, errorLevel),
             RuleTriggerType.AnyStringNotEqual => new AnyStringNotEqual(inputValues, errorLevel),
+            RuleTriggerType.StringEqualAndContainedInList => new StringEqualAndContainedInList(inputValues, conditionValues, errorLevel),
             _ => throw new NotImplementedException()
         };
     }
