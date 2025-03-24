@@ -141,6 +141,11 @@ list.Count()  <> 0
 |string
 |受診者コード
 
+|Age
+|Yes
+|string
+|年齢
+
 |Note
 |No
 |string
@@ -342,6 +347,14 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 **** Message `必須項目が不足しています。ExamineeCd`
 **** InputNote `Consult.InputNote`
 
+* 必須項目(Consult.Age)が空値
+** `Consult.Age` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。Age`
+**** InputNote `Consult.InputNote`
+
 * 必須項目(Consult.PreviousResults.ExamItemDetailCd)が空値
 ** `Consult.PreviousResults.ExamItemDetailCd` が `string.IsNullOrWhiteSpace` に該当する 
 *** Consultの単位で該当を取り除く
@@ -426,6 +439,14 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 **** Message `制限数を超えています。ConsultNumber:[Consult.ConsultNumber]`
 **** InputNote `Consult.InputNote`
 
+* 項目(Consult.Age)制限：文字数
+** `Consult.Age` の文字数 `!= 7` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10005`
+**** Message `制限数を超えています。Age:[Consult.Age]`
+**** InputNote `Consult.InputNote`
+
 * 項目(Consult.ConsultNumber)制限：形式
 ** `Consult.ConsultNumber` の `a-zA-Z0-9` 以外の文字を含む 
 *** Consultの単位で該当を取り除く
@@ -433,6 +454,15 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 **** Code `10006`
 **** Message `値の形式が無効です。ConsultNumber:[Consult.ConsultNumber]`
 **** InputNote `Consult.InputNote`
+
+* 項目(Consult.Age)制限：形式
+** `Consult.Age` が `^[0-9]{3}(0[0-9]|1[01])([012][0-9]|30)$` に一致しない
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10006`
+**** Message `値の形式が無効です。Age:[Consult.Age]`
+**** InputNote `Consult.InputNote`
+** 補足：正常範囲　`0000000` `9991130`
 
 * 受診番号が異なる連携キーで登録されている
 ** `[DB]consult.consult_number (受診番号)` == `Consult.ConsultNumber` && `[DB]consult.external_connection_code(連携キー)` != `Consult.ConnectionCode` が存在する
@@ -638,6 +668,10 @@ Update : 更新しない
 |`[DB]examinees.examinee_id`
 |`[DB]examinees.examinee_code` == `Consult.ExamineeCd` で検索し、`examinee_id` を登録する
 
+|age
+|Consult.Age
+|
+
 |external_connection_code
 |Consult.ConnectionCode
 |
@@ -837,6 +871,10 @@ Update : 更新しない
 |progress_status
 |`enum<Wellship.Core\Enums\ConsultProgressStatus.キャンセル>`
 |int型にパースする
+
+|note
+|`''`(空文字)
+|
 
 |created_at
 |system.datetime.now()
