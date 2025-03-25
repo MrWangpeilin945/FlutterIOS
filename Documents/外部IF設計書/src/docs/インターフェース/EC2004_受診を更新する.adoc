@@ -751,7 +751,7 @@ Update : 更新しない
 ====== Delete
 
 * 削除条件
-** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consulexam_item_detail_orderst_notes.consult_id`
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]exam_item_detail_orders.consult_id`
 *** 削除対象レコードが存在しない場合でも、エラーとしない
 
 ====== Insert
