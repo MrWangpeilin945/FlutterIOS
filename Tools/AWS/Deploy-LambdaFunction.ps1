@@ -1,5 +1,6 @@
 # Lambda関数管理フォルダまでの相対パス
-$lambdaFolderPath = "../../AWS/Lambda/"
+$scriptDir = Split-Path  $MyInvocation.MyCommand.Path -Parent
+$lambdaFolderPath = Join-Path $parentFolderPath "../../AWS/Lambda"
 
 # 更新対象のLambda関数名を入力
 do {
