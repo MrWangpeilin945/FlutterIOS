@@ -27,7 +27,8 @@ flowchart TD
     I --> J["Dalete(一括):[DB]consult_notes(受診特記)"]
     J --> K["Insert(一括):[DB]consult_notes(受診特記)"]
     K --> L["Dalete(一括):[DB]exam_item_detail_orders(検査項目明細依頼)"]
-    L --> M["Insert(一括):[DB]exam_item_detail_orders(検査項目明細依頼)"]
+    L --> L2["Insert(一括):[DB]exam_item_detail_orders(検査項目明細依頼)"]
+    L2 --> M["Insert(一括):[DB]external_exam_item_detail_orders (外部検査項目明細依頼)"]
     M --> N["Dalete(一括):[DB]consult_thresholds(基準値)"]
     N --> O["Insert(一括):[DB]consult_thresholds(基準値)"]
     O --> P["Dalete(一括):[DB]previous_results(過去検査結果)"]
@@ -38,6 +39,7 @@ flowchart TD
     J -.Exception.-> ROLLBACK
     K -.Exception.-> ROLLBACK
     L -.Exception.-> ROLLBACK
+    L2 -.Exception.-> ROLLBACK
     M -.Exception.-> ROLLBACK
     N -.Exception.-> ROLLBACK
     O -.Exception.-> ROLLBACK
@@ -248,6 +250,11 @@ list.Count()  <> 0
 |string
 |検査項目明細CD
 
+|Note
+|No
+|string
+|検査項目明細備考
+
 |===
 
 ===== Errorbject
@@ -429,6 +436,15 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 *** ErrorObject
 **** Code `10003`
 **** Message `キー項目が重複しています。ConsultNotes.Code:[ConsultNotes.Code]`
+**** InputNote `Consult.InputNote`
+
+* キー(Consult.ExamItemDetailOrders.ExamItemDetailCode)が重複するレコードが存在する
+** Consult.ExamItemDetailOrders.ExamItemDetailCodeを以下の条件でGroupByし、複数レコードが存在する
+**** `Consult.ExamItemDetailOrders.ExamItemDetailCode`
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCode:[ExamItemDetailOrders.ExamItemDetailCode]`
 **** InputNote `Consult.InputNote`
 
 * 項目(Consult.ConsultNumber)制限：文字数
@@ -735,8 +751,44 @@ Update : 更新しない
 ====== Delete
 
 * 削除条件
-** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consulexam_item_detail_orderst_notes.consult_id`
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]exam_item_detail_orders.consult_id`
 *** 削除対象レコードが存在しない場合でも、エラーとしない
+
+====== Insert
+
+* `consult_id` / `exam_item_detail_id` で重複を除外し登録する
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|[DB]consult(受診).consult_id
+|※Upsertした値
+
+|exam_item_detail_id
+|`[DB]external_exam_item_details.exam_item_detail_id`
+|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCode` で検索し、`exam_item_detail_id` を登録する
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+===== Table
+
+* [DB]external_exam_item_detail_orders (外部検査項目明細依頼)
+** 洗い替え
+
+====== Delete
+
+* None
+** [DB]exam_item_detail_orders(検査項目明細依頼)の制約にて削除されるため削除不要
 
 ====== Insert
 
@@ -750,10 +802,14 @@ Update : 更新しない
 
 |exam_item_detail_id
 |`[DB]external_exam_item_details.exam_item_detail_id`
-|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCode` で検索し、`exam_item_detail_id`を登録する
+|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCode` で検索し、`exam_item_detail_id` を登録する
 
 |external_exam_item_detail_code
 |Consult.ExamItemDetailOrders.ExamItemDetailCode
+|
+
+|external_note
+|Consult.ExamItemDetailOrders.Note
 |
 
 |created_at
@@ -907,6 +963,15 @@ Update : 更新しない
 * 削除条件
 ** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]exam_item_detail_orders.consult_id`
 *** 削除対象レコードが存在しない場合でも、エラーとしない
+
+===== Table
+
+* [DB]external_exam_item_detail_orders (外部検査項目明細依頼)
+
+====== Delete
+
+* None
+** [DB]exam_item_detail_orders(検査項目明細依頼)の制約にて削除されるため削除不要
 
 ===== Table
 
