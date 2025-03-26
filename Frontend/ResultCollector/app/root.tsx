@@ -1,4 +1,11 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useNavigate } from "react-router";
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useNavigate,
+} from "react-router";
 import { useEffect } from "react";
 import "@mantine/core/styles.css";
 import "./styles/global.css";
@@ -43,12 +50,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
     }
 
     // scaleが0未満の時、デリミタが","だとiPadで反応しないので";"にする
-    (viewportMeta as HTMLMetaElement).content =
-      `width=device-width; initial-scale=${scale}; user-scalable=no`;
+    (
+      viewportMeta as HTMLMetaElement
+    ).content = `width=device-width; initial-scale=${scale}; user-scalable=no`;
   };
 
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
