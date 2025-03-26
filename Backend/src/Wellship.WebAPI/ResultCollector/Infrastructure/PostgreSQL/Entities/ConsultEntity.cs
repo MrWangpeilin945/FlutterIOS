@@ -16,6 +16,11 @@ public class ConsultEntity
     public required string ConsultNumber { get; init; }
 
     /// <summary>
+    /// 年齢
+    /// </summary>
+    public required string Age { get; init; }
+
+    /// <summary>
     /// 受診進捗状況
     /// </summary>
     public required int ProgressStatus { get; init; }

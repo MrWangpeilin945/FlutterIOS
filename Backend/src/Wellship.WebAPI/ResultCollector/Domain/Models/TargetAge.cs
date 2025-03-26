@@ -16,8 +16,8 @@ public class TargetAge
     public TargetAge(string minAgeString, string maxAgeString)
     {
         // Ageに変換する
-        _minAge = ConvertToAge(minAgeString);
-        _maxAge = ConvertToAge(maxAgeString);
+        _minAge = new Age(minAgeString);
+        _maxAge = new Age(maxAgeString);
     }
 
     /// <summary>
@@ -37,30 +37,5 @@ public class TargetAge
             return true;
         }
         return false;
-    }
-
-    /// <summary>
-    /// 年齢文字列をAgeオブジェクトに変換する
-    /// </summary>
-    /// <param name="ageString">年齢文字列</param>
-    private static Age ConvertToAge(string ageString)
-    {
-        if (string.IsNullOrWhiteSpace(ageString))
-        {
-            throw new ArgumentNullException(nameof(ageString), "年齢文字列がnullまたは空白です。");
-        }
-
-        if (ageString.Length < 5 || ageString.Length > 7)
-        {
-            throw new ArgumentException("年齢文字列は5文字以上7文字以下で設定してください。", nameof(ageString));
-        }
-
-        string paddedAgeString = ageString.PadLeft(7, '0');
-        return new Age()
-        {
-            Years = int.Parse(paddedAgeString.Substring(0, 3)),
-            Months = int.Parse(paddedAgeString.Substring(3, 2)),
-            Days = int.Parse(paddedAgeString.Substring(5, 2))
-        };
     }
 }
