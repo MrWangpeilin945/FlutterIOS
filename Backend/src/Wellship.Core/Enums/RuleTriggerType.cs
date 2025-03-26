@@ -49,6 +49,36 @@ public enum RuleTriggerType
     NumericInputLessThanOrEqual = 1106,
 
     /// <summary>
+    /// 入力1と判定1が等しい数値か
+    /// </summary>
+    NumericConditionEqual = 1111,
+
+    /// <summary>
+    /// 入力1と判定1が異なる数値か
+    /// </summary>
+    NumericConditionNotEqual = 1112,
+
+    /// <summary>
+    /// 入力1が判定1より大きいか
+    /// </summary>
+    NumericConditionGreaterThan = 1113,
+
+    /// <summary>
+    /// 入力1が判定1以上か
+    /// </summary>
+    NumericConditionGreaterThanOrEqual = 1114,
+
+    /// <summary>
+    /// 入力1が判定1未満か
+    /// </summary>
+    NumericConditionLessThan = 1115,
+
+    /// <summary>
+    /// 入力1が判定1以下か
+    /// </summary>
+    NumericConditionLessThanOrEqual = 1116,
+
+    /// <summary>
     /// 入力値の差の絶対値が判定値より大きいか
     /// </summary>
     AbsoluteGreaterThan = 1201,
@@ -86,5 +116,10 @@ public enum RuleTriggerType
     /// <summary>
     /// 複数の入力文字列のうち異なるものがあるか
     /// </summary>
-    AnyStringNotEqual = 2202
+    AnyStringNotEqual = 2202,
+
+    /// <summary>
+    /// 入力1と判定1が等しい文字列であるかつ入力2が判定値リストに含まれるか
+    /// </summary>
+    StringEqualAndContainedInList = 2301
 }
