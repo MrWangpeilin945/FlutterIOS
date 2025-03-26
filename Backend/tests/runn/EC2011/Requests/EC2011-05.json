@@ -1,0 +1,8 @@
+[
+ { "staffCode": "",         "loginId": "S201101", "name": "職員01", "password": "P@ssw0rd01", "enabled": true, "roleId": 10, "inputNote": "20110501" },
+ { "staffCode": "20110502", "loginId": "",        "name": "職員02", "password": "P@ssw0rd02", "enabled": true, "roleId": 10, "inputNote": "20110502" },
+ { "staffCode": "20110503", "loginId": "S201103", "name": "",       "password": "P@ssw0rd03", "enabled": true, "roleId": 10, "inputNote": "20110503" },
+ { "staffCode": "20110504", "loginId": "S201104", "name": "職員04", "password": "",           "enabled": true, "roleId": 10, "inputNote": "20110504" },
+ { "staffCode": "20110505", "loginId": "S201105", "name": "職員05", "password": "P@ssw0rd05", "enabled": true, "roleId": 10, "inputNote": ""         },
+ { "staffCode": "",         "loginId": "",        "name": "",       "password": "",           "enabled": true, "roleId": 10, "inputNote": "20110506" }
+]

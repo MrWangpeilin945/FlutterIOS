@@ -568,6 +568,7 @@ public class ConsultUsecase : IConsultUsecase
             throw new PlaceScheduleLockedException();
         }
         var examItemIds = results.ExamResults.Select(x => x.ExamItemId);
+        var examItemDetailIds = results.ExamResults.SelectMany(x => x.ExamItemDetails).Select(x => x.ExamItemDetailId);
 
         // 検査結果相関ルールを検証する
         var ruleErrors = await ValidateCorrelationRuleAsync(consultNumber, results);
@@ -581,7 +582,9 @@ public class ConsultUsecase : IConsultUsecase
 
         // 検査基準値を検証する
         var rangeErrors = await ValidateNormalValueRangeAsync(consultNumber, results);
-        var registrationDeniedRangeError = rangeErrors.Where(x => x.ErrorLevel == InputErrorLevel.異常);
+        // NOTE: リクエストに含まれる検査項目明細IDで検査基準値エラーをチェックする
+        var registrationDeniedRangeError = rangeErrors.Where(x => examItemDetailIds.Contains(x.ExamItemDetailId))
+                                                      .Where(x => x.ErrorLevel == InputErrorLevel.異常);
         if (registrationDeniedRangeError.Any())
         {
             throw new ExamResultRegistrationErrorException();

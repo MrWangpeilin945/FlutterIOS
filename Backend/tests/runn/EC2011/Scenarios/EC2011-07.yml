@@ -1,0 +1,103 @@
+desc: EC2011-07 制限：形式エラーを除外_正常 [207]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2011-07.json"
+steps:
+  clearTable:
+    desc: "職員テーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.staffs CASCADE;
+  post:
+    desc: "制限：文字種類エラーを除外"
+    req:
+      /api/v1/external/staffs:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      && len(current.res.body) == 41
+      // 文字種類エラーに含まれないこと
+      && current.res.body[0].code == "10005"
+      && current.res.body[0].message == "制限数を超えています。LoginId:abcdefghijklmnopqrstuvwxyABCDEFGHIJKLMNOPQRSTUVWXY0123456789"
+      && current.res.body[0].inputNote == "20110701"
+      && current.res.body[1].code == "10005"
+      && current.res.body[1].message == "制限数を超えています。LoginId:0123456789abcdefghijklmnopqrstuvwxyABCDEFGHIJKLMNOPQRSTUVWXY"
+      && current.res.body[1].inputNote == "20110702"
+      && current.res.body[2].code == "10005"
+      && current.res.body[2].message == "制限数を超えています。LoginId:ABCDEFGHIJKLMNOPQRSTUVWXY0123456789abcdefghijklmnopqrstuvwxy"
+      && current.res.body[2].inputNote == "20110703"
+      // 文字種類エラーに含まれないこと
+      && current.res.body[03].code == "10006" && current.res.body[03].message == "値の形式が無効です。LoginId:S201104!"        && current.res.body[03].inputNote == "20110704"
+      && current.res.body[04].code == "10006" && current.res.body[04].message == "値の形式が無効です。LoginId:S201105\""       && current.res.body[04].inputNote == "20110705"
+      && current.res.body[05].code == "10006" && current.res.body[05].message == "値の形式が無効です。LoginId:S201106#"        && current.res.body[05].inputNote == "20110706"
+      && current.res.body[06].code == "10006" && current.res.body[06].message == "値の形式が無効です。LoginId:S201107$"        && current.res.body[06].inputNote == "20110707"
+      && current.res.body[07].code == "10006" && current.res.body[07].message == "値の形式が無効です。LoginId:S201108%"        && current.res.body[07].inputNote == "20110708"
+      && current.res.body[08].code == "10006" && current.res.body[08].message == "値の形式が無効です。LoginId:S201109&"        && current.res.body[08].inputNote == "20110709"
+      && current.res.body[09].code == "10006" && current.res.body[09].message == "値の形式が無効です。LoginId:S201110'"        && current.res.body[09].inputNote == "20110710"
+      && current.res.body[10].code == "10006" && current.res.body[10].message == "値の形式が無効です。LoginId:S201111("        && current.res.body[10].inputNote == "20110711"
+      && current.res.body[11].code == "10006" && current.res.body[11].message == "値の形式が無効です。LoginId:S201112)"        && current.res.body[11].inputNote == "20110712"
+      && current.res.body[12].code == "10006" && current.res.body[12].message == "値の形式が無効です。LoginId:S201113="        && current.res.body[12].inputNote == "20110713"
+      && current.res.body[13].code == "10006" && current.res.body[13].message == "値の形式が無効です。LoginId:S201114~"        && current.res.body[13].inputNote == "20110714"
+      && current.res.body[14].code == "10006" && current.res.body[14].message == "値の形式が無効です。LoginId:S201115|"        && current.res.body[14].inputNote == "20110715"
+      && current.res.body[15].code == "10006" && current.res.body[15].message == "値の形式が無効です。LoginId:S201116`"        && current.res.body[15].inputNote == "20110716"
+      && current.res.body[16].code == "10006" && current.res.body[16].message == "値の形式が無効です。LoginId:S201117{"        && current.res.body[16].inputNote == "20110717"
+      && current.res.body[17].code == "10006" && current.res.body[17].message == "値の形式が無効です。LoginId:S201118+"        && current.res.body[17].inputNote == "20110718"
+      && current.res.body[18].code == "10006" && current.res.body[18].message == "値の形式が無効です。LoginId:S201119*"        && current.res.body[18].inputNote == "20110719"
+      && current.res.body[19].code == "10006" && current.res.body[19].message == "値の形式が無効です。LoginId:S201120}"        && current.res.body[19].inputNote == "20110720"
+      && current.res.body[20].code == "10006" && current.res.body[20].message == "値の形式が無効です。LoginId:S201121<"        && current.res.body[20].inputNote == "20110721"
+      && current.res.body[21].code == "10006" && current.res.body[21].message == "値の形式が無効です。LoginId:S201122>"        && current.res.body[21].inputNote == "20110722"
+      && current.res.body[22].code == "10006" && current.res.body[22].message == "値の形式が無効です。LoginId:S201123?"        && current.res.body[22].inputNote == "20110723"
+      && current.res.body[23].code == "10006" && current.res.body[23].message == "値の形式が無効です。LoginId:S201124_"        && current.res.body[23].inputNote == "20110724"
+      && current.res.body[24].code == "10006" && current.res.body[24].message == "値の形式が無効です。LoginId:S201125-"        && current.res.body[24].inputNote == "20110725"
+      && current.res.body[25].code == "10006" && current.res.body[25].message == "値の形式が無効です。LoginId:S201126^"        && current.res.body[25].inputNote == "20110726"
+      && current.res.body[26].code == "10006" && current.res.body[26].message == "値の形式が無効です。LoginId:S201127\\"       && current.res.body[26].inputNote == "20110727"
+      && current.res.body[27].code == "10006" && current.res.body[27].message == "値の形式が無効です。LoginId:S201128@"        && current.res.body[27].inputNote == "20110728"
+      && current.res.body[28].code == "10006" && current.res.body[28].message == "値の形式が無効です。LoginId:S201129["        && current.res.body[28].inputNote == "20110729"
+      && current.res.body[29].code == "10006" && current.res.body[29].message == "値の形式が無効です。LoginId:S201130;"        && current.res.body[29].inputNote == "20110730"
+      && current.res.body[30].code == "10006" && current.res.body[30].message == "値の形式が無効です。LoginId:S201131:"        && current.res.body[30].inputNote == "20110731"
+      && current.res.body[31].code == "10006" && current.res.body[31].message == "値の形式が無効です。LoginId:S201132]"        && current.res.body[31].inputNote == "20110732"
+      && current.res.body[32].code == "10006" && current.res.body[32].message == "値の形式が無効です。LoginId:S201133,"        && current.res.body[32].inputNote == "20110733"
+      && current.res.body[33].code == "10006" && current.res.body[33].message == "値の形式が無効です。LoginId:S201134."        && current.res.body[33].inputNote == "20110734"
+      && current.res.body[34].code == "10006" && current.res.body[34].message == "値の形式が無効です。LoginId:S201135/"        && current.res.body[34].inputNote == "20110735"
+      && current.res.body[35].code == "10006" && current.res.body[35].message == "値の形式が無効です。LoginId:S201136 "        && current.res.body[35].inputNote == "20110736"
+      && current.res.body[36].code == "10006" && current.res.body[36].message == "値の形式が無効です。LoginId:ひらがな"        && current.res.body[36].inputNote == "20110737"
+      && current.res.body[37].code == "10006" && current.res.body[37].message == "値の形式が無効です。LoginId:カタカナ"        && current.res.body[37].inputNote == "20110738"
+      && current.res.body[38].code == "10006" && current.res.body[38].message == "値の形式が無効です。LoginId:漢字"            && current.res.body[38].inputNote == "20110739"
+      && current.res.body[39].code == "10006" && current.res.body[39].message == "値の形式が無効です。LoginId:ｶﾀｶﾅ"            && current.res.body[39].inputNote == "20110740"
+      && current.res.body[40].code == "10006" && current.res.body[40].message == "値の形式が無効です。LoginId:Az5$　 ひカ漢ｶ"  && current.res.body[40].inputNote == "20110741"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2011-07.json
+  confirmStaffs:
+    desc: "エラーの職員情報が登録されていないことを確認"
+    db:
+      query: |
+        SELECT
+          staff_code
+          , login_id
+          , name
+          , enabled
+          , role_id
+          , password_hash::text
+          , password_salt::text
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.staffs
+    test: |
+      len(current.rows) == 1
+      && current.rows[0].staff_code == "Az5$　 ひカ漢ｶ"
+      && current.rows[0].login_id == "20110742"
+      && current.rows[0].name == "Az5$　 ひカ漢ｶ"
+      && current.rows[0].enabled == true
+      && current.rows[0].role_id == 10
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"

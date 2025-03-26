@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 using Asp.Versioning;
 
 using Microsoft.AspNetCore.Mvc;
@@ -32,13 +34,26 @@ public class StaffController : ControllerBase
     /// </summary>
     /// <param name="request">連携データ</param>
     /// <returns></returns>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ErrorObject))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
     [Route("api/v{version:apiVersion}/external/staffs")]
     public async Task<IActionResult> StoreStaffsAsync([FromBody] Staff[] request)
     {
         var result = await _staffUsecase.StoreStaffsAsync(request.ToList());
 
-        return Ok(result);
+        if (result.Any())
+        {
+            return new ContentResult
+            {
+                Content = JsonSerializer.Serialize(result),
+                ContentType = "application/json",
+                StatusCode = (int)StatusCodes.Status207MultiStatus,
+            };
+        }
+        else
+        {
+            return Ok();
+        }
     }
 }
