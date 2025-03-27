@@ -357,6 +357,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = Guid.Parse("7400c9cc-c2ee-48ef-a12e-5c3244631a6d"),
             ConsultNumber = "0001",
+            Age = new Age(40,1,1),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             PlaceScheduleId = Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"),
