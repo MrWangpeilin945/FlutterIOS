@@ -7,8 +7,8 @@ import {
   Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import type { MetaFunction } from "@remix-run/node";
-import { useSearchParams } from "@remix-run/react";
+import type { MetaFunction } from "react-router";
+import { useSearchParams } from "react-router";
 import { isAxiosError } from "axios";
 import { format } from "date-fns";
 import { useAtom } from "jotai";
@@ -67,7 +67,7 @@ export default function PlaceScheduleLock() {
   const { isFetching, refetch } = usePlaceScheduleGetPlaceScheduleLockingStatus(
     "1",
     placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
-    { query: { enabled: false } },
+    { query: { enabled: false } }
   );
 
   //AP1017呼び出し用(POST系APIの定義)
@@ -97,7 +97,7 @@ export default function PlaceScheduleLock() {
 
   // ボタン(会場ロック, 会場ロック解除)クリック
   const handleButtonClick = async (
-    lockingStatus: PlaceScheduleLockingStatus,
+    lockingStatus: PlaceScheduleLockingStatus
   ) => {
     if (lockingStatus === PlaceScheduleLockingStatus.検査中) {
       setMessage("会場ロックの解除を行ってもよろしいですか？");
@@ -124,7 +124,10 @@ export default function PlaceScheduleLock() {
       try {
         const result = await mutateAsync({
           version: "1",
-          placeScheduleId: placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
+          placeScheduleId:
+            placeScheduleId ||
+            firstPlaceSchedule.current?.placeScheduleId ||
+            "",
           data: body,
         });
         if (result.status === 200) {
@@ -139,7 +142,7 @@ export default function PlaceScheduleLock() {
             setMessage(getErrorMessage(errorMessages.invalid, "パラメータ"));
           } else if (error.response.status === 404) {
             setMessage(
-              getErrorMessage(errorMessages.notFound, "該当する会場日程"),
+              getErrorMessage(errorMessages.notFound, "該当する会場日程")
             );
           } else if (error.response.status === 500) {
             setMessage(getErrorMessage(errorMessages.serverError));
@@ -225,7 +228,7 @@ export default function PlaceScheduleLock() {
                       {placeScheduleLock.updatedAt
                         ? format(
                             new Date(placeScheduleLock.updatedAt),
-                            "yyyy/MM/dd HH:mm",
+                            "yyyy/MM/dd HH:mm"
                           )
                         : ""}
                       ）&nbsp;
@@ -238,7 +241,7 @@ export default function PlaceScheduleLock() {
                   <Text size="sm" c="black01">
                     {getErrorMessage(
                       errorMessages.notFound,
-                      "該当する会場日程",
+                      "該当する会場日程"
                     )}
                   </Text>
                 </>

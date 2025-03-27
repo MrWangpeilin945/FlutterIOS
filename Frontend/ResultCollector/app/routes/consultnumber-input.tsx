@@ -10,13 +10,13 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useClickOutside, useDisclosure, useFocusTrap } from "@mantine/hooks";
-import type { MetaFunction } from "@remix-run/node";
-import { useNavigate } from "@remix-run/react";
+import type { MetaFunction } from "react-router";
+import { useNavigate } from "react-router";
 import { isAxiosError } from "axios";
 import { useAtom } from "jotai";
 import type React from "react";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import { z } from "zod";
 import {
   useConsultGetUnexaminedMenus,

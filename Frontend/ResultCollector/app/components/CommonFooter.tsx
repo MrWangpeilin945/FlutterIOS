@@ -1,5 +1,5 @@
 import { Box, Button, Grid, GridCol, Text } from "@mantine/core";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate } from "react-router";
 
 type FooterProps = {
   items?: {
