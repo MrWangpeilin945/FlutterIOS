@@ -235,6 +235,15 @@ public class ConsultUsecase : IConsultUsecase
         //   - b. 中止レコードがない => 中止レコードを挿入する
 
         var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        // 会場日程がロック中かを確認
+        // ロール：管理者は操作可能
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync(consult.PlaceScheduleId);
+        if (placeSchedule?.Status == PlaceScheduleLockingStatus.検査完了 && _staffIdentityProvider.Role != Role.Admin)
+        {
+            // 会場ロック中
+            throw new PlaceScheduleLockedException();
+        }
+
         var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
 
         // [1] isPerforming（検査実施する）：true & 中止理由：null
@@ -562,7 +571,7 @@ public class ConsultUsecase : IConsultUsecase
     public async Task RegisterResultsAsync(string consultNumber, ResultsRequest results)
     {
         var consult = await _consultRepository.GetConsultAsync(consultNumber);
-        // 会場のロック中かを確認
+        // 会場日程がロック中かを確認
         // ロール：管理者は操作可能
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync(consult.PlaceScheduleId);
         if (placeSchedule?.Status == PlaceScheduleLockingStatus.検査完了 && _staffIdentityProvider.Role != Role.Admin)
