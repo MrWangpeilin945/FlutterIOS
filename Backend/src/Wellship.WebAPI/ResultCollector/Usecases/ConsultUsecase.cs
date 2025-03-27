@@ -114,9 +114,8 @@ public class ConsultUsecase : IConsultUsecase
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
         // 健診日
         DateOnly examDate = placeSchedule.ExamDate;
-        // 受診日の年齢
-        // NOTE: 年齢加算日は暫定で前日年齢加算
-        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 受診の年齢
+        var examAge = consult.Age;
         // 検査メニューに関連した検査項目情報を取得
         var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
         // 検査中止を取得
@@ -315,9 +314,8 @@ public class ConsultUsecase : IConsultUsecase
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
         // 健診日
         DateOnly examDate = placeSchedule.ExamDate;
-        // 受診日の年齢
-        // NOTE: 年齢加算日は暫定で前日年齢加算
-        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 受診の年齢
+        var examAge = consult.Age;
         // 検査メニューに関連した検査項目情報を取得
         var examItemGroup = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
         // 検査項目明細IDを取得
@@ -522,9 +520,8 @@ public class ConsultUsecase : IConsultUsecase
         var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
         var examDate = placeSchedule.ExamDate;
-        // 受診日の年齢
-        // NOTE: 年齢加算日は暫定で前日年齢加算
-        var examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 受診の年齢
+        var examAge = consult.Age;
 
         // DBとリクエスト値から今回値を取得して合成する（リクエスト値を優先する）
         var dbCurrentResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
@@ -627,9 +624,8 @@ public class ConsultUsecase : IConsultUsecase
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
         // 健診日
         DateOnly examDate = placeSchedule.ExamDate;
-        // 受診日の年齢
-        // NOTE: 年齢加算日は暫定で前日年齢加算
-        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 受診の年齢
+        var examAge = consult.Age;
         // 検査結果を取得
         var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
         // 過去検査結果を取得

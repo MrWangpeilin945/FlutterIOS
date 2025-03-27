@@ -51,13 +51,8 @@ public sealed class Birthdate
         {
             if (startDate == Value)
             {
-                // 生年月日に達していないため-1を返す
-                return new Age()
-                {
-                    Years = 0,
-                    Months = 0,
-                    Days = -1
-                };
+                // 生年月日に達していないため0を返す
+                return new Age(0, 0, 0);
             }
             // 年齢到達日は前日のため、起算日を１日後に移動する
             startDate = startDate.AddDays(1);
@@ -110,11 +105,6 @@ public sealed class Birthdate
                 years -= 1;
             }
         }
-        return new Age()
-        {
-            Years = years,
-            Months = months,
-            Days = days
-        };
+        return new Age(years, months, days);
     }
 }

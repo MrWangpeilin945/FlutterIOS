@@ -89,6 +89,7 @@ public class ConsultUsecaseTests
                          {
                              ConsultId = Guid.Parse("8d670eb8-d9f2-40b2-bfa6-cef6403be53d"),
                              ConsultNumber = "0001",
+                             Age = new Age(25, 0, 0),
                              ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
                              ProgressStatus = ConsultProgressStatus.検査中,
                              Note = "定期健康診断",
@@ -152,6 +153,7 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(new Consult()
         {
             ConsultNumber = "1",
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             PlaceScheduleId = Guid.Parse("6df8bdff-66c0-4113-afd6-985a78bd35ff"),
@@ -216,6 +218,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = Guid.Parse("7400c9cc-c2ee-48ef-a12e-5c3244631a6d"),
             ConsultNumber = "0001",
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             PlaceScheduleId = Guid.Parse("caab7279-109a-4c63-bc9a-83fa25c59a91"),
@@ -286,6 +289,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = Guid.Parse("4a778828-c758-4437-99ec-3493310edf46"),
             ConsultNumber = "0001",
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             PlaceScheduleId = Guid.Parse("ed3e8d23-2c9f-4b0c-bfb1-e933afc8ee49"),
@@ -400,6 +404,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -499,6 +504,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -590,6 +596,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -725,6 +732,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -816,6 +824,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -903,6 +912,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -1011,6 +1021,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
             ProgressStatus = ConsultProgressStatus.検査中,
             Note = "定期健康診断",
@@ -1083,6 +1094,7 @@ public class ConsultUsecaseTests
                             {
                                 ConsultId = Guid.Parse("8d670eb8-d9f2-40b2-bfa6-cef6403be53d"),
                                 ConsultNumber = "0006",
+                                Age = new Age(0, 0, 0),
                                 ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
                                 ProgressStatus = ConsultProgressStatus.検査中,
                                 Note = "定期健康診断",
@@ -1149,6 +1161,7 @@ public class ConsultUsecaseTests
                             {
                                 ConsultId = consultId,
                                 ConsultNumber = consultNumber,
+                                Age = new Age(58, 8, 5),
                                 ExamineeId = examineeId,
                                 ProgressStatus = ConsultProgressStatus.検査中,
                                 Note = "定期健康診断",
@@ -1390,6 +1403,7 @@ public class ConsultUsecaseTests
                             {
                                 ConsultId = consultId,
                                 ConsultNumber = consultNumber,
+                                Age = new Age(58, 8, 5),
                                 ExamineeId = examineeId,
                                 ProgressStatus = ConsultProgressStatus.検査中,
                                 Note = "定期健康診断",
@@ -1586,6 +1600,7 @@ public class ConsultUsecaseTests
                             {
                                 ConsultId = consultId,
                                 ConsultNumber = consultNumber,
+                                Age = new Age(48, 3, 7),
                                 ExamineeId = examineeId,
                                 ProgressStatus = ConsultProgressStatus.来場待ち,
                                 Note = "定期健康診断",
@@ -2003,6 +2018,7 @@ public class ConsultUsecaseTests
                             {
                                 ConsultId = consultId,
                                 ConsultNumber = consultNumber,
+                                Age = new Age(48, 3, 7),
                                 ExamineeId = examineeId,
                                 ProgressStatus = ConsultProgressStatus.来場待ち,
                                 Note = "定期健康診断",

@@ -226,9 +226,10 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=950
-Top=2050
+Top=2000
 Field="受診ID","consult_id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="受診番号","consult_number","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="年齢","age","varchar(7)","NOT NULL",,"","",$FFFFFFFF,""
 Field="進捗状況","progress_status","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="結果出力状況","export_status","integer","NOT NULL",,"","",$FFFFFFFF,""
 Field="会場日程ID","place_schedule_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
@@ -240,8 +241,8 @@ Index==1,external_connection_code
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241203143603
-Position="MAIN",950,2050
+ModifiedDateTime=20250319132510
+Position="MAIN",950,2000
 ZOrder=17
 
 [Relation]
@@ -741,7 +742,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=1600
-Top=2450
+Top=2350
 Field="受診ID","consult_id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査特記コード","code","text","NOT NULL",1,"","",$FFFFFFFF,""
 Field="特記事項","note","text","NOT NULL",,"","",$FFFFFFFF,""
@@ -749,7 +750,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241218145433
-Position="MAIN",1600,2450
+Position="MAIN",1600,2350
 ZOrder=43
 
 [Relation]
@@ -781,15 +782,14 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=1600
-Top=2650
+Top=2500
 Field="受診ID","consult_id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
-Field="外部コード検査項目明細CD","external_exam_item_detail_code","text","NOT NULL",,"","",$FFFFFFFF,""
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241225163023
-Position="MAIN",1600,2650
+ModifiedDateTime=20250319151633
+Position="MAIN",1600,2500
 ZOrder=45
 
 [Relation]
@@ -2125,5 +2125,91 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20250130172540
-Position="Main",100,450,413,119
+Position="MAIN",100,450,413,119
 ZOrder=122
+
+[Entity]
+PName=external_exam_item_detail_orders
+LName=外部検査項目明細依頼
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=1600
+Top=2650
+Field="受診ID","consult_id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="外部コード検査項目明細CD","external_exam_item_detail_code","text","NOT NULL",2,"","",$FFFFFFFF,""
+Field="外部コード検査項目明細備考","external_note","text","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250321090812
+Position="MAIN",1600,2650
+ZOrder=123
+
+[Relation]
+Entity1=exam_item_detail_orders
+Entity2=external_exam_item_detail_orders
+RelationType1=2
+RelationType2=4
+Fields1=consult_id,exam_item_detail_id
+Fields2=consult_id,exam_item_detail_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,9500,529,9500,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20250321090824
+LineMode=0
+Bar1=950
+Bar2=53
+Bar3=950
+TermPos1=R
+TermPos2=R
+ZOrder=125
+
+[Relation]
+Entity1=external_exam_item_details
+Entity2=external_exam_item_detail_orders
+RelationType1=2
+RelationType2=3
+Fields1=exam_item_detail_id,external_exam_item_detail_code
+Fields2=exam_item_detail_id,external_exam_item_detail_code
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,9500,500,8978,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20250321105502
+LineMode=0
+Bar1=950
+Bar2=50
+Bar3=898
+TermPos1=R
+TermPos2=R
+ZOrder=126
+
+[Relation]
+Entity1=exam_item_details
+Entity2=exam_item_detail_orders
+RelationType1=2
+RelationType2=3
+Fields1=exam_item_detail_id
+Fields2=exam_item_detail_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,4659,5341,5923,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20250321104636
+LineMode=0
+Bar1=466
+Bar2=534
+Bar3=592
+TermPos1=R
+TermPos2=R
+ZOrder=127
