@@ -112,6 +112,17 @@ public class Program
         app.UseAuthorization();
         app.MapControllers();
 
+        // TODO: 負荷テストによるエラーに対応するために暫定的に設定します。
+        // チューニングが必要です。
+
+        ThreadPool.GetMinThreads(out var workMin, out var ioMin);
+        ThreadPool.GetMaxThreads(out var workMax, out var ioMax);
+
+        Console.WriteLine($"MinThreads work={workMin}, i/o={ioMin}");
+        Console.WriteLine($"MaxThreads work={workMax}, i/o={ioMax}");
+
+        ThreadPool.SetMinThreads(100, 4);
+
         app.Run();
     }
 }
