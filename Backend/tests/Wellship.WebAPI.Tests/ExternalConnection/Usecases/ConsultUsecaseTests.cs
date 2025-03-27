@@ -30,7 +30,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_連携キー_登録()
+    public async Task 空値のチェック_連携キー_登録で1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -60,7 +60,7 @@ public class ConsultUsecaseTests
         _thresholdRepositoryMock.Setup(r => r.GetThresholdsByCodesAsync(new List<string>())).ReturnsAsync(new List<ThresholdEntity>());
         // 検査項目明細CDに紐づく外部検査項目明細IDを取得する
         _consultRepositoryMock.Setup(r => r.GetExternalExamItemDetailInfoAsync(new List<string>())).ReturnsAsync(new List<ExternalExamItemDetailEntity>());
-        // *** 連携キーに紐づく外部連携キーを取得する
+        // 連携キーに紐づく外部連携キーを取得する
         _consultRepositoryMock.Setup(r => r.GetExternalConnectionCodeAsync(new List<string> { "" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // 受診番号に紐づく連携キーを取得する
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
@@ -88,7 +88,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_連携キー_削除()
+    public async Task 空値のチェック_連携キー_削除で2件のエラーが返る()
     {
         // Arrange
         // 連携キーに紐づく外部連携キーを取得する
@@ -118,16 +118,16 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_会場コード()
+    public async Task 空値のチェック_会場コードで3件のエラーが返る()
     {
         // Arrange
-        // *** 会場コードに紐づく会場IDを取得する
+        // 会場コードに紐づく会場IDを取得する
         _placeRepositoryMock.Setup(r => r.GetPlaceInfoAsync(new List<string> { "" })).ReturnsAsync(new List<PlaceEntity>());
         // 班コードに紐づく班IDを取得する
         var teamEntities = new List<TeamEntity> {
                     new TeamEntity(){ TeamId = Guid.Parse("b0000000-0000-0000-0000-000000000001"), TeamCode = "T001", Name = "班"} };
         _teamRepositoryMock.Setup(r => r.GetTeamInfoAsync(new List<string> { "T001" })).ReturnsAsync(teamEntities);
-        // *** 会場コード、班コード、健診日に紐づく会場日程情報を取得する
+        // 会場コード、班コード、健診日に紐づく会場日程情報を取得する
         _placeScheduleRepositoryMock.Setup(r => r.GetPlaceScheduleInfoAsync(new List<string> { "" }, new List<string> { "T001" },
                                                 new List<DateOnly> { DateOnly.Parse("2024-10-02") })).ReturnsAsync(new List<PlaceScheduleEntity>());
         // 受診者コードに紐づく受診者IDを取得する
@@ -147,9 +147,9 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10004", Message = "必須項目が不足しています。PlaceCode", InputNote  = "UT2004"}
-            ,   new(){Code = "10001", Message = "指定されたPlaceCodeがシステム上に存在しません。Code:", InputNote  = "UT2004"}
-            ,   new(){Code = "10001", Message = "指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:/TeamCode:T001/ExamDate:2024-10-02", InputNote  = "UT2004"}
+            new(){Code = "10004", Message = "必須項目が不足しています。PlaceCode", InputNote  = "UT2004"},
+            new(){Code = "10001", Message = "指定されたPlaceCodeがシステム上に存在しません。Code:", InputNote  = "UT2004"},
+            new(){Code = "10001", Message = "指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:/TeamCode:T001/ExamDate:2024-10-02", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
@@ -171,16 +171,16 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_班コード()
+    public async Task 空値のチェック_班コードで3件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
         var placeEntities = new List<PlaceEntity> {
                     new PlaceEntity(){ PlaceId = Guid.Parse("a0000000-0000-0000-0000-000000000001"), PlaceCode = "P001", Name = "会場"} };
         _placeRepositoryMock.Setup(r => r.GetPlaceInfoAsync(new List<string> { "P001" })).ReturnsAsync(placeEntities);
-        // *** 班コードに紐づく班IDを取得する
+        // 班コードに紐づく班IDを取得する
         _teamRepositoryMock.Setup(r => r.GetTeamInfoAsync(new List<string> { "" })).ReturnsAsync(new List<TeamEntity>());
-        // *** 会場コード、班コード、健診日に紐づく会場日程情報を取得する
+        // 会場コード、班コード、健診日に紐づく会場日程情報を取得する
         _placeScheduleRepositoryMock.Setup(r => r.GetPlaceScheduleInfoAsync(new List<string> { "P001" }, new List<string> { "" },
                                                 new List<DateOnly> { DateOnly.Parse("2024-10-02") })).ReturnsAsync(new List<PlaceScheduleEntity>());
         // 受診者コードに紐づく受診者IDを取得する
@@ -200,9 +200,9 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10004", Message = "必須項目が不足しています。TeamCode", InputNote  = "UT2004"}
-            ,   new(){Code = "10001", Message = "指定されたTeamCodeがシステム上に存在しません。Code:", InputNote  = "UT2004"}
-            ,   new(){Code = "10001", Message = "指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:P001/TeamCode:/ExamDate:2024-10-02", InputNote  = "UT2004"}
+            new(){Code = "10004", Message = "必須項目が不足しています。TeamCode", InputNote  = "UT2004"},
+            new(){Code = "10001", Message = "指定されたTeamCodeがシステム上に存在しません。Code:", InputNote  = "UT2004"},
+            new(){Code = "10001", Message = "指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:P001/TeamCode:/ExamDate:2024-10-02", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
@@ -224,7 +224,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_受診番号()
+    public async Task 空値のチェック_受診番号で1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -256,7 +256,7 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetExternalExamItemDetailInfoAsync(new List<string>())).ReturnsAsync(new List<ExternalExamItemDetailEntity>());
         // 連携キーに紐づく外部連携キーを取得する
         _consultRepositoryMock.Setup(r => r.GetExternalConnectionCodeAsync(new List<string> { "C001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
-        // *** 受診番号に紐づく連携キーを取得する
+        // 受診番号に紐づく連携キーを取得する
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
@@ -282,7 +282,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_受診者コード()
+    public async Task 空値のチェック_受診者コードで2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -301,7 +301,7 @@ public class ConsultUsecaseTests
                                        Status = 31, ExamDate = DateOnly.Parse("2024-10-02"), StartTime = "1500"} };
         _placeScheduleRepositoryMock.Setup(r => r.GetPlaceScheduleInfoAsync(new List<string> { "P001" }, new List<string> { "T001" },
                                                 new List<DateOnly> { DateOnly.Parse("2024-10-02") })).ReturnsAsync(placeScheduleEntities);
-        // *** 受診者コードに紐づく受診者IDを取得する
+        // 受診者コードに紐づく受診者IDを取得する
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "" })).ReturnsAsync(new List<ExamineeEntity>());
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -315,8 +315,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10004", Message = "必須項目が不足しています。ExamineeCd", InputNote  = "UT2004"}
-            ,   new(){Code = "10001", Message = "指定されたExamineeCdがシステム上に存在しません。Code:", InputNote  = "UT2004"}
+            new(){Code = "10004", Message = "必須項目が不足しています。ExamineeCd", InputNote  = "UT2004"},
+            new(){Code = "10001", Message = "指定されたExamineeCdがシステム上に存在しません。Code:", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
@@ -338,7 +338,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_過去検査結果_検査項目明細CD()
+    public async Task 空値のチェック_過去検査結果_検査項目明細CDで2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -366,7 +366,7 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
         // 基準値パターンコードに紐づく基準値パターンIDを取得する
         _thresholdRepositoryMock.Setup(r => r.GetThresholdsByCodesAsync(new List<string>())).ReturnsAsync(new List<ThresholdEntity>());
-        // *** 検査項目明細CDに紐づく外部検査項目明細IDを取得する
+        // 検査項目明細CDに紐づく外部検査項目明細IDを取得する
         _consultRepositoryMock.Setup(r => r.GetExternalExamItemDetailInfoAsync(new List<string> { "" })).ReturnsAsync(new List<ExternalExamItemDetailEntity>());
         // 連携キーに紐づく外部連携キーを取得する
         _consultRepositoryMock.Setup(r => r.GetExternalConnectionCodeAsync(new List<string> { "C001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
@@ -374,8 +374,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10004", Message = "必須項目が不足しています。PreviousResults.ExamItemDetailCd", InputNote  = "UT2004"}
-            ,   new(){Code = "10001", Message = "指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:", InputNote  = "UT2004"}
+            new(){Code = "10004", Message = "必須項目が不足しています。PreviousResults.ExamItemDetailCd", InputNote  = "UT2004"},
+            new(){Code = "10001", Message = "指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
@@ -398,7 +398,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_過去検査結果_結果値()
+    public async Task 空値のチェック_過去検査結果_結果値で1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -426,7 +426,7 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
         // 基準値パターンコードに紐づく基準値パターンIDを取得する
         _thresholdRepositoryMock.Setup(r => r.GetThresholdsByCodesAsync(new List<string>())).ReturnsAsync(new List<ThresholdEntity>());
-        // *** 検査項目明細CDに紐づく外部検査項目明細IDを取得する
+        // 検査項目明細CDに紐づく外部検査項目明細IDを取得する
         var externalExamItemDetailEntities = new List<ExternalExamItemDetailEntity>{
             new ExternalExamItemDetailEntity() { ExamItemDetailId = 2004, ExternalExamItemDetailCode = "Prev001" }};
         _consultRepositoryMock.Setup(r => r.GetExternalExamItemDetailInfoAsync(new List<string> { "Prev001" })).ReturnsAsync(externalExamItemDetailEntities);
@@ -436,7 +436,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10004", Message = "必須項目が不足しています。PreviousResults.Value", InputNote  = "UT2004"} };
+            new(){Code = "10004", Message = "必須項目が不足しています。PreviousResults.Value", InputNote  = "UT2004"}
+        };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
                                          _examineeRepositoryMock.Object, _thresholdRepositoryMock.Object,
@@ -458,7 +459,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_基準値判定_基準値判定コード()
+    public async Task 空値のチェック_基準値判定_基準値判定コードで2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -484,7 +485,7 @@ public class ConsultUsecaseTests
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
-        // *** 基準値パターンコードに紐づく基準値パターンIDを取得する
+        // 基準値パターンコードに紐づく基準値パターンIDを取得する
         _thresholdRepositoryMock.Setup(r => r.GetThresholdsByCodesAsync(new List<string> { "" })).ReturnsAsync(new List<ThresholdEntity>());
         // 検査項目明細CDに紐づく外部検査項目明細IDを取得する
         _consultRepositoryMock.Setup(r => r.GetExternalExamItemDetailInfoAsync(new List<string>())).ReturnsAsync(new List<ExternalExamItemDetailEntity>());
@@ -494,8 +495,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10004", Message = "必須項目が不足しています。ConsultThresholds.ThresholdCode", InputNote  = "UT2004"}
-            ,   new(){Code = "10001", Message = "指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:", InputNote  = "UT2004"}
+            new(){Code = "10004", Message = "必須項目が不足しています。ConsultThresholds.ThresholdCode", InputNote  = "UT2004"},
+            new(){Code = "10001", Message = "指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
@@ -519,7 +520,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_受診特記_検査特記コード()
+    public async Task 空値のチェック_受診特記_検査特記コードで2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -543,7 +544,7 @@ public class ConsultUsecaseTests
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
                                    Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
-        // *** 検査メニュー特記コードに紐づく情報を取得する
+        // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string> { "" })).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
         // 基準値パターンコードに紐づく基準値パターンIDを取得する
         _thresholdRepositoryMock.Setup(r => r.GetThresholdsByCodesAsync(new List<string>())).ReturnsAsync(new List<ThresholdEntity>());
@@ -555,8 +556,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10004", Message = "必須項目が不足しています。ConsultNotes.Code", InputNote  = "UT2004"}
-            ,   new(){Code = "10001", Message = "指定されたConsultNotes.Codeがシステム上に存在しません。Code:", InputNote  = "UT2004"}
+            new(){Code = "10004", Message = "必須項目が不足しています。ConsultNotes.Code", InputNote  = "UT2004"},
+            new(){Code = "10001", Message = "指定されたConsultNotes.Codeがシステム上に存在しません。Code:", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
@@ -580,7 +581,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_検査項目明細依頼_検査項目明細CD()
+    public async Task 空値のチェック_検査項目明細依頼_検査項目明細CDで2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -608,7 +609,7 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
         // 基準値パターンコードに紐づく基準値パターンIDを取得する
         _thresholdRepositoryMock.Setup(r => r.GetThresholdsByCodesAsync(new List<string>())).ReturnsAsync(new List<ThresholdEntity>());
-        // *** 検査項目明細CDに紐づく外部検査項目明細IDを取得する
+        // 検査項目明細CDに紐づく外部検査項目明細IDを取得する
         _consultRepositoryMock.Setup(r => r.GetExternalExamItemDetailInfoAsync(new List<string> { "" })).ReturnsAsync(new List<ExternalExamItemDetailEntity>());
         // 連携キーに紐づく外部連携キーを取得する
         _consultRepositoryMock.Setup(r => r.GetExternalConnectionCodeAsync(new List<string> { "C001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
@@ -616,8 +617,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10004", Message = "必須項目が不足しています。ExamItemDetailOrders.ExamItemDetailCd", InputNote  = "UT2004"}
-            ,   new(){Code = "10001", Message = "指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:", InputNote  = "UT2004"}
+            new(){Code = "10004", Message = "必須項目が不足しています。ExamItemDetailOrders.ExamItemDetailCd", InputNote  = "UT2004"},
+            new(){Code = "10001", Message = "指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
@@ -640,7 +641,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 重複キーのチェック_処理順()
+    public async Task 重複キーのチェック_処理順で2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -709,7 +710,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 重複キーのチェック_基準値判定_基準値判定コード()
+    public async Task 重複キーのチェック_基準値判定_基準値判定コードで1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -735,7 +736,7 @@ public class ConsultUsecaseTests
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
-        // *** 基準値パターンコードに紐づく基準値パターンIDを取得する
+        // 基準値パターンコードに紐づく基準値パターンIDを取得する
         var thresholdEntities = new List<ThresholdEntity> {
             new ThresholdEntity() { ThresholdId = Guid.Parse("f0000000-0000-0000-0000-000000000001"),
                                     ThresholdCode = "Th001", Name = "基準値パターン"}
@@ -749,7 +750,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10003", Message = "キー項目が重複しています。ConsultThresholds.ThresholdCode: Th001", InputNote  = "UT2004"}};
+            new(){Code = "10003", Message = "キー項目が重複しています。ConsultThresholds.ThresholdCode: Th001", InputNote  = "UT2004"}
+        };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
                                          _examineeRepositoryMock.Object, _thresholdRepositoryMock.Object,
@@ -775,7 +777,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 重複キーのチェック_基準値判定_優先度()
+    public async Task 重複キーのチェック_基準値判定_優先度で1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -801,7 +803,7 @@ public class ConsultUsecaseTests
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
-        // *** 基準値パターンコードに紐づく基準値パターンIDを取得する
+        //基準値パターンコードに紐づく基準値パターンIDを取得する
         var thresholdEntities = new List<ThresholdEntity> {
             new ThresholdEntity() { ThresholdId = Guid.Parse("f0000000-0000-0000-0000-000000000001"),
                                     ThresholdCode = "Th001", Name = "基準値パターン1"},
@@ -817,7 +819,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10003", Message = "キー項目が重複しています。ConsultThresholds.Priority: 1", InputNote  = "UT2004"}};
+            new(){Code = "10003", Message = "キー項目が重複しています。ConsultThresholds.Priority: 1", InputNote  = "UT2004"}
+        };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
                                          _examineeRepositoryMock.Object, _thresholdRepositoryMock.Object,
@@ -843,7 +846,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 重複キーのチェック_受診特記_検査特記コード()
+    public async Task 重複キーのチェック_受診特記_検査特記コードで1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -867,7 +870,7 @@ public class ConsultUsecaseTests
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
                                    Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
-        // *** 検査メニュー特記コードに紐づく情報を取得する
+        // 検査メニュー特記コードに紐づく情報を取得する
         var examMenuNoteCodeEntities = new List<ExamMenuNoteCodeEntity> { new ExamMenuNoteCodeEntity() { Code = "CT001", Name = "受診特記" } };
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string> { "CT001", "CT001" })).ReturnsAsync(examMenuNoteCodeEntities);
         // 基準値パターンコードに紐づく基準値パターンIDを取得する
@@ -880,7 +883,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10003", Message = "キー項目が重複しています。ConsultNotes.Code: CT001", InputNote  = "UT2004"}};
+            new(){Code = "10003", Message = "キー項目が重複しています。ConsultNotes.Code: CT001", InputNote  = "UT2004"}
+        };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
                                          _examineeRepositoryMock.Object, _thresholdRepositoryMock.Object,
@@ -906,7 +910,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 文字数のチェック_受診番号()
+    public async Task 文字数のチェック_受診番号で1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -942,7 +946,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "12345678901234567890123456789012345678901234567890a" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10005", Message = "制限数を超えています。ConsultNumber:12345678901234567890123456789012345678901234567890a", InputNote  = "UT2004"}};
+            new(){Code = "10005", Message = "制限数を超えています。ConsultNumber:12345678901234567890123456789012345678901234567890a", InputNote  = "UT2004"}
+        };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
                                          _examineeRepositoryMock.Object, _thresholdRepositoryMock.Object,
@@ -963,7 +968,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 文字制限のチェック_受診番号()
+    public async Task 文字制限のチェック_受診番号で1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -999,7 +1004,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "123-456$_a#123-456$_a#" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10006", Message = "値の形式が無効です。ConsultNumber:123-456$_a#123-456$_a#", InputNote  = "UT2004"}};
+            new(){Code = "10006", Message = "値の形式が無効です。ConsultNumber:123-456$_a#123-456$_a#", InputNote  = "UT2004"}
+        };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
                                          _examineeRepositoryMock.Object, _thresholdRepositoryMock.Object,
@@ -1020,7 +1026,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 連携キーのチェック_受診番号()
+    public async Task 連携キーのチェック_受診番号で1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1059,7 +1065,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(externalConnectionCodeEntities);
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10002", Message = "指定されたConsultNumberが既に登録済みです。Code:N001", InputNote  = "UT2004"}};
+            new(){Code = "10002", Message = "指定されたConsultNumberが既に登録済みです。Code:N001", InputNote  = "UT2004"}
+        };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
                                          _examineeRepositoryMock.Object, _thresholdRepositoryMock.Object,
@@ -1080,7 +1087,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task データのチェック_連携キー_削除()
+    public async Task データのチェック_連携キー_削除で1件のエラーが返る()
     {
         // Arrange
         // 連携キーに紐づく外部連携キーを取得する
@@ -1109,7 +1116,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task データのチェック_会場ID()
+    public async Task データのチェック_会場IDで2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1161,7 +1168,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task データのチェック_班ID()
+    public async Task データのチェック_班IDで2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1213,7 +1220,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task データのチェック_会場日程ID()
+    public async Task データのチェック_会場日程IDで1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1266,7 +1273,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task データのチェック_受診者ID()
+    public async Task データのチェック_受診者IDで1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1321,7 +1328,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task データのチェック_検査特記()
+    public async Task データのチェック_検査特記で1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1381,7 +1388,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task データのチェック_基準値パターン()
+    public async Task データのチェック_基準値パターンで1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1443,7 +1450,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task データのチェック_過去検査結果_検査項目明細CD()
+    public async Task データのチェック_過去検査結果_検査項目明細CDで1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1502,7 +1509,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 重複キーのチェック_過去検査結果_検査項目明細ID()
+    public async Task 重複キーのチェック_過去検査結果_検査項目明細IDで2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1569,7 +1576,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 重複キーのチェック_過去検査結果_検査項目明細CD()
+    public async Task 重複キーのチェック_過去検査結果_検査項目明細CDで1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1634,7 +1641,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task データのチェック_検査項目明細依頼_検査項目明細CD()
+    public async Task データのチェック_検査項目明細依頼_検査項目明細CDで1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1693,7 +1700,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 重複キーのチェック_検査項目明細依頼_検査項目明細ID()
+    public async Task 重複キーのチェック_検査項目明細依頼_検査項目明細IDで2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -1760,7 +1767,7 @@ public class ConsultUsecaseTests
     }
 
     [Fact]
-    public async Task 重複キーのチェック_検査項目明細依頼_検査項目明細CD()
+    public async Task 重複キーのチェック_検査項目明細依頼_検査項目明細CDで1件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
