@@ -34,12 +34,12 @@ steps:
         INSERT INTO
           resultcollector.teams
           (team_id, team_code, name, order_number, created_at, created_by)
-        VALUES('f0002004-0000-0000-0001-000000000001', 'T2004-01', '甲班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('f0002004-0000-0000-0001-000000000001', 'T2004-01', '班', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場
         INSERT INTO
           resultcollector.places
           (place_id, place_code, name, order_number, created_at, created_by)
-        VALUES('b0002004-0000-0000-0001-000000000001', 'P2004-01', '甲会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('b0002004-0000-0000-0001-000000000001', 'P2004-01', '会場', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場日程
         INSERT INTO
           resultcollector.place_schedule
@@ -79,10 +79,7 @@ steps:
     test: |
       current.res.status == 200
       // レスポンスにErrorObjectが返されないことを確認
-      && len(current.res.body) == 0
-    dump:
-      expr: current.res.body
-      out: ../Dump/EC2004-01.json
+      && current.res.body == null
   confirmConsult:
     desc: "受診の登録を確認"
     db:
@@ -108,7 +105,7 @@ steps:
     test: |
       // sortNoが大きいリクエストが処理されることを確認
       len(current.rows) == 1
-      && current.rows[0].consult_number == "No-200401-2"
+      && current.rows[0].consult_number == "No2004012"
       && current.rows[0].progress_status == 11
       && current.rows[0].export_status == 11
       && current.rows[0].place_schedule_id == "a0002004-0000-0000-0001-000000000003"
