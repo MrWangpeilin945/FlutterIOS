@@ -564,16 +564,6 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 **** Message `指定されたExamItemDetailOrders.ExamItemDetailCodeがシステム上に存在しません。Code:[Consult.ExamItemDetailOrders.ExamItemDetailCode]`
 **** InputNote `Consult.InputNote`
 
-* PKが重複するレコードが存在する(ExamItemDetailOrders)
-** Consult.ExamItemDetailOrdersを以下の条件でGroupByし、複数レコードが存在する
-*** 条件
-**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCode` で検索した `[DB]external_exam_item_details.exam_item_detail_id` 
-*** Consultの単位で該当を取り除く
-*** ErrorObject
-**** Code `10003`
-**** Message `キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCode:[Consult.ExamItemDetailOrders.ExamItemDetailCode]`
-**** InputNote `Consult.InputNote`
-
 ===== `Consult.ActionType` == `ActionType.削除`
 
 * 連携キーの取得に失敗
