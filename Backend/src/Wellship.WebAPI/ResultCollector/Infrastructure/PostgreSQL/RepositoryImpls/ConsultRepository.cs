@@ -78,6 +78,7 @@ public class ConsultRepository : IConsultRepository
         select
             c.consult_id as ConsultId
             , c.consult_number as ConsultNumber
+            , c.age as Age
             , c.progress_status as ProgressStatus
             , c.export_status as ExportStatus
             , c.place_schedule_id as PlaceScheduleId
@@ -99,6 +100,7 @@ public class ConsultRepository : IConsultRepository
         {
             ConsultId = x.ConsultId,
             ConsultNumber = x.ConsultNumber,
+            Age = new Age(x.Age),
             ExamineeId = x.ExamineeId,
             PlaceScheduleId = x.PlaceScheduleId,
             Note = x.Note,

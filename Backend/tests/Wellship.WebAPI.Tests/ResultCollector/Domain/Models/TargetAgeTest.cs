@@ -43,7 +43,7 @@ public class TargetAgeTest
     {
         // Arrange
         var targetRange = new TargetAge("0420600", "0500000");
-        var age = new Age() { Years = 42, Months = 5, Days = 31 };
+        var age = new Age(42, 5, 31);
 
         // Act
         var result = targetRange.IsMatch(age);
@@ -57,7 +57,7 @@ public class TargetAgeTest
     {
         // Arrange
         var targetRange = new TargetAge("0420600", "0500000");
-        var age = new Age() { Years = 42, Months = 6, Days = 0 };
+        var age = new Age(42, 6, 0);
 
         // Act
         var result = targetRange.IsMatch(age);
@@ -71,7 +71,7 @@ public class TargetAgeTest
     {
         // Arrange
         var targetRange = new TargetAge("0420600", "0500000");
-        var age = new Age() { Years = 49, Months = 12, Days = 31 };
+        var age = new Age(49, 12, 31);
 
         // Act
         var result = targetRange.IsMatch(age);
@@ -85,7 +85,7 @@ public class TargetAgeTest
     {
         // Arrange
         var targetRange = new TargetAge("0420600", "0500000");
-        var age = new Age() { Years = 50, Months = 0, Days = 0 };
+        var age = new Age(50, 0, 0);
 
         // Act
         var result = targetRange.IsMatch(age);

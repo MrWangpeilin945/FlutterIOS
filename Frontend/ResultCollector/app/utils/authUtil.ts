@@ -21,7 +21,7 @@ let refreshTokenPromise: Promise<boolean> | null = null;
 export const authUtil = {
   // アクセストークンを取得する
   getAccessToken: (): string | null => {
-    const cryptToken = localStorage.getItem(accessTokenName);
+    const cryptToken = sessionStorage.getItem(accessTokenName);
     // 復号化して返却する
     return cryptToken ? authUtil.decrypt(cryptToken) : null;
   },
@@ -30,7 +30,7 @@ export const authUtil = {
   setAccessToken: (token: string): void => {
     // 暗号化して保存する
     const cryptToken = authUtil.encrypt(token);
-    localStorage.setItem(accessTokenName, cryptToken);
+    sessionStorage.setItem(accessTokenName, cryptToken);
   },
 
   // アクセストークンの有効期限チェックを行う
@@ -74,7 +74,7 @@ export const authUtil = {
   // ログアウト処理
   logout: async (navigateToLogin: () => void): Promise<void> => {
     // アクセストークンを削除する
-    localStorage.removeItem(accessTokenName);
+    sessionStorage.removeItem(accessTokenName);
 
     // 状態管理をクリアする
     authUtil.removeState();

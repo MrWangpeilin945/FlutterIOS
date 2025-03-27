@@ -1,8 +1,8 @@
 = フロントエンド
 
 == フレームワーク
-https://remix.run/[Remix] +
-※ https://remix.run/docs/en/main/guides/spa-mode[Remix SPA Mode]を使用
+https://reactrouter.com/[React Router] +
+※ https://reactrouter.com/how-to/spa[SPA]を使用
 
 == 使用するライブラリ
 
@@ -26,9 +26,9 @@ https://remix.run/[Remix] +
 |===
 |[green]#ライブラリ#| [green]#バージョン#
 |https://nodejs.jp/[Node.js]| 22.9.0
-|https://ja.react.dev/[React]| 18.2.0
-|https://remix.run/[Remix]| 2.12.1
-|https://mantine.dev/[Mantine]| 7.12.0
+|https://ja.react.dev/[React]| 19.0.0
+|https://reactrouter.com/[React Router]| 7.1.5
+|https://mantine.dev/[Mantine]| 7.16.3
 |===
 
 == ディレクトリ構造

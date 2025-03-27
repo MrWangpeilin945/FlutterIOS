@@ -27,7 +27,8 @@ flowchart TD
     I --> J["Dalete(一括):[DB]consult_notes(受診特記)"]
     J --> K["Insert(一括):[DB]consult_notes(受診特記)"]
     K --> L["Dalete(一括):[DB]exam_item_detail_orders(検査項目明細依頼)"]
-    L --> M["Insert(一括):[DB]exam_item_detail_orders(検査項目明細依頼)"]
+    L --> L2["Insert(一括):[DB]exam_item_detail_orders(検査項目明細依頼)"]
+    L2 --> M["Insert(一括):[DB]external_exam_item_detail_orders (外部検査項目明細依頼)"]
     M --> N["Dalete(一括):[DB]consult_thresholds(基準値)"]
     N --> O["Insert(一括):[DB]consult_thresholds(基準値)"]
     O --> P["Dalete(一括):[DB]previous_results(過去検査結果)"]
@@ -38,6 +39,7 @@ flowchart TD
     J -.Exception.-> ROLLBACK
     K -.Exception.-> ROLLBACK
     L -.Exception.-> ROLLBACK
+    L2 -.Exception.-> ROLLBACK
     M -.Exception.-> ROLLBACK
     N -.Exception.-> ROLLBACK
     O -.Exception.-> ROLLBACK
@@ -136,10 +138,15 @@ list.Count()  <> 0
 |string
 |受診番号
 
-|ExamineeCd
+|ExamineeCode
 |Yes
 |string
 |受診者コード
+
+|Age
+|Yes
+|string
+|年齢
 
 |Note
 |No
@@ -179,7 +186,7 @@ list.Count()  <> 0
 |===
 |名称|必須|型|説明
 
-|ExamItemDetailCd
+|ExamItemDetailCode
 |Yes
 |string
 |検査項目明細CD
@@ -238,10 +245,15 @@ list.Count()  <> 0
 |===
 |名称|必須|型|説明
 
-|ExamItemDetailCd
+|ExamItemDetailCode
 |Yes
 |string
 |検査項目明細CD
+
+|Note
+|No
+|string
+|検査項目明細備考
 
 |===
 
@@ -334,20 +346,28 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 **** Message `必須項目が不足しています。ConsultNumber`
 **** InputNote `Consult.InputNote`
 
-* 必須項目(Consult.ExamineeCd)が空値
-** `Consult.ExamineeCd` が `string.IsNullOrWhiteSpace` に該当する 
+* 必須項目(Consult.ExamineeCode)が空値
+** `Consult.ExamineeCode` が `string.IsNullOrWhiteSpace` に該当する 
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10004`
-**** Message `必須項目が不足しています。ExamineeCd`
+**** Message `必須項目が不足しています。ExamineeCode`
 **** InputNote `Consult.InputNote`
 
-* 必須項目(Consult.PreviousResults.ExamItemDetailCd)が空値
-** `Consult.PreviousResults.ExamItemDetailCd` が `string.IsNullOrWhiteSpace` に該当する 
+* 必須項目(Consult.Age)が空値
+** `Consult.Age` が `string.IsNullOrWhiteSpace` に該当する 
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10004`
-**** Message `必須項目が不足しています。PreviousResults.ExamItemDetailCd`
+**** Message `必須項目が不足しています。Age`
+**** InputNote `Consult.InputNote`
+
+* 必須項目(Consult.PreviousResults.ExamItemDetailCode)が空値
+** `Consult.PreviousResults.ExamItemDetailCode` が `string.IsNullOrWhiteSpace` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。PreviousResults.ExamItemDetailCode`
 **** InputNote `Consult.InputNote
 
 * 必須項目(Consult.PreviousResults.Value)が空値
@@ -374,12 +394,12 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 **** Message `必須項目が不足しています。ConsultNotes.Code`
 **** InputNote `Consult.InputNote`
 
-* 必須項目(Consult.ExamItemDetailOrders.ExamItemDetailCd)が空値
-** `Consult.ExamItemDetailOrders.ExamItemDetailCd` が `string.IsNullOrWhiteSpace` に該当する 
+* 必須項目(Consult.ExamItemDetailOrders.ExamItemDetailCode)が空値
+** `Consult.ExamItemDetailOrders.ExamItemDetailCode` が `string.IsNullOrWhiteSpace` に該当する 
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10004`
-**** Message `必須項目が不足しています。ExamItemDetailOrders.ExamItemDetailCd`
+**** Message `必須項目が不足しています。ExamItemDetailOrders.ExamItemDetailCode`
 **** InputNote `Consult.InputNote`
 
 * ユニークキー(Consult.SortNo)が重複するレコードが存在する
@@ -418,12 +438,29 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 **** Message `キー項目が重複しています。ConsultNotes.Code:[ConsultNotes.Code]`
 **** InputNote `Consult.InputNote`
 
+* キー(Consult.ExamItemDetailOrders.ExamItemDetailCode)が重複するレコードが存在する
+** Consult.ExamItemDetailOrders.ExamItemDetailCodeを以下の条件でGroupByし、複数レコードが存在する
+**** `Consult.ExamItemDetailOrders.ExamItemDetailCode`
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCode:[ExamItemDetailOrders.ExamItemDetailCode]`
+**** InputNote `Consult.InputNote`
+
 * 項目(Consult.ConsultNumber)制限：文字数
 ** `Consult.ConsultNumber` の文字数 `> 50` に該当する 
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10005`
 **** Message `制限数を超えています。ConsultNumber:[Consult.ConsultNumber]`
+**** InputNote `Consult.InputNote`
+
+* 項目(Consult.Age)制限：文字数
+** `Consult.Age` の文字数 `!= 7` に該当する 
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10005`
+**** Message `制限数を超えています。Age:[Consult.Age]`
 **** InputNote `Consult.InputNote`
 
 * 項目(Consult.ConsultNumber)制限：形式
@@ -433,6 +470,15 @@ namespace : `Wellship.WebAPI.ExternalConnection.Enums`
 **** Code `10006`
 **** Message `値の形式が無効です。ConsultNumber:[Consult.ConsultNumber]`
 **** InputNote `Consult.InputNote`
+
+* 項目(Consult.Age)制限：形式
+** `Consult.Age` が `^[0-9]{3}(0[0-9]|1[01])([012][0-9]|30)$` に一致しない
+*** Consultの単位で該当を取り除く
+*** ErrorObject
+**** Code `10006`
+**** Message `値の形式が無効です。Age:[Consult.Age]`
+**** InputNote `Consult.InputNote`
+** 補足：正常範囲　`0000000` `9991130`
 
 * 受診番号が異なる連携キーで登録されている
 ** `[DB]consult.consult_number (受診番号)` == `Consult.ConsultNumber` && `[DB]consult.external_connection_code(連携キー)` != `Consult.ConnectionCode` が存在する
@@ -469,11 +515,11 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 **** InputNote `Consult.InputNote`
 
 * 受診者IDが取得できない
-** `[DB]examinees(受診者).examinee_code(受診者コード)` == `Consult.ExamineeCd` が存在しない
+** `[DB]examinees(受診者).examinee_code(受診者コード)` == `Consult.ExamineeCode` が存在しない
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10001`
-**** Message `指定されたExamineeCdがシステム上に存在しません。Code:[Consult.ExamineeCd]`
+**** Message `指定されたExamineeCodeがシステム上に存在しません。Code:[Consult.ExamineeCode]`
 **** InputNote `Consult.InputNote`
 
 * 検査特記が存在しない
@@ -493,39 +539,39 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 **** InputNote `Consult.InputNote`
 
 * 検査項目明細IDが取得できない(PreviousResults)
-** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `Consult.PreviousResults.ExamItemDetailCd` が存在しない
+** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `Consult.PreviousResults.ExamItemDetailCode` が存在しない
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10001`
-**** Message `指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:[Consult.PreviousResults.ExamItemDetailCd]`
+**** Message `指定されたPreviousResults.ExamItemDetailCodeがシステム上に存在しません。Code:[Consult.PreviousResults.ExamItemDetailCode]`
 **** InputNote `Consult.InputNote`
 
 * PKが重複するレコードが存在する(PreviousResults)
 ** Consult.PreviousResultsを以下の条件でGroupByし、複数レコードが存在する
 *** 条件
-**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.PreviousResults.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id`が一致、かつ `Consult.PreviousResults.ExamDate`が一致
+**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.PreviousResults.ExamItemDetailCode` で検索した `[DB]external_exam_item_details.exam_item_detail_id`が一致、かつ `Consult.PreviousResults.ExamDate`が一致
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
-**** Message `キー項目が重複しています。PreviousResults.ExamItemDetailCd:[Consult.PreviousResults.ExamItemDetailCd]/PreviousResults.ExamDate:[Consult.PreviousResults.ExamDate]`
+**** Message `キー項目が重複しています。PreviousResults.ExamItemDetailCode:[Consult.PreviousResults.ExamItemDetailCode]/PreviousResults.ExamDate:[Consult.PreviousResults.ExamDate]`
 **** InputNote `Consult.InputNote`
 
 * 検査項目明細IDが取得できない(ExamItemDetailOrders)
-** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` が存在しない
+** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `Consult.ExamItemDetailOrders.ExamItemDetailCode` が存在しない
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10001`
-**** Message `指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:[Consult.ExamItemDetailOrders.ExamItemDetailCd]`
+**** Message `指定されたExamItemDetailOrders.ExamItemDetailCodeがシステム上に存在しません。Code:[Consult.ExamItemDetailOrders.ExamItemDetailCode]`
 **** InputNote `Consult.InputNote`
 
 * PKが重複するレコードが存在する(ExamItemDetailOrders)
 ** Consult.ExamItemDetailOrdersを以下の条件でGroupByし、複数レコードが存在する
 *** 条件
-**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id` 
+**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCode` で検索した `[DB]external_exam_item_details.exam_item_detail_id` 
 *** Consultの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
-**** Message `キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCd:[Consult.ExamItemDetailOrders.ExamItemDetailCd]`
+**** Message `キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCode:[Consult.ExamItemDetailOrders.ExamItemDetailCode]`
 **** InputNote `Consult.InputNote`
 
 ===== `Consult.ActionType` == `ActionType.削除`
@@ -550,7 +596,7 @@ And `[DB]PlaceSchedule.exam_date(健診日)` == `Consult.ExamDate` が存在し�
 ==== 登録イメージ
 [cols="1,1,1,1,1" options="header"]
 |===
-|SortNo|ConnectionCode|ActionType|ExamineeCd|[DB]consult
+|SortNo|ConnectionCode|ActionType|ExamineeCode|[DB]consult
 
 |1
 |C001
@@ -636,7 +682,11 @@ Update : 更新しない
 
 |examinee_id
 |`[DB]examinees.examinee_id`
-|`[DB]examinees.examinee_code` == `Consult.ExamineeCd` で検索し、`examinee_id` を登録する
+|`[DB]examinees.examinee_code` == `Consult.ExamineeCode` で検索し、`examinee_id` を登録する
+
+|age
+|Consult.Age
+|
 
 |external_connection_code
 |Consult.ConnectionCode
@@ -701,8 +751,44 @@ Update : 更新しない
 ====== Delete
 
 * 削除条件
-** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]consulexam_item_detail_orderst_notes.consult_id`
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]exam_item_detail_orders.consult_id`
 *** 削除対象レコードが存在しない場合でも、エラーとしない
+
+====== Insert
+
+* `consult_id` / `exam_item_detail_id` で重複を除外し登録する
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|[DB]consult(受診).consult_id
+|※Upsertした値
+
+|exam_item_detail_id
+|`[DB]external_exam_item_details.exam_item_detail_id`
+|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCode` で検索し、`exam_item_detail_id` を登録する
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+===== Table
+
+* [DB]external_exam_item_detail_orders (外部検査項目明細依頼)
+** 洗い替え
+
+====== Delete
+
+* None
+** [DB]exam_item_detail_orders(検査項目明細依頼)の制約にて削除されるため削除不要
 
 ====== Insert
 
@@ -716,10 +802,14 @@ Update : 更新しない
 
 |exam_item_detail_id
 |`[DB]external_exam_item_details.exam_item_detail_id`
-|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCd` で検索し、`exam_item_detail_id`を登録する
+|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCode` で検索し、`exam_item_detail_id` を登録する
 
 |external_exam_item_detail_code
-|Consult.ExamItemDetailOrders.ExamItemDetailCd
+|Consult.ExamItemDetailOrders.ExamItemDetailCode
+|
+
+|external_note
+|Consult.ExamItemDetailOrders.Note
 |
 
 |created_at
@@ -798,7 +888,7 @@ Update : 更新しない
 
 |exam_item_detail_id
 |`[DB]external_exam_item_details.exam_item_detail_id`
-|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.PreviousResults.ExamItemDetailCd` で検索し、`exam_item_detail_id`を登録する
+|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.PreviousResults.ExamItemDetailCode` で検索し、`exam_item_detail_id`を登録する
 
 |value
 |Consult.PreviousResults.Value
@@ -838,6 +928,10 @@ Update : 更新しない
 |`enum<Wellship.Core\Enums\ConsultProgressStatus.キャンセル>`
 |int型にパースする
 
+|note
+|`''`(空文字)
+|
+
 |created_at
 |system.datetime.now()
 |
@@ -869,6 +963,15 @@ Update : 更新しない
 * 削除条件
 ** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]exam_item_detail_orders.consult_id`
 *** 削除対象レコードが存在しない場合でも、エラーとしない
+
+===== Table
+
+* [DB]external_exam_item_detail_orders (外部検査項目明細依頼)
+
+====== Delete
+
+* None
+** [DB]exam_item_detail_orders(検査項目明細依頼)の制約にて削除されるため削除不要
 
 ===== Table
 

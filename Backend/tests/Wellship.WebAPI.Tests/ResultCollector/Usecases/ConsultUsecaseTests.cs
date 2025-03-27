@@ -89,6 +89,7 @@ public class ConsultUsecaseTests
                          {
                              ConsultId = Guid.Parse("8d670eb8-d9f2-40b2-bfa6-cef6403be53d"),
                              ConsultNumber = "0001",
+                             Age = new Age(25, 0, 0),
                              ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
                              ProgressStatus = ConsultProgressStatus.検査中,
                              Note = "定期健康診断",
@@ -152,6 +153,7 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(new Consult()
         {
             ConsultNumber = "1",
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             PlaceScheduleId = Guid.Parse("6df8bdff-66c0-4113-afd6-985a78bd35ff"),
@@ -216,6 +218,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = Guid.Parse("7400c9cc-c2ee-48ef-a12e-5c3244631a6d"),
             ConsultNumber = "0001",
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             PlaceScheduleId = Guid.Parse("caab7279-109a-4c63-bc9a-83fa25c59a91"),
@@ -235,8 +238,23 @@ public class ConsultUsecaseTests
             ]
         };
 
+        // 会場日程ステータス
+        var placeScheduleStatus = new PlaceScheduleStatus
+        {
+            PlaceScheduleId = Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"),
+            PlaceId = Guid.Parse("492d6d5c-17ab-4aba-89e2-51369373b8a8"),
+            PlaceName = "市役所",
+            ExamDate = new DateOnly(2024, 12, 19),
+            Status = PlaceScheduleLockingStatus.検査中,
+            CreatedAt = DateTime.Now,
+            CreatedBy = "admin"
+        };
+
         _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(consult);
         _consultRepositoryMock.Setup(x => x.GetExamCancelsAsync(consult.ConsultId)).ReturnsAsync(examCancels);
+        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(It.IsAny<Guid>()))
+                                    .ReturnsAsync(placeScheduleStatus);
+        _staffIdentityProviderMock.Setup(x => x.Role).Returns(Role.User);
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
                                          _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
@@ -271,6 +289,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = Guid.Parse("4a778828-c758-4437-99ec-3493310edf46"),
             ConsultNumber = "0001",
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             PlaceScheduleId = Guid.Parse("ed3e8d23-2c9f-4b0c-bfb1-e933afc8ee49"),
@@ -287,8 +306,23 @@ public class ConsultUsecaseTests
             ExamItemDetailCancels = []
         };
 
+        // 会場日程ステータス
+        var placeScheduleStatus = new PlaceScheduleStatus
+        {
+            PlaceScheduleId = Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"),
+            PlaceId = Guid.Parse("492d6d5c-17ab-4aba-89e2-51369373b8a8"),
+            PlaceName = "市役所",
+            ExamDate = new DateOnly(2024, 12, 19),
+            Status = PlaceScheduleLockingStatus.検査完了,
+            CreatedAt = DateTime.Now,
+            CreatedBy = "admin"
+        };
+
         _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(consult);
         _consultRepositoryMock.Setup(x => x.GetExamCancelsAsync(consult.ConsultId)).ReturnsAsync(examCancel);
+        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(It.IsAny<Guid>()))
+                                    .ReturnsAsync(placeScheduleStatus);
+        _staffIdentityProviderMock.Setup(x => x.Role).Returns(Role.Admin);
 
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
                                          _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
@@ -299,6 +333,62 @@ public class ConsultUsecaseTests
 
         // Assert
         _consultRepositoryMock.Verify(x => x.SaveExamCancelsAsync(consult.ConsultId, It.IsAny<int[]>(), It.IsAny<ExamItemCancel[]>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task 検査の実施有無と中止理由を登録する_管理者でない時にエラーを送出()
+    {
+        // Arrange
+        // リクエスト内容
+        var consultNumber = "12345";
+        var request = new ExecutionsRequest()
+        {
+            // すべて実施する
+            Executions = [
+                new ExecutionRequest() {ExamItemId = 1, IsPerforming = true, CancelReasonId = null},
+                new ExecutionRequest() {ExamItemId = 2, IsPerforming = true, CancelReasonId = null},
+                new ExecutionRequest() {ExamItemId = 71, IsPerforming = true, CancelReasonId = null},
+                new ExecutionRequest() {ExamItemId = 72, IsPerforming = true, CancelReasonId = null}
+            ]
+        };
+
+        // DBの受診情報
+        var consult = new Consult()
+        {
+            ConsultId = Guid.Parse("7400c9cc-c2ee-48ef-a12e-5c3244631a6d"),
+            ConsultNumber = "0001",
+            ProgressStatus = ConsultProgressStatus.検査中,
+            ExportStatus = ConsultResultExportStatus.未出力,
+            PlaceScheduleId = Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"),
+            Note = "定期健康診断",
+            ExamineeId = Guid.Parse("9944b7f3-0728-4801-853f-424a9c23a0b9"),
+            TicketNumber = "1029"
+        };
+
+        // 会場日程ステータス
+        var placeScheduleStatus = new PlaceScheduleStatus
+        {
+            PlaceScheduleId = Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"),
+            PlaceId = Guid.Parse("492d6d5c-17ab-4aba-89e2-51369373b8a8"),
+            PlaceName = "市役所",
+            ExamDate = new DateOnly(2024, 12, 19),
+            Status = PlaceScheduleLockingStatus.検査完了,
+            CreatedAt = DateTime.Now,
+            CreatedBy = "admin"
+        };
+
+        _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber)).ReturnsAsync(consult);
+        _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleLockingStatusAsync(It.IsAny<Guid>()))
+                                    .ReturnsAsync(placeScheduleStatus);
+        _staffIdentityProviderMock.Setup(x => x.Role).Returns(Role.User);
+
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
+                                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                                         _staffIdentityProviderMock.Object);
+
+        // Act & Assert
+        await usecase.Invoking(x => x.RegisterExecutionsAsync(consultNumber, request))
+                     .Should().ThrowAsync<PlaceScheduleLockedException>();
     }
 
     [Fact]
@@ -314,6 +404,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -413,6 +504,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -504,6 +596,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -639,6 +732,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -730,6 +824,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -817,6 +912,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             ExamineeId = Guid.Parse("2cd0043d-ff17-4673-a765-86557966f143"),
@@ -925,6 +1021,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = consultId,
             ConsultNumber = consultNumber,
+            Age = new Age(0, 0, 0),
             ExamineeId = Guid.Parse("85417626-3b52-44f1-82cc-2bad8e43d5df"),
             ProgressStatus = ConsultProgressStatus.検査中,
             Note = "定期健康診断",
@@ -997,6 +1094,7 @@ public class ConsultUsecaseTests
                             {
                                 ConsultId = Guid.Parse("8d670eb8-d9f2-40b2-bfa6-cef6403be53d"),
                                 ConsultNumber = "0006",
+                                Age = new Age(0, 0, 0),
                                 ExamineeId = Guid.Parse("4380755f-9398-4caa-aa2f-4ed7613d50d3"),
                                 ProgressStatus = ConsultProgressStatus.検査中,
                                 Note = "定期健康診断",
@@ -1063,6 +1161,7 @@ public class ConsultUsecaseTests
                             {
                                 ConsultId = consultId,
                                 ConsultNumber = consultNumber,
+                                Age = new Age(58, 8, 5),
                                 ExamineeId = examineeId,
                                 ProgressStatus = ConsultProgressStatus.検査中,
                                 Note = "定期健康診断",
@@ -1304,6 +1403,7 @@ public class ConsultUsecaseTests
                             {
                                 ConsultId = consultId,
                                 ConsultNumber = consultNumber,
+                                Age = new Age(58, 8, 5),
                                 ExamineeId = examineeId,
                                 ProgressStatus = ConsultProgressStatus.検査中,
                                 Note = "定期健康診断",
@@ -1500,6 +1600,7 @@ public class ConsultUsecaseTests
                             {
                                 ConsultId = consultId,
                                 ConsultNumber = consultNumber,
+                                Age = new Age(48, 3, 7),
                                 ExamineeId = examineeId,
                                 ProgressStatus = ConsultProgressStatus.来場待ち,
                                 Note = "定期健康診断",
@@ -1917,6 +2018,7 @@ public class ConsultUsecaseTests
                             {
                                 ConsultId = consultId,
                                 ConsultNumber = consultNumber,
+                                Age = new Age(48, 3, 7),
                                 ExamineeId = examineeId,
                                 ProgressStatus = ConsultProgressStatus.来場待ち,
                                 Note = "定期健康診断",
