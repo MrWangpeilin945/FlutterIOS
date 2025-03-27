@@ -11,7 +11,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// </summary>
 public class ConsultUsecase : IConsultUsecase
 {
-    private readonly List<ErrorObject> _errorObjects;
     private readonly IConsultRepository _consultRepository;
     private readonly ITeamRepository _teamRepository;
     private readonly IPlaceRepository _placeRepository;
@@ -40,7 +39,6 @@ public class ConsultUsecase : IConsultUsecase
         _placeScheduleRepository = placeScheduleRepository;
         _examineeRepository = examineeRepository;
         _thresholdRepository = thresholdRepository;
-        _errorObjects = new List<ErrorObject>();
         _timeProvider = timeProvider;
     }
 
@@ -51,7 +49,7 @@ public class ConsultUsecase : IConsultUsecase
     /// <returns>エラーリスト</returns>
     public async Task<List<ErrorObject>> StoreConsultAsync(List<Consult> consults)
     {
-        _errorObjects.Clear();
+        List<ErrorObject> errorObjects = new List<ErrorObject>();
 
         var placeCodes = consults.Select(x => x.PlaceCode).ToList();
         var teamCodes = consults.Select(x => x.TeamCode).ToList();
@@ -97,7 +95,7 @@ public class ConsultUsecase : IConsultUsecase
             "ExamineeCd"         // 受診者コード
         };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
-        foreach (var warning in ValidationChecker.SpaceCheckProperties(registeConsults, spaceCheckProperties, _errorObjects))
+        foreach (var warning in ValidationChecker.SpaceCheckProperties(registeConsults, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
             if (warning is Consult consult)
@@ -114,7 +112,7 @@ public class ConsultUsecase : IConsultUsecase
             ("ExamItemDetailOrders", "ExamItemDetailCd")    // 検査項目明細依頼->検査項目明細CD
         };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
-        foreach (var warning in ValidationChecker.SpaceCheckChildrenProperties(registeConsults, spaceCheckChildrenProperties, _errorObjects))
+        foreach (var warning in ValidationChecker.SpaceCheckChildrenProperties(registeConsults, spaceCheckChildrenProperties, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
             if (warning is Consult consult)
@@ -129,7 +127,7 @@ public class ConsultUsecase : IConsultUsecase
             "SortNo"            // 処理順
         };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
-        foreach (var warning in ValidationChecker.DuplicateCheckProperties(registeConsults, duplicateCheckProperties, _errorObjects))
+        foreach (var warning in ValidationChecker.DuplicateCheckProperties(registeConsults, duplicateCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
             if (warning is Consult consult)
@@ -144,7 +142,7 @@ public class ConsultUsecase : IConsultUsecase
             ("ConsultNotes",       "Code")                  // 受診特記->検査特記コード
         };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
-        foreach (var warning in ValidationChecker.DuplicateCheckChildrenProperties(registeConsults, duplicateCheckChildProperties, _errorObjects))
+        foreach (var warning in ValidationChecker.DuplicateCheckChildrenProperties(registeConsults, duplicateCheckChildProperties, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
             if (warning is Consult consult)
@@ -160,7 +158,7 @@ public class ConsultUsecase : IConsultUsecase
         };
         var maxLengths = new [] { 50 };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
-        foreach (var warning in ValidationChecker.StringLengthCheckProperties(registeConsults, stringLengthCheckProperties, maxLengths, _errorObjects))
+        foreach (var warning in ValidationChecker.StringLengthCheckProperties(registeConsults, stringLengthCheckProperties, maxLengths, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
             if (warning is Consult consult)
@@ -175,7 +173,7 @@ public class ConsultUsecase : IConsultUsecase
             "ConsultNumber"            // 受診番号
         };
         var patterns = new [] { @"^[a-zA-Z0-9]+$" };
-        foreach (var warning in ValidationChecker.StringPatternCheckProperties(registeConsults, stringPatternCheckProperties, patterns, _errorObjects))
+        foreach (var warning in ValidationChecker.StringPatternCheckProperties(registeConsults, stringPatternCheckProperties, patterns, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
             if (warning is Consult consult)
@@ -194,7 +192,7 @@ public class ConsultUsecase : IConsultUsecase
             if (!string.IsNullOrWhiteSpace(connectionCode) && connectionCode != warning.ConnectionCode)
             {
                 warningConsults.Add(warning);
-                _errorObjects.Add(new ErrorObject
+                errorObjects.Add(new ErrorObject
                 {
                     Code = "10002",
                     Message = $"指定されたConsultNumberが既に登録済みです。Code:{warning.ConsultNumber}",
@@ -206,7 +204,7 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var warning in registeConsults.Where(x => !places.Select(p => p.PlaceCode).Contains(x.PlaceCode)))
         {
             warningConsults.Add(warning);
-            _errorObjects.Add(new ErrorObject
+            errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
                 Message = $"指定されたPlaceCodeがシステム上に存在しません。Code:{warning.PlaceCode}",
@@ -217,7 +215,7 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var warning in registeConsults.Where(x => !teams.Select(p => p.TeamCode).Contains(x.TeamCode)))
         {
             warningConsults.Add(warning);
-            _errorObjects.Add(new ErrorObject
+            errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
                 Message = $"指定されたTeamCodeがシステム上に存在しません。Code:{warning.TeamCode}",
@@ -231,7 +229,7 @@ public class ConsultUsecase : IConsultUsecase
                                                         DateOnly.Parse(x.ExamDate) == ps.ExamDate)))
         {
             warningConsults.Add(warning);
-            _errorObjects.Add(new ErrorObject
+            errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
                 Message = $"指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:{warning.PlaceCode}/TeamCode:{warning.TeamCode}/ExamDate:{warning.ExamDate}",
@@ -242,7 +240,7 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var warning in registeConsults.Where(x => !examinees.Select(e => e.ExamineeCode).Contains(x.ExamineeCd)))
         {
             warningConsults.Add(warning);
-            _errorObjects.Add(new ErrorObject
+            errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
                 Message = $"指定されたExamineeCdがシステム上に存在しません。Code:{warning.ExamineeCd}",
@@ -255,7 +253,7 @@ public class ConsultUsecase : IConsultUsecase
             foreach (var warning in consult.ConsultNotes.Where(x => !examMenuNodeCodes.Select(e => e.Code).Contains(x.Code)))
             {
                 warningConsults.Add(consult);
-                _errorObjects.Add(new ErrorObject
+                errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
                     Message = $"指定されたConsultNotes.Codeがシステム上に存在しません。Code:{warning.Code}",
@@ -269,7 +267,7 @@ public class ConsultUsecase : IConsultUsecase
             foreach (var warning in consult.ConsultThresholds.Where(x => !thresholds.Select(t => t.ThresholdCode).Contains(x.ThresholdCode)))
             {
                 warningConsults.Add(consult);
-                _errorObjects.Add(new ErrorObject
+                errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
                     Message = $"指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:{warning.ThresholdCode}",
@@ -284,7 +282,7 @@ public class ConsultUsecase : IConsultUsecase
             foreach (var warning in consult.PreviousResults.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCd)))
             {
                 warningConsults.Add(consult);
-                _errorObjects.Add(new ErrorObject
+                errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
                     Message = $"指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:{warning.ExamItemDetailCd}",
@@ -300,10 +298,10 @@ public class ConsultUsecase : IConsultUsecase
             foreach (var warning in duplicateExamItemDetailCds)
             {
                 warningConsults.Add(consult);
-                _errorObjects.Add(new ErrorObject
+                errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
-                    Message = $"キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:{warning.Key.ExamItemDetailCd}/PreviousResults.ExamDate:{warning.Key.ExamDate}",
+                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCd:{warning.Key.ExamItemDetailCd}/PreviousResults.ExamDate:{warning.Key.ExamDate}",
                     InputNote = consult.InputNote
                 });
             }
@@ -329,10 +327,10 @@ public class ConsultUsecase : IConsultUsecase
             foreach (var warning in duplicateExamItemDetailIds)
             {
                 warningConsults.Add(consult);
-                _errorObjects.Add(new ErrorObject
+                errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
-                    Message = $"キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:{warning.ExamItemDetailCd}/PreviousResults.ExamDate:{warning.ExamDate}",
+                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCd:{warning.ExamItemDetailCd}/PreviousResults.ExamDate:{warning.ExamDate}",
                     InputNote = consult.InputNote
                 });
             }
@@ -344,7 +342,7 @@ public class ConsultUsecase : IConsultUsecase
             foreach (var warning in consult.ExamItemDetailOrders.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCd)))
             {
                 warningConsults.Add(consult);
-                _errorObjects.Add(new ErrorObject
+                errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
                     Message = $"指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:{warning.ExamItemDetailCd}",
@@ -360,10 +358,10 @@ public class ConsultUsecase : IConsultUsecase
             foreach (var warning in duplicateExamItemDetailCds)
             {
                 warningConsults.Add(consult);
-                _errorObjects.Add(new ErrorObject
+                errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
-                    Message = $"キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:{warning.Key.ExamItemDetailCd}",
+                    Message = $"キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCd:{warning.Key.ExamItemDetailCd}",
                     InputNote = consult.InputNote
                 });
             }
@@ -388,10 +386,10 @@ public class ConsultUsecase : IConsultUsecase
             foreach (var warning in duplicateExamItemDetailIds)
             {
                 warningConsults.Add(consult);
-                _errorObjects.Add(new ErrorObject
+                errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
-                    Message = $"キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:{warning.ExamItemDetailCd}",
+                    Message = $"キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCd:{warning.ExamItemDetailCd}",
                     InputNote = consult.InputNote
                 });
             }
@@ -401,7 +399,7 @@ public class ConsultUsecase : IConsultUsecase
                                         .Where(x => !externalConnectionCodes.Select(x => x.ConnectionCode).Contains(x.ConnectionCode)))
         {
             warningConsults.Add(warning);
-            _errorObjects.Add(new ErrorObject
+            errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
                 Message = $"指定されたConnectionCodeがシステム上に存在しません。Code:{warning.ConnectionCode}",
@@ -453,6 +451,6 @@ public class ConsultUsecase : IConsultUsecase
                                     }).ToList();
         // 受付を更新する
         await _consultRepository.UpsertConsultsAsync(validConsults, _timeProvider.GetUtcNow(), "ExternalConnection");
-        return _errorObjects;
+        return errorObjects;
     }
 }
