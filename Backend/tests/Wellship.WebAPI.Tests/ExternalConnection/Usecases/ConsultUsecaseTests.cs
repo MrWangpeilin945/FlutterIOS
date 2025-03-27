@@ -1549,8 +1549,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:Prev001/PreviousResults.ExamDate:2023/10/20", InputNote  = "UT2004"},
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:Prev002/PreviousResults.ExamDate:2023/10/20", InputNote  = "UT2004"}
+            new(){Code = "10003", Message = "キー項目が重複しています。PreviousResults.ExamItemDetailCd:Prev001/PreviousResults.ExamDate:2023/10/20", InputNote  = "UT2004"},
+            new(){Code = "10003", Message = "キー項目が重複しています。PreviousResults.ExamItemDetailCd:Prev002/PreviousResults.ExamDate:2023/10/20", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
@@ -1615,7 +1615,7 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:Prev001/PreviousResults.ExamDate:2023/10/20", InputNote  = "UT2004"}
+            new(){Code = "10003", Message = "キー項目が重複しています。PreviousResults.ExamItemDetailCd:Prev001/PreviousResults.ExamDate:2023/10/20", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
@@ -1740,8 +1740,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:Order001", InputNote  = "UT2004"},
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:Order002", InputNote  = "UT2004"}
+            new(){Code = "10003", Message = "キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCd:Order001", InputNote  = "UT2004"},
+            new(){Code = "10003", Message = "キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCd:Order002", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
@@ -1806,7 +1806,7 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:Order001", InputNote  = "UT2004"}
+            new(){Code = "10003", Message = "キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCd:Order001", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,

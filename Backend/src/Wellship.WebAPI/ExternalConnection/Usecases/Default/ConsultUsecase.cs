@@ -89,7 +89,7 @@ public class ConsultUsecase : IConsultUsecase
         // 必須項目の空値のチェック
         // 連携キー（共通）
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
-        foreach (var warning in ValidationChecker.SpaceCheckProperties(consults, new string[] {"ConnectionCode"}, _errorObjects))
+        foreach (var warning in ValidationChecker.SpaceCheckProperties(consults, new string[] {"ConnectionCode"}, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
             if (warning is Consult consult)
