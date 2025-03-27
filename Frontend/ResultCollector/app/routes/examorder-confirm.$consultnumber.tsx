@@ -1,5 +1,5 @@
-import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
-import type { MetaFunction } from "@remix-run/node";
+import { useNavigate, useParams, useSearchParams } from "react-router";
+import type { MetaFunction } from "react-router";
 import BoothNote from "~/components/BoothNote";
 import CommonFooter from "~/components/CommonFooter";
 import ExamineeHeader from "~/components/ExamineeHeader";
