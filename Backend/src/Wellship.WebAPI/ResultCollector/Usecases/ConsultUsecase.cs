@@ -225,6 +225,7 @@ public class ConsultUsecase : IConsultUsecase
     {
         // NOTE: 中止理由の登録ルール
         // 前提：リクエストは検査項目単位、DBは検査項目明細単位
+        //       会場がロック中の時は管理者のみ操作可能
         // 
         // [1] isPerforming（検査実施する）：true & 中止理由：null
         //   - a. 中止レコードがある => 中止レコードを削除する
