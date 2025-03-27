@@ -34,12 +34,12 @@ steps:
         INSERT INTO
           resultcollector.teams
           (team_id, team_code, name, order_number, created_at, created_by)
-        VALUES('f0002004-0000-0000-0002-000000000001', 'T2004-02', '甲班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('f0002004-0000-0000-0002-000000000001', 'T2004-02', '班', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場
         INSERT INTO
           resultcollector.places
           (place_id, place_code, name, order_number, created_at, created_by)
-        VALUES('b0002004-0000-0000-0002-000000000001', 'P2004-02', '甲会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('b0002004-0000-0000-0002-000000000001', 'P2004-02', '会場', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場日程
         INSERT INTO
           resultcollector.place_schedule
@@ -89,9 +89,9 @@ steps:
         INSERT INTO
           resultcollector.consult
           (consult_id, consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
-        VALUES('c0002004-0000-0000-0002-000000000001', 'No-200402-1', 11, 21, 'a0002004-0000-0000-0002-000000000001', '特記事項2004021', 'e0002004-0000-0000-0002-000000000001', 'CCS-200402-1', CURRENT_TIMESTAMP, 'ec2004')
-        ,     ('c0002004-0000-0000-0002-000000000002', 'No-200402-2', 11, 21, 'a0002004-0000-0000-0002-000000000002', '特記事項2004022', 'e0002004-0000-0000-0002-000000000002', 'CCS-200402-2', CURRENT_TIMESTAMP, 'ec2004')
-        ,     ('c0002004-0000-0000-0002-000000000004', 'No-200402-4', 41, 21, 'a0002004-0000-0000-0002-000000000004', '特記事項2004024', 'e0002004-0000-0000-0002-000000000004', 'CCS-200402-4', CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('c0002004-0000-0000-0002-000000000001', 'No2004021', 11, 21, 'a0002004-0000-0000-0002-000000000001', '特記事項2004021', 'e0002004-0000-0000-0002-000000000001', 'CCS-200402-1', CURRENT_TIMESTAMP, 'ec2004')
+        ,     ('c0002004-0000-0000-0002-000000000002', 'No2004022', 11, 21, 'a0002004-0000-0000-0002-000000000002', '特記事項2004022', 'e0002004-0000-0000-0002-000000000002', 'CCS-200402-2', CURRENT_TIMESTAMP, 'ec2004')
+        ,     ('c0002004-0000-0000-0002-000000000004', 'No2004024', 41, 21, 'a0002004-0000-0000-0002-000000000004', '特記事項2004024', 'e0002004-0000-0000-0002-000000000004', 'CCS-200402-4', CURRENT_TIMESTAMP, 'ec2004');
         -- 受診特記
         INSERT INTO
           resultcollector.consult_notes
@@ -232,10 +232,7 @@ steps:
     test: |
       current.res.status == 200
       // レスポンスにErrorObjectが返されないことを確認
-      && len(current.res.body) == 0
-    dump:
-      expr: current.res.body
-      out: ../Dump/EC2004-02.json
+      && current.res.body == null
   confirmConsult:
     desc: "受診の登録を確認"
     db:
@@ -261,7 +258,7 @@ steps:
       len(current.rows) == 4
       // 受診の更新
       && current.rows[0].consult_id == consultData[0].consult_id
-      && current.rows[0].consult_number == "No-200402-100"
+      && current.rows[0].consult_number == "No200402100"
       && current.rows[0].progress_status == 11
       // 結果出力状況の変更がないことを確認
       && current.rows[0].export_status == consultData[0].export_status
@@ -288,7 +285,7 @@ steps:
       && current.rows[1].created_by == "ExternalConnection"
 
       // 受診の登録
-      && current.rows[2].consult_number == "No-200402-300"
+      && current.rows[2].consult_number == "No200402300"
       && current.rows[2].progress_status == 11
       && current.rows[2].export_status == 11
       && current.rows[2].place_schedule_id == "a0002004-0000-0000-0002-000000000003"

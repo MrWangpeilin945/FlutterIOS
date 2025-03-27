@@ -6,9 +6,9 @@
         "placeCode": "P2004-12",
         "teamCode": "T2004-12",
         "examDate": "2025-03-03",
-        "consultNumber": "No-200412-1",
+        "consultNumber": "No2004121",
         "examineeCd": "E2004121",
-        "note": "特記事項2004121",
+        "note": "検査項目明細依頼の検査項目明細IDが取得できない",
         "previousResults": [
         ],
         "consultThresholds": [
@@ -17,7 +17,16 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-200412"
+                "examItemDetailCd": "ORDER-200412-1"
+            },
+            {
+                "examItemDetailCd": "ORDER-200412-2"
+            },
+            {
+                "examItemDetailCd": "ORDER-200412-3"
+            },
+            {
+                "examItemDetailCd": "ORDER-200412-2"
             }
         ],
         "inputNote": "2004121"

@@ -1,0 +1,218 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041601",
+        "examineeCd": "E20041601",
+        "note": "連携キーが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041601"
+    },
+    {
+        "sortNo": 2,
+        "connectionCode": "C20211602",
+        "actionType": 0,
+        "placeCode": "",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041602",
+        "examineeCd": "E20041602",
+        "note": "会場コードが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041602"
+    },
+    {
+        "sortNo": 3,
+        "connectionCode": "C20211603",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041603",
+        "examineeCd": "E20041603",
+        "note": "班コードが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041603"
+    },
+    {
+        "sortNo": 4,
+        "connectionCode": "C20211604",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "",
+        "examineeCd": "E20041604",
+        "note": "受診番号が空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041604"
+    },
+    {
+        "sortNo": 5,
+        "connectionCode": "C20211605",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041605",
+        "examineeCd": "",
+        "note": "受診者コードが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041605"
+    },
+    {
+        "sortNo": 6,
+        "connectionCode": "",
+        "actionType": 0,
+        "placeCode": "",
+        "teamCode": "",
+        "examDate": "2025-03-03",
+        "consultNumber": "",
+        "examineeCd": "",
+        "note": "連携キー/会場コード/班コード/受診番号/受診者コードが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041606"
+    },
+    {
+        "sortNo": 7,
+        "connectionCode": "C20211607",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041607",
+        "examineeCd": "E20041607",
+        "note": "過去検査結果-検査項目明細CD/結果値が空値",
+        "previousResults": [
+            {
+                "examItemDetailCd": "",
+                "examDate": "2024-10-20",
+                "value": ""
+            }
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041607"
+    },
+    {
+        "sortNo": 8,
+        "connectionCode": "C20211608",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041608",
+        "examineeCd": "E20041608",
+        "note": "基準値判定-基準値判定コードが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+            {
+                "thresholdCode": "",
+                "priority": 1
+            }
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041608"
+    },
+    {
+        "sortNo": 9,
+        "connectionCode": "C20211609",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041609",
+        "examineeCd": "E20041609",
+        "note": "受診特記-検査特記コードが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+            {
+                "code": "",
+                "note": ""
+            }
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041609"
+    },
+    {
+        "sortNo": 10,
+        "connectionCode": "C20211610",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041610",
+        "examineeCd": "E20041610",
+        "note": "検査項目明細依頼-検査項目明細CDが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+            {
+                "examItemDetailCd": ""
+            }
+        ],
+        "inputNote": "20041610"
+    }
+]

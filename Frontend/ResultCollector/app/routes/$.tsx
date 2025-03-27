@@ -1,6 +1,6 @@
 import { Button, Center, Image, Space, Text } from "@mantine/core";
-import { useNavigate } from "@remix-run/react";
-import type { MetaFunction } from "@remix-run/react";
+import { useNavigate } from "react-router";
+import type { MetaFunction } from "react-router";
 import { authUtil } from "~/utils/authUtil";
 
 export const meta: MetaFunction = () => {

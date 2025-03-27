@@ -1,5 +1,5 @@
-import { useNavigate, useParams } from "@remix-run/react";
-import type { MetaFunction } from "@remix-run/node";
+import { useNavigate, useParams } from "react-router";
+import type { MetaFunction } from "react-router";
 import { useEffect, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { useAtom } from "jotai";

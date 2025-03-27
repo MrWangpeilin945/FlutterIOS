@@ -6,14 +6,14 @@
         "placeCode": "P2004-15",
         "teamCode": "T2004-15",
         "examDate": "2025-03-03",
-        "consultNumber": "No-200415-1",
-        "examineeCd": "E2004151",
-        "note": "特記事項2004151",
+        "consultNumber": "No200415a1",
+        "examineeCd": "E20041501",
+        "note": "受診番号が異なる連携キーで登録済",
         "previousResults": [],
         "consultThresholds": [],
         "consultNotes": [],
         "examItemDetailOrders": [],
-        "inputNote": "2004151"
+        "inputNote": "20041501"
     },
     {
         "sortNo": 2,
@@ -22,14 +22,14 @@
         "placeCode": "P2004-15-2",
         "teamCode": "T2004-15-2",
         "examDate": "2025-03-03",
-        "consultNumber": "No-2004152",
-        "examineeCd": "E2004152",
-        "note": "特記事項2004152",
+        "consultNumber": "No2004152",
+        "examineeCd": "E20041502",
+        "note": "会場ID/班ID/会場日程IDが取得できない",
         "previousResults": [],
         "consultThresholds": [],
         "consultNotes": [],
         "examItemDetailOrders": [],
-        "inputNote": "2004152"
+        "inputNote": "20041502"
     },
     {
         "sortNo": 3,
@@ -38,14 +38,14 @@
         "placeCode": "P2004-15",
         "teamCode": "T2004-15",
         "examDate": "2025-03-03",
-        "consultNumber": "No-2004153",
-        "examineeCd": "E2004153-1",
-        "note": "特記事項2004153",
+        "consultNumber": "No2004153",
+        "examineeCd": "E20041503-1",
+        "note": "受診者IDが取得できない",
         "previousResults": [],
         "consultThresholds": [],
         "consultNotes": [],
         "examItemDetailOrders": [],
-        "inputNote": "2004153"
+        "inputNote": "20041503"
     },
     {
         "sortNo": 4,
@@ -54,9 +54,9 @@
         "placeCode": "P2004-15",
         "teamCode": "T2004-15",
         "examDate": "2025-03-03",
-        "consultNumber": "No-2004153",
-        "examineeCd": "E2004151",
-        "note": "特記事項2004154",
+        "consultNumber": "No2004153",
+        "examineeCd": "E20041501",
+        "note": "過去検査結果/基準値判定/受診特記/検査項目明細依頼のエラー",
         "previousResults": [
             {
                 "examItemDetailCd": "PREVI-200415",
@@ -97,7 +97,7 @@
                 "examItemDetailCd": "ORDER-200415-Y"
             }
         ],
-        "inputNote": "2004154"
+        "inputNote": "20041504"
     },
     {
         "sortNo": 5,
@@ -108,12 +108,12 @@
         "examDate": "",
         "consultNumber": "",
         "examineeCd": "",
-        "note": "",
+        "note": "連携キーの取得に失敗",
         "previousResults": [],
         "consultThresholds": [],
         "consultNotes": [],
         "examItemDetailOrders": [],
-        "inputNote": "2004155"
+        "inputNote": "20041505"
     },
     {
         "sortNo": 6,
@@ -122,8 +122,8 @@
         "placeCode": "P2004-15",
         "teamCode": "T2004-15",
         "examDate": "2025-03-23",
-        "consultNumber": "No-200415-100",
-        "examineeCd": "E2004154",
+        "consultNumber": "No200415a100",
+        "examineeCd": "E20041504",
         "note": "特記事項2004-15-1",
         "previousResults": [
             {
@@ -149,7 +149,7 @@
                 "examItemDetailCd": "ORDER-200415-3"
             }
         ],
-        "inputNote": "2004156"
+        "inputNote": "20041506"
     },
     {
         "sortNo": 7,
@@ -165,7 +165,7 @@
         "consultThresholds": [],
         "consultNotes": [],
         "examItemDetailOrders": [],
-        "inputNote": "2004157"
+        "inputNote": "20041507"
     },
     {
         "sortNo": 8,
@@ -174,8 +174,8 @@
         "placeCode": "P2004-15",
         "teamCode": "T2004-15",
         "examDate": "2025-03-23",
-        "consultNumber": "No-200415-300",
-        "examineeCd": "E2004153",
+        "consultNumber": "No200415a300",
+        "examineeCd": "E20041503",
         "note": "特記事項2004-15-3",
         "previousResults": [
             {
@@ -201,6 +201,178 @@
                 "examItemDetailCd": "ORDER-200415-3"
             }
         ],
-        "inputNote": "2024158"
-    }
+        "inputNote": "20241508"
+    },
+    {
+        "sortNo": 9,
+        "connectionCode": "",
+        "actionType": 0,
+        "placeCode": "",
+        "teamCode": "",
+        "examDate": "2025-03-23",
+        "consultNumber": "",
+        "examineeCd": "",
+        "note": "必須項目の空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041509"
+    },
+    {
+        "sortNo": 10,
+        "connectionCode": "CCS-200415-10",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "No200415a100",
+        "examineeCd": "E20041510",
+        "note": "子の必須項目の空値",
+        "previousResults": [
+            {
+                "examItemDetailCd": "",
+                "examDate": "2024-04-05",
+                "value": ""
+            }
+        ],
+        "consultThresholds": [
+            {
+                "thresholdCode": "",
+                "priority": 1
+            }
+        ],
+        "consultNotes": [
+            {
+                "code": "",
+                "note": ""
+            }
+        ],
+        "examItemDetailOrders": [
+            {
+                "examItemDetailCd": ""
+            }
+        ],
+        "inputNote": "20041510"
+    },
+    {
+        "sortNo": 11,
+        "connectionCode": "CCS-200415-11",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "No200415011",
+        "examineeCd": "E20041511",
+        "note": "処理順が重複",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041511"
+    },
+    {
+        "sortNo": 11,
+        "connectionCode": "CCS-200415-12",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "No200415012",
+        "examineeCd": "E20041512",
+        "note": "処理順が重複",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041512"
+    },
+    {
+        "sortNo": 13,
+        "connectionCode": "CCS-200415-13",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "No200415013",
+        "examineeCd": "E20041513",
+        "note": "子のプロパティが重複",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+            {
+                "thresholdCode": "TID-EC2004-15-1",
+                "priority": 1
+            },
+            {
+                "thresholdCode": "TID-EC2004-15-1",
+                "priority": 1
+            }
+        ],
+        "consultNotes": [
+            {
+                "code": "NOTE-T200415-1",
+                "note": "検査特記コードが重複1"
+            },
+            {
+                "code": "NOTE-T200415-1",
+                "note": "検査特記コードが重複2"
+            }
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041513"
+    },
+    {
+        "sortNo": 14,
+        "connectionCode": "CCS-200415-14",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "12345678901234567890123456789012345678901234567890a",
+        "examineeCd": "E20041514",
+        "note": "受診番号の文字数が50を超える",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041514"
+    },
+    {
+        "sortNo": 15,
+        "connectionCode": "CCS-200415-15",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "No-12345/ 67890#a",
+        "examineeCd": "E20041514",
+        "note": "受診番号に記号が含まれる",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041515"
+    }            
 ]

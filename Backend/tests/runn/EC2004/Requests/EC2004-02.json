@@ -26,7 +26,7 @@
         "placeCode": "P2004-02",
         "teamCode": "T2004-02",
         "examDate": "2025-03-23",
-        "consultNumber": "No-200402-100",
+        "consultNumber": "No200402100",
         "examineeCd": "E2004024",
         "note": "特記事項2004-02-1",
         "previousResults": [
@@ -78,7 +78,7 @@
         "placeCode": "P2004-02",
         "teamCode": "T2004-02",
         "examDate": "2025-03-23",
-        "consultNumber": "No-200402-300",
+        "consultNumber": "No200402300",
         "examineeCd": "E2004023",
         "note": "特記事項2004-02-3",
         "previousResults": [
@@ -114,7 +114,7 @@
         "placeCode": "P2004-02",
         "teamCode": "T2004-02",
         "examDate": "2025-03-31",
-        "consultNumber": "No-200402-4",
+        "consultNumber": "No2004024",
         "examineeCd": "E2004024",
         "note": "特記事項2004024",
         "previousResults": [],
