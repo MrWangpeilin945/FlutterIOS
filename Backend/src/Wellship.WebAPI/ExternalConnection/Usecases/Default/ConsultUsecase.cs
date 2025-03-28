@@ -4,6 +4,7 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
 using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -86,9 +87,18 @@ public class ConsultUsecase : IConsultUsecase
         var registeConsults = consults.Where(x => x.ActionType == ActionType.登録);
 
         // 必須項目の空値のチェック
+        // 連携キー（共通）
+        // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
+        foreach (var warning in ValidationChecker.SpaceCheckProperties(consults, new string[] {"ConnectionCode"}, errorObjects))
+        {
+            // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
+            if (warning is Consult consult)
+            {
+                warningConsults.Add(consult);
+            }
+        }
         var spaceCheckProperties = new[]
         {
-            "ConnectionCode",    // 連携キー
             "PlaceCode",         // 会場コード
             "TeamCode",          // 班コード
             "ConsultNumber",     // 受診番号
