@@ -20,6 +20,8 @@ steps:
         TRUNCATE TABLE resultcollector.teams CASCADE;
         -- 受診者
         TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
         -- 検査特記
         TRUNCATE TABLE resultcollector.exam_menu_note_codes CASCADE;
         -- 基準値パターン
