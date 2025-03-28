@@ -7,6 +7,7 @@ autonumber
   participant Key as キーボード
 
   User->>KN:入力値テキストボックスを押下
+  alt hasConnectionEquipmentがtrue
   alt keyboardTypeが1の場合
   KN->>Key:【CP0012】キーボード(整数)を呼び出す
   Key->>KN:【CP0012】キーボード(整数)の値変更<br>数字ボタン押下 or AC押下
@@ -18,6 +19,7 @@ autonumber
   Key->>KN:【CP0013】キーボード(選択)の値変更<br>カスタムボタン押下 or AC押下
   KN-->>KN:【CP0013】キーボード(選択)を非表示
   end
+  end
   KN-->>KN:渡された値を保存してテキストボックスに表示
   alt onRegisterPressedがtrue
   KN-->>KN:バリデーションチェック
@@ -26,4 +28,3 @@ autonumber
   end
   end
   KN-->>FE:引数.変更イベントを呼び出す
-  
