@@ -2,7 +2,6 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
-  useRef,
   useState,
 } from "react";
 import {
@@ -38,6 +37,7 @@ type ExamBP2Props = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
   isInitialDisplay: boolean;
+  hasConnectionEquipment: boolean;
   onChange: (updatedExamItem: InputExamItem[] | undefined) => void;
 };
 
@@ -52,7 +52,13 @@ export type ValidationHandle = {
 
 const ExamBP2 = forwardRef<ValidationHandle, ExamBP2Props>(
   (
-    { examItems, onRegisterPressed, isInitialDisplay, onChange }: ExamBP2Props,
+    {
+      examItems,
+      onRegisterPressed,
+      isInitialDisplay,
+      hasConnectionEquipment,
+      onChange,
+    }: ExamBP2Props,
     ref,
   ) => {
     //登録ボタンプレスフラグを制御するための変数
@@ -692,7 +698,7 @@ const ExamBP2 = forwardRef<ValidationHandle, ExamBP2Props>(
                   </Group>
                 );
               })}
-              {examItemDetails?.map((detail) => (
+              {!hasConnectionEquipment && examItemDetails?.map((detail) => (
                 <React.Fragment key={detail?.positionNumber}>
                   {/* キーボード表示 */}
                   {positionNumber !== 平均値 &&
