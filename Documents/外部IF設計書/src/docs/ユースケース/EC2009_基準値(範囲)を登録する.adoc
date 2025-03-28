@@ -90,12 +90,12 @@ list.Count() <> 0
 |string
 |名称
 
-|ThresholdCd
+|ThresholdCode
 |Yes
 |string
 |基準値パターンCD
 
-|ExamItemDetailCd
+|ExamItemDetailCode
 |Yes
 |string
 |検査項目明細CD
@@ -178,20 +178,20 @@ list.Count() <> 0
 **** Message `必須項目が不足しています。Name`
 **** InputNote `ExamNormalValueRange.InputNote`
 
-* 必須項目(ExamNormalValueRange.ThresholdCd)が空値
-** `ExamNormalValueRange.ThresholdCd` が `string.IsNullOrWhiteSpace` に該当する 
+* 必須項目(ExamNormalValueRange.ThresholdCode)が空値
+** `ExamNormalValueRange.ThresholdCode` が `string.IsNullOrWhiteSpace` に該当する 
 *** ExamNormalValueRangeの単位で該当を取り除く
 *** ErrorObject
 **** Code `10004`
-**** Message `必須項目が不足しています。ThresholdCd`
+**** Message `必須項目が不足しています。ThresholdCode`
 **** InputNote `ExamNormalValueRange.InputNote`
 
-* 必須項目(ExamNormalValueRange.ExamItemDetailCd)が空値
-** `ExamNormalValueRange.ExamItemDetailCd` が `string.IsNullOrWhiteSpace` に該当する 
+* 必須項目(ExamNormalValueRange.ExamItemDetailCode)が空値
+** `ExamNormalValueRange.ExamItemDetailCode` が `string.IsNullOrWhiteSpace` に該当する 
 *** ExamNormalValueRangeの単位で該当を取り除く
 *** ErrorObject
 **** Code `10004`
-**** Message `必須項目が不足しています。ExamItemDetailCd`
+**** Message `必須項目が不足しています。ExamItemDetailCode`
 **** InputNote `ExamNormalValueRange.InputNote`
 
 * 必須項目(ExamNormalValueRange.MaxAge)が空値
@@ -247,32 +247,32 @@ list.Count() <> 0
 ** 補足：範囲は　Min以上 Max未満となるため、`=(一致)` はエラーとする
 
 * 基準値パターンが取得できない
-** `[DB]thresholds(基準値パターン).threshold_code(基準値パターンコード)` == `ExamNormalValueRange.ThresholdCd` が存在しない
+** `[DB]thresholds(基準値パターン).threshold_code(基準値パターンコード)` == `ExamNormalValueRange.ThresholdCode` が存在しない
 *** ExamNormalValueRangeの単位で該当を取り除く
 *** ErrorObject
 **** Code `10001`
-**** Message `指定されたThresholdCdがシステム上に存在しません。Code:[ExamNormalValueRange.ThresholdCd]`
+**** Message `指定されたThresholdCodeがシステム上に存在しません。Code:[ExamNormalValueRange.ThresholdCode]`
 **** InputNote `ExamNormalValueRange.InputNote`
 
 * 検査項目明細IDが取得できない
-** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `ExamNormalValueRange.ExamItemDetailCd` が存在しない
+** `[DB]external_exam_item_details(外部検査項目明細).external_exam_item_detail_code(外部コード検査項目明細CD)` == `ExamNormalValueRange.ExamItemDetailCode` が存在しない
 *** ExamNormalValueRangeの単位で該当を取り除く
 *** ErrorObject
 **** Code `10001`
-**** Message `指定されたExamItemDetailCdがシステム上に存在しません。Code:[ExamNormalValueRange.ExamItemDetailCd]`
+**** Message `指定されたExamItemDetailCodeがシステム上に存在しません。Code:[ExamNormalValueRange.ExamItemDetailCode]`
 **** InputNote `ExamNormalValueRange.InputNote`
 
 * PKが重複するレコードが存在する
 ** ExamNormalValueRangesを以下の条件でGroupByし、複数レコードが存在する
-**** `[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCd` で検索した `[DB]thresholds.threshold_id`
-**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id`
+**** `[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCode` で検索した `[DB]thresholds.threshold_id`
+**** `[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCode` で検索した `[DB]external_exam_item_details.exam_item_detail_id`
 **** `ExamNormalValueRange.TargetSex`
 **** `ExamNormalValueRange.MaxAge` ※左0埋め7桁にそろえる
 **** `ExamNormalValueRange.MaxValue`
 *** ExamNormalValueRangeの単位で該当を取り除く
 *** ErrorObject
 **** Code `10003`
-**** Message `キー項目が重複しています。ThresholdCd:[ExamNormalValueRange.ThresholdCd]/ExamItemDetailCd:[ExamNormalValueRange.ExamItemDetailCd]/TargetSex:[ExamNormalValueRange.TargetSex]/MaxAge:[ExamNormalValueRange.MaxAge]/MaxValue:[ExamNormalValueRange.MaxValue]`
+**** Message `キー項目が重複しています。ThresholdCode:[ExamNormalValueRange.ThresholdCode]/ExamItemDetailCode:[ExamNormalValueRange.ExamItemDetailCode]/TargetSex:[ExamNormalValueRange.TargetSex]/MaxAge:[ExamNormalValueRange.MaxAge]/MaxValue:[ExamNormalValueRange.MaxValue]`
 **** InputNote `ExamNormalValueRange.InputNote`
 
 ==== 処理(Repository)
@@ -285,8 +285,8 @@ list.Count() <> 0
 ====== Delete
 
 * 削除条件
-** `[DB]exam_normal_value_range.threshold_id(基準値パターンID)` == `[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCd` で検索した `[DB]thresholds.threshold_id`
-And `[DB]exam_normal_value_range.exam_item_detail_id(検査項目明細ID)` == `[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCd` で検索した `[DB]external_exam_item_details.exam_item_detail_id`
+** `[DB]exam_normal_value_range.threshold_id(基準値パターンID)` == `[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCode` で検索した `[DB]thresholds.threshold_id`
+And `[DB]exam_normal_value_range.exam_item_detail_id(検査項目明細ID)` == `[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCode` で検索した `[DB]external_exam_item_details.exam_item_detail_id`
 *** 削除対象レコードが存在しない場合でも、エラーとしない
 
 ====== Insert
@@ -305,11 +305,11 @@ And `[DB]exam_normal_value_range.exam_item_detail_id(検査項目明細ID)` == `
 
 |threshold_id
 |`[DB]thresholds.threshold_id`
-|`[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCd` で検索し、`threshold_id`を登録する
+|`[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCode` で検索し、`threshold_id`を登録する
 
 |exam_item_detail_id
 |`[DB]external_exam_item_details.exam_item_detail_id`
-|`[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCd` で検索し、`exam_item_detail_id`を登録する
+|`[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCode` で検索し、`exam_item_detail_id`を登録する
 
 |max_age
 |ExamNormalValueRange.MaxAge
