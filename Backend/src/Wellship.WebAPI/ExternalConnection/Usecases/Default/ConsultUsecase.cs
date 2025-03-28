@@ -62,7 +62,7 @@ public class ConsultUsecase : IConsultUsecase
                                .Select(x => DateOnly.Parse(x.ExamDate)).ToList();
         var placeSchedules = await _placeScheduleRepository.GetPlaceScheduleInfoAsync(placeCodes, teamCodes, examDate);
         // 受診者コードに紐づく受診者IDを取得する
-        var examinees = await _examineeRepository.GetExamineeInfoAsync(consults.Select(x => x.ExamineeCd).ToList());
+        var examinees = await _examineeRepository.GetExamineeInfoAsync(consults.Select(x => x.ExamineeCode).ToList());
         // 検査メニュー特記コードに紐づく情報を取得する
         var examMenuNodeCodes = await _consultRepository.GetExamMenuNodeCodeInfoAsync(
                                             consults.SelectMany(x => x.ConsultNotes.Select(cn => cn.Code)).ToList());
@@ -70,9 +70,9 @@ public class ConsultUsecase : IConsultUsecase
         var thresholds = await _thresholdRepository.GetThresholdsByCodesAsync(
                                             consults.SelectMany(x => x.ConsultThresholds.Select(ct => ct.ThresholdCode)).ToList());
         // 検査項目明細CDに紐づく外部検査項目明細IDを取得する
-        var detailCodes = consults.SelectMany(x => x.PreviousResults.Select(pr => pr.ExamItemDetailCd))
+        var detailCodes = consults.SelectMany(x => x.PreviousResults.Select(pr => pr.ExamItemDetailCode))
                                   .Concat(
-                                      consults.SelectMany(x => x.ExamItemDetailOrders.Select(ei => ei.ExamItemDetailCd))
+                                      consults.SelectMany(x => x.ExamItemDetailOrders.Select(ei => ei.ExamItemDetailCode))
                                   ).ToList();
         var externalExamItemDetails = await _consultRepository.GetExternalExamItemDetailInfoAsync(detailCodes);
         // 連携キーに紐づく外部連携キーを取得する
@@ -92,7 +92,8 @@ public class ConsultUsecase : IConsultUsecase
             "PlaceCode",         // 会場コード
             "TeamCode",          // 班コード
             "ConsultNumber",     // 受診番号
-            "ExamineeCd"         // 受診者コード
+            "ExamineeCode",      // 受診者コード
+            "Age"                // 年齢
         };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
         foreach (var warning in ValidationChecker.SpaceCheckProperties(registeConsults, spaceCheckProperties, errorObjects))
@@ -105,11 +106,11 @@ public class ConsultUsecase : IConsultUsecase
         }
         var spaceCheckChildrenProperties = new List<(string ParentProperty, string ChildProperty)>
         {
-            ("PreviousResults",      "ExamItemDetailCd"),   // 過去検査結果->検査項目明細CD
-            ("PreviousResults",      "Value"),              // 過去検査結果->結果値
-            ("ConsultThresholds",    "ThresholdCode"),      // 基準値判定->基準値判定コード
-            ("ConsultNotes",         "Code"),               // 受診特記->検査特記コード
-            ("ExamItemDetailOrders", "ExamItemDetailCd")    // 検査項目明細依頼->検査項目明細CD
+            ("PreviousResults",      "ExamItemDetailCode"),     // 過去検査結果->検査項目明細CD
+            ("PreviousResults",      "Value"),                  // 過去検査結果->結果値
+            ("ConsultThresholds",    "ThresholdCode"),          // 基準値判定->基準値判定コード
+            ("ConsultNotes",         "Code"),                   // 受診特記->検査特記コード
+            ("ExamItemDetailOrders", "ExamItemDetailCode")      // 検査項目明細依頼->検査項目明細CD
         };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
         foreach (var warning in ValidationChecker.SpaceCheckChildrenProperties(registeConsults, spaceCheckChildrenProperties, errorObjects))
@@ -137,9 +138,10 @@ public class ConsultUsecase : IConsultUsecase
         }
         var duplicateCheckChildProperties = new List<(string ParentProperty, string ChildProperty)>
         {
-            ("ConsultThresholds",  "ThresholdCode"),        // 基準値判定->基準値判定コード
-            ("ConsultThresholds",  "Priority"),             // 基準値判定->優先
-            ("ConsultNotes",       "Code")                  // 受診特記->検査特記コード
+            ("ConsultThresholds",   "ThresholdCode"),       // 基準値判定->基準値判定コード
+            ("ConsultThresholds",   "Priority"),            // 基準値判定->優先
+            ("ConsultNotes",        "Code"),                // 受診特記->検査特記コード
+            ("ExamItemDetailOrders","ExamItemDetailCode")   // 検査項目明細依頼->検査項目明細CD
         };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
         foreach (var warning in ValidationChecker.DuplicateCheckChildrenProperties(registeConsults, duplicateCheckChildProperties, errorObjects))
@@ -154,11 +156,13 @@ public class ConsultUsecase : IConsultUsecase
         // 文字数のチェック
         var stringLengthCheckProperties = new[]
         {
-            "ConsultNumber"            // 受診番号
+            "ConsultNumber",            // 受診番号　50桁以下
+            "Age"                       // 年齢　　　 7桁　
         };
-        var maxLengths = new [] { 50 };
+        var stringLengths = new [] { 50, 7 }; 
+        var compars = new [] {-1, 0 };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
-        foreach (var warning in ValidationChecker.StringLengthCheckProperties(registeConsults, stringLengthCheckProperties, maxLengths, errorObjects))
+        foreach (var warning in ValidationChecker.StringLengthCheckProperties(registeConsults, stringLengthCheckProperties, stringLengths, compars, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
             if (warning is Consult consult)
@@ -170,9 +174,10 @@ public class ConsultUsecase : IConsultUsecase
         // 文字形式のチェック
         var stringPatternCheckProperties = new[]
         {
-            "ConsultNumber"            // 受診番号
+            "ConsultNumber",            // 受診番号
+            "Age"                       // 年齢
         };
-        var patterns = new [] { @"^[a-zA-Z0-9]+$" };
+        var patterns = new [] { @"^[a-zA-Z0-9]+$", @"^[0-9]{3}(0[0-9]|1[01])([012][0-9]|30)$" };
         foreach (var warning in ValidationChecker.StringPatternCheckProperties(registeConsults, stringPatternCheckProperties, patterns, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
@@ -237,13 +242,13 @@ public class ConsultUsecase : IConsultUsecase
             });
         }
         // 受診者IDが取得できない
-        foreach (var warning in registeConsults.Where(x => !examinees.Select(e => e.ExamineeCode).Contains(x.ExamineeCd)))
+        foreach (var warning in registeConsults.Where(x => !examinees.Select(e => e.ExamineeCode).Contains(x.ExamineeCode)))
         {
             warningConsults.Add(warning);
             errorObjects.Add(new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたExamineeCdがシステム上に存在しません。Code:{warning.ExamineeCd}",
+                Message = $"指定されたExamineeCodeがシステム上に存在しません。Code:{warning.ExamineeCode}",
                 InputNote = warning.InputNote
             });
         }
@@ -279,20 +284,20 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var consult in registeConsults)
         {
             // 検査項目明細IDが取得できない
-            foreach (var warning in consult.PreviousResults.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCd)))
+            foreach (var warning in consult.PreviousResults.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCode)))
             {
                 warningConsults.Add(consult);
                 errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
-                    Message = $"指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:{warning.ExamItemDetailCd}",
+                    Message = $"指定されたPreviousResults.ExamItemDetailCodeがシステム上に存在しません。Code:{warning.ExamItemDetailCode}",
                     InputNote = consult.InputNote
                 });
             }
             // PKが重複するレコードが存在する
-            // ExamItemDetailCd+ExamDateで重複する
+            // ExamItemDetailCode+ExamDateで重複する
             var duplicateExamItemDetailCds = consult.PreviousResults
-                                                    .GroupBy(x => new { x.ExamItemDetailCd, x.ExamDate })
+                                                    .GroupBy(x => new { x.ExamItemDetailCode, x.ExamDate })
                                                     .Where(x => x.Count() > 1)
                                                     .Select(x => x);
             foreach (var warning in duplicateExamItemDetailCds)
@@ -301,24 +306,24 @@ public class ConsultUsecase : IConsultUsecase
                 errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
-                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCd:{warning.Key.ExamItemDetailCd}/PreviousResults.ExamDate:{warning.Key.ExamDate}",
+                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{warning.Key.ExamItemDetailCode}/PreviousResults.ExamDate:{warning.Key.ExamDate}",
                     InputNote = consult.InputNote
                 });
             }
             // ExamItemDetailId+ExamDateで重複する
             var examItemDetail = from p in consult.PreviousResults
                                  join e in externalExamItemDetails
-                                 on p.ExamItemDetailCd equals e.ExternalExamItemDetailCode
+                                 on p.ExamItemDetailCode equals e.ExternalExamItemDetailCode
                                  select new
                                  {
                                      // external_exam_item_detailsのexam_item_detail_idを連結する
                                      ExamItemDetailId = e.ExamItemDetailId,
-                                     ExamItemDetailCd = p.ExamItemDetailCd,
+                                     ExamItemDetailCode = p.ExamItemDetailCode,
                                      ExamDate = p.ExamDate
                                  };
             var duplicateExamItemDetailIds = examItemDetail
-                                                // ExamItemDetailCd+ExamDateの重複を取り除く
-                                                .GroupBy(x => new { x.ExamItemDetailCd, x.ExamDate })
+                                                // ExamItemDetailCode+ExamDateの重複を取り除く
+                                                .GroupBy(x => new { x.ExamItemDetailCode, x.ExamDate })
                                                 .Select(x => x.First())
                                                 // ExamItemDetailId+ExamDateの重複を取得する
                                                 .GroupBy(x => new { x.ExamItemDetailId, x.ExamDate })
@@ -330,7 +335,7 @@ public class ConsultUsecase : IConsultUsecase
                 errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
-                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCd:{warning.ExamItemDetailCd}/PreviousResults.ExamDate:{warning.ExamDate}",
+                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{warning.ExamItemDetailCode}/PreviousResults.ExamDate:{warning.ExamDate}",
                     InputNote = consult.InputNote
                 });
             }
@@ -339,57 +344,13 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var consult in registeConsults)
         {
             // 検査項目明細IDが取得できない
-            foreach (var warning in consult.ExamItemDetailOrders.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCd)))
+            foreach (var warning in consult.ExamItemDetailOrders.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCode)))
             {
                 warningConsults.Add(consult);
                 errorObjects.Add(new ErrorObject
                 {
                     Code = "10001",
-                    Message = $"指定されたExamItemDetailOrders.ExamItemDetailCdがシステム上に存在しません。Code:{warning.ExamItemDetailCd}",
-                    InputNote = consult.InputNote
-                });
-            }
-            // PKが重複するレコードが存在する
-            // ExamItemDetailCd+ExamDateで重複する
-            var duplicateExamItemDetailCds = consult.ExamItemDetailOrders
-                                                    .GroupBy(x => new { x.ExamItemDetailCd })
-                                                    .Where(x => x.Count() > 1)
-                                                    .Select(x => x);
-            foreach (var warning in duplicateExamItemDetailCds)
-            {
-                warningConsults.Add(consult);
-                errorObjects.Add(new ErrorObject
-                {
-                    Code = "10003",
-                    Message = $"キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCd:{warning.Key.ExamItemDetailCd}",
-                    InputNote = consult.InputNote
-                });
-            }
-            // ExamItemDetailId+ExamDateで重複する
-            var examItemDetail = from p in consult.ExamItemDetailOrders
-                                 join e in externalExamItemDetails
-                                 on p.ExamItemDetailCd equals e.ExternalExamItemDetailCode
-                                 select new
-                                 {
-                                     // external_exam_item_detailsのexam_item_detail_idを連結する
-                                     ExamItemDetailId = e.ExamItemDetailId,
-                                     ExamItemDetailCd = p.ExamItemDetailCd,
-                                 };
-            var duplicateExamItemDetailIds = examItemDetail
-                                                // ExamItemDetailCdの重複を取り除く
-                                                .GroupBy(x => new { x.ExamItemDetailCd })
-                                                .Select(x => x.First())
-                                                // ExamItemDetailIdの重複を取得する
-                                                .GroupBy(x => new { x.ExamItemDetailId })
-                                                .Where(x => x.Count() > 1)
-                                                .SelectMany(x => x);
-            foreach (var warning in duplicateExamItemDetailIds)
-            {
-                warningConsults.Add(consult);
-                errorObjects.Add(new ErrorObject
-                {
-                    Code = "10003",
-                    Message = $"キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCd:{warning.ExamItemDetailCd}",
+                    Message = $"指定されたExamItemDetailOrders.ExamItemDetailCodeがシステム上に存在しません。Code:{warning.ExamItemDetailCode}",
                     InputNote = consult.InputNote
                 });
             }
@@ -420,8 +381,9 @@ public class ConsultUsecase : IConsultUsecase
                                                                                      ps.ExamDate == DateOnly.Parse(x.ExamDate))
                                                                         .Select(ps => ps.PlaceScheduleId).FirstOrDefault(),
                                         Note = x.Note,
-                                        ExamineeId = examinees.Where(e => e.ExamineeCode == x.ExamineeCd)
+                                        ExamineeId = examinees.Where(e => e.ExamineeCode == x.ExamineeCode)
                                                               .Select(e => e.ExamineeId).FirstOrDefault(),
+                                        Age = x.Age,
                                         ConnectionCode = x.ConnectionCode,
                                         SortNo = x.SortNo,
                                         ConsultNotes = x.ConsultNotes.Select(cn => new ConsultNoteEntity
@@ -431,9 +393,10 @@ public class ConsultUsecase : IConsultUsecase
                                         }).ToList(),
                                         ExamItemDetailOrders = x.ExamItemDetailOrders.Select(eo => new ExamItemDetailOrderEntity
                                         {
-                                            ExamItemDetailId = externalExamItemDetails.Where(ed => ed.ExternalExamItemDetailCode == eo.ExamItemDetailCd)
+                                            ExamItemDetailId = externalExamItemDetails.Where(ed => ed.ExternalExamItemDetailCode == eo.ExamItemDetailCode)
                                                                                       .Select(ed => ed.ExamItemDetailId).FirstOrDefault(),
-                                            ExamItemDetailCd = eo.ExamItemDetailCd
+                                            ExamItemDetailCode = eo.ExamItemDetailCode,
+                                            Note = eo.Note
                                         }).ToList(),
                                         ConsultThresholds = x.ConsultThresholds.Select(ct => new ConsultThresholdEntity
                                         {
@@ -444,7 +407,7 @@ public class ConsultUsecase : IConsultUsecase
                                         PreviousResults = x.PreviousResults.Select(pr => new PreviousResultEntity
                                         {
                                             ExamDate = pr.ExamDate,
-                                            ExamItemDetailId = externalExamItemDetails.Where(ed => ed.ExternalExamItemDetailCode == pr.ExamItemDetailCd)
+                                            ExamItemDetailId = externalExamItemDetails.Where(ed => ed.ExternalExamItemDetailCode == pr.ExamItemDetailCode)
                                                                                       .Select(ed => ed.ExamItemDetailId).FirstOrDefault(),
                                             Value = pr.Value
                                         }).ToList()

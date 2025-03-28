@@ -182,9 +182,10 @@ public static class ValidationChecker
     /// </summary>
     /// <param name="requestCollection">リクエストクラスのコレクション</param>
     /// <param name="properties">チェック対象のプロパティ名一覧</param>
-    /// <param name="maxLengths">最大文字長一覧</param>
+    /// <param name="stringLengths">文字長一覧</param>
+    /// <param name="compars">文字比較一覧(-1:以下 0:等しい 1:以上)</param>
     /// <param name="errorObjects">エラーオブジェクト</param>
-    public static List<object> StringLengthCheckProperties(IEnumerable<object> requestCollection, string[] properties, int[] maxLengths, List<ErrorObject> errorObjects)
+    public static List<object> StringLengthCheckProperties(IEnumerable<object> requestCollection, string[] properties, int[] stringLengths, int[] compars, List<ErrorObject> errorObjects)
     {
         var warningList = new List<object>();
 
@@ -195,16 +196,21 @@ public static class ValidationChecker
             foreach (var propertyName in properties)
             {
                 var propertyValue = request.GetType().GetProperty(propertyName)?.GetValue(request)?.ToString();
-                if (propertyValue?.Length > maxLengths[index])
+                if (!string.IsNullOrEmpty(propertyValue))
                 {
-                    var inputNote = request.GetType().GetProperty("InputNote")?.GetValue(request)?.ToString();
-                    warningList.Add(request);
-                    errorObjects.Add(new ErrorObject
+                    if ((compars[index] == -1 && propertyValue.Length > stringLengths[index]) ||
+                        (compars[index] == 1  && propertyValue.Length < stringLengths[index]) || 
+                        (compars[index] == 0  && propertyValue.Length != stringLengths[index]))
                     {
-                        Code = "10005",
-                        Message = $"制限数を超えています。{propertyName}:{propertyValue}",
-                        InputNote = inputNote ?? ""
-                    });
+                        var inputNote = request.GetType().GetProperty("InputNote")?.GetValue(request)?.ToString();
+                        warningList.Add(request);
+                        errorObjects.Add(new ErrorObject
+                        {
+                            Code = "10005",
+                            Message = $"制限数を超えています。{propertyName}:{propertyValue}",
+                            InputNote = inputNote ?? ""
+                        });
+                    }
                 }
                 index++;
             }

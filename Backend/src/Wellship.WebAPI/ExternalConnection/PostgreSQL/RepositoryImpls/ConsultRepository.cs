@@ -4,6 +4,7 @@ using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Transaction;
 
@@ -49,6 +50,7 @@ public class ConsultRepository : IConsultRepository
                                                        {
                                                            ConsultId = Guid.NewGuid(),
                                                            ConsultNumber = x.ConsultNumber,
+                                                           Age = x.Age,
                                                            ProgressStatus = (int)ConsultProgressStatus.来場待ち,
                                                            ExportStatus = (int)ConsultResultExportStatus.未出力,
                                                            PlaceScheduleId = x.PlaceScheduleId,
@@ -64,10 +66,11 @@ public class ConsultRepository : IConsultRepository
                     const string mergeConsultSql = @"
                     merge
                     into resultcollector.consult as cs
-                        using (values (@ConsultId, @ConsultNumber, @ProgressStatus, @ExportStatus, @PlaceScheduleId, @Note, 
+                        using (values (@ConsultId, @ConsultNumber, @Age, @ProgressStatus, @ExportStatus, @PlaceScheduleId, @Note, 
                                        @ExamineeId, @ExternalConnectionCode, @CreatedAt, @CreatedBy)) as new_data(
                             consult_id
                             , consult_number
+                            , age
                             , progress_status
                             , export_status
                             , place_schedule_id
@@ -81,6 +84,7 @@ public class ConsultRepository : IConsultRepository
                     when matched then 
                         update set
                             consult_number = new_data.consult_number
+                            , age = new_data.age
                             , note = new_data.note
                             , external_connection_code = new_data.external_connection_code
                             , place_schedule_id = new_data.place_schedule_id
@@ -96,6 +100,7 @@ public class ConsultRepository : IConsultRepository
                         insert (
                             consult_id
                             , consult_number
+                            , age
                             , progress_status
                             , export_status
                             , place_schedule_id
@@ -108,6 +113,7 @@ public class ConsultRepository : IConsultRepository
                         values (
                             new_data.consult_id
                             , new_data.consult_number
+                            , new_data.age
                             , new_data.progress_status
                             , new_data.export_status
                             , new_data.place_schedule_id
@@ -152,6 +158,14 @@ public class ConsultRepository : IConsultRepository
                 where
                     consult_id = any (@ConsultIds);";
                 await connection.ExecuteAsync(deleteConsultNotesSql, new { ConsultIds = consultIds });
+
+                // external_exam_item_detail_orders（外部検査項目明細依頼）
+                const string deleteExternalExamItemDetailOrdersSql = @"
+                delete from
+                    resultcollector.external_exam_item_detail_orders 
+                where
+                    consult_id = any (@ConsultIds);";
+                await connection.ExecuteAsync(deleteExternalExamItemDetailOrdersSql, new { ConsultIds = consultIds });
 
                 // exam_item_detail_orders（検査項目明細依頼）
                 const string deleteExamItemDetailOrdersSql = @"
@@ -201,6 +215,7 @@ public class ConsultRepository : IConsultRepository
                                                            PlaceScheduleId = x.PlaceScheduleId,
                                                            Note = x.Note,
                                                            ExamineeId = x.ExamineeId,
+                                                           Age = x.Age,
                                                            ConnectionCode = x.ConnectionCode,
                                                            SortNo = x.SortNo,
                                                            ConsultNotes = x.ConsultNotes,
@@ -237,20 +252,56 @@ public class ConsultRepository : IConsultRepository
                     await connection.ExecuteAsync(insertConsultNotesSql, consultNotes);
 
                     // exam_item_detail_orders（検査項目明細依頼）
-                    var examItemDetailOrders = upsertConsults.SelectMany(x => x.ExamItemDetailOrders.Select(eo => new
-                    {
-                        ConsultId = x.ConsultId,
-                        ExamItemDetailId = eo.ExamItemDetailId,
-                        ExternalExamItemDetailCode = eo.ExamItemDetailCd,
-                        CreatedAt = createdAt,
-                        CreatedBy = createdBy
-                    }));
+                    var examItemDetailOrders = upsertConsults
+                        .SelectMany(x => x.ExamItemDetailOrders.Select(eo => new
+                        {
+                            ConsultId = x.ConsultId,
+                            ExamItemDetailId = eo.ExamItemDetailId,
+                            CreatedAt = createdAt,
+                            CreatedBy = createdBy
+                        }))
+                        .GroupBy(order => new { order.ConsultId, order.ExamItemDetailId })
+                        .Select(group => new
+                        {
+                            ConsultId = group.Key.ConsultId,
+                            ExamItemDetailId = group.Key.ExamItemDetailId,
+                            CreatedAt = group.First().CreatedAt,
+                            CreatedBy = group.First().CreatedBy
+                        });
                     const string insertExamItemDetailOrdersSql = @"
                     insert into resultcollector.exam_item_detail_orders 
                     (
                         consult_id
                         , exam_item_detail_id
+                        , created_at
+                        , created_by
+                    ) 
+                    values
+                    (
+                        @ConsultId
+                        , @ExamItemDetailId
+                        , @CreatedAt
+                        , @CreatedBy
+                    );";
+                    await connection.ExecuteAsync(insertExamItemDetailOrdersSql, examItemDetailOrders);
+
+                    // external_exam_item_detail_orders（外部検査項目明細依頼）
+                    var externalExamItemDetailOrders = upsertConsults.SelectMany(x => x.ExamItemDetailOrders.Select(eo => new
+                    {
+                        ConsultId = x.ConsultId,
+                        ExamItemDetailId = eo.ExamItemDetailId,
+                        ExternalExamItemDetailCode = eo.ExamItemDetailCode,
+                        ExternalNote = eo.Note,
+                        CreatedAt = createdAt,
+                        CreatedBy = createdBy
+                    }));
+                    const string insertExternalExamItemDetailOrdersSql = @"
+                    insert into resultcollector.external_exam_item_detail_orders 
+                    (
+                        consult_id
+                        , exam_item_detail_id
                         , external_exam_item_detail_code
+                        , external_note
                         , created_at
                         , created_by
                     ) 
@@ -259,10 +310,11 @@ public class ConsultRepository : IConsultRepository
                         @ConsultId
                         , @ExamItemDetailId
                         , @ExternalExamItemDetailCode
+                        , @ExternalNote
                         , @CreatedAt
                         , @CreatedBy
                     );";
-                    await connection.ExecuteAsync(insertExamItemDetailOrdersSql, examItemDetailOrders);
+                    await connection.ExecuteAsync(insertExternalExamItemDetailOrdersSql, externalExamItemDetailOrders);
 
                     // consult_thresholds（基準値）
                     var consultThresholds = upsertConsults.SelectMany(x => x.ConsultThresholds.Select(ct => new
@@ -280,6 +332,7 @@ public class ConsultRepository : IConsultRepository
                         , consult_id
                         , priority
                         , created_at
+                        
                         , created_by
                     ) 
                     values
