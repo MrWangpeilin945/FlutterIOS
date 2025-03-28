@@ -103,8 +103,8 @@ export default function ConsultInput() {
   // 通過用
   const [hasPass, setHasPass] = useState(false);
   const [passValue, setPassValue] = useState("");
-  //測定ボタンの表示切り替え
-  const [visibleRemeasurement, setVisibleRemeasurement] = useState(true);
+  //機器が選択されているかのフラグ（測定するボタンの表示制御に使用）
+  const [hasConnectionEquipment, setHasConnectionEquipment] = useState(true);
   //測定ボタンの無効切り替え
   const disabledRemeasurement = useRef<HTMLButtonElement>(null);
   //機器連携用
@@ -255,15 +255,15 @@ export default function ConsultInput() {
   const checkEquipment = () => {
     // [測定する]ボタンの表示を制御
     const handleRemeasurementCheck = () => {
-      const isConnectionEquipment =
+      const hasConnectionEquipment =
         !!targetConnectionEquipment &&
         !!targetConnectionEquipment.appLaunchUrl &&
         !!targetConnectionEquipment.processingScriptUrl;
-      setVisibleRemeasurement(isConnectionEquipment); // 機器が選択されていないなら非表示
+      setHasConnectionEquipment(hasConnectionEquipment); // 機器が選択されていないなら非表示
       // valueが全て存在する場合、[測定する]ボタンを無効化
       const isEmpty = !checkRemeasurementDisabled();
 
-      if (isConnectionEquipment && isEmpty && initialDisplay) {
+      if (hasConnectionEquipment && isEmpty && initialDisplay) {
         setInitialDisplay(false);
         launchConnectionEquipment();
       }
@@ -750,6 +750,7 @@ export default function ConsultInput() {
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
             isInitialDisplay={isInitialDisplay}
+            hasConnectionEquipment={hasConnectionEquipment}
             onChange={handleChange}
           />
         );
@@ -858,7 +859,7 @@ export default function ConsultInput() {
         />
         <Stack align="center" gap={32} px={32} mt={32}>
           {/* 測定ボタン */}
-          {visibleRemeasurement && (
+          {hasConnectionEquipment && (
             <Button
               ml="auto"
               ref={disabledRemeasurement}
