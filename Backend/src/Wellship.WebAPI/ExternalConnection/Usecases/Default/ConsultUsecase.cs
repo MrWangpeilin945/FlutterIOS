@@ -52,24 +52,24 @@ public class ConsultUsecase : IConsultUsecase
     {
         List<ErrorObject> errorObjects = new List<ErrorObject>();
 
-        var placeCodes = consults.Select(x => x.PlaceCode).ToList();
-        var teamCodes = consults.Select(x => x.TeamCode).ToList();
+        var placeCodes = consults.Select(x => x.PlaceCode).Distinct().ToList();
+        var teamCodes = consults.Select(x => x.TeamCode).Distinct().ToList();
         // 会場コードに紐づく会場IDを取得する
         var places = await _placeRepository.GetPlaceInfoAsync(placeCodes);
         // 班コードに紐づく班IDを取得する
         var teams = await _teamRepository.GetTeamInfoAsync(teamCodes);
         // 会場コード、班コード、健診日に紐づく会場日程情報を取得する
         var examDate = consults.Where(x => x.ActionType == ActionType.登録 && !string.IsNullOrWhiteSpace(x.ExamDate))
-                               .Select(x => DateOnly.Parse(x.ExamDate)).ToList();
+                               .Select(x => DateOnly.Parse(x.ExamDate)).Distinct().ToList();
         var placeSchedules = await _placeScheduleRepository.GetPlaceScheduleInfoAsync(placeCodes, teamCodes, examDate);
         // 受診者コードに紐づく受診者IDを取得する
-        var examinees = await _examineeRepository.GetExamineeInfoAsync(consults.Select(x => x.ExamineeCode).ToList());
+        var examinees = await _examineeRepository.GetExamineeInfoAsync(consults.Select(x => x.ExamineeCode).Distinct().ToList());
         // 検査メニュー特記コードに紐づく情報を取得する
         var examMenuNodeCodes = await _consultRepository.GetExamMenuNodeCodeInfoAsync(
-                                            consults.SelectMany(x => x.ConsultNotes.Select(cn => cn.Code)).ToList());
+                                            consults.SelectMany(x => x.ConsultNotes.Select(cn => cn.Code)).Distinct().ToList());
         // 基準値パターンコードに紐づく基準値パターンIDを取得する
         var thresholds = await _thresholdRepository.GetThresholdsByCodesAsync(
-                                            consults.SelectMany(x => x.ConsultThresholds.Select(ct => ct.ThresholdCode)).ToList());
+                                            consults.SelectMany(x => x.ConsultThresholds.Select(ct => ct.ThresholdCode)).Distinct().ToList());
         // 検査項目明細CDに紐づく外部検査項目明細IDを取得する
         var detailCodes = consults.SelectMany(x => x.PreviousResults.Select(pr => pr.ExamItemDetailCode))
                                   .Concat(
@@ -77,9 +77,9 @@ public class ConsultUsecase : IConsultUsecase
                                   ).ToList();
         var externalExamItemDetails = await _consultRepository.GetExternalExamItemDetailInfoAsync(detailCodes);
         // 連携キーに紐づく外部連携キーを取得する
-        var externalConnectionCodes = await _consultRepository.GetExternalConnectionCodeAsync(consults.Select(x => x.ConnectionCode).ToList());
+        var externalConnectionCodes = await _consultRepository.GetExternalConnectionCodeAsync(consults.Select(x => x.ConnectionCode).Distinct().ToList());
         // 受診番号に紐づく連携キーを取得する
-        var consultExternalConnectionCodes = await _consultRepository.GetConsultExternalConnectionCodeAsync(consults.Select(x => x.ConsultNumber).ToList());
+        var consultExternalConnectionCodes = await _consultRepository.GetConsultExternalConnectionCodeAsync(consults.Select(x => x.ConsultNumber).Distinct().ToList());
 
         // WARNING検証
         var warningConsults = new List<Consult>();
@@ -89,7 +89,7 @@ public class ConsultUsecase : IConsultUsecase
         // 必須項目の空値のチェック
         // 連携キー（共通）
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
-        foreach (var warning in ValidationChecker.SpaceCheckProperties(consults, new string[] {"ConnectionCode"}, errorObjects))
+        foreach (var warning in ValidationChecker.SpaceCheckProperties(consults, new string[] { "ConnectionCode" }, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
             if (warning is Consult consult)
@@ -169,8 +169,8 @@ public class ConsultUsecase : IConsultUsecase
             "ConsultNumber",            // 受診番号　50桁以下
             "Age"                       // 年齢　　　 7桁　
         };
-        var stringLengths = new [] { 50, 7 }; 
-        var compars = new [] {-1, 0 };
+        var stringLengths = new[] { 50, 7 };
+        var compars = new[] { -1, 0 };
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
         foreach (var warning in ValidationChecker.StringLengthCheckProperties(registeConsults, stringLengthCheckProperties, stringLengths, compars, errorObjects))
         {
@@ -187,7 +187,7 @@ public class ConsultUsecase : IConsultUsecase
             "ConsultNumber",            // 受診番号
             "Age"                       // 年齢
         };
-        var patterns = new [] { @"^[a-zA-Z0-9]+$", @"^[0-9]{3}(0[0-9]|1[01])([012][0-9]|30)$" };
+        var patterns = new[] { @"^[a-zA-Z0-9]+$", @"^[0-9]{3}(0[0-9]|1[01])([012][0-9]|30)$" };
         foreach (var warning in ValidationChecker.StringPatternCheckProperties(registeConsults, stringPatternCheckProperties, patterns, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
@@ -196,7 +196,7 @@ public class ConsultUsecase : IConsultUsecase
                 warningConsults.Add(consult);
             }
         }
-        
+
         // 受診番号が異なる連携キーで登録されている
         foreach (var warning in registeConsults)
         {
