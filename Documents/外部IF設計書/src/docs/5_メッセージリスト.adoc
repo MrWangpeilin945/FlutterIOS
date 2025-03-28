@@ -2,7 +2,6 @@
 
 ErrorObjectに指定されるメッセージリストを指定します。
 
-
 [options="header",cols="1,1,3,3,2"]
 |===
 
@@ -56,8 +55,8 @@ ErrorObjectに指定されるメッセージリストを指定します。
 
 |Warning
 |`20003`
-|`重複したコードが存在します。[項目1]:[登録値1] .... /[項目N]:[登録値N]`
-|`重複したコードが存在します。PreviousResults.ExamItemDetailCd:PREVI-200415-X/PreviousResults.ExamDate:2024/11/22`
+|`指定されたコードから取得したマスタのIDが重複しています。[項目1]:[登録値1] .... /[項目N]:[登録値N]`
+|`指定されたコードから取得したマスタのIDが重複しています。PreviousResults.ExamItemDetailCd:PREVI-200415-X/PreviousResults.ExamDate:2024/11/22`
 |内部キーが重複する値が連携された場合。フェイズ１時点 : `10003`
 
 |===
