@@ -161,7 +161,6 @@ CREATE TABLE exam_item_detail_options (
 CREATE TABLE exam_item_detail_orders (
   consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
-  , external_exam_item_detail_code text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_item_detail_orders_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
@@ -246,6 +245,16 @@ CREATE TABLE export_history_details (
   , CONSTRAINT export_history_details_PKC PRIMARY KEY (id,consult_id)
 );
 
+CREATE TABLE external_exam_item_detail_orders (
+  consult_id uuid NOT NULL
+  , exam_item_detail_id integer NOT NULL
+  , external_exam_item_detail_code text NOT NULL
+  , external_note text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT external_exam_item_detail_orders_PKC PRIMARY KEY (consult_id,exam_item_detail_id,external_exam_item_detail_code)
+);
+
 CREATE TABLE external_exam_item_details (
   exam_item_detail_id integer NOT NULL
   , external_exam_item_detail_code text NOT NULL
@@ -324,7 +333,7 @@ CREATE TABLE refresh_tokens (
   , expires_at timestamp with time zone NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
-  , CONSTRAINT refresh_tokens_PKC PRIMARY KEY (staff_id, sid)
+  , CONSTRAINT refresh_tokens_PKC PRIMARY KEY (staff_id,sid)
 );
 
 CREATE TABLE staff_login_histories (
@@ -402,6 +411,7 @@ CREATE TABLE cancel_reasons (
 CREATE TABLE consult (
   consult_id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_number text NOT NULL
+  , age varchar(7) NOT NULL
   , progress_status integer NOT NULL
   , export_status integer NOT NULL
   , place_schedule_id uuid NOT NULL
@@ -708,6 +718,11 @@ ALTER TABLE exam_item_detail_orders
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE exam_item_detail_orders
+  ADD CONSTRAINT exam_item_detail_orders_FK2 FOREIGN KEY (exam_item_detail_id) REFERENCES exam_item_details(exam_item_detail_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE exam_item_details
   ADD CONSTRAINT exam_item_details_FK1 FOREIGN KEY (exam_item_id) REFERENCES exam_items(exam_item_id)
   ON DELETE RESTRICT
@@ -765,6 +780,16 @@ ALTER TABLE export_histories
 
 ALTER TABLE export_history_details
   ADD CONSTRAINT export_history_details_FK1 FOREIGN KEY (id) REFERENCES export_histories(id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE external_exam_item_detail_orders
+  ADD CONSTRAINT external_exam_item_detail_orders_FK1 FOREIGN KEY (consult_id,exam_item_detail_id) REFERENCES exam_item_detail_orders(consult_id,exam_item_detail_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE external_exam_item_detail_orders
+  ADD CONSTRAINT external_exam_item_detail_orders_FK2 FOREIGN KEY (exam_item_detail_id,external_exam_item_detail_code) REFERENCES external_exam_item_details(exam_item_detail_id,external_exam_item_detail_code)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -968,7 +993,6 @@ COMMENT ON COLUMN exam_item_detail_options.created_by IS '作成者';
 COMMENT ON TABLE exam_item_detail_orders IS '検査項目明細依頼';
 COMMENT ON COLUMN exam_item_detail_orders.consult_id IS '受診ID';
 COMMENT ON COLUMN exam_item_detail_orders.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_item_detail_orders.external_exam_item_detail_code IS '外部コード検査項目明細CD';
 COMMENT ON COLUMN exam_item_detail_orders.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_detail_orders.created_by IS '作成者';
 
@@ -1030,6 +1054,14 @@ COMMENT ON COLUMN export_history_details.id IS 'ID';
 COMMENT ON COLUMN export_history_details.consult_id IS '受診ID';
 COMMENT ON COLUMN export_history_details.created_at IS '作成日時';
 COMMENT ON COLUMN export_history_details.created_by IS '作成者';
+
+COMMENT ON TABLE external_exam_item_detail_orders IS '外部検査項目明細依頼';
+COMMENT ON COLUMN external_exam_item_detail_orders.consult_id IS '受診ID';
+COMMENT ON COLUMN external_exam_item_detail_orders.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN external_exam_item_detail_orders.external_exam_item_detail_code IS '外部コード検査項目明細CD';
+COMMENT ON COLUMN external_exam_item_detail_orders.external_note IS '外部コード検査項目明細備考';
+COMMENT ON COLUMN external_exam_item_detail_orders.created_at IS '作成日時';
+COMMENT ON COLUMN external_exam_item_detail_orders.created_by IS '作成者';
 
 COMMENT ON TABLE external_exam_item_details IS '外部検査項目明細';
 COMMENT ON COLUMN external_exam_item_details.exam_item_detail_id IS '検査項目明細ID';
@@ -1144,6 +1176,7 @@ COMMENT ON COLUMN cancel_reasons.created_by IS '作成者';
 COMMENT ON TABLE consult IS '受診';
 COMMENT ON COLUMN consult.consult_id IS '受診ID';
 COMMENT ON COLUMN consult.consult_number IS '受診番号';
+COMMENT ON COLUMN consult.age IS '年齢';
 COMMENT ON COLUMN consult.progress_status IS '進捗状況';
 COMMENT ON COLUMN consult.export_status IS '結果出力状況';
 COMMENT ON COLUMN consult.place_schedule_id IS '会場日程ID';
