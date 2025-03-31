@@ -132,7 +132,13 @@ EFCoreの場合とは異なり、クエリビルダ機能はないため開発�
 
 === リトライ
 
-アプリからPostgreSQLへの接続が瞬断した場合でも自動復旧できるようにIDbConnectionProviderにリトライ処理を入れる。リトライ処理はPollyというライブラリを使用する。
+アプリからPostgreSQLへの接続が瞬断した場合でも自動復旧できるよう、データベース接続に関する処理にリトライ処理を実装する。リトライ処理はPolly.Coreライブラリを使用する。
+
+==== Resilience
+
+``Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Resilience``名前空間に``DbConnection``、``DbCommand``、``DbTransaction``を継承・ラップしたクラスを作成した。
+
+これらのクラスは内部に実体のインスタンスを保持しており、定義されたメソッドを実体のインスタンスに中継する役割を持つ。リトライが必要な処理の場合はリトライ処理を挟んで中継する。
 
 == ロギング
 

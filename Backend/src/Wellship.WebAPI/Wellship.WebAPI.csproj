@@ -13,6 +13,7 @@
     <PackageReference Include="nlog.Web.AspNetCore" Version="5.3.13" />
     <PackageReference Include="Npgsql" Version="8.0.4" />
     <PackageReference Include="nswag.AspNetCore" Version="14.1.0" />
+    <PackageReference Include="Polly.Core" Version="8.5.2" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>

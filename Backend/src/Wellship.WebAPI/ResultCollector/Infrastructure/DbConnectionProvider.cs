@@ -1,6 +1,10 @@
 ﻿using System.Data;
 using System.Data.Common;
 
+using Dapper;
+
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Resilience;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 
 /// <summary>
@@ -24,7 +28,8 @@ public interface IDbConnectionProvider
 /// </summary>
 /// <param name="registory">データソースのレジストリ</param>
 /// <param name="tenantProvider">接続先環境の情報を提供するプロバイダです</param>
-public class DbConnectionProvider(IDbDataSourceRegistry registory, ITenantProvider tenantProvider) : IDbConnectionProvider, IDisposable
+/// <param name="dbAccessRetryPolicyProvider">リトライポリシーを提供するプロバイダです</param>
+public class DbConnectionProvider(IDbDataSourceRegistry registory, ITenantProvider tenantProvider, IDbAccessRetryPolicyProvider dbAccessRetryPolicyProvider) : IDbConnectionProvider, IDisposable
 {
     private readonly IDbDataSourceRegistry _registory = registory;
     // NOTE: コネクションは1HTTPアクセスに対して最大1つを想定しています。平行で投げたい場合は別途実装が必要です。
@@ -42,7 +47,8 @@ public class DbConnectionProvider(IDbDataSourceRegistry registory, ITenantProvid
         if (_connection is null || _connection.State == ConnectionState.Closed)
         {
             var dbDataSource = await _registory.GetOrCreateAsync(_key);
-            _connection = await dbDataSource.OpenConnectionAsync();
+            var rawConnection = await dbAccessRetryPolicyProvider.ResiliencePipeline.ExecuteAsync(dbDataSource.OpenConnectionAsync);
+            _connection = new ResilienceDbConnection(rawConnection, dbAccessRetryPolicyProvider.ResiliencePipeline);
         }
         return _connection;
     }
@@ -66,7 +72,6 @@ public class DbConnectionProvider(IDbDataSourceRegistry registory, ITenantProvid
         }
         if (disposing)
         {
-            // TODO: Disposeの実装これでいい？
             _connection?.Dispose();
             _disposed = true;
         }
