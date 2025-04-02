@@ -40,13 +40,15 @@
 
 [source,json]
 ----
-[
-    {
-        "consultNumber" : "012345678",
-        "ticketNumber" : "10",
-        "kanaName" : "リョウビ　タロウ"
-    }
-]
+{
+    "examinees": [
+        {
+            "consultNumber": "012345678",
+            "ticketNumber": "10",
+            "kanaName": "リョウビ　タロウ"
+        }
+    ]
+}
 ----
 
 === ステータスコード
