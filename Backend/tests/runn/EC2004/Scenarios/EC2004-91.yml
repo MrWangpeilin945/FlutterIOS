@@ -6,7 +6,7 @@ runners:
     skipValidateRequest: false
     skipValidateResponse: false
 vars:
-  recordCount: 5000
+  recordCount: 50
 steps:
   clearTable:
     desc: "関連テーブルをクリア"
@@ -62,6 +62,31 @@ steps:
         VALUES('ec002004-0000-0000-0091-000000000001', 'TID-EC2004-1', '旧基準値パターン1', 1, CURRENT_TIMESTAMP, 'ec2004')
         ,     ('ec002004-0000-0000-0091-000000000002', 'TID-EC2004-2', '旧基準値パターン2', 2, CURRENT_TIMESTAMP, 'ec2004')
         ,     ('ec002004-0000-0000-0091-000000000003', 'TID-EC2004', '新基準値パターン', 3, CURRENT_TIMESTAMP, 'ec2004');
+        -- 検査メニュー
+        INSERT INTO
+          resultcollector.exam_menus
+          (exam_menu_id, name, order_number, enabled, created_at, created_by)
+        VALUES(2004, '検査メニュー', 1, true, CURRENT_TIMESTAMP,'ec2004');
+        -- 検査項目グループ
+        INSERT INTO
+          resultcollector.exam_item_groups
+          (exam_item_group_id, name, exam_menu_id, type, order_number, created_at, created_by)
+        VALUES(2004, '検査項目グループ', 2004, 1, 1, CURRENT_TIMESTAMP,'ec2004');
+        -- 検査項目
+        INSERT INTO
+          resultcollector.exam_items
+          (exam_item_id, name, exam_item_group_id, position_number, unit, order_number, created_at, created_by)
+        VALUES(2004, '検査項目', 2004, 1, '1000/ul', 1, CURRENT_TIMESTAMP,'ec2004');
+        -- 検査項目明細
+        INSERT INTO
+          resultcollector.exam_item_details
+          (exam_item_detail_id, exam_item_id, name, order_number, position_number, type, keyboard_type, integer_length, decimal_length, equipment_label, created_at, created_by)
+        VALUES(2004911, 2004, '検査項目明細1', 1, 1, 1, 1, 3, 2, null, CURRENT_TIMESTAMP,'ec2004')
+        ,     (2004912, 2004, '検査項目明細2', 1, 1, 1, 1, 3, 2, null, CURRENT_TIMESTAMP,'ec2004')
+        ,     (2004913, 2004, '検査項目明細3', 1, 1, 1, 1, 3, 2, null, CURRENT_TIMESTAMP,'ec2004')
+        ,     (2004914, 2004, '検査項目明細4', 1, 1, 1, 1, 3, 2, null, CURRENT_TIMESTAMP,'ec2004')
+        ,     (2004915, 2004, '検査項目明細5', 1, 1, 1, 1, 3, 2, null, CURRENT_TIMESTAMP,'ec2004')
+        ,     (2004916, 2004, '検査項目明細6', 1, 1, 1, 1, 3, 2, null, CURRENT_TIMESTAMP,'ec2004');
         -- 外部検査項目明細
         INSERT INTO
           resultcollector.external_exam_item_details
@@ -85,9 +110,9 @@ steps:
         )
         SELECT
           to_char('2025-01-01'::DATE + INTERVAL '1 day' * num ,'YYYY/MM/DD') AS examDate
-          , 'CON-' || lpad(cast(num as character varying), 6, '0') AS connectioncode
-          , 'PRE-' || lpad(cast(num as character varying), 6, '0') AS precode
-          , 'NEW-' || lpad(cast(num as character varying), 6, '0') AS newcode
+          , 'CON' || lpad(cast(num as character varying), 6, '0') AS connectioncode
+          , 'PRE' || lpad(cast(num as character varying), 6, '0') AS precode
+          , 'NEW' || lpad(cast(num as character varying), 6, '0') AS newcode
           , num As number
         FROM
           numbers;
@@ -130,10 +155,11 @@ steps:
       query: |
         INSERT INTO
           resultcollector.consult
-          (consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
+          (consult_number, age, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
         VALUES
           (
             '{{ uniqueKeys[i].precode }}'
+            , '0340307'
             , 41
             , 21 
             , '{{ placeScheduleIds[i].place_schedule_id }}'
@@ -185,22 +211,45 @@ steps:
       query: |
         INSERT INTO
           resultcollector.exam_item_detail_orders
-          (consult_id, exam_item_detail_id, external_exam_item_detail_code, created_at, created_by)
+          (consult_id, exam_item_detail_id, created_at, created_by)
         VALUES
           (
             '{{ consultIds[i].consult_id }}'
-            , 2004913
-            , 'ODR-EC2004-1' 
+            , 2004914
             , '2025-01-01T12:34:56.789'
             , 'ec2004'
           ),
           (
             '{{ consultIds[i].consult_id }}'
-            , 2004914
-            , 'ODR-EC2004-2' 
+            , 2004915
             , '2025-01-01T12:34:56.789'
             , 'ec2004'
-          );    
+          );
+  createExternalExamItemDetailOrders:
+    desc: "事前に外部検査項目明細依頼のレコードを作成する"
+    loop: vars.recordCount
+    db:
+      query: |
+        INSERT INTO
+          resultcollector.external_exam_item_detail_orders
+          (consult_id, exam_item_detail_id, external_exam_item_detail_code, external_note, created_at, created_by)
+        VALUES
+          (
+            '{{ consultIds[i].consult_id }}'
+            , 2004914
+            , 'ODR-EC2004-1'
+            , 'comment-2004-1'
+            , '2025-01-01T12:34:56.789'
+            , 'ec2004'
+          ),
+          (
+            '{{ consultIds[i].consult_id }}'
+            , 2004915
+            , 'ODR-EC2004-2' 
+            , 'comment-2004-2'
+            , '2025-01-01T12:34:56.789'
+            , 'ec2004'
+          );
   createConsultThresholds:
     desc: "事前に基準値のレコードを作成する"
     loop: vars.recordCount
@@ -263,11 +312,12 @@ steps:
           teamCode: "'T2004-91'"
           examDate: uniqueKeys[i].examdate
           consultNumber: uniqueKeys[i].newcode
-          examineeCd: "'E2004912'"
+          examineeCode: "'E2004912'"
+          age: "'0360405'"
           note: "'新特記事項'"
           previousResults:
             -
-              examItemDetailCd: "'PRE-EC2004'"
+              examItemDetailCode: "'PRE-EC2004'"
               examDate: "'2024-10-02'"
               value: "'300'"
           consultThresholds:
@@ -280,7 +330,8 @@ steps:
               note: "'新特記事項2004'"
           examItemDetailOrders:
             -
-              examItemDetailCd: "'ODR-EC2004'"
+              examItemDetailCode: "'ODR-EC2004'"
+              note: "'comment-2004'"
           inputNote: "'2004-91'"
   startBatch:
     desc: "処理の開始時間"
@@ -312,6 +363,7 @@ steps:
         SELECT
           consult_id::text
           , consult_number
+          , age
           , progress_status
           , export_status
           , place_schedule_id::text
@@ -328,6 +380,7 @@ steps:
     test: |
       len(current.rows) == vars.recordCount
       && current.rows[0].consult_number == uniqueKeys[0].newcode
+      && current.rows[0].age == "0360405"
       // 進捗状況がキャンセル(41)が来場待ち(11)に更新されたことを確認
       && current.rows[0].progress_status == 11
       // 結果出力状況が更新されないことを確認
@@ -339,6 +392,7 @@ steps:
       && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
       && current.rows[vars.recordCount - 1].consult_number == uniqueKeys[vars.recordCount - 1].newcode
+      && current.rows[vars.recordCount - 1].age == "0360405"
       // 進捗状況がキャンセル(41)が来場待ち(11)に更新されたことを確認
       && current.rows[vars.recordCount - 1].progress_status == 11
       // 結果出力状況が更新されないことを確認
@@ -388,7 +442,6 @@ steps:
         SELECT
           e.consult_id::text
           , e.exam_item_detail_id
-          , e.external_exam_item_detail_code
           , to_char(e.created_at, 'yyyymmdd') as created_at
           , e.created_by
           , to_char(CURRENT_DATE, 'yyyymmdd') as now
@@ -403,12 +456,43 @@ steps:
       len(current.rows) == vars.recordCount
       && current.rows[0].consult_id == consultIds[0].consult_id
       && current.rows[0].exam_item_detail_id == 2004916
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[vars.recordCount - 1].consult_id == consultIds[vars.recordCount - 1].consult_id
+      && current.rows[vars.recordCount - 1].exam_item_detail_id == 2004916
+      && current.rows[vars.recordCount - 1].created_at == current.rows[vars.recordCount - 1].now
+      && current.rows[vars.recordCount - 1].created_by == "ExternalConnection"
+  confirmExternalExamItemDetailOrders:
+    desc: "外部検査項目明細依頼の登録を確認"
+    db:
+      query: |
+        SELECT
+          e.consult_id::text
+          , e.exam_item_detail_id
+          , e.external_exam_item_detail_code
+          , e.external_note
+          , to_char(e.created_at, 'yyyymmdd') as created_at
+          , e.created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.external_exam_item_detail_orders e
+        LEFT JOIN
+          resultcollector.consult c
+            on e.consult_id = c.consult_id
+        ORDER BY
+          c.consult_number ASC;
+    test: |
+      len(current.rows) == vars.recordCount
+      && current.rows[0].consult_id == consultIds[0].consult_id
+      && current.rows[0].exam_item_detail_id == 2004916
       && current.rows[0].external_exam_item_detail_code == "ODR-EC2004"
+      && current.rows[0].external_note == "comment-2004"
       && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
       && current.rows[vars.recordCount - 1].consult_id == consultIds[vars.recordCount - 1].consult_id
       && current.rows[vars.recordCount - 1].exam_item_detail_id == 2004916
       && current.rows[vars.recordCount - 1].external_exam_item_detail_code == "ODR-EC2004"
+      && current.rows[vars.recordCount - 1].external_note == "comment-2004"
       && current.rows[vars.recordCount - 1].created_at == current.rows[vars.recordCount - 1].now
       && current.rows[vars.recordCount - 1].created_by == "ExternalConnection"
   confirmConsultThresholds:

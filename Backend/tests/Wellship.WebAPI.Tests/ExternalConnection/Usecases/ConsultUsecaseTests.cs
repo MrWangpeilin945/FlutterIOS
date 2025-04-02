@@ -739,8 +739,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10003", Message = "キー項目が重複しています。SortNo: 1", InputNote  = "UT2004-01"},
-            new(){Code = "10003", Message = "キー項目が重複しています。SortNo: 1", InputNote  = "UT2004-02"}
+            new(){Code = "10003", Message = "キー項目が重複しています。SortNo:1", InputNote  = "UT2004-01"},
+            new(){Code = "10003", Message = "キー項目が重複しています。SortNo:1", InputNote  = "UT2004-02"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,

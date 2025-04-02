@@ -53,7 +53,10 @@ steps:
           (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
         VALUES('e0002004-0000-0000-0019-000000000001', 'E20041901', '両備　一郎', 'リョウビ　イチロウ',   1, '1991-01-01', CURRENT_TIMESTAMP,'ec2004')
         ,     ('e0002004-0000-0000-0019-000000000002', 'E20041902', '両備　ニ郎', 'リョウビ　ジロウ',     1, '1992-02-02', CURRENT_TIMESTAMP,'ec2004')
-        ,     ('e0002004-0000-0000-0019-000000000003', 'E20041903', '両備　三郎', 'リョウビ　サブロウ',   1, '1992-03-03', CURRENT_TIMESTAMP,'ec2004');
+        ,     ('e0002004-0000-0000-0019-000000000003', 'E20041903', '両備　三郎', 'リョウビ　サブロウ',   1, '1993-03-03', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0019-000000000004', 'E20041904', '両備　四郎', 'リョウビ　シロウ',     1, '1994-04-04', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0019-000000000005', 'E20041905', '両備　五郎', 'リョウビ　ゴロウ',     1, '1995-05-05', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0019-000000000006', 'E20041906', '両備　六郎', 'リョウビ　ロクロウ',   1, '1996-06-06', CURRENT_TIMESTAMP,'ec2004');
   post:
     desc: "文字形式のチェック"
     req:
@@ -65,13 +68,21 @@ steps:
     test: |
       current.res.status == 207
       // レスポンスに5件のErrorObjectが返されることを確認
-      && len(current.res.body) == 2
+      && len(current.res.body) == 4
+      // 受診番号
       && current.res.body[0].code == "10006"
       && current.res.body[0].inputNote == "20041901"
       && current.res.body[0].message == "値の形式が無効です。ConsultNumber:No-1234567890$"
       && current.res.body[1].code == "10006"
       && current.res.body[1].inputNote == "20041902"
       && current.res.body[1].message == "値の形式が無効です。ConsultNumber:No 123456780"
+      // 年齢
+      && current.res.body[2].code == "10006"
+      && current.res.body[2].inputNote == "20041904"
+      && current.res.body[2].message == "値の形式が無効です。Age:0541231"
+      && current.res.body[3].code == "10006"
+      && current.res.body[3].inputNote == "20041905"
+      && current.res.body[3].message == "値の形式が無効です。Age:-54a1-1"
     dump:
       expr: current.res.body
       out: ../Dump/EC2004-19.json
@@ -82,6 +93,7 @@ steps:
         SELECT
           consult_id::text
           , consult_number
+          , age
           , progress_status
           , export_status
           , place_schedule_id::text
@@ -94,9 +106,10 @@ steps:
         FROM
           resultcollector.consult;
     test: |
-      // 受診が1件登録されていることを確認
-      len(current.rows) == 1
+      // 受診が2件登録されていることを確認
+      len(current.rows) == 2
       && current.rows[0].consult_number == "No123456780a"
+      && current.rows[0].age == "0530303"
       && current.rows[0].progress_status == 11
       && current.rows[0].export_status == 11
       && current.rows[0].place_schedule_id == "a0002004-0000-0000-0019-000000000001"
@@ -105,6 +118,16 @@ steps:
       && current.rows[0].external_connection_code == "C20211903"
       && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[1].consult_number == "No0006"
+      && current.rows[1].age == "0281002"
+      && current.rows[1].progress_status == 11
+      && current.rows[1].export_status == 11
+      && current.rows[1].place_schedule_id == "a0002004-0000-0000-0019-000000000001"
+      && current.rows[1].note == "年齢が数字のみで月数・日数が範囲内で登録可"
+      && current.rows[1].examinee_id == "e0002004-0000-0000-0019-000000000006"
+      && current.rows[1].external_connection_code == "C20211906"
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
   confirmConsultNotes:
     desc: "受診特記の登録を確認"
     db:

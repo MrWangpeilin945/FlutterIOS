@@ -55,8 +55,8 @@ steps:
         -- 受診
         INSERT INTO
           resultcollector.consult
-          (consult_id, consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
-        VALUES('c0002004-0000-0000-0003-000000000001', 'No2004031', 11, 11, 'a0002004-0000-0000-0003-000000000001', '特記事項2004031', 'e0002004-0000-0000-0003-000000000001', 'CCS-2004-9999', CURRENT_TIMESTAMP, 'ec2004');
+          (consult_id, consult_number, age, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
+        VALUES('c0002004-0000-0000-0003-000000000001', 'No2004031', '0500510', 11, 11, 'a0002004-0000-0000-0003-000000000001', '特記事項2004031', 'e0002004-0000-0000-0003-000000000001', 'CCS-2004-9999', CURRENT_TIMESTAMP, 'ec2004');
   getConsult:
     desc: "受診情報を取得する"
     db:
@@ -64,6 +64,7 @@ steps:
         SELECT
           consult_id::text
           , consult_number
+          , age
           , progress_status
           , export_status
           , place_schedule_id::text
@@ -101,6 +102,7 @@ steps:
         SELECT
           consult_id::text
           , consult_number
+          , age
           , progress_status
           , export_status
           , place_schedule_id::text
@@ -116,6 +118,7 @@ steps:
       len(current.rows) == 1
       && current.rows[0].consult_id == consultData[0].consult_id
       && current.rows[0].consult_number == consultData[0].consult_number
+      && current.rows[0].age == consultData[0].age
       && current.rows[0].progress_status == consultData[0].progress_status
       && current.rows[0].export_status == consultData[0].export_status
       && current.rows[0].place_schedule_id == consultData[0].place_schedule_id

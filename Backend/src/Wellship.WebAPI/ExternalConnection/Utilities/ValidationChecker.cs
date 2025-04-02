@@ -119,7 +119,7 @@ public static class ValidationChecker
                     errorObjects.Add(new ErrorObject
                     {
                         Code = "10003",
-                        Message = $"キー項目が重複しています。{propertyName}: {item.PropertyValue}",
+                        Message = $"キー項目が重複しています。{propertyName}:{item.PropertyValue}",
                         InputNote = inputNote ?? ""
                     });
                 }

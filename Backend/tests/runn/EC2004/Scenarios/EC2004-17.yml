@@ -55,7 +55,8 @@ steps:
         ,     ('e0002004-0000-0000-0017-000000000002', 'E20041702', '両備　ニ郎', 'リョウビ　ジロウ',     1, '1992-02-02', CURRENT_TIMESTAMP,'ec2004')
         ,     ('e0002004-0000-0000-0017-000000000003', 'E20041703', '両備　三郎', 'リョウビ　サブロウ',   1, '1993-03-03', CURRENT_TIMESTAMP,'ec2004')
         ,     ('e0002004-0000-0000-0017-000000000004', 'E20041704', '両備　四郎', 'リョウビ　シロウ',     1, '1994-04-04', CURRENT_TIMESTAMP,'ec2004')
-        ,     ('e0002004-0000-0000-0017-000000000005', 'E20041705', '両備　五郎', 'リョウビ　ゴロウ',     1, '1995-05-05', CURRENT_TIMESTAMP,'ec2004');
+        ,     ('e0002004-0000-0000-0017-000000000005', 'E20041705', '両備　五郎', 'リョウビ　ゴロウ',     1, '1995-05-05', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0017-000000000006', 'E20041706', '両備　六郎', 'リョウビ　ロクロウ',   1, '1995-06-06', CURRENT_TIMESTAMP,'ec2004');
         -- 検査特記
         INSERT INTO
           resultcollector.exam_menu_note_codes
@@ -67,6 +68,31 @@ steps:
           (threshold_id, threshold_code, name, order_number, created_at, created_by)
         VALUES('ec002004-0000-0000-0017-000000000001', 'TID-EC2004-1', 'EC2004基準値-1', 1, CURRENT_TIMESTAMP, 'ec2004')
         ,     ('ec002004-0000-0000-0017-000000000002', 'TID-EC2004-2', 'EC2004基準値-2', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 検査メニュー
+        INSERT INTO
+          resultcollector.exam_menus
+          (exam_menu_id, name, order_number, enabled, created_at, created_by)
+        VALUES(2004, '検査メニュー', 1, true, CURRENT_TIMESTAMP,'ec2004');
+        -- 検査項目グループ
+        INSERT INTO
+          resultcollector.exam_item_groups
+          (exam_item_group_id, name, exam_menu_id, type, order_number, created_at, created_by)
+        VALUES(2004, '検査項目グループ', 2004, 1, 1, CURRENT_TIMESTAMP,'ec2004');
+        -- 検査項目
+        INSERT INTO
+          resultcollector.exam_items
+          (exam_item_id, name, exam_item_group_id, position_number, unit, order_number, created_at, created_by)
+        VALUES(2004, '検査項目', 2004, 1, '1000/ul', 1, CURRENT_TIMESTAMP,'ec2004');
+        -- 検査項目明細
+        INSERT INTO
+          resultcollector.exam_item_details
+          (exam_item_detail_id, exam_item_id, name, order_number, position_number, type, keyboard_type, integer_length, decimal_length, equipment_label, created_at, created_by)
+        VALUES(200417, 2004, '検査項目明細', 1, 1, 1, 1, 3, 2, null, CURRENT_TIMESTAMP,'ec2004');
+        -- 外部検査項目明細
+        INSERT INTO
+          resultcollector.external_exam_item_details
+          (exam_item_detail_id, external_exam_item_detail_code, created_at, created_by)
+        VALUES(200417, 'Order-200417', CURRENT_TIMESTAMP,'ec2004');
   post:
     desc: "キー重複チェック"
     req:
@@ -78,22 +104,25 @@ steps:
     test: |
       current.res.status == 207
       // レスポンスに5件のErrorObjectが返されることを確認
-      && len(current.res.body) == 5
+      && len(current.res.body) == 6
       && current.res.body[0].code == "10003"
       && current.res.body[0].inputNote == "20041701"
-      && current.res.body[0].message == "キー項目が重複しています。SortNo: 1"
+      && current.res.body[0].message == "キー項目が重複しています。SortNo:1"
       && current.res.body[1].code == "10003"
       && current.res.body[1].inputNote == "20041702"
-      && current.res.body[1].message == "キー項目が重複しています。SortNo: 1"
+      && current.res.body[1].message == "キー項目が重複しています。SortNo:1"
       && current.res.body[2].code == "10003"
       && current.res.body[2].inputNote == "20041703"
-      && current.res.body[2].message == "キー項目が重複しています。ConsultThresholds.ThresholdCode: TID-EC2004-1"
+      && current.res.body[2].message == "キー項目が重複しています。ConsultThresholds.ThresholdCode:TID-EC2004-1"
       && current.res.body[3].code == "10003"
       && current.res.body[3].inputNote == "20041704"
-      && current.res.body[3].message == "キー項目が重複しています。ConsultThresholds.Priority: 1"
+      && current.res.body[3].message == "キー項目が重複しています。ConsultThresholds.Priority:1"
       && current.res.body[4].code == "10003"
       && current.res.body[4].inputNote == "20041705"
-      && current.res.body[4].message == "キー項目が重複しています。ConsultNotes.Code: NOTE-T200417-1"
+      && current.res.body[4].message == "キー項目が重複しています。ConsultNotes.Code:NOTE-T200417-1"
+      && current.res.body[5].code == "10003"
+      && current.res.body[5].inputNote == "20041706"
+      && current.res.body[5].message == "キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCode:Order-200417"
     dump:
       expr: current.res.body
       out: ../Dump/EC2004-17.json

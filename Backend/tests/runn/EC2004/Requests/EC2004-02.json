@@ -52,8 +52,12 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCode": "ORDER-200402-3",
-                "note": "comment-2004021"
+                "examItemDetailCode": "ORDER-200402-3_1",
+                "note": "comment-20040231"
+            },
+            {
+                "examItemDetailCode": "ORDER-200402-3_2",
+                "note": "comment-20040232"
             }
         ],
         "inputNote": "2004021"
@@ -84,7 +88,7 @@
         "examDate": "2025-03-23",
         "consultNumber": "No200402300",
         "examineeCode": "E2004023",
-        "age": "0490110",
+        "age": "0491111",
         "note": "特記事項2004-02-3",
         "previousResults": [
             {
@@ -107,8 +111,20 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCode": "ORDER-200402-3",
-                "note": "comment-2004023"
+                "examItemDetailCode": "ORDER-200402-4_1",
+                "note": "comment-20040241"
+            },
+            {
+                "examItemDetailCode": "ORDER-200402-5",
+                "note": "comment-2004025"
+            },
+            {
+                "examItemDetailCode": "ORDER-200402-4_2",
+                "note": "comment-20040242"
+            },
+            {
+                "examItemDetailCode": "ORDER-200402-4_3",
+                "note": "comment-20040243"
             }
         ],
         "inputNote": "20024023"
@@ -122,7 +138,7 @@
         "examDate": "2025-03-31",
         "consultNumber": "No2004024",
         "examineeCode": "E2004024",
-        "age": "0501020",
+        "age": "0521110",
         "note": "特記事項2004024",
         "previousResults": [],
         "consultThresholds": [],
