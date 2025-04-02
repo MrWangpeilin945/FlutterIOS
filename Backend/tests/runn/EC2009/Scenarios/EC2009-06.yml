@@ -35,11 +35,11 @@ steps:
       // 基準値パターンCDエラーがErrorObjectで返される
       && current.res.body[0].code == "10001"
       && current.res.body[0].inputNote == "2009061"
-      && current.res.body[0].message == "指定されたThresholdCdがシステム上に存在しません。Code:Dummy2009"
+      && current.res.body[0].message == "指定されたThresholdCodeがシステム上に存在しません。Code:Dummy2009"
       // 検査項目明細CDエラーがErrorObjectで返される
       && current.res.body[1].code == "10001"
       && current.res.body[1].inputNote == "2009061"
-      && current.res.body[1].message == "指定されたExamItemDetailCdがシステム上に存在しません。Code:Dummy2009WBC"
+      && current.res.body[1].message == "指定されたExamItemDetailCodeがシステム上に存在しません。Code:Dummy2009WBC"
     dump:
       expr: current.res.body
       out: ../Dump/EC2009-06.json

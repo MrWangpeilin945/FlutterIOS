@@ -69,10 +69,10 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
                                                                        .ToList();
 
         // 基準値パターンIDの取得
-        var thresholds = await _thresholdRepository.GetThresholdsByCodesAsync(examNormalValueRanges.Select(c => c.ThresholdCd).ToList());
+        var thresholds = await _thresholdRepository.GetThresholdsByCodesAsync(examNormalValueRanges.Select(c => c.ThresholdCode).ToList());
 
         // 検査項目明細IDの取得
-        var externalExamItemDetails = await _externalExamItemDetailsRepository.GetDetailsByCodesAsync(examNormalValueRanges.Select(c => c.ExamItemDetailCd).ToList());
+        var externalExamItemDetails = await _externalExamItemDetailsRepository.GetDetailsByCodesAsync(examNormalValueRanges.Select(c => c.ExamItemDetailCode).ToList());
 
 
 
@@ -80,8 +80,8 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
         var examNormalValueRangeEntities = commonInsertExamNormalValueRanges.Select(examNormalValueRange => new ExamNormalValueRangeEntity
         {
             Name = examNormalValueRange.Name,
-            ThresholdId = thresholds.Where(t => t.ThresholdCode == examNormalValueRange.ThresholdCd).Select(t => t.ThresholdId).FirstOrDefault(),
-            ExamItemDetailId = externalExamItemDetails.Where(e => e.ExternalExamItemDetailCode == examNormalValueRange.ExamItemDetailCd).Select(e => e.ExamItemDetailId).FirstOrDefault(),
+            ThresholdId = thresholds.Where(t => t.ThresholdCode == examNormalValueRange.ThresholdCode).Select(t => t.ThresholdId).FirstOrDefault(),
+            ExamItemDetailId = externalExamItemDetails.Where(e => e.ExternalExamItemDetailCode == examNormalValueRange.ExamItemDetailCode).Select(e => e.ExamItemDetailId).FirstOrDefault(),
             MinAge = examNormalValueRange.MinAge.ToString().PadLeft(7, '0'),
             MaxAge = examNormalValueRange.MaxAge.ToString().PadLeft(7, '0'),
             TargetSex = (int)examNormalValueRange.TargetSex,
@@ -116,19 +116,19 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
         }
 
         // 未入力
-        var requiredThresholdCdData = examNormalValueRanges.Where(x => string.IsNullOrWhiteSpace(x.ThresholdCd));
+        var requiredThresholdCdData = examNormalValueRanges.Where(x => string.IsNullOrWhiteSpace(x.ThresholdCode));
         if (requiredThresholdCdData.Any())
         {
             // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredThresholdCdData, "ThresholdCd");
+            AddRequiredDataErrorObjects(requiredThresholdCdData, "ThresholdCode");
         }
 
         // 未入力
-        var requiredExamItemDetailCdData = examNormalValueRanges.Where(x => string.IsNullOrWhiteSpace(x.ExamItemDetailCd));
+        var requiredExamItemDetailCdData = examNormalValueRanges.Where(x => string.IsNullOrWhiteSpace(x.ExamItemDetailCode));
         if (requiredExamItemDetailCdData.Any())
         {
             // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredExamItemDetailCdData, "ExamItemDetailCd");
+            AddRequiredDataErrorObjects(requiredExamItemDetailCdData, "ExamItemDetailCode");
         }
 
         // 未入力
@@ -162,12 +162,12 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     private List<ExamNormalValueRange> GetCheckedDuplicateKey(List<ExamNormalValueRange> examNormalValueRanges)
     {
         // キー重複
-        var duplicateKeys = examNormalValueRanges.GroupBy(x => new { x.ThresholdCd, x.ExamItemDetailCd, x.TargetSex, MaxAge = x.MaxAge.PadLeft(7, '0'), x.MaxValue })
+        var duplicateKeys = examNormalValueRanges.GroupBy(x => new { x.ThresholdCode, x.ExamItemDetailCode, x.TargetSex, MaxAge = x.MaxAge.PadLeft(7, '0'), x.MaxValue })
                                                  .Where(x => x.Count() > 1)
                                                  .Select(x => x.Key).ToHashSet();
         if (duplicateKeys.Any())
         {
-            var duplicatedData = examNormalValueRanges.Where(x => duplicateKeys.Contains(new { x.ThresholdCd, x.ExamItemDetailCd, x.TargetSex, MaxAge = x.MaxAge.PadLeft(7, '0'), x.MaxValue }));
+            var duplicatedData = examNormalValueRanges.Where(x => duplicateKeys.Contains(new { x.ThresholdCode, x.ExamItemDetailCode, x.TargetSex, MaxAge = x.MaxAge.PadLeft(7, '0'), x.MaxValue }));
             // 返却用エラーオブジェクトに追加
             AddDuplicateErrorObjects(duplicatedData.ToList());
             return examNormalValueRanges.Except(duplicatedData).ToList();
@@ -253,7 +253,7 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
             AddThresholdCodeErrorObjects(examNormalValueRanges, errorThresholdCodes);
             // 基準値パターンが存在する基準値範囲のみ抽出
             results = examNormalValueRanges
-                .Where(examNormalValueRange => !errorThresholdCodes.Contains(examNormalValueRange.ThresholdCd))
+                .Where(examNormalValueRange => !errorThresholdCodes.Contains(examNormalValueRange.ThresholdCode))
                 .ToList();
         }
         else
@@ -282,7 +282,7 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
             AddExternalExamItemDetailCodesErrorObjects(examNormalValueRanges, errorExternalExamItemDetailCodes);
             // 検査項目明細が存在する基準値範囲のみ抽出
             results = examNormalValueRanges
-                .Where(examNormalValueRange => !errorExternalExamItemDetailCodes.Contains(examNormalValueRange.ExamItemDetailCd))
+                .Where(examNormalValueRange => !errorExternalExamItemDetailCodes.Contains(examNormalValueRange.ExamItemDetailCode))
                 .ToList();
         }
         else
@@ -303,7 +303,7 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
 
         // 基準値コードを取得する
         var thresholdCodes = examNormalValueRanges
-            .Select(examNormalValueRange => examNormalValueRange.ThresholdCd)
+            .Select(examNormalValueRange => examNormalValueRange.ThresholdCode)
             .Distinct()
             .ToList();
 
@@ -327,7 +327,7 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
 
         // 外部コード検査項目明細コードを取得する
         var externalExamItemDetailCodes = examNormalValueRanges
-            .Select(examNormalValueRange => examNormalValueRange.ExamItemDetailCd)
+            .Select(examNormalValueRange => examNormalValueRange.ExamItemDetailCode)
             .Distinct()
             .ToList();
 
@@ -368,11 +368,11 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     {
         // 取得できないエラーを返却用エラーオブジェクトに追加
         var errorObjects = examNormalValueRanges
-            .Where(examNormalValueRange => errorThresholdCodes.Contains(examNormalValueRange.ThresholdCd))
+            .Where(examNormalValueRange => errorThresholdCodes.Contains(examNormalValueRange.ThresholdCode))
             .Select(examNormalValueRange => new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたThresholdCdがシステム上に存在しません。Code:{examNormalValueRange.ThresholdCd}",
+                Message = $"指定されたThresholdCodeがシステム上に存在しません。Code:{examNormalValueRange.ThresholdCode}",
                 InputNote = examNormalValueRange.InputNote
             }).ToList();
 
@@ -388,11 +388,11 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
     {
         // 取得できないエラーを返却用エラーオブジェクトに追加
         var errorObjects = examNormalValueRanges
-            .Where(examNormalValueRange => errorExternalExamItemDetailCodes.Contains(examNormalValueRange.ExamItemDetailCd))
+            .Where(examNormalValueRange => errorExternalExamItemDetailCodes.Contains(examNormalValueRange.ExamItemDetailCode))
             .Select(examNormalValueRange => new ErrorObject
             {
                 Code = "10001",
-                Message = $"指定されたExamItemDetailCdがシステム上に存在しません。Code:{examNormalValueRange.ExamItemDetailCd}",
+                Message = $"指定されたExamItemDetailCodeがシステム上に存在しません。Code:{examNormalValueRange.ExamItemDetailCode}",
                 InputNote = examNormalValueRange.InputNote
             }).ToList();
 
@@ -409,7 +409,7 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
             .Select(d => new ErrorObject
             {
                 Code = "10003",
-                Message = $"キー項目が重複しています。ThresholdCd:{d.ThresholdCd}/ExamItemDetailCd:{d.ExamItemDetailCd}/TargetSex:{d.TargetSex}/MaxAge:{d.MaxAge}/MaxValue:{d.MaxValue}",
+                Message = $"キー項目が重複しています。ThresholdCode:{d.ThresholdCode}/ExamItemDetailCode:{d.ExamItemDetailCode}/TargetSex:{d.TargetSex}/MaxAge:{d.MaxAge}/MaxValue:{d.MaxValue}",
                 InputNote = d.InputNote
             }).ToList();
 

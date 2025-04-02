@@ -108,8 +108,8 @@ steps:
       requestBody:
         -
           name: "'負荷テスト_検査基準値範囲'"
-          thresholdCd: "'Threshold2009'"
-          examItemDetailCd: uniqueKeys[i].code
+          thresholdCode: "'Threshold2009'"
+          examItemDetailCode: uniqueKeys[i].code
           maxAge: "'9990000'"
           minAge: "'0000000'"
           targetSex: 3

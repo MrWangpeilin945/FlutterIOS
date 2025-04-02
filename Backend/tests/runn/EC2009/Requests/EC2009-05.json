@@ -1,8 +1,8 @@
 [
     {
         "name": "白血球数１",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "0750000",
         "minAge": "0000000",
         "targetSex": 1,
@@ -13,8 +13,8 @@
     },
     {
         "name": "白血球数２",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "0750000",
         "minAge": "0000000",
         "targetSex": 1,
