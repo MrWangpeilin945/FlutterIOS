@@ -1,0 +1,21 @@
+Parameters:
+  ApplicationName:
+    Type: String
+  EnvType:
+    Type: String
+  TenantName:
+    Type: String
+  HostedZoneId:
+    Type: String
+    Default: 
+
+Resources:
+  SubdomainRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Comment:
+      Name: !Sub ${TenantName}.wellship.jp
+      Type: A
+      TTL: 60
+      ResourceRecords: '192.0.2.1'
