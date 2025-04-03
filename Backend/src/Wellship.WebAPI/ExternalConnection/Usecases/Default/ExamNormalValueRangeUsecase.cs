@@ -58,15 +58,6 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
         // 値の大小確認
         var insertExamNormalValueRangeByCompared = GetCheckedCompareValue(examNormalValueRanges);
 
-        // キー重複の確認
-        var insertExamNormalValueRangeByDuplicated = GetCheckedDuplicateKey(examNormalValueRanges);
-
-        var commonInsertExamNormalValueRanges = insertExamNormalValueRangeByRequired.Intersect(insertExamNormalValueRangesByThresholdCodes)
-                                                                       .Intersect(insertExamNormalValueRangesByExamItemDetails)
-                                                                       .Intersect(insertExamNormalValueRangeByDuplicated)
-                                                                       .Intersect(insertExamNormalValueRangesByAgeInvalid)
-                                                                       .Intersect(insertExamNormalValueRangeByCompared)
-                                                                       .ToList();
 
         // 基準値パターンIDの取得
         var thresholds = await _thresholdRepository.GetThresholdsByCodesAsync(examNormalValueRanges.Select(c => c.ThresholdCode).ToList());
@@ -74,6 +65,54 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
         // 検査項目明細IDの取得
         var externalExamItemDetails = await _externalExamItemDetailsRepository.GetDetailsByCodesAsync(examNormalValueRanges.Select(c => c.ExamItemDetailCode).ToList());
 
+
+        // キー重複の確認
+        // 外部コード検査項目明細コード ※ユニットテストコード後、書き直す
+        var insertExamNormalValueRangeByDuplicated = new List<ExamNormalValueRange>(examNormalValueRanges);
+        var examItemDetail = from normalValueRange in examNormalValueRanges
+                             join externalExamItemDetail in externalExamItemDetails
+                             on normalValueRange.ExamItemDetailCode equals externalExamItemDetail.ExternalExamItemDetailCode
+                             select new
+                             {
+                                 ExamItemDetailID = externalExamItemDetail.ExamItemDetailId,
+                                 normalValueRange.ThresholdCode,
+                                 normalValueRange.ExamItemDetailCode,
+                                 normalValueRange.TargetSex,
+                                 MaxAge = normalValueRange.MaxAge.PadLeft(7, '0'),
+                                 normalValueRange.MaxValue
+                             };
+        var duplicateKeys = examItemDetail.GroupBy(x => new { x.ThresholdCode, x.ExamItemDetailID, x.TargetSex, x.MaxAge, x.MaxValue })
+                                          .Where(x => x.Count() > 1)
+                                          .SelectMany(x => x.Select(y => new
+                                          {
+                                              y.ThresholdCode,
+                                              y.ExamItemDetailID,
+                                              y.TargetSex,
+                                              y.MaxAge,
+                                              y.MaxValue,
+                                              y.ExamItemDetailCode
+                                          })).ToList();
+        if (duplicateKeys.Any())
+        {
+            var duplicatedData = examNormalValueRanges.Where(x => 
+                                                        duplicateKeys.Any(duplicateKey =>
+                                                            duplicateKey.ExamItemDetailCode == x.ExamItemDetailCode && 
+                                                            duplicateKey.ThresholdCode == x.ThresholdCode &&
+                                                            duplicateKey.TargetSex == x.TargetSex &&
+                                                            duplicateKey.MaxAge == x.MaxAge.ToString().PadLeft(7, '0') && 
+                                                            duplicateKey.MaxValue == x.MaxValue
+                                                        ));            
+            // 返却用エラーオブジェクトに追加
+            AddDuplicateErrorObjects(duplicatedData.ToList());
+            insertExamNormalValueRangeByDuplicated = examNormalValueRanges.Except(duplicatedData).ToList();
+        }
+
+        var commonInsertExamNormalValueRanges = insertExamNormalValueRangeByRequired.Intersect(insertExamNormalValueRangesByThresholdCodes)
+                                                                       .Intersect(insertExamNormalValueRangesByExamItemDetails)
+                                                                       .Intersect(insertExamNormalValueRangeByDuplicated)
+                                                                       .Intersect(insertExamNormalValueRangesByAgeInvalid)
+                                                                       .Intersect(insertExamNormalValueRangeByCompared)
+                                                                       .ToList();
 
 
         // 基準値範囲エンティティリストを生成

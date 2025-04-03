@@ -48,7 +48,8 @@ steps:
         INSERT INTO
           resultcollector.external_exam_item_details
           (exam_item_detail_id, external_exam_item_detail_code, created_at, created_by)
-        VALUES(20091, 'EC2009WBC', CURRENT_TIMESTAMP,'ec2009');
+        VALUES(20091, 'EC2009WBC', CURRENT_TIMESTAMP,'ec2009')
+        ,     (20091, 'EC2009RBC', CURRENT_TIMESTAMP,'ec2009');
         -- 基準値パターン
         INSERT INTO
           resultcollector.thresholds
@@ -71,7 +72,7 @@ steps:
       && current.res.body[0].message == "キー項目が重複しています。ThresholdCode:EC2009/ExamItemDetailCode:EC2009WBC/TargetSex:男/MaxAge:0750000/MaxValue:10.6"
       && current.res.body[1].code == "10003"
       && current.res.body[1].inputNote == "2009052"
-      && current.res.body[1].message == "キー項目が重複しています。ThresholdCode:EC2009/ExamItemDetailCode:EC2009WBC/TargetSex:男/MaxAge:0750000/MaxValue:10.6"
+      && current.res.body[1].message == "キー項目が重複しています。ThresholdCode:EC2009/ExamItemDetailCode:EC2009RBC/TargetSex:男/MaxAge:0750000/MaxValue:10.6"
     dump:
       expr: current.res.body
       out: ../Dump/EC2009-05.json
