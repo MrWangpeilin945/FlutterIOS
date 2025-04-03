@@ -1,4 +1,6 @@
-﻿namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
+﻿using Ryobi.Wellship.Core.Exceptions;
+
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 
 /// <summary>
 /// メインスレッドとは別のDIのスコープでFire-And-Forgetする仕組みを提供するためのインターフェースです
@@ -86,11 +88,23 @@ public class ServiceScopeTaskRunner(IServiceScopeFactory serviceScopeFactory, IT
         using (ExecutionContext.SuppressFlow())
             return Task.Run(async () =>
             {
-                // TODO: ログの書き込みを実装する必要があります
                 using var scope = _serviceScopeFactory.CreateScope();
-                var tenantProvider = scope.ServiceProvider.GetRequiredService<ITenantProvider>();
-                tenantProvider.OverrideTenantKeyOnlyIfNotSet(_tenant);
-                await func(scope.ServiceProvider);
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<ServiceScopeTaskRunner>>();
+                try
+                {
+                    logger.Log(LogLevel.Error, "start");
+                    var tenantProvider = scope.ServiceProvider.GetRequiredService<ITenantProvider>();
+                    tenantProvider.OverrideTenantKeyOnlyIfNotSet(_tenant);
+                    await func(scope.ServiceProvider);
+                }
+                catch (WellshipException wex)
+                {
+                    logger.Log(LogLevel.Warning, wex, wex.Message);
+                }
+                catch (Exception ex)
+                {
+                    logger.Log(LogLevel.Error, ex, ex.Message);
+                }
             }, token);
     }
 }
