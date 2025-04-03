@@ -9,7 +9,7 @@
         "consultNumber": "No2004131",
         "examineeCode": "E2004131",
         "age": "0410302",
-        "note": "検査項目明細依頼の検査項目明細CDが重複（examItemDetailCd）",
+        "note": "検査項目明細依頼の検査項目明細CDが重複（examItemDetailCode）",
         "previousResults": [
         ],
         "consultThresholds": [

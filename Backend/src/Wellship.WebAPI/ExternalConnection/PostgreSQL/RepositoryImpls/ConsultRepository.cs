@@ -137,6 +137,7 @@ public class ConsultRepository : IConsultRepository
                     update resultcollector.consult 
                     set
                         progress_status = @ProgressStatus
+                        , note = ''
                         , created_at = @CreatedAt
                         , created_by = @CreatedBy
                     where
@@ -332,7 +333,6 @@ public class ConsultRepository : IConsultRepository
                         , consult_id
                         , priority
                         , created_at
-                        
                         , created_by
                     ) 
                     values

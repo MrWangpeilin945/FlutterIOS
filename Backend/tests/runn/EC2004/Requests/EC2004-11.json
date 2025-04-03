@@ -9,7 +9,7 @@
         "consultNumber": "No2004111",
         "examineeCode": "E2004111",
         "age": "0410302",
-        "note": "過去検査結果のPKが重複（examItemDetailIdId・examItemDetailCd）",
+        "note": "過去検査結果のPKが重複（examItemDetailIdId・examItemDetailCode）",
         "previousResults": [
             {
                 "examItemDetailCode": "PREVI-2004-11-1",

@@ -323,9 +323,10 @@ steps:
       && current.rows[0].consult_number == uniqueKeys[0].code
       && current.rows[0].age == "0340308"
       && current.rows[0].progress_status == 41
+      // 特記事項が空文字に設定されることを確認
+      && current.rows[0].note == ""
       && current.rows[0].export_status == 11
       && current.rows[0].place_schedule_id == placeScheduleIds[0].place_schedule_id
-      && current.rows[0].note == "特記事項"
       && current.rows[0].examinee_id == "e0002004-0000-0000-0092-000000000001"
       && current.rows[0].external_connection_code == uniqueKeys[0].code
       // 作成日時が更新されたことを確認する
@@ -336,10 +337,11 @@ steps:
       && current.rows[vars.recordCount - 1].age == "0340308"
       // 進捗状況が11から41に更新されたことを確認する
       && current.rows[vars.recordCount - 1].progress_status == 41
+      // 特記事項が空文字に設定されることを確認
+      && current.rows[vars.recordCount - 1].note == ""
       // 以下の項目は変更はないことを確認する
       && current.rows[vars.recordCount - 1].export_status == 11
       && current.rows[vars.recordCount - 1].place_schedule_id == placeScheduleIds[vars.recordCount - 1].place_schedule_id
-      && current.rows[vars.recordCount - 1].note == "特記事項"
       && current.rows[vars.recordCount - 1].examinee_id == "e0002004-0000-0000-0092-000000000001"
       && current.rows[vars.recordCount - 1].external_connection_code == uniqueKeys[vars.recordCount - 1].code
       // 作成日時が更新されたことを確認する

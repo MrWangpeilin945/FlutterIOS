@@ -67,7 +67,7 @@ steps:
       && current.res.body[0].code == "10001"
       && current.res.body[0].inputNote == "2004101"
       && current.res.body[0].message == "指定されたPreviousResults.ExamItemDetailCodeがシステム上に存在しません。Code:PREVI-200401-10-1"
-      // PreviousResults.ExamItemDetailCdが重複している場合でも「過去検査結果の検査項目明細IDが取得できない」ErrorObjectは出力される
+      // PreviousResults.ExamItemDetailCodeが重複している場合でも「過去検査結果の検査項目明細IDが取得できない」ErrorObjectは出力される
       && current.res.body[1].code == "10001"
       && current.res.body[1].inputNote == "2004101"
       && current.res.body[1].message == "指定されたPreviousResults.ExamItemDetailCodeがシステム上に存在しません。Code:PREVI-200401-10-1"
