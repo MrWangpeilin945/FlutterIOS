@@ -1,11 +1,11 @@
-= WELLSHIP UI設計書
+= WELLSHIP 外部IF設計書
 :author: 両備システムズ ヘルスケアソリューションカンパニー ウェルネスビジネス事業部
-:revdate: 2025-03-28
-:revnumber: 0.6
+:revdate: 2025-03-26
+:revnumber: 0.10
 :doctype: book
 :lang: ja
 :toc: left
-:toclevels: 4
+:toc-levels: 3
 :toc-title: 目次
 :icons: font
 :imagesdir: images
@@ -19,6 +19,15 @@
 :source-highlighter: highlightjs
 :stem: latexmath
 
-include::docs/画面/画面.adoc[leveloffset=+1]
-include::docs/コンポーネント/コンポーネント.adoc[leveloffset=+1]
+<<<
+include::docs/1_はじめに.adoc[leveloffset=+1]
+<<<
+include::docs/2_基本方針.adoc[leveloffset=+1]
+<<<
+include::docs/3_外部IFユースケース一覧.adoc[leveloffset=+1]
+<<<
+include::docs/4_ユースケース.adoc[leveloffset=+1]
+<<<
+include::docs/5_メッセージリスト.adoc[leveloffset=+1]
+<<<
 include::docs/改版履歴.adoc[leveloffset=+1]

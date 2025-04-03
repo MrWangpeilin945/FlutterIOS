@@ -5,7 +5,8 @@ $docnames = @(
     # [PSustomObject]@{Name = 'ui-design'; JpName = 'UI設計書' },
     [PSCustomObject]@{Name = 'webapi-design'; JpName = 'API設計書' },
     [PSCustomObject]@{Name = 'mobileapp-design'; JpName = 'アプリ設計書' },
-    [PSCustomObject]@{Name = 'equipment-design'; JpName = '機器連携設計書' }
+    [PSCustomObject]@{Name = 'equipment-design'; JpName = '機器連携設計書' },
+    [PSCustomObject]@{Name = 'external-design'; JpName = '外部IF設計書' }
 )
 
 $docnames | ForEach-Object {

@@ -1,0 +1,65 @@
+Parameters:
+  ApplicationName:
+    Type: String
+  EnvType:
+    Type: String
+  TenantName:
+    Type: String
+
+Mappings:
+  EnvMap:
+    stg:
+      FunctionName: arn:aws:lambda:ap-northeast-1:961341540592:function:invoke-constantly-data-import-api
+    prd:
+      FunctionName: prd環境のLambda関数ARN
+
+Resources:
+  # イベント通知設定を行う場合、バケット作成よりも先にLambda関数呼び出し許可を与える必要がある
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !FindInMap [EnvMap, !Ref EnvType, FunctionName]
+      Principal: s3.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Sub arn:aws:s3:::${ApplicationName}-${EnvType}-s3-fileshare-${TenantName}
+
+  FileshareBucket:
+    DependsOn: LambdaInvokePermission
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${ApplicationName}-${EnvType}-s3-fileshare-${TenantName}
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !FindInMap [EnvMap, !Ref EnvType, FunctionName]
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: /ToWELLSHIP/Constantly/
+                  - Name: suffix
+                    Value: .zip
+
+  BucketPolicy:
+    DependsOn: FileshareBucket
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FileshareBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowSSLRequestsOnly
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource: !Sub 'arn:aws:s3:::${FileshareBucket}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+Outputs:
+  FileshareBucketName:
+    Value: !Ref FileshareBucket
+    Export:
+      Name: FileshareBucketName
