@@ -48,6 +48,9 @@ CREATE TABLE consult_thresholds (
   , CONSTRAINT consult_thresholds_PKC PRIMARY KEY (threshold_id,consult_id)
 );
 
+CREATE INDEX consult_thresholds_IX1
+  ON consult_thresholds(consult_id);
+
 CREATE TABLE correlation_rule_evaluations (
   correlation_rule_id integer NOT NULL
   , variable_number integer NOT NULL
@@ -426,6 +429,12 @@ ALTER TABLE consult ADD CONSTRAINT consult_IX1
 
 CREATE UNIQUE INDEX consult_IX2
   ON consult(external_connection_code);
+
+CREATE INDEX consult_IX3
+  ON consult(place_schedule_id);
+
+CREATE INDEX consult_IX4
+  ON consult(examinee_id);
 
 CREATE TABLE exam_item_details (
   exam_item_detail_id integer NOT NULL
