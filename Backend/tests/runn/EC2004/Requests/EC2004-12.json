@@ -7,7 +7,8 @@
         "teamCode": "T2004-12",
         "examDate": "2025-03-03",
         "consultNumber": "No2004121",
-        "examineeCd": "E2004121",
+        "examineeCode": "E2004121",
+        "age": "0410302",
         "note": "検査項目明細依頼の検査項目明細IDが取得できない",
         "previousResults": [
         ],
@@ -17,16 +18,20 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-200412-1"
+                "examItemDetailCode": "ORDER-200412-1",
+                "note": "comment-200412-1"
             },
             {
-                "examItemDetailCd": "ORDER-200412-2"
+                "examItemDetailCode": "ORDER-200412-2",
+                "note": "comment-200412-2"
             },
             {
-                "examItemDetailCd": "ORDER-200412-3"
+                "examItemDetailCode": "ORDER-200412-3",
+                "note": "comment-200412-3"
             },
             {
-                "examItemDetailCd": "ORDER-200412-2"
+                "examItemDetailCode": "ORDER-200412-2",
+                "note": "comment-200412-4"
             }
         ],
         "inputNote": "2004121"

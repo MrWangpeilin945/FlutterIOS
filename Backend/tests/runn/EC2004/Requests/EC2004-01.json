@@ -7,11 +7,12 @@
         "teamCode": "T2004-01",
         "examDate": "2025-03-03",
         "consultNumber": "No2004011",
-        "examineeCd": "E2004011",
+        "examineeCode": "E2004011",
+        "age": "0450110",
         "note": "特記事項2004011",
         "previousResults": [
             {
-                "examItemDetailCd": "PREVI-200401",
+                "examItemDetailCode": "PREVI-200401",
                 "examDate": "2024-10-20",
                 "value": "400"
             }
@@ -30,7 +31,8 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-200401"
+                "examItemDetailCode": "ORDER-200401",
+                "note": "検査項目明細備考200401-1"
             }
         ],
         "inputNote": "2004011"
@@ -43,11 +45,12 @@
         "teamCode": "T2004-01",
         "examDate": "2025-03-23",
         "consultNumber": "No2004012",
-        "examineeCd": "E2004011",
+        "examineeCode": "E2004011",
+        "age": "0450110",
         "note": "特記事項2004012",
         "previousResults": [
             {
-                "examItemDetailCd": "PREVI-200401",
+                "examItemDetailCode": "PREVI-200401",
                 "examDate": "2024-11-22",
                 "value": "300"
             }
@@ -66,7 +69,8 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-200401"
+                "examItemDetailCode": "ORDER-200401",
+                "note": "検査項目明細備考200401-2"
             }
         ],
         "inputNote": "2004012"
@@ -79,11 +83,12 @@
         "teamCode": "T2004-01",
         "examDate": "2025-03-13",
         "consultNumber": "No2004011",
-        "examineeCd": "E2004011",
+        "examineeCode": "E2004011",
+        "age": "0450110",
         "note": "特記事項2004013",
         "previousResults": [
             {
-                "examItemDetailCd": "PREVI-200401",
+                "examItemDetailCode": "PREVI-200401",
                 "examDate": "2024-12-24",
                 "value": "100"
             }
@@ -102,7 +107,8 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-200401"
+                "examItemDetailCode": "ORDER-200401",
+                "note": "検査項目明細備考200401-3"
             }
         ],
         "inputNote": "2004013"
