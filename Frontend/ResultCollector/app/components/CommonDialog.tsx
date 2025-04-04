@@ -53,7 +53,7 @@ export default function CommonDialog({
         <Flex
           mih={50}
           gap="md"
-          justify="center"
+          justify="flex-start"
           align="center"
           direction="row"
           c={
