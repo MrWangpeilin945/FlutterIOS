@@ -135,6 +135,7 @@ public class ExamNormalValueRangeUsecaseTests
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
             new(){Code = "10004", Message = "必須項目が不足しています。MaxAge", InputNote  = "UT2009"},
+            new(){Code = "10006", Message = "値の形式が無効です。MaxAge:", InputNote  = "UT2009"},
             new(){Code = "10007", Message = "値の範囲が無効です。MinAge:0000000/MaxAge:", InputNote  = "UT2009"}
         };
         var usecase = new ExamNormalValueRangeUsecase(_examNormalValueRangeRepositoryMock.Object, _thresholdRepositoryMock.Object,
@@ -168,7 +169,8 @@ public class ExamNormalValueRangeUsecaseTests
         _externalExamItemDetailsRepositoryMock.Setup(r => r.GetDetailsByCodesAsync(new List<string> { "EEIDC2009" })).ReturnsAsync(externalExamItemDetails);
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10004", Message = "必須項目が不足しています。MinAge", InputNote  = "UT2009"}
+            new(){Code = "10004", Message = "必須項目が不足しています。MinAge", InputNote  = "UT2009"},
+            new(){Code = "10006", Message = "値の形式が無効です。MinAge:", InputNote  = "UT2009"}
         };
         var usecase = new ExamNormalValueRangeUsecase(_examNormalValueRangeRepositoryMock.Object, _thresholdRepositoryMock.Object,
                                                       _externalExamItemDetailsRepositoryMock.Object, _timeProvider);

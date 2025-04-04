@@ -65,7 +65,7 @@ steps:
     test: |
       current.res.status == 207
       // 必須エラーがErrorObjectで返される
-      && len(current.res.body) == 8
+      && len(current.res.body) == 10
       && current.res.body[0].code == "10004"
       && current.res.body[0].inputNote == "2009081"
       && current.res.body[0].message == "必須項目が不足しています。Name"
@@ -81,15 +81,21 @@ steps:
       && current.res.body[4].code == "10004"
       && current.res.body[4].inputNote == "2009085"
       && current.res.body[4].message == "必須項目が不足しています。MinAge"
-      && current.res.body[5].code == "10007"
+      && current.res.body[5].code == "10006"
       && current.res.body[5].inputNote == "2009084"
-      && current.res.body[5].message == "値の範囲が無効です。MinAge:0000000/MaxAge:"
-      && current.res.body[6].code == "10001"
-      && current.res.body[6].inputNote == "2009082"
-      && current.res.body[6].message == "指定されたThresholdCodeがシステム上に存在しません。Code:"
-      && current.res.body[7].code == "10001"
-      && current.res.body[7].inputNote == "2009083"
-      && current.res.body[7].message == "指定されたExamItemDetailCodeがシステム上に存在しません。Code:"
+      && current.res.body[5].message == "値の形式が無効です。MaxAge:"
+      && current.res.body[6].code == "10006"
+      && current.res.body[6].inputNote == "2009085"
+      && current.res.body[6].message == "値の形式が無効です。MinAge:"
+      && current.res.body[7].code == "10007"
+      && current.res.body[7].inputNote == "2009084"
+      && current.res.body[7].message == "値の範囲が無効です。MinAge:0000000/MaxAge:"
+      && current.res.body[8].code == "10001"
+      && current.res.body[8].inputNote == "2009082"
+      && current.res.body[8].message == "指定されたThresholdCodeがシステム上に存在しません。Code:"
+      && current.res.body[9].code == "10001"
+      && current.res.body[9].inputNote == "2009083"
+      && current.res.body[9].message == "指定されたExamItemDetailCodeがシステム上に存在しません。Code:"
     dump:
       expr: current.res.body
       out: ../Dump/EC2009-08.json
