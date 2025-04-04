@@ -7,7 +7,8 @@
         "teamCode": "T2004-03",
         "examDate": "2025-03-03",
         "consultNumber": "No2004031",
-        "examineeCd": "E2004031",
+        "examineeCode": "E2004031",
+        "age": "0490805",
         "note": "受診番号が異なる連携キーで登録済",
         "previousResults": [
         ],

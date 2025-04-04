@@ -330,7 +330,7 @@ export default function ExamresultExportHistory() {
                   </Table.Thead>
                   <Table.Tbody h={118} fz="xs" c="black01">
                     {exportHistory?.exportHistories?.map((eh) => (
-                      <Table.Tr key={eh.placeScheduleId}>
+                      <Table.Tr key={eh.exportId}>
                         <Table.Td ta="center" w={160}>
                           {eh.exportedAt &&
                             format(parseISO(eh.exportedAt), "yyyy/MM/dd HH:mm")}

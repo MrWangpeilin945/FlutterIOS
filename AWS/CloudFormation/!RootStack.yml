@@ -1,0 +1,96 @@
+Metadata:
+  AWS::CloudFormation::Interface:
+    # パラメータ入力時の表示順を設定
+    ParameterGroups:
+      -
+        Label:
+          default: Resource Property
+        Parameters:
+          - ApplicationName
+          - EnvType
+          - TenantName
+
+Parameters:
+  ApplicationName:
+    Type: String
+    Default: wellship
+    AllowedValues:
+      - wellship
+  EnvType:
+    Type: String
+    Default: stg
+    AllowedValues:
+      - stg
+      - prd
+  TenantName:
+    Description: This parameter is used for specifying various resource names
+    Type: String
+    AllowedPattern: ^[a-zA-Z0-9\-]+$
+    MinLength: 1
+    ConstraintDescription: Alphabets, numbers, and hyphens only
+
+Mappings:
+  EnvMap:
+    stg:
+      TemplateStoredBucketURL: https://wellship-stg-cloudformation-template.s3.ap-northeast-1.amazonaws.com
+    prd:
+      TemplateStoredBucketURL: prd環境のテンプレート保存バケットURL
+
+Resources:
+  # --------------------------------------- #
+  # Route 53
+  # --------------------------------------- #
+  # Route53Stack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub
+  #       - ${TemplateStoredBucketURL}/Route53.yml
+  #       - TemplateStoredBucketURL: !FindInMap [EnvMap, !Ref EnvType, TemplateStoredBucketURL]
+  #     Parameters:
+  #       ApplicationName: !Ref ApplicationName
+  #       EnvType: !Ref EnvType
+  #       TenantName: !Ref TenantName
+
+  # --------------------------------------- #
+  # S3
+  # --------------------------------------- #
+  S3Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - ${TemplateStoredBucketURL}/S3.yml
+        - TemplateStoredBucketURL: !FindInMap [EnvMap, !Ref EnvType, TemplateStoredBucketURL]
+      Parameters:
+        ApplicationName: !Ref ApplicationName
+        EnvType: !Ref EnvType
+        TenantName: !Ref TenantName
+
+  # --------------------------------------- #
+  # EventBridge Scheduler
+  # --------------------------------------- #
+  EventBridgeSchedulerStack:
+    DependsOn: S3Stack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - ${TemplateStoredBucketURL}/EventBridgeScheduler.yml
+        - TemplateStoredBucketURL: !FindInMap [EnvMap, !Ref EnvType, TemplateStoredBucketURL]
+      Parameters:
+        ApplicationName: !Ref ApplicationName
+        EnvType: !Ref EnvType
+        TenantName: !Ref TenantName
+
+  # --------------------------------------- #
+  # Transfer Family
+  # --------------------------------------- #
+  TransferFamilyStack:
+    DependsOn: S3Stack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - ${TemplateStoredBucketURL}/TransferFamily.yml
+        - TemplateStoredBucketURL: !FindInMap [EnvMap, !Ref EnvType, TemplateStoredBucketURL]
+      Parameters:
+        ApplicationName: !Ref ApplicationName
+        EnvType: !Ref EnvType
+        TenantName: !Ref TenantName

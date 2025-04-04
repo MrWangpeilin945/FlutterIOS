@@ -1,0 +1,32 @@
+Parameters:
+  ApplicationName:
+    Type: String
+  EnvType:
+    Type: String
+  TenantName:
+    Type: String
+
+Mappings:
+  EnvMap:
+    stg:
+      ServerId: s-c90dd3ad28104462a
+      Role: arn:aws:iam::961341540592:role/wellship-stg-iam-role-transferfamily
+    prd:
+      ServerId: prd環境のサーバーID
+      Role: prd環境のユーザーロールARN
+
+Resources:
+  TenantSFTPUser:
+    Type: AWS::Transfer::User
+    Properties:
+      UserName: !Sub ${ApplicationName}-${EnvType}-transfer-user-${TenantName}
+      ServerId: !FindInMap [EnvMap, !Ref EnvType, ServerId]
+      Role: !FindInMap [EnvMap, !Ref EnvType, Role]
+      HomeDirectoryType: LOGICAL
+      HomeDirectoryMappings:
+        - Entry: /
+          Target: !Sub 
+            - /${FileshareBucketName}
+            - FileshareBucketName: !ImportValue FileshareBucketName
+      # SshPublicKeys:
+      #   - ''
