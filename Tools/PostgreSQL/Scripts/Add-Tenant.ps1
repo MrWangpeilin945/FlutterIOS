@@ -82,7 +82,21 @@ function New-Schema {
 
 # テーブルを作成する
 function New-Table {
+    # Dockerコンテナの初期化用のDDLと共用するため、一時的にファイルに追記して実行します。
+    # メモリ上でクエリを渡すと文字化けするので、一度ファイルに落としています。
+    $createTable = Get-Content -Path "$rootDir/../../Database/Docker/init/02_create_table.sql"  -Encoding utf8NoBOM
+    
+    # Dockerコンテナ用の記述を消す
+    $ddl = $createTable | Where-Object { $_ -notlike '\c*' } | Where-Object { $_ -notlike '-- DB切り替え*' }
+    
+    $header = Get-Content -Path "$rootDir/SQL/create-table.template.sql" -Encoding utf8NoBOM
+    $header + $ddl | Out-File -FilePath "$rootDir/SQL/create-table.template.sql"
+    
+    # SQLを実行する
     Invoke-PSQLFile -filePath "create-table.template.sql" -database $TenantKey
+    
+    # SQLを元に戻す
+    $header | Out-File -FilePath "$rootDir/SQL/create-table.template.sql" -Encoding utf8NoBOM
 }
 
 # 権限を付与する
