@@ -260,7 +260,8 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10004", Message = "必須項目が不足しています。ConsultNumber", InputNote  = "UT2004"}
+            new(){Code = "10004", Message = "必須項目が不足しています。ConsultNumber", InputNote  = "UT2004"},
+            new(){Code = "10006", Message = "値の形式が無効です。ConsultNumber:", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
@@ -374,7 +375,9 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Setup(r => r.GetConsultExternalConnectionCodeAsync(new List<string> { "N001" })).ReturnsAsync(new List<ExternalConnectionCodeEntity>());
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10004", Message = "必須項目が不足しています。Age", InputNote  = "UT2004"}
+            new(){Code = "10004", Message = "必須項目が不足しています。Age", InputNote  = "UT2004"},
+            new(){Code = "10005", Message = "制限数を超えています。Age:", InputNote  = "UT2004"},
+            new(){Code = "10006", Message = "値の形式が無効です。Age:", InputNote  = "UT2004"}
         };
         var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _teamRepositoryMock.Object,
                                          _placeRepositoryMock.Object, _placeScheduleRepositoryMock.Object,
