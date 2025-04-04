@@ -316,6 +316,8 @@ public class ConsultUsecase : IConsultUsecase
         DateOnly examDate = placeSchedule.ExamDate;
         // 受診の年齢
         var examAge = consult.Age;
+        // 未受診の検査メニューを取得
+        var unexaminedItems = await GetUnexaminedMenusAsync(consultNumber);
         // 検査メニューに関連した検査項目情報を取得
         var examItemGroup = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
         // 検査項目明細IDを取得
@@ -375,6 +377,7 @@ public class ConsultUsecase : IConsultUsecase
                 Sex = (int)examinee.Sex,
                 ExamDateAge = examAge.Years
             },
+            IsComplete = !unexaminedItems.UnexaminedMenus.Select(x => x.ExamMenuId).Contains(examMenuId),
             RelatedExamItems = relatedExamItems,
             ExamItemGroups = examItemGroups.ToArray()
         };
