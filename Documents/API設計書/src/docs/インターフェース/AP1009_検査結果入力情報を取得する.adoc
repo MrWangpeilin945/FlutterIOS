@@ -64,6 +64,7 @@
         "examResult" : "所見なし"
     }
   ],
+  "isComplete": false,
   "examItemGroups" :[
     {
       "type" : 1,
