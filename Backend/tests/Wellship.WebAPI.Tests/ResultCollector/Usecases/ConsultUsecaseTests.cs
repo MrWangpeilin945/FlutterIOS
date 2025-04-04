@@ -1872,7 +1872,24 @@ public class ConsultUsecaseTests
                 }
             ]
         });
-        var inputExamItems = new APIModels.Responses.InputExamItems
+
+        // 未受診の検査メニュー
+        _consultRepositoryMock.Setup(x => x.GetUnexaminedConsultsAsync((new string[] { consultNumber })))
+                              .ReturnsAsync(new List<UnexaminedConsult>(){
+                                new(){
+                                    ExamineeId = examineeId,
+                                    ConsultId = consultId,
+                                    ConsultNumber  = consultNumber,
+                                    UnexaminedExamMenus = [
+                                        new UnexaminedExamMenu(){
+                                            ExamMenuId = 1,
+                                            ExamMenuName = "メニュー名"
+                                        }
+                                    ]
+                                }
+                              });
+
+        var expected = new APIModels.Responses.InputExamItems
         {
             ConsultNumber = "0001",
             Examinee =
@@ -1887,6 +1904,7 @@ public class ConsultUsecaseTests
                 new APIModels.Responses.RelatedExamItem{ ExamItemName = "身長", ExamResult = "178(175.4)cm" },
                 new APIModels.Responses.RelatedExamItem{ ExamItemName = "検査メニュー特記用", ExamResult = "30(20)" }
             ],
+            IsComplete = false,
             ExamItemGroups = [
                 new APIModels.Responses.ExamItemGroup{
                     Type = (int)ExamItemGroupType.数値,
@@ -1975,7 +1993,7 @@ public class ConsultUsecaseTests
         var response = await usecase.GetInputExamItemsExamineeAsync(consultNumber, examMenuId);
 
         // Assert
-        response.Should().BeEquivalentTo(inputExamItems);
+        response.Should().BeEquivalentTo(expected);
 
     }
 
