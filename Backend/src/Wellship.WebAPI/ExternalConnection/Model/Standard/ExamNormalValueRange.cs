@@ -16,13 +16,13 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard
         /// <summary>
         /// 基準値パターンコード
         /// </summary>
-        [JsonPropertyName("thresholdCd")]
-        public required string ThresholdCd { get; init; }
+        [JsonPropertyName("thresholdCode")]
+        public required string ThresholdCode { get; init; }
         /// <summary>
         /// 検査項目明細コード
         /// </summary>
-        [JsonPropertyName("examItemDetailCd")]
-        public required string ExamItemDetailCd { get; init; }
+        [JsonPropertyName("examItemDetailCode")]
+        public required string ExamItemDetailCode { get; init; }
         /// <summary>
         /// 対象年齢上限
         /// </summary>

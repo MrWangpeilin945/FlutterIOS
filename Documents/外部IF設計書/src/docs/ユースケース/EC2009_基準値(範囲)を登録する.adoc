@@ -264,7 +264,7 @@ list.Count() <> 0
 
 * PKが重複するレコードが存在する
 ** ExamNormalValueRangesを以下の条件でGroupByし、複数レコードが存在する
-**** `[DB]thresholds.threshold_code` == `ExamNormalValueRange.ThresholdCode` で検索した `[DB]thresholds.threshold_id`
+**** `ExamNormalValueRange.ThresholdCode`
 **** `[DB]external_exam_item_details.external_exam_item_detail_code` == `ExamNormalValueRange.ExamItemDetailCode` で検索した `[DB]external_exam_item_details.exam_item_detail_id`
 **** `ExamNormalValueRange.TargetSex`
 **** `ExamNormalValueRange.MaxAge` ※左0埋め7桁にそろえる

@@ -1,8 +1,8 @@
 [
     {
         "name": "",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "0500000",
         "minAge": "0000000",
         "targetSex": 1,
@@ -13,8 +13,8 @@
     },
     {
         "name": "基準値パターンが空値",
-        "thresholdCd": "",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "0600000",
         "minAge": "0000000",
         "targetSex": 1,
@@ -25,8 +25,8 @@
     },
     {
         "name": "検査項目明細が空値",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "",
         "maxAge": "0700000",
         "minAge": "0000000",
         "targetSex": 1,
@@ -37,8 +37,8 @@
     },
     {
         "name": "上限年齢が空値",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "",
         "minAge": "0000000",
         "targetSex": 1,
@@ -49,8 +49,8 @@
     },
     {
         "name": "下限年齢が空値",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "0800000",
         "minAge": "",
         "targetSex": 1,

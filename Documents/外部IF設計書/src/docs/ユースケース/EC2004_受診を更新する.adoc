@@ -737,7 +737,7 @@ Update : 更新しない
 
 ===== Table
 
-* [DB]exam_item_detail_orders(検査項目明細依頼)
+* [DB]external_exam_item_detail_orders (外部検査項目明細依頼)
 ** 洗い替え
 
 ====== Delete
@@ -749,43 +749,8 @@ Update : 更新しない
 **** 削除対象レコードが存在しない場合でも、エラーとしない
 
 * 削除条件
-** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]exam_item_detail_orders.consult_id`
+** `[DB]consult.external_connection_code` == `Consult.ConnectionCode` で検索して取得した `[DB]consult.consult_id` == `[DB]external_exam_item_detail_orders.consult_id`
 *** 削除対象レコードが存在しない場合でも、エラーとしない
-
-====== Insert
-
-* `consult_id` / `exam_item_detail_id` で重複を除外し登録する
-
-[cols="1,2,2" options="header"]
-|===
-|列|登録値|処理・変換
-
-|consult_id
-|[DB]consult(受診).consult_id
-|※Upsertした値
-
-|exam_item_detail_id
-|`[DB]external_exam_item_details.exam_item_detail_id`
-|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCode` で検索し、`exam_item_detail_id` を登録する
-
-|created_at
-|system.datetime.now()
-|
-
-|created_by
-|`'ExternalConnection'`
-|
-
-|===
-
-===== Table
-
-* [DB]external_exam_item_detail_orders (外部検査項目明細依頼)
-** 洗い替え
-
-====== Delete
-
-* [DB]exam_item_detail_orders(検査項目明細依頼)の削除エラーとなるため、[DB]exam_item_detail_orders(検査項目明細依頼)削除時に同時に削除する
 
 ====== Insert
 
@@ -818,6 +783,42 @@ Update : 更新しない
 |
 
 |===
+
+===== Table
+
+* [DB]exam_item_detail_orders(検査項目明細依頼)
+** 洗い替え
+
+====== Delete
+
+* [DB]exam_item_detail_orders(検査項目明細依頼)の削除エラーとなるため、[DB]exam_item_detail_orders(検査項目明細依頼)削除時に同時に削除する
+
+====== Insert
+
+* `consult_id` / `exam_item_detail_id` で重複を除外し登録する
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|consult_id
+|[DB]consult(受診).consult_id
+|※Upsertした値
+
+|exam_item_detail_id
+|`[DB]external_exam_item_details.exam_item_detail_id`
+|`[DB]external_exam_item_details.external_exam_item_detail_code` == `Consult.ExamItemDetailOrders.ExamItemDetailCode` で検索し、`exam_item_detail_id` を登録する
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
 
 ===== Table
 
