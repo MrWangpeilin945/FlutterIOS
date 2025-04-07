@@ -10,12 +10,12 @@ public class AggregatedProgressDetail
     /// <summary>
     /// 検査項目ID
     /// </summary>
-    public required int ExamItemId { get; init; }
+    public required int ExamMenuId { get; init; }
 
     /// <summary>
     /// 検査項目名
     /// </summary>
-    public required string ExamItemName { get; init; }
+    public required string ExamMenuName { get; init; }
 
     /// <summary>
     /// 予定の件数
