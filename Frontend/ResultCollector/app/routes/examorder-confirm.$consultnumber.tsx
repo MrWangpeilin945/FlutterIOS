@@ -485,11 +485,13 @@ export default function ExamOrderConfirm() {
           errorMessage =
             status === 400
               ? getErrorMessage(errorMessages.invalid, "受診番号")
-              : status === 404
-                ? getErrorMessage(errorMessages.notFound, "該当する受診番号")
-                : status === 500
-                  ? getErrorMessage(errorMessages.serverError)
-                  : unexpectedErrorMessage;
+              : status === 403
+                ? "会場ロック中です。管理者のみ更新可能です。"
+                : status === 404
+                  ? getErrorMessage(errorMessages.notFound, "該当する受診番号")
+                  : status === 500
+                    ? getErrorMessage(errorMessages.serverError)
+                    : unexpectedErrorMessage;
         }
         startupCommonDialog(errorMessage, false);
       } finally {
