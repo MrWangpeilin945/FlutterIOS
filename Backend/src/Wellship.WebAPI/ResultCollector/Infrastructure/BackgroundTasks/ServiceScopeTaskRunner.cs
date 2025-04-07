@@ -1,6 +1,6 @@
 ﻿using Ryobi.Wellship.Core.Exceptions;
 
-namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.BackgroundTasks;
 
 /// <summary>
 /// メインスレッドとは別のDIのスコープでFire-And-Forgetする仕組みを提供するためのインターフェースです
@@ -92,7 +92,6 @@ public class ServiceScopeTaskRunner(IServiceScopeFactory serviceScopeFactory, IT
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<ServiceScopeTaskRunner>>();
                 try
                 {
-                    logger.Log(LogLevel.Error, "start");
                     var tenantProvider = scope.ServiceProvider.GetRequiredService<ITenantProvider>();
                     tenantProvider.OverrideTenantKeyOnlyIfNotSet(_tenant);
                     await func(scope.ServiceProvider);
