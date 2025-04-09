@@ -25,9 +25,9 @@ public class ExamineeUsecase : IExamineeUsecase
     public async Task<ConsultExamineeList> GetConsultExamineesAsync(Guid placeScheduleId, int examMenuId, int status)
     {
         // 会場日程、検査メニュー、進捗状況に該当する受診者ID配列を取得
-        Guid[] consultExamineeIds = [];
+        var consultExamineeIds = await _examineeRepository.GetConsultIdsAsync(placeScheduleId, examMenuId, status);
         // 受診者ID配列で検索
-        var consultExaminees = await _examineeRepository.GetConsultExamineesAsync(consultExamineeIds);
+        var consultExaminees = await _examineeRepository.GetConsultExamineesAsync((Guid[])consultExamineeIds);
         return new ConsultExamineeList()
         {
             Examinees = consultExaminees.Select(x => new ConsultExaminee()
