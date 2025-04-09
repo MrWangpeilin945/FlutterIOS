@@ -28,7 +28,7 @@ public class ExamineeRepository : IExamineeRepository
     /// <summary>
     /// 受診者IDで受診者を取得します。
     /// </summary>
-    /// <param name="examineeId">ログインID</param>
+    /// <param name="examineeId">受診者ID</param>
     public async Task<Examinee> GetExamineeAsync(Guid examineeId)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
@@ -77,5 +77,35 @@ public class ExamineeRepository : IExamineeRepository
                                 OrderNumber = x.OrderNumber
                             })
         };
+    }
+
+    /// <summary>
+    /// 受診者IDで受診者を取得します。
+    /// </summary>
+    /// <param name="consultExamineeIds">受診者ID配列</param>
+    public async Task<ConsultExaminee[]> GetConsultExamineesAsync(Guid[] consultExamineeIds)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+        select
+            c.consult_number
+            , t.ticket_number
+            , e.kana_name
+            , e.sex
+            , t.created_at
+        from
+            resultcollector.consult c
+            left join resultcollector.tickets t
+                on c.consult_id = t.consult_id
+            left join resultcollector.examinees e
+                on c.examinee_id = e.examinee_id
+        where
+            c.consult_number = any(@ConsultExamineeIds)
+        order by
+            c.consult_number";
+
+        var examinees = await connection.QueryAsync<ConsultExamineeEntity>(sql, new { ConsultExamineeIds = consultExamineeIds });
+        // クエリの戻り値と関数の戻り値を合わせる
+        return ([]);
     }
 }
