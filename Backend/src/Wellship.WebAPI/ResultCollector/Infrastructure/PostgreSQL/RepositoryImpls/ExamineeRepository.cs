@@ -80,19 +80,19 @@ public class ExamineeRepository : IExamineeRepository
     }
 
     /// <summary>
-    /// 受診者IDで受診者を取得します。
+    /// 受診者ID配列で受診者一覧を取得します。
     /// </summary>
     /// <param name="consultExamineeIds">受診者ID配列</param>
-    public async Task<ConsultExaminee[]> GetConsultExamineesAsync(Guid[] consultExamineeIds)
+    public async Task<IEnumerable<ConsultExaminee>> GetConsultExamineesAsync(Guid[] consultExamineeIds)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
         select
-            c.consult_number
-            , t.ticket_number
-            , e.kana_name
-            , e.sex
-            , t.created_at
+            c.consult_number as ConsultNumber
+            , t.ticket_number as TicketNumber
+            , e.kana_name as KanaName
+            , e.sex as Sex
+            , t.created_at as CreatedAt
         from
             resultcollector.consult c
             left join resultcollector.tickets t
@@ -105,7 +105,14 @@ public class ExamineeRepository : IExamineeRepository
             c.consult_number";
 
         var examinees = await connection.QueryAsync<ConsultExamineeEntity>(sql, new { ConsultExamineeIds = consultExamineeIds });
-        // クエリの戻り値と関数の戻り値を合わせる
-        return ([]);
+
+        return examinees.Select(x => new ConsultExaminee()
+        {
+            ConsultNumber = x.ConsultNumber,
+            TicketNumber = x.TicketNumber,
+            KanaName = x.KanaName,
+            Sex = (Sex)x.Sex,
+            CreatedAt = x.CreatedAt
+        });
     }
 }

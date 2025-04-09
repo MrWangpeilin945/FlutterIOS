@@ -1,3 +1,5 @@
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 /// <summary>
@@ -9,11 +11,11 @@ public interface IExamineeRepository
     /// 受診者IDで受診者を取得します。
     /// </summary>
     /// <param name="examineeId">受診者ID</param>
-    public Task<Models.Examinee> GetExamineeAsync(Guid examineeId);
+    public Task<Examinee> GetExamineeAsync(Guid examineeId);
 
     /// <summary>
-    /// 受診者ID配列で受診者を取得します。
+    /// 受診者ID配列で受診者一覧を取得します。
     /// </summary>
     /// <param name="consultExamineeIds">受診者ID配列</param>
-    public Task<Models.ConsultExaminee[]> GetConsultExamineesAsync(Guid[] consultExamineeIds);
+    public Task<IEnumerable<ConsultExaminee>> GetConsultExamineesAsync(Guid[] consultExamineeIds);
 }
