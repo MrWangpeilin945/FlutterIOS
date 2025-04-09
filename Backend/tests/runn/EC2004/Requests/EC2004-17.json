@@ -7,7 +7,8 @@
         "teamCode": "T2004-17",
         "examDate": "2025-03-03",
         "consultNumber": "No20041701",
-        "examineeCd": "E20041701",
+        "examineeCode": "E20041701",
+        "age": "0530210",
         "note": "処理順が重複",
         "previousResults": [
         ],
@@ -27,7 +28,8 @@
         "teamCode": "T2004-17",
         "examDate": "2025-03-03",
         "consultNumber": "No20041702",
-        "examineeCd": "E20041702",
+        "examineeCode": "E20041702",
+        "age": "0520202",
         "note": "処理順が重複",
         "previousResults": [
         ],
@@ -47,7 +49,8 @@
         "teamCode": "T2004-17",
         "examDate": "2025-03-03",
         "consultNumber": "No20041703",
-        "examineeCd": "E20041703",
+        "examineeCode": "E20041703",
+        "age": "0530303",
         "note": "基準値判定-基準値判定コードが重複",
         "previousResults": [
         ],
@@ -75,7 +78,8 @@
         "teamCode": "T2004-17",
         "examDate": "2025-03-03",
         "consultNumber": "No20041704",
-        "examineeCd": "E20041704",
+        "examineeCode": "E20041704",
+        "age": "0540404",
         "note": "基準値判定-優先度が重複",
         "previousResults": [
         ],
@@ -103,7 +107,8 @@
         "teamCode": "T2004-17",
         "examDate": "2025-03-03",
         "consultNumber": "No20041705",
-        "examineeCd": "E20041705",
+        "examineeCode": "E20041705",
+        "age": "0550505",
         "note": "受診特記-検査特記コードが重複",
         "previousResults": [
         ],
@@ -126,5 +131,34 @@
         "examItemDetailOrders": [
         ],
         "inputNote": "20041705"
+    },
+    {
+        "sortNo": 6,
+        "connectionCode": "C20211706",
+        "actionType": 0,
+        "placeCode": "P2004-17",
+        "teamCode": "T2004-17",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041706",
+        "examineeCode": "E20041706",
+        "age": "0560606",
+        "note": "検査項目明細依頼-検査項目明細CDが重複",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+            {
+                "examItemDetailCode": "Order-200417",
+                "note": "comment-200417-1"
+            },
+            {
+                "examItemDetailCode": "Order-200417",
+                "note": "comment-200417-2"
+            }
+        ],
+        "inputNote": "20041706"
     }
 ]

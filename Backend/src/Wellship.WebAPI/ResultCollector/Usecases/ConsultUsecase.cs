@@ -316,6 +316,8 @@ public class ConsultUsecase : IConsultUsecase
         DateOnly examDate = placeSchedule.ExamDate;
         // 受診の年齢
         var examAge = consult.Age;
+        // 未受診の検査メニューを取得
+        var unexaminedItems = await GetUnexaminedMenusAsync(consultNumber);
         // 検査メニューに関連した検査項目情報を取得
         var examItemGroup = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
         // 検査項目明細IDを取得
@@ -375,6 +377,7 @@ public class ConsultUsecase : IConsultUsecase
                 Sex = (int)examinee.Sex,
                 ExamDateAge = examAge.Years
             },
+            IsComplete = !unexaminedItems.UnexaminedMenus.Select(x => x.ExamMenuId).Contains(examMenuId),
             RelatedExamItems = relatedExamItems,
             ExamItemGroups = examItemGroups.ToArray()
         };
@@ -519,9 +522,6 @@ public class ConsultUsecase : IConsultUsecase
         var consult = await _consultRepository.GetConsultAsync(consultNumber);
         var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
-        var examDate = placeSchedule.ExamDate;
-        // 受診の年齢
-        var examAge = consult.Age;
 
         // DBとリクエスト値から今回値を取得して合成する（リクエスト値を優先する）
         var dbCurrentResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
@@ -534,6 +534,9 @@ public class ConsultUsecase : IConsultUsecase
 
         // 検査基準値範囲を取得
         var ranges = await _consultRepository.GetExamNormalValueRangesAsync(consult.ConsultId, examItemDetailIds);
+        var filteredRanges = ranges.Where(x => x.TargetAge.IsMatch(consult.Age))
+                                   .Where(x => x.TargetSex.IsMatch(examinee.Sex))
+                                   .ToArray();
 
         // 今回値に対して範囲チェック
         var errors = new List<Domain.Models.RangeError>();
@@ -541,7 +544,7 @@ public class ConsultUsecase : IConsultUsecase
         {
             // 検査結果がMin以上Max未満に当てはまる範囲の設定を取得する
             // 優先度の昇順でソートして先頭の基準値範囲を採用する
-            var range = ranges.Where(x => x.ExamItemDetailId == current.Key && x.ValueRange.InRange(current.Value))
+            var range = filteredRanges.Where(x => x.ExamItemDetailId == current.Key && x.ValueRange.InRange(current.Value))
                               .OrderBy(x => x.Priority)
                               .FirstOrDefault();
 

@@ -131,3 +131,14 @@ export enum Role {
   一般 = 10,
   管理者 = 20,
 }
+
+/**
+ * アイコンタイプ
+ * @description ダイアログに表示するアイコンを出し分けるためのタイプです。
+ */
+export enum IconType {
+  未設定 = "none",
+  正常 = "info",
+  警告 = "warning",
+  異常 = "error",
+}

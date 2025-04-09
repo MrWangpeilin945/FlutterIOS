@@ -20,6 +20,8 @@ steps:
         TRUNCATE TABLE resultcollector.teams CASCADE;
         -- 受診者
         TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
         -- 検査特記
         TRUNCATE TABLE resultcollector.exam_menu_note_codes CASCADE;
         -- 基準値パターン
@@ -69,18 +71,22 @@ steps:
       current.res.status == 207
       // レスポンスに4件のErrorObjectが返されることを確認
       && len(current.res.body) == 4
+      // ExamItemDetailCodeとExamDateで重複する
       && current.res.body[0].code == "10003"
       && current.res.body[0].inputNote == "2004111"
-      && current.res.body[0].message == "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:PREVI-2004-11-1/PreviousResults.ExamDate:2024/11/22"
+      && current.res.body[0].message == "キー項目が重複しています。PreviousResults.ExamItemDetailCode:PREVI-2004-11-1/PreviousResults.ExamDate:2024/11/22"
+      // ExamItemDetailCodeとExamDateで重複する
       && current.res.body[1].code == "10003"
       && current.res.body[1].inputNote == "2004111"
-      && current.res.body[1].message == "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:PREVI-2004-11-3/PreviousResults.ExamDate:2024/10/10"
+      && current.res.body[1].message == "キー項目が重複しています。PreviousResults.ExamItemDetailCode:PREVI-2004-11-3/PreviousResults.ExamDate:2024/10/10"
+      // ExamItemDetailCodeのexam_item_detail_idとExamDateで重複する
       && current.res.body[2].code == "10003"
       && current.res.body[2].inputNote == "2004111"
-      && current.res.body[2].message == "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:PREVI-2004-11-1/PreviousResults.ExamDate:2024/11/22"
+      && current.res.body[2].message == "キー項目が重複しています。PreviousResults.ExamItemDetailCode:PREVI-2004-11-1/PreviousResults.ExamDate:2024/11/22"
+      // ExamItemDetailCodeのexam_item_detail_idとExamDateで重複する
       && current.res.body[3].code == "10003"
       && current.res.body[3].inputNote == "2004111"
-      && current.res.body[3].message == "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:PREVI-2004-11-2/PreviousResults.ExamDate:2024/11/22"
+      && current.res.body[3].message == "キー項目が重複しています。PreviousResults.ExamItemDetailCode:PREVI-2004-11-2/PreviousResults.ExamDate:2024/11/22"
     dump:
       expr: current.res.body
       out: ../Dump/EC2004-11.json

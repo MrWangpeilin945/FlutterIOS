@@ -22,6 +22,11 @@ public enum ExamItemGroupType
     数値_左右 = 22,
 
     /// <summary>
+    /// 数値_繰り返し_同一値
+    /// </summary>
+    数値_繰り返し_同一値 = 23,
+
+    /// <summary>
     /// 選択
     /// </summary>
     選択 = 31,

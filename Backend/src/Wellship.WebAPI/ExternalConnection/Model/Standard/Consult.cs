@@ -53,8 +53,14 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard
         /// <summary>
         /// 受診者コード
         /// </summary>
-        [JsonPropertyName("examineeCd")]
-        public required string ExamineeCd { get; init; }
+        [JsonPropertyName("examineeCode")]
+        public required string ExamineeCode { get; init; }
+
+        /// <summary>
+        /// 年齢
+        /// </summary>
+        [JsonPropertyName("age")]
+        public required string Age { get; init; }
 
         /// <summary>
         /// 受診.特記事項

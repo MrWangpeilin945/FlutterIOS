@@ -20,6 +20,8 @@ steps:
         TRUNCATE TABLE resultcollector.teams CASCADE;
         -- 受診者
         TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
         -- 検査特記
         TRUNCATE TABLE resultcollector.exam_menu_note_codes CASCADE;
         -- 基準値パターン
@@ -64,7 +66,7 @@ steps:
       && len(current.res.body) == 5
       && current.res.body[0].code == "10003"
       && current.res.body[0].inputNote == "2004081"
-      && current.res.body[0].message == "キー項目が重複しています。ConsultNotes.Code: NOTE-T2004081"
+      && current.res.body[0].message == "キー項目が重複しています。ConsultNotes.Code:NOTE-T2004081"
       && current.res.body[1].code == "10001"
       && current.res.body[1].inputNote == "2004081"
       && current.res.body[1].message == "指定されたConsultNotes.Codeがシステム上に存在しません。Code:NOTE-T2004081"

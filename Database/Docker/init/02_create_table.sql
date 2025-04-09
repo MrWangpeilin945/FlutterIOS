@@ -606,6 +606,85 @@ order by
 
 ;
 
+CREATE VIEW progress_exam_menus AS 
+with 明細結果 as ( 
+    select
+        c.consult_id
+        , c.place_schedule_id
+        , d.exam_item_id
+        , o.exam_item_detail_id
+        , case 
+            when r.exam_item_detail_id is not null -- 結果レコードがあれば実施済み
+                then 41 
+            when ca.exam_item_detail_id is not null -- 中止レコードがあれば検査中止
+                then 51 
+            else 11                             -- レコードがなければ未実施
+            end as detail_status                -- 明細ステータス
+    from
+        resultcollector.consult c 
+        inner join resultcollector.exam_item_detail_orders o 
+            on c.consult_id = o.consult_id 
+        left join resultcollector.exam_results r 
+            on o.exam_item_detail_id = r.exam_item_detail_id 
+            and o.consult_id = r.consult_id 
+        left join resultcollector.exam_cancels ca 
+            on o.exam_item_detail_id = ca.exam_item_detail_id 
+            and o.consult_id = ca.consult_id 
+        left join resultcollector.exam_item_details d 
+            on o.exam_item_detail_id = d.exam_item_detail_id
+) 
+, 検査メニュー状況 as ( 
+    select
+        明細結果.consult_id
+        , 明細結果.place_schedule_id
+        , m.exam_menu_id
+        , case 
+            when 11 = any (ARRAY_AGG(明細結果.detail_status)) -- 未実施が一つでもあれば未実施
+                then 11 
+            when 51 = all (ARRAY_AGG(明細結果.detail_status)) -- すべて検査中止であれば検査中止
+                then 51 
+            when 41 = any (ARRAY_AGG(明細結果.detail_status)) -- 上記以外で検査済みを含む場合は検査済み
+                then 41 
+            end as menu_status 
+    from
+        明細結果 
+        inner join resultcollector.exam_items i 
+            on 明細結果.exam_item_id = i.exam_item_id 
+        inner join resultcollector.exam_item_groups g 
+            on i.exam_item_group_id = g.exam_item_group_id 
+        inner join resultcollector.exam_menus m 
+            on g.exam_menu_id = m.exam_menu_id 
+    group by
+        consult_id
+        , place_schedule_id
+        , m.exam_menu_id
+) 
+select
+    検査メニュー状況.consult_id                 -- 受診ID
+    , 検査メニュー状況.place_schedule_id        -- 会場日程ID
+    , 検査メニュー状況.exam_menu_id             -- 検査メニューID
+    , 検査メニュー状況.menu_status              -- 検査進捗状況
+    , con.progress_status as consult_status     -- 受診進捗状況
+    , case 
+        when 検査メニュー状況.exam_menu_id = 11 
+        and con.progress_status = 11 
+            then 11 
+        when 検査メニュー状況.exam_menu_id = 11 
+        and con.progress_status = 21 
+            then 21 
+        when 検査メニュー状況.exam_menu_id = 41 
+        and con.progress_status = 21 
+            then 41 
+        when 検査メニュー状況.exam_menu_id = 51 
+        and con.progress_status = 21 
+            then 51 
+        end as aggregated_status                -- 集計検査進捗状況
+from
+    検査メニュー状況 
+    inner join resultcollector.consult con 
+        on 検査メニュー状況.consult_id = con.consult_id;
+;
+
 ALTER TABLE affiliations
   ADD CONSTRAINT affiliations_FK1 FOREIGN KEY (examinee_id) REFERENCES examinees(examinee_id)
   ON DELETE RESTRICT
@@ -1111,6 +1190,13 @@ COMMENT ON COLUMN prior_exam_menus.current_exam_menu_id IS '現在検査メニ�
 COMMENT ON COLUMN prior_exam_menus.prior_exam_menu_id IS '前提検査メニューID';
 COMMENT ON COLUMN prior_exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN prior_exam_menus.created_by IS '作成者';
+
+COMMENT ON VIEW progress_exam_menus IS '進捗_検査メニュー単位';
+COMMENT ON COLUMN progress_exam_menus.consult_id IS 'consult_id';
+COMMENT ON COLUMN progress_exam_menus.place_schedule_id IS 'place_schedule_id';
+COMMENT ON COLUMN progress_exam_menus.exam_item_id IS 'exam_item_id';
+COMMENT ON COLUMN progress_exam_menus.exam_item_detail_id IS 'exam_item_detail_id';
+COMMENT ON COLUMN progress_exam_menus.detail_status IS 'detail_status';
 
 COMMENT ON TABLE refresh_tokens IS 'リフレッシュトークン';
 COMMENT ON COLUMN refresh_tokens.staff_id IS '職員ID';
