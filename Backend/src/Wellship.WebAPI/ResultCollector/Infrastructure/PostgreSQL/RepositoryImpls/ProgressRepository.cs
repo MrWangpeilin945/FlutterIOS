@@ -23,7 +23,7 @@ public class ProgressRepository : IProgressRepository
     }
 
     /// <summary>
-    /// 会場日程IDを指定して検査項目ごとの進捗状況を取得します。
+    /// 会場日程IDを指定して検査メニューごとの進捗状況を取得します。
     /// </summary>
     public async Task<AggregatedProgress> GetAggregatedProgressAsync(Guid placeScheduleId)
     {
