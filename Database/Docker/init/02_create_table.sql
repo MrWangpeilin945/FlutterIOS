@@ -1191,12 +1191,6 @@ COMMENT ON COLUMN prior_exam_menus.prior_exam_menu_id IS '前提検査メニュ�
 COMMENT ON COLUMN prior_exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN prior_exam_menus.created_by IS '作成者';
 
-COMMENT ON VIEW progress_exam_menus IS '進捗_検査メニュー単位';
-COMMENT ON COLUMN progress_exam_menus.consult_id IS 'consult_id';
-COMMENT ON COLUMN progress_exam_menus.place_schedule_id IS 'place_schedule_id';
-COMMENT ON COLUMN progress_exam_menus.exam_item_id IS 'exam_item_id';
-COMMENT ON COLUMN progress_exam_menus.exam_item_detail_id IS 'exam_item_detail_id';
-COMMENT ON COLUMN progress_exam_menus.detail_status IS 'detail_status';
 
 COMMENT ON TABLE refresh_tokens IS 'リフレッシュトークン';
 COMMENT ON COLUMN refresh_tokens.staff_id IS '職員ID';
