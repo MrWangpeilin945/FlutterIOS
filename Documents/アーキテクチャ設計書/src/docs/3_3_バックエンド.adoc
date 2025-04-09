@@ -25,6 +25,7 @@
     │           │   ├── Enums
     │           │   └── Repositories
     │           ├── Infrastructure/
+    │           │   ├── BackgroudTasks/
     │           │   ├── PostgreSQL/
     │           │   │   └── RepositoryImpls
     │           │   └── Http
@@ -377,6 +378,16 @@ sequenceDiagram
     end
 ----
 
+== バックグラウンド処理
+
+HTTPリクエストをトリガーにしてクライアント側がタイムアウトするレベルの巨大なデータを処理する場合、HTTPレスポンスを即時返却して別スレッドで処理を実行する。
+
+Fire-And-Forgetパターンで処理をする場合、taskをawaitしないようにしただけではHTTPレスポンス返却後にDbConnectionなどがDisposeされることから、専用のTaskRunnerを用意した。
+``Ryobi.Wellship.WebApi.Infrastructure.BackgroundTasks`` 名前空間の``IServiceScopeTaskRunner``の``Run``メソッドを使用することで、メソッドに渡した処理が非同期で実行される。
+
+NOTE: このTaskRunnerに渡された処理はHttpContextなど元のスレッドの情報を引き継がないようになっています。``ITenantProvider``のみ情報を引き継ぐ処理をしていますが、他に引き継ぐ必要がある情報があればDIコンテナによってDisposeされないよう注意して引き渡してください。
+
+CAUTION: 別スレッドで処理をするため、処理中にエラーが発生して処理が中断されてもその情報はクライアント側に伝わりません。使用する場合には運用フローの考慮と適切なロギングを実施してください。
 
 == 効率的なバックエンド開発のために
 
