@@ -7,7 +7,8 @@
         "teamCode": "T2004-15",
         "examDate": "2025-03-03",
         "consultNumber": "No200415a1",
-        "examineeCd": "E20041501",
+        "examineeCode": "E20041501",
+        "age": "0470510",
         "note": "受診番号が異なる連携キーで登録済",
         "previousResults": [],
         "consultThresholds": [],
@@ -23,7 +24,8 @@
         "teamCode": "T2004-15-2",
         "examDate": "2025-03-03",
         "consultNumber": "No2004152",
-        "examineeCd": "E20041502",
+        "examineeCode": "E20041502",
+        "age": "0390810",
         "note": "会場ID/班ID/会場日程IDが取得できない",
         "previousResults": [],
         "consultThresholds": [],
@@ -39,7 +41,8 @@
         "teamCode": "T2004-15",
         "examDate": "2025-03-03",
         "consultNumber": "No2004153",
-        "examineeCd": "E20041503-1",
+        "examineeCode": "E20041503-1",
+        "age": "0410302",
         "note": "受診者IDが取得できない",
         "previousResults": [],
         "consultThresholds": [],
@@ -55,21 +58,22 @@
         "teamCode": "T2004-15",
         "examDate": "2025-03-03",
         "consultNumber": "No2004153",
-        "examineeCd": "E20041501",
+        "examineeCode": "E20041501",
+        "age": "0410302",
         "note": "過去検査結果/基準値判定/受診特記/検査項目明細依頼のエラー",
         "previousResults": [
             {
-                "examItemDetailCd": "PREVI-200415",
+                "examItemDetailCode": "PREVI-200415",
                 "examDate": "2024-11-22",
                 "value": "100"
             },
             {
-                "examItemDetailCd": "PREVI-200415-X",
+                "examItemDetailCode": "PREVI-200415-X",
                 "examDate": "2024-11-22",
                 "value": "110"
             },
             {
-                "examItemDetailCd": "PREVI-200415-Y",
+                "examItemDetailCode": "PREVI-200415-Y",
                 "examDate": "2024-11-22",
                 "value": "120"
             }
@@ -88,13 +92,16 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-200415"
+                "examItemDetailCode": "ORDER-200415",
+                "note": "comment-200415"
             },
             {
-                "examItemDetailCd": "ORDER-200415-X"
+                "examItemDetailCode": "ORDER-200415-X",
+                "note": "comment-200415-X"
             },
             {
-                "examItemDetailCd": "ORDER-200415-Y"
+                "examItemDetailCode": "ORDER-200415-Y",
+                "note": "comment-200415-Y"
             }
         ],
         "inputNote": "20041504"
@@ -107,7 +114,8 @@
         "teamCode": "",
         "examDate": "",
         "consultNumber": "",
-        "examineeCd": "",
+        "examineeCode": "",
+        "age": "",
         "note": "連携キーの取得に失敗",
         "previousResults": [],
         "consultThresholds": [],
@@ -123,11 +131,12 @@
         "teamCode": "T2004-15",
         "examDate": "2025-03-23",
         "consultNumber": "No200415a100",
-        "examineeCd": "E20041504",
+        "examineeCode": "E20041504",
+        "age": "0540415",
         "note": "特記事項2004-15-1",
         "previousResults": [
             {
-                "examItemDetailCd": "PREVI-200415-3",
+                "examItemDetailCode": "PREVI-200415-3",
                 "examDate": "2024-06-20",
                 "value": "25"
             }
@@ -146,7 +155,8 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-200415-3"
+                "examItemDetailCode": "ORDER-200415-3",
+                "note": "comment-20041506"
             }
         ],
         "inputNote": "20041506"
@@ -159,7 +169,8 @@
         "teamCode": "",
         "examDate": "",
         "consultNumber": "",
-        "examineeCd": "",
+        "examineeCode": "",
+        "age": "",
         "note": "",
         "previousResults": [],
         "consultThresholds": [],
@@ -175,11 +186,12 @@
         "teamCode": "T2004-15",
         "examDate": "2025-03-23",
         "consultNumber": "No200415a300",
-        "examineeCd": "E20041503",
+        "examineeCode": "E20041503",
+        "age": "0540810",
         "note": "特記事項2004-15-3",
         "previousResults": [
             {
-                "examItemDetailCd": "PREVI-200415-3",
+                "examItemDetailCode": "PREVI-200415-3",
                 "examDate": "2024-04-05",
                 "value": "80"
             }
@@ -198,7 +210,16 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-200415-3"
+                "examItemDetailCode": "ORDER-200415-4-1",
+                "note": "comment-20241508-4-1"
+            },
+            {
+                "examItemDetailCode": "ORDER-200415-4-2",
+                "note": "comment-20241508-4-2"
+            },
+            {
+                "examItemDetailCode": "ORDER-200415-4-3",
+                "note": "comment-20241508-4-3"
             }
         ],
         "inputNote": "20241508"
@@ -211,7 +232,8 @@
         "teamCode": "",
         "examDate": "2025-03-23",
         "consultNumber": "",
-        "examineeCd": "",
+        "examineeCode": "",
+        "age": "",
         "note": "必須項目の空値",
         "previousResults": [
         ],
@@ -231,11 +253,12 @@
         "teamCode": "T2004-15",
         "examDate": "2025-03-23",
         "consultNumber": "No200415a100",
-        "examineeCd": "E20041510",
+        "examineeCode": "E20041510",
+        "age": "0451019",
         "note": "子の必須項目の空値",
         "previousResults": [
             {
-                "examItemDetailCd": "",
+                "examItemDetailCode": "",
                 "examDate": "2024-04-05",
                 "value": ""
             }
@@ -254,7 +277,8 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": ""
+                "examItemDetailCode": "",
+                "note": ""
             }
         ],
         "inputNote": "20041510"
@@ -267,7 +291,8 @@
         "teamCode": "T2004-15",
         "examDate": "2025-03-23",
         "consultNumber": "No200415011",
-        "examineeCd": "E20041511",
+        "examineeCode": "E20041511",
+        "age": "0501010",
         "note": "処理順が重複",
         "previousResults": [
         ],
@@ -287,7 +312,8 @@
         "teamCode": "T2004-15",
         "examDate": "2025-03-23",
         "consultNumber": "No200415012",
-        "examineeCd": "E20041512",
+        "examineeCode": "E20041512",
+        "age": "0440906",
         "note": "処理順が重複",
         "previousResults": [
         ],
@@ -307,7 +333,8 @@
         "teamCode": "T2004-15",
         "examDate": "2025-03-23",
         "consultNumber": "No200415013",
-        "examineeCd": "E20041513",
+        "examineeCode": "E20041513",
+        "age": "0600606",
         "note": "子のプロパティが重複",
         "previousResults": [
         ],
@@ -343,7 +370,8 @@
         "teamCode": "T2004-15",
         "examDate": "2025-03-23",
         "consultNumber": "12345678901234567890123456789012345678901234567890a",
-        "examineeCd": "E20041514",
+        "examineeCode": "E20041514",
+        "age": "0490707",
         "note": "受診番号の文字数が50を超える",
         "previousResults": [
         ],
@@ -363,7 +391,8 @@
         "teamCode": "T2004-15",
         "examDate": "2025-03-23",
         "consultNumber": "No-12345/ 67890#a",
-        "examineeCd": "E20041514",
+        "examineeCode": "E20041514",
+        "age": "0510609",
         "note": "受診番号に記号が含まれる",
         "previousResults": [
         ],
@@ -374,5 +403,89 @@
         "examItemDetailOrders": [
         ],
         "inputNote": "20041515"
+    },
+    {
+        "sortNo": 16,
+        "connectionCode": "CCS-200415-16",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "No20041516",
+        "examineeCode": "E20041515",
+        "age": "510609",
+        "note": "年齢が7桁未満",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041516"
+    },
+    {
+        "sortNo": 17,
+        "connectionCode": "CCS-200415-17",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "No20041517",
+        "examineeCode": "E20041515",
+        "age": "00510609",
+        "note": "年齢が7桁超",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041517"
+    },
+    {
+        "sortNo": 18,
+        "connectionCode": "CCS-200415-18",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "No20041518",
+        "examineeCode": "E20041515",
+        "age": "0511231",
+        "note": "年齢の月数・日数が範囲外",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041518"
+    },
+    {
+        "sortNo": 19,
+        "connectionCode": "CCS-200415-19",
+        "actionType": 0,
+        "placeCode": "P2004-15",
+        "teamCode": "T2004-15",
+        "examDate": "2025-03-23",
+        "consultNumber": "No20041519",
+        "examineeCode": "E20041515",
+        "age": "-51a60z",
+        "note": "年齢に英字・記号が含まれる",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041519"
     }            
 ]

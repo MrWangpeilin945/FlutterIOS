@@ -13,6 +13,11 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard
         /// <summary>
         /// 検査項目明細CD
         /// </summary>
-        public required string ExamItemDetailCd { get; init; }
+        public required string ExamItemDetailCode { get; init; }
+
+        /// <summary>
+        /// 検査項目明細備考
+        /// </summary>
+        public required string Note { get; init; }
     }
 }

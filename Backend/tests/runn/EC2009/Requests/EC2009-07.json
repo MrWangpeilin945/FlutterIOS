@@ -1,8 +1,8 @@
 [
     {
         "name": "白血球数（男女）",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "9990000",
         "minAge": "0000000",
         "targetSex": 3,
@@ -13,8 +13,8 @@
     },
     {
         "name": "白血球数（基準値パターンが取得できない）",
-        "thresholdCd": "Dummy2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "Dummy2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "9990000",
         "minAge": "0000000",
         "targetSex": 3,
@@ -25,8 +25,8 @@
     },
     {
         "name": "白血球数（検査項目明細IDが取得できない）",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "Dummy2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "Dummy2009WBC",
         "maxAge": "9990000",
         "minAge": "0000000",
         "targetSex": 3,
@@ -36,9 +36,9 @@
         "inputNote": "2009073"
     },
     {
-        "name": "白血球数１（PKが重複するレコードが存在する）",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "name": "白血球数1（PKが重複するレコードが存在する）",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "0750000",
         "minAge": "0000000",
         "targetSex": 1,
@@ -48,9 +48,9 @@
         "inputNote": "2009074"
     },
     {
-        "name": "白血球数２（PKが重複するレコードが存在する）",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "name": "白血球数2（PKが重複するレコードが存在する）",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "0750000",
         "minAge": "0000000",
         "targetSex": 1,
@@ -61,8 +61,8 @@
     },
     {
         "name": "白血球数（基準値パターン・検査項目明細IDが取得できない）",
-        "thresholdCd": "Dummy2009",
-        "examItemDetailCd": "Dummy2009WBC",
+        "thresholdCode": "Dummy2009",
+        "examItemDetailCode": "Dummy2009WBC",
         "maxAge": "9990000",
         "minAge": "0000000",
         "targetSex": 3,
@@ -73,8 +73,8 @@
     },
     {
         "name": "",
-        "thresholdCd": "",
-        "examItemDetailCd": "",
+        "thresholdCode": "",
+        "examItemDetailCode": "",
         "maxAge": "",
         "minAge": "",
         "targetSex": 3,
@@ -85,8 +85,8 @@
     },
     {
         "name": "白血球数（年齢の形式が一致しない）",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "9999999",
         "minAge": "000000",
         "targetSex": 2,
@@ -97,8 +97,8 @@
     },
     {
         "name": "白血球数（年齢の大小比較が一致しない）",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "0450000",
         "minAge": "0500000",
         "targetSex": 1,
@@ -109,8 +109,8 @@
     },
     {
         "name": "白血球数（基準値の大小比較が一致しない）",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "9990000",
         "minAge": "0000000",
         "targetSex": 3,

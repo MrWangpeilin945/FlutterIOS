@@ -7,7 +7,8 @@
         "teamCode": "T2004-09",
         "examDate": "2025-03-03",
         "consultNumber": "No2004091",
-        "examineeCd": "E2004091",
+        "examineeCode": "E2004091",
+        "age": "0410302",
         "note": "基準値パターンが取得できない",
         "previousResults": [
         ],

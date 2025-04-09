@@ -20,6 +20,8 @@ steps:
         TRUNCATE TABLE resultcollector.teams CASCADE;
         -- 受診者
         TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
         -- 検査特記
         TRUNCATE TABLE resultcollector.exam_menu_note_codes CASCADE;
         -- 基準値パターン
@@ -64,20 +66,20 @@ steps:
       && len(current.res.body) == 5
       && current.res.body[0].code == "10001"
       && current.res.body[0].inputNote == "2004101"
-      && current.res.body[0].message == "指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:PREVI-200401-10-1"
-      // PreviousResults.ExamItemDetailCdが重複している場合でも「過去検査結果の検査項目明細IDが取得できない」ErrorObjectは出力される
+      && current.res.body[0].message == "指定されたPreviousResults.ExamItemDetailCodeがシステム上に存在しません。Code:PREVI-200401-10-1"
+      // PreviousResults.ExamItemDetailCodeが重複している場合でも「過去検査結果の検査項目明細IDが取得できない」ErrorObjectは出力される
       && current.res.body[1].code == "10001"
       && current.res.body[1].inputNote == "2004101"
-      && current.res.body[1].message == "指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:PREVI-200401-10-1"
+      && current.res.body[1].message == "指定されたPreviousResults.ExamItemDetailCodeがシステム上に存在しません。Code:PREVI-200401-10-1"
       && current.res.body[2].code == "10001"
       && current.res.body[2].inputNote == "2004101"
-      && current.res.body[2].message == "指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:PREVI-200401-10-2"
+      && current.res.body[2].message == "指定されたPreviousResults.ExamItemDetailCodeがシステム上に存在しません。Code:PREVI-200401-10-2"
       && current.res.body[3].code == "10001"
       && current.res.body[3].inputNote == "2004101"
-      && current.res.body[3].message == "指定されたPreviousResults.ExamItemDetailCdがシステム上に存在しません。Code:PREVI-200401-10-3"
+      && current.res.body[3].message == "指定されたPreviousResults.ExamItemDetailCodeがシステム上に存在しません。Code:PREVI-200401-10-3"
       && current.res.body[4].code == "10003"
       && current.res.body[4].inputNote == "2004101"
-      && current.res.body[4].message == "キー項目が重複しています。Code:PreviousResults.ExamItemDetailCd:PREVI-200401-10-1/PreviousResults.ExamDate:2024/11/22"
+      && current.res.body[4].message == "キー項目が重複しています。PreviousResults.ExamItemDetailCode:PREVI-200401-10-1/PreviousResults.ExamDate:2024/11/22"
     dump:
       expr: current.res.body
       out: ../Dump/EC2004-10.json

@@ -119,7 +119,7 @@ public static class ValidationChecker
                     errorObjects.Add(new ErrorObject
                     {
                         Code = "10003",
-                        Message = $"キー項目が重複しています。{propertyName}: {item.PropertyValue}",
+                        Message = $"キー項目が重複しています。{propertyName}:{item.PropertyValue}",
                         InputNote = inputNote ?? ""
                     });
                 }
@@ -165,7 +165,7 @@ public static class ValidationChecker
                                 errorObjects.Add(new ErrorObject
                                 {
                                     Code = "10003",
-                                    Message = $"キー項目が重複しています。{parentProperty}.{childrenProperty}: {duplicate}",
+                                    Message = $"キー項目が重複しています。{parentProperty}.{childrenProperty}:{duplicate}",
                                     InputNote = inputNote ?? ""
                                 });
                             }
@@ -182,9 +182,10 @@ public static class ValidationChecker
     /// </summary>
     /// <param name="requestCollection">リクエストクラスのコレクション</param>
     /// <param name="properties">チェック対象のプロパティ名一覧</param>
-    /// <param name="maxLengths">最大文字長一覧</param>
+    /// <param name="stringLengths">文字長一覧</param>
+    /// <param name="compars">文字比較一覧(-1:以下 0:等しい 1:以上)</param>
     /// <param name="errorObjects">エラーオブジェクト</param>
-    public static List<object> StringLengthCheckProperties(IEnumerable<object> requestCollection, string[] properties, int[] maxLengths, List<ErrorObject> errorObjects)
+    public static List<object> StringLengthCheckProperties(IEnumerable<object> requestCollection, string[] properties, int[] stringLengths, int[] compars, List<ErrorObject> errorObjects)
     {
         var warningList = new List<object>();
 
@@ -194,8 +195,10 @@ public static class ValidationChecker
             // プロパティ単位にチェックする
             foreach (var propertyName in properties)
             {
-                var propertyValue = request.GetType().GetProperty(propertyName)?.GetValue(request)?.ToString();
-                if (propertyValue?.Length > maxLengths[index])
+                var propertyValue = request.GetType().GetProperty(propertyName)?.GetValue(request)?.ToString() ?? "";
+                if ((compars[index] == -1 && propertyValue.Length > stringLengths[index]) ||
+                    (compars[index] == 1  && propertyValue.Length < stringLengths[index]) || 
+                    (compars[index] == 0  && propertyValue.Length != stringLengths[index]))
                 {
                     var inputNote = request.GetType().GetProperty("InputNote")?.GetValue(request)?.ToString();
                     warningList.Add(request);
@@ -217,9 +220,10 @@ public static class ValidationChecker
     /// </summary>
     /// <param name="requestCollection">リクエストクラスのコレクション</param>
     /// <param name="properties">チェック対象のプロパティ名一覧（親プロパティ名, 子プロパティ名）</param>
-    /// <param name="maxLengths">最大文字長一覧</param>
+    /// <param name="stringLengths">文字長一覧</param>
+    /// <param name="compars">文字比較一覧(-1:以下 0:等しい 1:以上)</param>
     /// <param name="errorObjects">エラーオブジェクト</param>
-    public static List<object> StringLengthChildrenProperties(IEnumerable<object> requestCollection, List<(string ParentProperty, string ChildrenProperty)> properties, int[] maxLengths, List<ErrorObject> errorObjects)
+    public static List<object> StringLengthChildrenProperties(IEnumerable<object> requestCollection, List<(string ParentProperty, string ChildrenProperty)> properties, int[] stringLengths, int[] compars, List<ErrorObject> errorObjects)
     {
 
         var warningList = new List<object>();
@@ -237,8 +241,10 @@ public static class ValidationChecker
                     {
                         foreach (var item in parentEnumerable)
                         {
-                            var propertyValue = item.GetType().GetProperty(childrenProperty)?.GetValue(item)?.ToString();
-                            if (propertyValue?.Length > maxLengths[index])
+                            var propertyValue = item.GetType().GetProperty(childrenProperty)?.GetValue(item)?.ToString() ?? "";
+                            if ((compars[index] == -1 && propertyValue.Length > stringLengths[index]) ||
+                                (compars[index] == 1  && propertyValue.Length < stringLengths[index]) || 
+                                (compars[index] == 0  && propertyValue.Length != stringLengths[index]))
                             {
                                 var inputNote = request.GetType().GetProperty("InputNote")?.GetValue(request)?.ToString();
                                 warningList.Add(request);
@@ -275,8 +281,8 @@ public static class ValidationChecker
             // プロパティ単位にチェックする
             foreach (var propertyName in properties)
             {
-                var propertyValue = request.GetType().GetProperty(propertyName)?.GetValue(request)?.ToString();
-                if (!string.IsNullOrEmpty(propertyValue) && !Regex.IsMatch(propertyValue, patterns[index]))
+                var propertyValue = request.GetType().GetProperty(propertyName)?.GetValue(request)?.ToString() ?? "";
+                if (!Regex.IsMatch(propertyValue, patterns[index]))
                 {
                     var inputNote = request.GetType().GetProperty("InputNote")?.GetValue(request)?.ToString();
                     warningList.Add(request);
@@ -318,8 +324,8 @@ public static class ValidationChecker
                     {
                         foreach (var item in parentEnumerable)
                         {
-                            var propertyValue = item.GetType().GetProperty(childrenProperty)?.GetValue(item)?.ToString();
-                            if (!string.IsNullOrEmpty(propertyValue) && !Regex.IsMatch(propertyValue, patterns[index]))
+                            var propertyValue = item.GetType().GetProperty(childrenProperty)?.GetValue(item)?.ToString() ?? "";
+                            if (!Regex.IsMatch(propertyValue, patterns[index]))
                             {
                                 var inputNote = request.GetType().GetProperty("InputNote")?.GetValue(request)?.ToString();
                                 warningList.Add(request);

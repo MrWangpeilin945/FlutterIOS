@@ -1,8 +1,8 @@
 [
     {
         "name": "下限年齢値と上限年齢値が等しい",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "0750000",
         "minAge": "0750000",
         "targetSex": 1,
@@ -13,8 +13,8 @@
     },
     {
         "name": "下限年齢値が上限年齢値より大きい",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "0400000",
         "minAge": "0500000",
         "targetSex": 2,
@@ -25,8 +25,8 @@
     },
     {
         "name": "下限基準値と上限基準値が等しい",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "9990000",
         "minAge": "0000000",
         "targetSex": 1,
@@ -37,8 +37,8 @@
     },
     {
         "name": "下限基準値が上限基準値より大きい",
-        "thresholdCd": "EC2009",
-        "examItemDetailCd": "EC2009WBC",
+        "thresholdCode": "EC2009",
+        "examItemDetailCode": "EC2009WBC",
         "maxAge": "9990000",
         "minAge": "0000000",
         "targetSex": 2,

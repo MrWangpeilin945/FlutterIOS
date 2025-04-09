@@ -7,6 +7,7 @@ using NSwag.Annotations;
 using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers.V1;
 /// <summary>
@@ -17,15 +18,17 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers.V1;
 [OpenApiIgnore]
 public class DataImportController : ControllerBase
 {
-    private readonly IDataImportUsecase _dataImportUsecase;
+    private readonly IServiceScopeTaskRunner _serviceScopeTaskRunner;
+
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="dataImportUsecase">ファイル取り込み ユースケース</param>
-    public DataImportController(IDataImportUsecase dataImportUsecase)
+    /// <param name="serviceScopeTaskRunner"></param>
+    public DataImportController(IServiceScopeTaskRunner serviceScopeTaskRunner)
     {
-        _dataImportUsecase = dataImportUsecase;
+        _serviceScopeTaskRunner = serviceScopeTaskRunner;
+
     }
 
     /// <summary>
@@ -45,7 +48,7 @@ public class DataImportController : ControllerBase
             return BadRequest();
         }
 
-        var task = Task.Run(() => _dataImportUsecase.StoreConstantlyDataAsync(s3EventRequest.BucketName, s3EventRequest.ObjectKey)); // 別スレッドで非同期メソッドを実行
+        _ = _serviceScopeTaskRunner.Run<IDataImportUsecase>((dataImportUseCase) => dataImportUseCase.StoreConstantlyDataAsync(s3EventRequest.BucketName, s3EventRequest.ObjectKey));
 
         return Accepted();
 
@@ -66,7 +69,7 @@ public class DataImportController : ControllerBase
             return BadRequest();
         }
 
-        var task = Task.Run(() => _dataImportUsecase.StoreDailyDataAsync(s3EventRequest.BucketName)); // 別スレッドで非同期メソッドを実行
+        _ = _serviceScopeTaskRunner.Run<IDataImportUsecase>((dataImportUseCase) => dataImportUseCase.StoreDailyDataAsync(s3EventRequest.BucketName));
 
         return Accepted();
 

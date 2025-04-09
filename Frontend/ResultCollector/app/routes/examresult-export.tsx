@@ -40,6 +40,7 @@ import CommonFooter from "~/components/CommonFooter";
 import CommonHeader from "~/components/CommonHeader";
 import {
   ConsultResultExportStatus,
+  IconType,
   PlaceScheduleLockingStatus,
 } from "~/domain/enums";
 import type { ExportDataList } from "~/domain/wellship.schemas";
@@ -202,6 +203,7 @@ export default function ExamresultExport() {
   const [exportData, setExportData] = useState<ExportDataList>();
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [iconType, setIconType] = useState<string>(IconType.未設定);
   const [resultsOutputConfirmDialog, setResultsOutputConfirmDialog] =
     useState<ResultsOutputConfirmDialogState | null>(null);
   const [staff] = useAtom(staffState);
@@ -256,11 +258,13 @@ export default function ExamresultExport() {
               data: body,
             });
             if (result.status === 200) {
+              setIconType(IconType.正常);
               setMessage("検査結果を出力しました。");
               open();
             }
           } catch (error) {
             if (isAxiosError(error) && error.response) {
+              setIconType(IconType.異常);
               if (error.response.status === 400) {
                 setMessage(
                   getErrorMessage(errorMessages.invalid, "パラメータ"),
@@ -452,6 +456,7 @@ export default function ExamresultExport() {
                 onClose={close}
                 message={message || ""}
                 buttonMessage="閉じる"
+                iconType={iconType}
               />
               <ResultsOutputConfirmDialog ref={ref} title="検査結果出力">
                 <Stack>

@@ -23,7 +23,7 @@ import CommonFooter from "~/components/CommonFooter";
 import CommonHeader from "~/components/CommonHeader";
 import ConfirmDialog from "~/components/ConfirmDialog";
 import PlaceSchedule from "~/components/PlaceSchedule";
-import { PlaceScheduleLockingStatus } from "~/domain/enums";
+import { IconType, PlaceScheduleLockingStatus } from "~/domain/enums";
 import type {
   PlaceSchedule as PlaceScheduleType,
   PlaceScheduleLocking,
@@ -45,6 +45,7 @@ export default function PlaceScheduleLock() {
   const firstPlaceSchedule = useRef<PlaceScheduleType>(placeSchedule);
   const [opened, { open, close }] = useDisclosure(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [iconType, setIconType] = useState<string>(IconType.未設定);
   const [openedConfirm, { open: openConfirm, close: closeConfirm }] =
     useDisclosure(false);
   const [processStatus, setProcessStatus] =
@@ -67,7 +68,7 @@ export default function PlaceScheduleLock() {
   const { isFetching, refetch } = usePlaceScheduleGetPlaceScheduleLockingStatus(
     "1",
     placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
-    { query: { enabled: false } }
+    { query: { enabled: false } },
   );
 
   //AP1017呼び出し用(POST系APIの定義)
@@ -75,6 +76,7 @@ export default function PlaceScheduleLock() {
 
   //AP1016_会場ロック状態を取得する
   const fetchGetPlaceScheduleLocking = async () => {
+    setIconType(IconType.未設定);
     const result = await refetch();
     if (result.data) {
       setPlaceScheduleLock(result.data.data);
@@ -97,7 +99,7 @@ export default function PlaceScheduleLock() {
 
   // ボタン(会場ロック, 会場ロック解除)クリック
   const handleButtonClick = async (
-    lockingStatus: PlaceScheduleLockingStatus
+    lockingStatus: PlaceScheduleLockingStatus,
   ) => {
     if (lockingStatus === PlaceScheduleLockingStatus.検査中) {
       setMessage("会場ロックの解除を行ってもよろしいですか？");
@@ -133,16 +135,18 @@ export default function PlaceScheduleLock() {
         if (result.status === 200) {
           // AP1016を実行して画面再取得
           await fetchGetPlaceScheduleLocking();
+          setIconType(IconType.正常);
           setMessage("登録が完了しました。");
           open();
         }
       } catch (error) {
         if (isAxiosError(error) && error.response) {
+          setIconType(IconType.異常);
           if (error.response.status === 400) {
             setMessage(getErrorMessage(errorMessages.invalid, "パラメータ"));
           } else if (error.response.status === 404) {
             setMessage(
-              getErrorMessage(errorMessages.notFound, "該当する会場日程")
+              getErrorMessage(errorMessages.notFound, "該当する会場日程"),
             );
           } else if (error.response.status === 500) {
             setMessage(getErrorMessage(errorMessages.serverError));
@@ -228,7 +232,7 @@ export default function PlaceScheduleLock() {
                       {placeScheduleLock.updatedAt
                         ? format(
                             new Date(placeScheduleLock.updatedAt),
-                            "yyyy/MM/dd HH:mm"
+                            "yyyy/MM/dd HH:mm",
                           )
                         : ""}
                       ）&nbsp;
@@ -241,7 +245,7 @@ export default function PlaceScheduleLock() {
                   <Text size="sm" c="black01">
                     {getErrorMessage(
                       errorMessages.notFound,
-                      "該当する会場日程"
+                      "該当する会場日程",
                     )}
                   </Text>
                 </>
@@ -250,6 +254,7 @@ export default function PlaceScheduleLock() {
               <CommonDialog
                 message={message || ""}
                 buttonMessage="閉じる"
+                iconType={iconType}
                 isOpen={opened}
                 onClose={close}
               />

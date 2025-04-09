@@ -39,6 +39,11 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
         public required Guid ExamineeId { get; init; }
 
         /// <summary>
+        /// 年齢
+        /// </summary>
+        public required string Age { get; init; }
+
+        /// <summary>
         /// 連携キー
         /// </summary>
         public required string ConnectionCode { get; init; }

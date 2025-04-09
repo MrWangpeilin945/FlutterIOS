@@ -7,8 +7,9 @@
         "teamCode": "T2004-13",
         "examDate": "2025-03-03",
         "consultNumber": "No2004131",
-        "examineeCd": "E2004131",
-        "note": "検査項目明細依頼のPKが重複（examItemDetailId・examItemDetailCd）",
+        "examineeCode": "E2004131",
+        "age": "0410302",
+        "note": "検査項目明細依頼の検査項目明細CDが重複（examItemDetailCode）",
         "previousResults": [
         ],
         "consultThresholds": [
@@ -17,19 +18,24 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-2004-13-1"
+                "examItemDetailCode": "ORDER-2004-13-1",
+                "note": "comment-200413-1"
             },
             {
-                "examItemDetailCd": "ORDER-2004-13-2"
+                "examItemDetailCode": "ORDER-2004-13-2",
+                "note": "comment-200413-2"
             },
             {
-                "examItemDetailCd": "ORDER-2004-13-1"
+                "examItemDetailCode": "ORDER-2004-13-1",
+                "note": "comment-200413-3"
             },
             {
-                "examItemDetailCd": "ORDER-2004-13-3"
+                "examItemDetailCode": "ORDER-2004-13-3",
+                "note": "comment-200413-4"
             },
             {
-                "examItemDetailCd": "ORDER-2004-13-3"
+                "examItemDetailCode": "ORDER-2004-13-3",
+                "note": "comment-200413-5"
             }
         ],
         "inputNote": "2004131"

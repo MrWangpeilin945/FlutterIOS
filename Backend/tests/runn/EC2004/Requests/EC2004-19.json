@@ -7,7 +7,8 @@
         "teamCode": "T2004-19",
         "examDate": "2025-03-03",
         "consultNumber": "No-1234567890$",
-        "examineeCd": "E20041901",
+        "examineeCode": "E20041901",
+        "age": "0510101",
         "note": "受診番号に記号が含まれる",
         "previousResults": [
         ],
@@ -27,7 +28,8 @@
         "teamCode": "T2004-19",
         "examDate": "2025-03-03",
         "consultNumber": "No 123456780",
-        "examineeCd": "E20041902",
+        "examineeCode": "E20041902",
+        "age": "0520202",
         "note": "受診番号が空白が含まれる",
         "previousResults": [
         ],
@@ -47,7 +49,8 @@
         "teamCode": "T2004-19",
         "examDate": "2025-03-03",
         "consultNumber": "No123456780a",
-        "examineeCd": "E20041903",
+        "examineeCode": "E20041903",
+        "age": "0530303",
         "note": "受診番号が英字と数字のみで登録可",
         "previousResults": [
         ],
@@ -58,5 +61,68 @@
         "examItemDetailOrders": [
         ],
         "inputNote": "20041903"
+    },
+    {
+        "sortNo": 4,
+        "connectionCode": "C20211904",
+        "actionType": 0,
+        "placeCode": "P2004-19",
+        "teamCode": "T2004-19",
+        "examDate": "2025-03-03",
+        "consultNumber": "No0004",
+        "examineeCode": "E20041904",
+        "age": "0541231",
+        "note": "年齢の月数・日数が範囲外でエラー",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041904"
+    },
+    {
+        "sortNo": 5,
+        "connectionCode": "C20211905",
+        "actionType": 0,
+        "placeCode": "P2004-19",
+        "teamCode": "T2004-19",
+        "examDate": "2025-03-03",
+        "consultNumber": "No0005",
+        "examineeCode": "E20041905",
+        "age": "-54a1-1",
+        "note": "年齢に英字・記号が含まれエラー",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041905"
+    },
+    {
+        "sortNo": 6,
+        "connectionCode": "C20211906",
+        "actionType": 0,
+        "placeCode": "P2004-19",
+        "teamCode": "T2004-19",
+        "examDate": "2025-03-03",
+        "consultNumber": "No0006",
+        "examineeCode": "E20041906",
+        "age": "0281002",
+        "note": "年齢が数字のみで月数・日数が範囲内で登録可",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041906"
     }
 ]
