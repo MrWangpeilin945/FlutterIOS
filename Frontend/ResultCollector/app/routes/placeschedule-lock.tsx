@@ -75,13 +75,13 @@ export default function PlaceScheduleLock() {
   const { mutateAsync } = usePlaceScheduleUpdatePlaceScheduleLockingStatus();
 
   //AP1016_会場ロック状態を取得する
-  const fetchGetPlaceScheduleLocking = async (isRefetch?:boolean) => {
+  const fetchGetPlaceScheduleLocking = async (isRefetch?: boolean) => {
     setIconType(IconType.未設定);
     const result = await refetch();
     if (result.data) {
       setPlaceScheduleLock(result.data.data);
     } else if (result.error) {
-      if (isRefetch === true) {
+      if (isRefetch) {
         setIconType(IconType.異常);
       }
       if (result.error.status === 400) {
