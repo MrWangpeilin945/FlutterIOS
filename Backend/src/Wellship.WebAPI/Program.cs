@@ -184,6 +184,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IIntegrationUsecase, IntegrationUsecase>();
         services.AddScoped<IProgressUsecase, ProgressUsecase>();
         services.AddScoped<ICancelReasonUsecase, CancelReasonUsecase>();
+        services.AddScoped<IExamineeUsecase, ExamineeUsecase>();
         services.AddScoped<ExternalConnection.Usecases.Default.IOrganizationUsecase, ExternalConnection.Usecases.Default.OrganizationUsecase>();
         services.AddScoped<ExternalConnection.Usecases.Default.IExamineeUsecase, ExternalConnection.Usecases.Default.ExamineeUsecase>();
         services.AddScoped<ExternalConnection.Usecases.Default.ITeamUsecase, ExternalConnection.Usecases.Default.TeamUsecase>();
