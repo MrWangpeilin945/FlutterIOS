@@ -9,7 +9,7 @@
 
 [source]
 ----
-[GET] /examinees/examMenus/{examMenuId}
+[GET] /examinees/placeSchedules/{placeScheduleId}/examMenus/{examMenuId}
 ----
 
 === リクエストヘッダー
@@ -45,7 +45,9 @@
         {
             "consultNumber": "012345678",
             "ticketNumber": "10",
-            "kanaName": "リョウビ　タロウ"
+            "kanaName": "リョウビ　タロウ",
+            "sex" : 1,
+            "createdAt" : "2025-04-01"
         }
     ]
 }
