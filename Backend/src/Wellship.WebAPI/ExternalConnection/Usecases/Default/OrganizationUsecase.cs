@@ -41,7 +41,7 @@ public class OrganizationUsecase : IOrganizationUsecase
             "Code",     // 団体コード
             "Name"      // 団体名
         };
-        // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
+        // チェックするプロパティ一覧をメソッドに渡して空値チェックする
         foreach (var warning in ValidationChecker.SpaceCheckProperties(organizations, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをOrganizationにキャストしてワーニングリストに追加する
@@ -56,7 +56,7 @@ public class OrganizationUsecase : IOrganizationUsecase
         {
             "Code"      // 団体コード
         };
-        // チェックするプロパティ一覧をメソッドに渡して重複チェックを取得する
+        // チェックするプロパティ一覧をメソッドに渡して重複チェックする
         foreach (var warning in ValidationChecker.DuplicateCheckProperties(organizations, duplicateCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをOrganizationにキャストしてワーニングリストに追加する
