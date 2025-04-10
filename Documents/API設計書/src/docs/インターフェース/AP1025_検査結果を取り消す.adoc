@@ -53,7 +53,7 @@
 
 === ステータスコード
 
-* No Content
+* 204 No Content
 ** 結果取り消しが完了
 * 400 BadRequest
 ** リクエストボディの形式が不正
