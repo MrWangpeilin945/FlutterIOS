@@ -48,6 +48,9 @@ CREATE TABLE consult_thresholds (
   , CONSTRAINT consult_thresholds_PKC PRIMARY KEY (threshold_id,consult_id)
 );
 
+CREATE INDEX consult_thresholds_IX1
+  ON consult_thresholds(consult_id);
+
 CREATE TABLE correlation_rule_evaluations (
   correlation_rule_id integer NOT NULL
   , variable_number integer NOT NULL
@@ -437,6 +440,12 @@ ALTER TABLE consult ADD CONSTRAINT consult_IX1
 CREATE UNIQUE INDEX consult_IX2
   ON consult(external_connection_code);
 
+CREATE INDEX consult_IX3
+  ON consult(place_schedule_id);
+
+CREATE INDEX consult_IX4
+  ON consult(examinee_id);
+
 CREATE TABLE exam_item_details (
   exam_item_detail_id integer NOT NULL
   , exam_item_id integer NOT NULL
@@ -676,16 +685,16 @@ select
     , 検査メニュー状況.menu_status              -- 検査進捗状況
     , con.progress_status as consult_status     -- 受診進捗状況
     , case 
-        when 検査メニュー状況.exam_menu_id = 11 
+        when 検査メニュー状況.menu_status = 11 
         and con.progress_status = 11 
             then 11 
-        when 検査メニュー状況.exam_menu_id = 11 
+        when 検査メニュー状況.menu_status = 11 
         and con.progress_status = 21 
             then 21 
-        when 検査メニュー状況.exam_menu_id = 41 
+        when 検査メニュー状況.menu_status = 41 
         and con.progress_status = 21 
             then 41 
-        when 検査メニュー状況.exam_menu_id = 51 
+        when 検査メニュー状況.menu_status = 51 
         and con.progress_status = 21 
             then 51 
         end as aggregated_status                -- 集計検査進捗状況

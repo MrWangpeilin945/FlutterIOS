@@ -238,10 +238,12 @@ Field="受診者ID","examinee_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
 Field="外部連携キー","external_connection_code","text","NOT NULL",,"","",$FFFFFFFF,""
 Index==2,consult_number
 Index==1,external_connection_code
+Index==0,place_schedule_id
+Index==0,examinee_id
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20250319132510
+ModifiedDateTime=20250403093611
 Position="MAIN",950,2000
 ZOrder=17
 
@@ -1323,10 +1325,11 @@ Top=2150
 Field="基準値パターンID","threshold_id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
 Field="受診ID","consult_id","uuid","NOT NULL",1,"","",$FFFFFFFF,""
 Field="優先度","priority","integer","NOT NULL",,"","小さいものが優先して使用される",$FFFFFFFF,""
+Index==0,consult_id
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241225164511
+ModifiedDateTime=20250403093433
 Position="MAIN",100,2150
 ZOrder=80
 
@@ -2218,7 +2221,7 @@ ZOrder=127
 PName=progress_exam_menus
 LName=進捗_検査メニュー単位
 Comment=
-Query=with 明細結果 as ( \n    select\n        c.consult_id\n        , c.place_schedule_id\n        , d.exam_item_id\n        , o.exam_item_detail_id\n        , case \n            when r.exam_item_detail_id is not null -- 結果レコードがあれば実施済み\n                then 41 \n            when ca.exam_item_detail_id is not null -- 中止レコードがあれば検査中止\n                then 51 \n            else 11                             -- レコードがなければ未実施\n            end as detail_status                -- 明細ステータス\n    from\n        resultcollector.consult c \n        inner join resultcollector.exam_item_detail_orders o \n            on c.consult_id = o.consult_id \n        left join resultcollector.exam_results r \n            on o.exam_item_detail_id = r.exam_item_detail_id \n            and o.consult_id = r.consult_id \n        left join resultcollector.exam_cancels ca \n            on o.exam_item_detail_id = ca.exam_item_detail_id \n            and o.consult_id = ca.consult_id \n        left join resultcollector.exam_item_details d \n            on o.exam_item_detail_id = d.exam_item_detail_id\n) \n, 検査メニュー状況 as ( \n    select\n        明細結果.consult_id\n        , 明細結果.place_schedule_id\n        , m.exam_menu_id\n        , case \n            when 11 = any (ARRAY_AGG(明細結果.detail_status)) -- 未実施が一つでもあれば未実施\n                then 11 \n            when 51 = all (ARRAY_AGG(明細結果.detail_status)) -- すべて検査中止であれば検査中止\n                then 51 \n            when 41 = any (ARRAY_AGG(明細結果.detail_status)) -- 上記以外で検査済みを含む場合は検査済み\n                then 41 \n            end as menu_status \n    from\n        明細結果 \n        inner join resultcollector.exam_items i \n            on 明細結果.exam_item_id = i.exam_item_id \n        inner join resultcollector.exam_item_groups g \n            on i.exam_item_group_id = g.exam_item_group_id \n        inner join resultcollector.exam_menus m \n            on g.exam_menu_id = m.exam_menu_id \n    group by\n        consult_id\n        , place_schedule_id\n        , m.exam_menu_id\n) \nselect\n    検査メニュー状況.consult_id                 -- 受診ID\n    , 検査メニュー状況.place_schedule_id        -- 会場日程ID\n    , 検査メニュー状況.exam_menu_id             -- 検査メニューID\n    , 検査メニュー状況.menu_status              -- 検査進捗状況\n    , con.progress_status as consult_status     -- 受診進捗状況\n    , case \n        when 検査メニュー状況.exam_menu_id = 11 \n        and con.progress_status = 11 \n            then 11 \n        when 検査メニュー状況.exam_menu_id = 11 \n        and con.progress_status = 21 \n            then 21 \n        when 検査メニュー状況.exam_menu_id = 41 \n        and con.progress_status = 21 \n            then 41 \n        when 検査メニュー状況.exam_menu_id = 51 \n        and con.progress_status = 21 \n            then 51 \n        end as aggregated_status                -- 集計検査進捗状況\nfrom\n    検査メニュー状況 \n    inner join resultcollector.consult con \n        on 検査メニュー状況.consult_id = con.consult_id;
+Query=with 明細結果 as ( \n    select\n        c.consult_id\n        , c.place_schedule_id\n        , d.exam_item_id\n        , o.exam_item_detail_id\n        , case \n            when r.exam_item_detail_id is not null -- 結果レコードがあれば実施済み\n                then 41 \n            when ca.exam_item_detail_id is not null -- 中止レコードがあれば検査中止\n                then 51 \n            else 11                             -- レコードがなければ未実施\n            end as detail_status                -- 明細ステータス\n    from\n        resultcollector.consult c \n        inner join resultcollector.exam_item_detail_orders o \n            on c.consult_id = o.consult_id \n        left join resultcollector.exam_results r \n            on o.exam_item_detail_id = r.exam_item_detail_id \n            and o.consult_id = r.consult_id \n        left join resultcollector.exam_cancels ca \n            on o.exam_item_detail_id = ca.exam_item_detail_id \n            and o.consult_id = ca.consult_id \n        left join resultcollector.exam_item_details d \n            on o.exam_item_detail_id = d.exam_item_detail_id\n) \n, 検査メニュー状況 as ( \n    select\n        明細結果.consult_id\n        , 明細結果.place_schedule_id\n        , m.exam_menu_id\n        , case \n            when 11 = any (ARRAY_AGG(明細結果.detail_status)) -- 未実施が一つでもあれば未実施\n                then 11 \n            when 51 = all (ARRAY_AGG(明細結果.detail_status)) -- すべて検査中止であれば検査中止\n                then 51 \n            when 41 = any (ARRAY_AGG(明細結果.detail_status)) -- 上記以外で検査済みを含む場合は検査済み\n                then 41 \n            end as menu_status \n    from\n        明細結果 \n        inner join resultcollector.exam_items i \n            on 明細結果.exam_item_id = i.exam_item_id \n        inner join resultcollector.exam_item_groups g \n            on i.exam_item_group_id = g.exam_item_group_id \n        inner join resultcollector.exam_menus m \n            on g.exam_menu_id = m.exam_menu_id \n    group by\n        consult_id\n        , place_schedule_id\n        , m.exam_menu_id\n) \nselect\n    検査メニュー状況.consult_id                 -- 受診ID\n    , 検査メニュー状況.place_schedule_id        -- 会場日程ID\n    , 検査メニュー状況.exam_menu_id             -- 検査メニューID\n    , 検査メニュー状況.menu_status              -- 検査進捗状況\n    , con.progress_status as consult_status     -- 受診進捗状況\n    , case \n        when 検査メニュー状況.menu_status = 11 \n        and con.progress_status = 11 \n            then 11 \n        when 検査メニュー状況.menu_status = 11 \n        and con.progress_status = 21 \n            then 21 \n        when 検査メニュー状況.menu_status = 41 \n        and con.progress_status = 21 \n            then 41 \n        when 検査メニュー状況.menu_status = 51 \n        and con.progress_status = 21 \n            then 51 \n        end as aggregated_status                -- 集計検査進捗状況\nfrom\n    検査メニュー状況 \n    inner join resultcollector.consult con \n        on 検査メニュー状況.consult_id = con.consult_id;
 Color=$000000
 BkColor=$FFFFFF
 Position="MAIN",3550,700,273,148
