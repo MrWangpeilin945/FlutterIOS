@@ -1,0 +1,66 @@
+== AP1024_受診者一覧を取得する
+
+=== 概要
+
+* 検査メニューの受診者一覧を取得して返却する
+* 進捗画面から利用する
+
+=== URI
+
+[source]
+----
+[GET] /examinees/placeSchedules/{placeScheduleId}/examMenus/{examMenuId}
+----
+
+=== リクエストヘッダー
+
+=== パスパラメータ
+
+なし
+
+=== クエリパラメータ
+
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|status
+|No
+|number
+|進捗状況
+|11
+
+|===
+
+=== リクエストボディ
+
+なし
+
+=== レスポンスボディ
+
+[source,json]
+----
+{
+    "examinees": [
+        {
+            "consultNumber": "012345678",
+            "ticketNumber": "10",
+            "kanaName": "リョウビ　タロウ",
+            "sex" : 1,
+            "createdAt" : "2025-04-01"
+        }
+    ]
+}
+----
+
+=== ステータスコード
+
+* 200 OK
+* 401 Unauthorized
+** JWT認証に失敗
+* 404 NotFound
+** 指定した進捗状況が存在しない
+
+=== 並び順
+
+* 受診.受診番号の昇順
