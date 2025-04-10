@@ -666,16 +666,16 @@ select
     , 検査メニュー状況.menu_status              -- 検査進捗状況
     , con.progress_status as consult_status     -- 受診進捗状況
     , case 
-        when 検査メニュー状況.exam_menu_id = 11 
+        when 検査メニュー状況.menu_status = 11 
         and con.progress_status = 11 
             then 11 
-        when 検査メニュー状況.exam_menu_id = 11 
+        when 検査メニュー状況.menu_status = 11 
         and con.progress_status = 21 
             then 21 
-        when 検査メニュー状況.exam_menu_id = 41 
+        when 検査メニュー状況.menu_status = 41 
         and con.progress_status = 21 
             then 41 
-        when 検査メニュー状況.exam_menu_id = 51 
+        when 検査メニュー状況.menu_status = 51 
         and con.progress_status = 21 
             then 51 
         end as aggregated_status                -- 集計検査進捗状況
