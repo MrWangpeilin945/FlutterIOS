@@ -73,7 +73,7 @@ export default function Progress() {
                 <Stack gap={16} pt={24}>
                   {progressData?.progress?.map((p) => (
                     <ExamItemProgress
-                      key={p.examItemId}
+                      key={p.examMenuId}
                       progress={p}
                       onClick={() => {}}
                     />

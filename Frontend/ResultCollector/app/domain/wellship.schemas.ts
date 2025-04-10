@@ -61,10 +61,10 @@ export interface ProgressDetail {
 export interface Progress {
   /** 進捗明細 */
   details?: ProgressDetail[];
-  /** 検査項目ID */
-  examItemId?: number;
-  /** 検査項目名 */
-  examItemName?: string;
+  /** 検査メニューID */
+  examMenuId?: number;
+  /** 検査メニュー名 */
+  examMenuName?: string;
 }
 
 /**
