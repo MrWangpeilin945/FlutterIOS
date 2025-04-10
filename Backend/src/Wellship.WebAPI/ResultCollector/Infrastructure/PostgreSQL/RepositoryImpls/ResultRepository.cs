@@ -162,22 +162,20 @@ public class ResultRepository : IResultRepository
         -- 削除履歴テーブルにレコードを挿入
         insert 
         into resultcollector.exam_result_delete_histories( 
-            id
-            , consult_id
+            consult_id
             , exam_item_detail_id
             , value
             , created_at
             , created_by
         ) 
         select
-            id
-            , consult_id
+            consult_id
             , exam_item_detail_id
             , value
             , @CreatedAt
             , @CreatedBy
         from
-            resultcollector.exam_result_histories 
+            resultcollector.exam_results 
         where
             consult_id = @ConsultId
             and exam_item_detail_id = any (@ExamItemDetailIds); 
@@ -185,7 +183,7 @@ public class ResultRepository : IResultRepository
         -- 結果テーブルからレコードを削除
         delete 
         from
-            resultcollector.exam_result_histories 
+            resultcollector.exam_results 
         where
             consult_id = @ConsultId
             and exam_item_detail_id = any (@ExamItemDetailIds); 
