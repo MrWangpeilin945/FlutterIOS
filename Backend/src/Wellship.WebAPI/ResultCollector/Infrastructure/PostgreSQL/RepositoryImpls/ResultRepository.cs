@@ -1,6 +1,5 @@
 using Dapper;
 
-using System.Data.Common;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
@@ -128,6 +127,70 @@ public class ResultRepository : IResultRepository
             , @CreatedAt
             , @CreatedBy
         );";
+
+        await connection.ExecuteAsync(sql, param);
+    }
+
+    /// <summary>
+    /// 受診を指定して複数の検査結果を取り消す
+    /// </summary>
+    /// <param name="consultId">受診ID</param>
+    /// <param name="examItemDetailIds">削除対象の検査項目明細ID一覧</param>
+    public async Task BatchDeleteResultsAsync(Guid consultId, int[] examItemDetailIds)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+
+        var operationTime = _timeProvider.GetUtcNow();
+        var operationStaffCode = _staffIdentityProvider.StaffCode;
+        if (operationStaffCode is null)
+        {
+            throw new WellshipAuthenticationException();
+        }
+
+        var param = new
+        {
+            ConsultId = consultId,
+            ExamItemDetailIds = examItemDetailIds,
+            CreatedAt = operationTime,
+            CreatedBy = operationStaffCode
+        };
+
+        // 検査結果削除履歴を登録して検査結果を削除する
+        const string sql = @"
+        begin; 
+        
+        -- 削除履歴テーブルにレコードを挿入
+        insert 
+        into resultcollector.exam_result_delete_histories( 
+            id
+            , consult_id
+            , exam_item_detail_id
+            , value
+            , created_at
+            , created_by
+        ) 
+        select
+            id
+            , consult_id
+            , exam_item_detail_id
+            , value
+            , @CreatedAt
+            , @CreatedBy
+        from
+            resultcollector.exam_result_histories 
+        where
+            consult_id = @ConsultId
+            and exam_item_detail_id = any (@ExamItemDetailIds); 
+        
+        -- 結果テーブルからレコードを削除
+        delete 
+        from
+            resultcollector.exam_result_histories 
+        where
+            consult_id = @ConsultId
+            and exam_item_detail_id = any (@ExamItemDetailIds); 
+        
+        commit;";
 
         await connection.ExecuteAsync(sql, param);
     }
