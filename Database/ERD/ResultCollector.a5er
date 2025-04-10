@@ -980,7 +980,7 @@ TableInnerOption=
 TableOption=
 Page=MAIN
 Left=900
-Top=2650
+Top=2600
 Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
 Field="受診ID","consult_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
 Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
@@ -989,7 +989,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20241219132630
-Position="MAIN",900,2650
+Position="MAIN",900,2600
 ZOrder=60
 
 [Entity]
@@ -2229,3 +2229,23 @@ ZOrder=128
 Page=MAIN
 Left=3550
 Top=700
+
+[Entity]
+PName=exam_result_delete_histories
+LName=検査結果削除履歴
+Comment=
+TableInnerOption=
+TableOption=
+Page=Main
+Left=900
+Top=2750
+Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
+Field="受診ID","consult_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
+Field="検査項目明細ID","exam_item_detail_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="値","value","text","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250409173312
+Position="Main",900,2750
+ZOrder=129
