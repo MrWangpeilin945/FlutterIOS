@@ -1,6 +1,7 @@
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -8,7 +9,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// </summary>
 public class OrganizationUsecase : IOrganizationUsecase
 {
-    private readonly List<ErrorObject> _errorObjects;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly TimeProvider _timeProvider;
 
@@ -20,7 +20,6 @@ public class OrganizationUsecase : IOrganizationUsecase
     public OrganizationUsecase(IOrganizationRepository organizationRepository, TimeProvider timeProvider)
     {
         _organizationRepository = organizationRepository;
-        _errorObjects = new List<ErrorObject>();
         _timeProvider = timeProvider;
     }
 
@@ -31,117 +30,53 @@ public class OrganizationUsecase : IOrganizationUsecase
     /// <returns></returns>
     public async Task<List<ErrorObject>> StoreOrganizationsAsync(List<Organization> organizations)
     {
-        _errorObjects.Clear();
+        List<ErrorObject> errorObjects = new List<ErrorObject>();
 
-        // 必須チェック済みのリストを取得する
-        var insertOrganizationsByRequired = GetCheckedRequired(organizations);
+        // WARNING検証
+        var warningOrganizations = new List<Organization>();
 
-        // 重複チェック済みのリストを取得する
-        var insertOrganizationsByDuplicated = GetCheckedDuplicated(organizations);
+        // 必須項目の空値のチェック
+        var spaceCheckProperties = new[]
+        {
+            "Code",     // 団体コード
+            "Name"      // 団体名
+        };
+        // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
+        foreach (var warning in ValidationChecker.SpaceCheckProperties(organizations, spaceCheckProperties, errorObjects))
+        {
+            // エラーのオブジェクトをOrganizationにキャストしてワーニングリストに追加する
+            if (warning is Organization organization)
+            {
+                warningOrganizations.Add(organization);
+            }
+        }
 
-        var commonInsertPlaces = insertOrganizationsByRequired.Intersect(insertOrganizationsByDuplicated)
-                                                              .ToList();
+        // キー重複チェック
+        var duplicateCheckProperties = new[]
+        {
+            "Code"      // 団体コード
+        };
+        // チェックするプロパティ一覧をメソッドに渡して重複チェックを取得する
+        foreach (var warning in ValidationChecker.DuplicateCheckProperties(organizations, duplicateCheckProperties, errorObjects))
+        {
+            // エラーのオブジェクトをOrganizationにキャストしてワーニングリストに追加する
+            if (warning is Organization organization)
+            {
+                warningOrganizations.Add(organization);
+            }
+        }
 
         // 団体エンティティリスト生成
-        var organizationEntities = commonInsertPlaces.Select(item => new OrganizationEntity
-        {
-            OrganizationCode = item.Code,
-            Name = item.Name
-        }).ToList();
+        var organizationEntities = organizations.Except(warningOrganizations)
+                                                .Select(item => new OrganizationEntity
+                                                {
+                                                    OrganizationCode = item.Code,
+                                                    Name = item.Name
+                                                }).ToList();
 
         // 団体登録
         await _organizationRepository.UpsertOrganizationsAsync(organizationEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
-        return _errorObjects;
-    }
-
-
-    /// <summary>
-    /// 必須チェック済みのリストを取得する
-    /// </summary>
-    /// <param name="organizations"></param>
-    /// <returns></returns>
-    private List<Organization> GetCheckedRequired(List<Organization> organizations)
-    {
-        // WARNING検証
-        // 未入力(Code)
-        var requiredCodeData = organizations.Where(x => string.IsNullOrWhiteSpace(x.Code));
-        if (requiredCodeData.Any())
-        {
-            // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredCodeData, "Code");
-        }
-
-        // 未入力(Name)
-        var requiredNameData = organizations.Where(x => string.IsNullOrWhiteSpace(x.Name));
-        if (requiredNameData.Any())
-        {
-            // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredNameData, "Name");
-        }
-
-        return organizations.Except(requiredCodeData)
-                            .Except(requiredNameData)
-                            .ToList();
-    }
-
-    /// <summary>
-    /// 重複チェック済みのリストを取得する
-    /// </summary>
-    /// <param name="organizations"></param>
-    /// <returns></returns>
-    private List<Organization> GetCheckedDuplicated(List<Organization> organizations)
-    {
-        // WARNING検証
-        // キー重複
-        var duplicatedTeamCodes = organizations.GroupBy(x => x.Code).Where(x => x.Count() > 1).Select(x => x.Key).ToHashSet();
-
-        if (duplicatedTeamCodes.Any())
-        {
-            var duplicatedData = organizations.Where(x => duplicatedTeamCodes.Contains(x.Code));
-
-            // 返却用エラーオブジェクトに追加
-            AddDuplicateDataErrorObjects(duplicatedData);
-            return organizations.Except(duplicatedData).ToList();
-        }
-        else
-        {
-            return new List<Organization>(organizations);
-        }
-    }
-
-    /// <summary>
-    /// エラーオブジェクトに情報追加する(必須項目エラー）
-    /// </summary>
-    /// <param name="requiredData"></param>
-    /// <param name="itemName"></param>
-    private void AddRequiredDataErrorObjects(IEnumerable<Organization> requiredData, string itemName)
-    {
-        var errorObjects = requiredData
-            .Select(r => new ErrorObject
-            {
-                Code = "10004",
-                Message = $"必須項目が不足しています。{itemName}",
-                InputNote = r.InputNote
-            }).ToList();
-
-        _errorObjects.AddRange(errorObjects);
-    }
-
-    /// <summary>
-    /// エラーオブジェクトに情報追加する(キーが重複するレコード）
-    /// </summary>
-    /// <param name="duplicatedData"></param>
-    private void AddDuplicateDataErrorObjects(IEnumerable<Organization> duplicatedData)
-    {
-        var errorObjects = duplicatedData
-            .Select(d => new ErrorObject
-            {
-                Code = "10003",
-                Message = $"キー項目が重複しています。Code:{d.Code}",
-                InputNote = d.InputNote
-            }).ToList();
-
-        _errorObjects.AddRange(errorObjects);
+        return errorObjects;
     }
 }
