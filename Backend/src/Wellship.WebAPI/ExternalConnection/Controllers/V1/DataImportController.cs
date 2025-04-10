@@ -7,7 +7,7 @@ using NSwag.Annotations;
 using Ryobi.Wellship.APIModels.Requests;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
-using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.BackgroundTasks;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers.V1;
 /// <summary>
