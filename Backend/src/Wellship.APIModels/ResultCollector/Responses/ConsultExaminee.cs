@@ -11,19 +11,19 @@ public class ConsultExaminee
     /// 受診番号
     /// </summary>
     [JsonPropertyName("consultNumber")]
-    public required string ConsultNumber  { get; init; }
+    public required string ConsultNumber { get; init; }
 
     /// <summary>
     /// 受付番号
     /// </summary>
     [JsonPropertyName("ticketNumber")]
-    public required string TicketNumber  { get; init; }
+    public required string TicketNumber { get; init; }
 
     /// <summary>
     /// カナ氏名
     /// </summary>
     [JsonPropertyName("kanaName")]
-    public required string KanaName  { get; init; }
+    public required string KanaName { get; init; }
 
     /// <summary>
     /// 性別
@@ -35,5 +35,5 @@ public class ConsultExaminee
     /// 受付日時
     /// </summary>
     [JsonPropertyName("createdAt")]
-    public required DateTimeOffset CreatedAt { get; init; }
+    public DateTimeOffset? CreatedAt { get; init; }
 }

@@ -80,12 +80,12 @@ public class ExamineeRepository : IExamineeRepository
     }
 
     /// <summary>
-    /// 会場日程ID,検査メニューID,進捗状況に該当する受診者ID一覧を取得します。
+    /// 会場日程ID,検査メニューID,進捗状況に該当する受診ID一覧を取得します。
     /// </summary>
     /// <param name="placeScheduleId">会場日程ID</param>
     /// <param name="examMenuId">検査メニューID</param>
     /// <param name="status">進捗状況</param>
-    public async Task<IEnumerable<Guid>> GetConsultIdsAsync(Guid placeScheduleId, int examMenuId, int status)
+    public async Task<IEnumerable<Guid>> GetConsultIdsAsync(Guid placeScheduleId, int examMenuId, AggregatedProgressStatus status)
     {
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
         const string sql = @"
@@ -95,17 +95,16 @@ public class ExamineeRepository : IExamineeRepository
             resultcollector.progress_exam_menus p
         where
             p.place_schedule_id = @PlaceScheduleId
-            and p.aggregated_status = @ExamMenuId
-            and p.exam_menu_id = @Status
-        ";
+            and p.exam_menu_id = @ExamMenuId
+            and p.aggregated_status = @Status";
 
-        var consultIds = await connection.QueryAsync<Guid>(sql, new { PlaceScheduleId = placeScheduleId, ExamMenuId = examMenuId , Status = status });
+        var consultIds = await connection.QueryAsync<Guid>(sql, new { PlaceScheduleId = placeScheduleId, ExamMenuId = examMenuId , Status = (int)status });
 
         return consultIds;
     }
 
     /// <summary>
-    /// 受診者ID配列で受診者一覧を取得します。
+    /// 受診ID配列で受診者一覧を取得します。
     /// </summary>
     /// <param name="consultExamineeIds">受診者ID配列</param>
     public async Task<IEnumerable<ConsultExaminee>> GetConsultExamineesAsync(Guid[] consultExamineeIds)
@@ -125,7 +124,7 @@ public class ExamineeRepository : IExamineeRepository
             left join resultcollector.examinees e
                 on c.examinee_id = e.examinee_id
         where
-            c.consult_number = any(@ConsultExamineeIds)
+            c.consult_id = any(@ConsultExamineeIds)
         order by
             c.consult_number";
 

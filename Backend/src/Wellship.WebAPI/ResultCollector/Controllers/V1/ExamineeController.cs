@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using Asp.Versioning;
 
+using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 
@@ -33,7 +34,7 @@ public class ExamineeController: ControllerBase
     /// AP1024_受診者一覧を取得する
     /// </summary>
     /// <returns></returns>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ConsultExaminee))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ConsultExamineeList))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [HttpGet]
@@ -41,7 +42,7 @@ public class ExamineeController: ControllerBase
     public async Task<IActionResult> GetConsultExamineesAsync([FromRoute][Required] Guid placeScheduleId, [FromRoute][Required] int examMenuId,
                                                               [FromQuery][Required] int status)
     {
-        var results = await _examineeUsecase.GetConsultExamineesAsync(placeScheduleId, examMenuId, status);
+        var results = await _examineeUsecase.GetConsultExamineesAsync(placeScheduleId, examMenuId, (AggregatedProgressStatus)status);
         return Ok(results);
     }
 }

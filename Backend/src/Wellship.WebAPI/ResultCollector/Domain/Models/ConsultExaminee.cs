@@ -15,7 +15,7 @@ public class ConsultExaminee
     /// <summary>
     /// 受付番号
     /// </summary>
-    public required string TicketNumber { get; init; }
+    public string? TicketNumber { get; init; }
 
     /// <summary>
     /// カナ氏名
@@ -30,5 +30,5 @@ public class ConsultExaminee
     /// <summary>
     /// 受付日時
     /// </summary>
-    public required DateTimeOffset CreatedAt { get; init; }
+    public DateTimeOffset? CreatedAt { get; init; }
 }
