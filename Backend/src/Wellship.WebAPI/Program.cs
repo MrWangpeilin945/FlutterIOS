@@ -21,6 +21,7 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Middlewares;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 using Ryobi.Wellship.WebAPI.ResultCollector.Utilities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Logger;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.BackgroundTasks;
 
 namespace Ryobi.Wellship.WebAPI;
 

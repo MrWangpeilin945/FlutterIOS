@@ -75,12 +75,15 @@ export default function PlaceScheduleLock() {
   const { mutateAsync } = usePlaceScheduleUpdatePlaceScheduleLockingStatus();
 
   //AP1016_会場ロック状態を取得する
-  const fetchGetPlaceScheduleLocking = async () => {
+  const fetchGetPlaceScheduleLocking = async (isRefetch?: boolean) => {
     setIconType(IconType.未設定);
     const result = await refetch();
     if (result.data) {
       setPlaceScheduleLock(result.data.data);
     } else if (result.error) {
+      if (isRefetch) {
+        setIconType(IconType.異常);
+      }
       if (result.error.status === 400) {
         setMessage(getErrorMessage(errorMessages.invalid, "パラメータ"));
       } else if (result.error.status === 404) {
@@ -134,7 +137,7 @@ export default function PlaceScheduleLock() {
         });
         if (result.status === 200) {
           // AP1016を実行して画面再取得
-          await fetchGetPlaceScheduleLocking();
+          await fetchGetPlaceScheduleLocking(true);
           setIconType(IconType.正常);
           setMessage("登録が完了しました。");
           open();

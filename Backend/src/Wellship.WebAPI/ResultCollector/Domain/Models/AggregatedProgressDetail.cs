@@ -8,14 +8,14 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 public class AggregatedProgressDetail
 {
     /// <summary>
-    /// 検査項目ID
+    /// 検査メニューID
     /// </summary>
-    public required int ExamItemId { get; init; }
+    public required int ExamMenuId { get; init; }
 
     /// <summary>
-    /// 検査項目名
+    /// 検査メニュー名
     /// </summary>
-    public required string ExamItemName { get; init; }
+    public required string ExamMenuName { get; init; }
 
     /// <summary>
     /// 予定の件数

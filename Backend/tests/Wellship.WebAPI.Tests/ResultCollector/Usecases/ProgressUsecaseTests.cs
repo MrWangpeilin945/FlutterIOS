@@ -24,9 +24,9 @@ public class ProgressUsecaseTests
                               {
                                   PlaceScheduleId = Guid.Parse("e1b9277a-c0a7-4de5-b36f-bc912e1189dd"),
                                   AggregatedProgressDetails = [
-                                    new AggregatedProgressDetail(){ExamItemId = 1, ExamItemName = "身長", Count11 = 10, Count21 = 8, Count41 = 0, Count51 = 0},
-                                    new AggregatedProgressDetail(){ExamItemId = 2, ExamItemName = "体重", Count11 = 11, Count21 = 9, Count41 = 1, Count51 = 0},
-                                    new AggregatedProgressDetail(){ExamItemId = 3, ExamItemName = "血圧", Count11 = 0, Count21 = 1, Count41 = 10, Count51 = 3}
+                                    new AggregatedProgressDetail(){ExamMenuId = 1, ExamMenuName = "身長", Count11 = 10, Count21 = 8, Count41 = 0, Count51 = 0},
+                                    new AggregatedProgressDetail(){ExamMenuId = 2, ExamMenuName = "体重", Count11 = 11, Count21 = 9, Count41 = 1, Count51 = 0},
+                                    new AggregatedProgressDetail(){ExamMenuId = 3, ExamMenuName = "血圧", Count11 = 0, Count21 = 1, Count41 = 10, Count51 = 3}
                                   ]
                               });
 
@@ -50,8 +50,8 @@ public class ProgressUsecaseTests
             ExamDate = new DateOnly(2024, 12, 3),
             Progress = [
                 new APIModels.Responses.Progress(){
-                    ExamItemId = 1,
-                    ExamItemName = "身長",
+                    ExamMenuId = 1,
+                    ExamMenuName = "身長",
                     Details = [
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.予定, StatusName = Core.Enums.AggregatedProgressStatus.予定.ToString(), Count = 10},
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.来場, StatusName = Core.Enums.AggregatedProgressStatus.来場.ToString(), Count = 8},
@@ -60,8 +60,8 @@ public class ProgressUsecaseTests
                     ]
                 },
                 new APIModels.Responses.Progress(){
-                    ExamItemId = 2,
-                    ExamItemName = "体重",
+                    ExamMenuId = 2,
+                    ExamMenuName = "体重",
                     Details = [
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.予定, StatusName = Core.Enums.AggregatedProgressStatus.予定.ToString(), Count = 11},
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.来場, StatusName = Core.Enums.AggregatedProgressStatus.来場.ToString(), Count = 9},
@@ -70,8 +70,8 @@ public class ProgressUsecaseTests
                     ]
                 },
                 new APIModels.Responses.Progress(){
-                    ExamItemId = 3,
-                    ExamItemName = "血圧",
+                    ExamMenuId = 3,
+                    ExamMenuName = "血圧",
                     Details = [
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.予定, StatusName = Core.Enums.AggregatedProgressStatus.予定.ToString(), Count = 0},
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.来場, StatusName = Core.Enums.AggregatedProgressStatus.来場.ToString(), Count = 1},
