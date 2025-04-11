@@ -63,8 +63,8 @@ public class PlaceUsecaseTests
         // Arrange
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new ErrorObject {Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2007"},
-            new ErrorObject {Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2007"}
+            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2007"},
+            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2007"}
         };
         var usecase = new PlaceUsecase(_placeRepositoryMock.Object, _timeProvider);
         var request = new List<Place>
