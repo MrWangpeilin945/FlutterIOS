@@ -8,16 +8,16 @@ namespace Ryobi.Wellship.APIModels.Responses;
 public class Progress
 {
     /// <summary>
-    /// 検査項目ID
+    /// 検査メニューID
     /// </summary>
-    [JsonPropertyName("examItemId")]
-    public required int ExamItemId { get; init; }
+    [JsonPropertyName("examMenuId")]
+    public required int ExamMenuId { get; init; }
 
     /// <summary>
-    /// 検査項目名
+    /// 検査メニュー名
     /// </summary>
-    [JsonPropertyName("examItemName")]
-    public required string ExamItemName { get; init; }
+    [JsonPropertyName("examMenuName")]
+    public required string ExamMenuName { get; init; }
 
     /// <summary>
     /// 進捗明細
