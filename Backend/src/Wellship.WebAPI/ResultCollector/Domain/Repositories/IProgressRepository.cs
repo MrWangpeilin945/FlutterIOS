@@ -1,5 +1,4 @@
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
-using Ryobi.Wellship.Core.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 

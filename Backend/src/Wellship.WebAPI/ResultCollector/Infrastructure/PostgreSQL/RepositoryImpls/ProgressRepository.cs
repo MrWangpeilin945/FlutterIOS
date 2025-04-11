@@ -2,7 +2,6 @@
 using Dapper;
 
 using Ryobi.Wellship.Core.Exceptions;
-using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
