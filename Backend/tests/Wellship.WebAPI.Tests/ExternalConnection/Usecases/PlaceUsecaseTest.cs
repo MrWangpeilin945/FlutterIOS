@@ -1,5 +1,6 @@
 
 using Moq;
+using FluentAssertions;
 
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
@@ -34,7 +35,7 @@ public class PlaceUsecaseTest
         // Act
         var errors = await usecase.StorePlacesAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -53,7 +54,7 @@ public class PlaceUsecaseTest
         // Act
         var errors = await usecase.StorePlacesAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -74,7 +75,7 @@ public class PlaceUsecaseTest
         // Act
         var errors = await usecase.StorePlacesAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
 }
