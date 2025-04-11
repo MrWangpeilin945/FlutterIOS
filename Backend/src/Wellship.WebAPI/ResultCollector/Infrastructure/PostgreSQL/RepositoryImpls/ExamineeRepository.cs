@@ -136,7 +136,7 @@ public class ExamineeRepository : IExamineeRepository
             TicketNumber = x.TicketNumber,
             KanaName = x.KanaName,
             Sex = (Sex)x.Sex,
-            CreatedAt = x.CreatedAt
+            CheckedInAt = x.CheckedInAt
         });
     }
 }

@@ -66,7 +66,7 @@ public class ExamineeUsecase : IExamineeUsecase
                 TicketNumber = x.TicketNumber ?? "",
                 KanaName = x.KanaName,
                 Sex = (int)x.Sex,
-                CreatedAt = x.CreatedAt
+                CheckedInAt = x.CheckedInAt
             }).ToArray()
         };
     }

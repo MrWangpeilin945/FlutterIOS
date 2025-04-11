@@ -34,6 +34,6 @@ public class ConsultExaminee
     /// <summary>
     /// 受付日時
     /// </summary>
-    [JsonPropertyName("createdAt")]
-    public DateTimeOffset? CreatedAt { get; init; }
+    [JsonPropertyName("checkedInAt")]
+    public DateTimeOffset? CheckedInAt { get; init; }
 }

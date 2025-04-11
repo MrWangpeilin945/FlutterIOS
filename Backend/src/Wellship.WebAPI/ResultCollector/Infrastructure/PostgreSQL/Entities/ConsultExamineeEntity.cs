@@ -28,5 +28,5 @@ public class ConsultExamineeEntity
     /// <summary>
     /// 受付日時
     /// </summary>
-    public DateTimeOffset? CreatedAt { get; set; }
+    public DateTimeOffset? CheckedInAt { get; set; }
 }
