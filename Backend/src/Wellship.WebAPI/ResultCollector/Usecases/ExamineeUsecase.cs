@@ -1,6 +1,5 @@
 using Ryobi.Wellship.APIModels.Responses;
 using Ryobi.Wellship.Core.Enums;
-using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
@@ -33,7 +32,7 @@ public class ExamineeUsecase : IExamineeUsecase
     public async Task<ConsultExamineeList> GetConsultExamineesAsync(Guid placeScheduleId, int examMenuId, AggregatedProgressStatus status)
     {
         // 会場日程の対象検査メニューの進捗状況を取得
-        var examMenuProgress = await _progressRepository.GetAggregatedProgressByStatusAsync(placeScheduleId, examMenuId);
+        var examMenuProgress = await _progressRepository.GetAggregatedProgressByMenuIdAsync(placeScheduleId, examMenuId);
 
         // 会場や健診日を取得するために会場日程を取得する
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(placeScheduleId);

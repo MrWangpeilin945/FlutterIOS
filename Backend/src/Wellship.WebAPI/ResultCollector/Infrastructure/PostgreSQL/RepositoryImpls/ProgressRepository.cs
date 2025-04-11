@@ -34,11 +34,11 @@ public class ProgressRepository : IProgressRepository
     /// <summary>
     /// 会場日程IDと検査メニューIDを指定して対象検査メニューの進捗状況を取得します。
     /// </summary>
-    public async Task<AggregatedProgressDetail> GetAggregatedProgressByStatusAsync(Guid placeScheduleId, int? examMenuId = null)
+    public async Task<AggregatedProgressDetail> GetAggregatedProgressByMenuIdAsync(Guid placeScheduleId, int examMenuId)
     {
         var progress = await GetAggregatedProgress(placeScheduleId, examMenuId);
-        var progressDetail = progress.AggregatedProgressDetails.FirstOrDefault(x => x.ExamMenuId == examMenuId);
-        if (progressDetail == null) 
+        var progressDetail = progress.AggregatedProgressDetails.SingleOrDefault(x => x.ExamMenuId == examMenuId);
+        if (progressDetail is null) 
         {
             throw new ResourceNotFoundException();
         }
@@ -63,7 +63,7 @@ public class ProgressRepository : IProgressRepository
         where
             p.place_schedule_id = @PlaceScheduleId";
 
-        if (examMenuId != null)
+        if (examMenuId is not null)
         {
             sql += @" and p.exam_menu_id = @ExamMenuId";
         }
@@ -73,7 +73,6 @@ public class ProgressRepository : IProgressRepository
             p.exam_menu_id
             , m.name
             , m.order_number
-            , aggregated_status
         order by
             m.order_number;";
 

@@ -16,5 +16,5 @@ public interface IProgressRepository
     /// <summary>
     /// 会場日程IDと検査メニューIDを指定して対象検査メニューの進捗状況を取得します。
     /// </summary>
-    public Task<AggregatedProgressDetail> GetAggregatedProgressByStatusAsync(Guid placeScheduleId, int? examMenuId);
+    public Task<AggregatedProgressDetail> GetAggregatedProgressByMenuIdAsync(Guid placeScheduleId, int examMenuId);
 }
