@@ -37,7 +37,7 @@ public class ExamineeUsecase : IExamineeUsecase
         // 会場や健診日を取得するために会場日程を取得する
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(placeScheduleId);
         
-        // // 会場日程ID、検査メニュー、進捗状況に該当する受診ID配列を取得
+        // 会場日程ID、検査メニュー、進捗状況に該当する受診ID配列を取得
         var consultIds = await _examineeRepository.GetConsultIdsAsync(placeScheduleId, examMenuId, status);
 
         // 受診ID配列で受診者一覧を取得
