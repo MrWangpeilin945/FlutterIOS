@@ -8,12 +8,12 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 
 namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases;
 
-public class PlaceUsecaseTest
+public class PlaceUsecaseTests
 {
     private readonly Mock<IPlaceRepository> _placeRepositoryMock;
     private readonly TimeProvider _timeProvider;
 
-    public PlaceUsecaseTest()
+    public PlaceUsecaseTests()
     {
         _placeRepositoryMock = new Mock<IPlaceRepository>();
         _timeProvider = TimeProvider.System;
