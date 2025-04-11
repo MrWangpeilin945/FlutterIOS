@@ -76,7 +76,7 @@
             "ticketNumber": "10",
             "kanaName": "リョウビ　タロウ",
             "sex" : 1,
-            "createdAt" : "2025-04-01T11:35:20+09:00"
+            "checkedInAt" : "2025-04-01T11:35:20+09:00"
         }
     ]
 }
