@@ -1,10 +1,10 @@
 using Moq;
+using FluentAssertions;
 
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 
 namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases;
 
@@ -53,7 +53,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -185,7 +185,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }    
 
     [Fact]
@@ -218,7 +218,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -251,7 +251,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -284,7 +284,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -317,7 +317,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -347,7 +347,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -378,7 +378,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -419,7 +419,7 @@ public class ExamNormalValueRangeUsecaseTests
         // Act
         var errors = await usecase.StoreExamNormalValueRangeAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
 }
