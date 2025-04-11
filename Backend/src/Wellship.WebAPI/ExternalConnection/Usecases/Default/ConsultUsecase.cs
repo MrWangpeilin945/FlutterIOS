@@ -3,8 +3,6 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
-using System.Text.RegularExpressions;
-using System.Runtime.CompilerServices;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -316,7 +314,7 @@ public class ConsultUsecase : IConsultUsecase
                 errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
-                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{warning.Key.ExamItemDetailCode}/PreviousResults.ExamDate:{warning.Key.ExamDate}",
+                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{warning.Key.ExamItemDetailCode}/PreviousResults.ExamDate:{warning.Key.ExamDate.ToString("yyyy/MM/dd")}",
                     InputNote = consult.InputNote
                 });
             }
@@ -345,7 +343,7 @@ public class ConsultUsecase : IConsultUsecase
                 errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
-                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{warning.ExamItemDetailCode}/PreviousResults.ExamDate:{warning.ExamDate}",
+                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{warning.ExamItemDetailCode}/PreviousResults.ExamDate:{warning.ExamDate.ToString("yyyy/MM/dd")}",
                     InputNote = consult.InputNote
                 });
             }
