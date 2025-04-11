@@ -47,7 +47,7 @@ export default function ExamItemProgress({
   return (
     <Box bg="white01" py={24} px={32} style={{ borderRadius: 16 }}>
       <Text size="md" fw={700} c="black01" pb={16}>
-        {progress.examItemName}
+        {progress.examMenuName}
       </Text>
       <Divider size="xs" pb={16} />
       <Group>

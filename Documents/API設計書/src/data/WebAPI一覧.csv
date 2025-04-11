@@ -22,3 +22,4 @@ AP1020,検査結果の出力履歴を取得する,GET,/integrations/examResults/
 AP1021,検査結果の連携状態を未出力にする,POST,/integrations/examResults/undoExport
 AP1022,検査の実施有無と中止理由を登録する,POST,/consult/{consultNumber}/executions
 AP1023,ログイン状態を更新する,POST,/staff/login/refresh
+AP1024,受診者一覧を取得する,GET,/examinees/placeSchedules/{placeScheduleId}/examMenus/{examMenuId}

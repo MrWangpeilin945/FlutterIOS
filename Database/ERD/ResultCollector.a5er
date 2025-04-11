@@ -238,10 +238,12 @@ Field="受診者ID","examinee_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
 Field="外部連携キー","external_connection_code","text","NOT NULL",,"","",$FFFFFFFF,""
 Index==2,consult_number
 Index==1,external_connection_code
+Index==0,place_schedule_id
+Index==0,examinee_id
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20250319132510
+ModifiedDateTime=20250403093611
 Position="MAIN",950,2000
 ZOrder=17
 
@@ -1323,10 +1325,11 @@ Top=2150
 Field="基準値パターンID","threshold_id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
 Field="受診ID","consult_id","uuid","NOT NULL",1,"","",$FFFFFFFF,""
 Field="優先度","priority","integer","NOT NULL",,"","小さいものが優先して使用される",$FFFFFFFF,""
+Index==0,consult_id
 EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
-ModifiedDateTime=20241225164511
+ModifiedDateTime=20250403093433
 Position="MAIN",100,2150
 ZOrder=80
 

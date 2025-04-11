@@ -40,8 +40,8 @@ public class ProgressUsecase : IProgressUsecase
             ExamDate = placeSchedule.ExamDate,
             Progress = progress.AggregatedProgressDetails.Select(x => new Progress()
             {
-                ExamItemId = x.ExamItemId,
-                ExamItemName = x.ExamItemName,
+                ExamMenuId = x.ExamMenuId,
+                ExamMenuName = x.ExamMenuName,
                 Details = [
                     new ProgressDetail(){Status = (int)AggregatedProgressStatus.予定 , StatusName = AggregatedProgressStatus.予定.ToString(), Count = x.Count11},
                     new ProgressDetail(){Status = (int)AggregatedProgressStatus.来場 , StatusName = AggregatedProgressStatus.来場.ToString(), Count = x.Count21},
