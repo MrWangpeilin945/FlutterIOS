@@ -1,4 +1,5 @@
 using Moq;
+using FluentAssertions;
 
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
@@ -84,7 +85,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -114,7 +115,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -167,7 +168,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -220,7 +221,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -279,7 +280,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -335,7 +336,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -395,7 +396,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -455,7 +456,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -516,7 +517,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -577,7 +578,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -638,7 +639,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -698,7 +699,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -767,7 +768,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -834,7 +835,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -903,7 +904,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -967,7 +968,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1032,7 +1033,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1090,7 +1091,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1163,7 +1164,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1221,10 +1222,10 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
-        [Fact]
+    [Fact]
     public async Task 文字制限のチェック_年齢で2件のエラーが返る()
     {
         // Arrange
@@ -1292,7 +1293,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1353,7 +1354,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1382,7 +1383,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1434,7 +1435,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1486,7 +1487,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1539,7 +1540,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1594,7 +1595,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1654,7 +1655,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1716,7 +1717,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1775,7 +1776,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1842,7 +1843,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1907,7 +1908,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
@@ -1966,7 +1967,7 @@ public class ConsultUsecaseTests
         // Act
         var errors = await usecase.StoreConsultAsync(request);
         // Assert
-        Assert.Equal(errors, expected);
+        errors.Should().BeEquivalentTo(expected);
     }
 
 }

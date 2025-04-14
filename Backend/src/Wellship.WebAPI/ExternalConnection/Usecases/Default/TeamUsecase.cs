@@ -1,6 +1,7 @@
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -8,7 +9,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// </summary>
 public class TeamUsecase : ITeamUsecase
 {
-    private readonly List<ErrorObject> _errorObjects;
     private readonly ITeamRepository _teamRepository;
     private readonly TimeProvider _timeProvider;
 
@@ -20,7 +20,6 @@ public class TeamUsecase : ITeamUsecase
     public TeamUsecase(ITeamRepository teamRepository, TimeProvider timeProvider)
     {
         _teamRepository = teamRepository;
-        _errorObjects = new List<ErrorObject>();
         _timeProvider = timeProvider;
     }
 
@@ -31,117 +30,54 @@ public class TeamUsecase : ITeamUsecase
     /// <returns>エラーリスト</returns>
     public async Task<List<ErrorObject>> StoreTeamsAsync(List<Team> teams)
     {
-        _errorObjects.Clear();
+        List<ErrorObject> errorObjects = new List<ErrorObject>();
 
-        // Code 必須チェック済みのリストを取得する
-        var insertTeamsByRequired = GetCheckedRequired(teams);
+        // WARNING検証
+        var warningTeams = new List<Team>();
 
-        // Code 重複チェック済みのリストを取得する
-        var insertTeamsByDuplicated = GetCheckedDuplicated(teams);
-
-        var commonInsertTeams = insertTeamsByRequired.Intersect(insertTeamsByDuplicated)
-                                                     .ToList();
-
-        // エンティティリスト生成
-        var teamEntities = commonInsertTeams.Select(item => new TeamEntity
+        // 必須項目の空値のチェック
+        var spaceCheckProperties = new[]
         {
-            TeamId = Guid.NewGuid(),
-            TeamCode = item.Code,
-            Name = item.Name
-        }).ToList();
+            "Code",     // 班コード,
+            "Name"      // 班名
+        };
+        // チェックするプロパティ一覧をメソッドに渡して空値チェックする
+        foreach (var warning in ValidationChecker.SpaceCheckProperties(teams, spaceCheckProperties, errorObjects))
+        {
+            // エラーのオブジェクトをTeamにキャストしてワーニングリストに追加する
+            if (warning is Team team)
+            {
+                warningTeams.Add(team);
+            }
+        }
+
+        // キー重複チェック
+        var duplicateCheckProperties = new[]
+        {
+            "Code"      // 班コード
+        };
+        // チェックするプロパティ一覧をメソッドに渡して重複チェックする
+        foreach (var warning in ValidationChecker.DuplicateCheckProperties(teams, duplicateCheckProperties, errorObjects))
+        {
+            // エラーのオブジェクトをTeamにキャストしてワーニングリストに追加する
+            if (warning is Team team)
+            {
+                warningTeams.Add(team);
+            }
+        }
+
+        // 班エンティティリスト生成
+        var teamEntities = teams.Except(warningTeams)
+                                .Select(item => new TeamEntity
+                                {
+                                    TeamId = Guid.NewGuid(),
+                                    TeamCode = item.Code,
+                                    Name = item.Name
+                                }).ToList();
 
         // 班を登録する
         await _teamRepository.UpsertTeamsAsync(teamEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
-        return _errorObjects;
-    }
-
-    /// <summary>
-    /// 必須チェック済みのリストを取得する
-    /// </summary>
-    /// <param name="teams"></param>
-    /// <returns></returns>
-    private List<Team> GetCheckedRequired(List<Team> teams)
-    {
-        // WARNING検証
-        // 未入力(Code)
-        var requiredCodeData = teams.Where(x => string.IsNullOrWhiteSpace(x.Code));
-        if (requiredCodeData.Any())
-        {
-            // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredCodeData, "Code");
-        }
-
-        // 未入力(Name)
-        var requiredNameData = teams.Where(x => string.IsNullOrWhiteSpace(x.Name));
-        if (requiredNameData.Any())
-        {
-            // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredNameData, "Name");
-        }
-
-        return teams.Except(requiredCodeData)
-                    .Except(requiredNameData)
-                    .ToList();
-    }
-
-    /// <summary>
-    /// 重複チェック済みのリストを取得する
-    /// </summary>
-    /// <param name="teams"></param>
-    /// <returns></returns>
-    private List<Team> GetCheckedDuplicated(List<Team> teams)
-    {
-        // WARNING検証
-        // キー重複
-        var duplicatedTeamCodes = teams.GroupBy(x => x.Code).Where(x => x.Count() > 1).Select(x => x.Key).ToHashSet();
-
-        if (duplicatedTeamCodes.Any())
-        {
-            var duplicatedData = teams.Where(x => duplicatedTeamCodes.Contains(x.Code));
-
-            // 返却用エラーオブジェクトに追加
-            AddDuplicateDataErrorObjects(duplicatedData);
-            return teams.Except(duplicatedData).ToList();
-        }
-        else
-        {
-            return new List<Team>(teams);
-        }
-    }
-
-    /// <summary>
-    /// エラーオブジェクトに情報追加する(必須項目エラー）
-    /// </summary>
-    /// <param name="requiredData"></param>
-    /// <param name="itemName"></param>
-    private void AddRequiredDataErrorObjects(IEnumerable<Team> requiredData, string itemName)
-    {
-        var errorObjects = requiredData
-            .Select(r => new ErrorObject
-            {
-                Code = "10004",
-                Message = $"必須項目が不足しています。{itemName}",
-                InputNote = r.InputNote
-            }).ToList();
-
-        _errorObjects.AddRange(errorObjects);
-    }
-
-    /// <summary>
-    /// エラーオブジェクトに情報追加する(キーが重複するレコード）
-    /// </summary>
-    /// <param name="duplicatedData"></param>
-    private void AddDuplicateDataErrorObjects(IEnumerable<Team> duplicatedData)
-    {
-        var errorObjects = duplicatedData
-            .Select(d => new ErrorObject
-            {
-                Code = "10003",
-                Message = $"キー項目が重複しています。Code:{d.Code}",
-                InputNote = d.InputNote
-            }).ToList();
-
-        _errorObjects.AddRange(errorObjects);
+        return errorObjects;
     }
 }

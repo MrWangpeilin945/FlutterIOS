@@ -36,50 +36,63 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
             {
                 using var connection = await _dbConnectionProvider.GetOrOpenAsync();
                 {
-                    // 一時テーブル作成
-                    string sqlCreateTempTable = @"
-                        create temp table tmp_teams(
-                            team_code text not null
-                            , name text not null
-                        ) on commit drop;";
-                    // 一時テーブル作成 SQL実行
-                    await connection.ExecuteAsync(sqlCreateTempTable);
+                    // 表示順を取得する
+                    const string selectOrderNumberSql = @"
+                    select 
+                        coalesce(max(order_number), 0) + 1
+                    from 
+                        resultcollector.teams";
+                    var result = await connection.QueryAsync<int>(selectOrderNumberSql);
+                    int orderNumber = result.FirstOrDefault();
 
-                    // 一時テーブルにINSERT
-                    await BulkInsertHelper.BulkInsert(teams,
-                        team =>
-                        $"(" +
-                        $"{SqlFormatter.EscapeSqlValue(team.TeamCode)}, " +
-                        $"{SqlFormatter.EscapeSqlValue(team.Name)}" +
-                        $")",
-                        "tmp_teams",
-                        connection);
+                    var upsertTeams = teams.Select((x, index) => new
+                    {
+                        TeamId = Guid.NewGuid(),
+                        TeamCode = x.TeamCode,
+                        Name = x.Name,
+                        OrderNumber = orderNumber + index,
+                        CreatedAt = createdAt,
+                        CreatedBy = createdBy,
+                    }).ToArray();
 
-
-                    // UPSERT処理
-                    string upsertSql = @"   
-                        with max_order_number as (
-                            select coalesce(max(order_number), 0) as max_number from resultcollector.teams
+                    // teams（班）
+                    const string mergeTeamsSql = @"
+                    merge
+                    into resultcollector.teams as team
+                        using (values (@TeamId, @TeamCode, @Name, @OrderNumber,
+                                       @CreatedAt, @CreatedBy)) as new_data(
+                            team_id
+                            , team_code
+                            , name
+                            , order_number
+                            , created_at
+                            , created_by
                         )
-                        insert into resultcollector.teams (team_code, name, order_number, created_at, created_by)
-                        select
-                            team_code,
-                            name,
-                            max_order.max_number + row_number() over(),
-                            @CreatedAt,
-                            @CreatedBy
-                        from tmp_teams
-                        cross join max_order_number as max_order
-                        on conflict (team_code)
-                        do update set
-                            name = excluded.name,
-                            created_at = excluded.created_at,
-                            created_by = excluded.created_by;
-                    ";
-                    // UPSERT処理 SQL実行
-                    await connection.ExecuteAsync(upsertSql, new { CreatedAt = createdAt, CreatedBy = createdBy });
+                        on team.team_code = new_data.team_code
+                    when matched then 
+                        update set
+                            name = new_data.name
+                            , created_at = new_data.created_at
+                            , created_by = new_data.created_by 
+                    when not matched then
+                        insert (
+                            team_id
+                            , team_code
+                            , name
+                            , order_number
+                            , created_at
+                            , created_by
+                        )
+                        values (
+                            new_data.team_id
+                            , new_data.team_code
+                            , new_data.name
+                            , new_data.order_number
+                            , new_data.created_at
+                            , new_data.created_by
+                        );";
+                    await connection.ExecuteAsync(mergeTeamsSql, upsertTeams);
                 }
-
                 scope.Complete();
             }
         }
