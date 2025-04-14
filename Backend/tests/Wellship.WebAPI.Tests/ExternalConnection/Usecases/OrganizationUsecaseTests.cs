@@ -61,14 +61,14 @@ public class OrganizationUsecaseTests
         // Arrange
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2008"},
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2008"}
+            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2008-1"},
+            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2008-2"}
         };
         var usecase = new OrganizationUsecase(_organizationRepositoryMock.Object, _timeProvider);
         var request = new List<Organization>
         {
-            new Organization { Code = "5963", Name = "両備工業", InputNote = "UT2008" },
-            new Organization { Code = "5963", Name = "両備商工", InputNote = "UT2008" }
+            new Organization { Code = "5963", Name = "両備工業", InputNote = "UT2008-1" },
+            new Organization { Code = "5963", Name = "両備商工", InputNote = "UT2008-2" }
         };
         // Act
         var errors = await usecase.StoreOrganizationsAsync(request);

@@ -155,7 +155,7 @@ list.Count()  <> 0
 **** InputNote `PlaceSchedule.InputNote`
 
 * ユニークキーが重複するレコードが存在する
-** Thresholdsを以下の条件でGroupByし、複数レコードが存在する
+** PlaceSchedulesを以下の条件でGroupByし、複数レコードが存在する
 **** `PlaceSchedule.PlaceCode`
 **** `PlaceSchedule.TeamCode`
 **** `PlaceSchedule.ExamDate` ※DateOnly型にパース

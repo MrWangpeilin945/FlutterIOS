@@ -63,14 +63,14 @@ public class PlaceUsecaseTests
         // Arrange
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2007"},
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2007"}
+            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2007-1"},
+            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2007-2"}
         };
         var usecase = new PlaceUsecase(_placeRepositoryMock.Object, _timeProvider);
         var request = new List<Place>
         {
-            new Place { Code = "5963", Name = "会場Ａ", InputNote = "UT2007" },
-            new Place { Code = "5963", Name = "会場Ｂ", InputNote = "UT2007" }
+            new Place { Code = "5963", Name = "会場Ａ", InputNote = "UT2007-1" },
+            new Place { Code = "5963", Name = "会場Ｂ", InputNote = "UT2007-2" }
         };
         // Act
         var errors = await usecase.StorePlacesAsync(request);
