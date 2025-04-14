@@ -27,7 +27,7 @@ public class PlaceScheduleUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_班コードで1件のエラーが返る()
+    public async Task 空値のチェック_班コードで2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
@@ -55,7 +55,7 @@ public class PlaceScheduleUsecaseTests
     }
 
     [Fact]
-    public async Task 空値のチェック_会場コードで1件のエラーが返る()
+    public async Task 空値のチェック_会場コードで2件のエラーが返る()
     {
         // Arrange
         // 会場コードに紐づく会場IDを取得する
