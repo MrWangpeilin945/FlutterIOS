@@ -2236,7 +2236,7 @@ LName=検査結果削除履歴
 Comment=
 TableInnerOption=
 TableOption=
-Page=Main
+Page=MAIN
 Left=900
 Top=2750
 Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
@@ -2247,5 +2247,384 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20250409173312
-Position="Main",900,2750
+Position="MAIN",900,2750
 ZOrder=129
+
+[Entity]
+PName=notification_groups
+LName=通知先グループ
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=4150
+Top=300
+Field="ID","id","integer",,0,"","",$FFFFFFFF,""
+Field="名称","name","varchar(50)","NOT NULL",,"","",$FFFFFFFF,""
+Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+Index==2,order_number
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250325141036
+Position="MAIN",4150,300
+ZOrder=123
+
+[Entity]
+PName=notification_recipients
+LName=通知先
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=4150
+Top=550
+Field="ID","id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="名称","name","varchar(50)","NOT NULL",,"","",$FFFFFFFF,""
+Field="表示用名称","display_name","varchar(50)","NOT NULL",,"","",$FFFFFFFF,""
+Field="メールアドレス","email_address","varchar(254)","NOT NULL",,"","",$FFFFFFFF,""
+Field="表示順","order_number","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="通知先グループID","notification_group_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Index==2,order_number,notification_group_id
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250325140424
+Position="MAIN",4150,550
+ZOrder=124
+
+[Entity]
+PName=notification_rules
+LName=通知ルール
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=4850
+Top=400
+Field="通知先グループID","notification_group_id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="ログレベル","log_level","integer","NOT NULL",1,"","Info:2, Warn:3, Error:4",$FFFFFFFF,""
+Field="有効","enabled","boolean","NOT NULL",,"true","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250325135542
+Position="MAIN",4850,400
+ZOrder=125
+
+[Entity]
+PName=notification_templates
+LName=通知テンプレート
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=4850
+Top=150
+Field="ID","id","integer","NOT NULL",0,"","",$FFFFFFFF,""
+Field="名称","name","varchar(50)","NOT NULL",,"","",$FFFFFFFF,""
+Field="件名","subject","varchar(70)","NOT NULL",,"","",$FFFFFFFF,""
+Field="本文","body","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="差出人メールアドレス","sender_address","varchar(254)","NOT NULL",,"","",$FFFFFFFF,""
+Field="通知先グループID","notification_group_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Index==2,notification_group_id
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250326115219
+Position="MAIN",4850,150
+ZOrder=126
+
+[Relation]
+Entity1=notification_groups
+Entity2=notification_rules
+RelationType1=2
+RelationType2=3
+Fields1=id
+Fields2=notification_group_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,5386,4614,5948,R,R,""
+Dependence=0
+Caption=
+PName=
+LineMode=0
+Bar1=539
+Bar2=461
+Bar3=595
+TermPos1=R
+TermPos2=R
+ZOrder=131
+
+[Entity]
+PName=notification_send_histories
+LName=通知送信履歴
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=4850
+Top=600
+Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
+Field="ログID","log_id","uuid","NOT NULL",,"","",$FFFFFFFF,""
+Field="件名","subject","varchar(70)","NOT NULL",,"","",$FFFFFFFF,""
+Field="本文","body","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="通知先グループID","notification_group_id","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="差出人メールアドレス","sender_address","varchar(254)","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250414142047
+Position="MAIN",4850,600
+ZOrder=133
+
+[Entity]
+PName=integration_result_logs
+LName=連携処理結果ログ
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=3950
+Top=1050
+Field="ID","id","uuid","NOT NULL",0,"gen_random_uuid ()","",$FFFFFFFF,""
+Field="処理結果コード","result_code","varchar(20)","NOT NULL",,"","",$FFFFFFFF,""
+Field="ログレベル","log_level","integer","NOT NULL",,"","",$FFFFFFFF,""
+Field="機能コード","function_code","varchar(20)","NOT NULL",,"","",$FFFFFFFF,""
+Field="概要","summary","text","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250411150945
+Position="MAIN",3950,1050
+ZOrder=134
+
+[Entity]
+PName=integration_result_log_details
+LName=連携処理結果ログ明細
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=4100
+Top=1300
+Field="連携処理結果ログID","integration_result_log_id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
+Field="表示順","order_number","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="機能コード","function_code","varchar(20)","NOT NULL",,"","",$FFFFFFFF,""
+Field="発生源","event_source","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="詳細結果コード","result_detail_code","varchar(20)","NOT NULL",,"","",$FFFFFFFF,""
+Field="詳細結果メッセージ","result_detail_message","text","NOT NULL",,"","",$FFFFFFFF,""
+Field="プロパティ","properties","jsonb","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250414140310
+Position="MAIN",4100,1300
+ZOrder=135
+
+[Relation]
+Entity1=integration_result_logs
+Entity2=integration_result_log_details
+RelationType1=2
+RelationType2=4
+Fields1=id
+Fields2=integration_result_log_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",3,1032,4592,2245,R,R,""
+Dependence=1
+Caption=
+PName=
+ModifiedDateTime=20250325145711
+LineMode=3
+Bar1=103
+Bar2=459
+Bar3=224
+TermPos1=R
+TermPos2=R
+ZOrder=136
+
+[Entity]
+PName=integration_result_codes
+LName=連携処理結果コード
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=3950
+Top=850
+Field="コード","code","varchar(20)","NOT NULL",0,"","",$FFFFFFFF,""
+Field="名称","name","varchar(100)","NOT NULL",,"","",$FFFFFFFF,""
+Field="ログレベル","log_level","integer","NOT NULL",,"","Info:2, Warn:3, Error:4",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250324144005
+Position="MAIN",3950,850
+ZOrder=137
+
+[Entity]
+PName=integration_functions
+LName=連携処理機能
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=4600
+Top=1100
+Field="コード","code","varchar(20)","NOT NULL",0,"","",$FFFFFFFF,""
+Field="名称","name","varchar(100)","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250411152203
+Position="MAIN",4600,1100
+ZOrder=138
+
+[Relation]
+Entity1=integration_result_codes
+Entity2=integration_result_logs
+RelationType1=2
+RelationType2=3
+Fields1=code
+Fields2=result_code
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,3610,4804,2602,R,R,""
+Dependence=0
+Caption=
+PName=
+LineMode=0
+Bar1=361
+Bar2=480
+Bar3=260
+TermPos1=R
+TermPos2=R
+ZOrder=139
+
+[Relation]
+Entity1=integration_functions
+Entity2=integration_result_logs
+RelationType1=2
+RelationType2=3
+Fields1=code
+Fields2=function_code
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,4262,6282,5079,R,R,""
+Dependence=0
+Caption=
+PName=
+ModifiedDateTime=20250411152308
+LineMode=0
+Bar1=426
+Bar2=628
+Bar3=508
+TermPos1=R
+TermPos2=R
+ZOrder=142
+
+[Relation]
+Entity1=notification_groups
+Entity2=notification_recipients
+RelationType1=2
+RelationType2=4
+Fields1=id
+Fields2=notification_group_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,4003,4148,2880,R,R,""
+Dependence=0
+Caption=
+PName=
+ModifiedDateTime=20250325145639
+LineMode=0
+Bar1=400
+Bar2=415
+Bar3=288
+TermPos1=R
+TermPos2=R
+ZOrder=144
+
+[Relation]
+Entity1=notification_groups
+Entity2=notification_templates
+RelationType1=2
+RelationType2=3
+Fields1=id
+Fields2=notification_group_id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",0,2341,4809,5235,R,R,""
+Dependence=0
+Caption=
+PName=
+LineMode=0
+Bar1=234
+Bar2=481
+Bar3=524
+TermPos1=R
+TermPos2=R
+ZOrder=145
+
+[Relation]
+Entity1=integration_functions
+Entity2=integration_result_log_details
+RelationType1=2
+RelationType2=3
+Fields1=code
+Fields2=function_code
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",1,2276,5515,8118,R,R,""
+Dependence=0
+Caption=
+PName=
+ModifiedDateTime=20250411152301
+LineMode=1
+Bar1=228
+Bar2=552
+Bar3=812
+TermPos1=R
+TermPos2=R
+ZOrder=146
+
+[Entity]
+PName=notification_send_history_recipients
+LName=通知送信履歴宛先
+Comment=
+TableInnerOption=
+TableOption=
+Page=MAIN
+Left=4950
+Top=850
+Field="ID","id","uuid","NOT NULL",0,"","",$FFFFFFFF,""
+Field="通知先ID","recipient_id","integer","NOT NULL",1,"","",$FFFFFFFF,""
+Field="メールアドレス","recipient_address","varchar(254)","NOT NULL",,"","",$FFFFFFFF,""
+EffectMode=None
+Color=$000000
+BkColor=$FFFFFF
+ModifiedDateTime=20250414140035
+Position="MAIN",4950,850
+ZOrder=147
+
+[Relation]
+Entity1=notification_send_histories
+Entity2=notification_send_history_recipients
+RelationType1=2
+RelationType2=3
+Fields1=id
+Fields2=id
+Cardinarity1=
+Cardinarity2=
+Position="MAIN",3,508,3980,9500,R,R,""
+Dependence=1
+Caption=
+PName=
+LineMode=3
+Bar1=51
+Bar2=398
+Bar3=950
+TermPos1=R
+TermPos2=R
+ZOrder=149
