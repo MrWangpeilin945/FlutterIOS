@@ -1,0 +1,107 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "C20211801",
+        "actionType": 0,
+        "placeCode": "P2004-18",
+        "teamCode": "T2004-18",
+        "examDate": "2025-03-03",
+        "consultNumber": "123456789012345678901234567890123456789012345678901",
+        "examineeCode": "E20041801",
+        "age": "0580710",
+        "note": "受診番号が51文字でエラー",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041801"
+    },
+    {
+        "sortNo": 2,
+        "connectionCode": "C20211802",
+        "actionType": 0,
+        "placeCode": "P2004-18",
+        "teamCode": "T2004-18",
+        "examDate": "2025-03-03",
+        "consultNumber": "12345678901234567890123456789012345678901234567890",
+        "examineeCode": "E20041802",
+        "age": "0520203",
+        "note": "受診番号が50文字で登録可",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041802"
+    },
+    {
+        "sortNo": 3,
+        "connectionCode": "C20211803",
+        "actionType": 0,
+        "placeCode": "P2004-18",
+        "teamCode": "T2004-18",
+        "examDate": "2025-03-03",
+        "consultNumber": "C20041803",
+        "examineeCode": "E20041803",
+        "age": "520203",
+        "note": "年齢が7桁未満でエラー",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041803"
+    },
+    {
+        "sortNo": 4,
+        "connectionCode": "C20211804",
+        "actionType": 0,
+        "placeCode": "P2004-18",
+        "teamCode": "T2004-18",
+        "examDate": "2025-03-03",
+        "consultNumber": "C20041804",
+        "examineeCode": "E20041804",
+        "age": "00520203",
+        "note": "年齢が7桁超えでエラー",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041804"
+    },
+    {
+        "sortNo": 5,
+        "connectionCode": "C20211805",
+        "actionType": 0,
+        "placeCode": "P2004-18",
+        "teamCode": "T2004-18",
+        "examDate": "2025-03-03",
+        "consultNumber": "C20041805",
+        "examineeCode": "E20041805",
+        "age": "0570707",
+        "note": "年齢が7桁で登録可",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041805"
+    }
+]

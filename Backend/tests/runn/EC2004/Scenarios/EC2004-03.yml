@@ -20,6 +20,8 @@ steps:
         TRUNCATE TABLE resultcollector.teams CASCADE;
         -- 受診者
         TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
         -- 検査特記
         TRUNCATE TABLE resultcollector.exam_menu_note_codes CASCADE;
         -- 基準値パターン
@@ -34,12 +36,12 @@ steps:
         INSERT INTO
           resultcollector.teams
           (team_id, team_code, name, order_number, created_at, created_by)
-        VALUES('f0002004-0000-0000-0003-000000000001', 'T2004-03', '甲班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('f0002004-0000-0000-0003-000000000001', 'T2004-03', '班', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場
         INSERT INTO
           resultcollector.places
           (place_id, place_code, name, order_number, created_at, created_by)
-        VALUES('b0002004-0000-0000-0003-000000000001', 'P2004-03', '甲会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('b0002004-0000-0000-0003-000000000001', 'P2004-03', '会場', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場日程
         INSERT INTO
           resultcollector.place_schedule
@@ -53,8 +55,8 @@ steps:
         -- 受診
         INSERT INTO
           resultcollector.consult
-          (consult_id, consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
-        VALUES('c0002004-0000-0000-0003-000000000001', 'No-200403-1', 11, 11, 'a0002004-0000-0000-0003-000000000001', '特記事項2004031', 'e0002004-0000-0000-0003-000000000001', 'CCS-2004-9999', CURRENT_TIMESTAMP, 'ec2004');
+          (consult_id, consult_number, age, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
+        VALUES('c0002004-0000-0000-0003-000000000001', 'No2004031', '0500510', 11, 11, 'a0002004-0000-0000-0003-000000000001', '特記事項2004031', 'e0002004-0000-0000-0003-000000000001', 'CCS-2004-9999', CURRENT_TIMESTAMP, 'ec2004');
   getConsult:
     desc: "受診情報を取得する"
     db:
@@ -62,6 +64,7 @@ steps:
         SELECT
           consult_id::text
           , consult_number
+          , age
           , progress_status
           , export_status
           , place_schedule_id::text
@@ -83,12 +86,12 @@ steps:
             application/json:
               "{{ vars.request }}"
     test: |
-      current.res.status == 200
+      current.res.status == 207
       // レスポンスに1件のErrorObjectが返されることを確認
       && len(current.res.body) == 1
       && current.res.body[0].code == "10002"
       && current.res.body[0].inputNote == "2004031"
-      && current.res.body[0].message == "指定されたConsultNumberが既に登録済みです。Code:No-200403-1"
+      && current.res.body[0].message == "指定されたConsultNumberが既に登録済みです。Code:No2004031"
     dump:
       expr: current.res.body
       out: ../Dump/EC2004-03.json
@@ -99,6 +102,7 @@ steps:
         SELECT
           consult_id::text
           , consult_number
+          , age
           , progress_status
           , export_status
           , place_schedule_id::text
@@ -114,6 +118,7 @@ steps:
       len(current.rows) == 1
       && current.rows[0].consult_id == consultData[0].consult_id
       && current.rows[0].consult_number == consultData[0].consult_number
+      && current.rows[0].age == consultData[0].age
       && current.rows[0].progress_status == consultData[0].progress_status
       && current.rows[0].export_status == consultData[0].export_status
       && current.rows[0].place_schedule_id == consultData[0].place_schedule_id

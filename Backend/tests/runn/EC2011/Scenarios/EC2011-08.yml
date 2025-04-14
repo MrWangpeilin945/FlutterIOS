@@ -1,0 +1,54 @@
+desc: EC2011-08 キー重複を除外_正常 [207]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2011-08.json"
+steps:
+  clearTable:
+    desc: "職員テーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.staffs CASCADE;
+  post:
+    desc: "キー重複のレコードがエラーで返される"
+    req:
+      /api/v1/external/staffs:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      && len(current.res.body) == 4
+      && current.res.body[0].code == "10003" && current.res.body[0].message == "キー項目が重複しています。StaffCode:201108012"        && current.res.body[0].inputNote == "20110801"
+      && current.res.body[1].code == "10003" && current.res.body[1].message == "キー項目が重複しています。StaffCode:201108012"        && current.res.body[1].inputNote == "20110802"
+      && current.res.body[2].code == "10003" && current.res.body[2].message == "キー項目が重複しています。LoginId:S2011023"           && current.res.body[2].inputNote == "20110802"
+      && current.res.body[3].code == "10003" && current.res.body[3].message == "キー項目が重複しています。LoginId:S2011023"           && current.res.body[3].inputNote == "20110803"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2011-08.json
+  confirmStaffs:
+    desc: "エラーの職員情報が登録されていないことを確認"
+    db:
+      query: |
+        SELECT
+          staff_id::text
+          , staff_code
+          , login_id
+          , name
+          , enabled
+          , role_id
+          , password_hash::text
+          , password_salt::text
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.staffs
+        ORDER BY
+          staff_code
+    test: |
+      len(current.rows) == 0

@@ -1,0 +1,70 @@
+desc: EC2014-04 キー重複を除外_正常 [207]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2014-04.json"
+steps:
+  clearTable:
+    desc: "基準値パターンテーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.thresholds CASCADE;
+  insertData:
+    desc: "基準値パターンテーブルに実行前データを登録"
+    db: 
+      query: |
+        insert into resultcollector.thresholds(threshold_code, name, order_number, created_at, created_by)
+            values('T2014-04-1', '一般健診', 1, '2025-01-01T12:34:56.789', 'ec2014')
+            ,     ('T2014-04-2', '職員健診', 2, '2025-01-01T12:34:56.789', 'ec2014');
+  post:
+    desc: "基準値パターンを更新_正常"
+    req:
+      /api/v1/external/thresholds:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      && len(current.res.body) == 2
+      // キー重複のレコードがエラーで返される
+      && current.res.body[0].code == "10003"
+      && current.res.body[0].inputNote == "20140402A"
+      && current.res.body[0].message == "キー項目が重複しています。Code:T2014-04-2"
+      && current.res.body[1].code == "10003"
+      && current.res.body[1].inputNote == "20140402B"
+      && current.res.body[1].message == "キー項目が重複しています。Code:T2014-04-2"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2014-04.json
+  confirmThresholds:
+    desc: "基準値パターンの更新を確認"
+    db:
+      query: |
+        SELECT
+          threshold_code
+          , name
+          , order_number
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.thresholds
+        ORDER BY
+          threshold_code ASC;
+    test: |
+      len(current.rows) == 2
+      // 基準値パターンが変更されないことを確認
+      && current.rows[0].threshold_code == "T2014-04-1"
+      && current.rows[0].name == "一般健診"
+      && current.rows[0].order_number == 1
+      && current.rows[0].created_at == "20250101"
+      && current.rows[0].created_by == "ec2014"
+      && current.rows[1].threshold_code == "T2014-04-2"
+      && current.rows[1].name == "職員健診"
+      && current.rows[1].order_number == 2
+      && current.rows[1].created_at == "20250101"
+      && current.rows[1].created_by == "ec2014"

@@ -24,5 +24,10 @@ public enum AggregatedProgressStatus
     /// <summary>
     /// 中止
     /// </summary>
-    中止 = 51
+    中止 = 51,
+
+    /// <summary>
+    /// その他
+    /// </summary>
+    その他 = 71
 }

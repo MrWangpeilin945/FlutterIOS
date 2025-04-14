@@ -15,6 +15,11 @@ public interface ITenantProvider
     /// テナントを識別するキー文字列
     /// </summary>
     public string TenantKey { get; }
+    /// <summary>
+    /// テナント情報を上書きします
+    /// </summary>
+    /// <param name="tenantKey">テナントキー</param>
+    public void OverrideTenantKeyOnlyIfNotSet(string tenantKey);
 }
 
 /// <summary>
@@ -29,7 +34,12 @@ public class TenantProvider : ITenantProvider
     public TenantProvider(IHttpContextAccessor httpContextAccessor)
     {
         var request = httpContextAccessor.HttpContext?.Request;
-        ArgumentNullException.ThrowIfNull(request);
+        // NOTE: 別スコープでDIした場合Requestがnullのため、nullかどうかで分岐しています
+        if (request is null)
+        {
+            TenantKey = string.Empty;
+            return;
+        }
         var uri = new UriBuilder(request.Scheme, request.Host.Host).Uri;
         TenantKey = uri.HostNameType switch
         {
@@ -43,7 +53,17 @@ public class TenantProvider : ITenantProvider
     }
 
     /// <inheritdoc/>
-    public string TenantKey { get; private init; }
+    public string TenantKey { get; private set; }
+
+    /// <inheritdoc/>
+    public void OverrideTenantKeyOnlyIfNotSet(string tenantKey)
+    {
+        if (!string.IsNullOrEmpty(TenantKey))
+        {
+            throw new InvalidOperationException("既にテナント情報を取得しているためテナント情報を上書きできません");
+        }
+        TenantKey = tenantKey;
+    }
 
     /// <summary>
     /// DNSHost名（tenant-01.wellship.jpなど）からサブドメイン部を取得します。

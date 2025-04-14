@@ -1,0 +1,242 @@
+desc: EC2004-16 必須項目の空値のチェック
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2004-16.json"
+steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 受診
+        TRUNCATE TABLE resultcollector.consult CASCADE;
+        -- 会場
+        TRUNCATE TABLE resultcollector.places CASCADE; 
+        -- 班
+        TRUNCATE TABLE resultcollector.teams CASCADE;
+        -- 受診者
+        TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
+        -- 検査特記
+        TRUNCATE TABLE resultcollector.exam_menu_note_codes CASCADE;
+        -- 基準値パターン
+        TRUNCATE TABLE resultcollector.thresholds CASCADE;
+        -- 外部検査項目明細
+        TRUNCATE TABLE resultcollector.external_exam_item_details CASCADE;
+  insertData:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 班
+        INSERT INTO
+          resultcollector.teams
+          (team_id, team_code, name, order_number, created_at, created_by)
+        VALUES('f0002004-0000-0000-0016-000000000001', 'T2004-16', '班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 会場
+        INSERT INTO
+          resultcollector.places
+          (place_id, place_code, name, order_number, created_at, created_by)
+        VALUES('b0002004-0000-0000-0016-000000000001', 'P2004-16', '会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 会場日程
+        INSERT INTO
+          resultcollector.place_schedule
+          (place_schedule_id, place_id, team_id, status, exam_date, start_time, created_at, created_by)
+        VALUES('a0002004-0000-0000-0016-000000000001', 'b0002004-0000-0000-0016-000000000001', 'f0002004-0000-0000-0016-000000000001', 31, '2025/03/03', '1500', CURRENT_TIMESTAMP, 'ec2004');
+        -- 受診者
+        INSERT INTO
+          resultcollector.examinees
+          (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
+        VALUES('e0002004-0000-0000-0016-000000000001', 'E20041601', '両備　一郎', 'リョウビ　イチロウ',   1, '1991-01-01', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0016-000000000002', 'E20041602', '両備　ニ郎', 'リョウビ　ジロウ',     1, '1992-02-02', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0016-000000000003', 'E20041603', '両備　三郎', 'リョウビ　サブロウ',   1, '1993-03-03', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0016-000000000004', 'E20041604', '両備　四郎', 'リョウビ　シロウ',     1, '1994-04-04', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0016-000000000005', 'E20041605', '両備　五郎', 'リョウビ　ゴロウ',     1, '1995-05-05', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0016-000000000006', 'E20041606', '両備　六郎', 'リョウビ　ロクロウ',   1, '1996-06-06', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0016-000000000007', 'E20041607', '両備　七郎', 'リョウビ　ナナロウ',   1, '1997-07-07', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0016-000000000008', 'E20041608', '両備　八郎', 'リョウビ　ハチロウ',   1, '1998-08-08', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0016-000000000009', 'E20041609', '両備　九郎', 'リョウビ　キュウロウ', 1, '1999-09-09', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0016-000000000010', 'E20041610', '両備　十郎', 'リョウビ　ジュウロウ', 1, '2000-10-10', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0016-000000000011', 'E20041611', '両備　十一郎', 'リョウビ　ジュウイチロウ', 1, '2000-11-11', CURRENT_TIMESTAMP,'ec2004');
+  post:
+    desc: "必須項目の空値のチェック"
+    req:
+      /api/v1/external/consult:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      // レスポンスに28件のErrorObjectが返されることを確認
+      && len(current.res.body) == 36
+      && current.res.body[0].code == "10004"
+      && current.res.body[0].inputNote == "20041601"
+      && current.res.body[0].message == "必須項目が不足しています。ConnectionCode"
+      && current.res.body[1].code == "10004"
+      && current.res.body[1].inputNote == "20041606"
+      && current.res.body[1].message == "必須項目が不足しています。ConnectionCode"
+      && current.res.body[2].code == "10004"
+      && current.res.body[2].inputNote == "20041602"
+      && current.res.body[2].message == "必須項目が不足しています。PlaceCode"
+      && current.res.body[3].code == "10004"
+      && current.res.body[3].inputNote == "20041603"
+      && current.res.body[3].message == "必須項目が不足しています。TeamCode"
+      && current.res.body[4].code == "10004"
+      && current.res.body[4].inputNote == "20041604"
+      && current.res.body[4].message == "必須項目が不足しています。ConsultNumber"
+      && current.res.body[5].code == "10004"
+      && current.res.body[5].inputNote == "20041605"
+      && current.res.body[5].message == "必須項目が不足しています。ExamineeCode"
+      && current.res.body[6].code == "10004"
+      && current.res.body[6].inputNote == "20041606"
+      && current.res.body[6].message == "必須項目が不足しています。PlaceCode"
+      && current.res.body[7].code == "10004"
+      && current.res.body[7].inputNote == "20041606"
+      && current.res.body[7].message == "必須項目が不足しています。TeamCode"
+      && current.res.body[8].code == "10004"
+      && current.res.body[8].inputNote == "20041606"
+      && current.res.body[8].message == "必須項目が不足しています。ConsultNumber"
+      && current.res.body[9].code == "10004"
+      && current.res.body[9].inputNote == "20041606"
+      && current.res.body[9].message == "必須項目が不足しています。ExamineeCode"
+      && current.res.body[10].code == "10004"
+      && current.res.body[10].inputNote == "20041606"
+      && current.res.body[10].message == "必須項目が不足しています。Age"
+      && current.res.body[11].code == "10004"
+      && current.res.body[11].inputNote == "20041611"
+      && current.res.body[11].message == "必須項目が不足しています。Age"
+      && current.res.body[12].code == "10004"
+      && current.res.body[12].inputNote == "20041607"
+      && current.res.body[12].message == "必須項目が不足しています。PreviousResults.ExamItemDetailCode"
+      && current.res.body[13].code == "10004"
+      && current.res.body[13].inputNote == "20041607"
+      && current.res.body[13].message == "必須項目が不足しています。PreviousResults.Value"
+      && current.res.body[14].code == "10004"
+      && current.res.body[14].inputNote == "20041608"
+      && current.res.body[14].message == "必須項目が不足しています。ConsultThresholds.ThresholdCode"
+      && current.res.body[15].code == "10004"
+      && current.res.body[15].inputNote == "20041609"
+      && current.res.body[15].message == "必須項目が不足しています。ConsultNotes.Code"
+      && current.res.body[16].code == "10004"
+      && current.res.body[16].inputNote == "20041610"
+      && current.res.body[16].message == "必須項目が不足しています。ExamItemDetailOrders.ExamItemDetailCode"
+      && current.res.body[17].code == "10005"
+      && current.res.body[17].inputNote == "20041606"
+      && current.res.body[17].message == "制限数を超えています。Age:"
+      && current.res.body[18].code == "10005"
+      && current.res.body[18].inputNote == "20041611"
+      && current.res.body[18].message == "制限数を超えています。Age:"
+      && current.res.body[19].code == "10006"
+      && current.res.body[19].inputNote == "20041604"
+      && current.res.body[19].message == "値の形式が無効です。ConsultNumber:"
+      && current.res.body[20].code == "10006"
+      && current.res.body[20].inputNote == "20041606"
+      && current.res.body[20].message == "値の形式が無効です。ConsultNumber:"
+      && current.res.body[21].code == "10006"
+      && current.res.body[21].inputNote == "20041606"
+      && current.res.body[21].message == "値の形式が無効です。Age:"
+      && current.res.body[22].code == "10006"
+      && current.res.body[22].inputNote == "20041611"
+      && current.res.body[22].message == "値の形式が無効です。Age:"
+      && current.res.body[23].code == "10001"
+      && current.res.body[23].inputNote == "20041602"
+      && current.res.body[23].message == "指定されたPlaceCodeがシステム上に存在しません。Code:"
+      && current.res.body[24].code == "10001"
+      && current.res.body[24].inputNote == "20041606"
+      && current.res.body[24].message == "指定されたPlaceCodeがシステム上に存在しません。Code:"
+      && current.res.body[25].code == "10001"
+      && current.res.body[25].inputNote == "20041603"
+      && current.res.body[25].message == "指定されたTeamCodeがシステム上に存在しません。Code:"
+      && current.res.body[26].code == "10001"
+      && current.res.body[26].inputNote == "20041606"
+      && current.res.body[26].message == "指定されたTeamCodeがシステム上に存在しません。Code:"
+      && current.res.body[27].code == "10001"
+      && current.res.body[27].inputNote == "20041602"
+      && current.res.body[27].message == "指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:/TeamCode:T2004-16/ExamDate:2025-03-03"
+      && current.res.body[28].code == "10001"
+      && current.res.body[28].inputNote == "20041603"
+      && current.res.body[28].message == "指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:P2004-16/TeamCode:/ExamDate:2025-03-03"
+      && current.res.body[29].code == "10001"
+      && current.res.body[29].inputNote == "20041606"
+      && current.res.body[29].message == "指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:/TeamCode:/ExamDate:2025-03-03"
+      && current.res.body[30].code == "10001"
+      && current.res.body[30].inputNote == "20041605"
+      && current.res.body[30].message == "指定されたExamineeCodeがシステム上に存在しません。Code:"
+      && current.res.body[31].code == "10001"
+      && current.res.body[31].inputNote == "20041606"
+      && current.res.body[31].message == "指定されたExamineeCodeがシステム上に存在しません。Code:"
+      && current.res.body[32].code == "10001"
+      && current.res.body[32].inputNote == "20041609"
+      && current.res.body[32].message == "指定されたConsultNotes.Codeがシステム上に存在しません。Code:"
+      && current.res.body[33].code == "10001"
+      && current.res.body[33].inputNote == "20041608"
+      && current.res.body[33].message == "指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:"
+      && current.res.body[34].code == "10001"
+      && current.res.body[34].inputNote == "20041607"
+      && current.res.body[34].message == "指定されたPreviousResults.ExamItemDetailCodeがシステム上に存在しません。Code:"
+      && current.res.body[35].code == "10001"
+      && current.res.body[35].inputNote == "20041610"
+      && current.res.body[35].message == "指定されたExamItemDetailOrders.ExamItemDetailCodeがシステム上に存在しません。Code:"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2004-16.json
+  confirmConsult:
+    desc: "受診の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.consult;
+    test: |
+      // 受診が登録されていないことを確認
+      len(current.rows) == 0
+  confirmConsultNotes:
+    desc: "受診特記の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.consult_notes;
+    test: |
+      // 受診特記が登録されていないことを確認
+      len(current.rows) == 0
+  confirmExamItemDetailOrders:
+    desc: "検査項目明細依頼の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.exam_item_detail_orders;
+    test: |
+      // 検査項目明細依頼が登録されていないことを確認
+      len(current.rows) == 0
+  confirmConsultThresholds:
+    desc: "基準値の登録を確認"
+    db:
+      query: |
+        SELECT
+          threshold_id::text
+        FROM
+          resultcollector.consult_thresholds;
+    test: |
+      // 基準値が登録されていないことを確認
+      len(current.rows) == 0
+  confirmPreviousResults:
+    desc: "過去検査結果の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.previous_results;
+    test: |
+      // 過去検査結果が登録されていないことを確認
+      len(current.rows) == 0

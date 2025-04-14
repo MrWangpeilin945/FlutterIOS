@@ -114,9 +114,8 @@ public class ConsultUsecase : IConsultUsecase
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
         // 健診日
         DateOnly examDate = placeSchedule.ExamDate;
-        // 受診日の年齢
-        // NOTE: 年齢加算日は暫定で前日年齢加算
-        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 受診の年齢
+        var examAge = consult.Age;
         // 検査メニューに関連した検査項目情報を取得
         var examItemGroups = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
         // 検査中止を取得
@@ -157,7 +156,7 @@ public class ConsultUsecase : IConsultUsecase
 
         // 検査実施判断ルールで検証する
         var decisionRules = await ValidateDecisionRuleAsync(examMenuId, examResults, previousResults);
-        var examDecisionResults = decisionRules.OrderBy(x => x.ErrorLevel)
+        var examDecisionResults = decisionRules.OrderByDescending(x => x.ErrorLevel)
                                                .Select(x => new ExamDecisionResult()
                                                {
                                                    ErrorLevel = (int)x.ErrorLevel,
@@ -225,6 +224,7 @@ public class ConsultUsecase : IConsultUsecase
     {
         // NOTE: 中止理由の登録ルール
         // 前提：リクエストは検査項目単位、DBは検査項目明細単位
+        //       会場がロック中の時は管理者のみ操作可能
         // 
         // [1] isPerforming（検査実施する）：true & 中止理由：null
         //   - a. 中止レコードがある => 中止レコードを削除する
@@ -235,6 +235,15 @@ public class ConsultUsecase : IConsultUsecase
         //   - b. 中止レコードがない => 中止レコードを挿入する
 
         var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        // 会場日程がロック中かを確認
+        // ロール：管理者は操作可能
+        var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync(consult.PlaceScheduleId);
+        if (placeSchedule?.Status == PlaceScheduleLockingStatus.検査完了 && _staffIdentityProvider.Role != Role.Admin)
+        {
+            // 会場ロック中
+            throw new PlaceScheduleLockedException();
+        }
+
         var examCancels = await _consultRepository.GetExamCancelsAsync(consult.ConsultId);
 
         // [1] isPerforming（検査実施する）：true & 中止理由：null
@@ -305,9 +314,10 @@ public class ConsultUsecase : IConsultUsecase
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
         // 健診日
         DateOnly examDate = placeSchedule.ExamDate;
-        // 受診日の年齢
-        // NOTE: 年齢加算日は暫定で前日年齢加算
-        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 受診の年齢
+        var examAge = consult.Age;
+        // 未受診の検査メニューを取得
+        var unexaminedItems = await GetUnexaminedMenusAsync(consultNumber);
         // 検査メニューに関連した検査項目情報を取得
         var examItemGroup = await _examItemRepository.GetExamItemGroupsAsync(examMenuId);
         // 検査項目明細IDを取得
@@ -367,6 +377,7 @@ public class ConsultUsecase : IConsultUsecase
                 Sex = (int)examinee.Sex,
                 ExamDateAge = examAge.Years
             },
+            IsComplete = !unexaminedItems.UnexaminedMenus.Select(x => x.ExamMenuId).Contains(examMenuId),
             RelatedExamItems = relatedExamItems,
             ExamItemGroups = examItemGroups.ToArray()
         };
@@ -511,10 +522,6 @@ public class ConsultUsecase : IConsultUsecase
         var consult = await _consultRepository.GetConsultAsync(consultNumber);
         var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
-        var examDate = placeSchedule.ExamDate;
-        // 受診日の年齢
-        // NOTE: 年齢加算日は暫定で前日年齢加算
-        var examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
 
         // DBとリクエスト値から今回値を取得して合成する（リクエスト値を優先する）
         var dbCurrentResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
@@ -527,6 +534,9 @@ public class ConsultUsecase : IConsultUsecase
 
         // 検査基準値範囲を取得
         var ranges = await _consultRepository.GetExamNormalValueRangesAsync(consult.ConsultId, examItemDetailIds);
+        var filteredRanges = ranges.Where(x => x.TargetAge.IsMatch(consult.Age))
+                                   .Where(x => x.TargetSex.IsMatch(examinee.Sex))
+                                   .ToArray();
 
         // 今回値に対して範囲チェック
         var errors = new List<Domain.Models.RangeError>();
@@ -534,7 +544,7 @@ public class ConsultUsecase : IConsultUsecase
         {
             // 検査結果がMin以上Max未満に当てはまる範囲の設定を取得する
             // 優先度の昇順でソートして先頭の基準値範囲を採用する
-            var range = ranges.Where(x => x.ExamItemDetailId == current.Key && x.ValueRange.InRange(current.Value))
+            var range = filteredRanges.Where(x => x.ExamItemDetailId == current.Key && x.ValueRange.InRange(current.Value))
                               .OrderBy(x => x.Priority)
                               .FirstOrDefault();
 
@@ -562,7 +572,7 @@ public class ConsultUsecase : IConsultUsecase
     public async Task RegisterResultsAsync(string consultNumber, ResultsRequest results)
     {
         var consult = await _consultRepository.GetConsultAsync(consultNumber);
-        // 会場のロック中かを確認
+        // 会場日程がロック中かを確認
         // ロール：管理者は操作可能
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleLockingStatusAsync(consult.PlaceScheduleId);
         if (placeSchedule?.Status == PlaceScheduleLockingStatus.検査完了 && _staffIdentityProvider.Role != Role.Admin)
@@ -571,6 +581,7 @@ public class ConsultUsecase : IConsultUsecase
             throw new PlaceScheduleLockedException();
         }
         var examItemIds = results.ExamResults.Select(x => x.ExamItemId);
+        var examItemDetailIds = results.ExamResults.SelectMany(x => x.ExamItemDetails).Select(x => x.ExamItemDetailId);
 
         // 検査結果相関ルールを検証する
         var ruleErrors = await ValidateCorrelationRuleAsync(consultNumber, results);
@@ -584,7 +595,9 @@ public class ConsultUsecase : IConsultUsecase
 
         // 検査基準値を検証する
         var rangeErrors = await ValidateNormalValueRangeAsync(consultNumber, results);
-        var registrationDeniedRangeError = rangeErrors.Where(x => x.ErrorLevel == InputErrorLevel.異常);
+        // NOTE: リクエストに含まれる検査項目明細IDで検査基準値エラーをチェックする
+        var registrationDeniedRangeError = rangeErrors.Where(x => examItemDetailIds.Contains(x.ExamItemDetailId))
+                                                      .Where(x => x.ErrorLevel == InputErrorLevel.異常);
         if (registrationDeniedRangeError.Any())
         {
             throw new ExamResultRegistrationErrorException();
@@ -614,9 +627,8 @@ public class ConsultUsecase : IConsultUsecase
         var placeSchedule = await _placeScheduleRepository.GetPlaceScheduleAsync(consult.PlaceScheduleId);
         // 健診日
         DateOnly examDate = placeSchedule.ExamDate;
-        // 受診日の年齢
-        // NOTE: 年齢加算日は暫定で前日年齢加算
-        Domain.Models.Age examAge = examinee.Birthdate.GetAge(examDate, Core.Enums.AgeCalcMode.前日年齢加算);
+        // 受診の年齢
+        var examAge = consult.Age;
         // 検査結果を取得
         var examResults = await _consultRepository.GetExamResultsAsync(consult.ConsultId);
         // 過去検査結果を取得

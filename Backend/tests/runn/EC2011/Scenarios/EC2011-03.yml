@@ -1,4 +1,4 @@
-desc: EC2011-03 ログインIDが異なる職員コードで登録されている [200]
+desc: EC2011-03 ログインIDが異なる職員コードで登録されている [207]
 runners:
   db: ${DB_HOST}
   req:
@@ -7,9 +7,17 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2011-03.json"
-  loginId: "S201105"
-  errorMessage: "指定されたLoginIdが既に登録済みです。"
 steps:
+  clearTable:
+    desc: "職員テーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.staffs CASCADE;
+  insertData:
+    desc: "職員テーブルに実行前データを登録"
+    db: 
+      query: |
+        insert into resultcollector.staffs(staff_code, login_id, name, password_hash, password_salt, enabled, role_id, created_at, created_by)
+            values('201105','S201105', '既存ログインID', '00', '00' , true, 10,  '2025-01-01T12:34:56.789', 'ex2011');
   getStaffs:
     desc: "リクエスト前の職員情報を取得"
     db:
@@ -22,10 +30,10 @@ steps:
           , role_id
           , password_hash::text 
           , password_salt::text
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
         FROM
           resultcollector.staffs
-        WHERE
-          login_id = '{{ vars.loginId }}'
     bind:
       staffData: current.rows[0]
   post:
@@ -37,12 +45,12 @@ steps:
             application/json:
               "{{ vars.request }}"
     test: |
-      current.res.status == 200
+      current.res.status == 207
       && len(current.res.body) == 1
       // ログインIDがErrorObjectで返される
       && current.res.body[0].code == "10002"
       && current.res.body[0].inputNote == "2011031"
-      && current.res.body[0].message startsWith vars.errorMessage
+      && current.res.body[0].message == "指定されたLoginIdが既に登録済みです。Code:S201105"
     dump:
       expr: current.res.body
       out: ../Dump/EC2011-03.json
@@ -58,16 +66,20 @@ steps:
           , role_id
           , password_hash::text
           , password_salt::text
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.staffs
-        WHERE
-          login_id = '{{ vars.loginId }}'
     test: |
       len(current.rows) == 1
-      && current.rows[0].staff_code == staffData.staff_code
-      && current.rows[0].login_id == staffData.login_id
-      && current.rows[0].name == staffData.name
-      && current.rows[0].enabled == staffData.enabled
-      && current.rows[0].role_id == staffData.role_id
+      && current.rows[0].staff_code == "201105"
+      && current.rows[0].login_id == "S201105"
+      && current.rows[0].name == "既存ログインID"
+      && current.rows[0].enabled == true
+      && current.rows[0].role_id == 10
       && current.rows[0].password_hash == staffData.password_hash
       && current.rows[0].password_salt == staffData.password_salt
+      && current.rows[0].created_at == "20250101"
+      && current.rows[0].created_by == "ex2011"
+

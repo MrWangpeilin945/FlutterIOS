@@ -1,4 +1,4 @@
-desc: EC2004-13 検査項目明細依頼のPKが重複するレコードが存在する
+desc: EC2004-13 検査項目明細依頼の検査項目明細CDが重複するレコードが存在する
 runners:
   db: ${DB_HOST}
   req:
@@ -20,6 +20,8 @@ steps:
         TRUNCATE TABLE resultcollector.teams CASCADE;
         -- 受診者
         TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
         -- 検査特記
         TRUNCATE TABLE resultcollector.exam_menu_note_codes CASCADE;
         -- 基準値パターン
@@ -34,12 +36,12 @@ steps:
         INSERT INTO
           resultcollector.teams
           (team_id, team_code, name, order_number, created_at, created_by)
-        VALUES('f0002004-0000-0000-0013-000000000001', 'T2004-13', '甲班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('f0002004-0000-0000-0013-000000000001', 'T2004-13', '班', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場
         INSERT INTO
           resultcollector.places
           (place_id, place_code, name, order_number, created_at, created_by)
-        VALUES('b0002004-0000-0000-0013-000000000001', 'P2004-13', '甲会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        VALUES('b0002004-0000-0000-0013-000000000001', 'P2004-13', '会場', 1, CURRENT_TIMESTAMP, 'ec2004');
         -- 会場日程
         INSERT INTO
           resultcollector.place_schedule
@@ -54,8 +56,9 @@ steps:
         INSERT INTO
           resultcollector.external_exam_item_details
           (exam_item_detail_id, external_exam_item_detail_code, created_at, created_by)
-        VALUES(200413, 'ORDER-2004-13-1', CURRENT_TIMESTAMP, 'ec2004')
-        ,     (200413, 'ORDER-2004-13-2', CURRENT_TIMESTAMP, 'ec2004');
+        VALUES(2004131, 'ORDER-2004-13-1', CURRENT_TIMESTAMP, 'ec2004')
+        ,     (2004131, 'ORDER-2004-13-2', CURRENT_TIMESTAMP, 'ec2004')
+        ,     (2004132, 'ORDER-2004-13-3', CURRENT_TIMESTAMP, 'ec2004');
   post:
     desc: "検査項目明細依頼のPKが重複するレコードが存在する"
     req:
@@ -65,15 +68,16 @@ steps:
             application/json:
               "{{ vars.request }}"
     test: |
-      current.res.status == 200
+      current.res.status == 207
       // レスポンスに2件のErrorObjectが返されることを確認
+      // PK(exam_item_detail_id)の重複はエラーにはならないことを確認
       && len(current.res.body) == 2
       && current.res.body[0].code == "10003"
       && current.res.body[0].inputNote == "2004131"
-      && current.res.body[0].message == "キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:ORDER-2004-13-1"
+      && current.res.body[0].message == "キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCode:ORDER-2004-13-1"
       && current.res.body[1].code == "10003"
       && current.res.body[1].inputNote == "2004131"
-      && current.res.body[1].message == "キー項目が重複しています。Code:ExamItemDetailOrders.ExamItemDetailCd:ORDER-2004-13-2"
+      && current.res.body[1].message == "キー項目が重複しています。ExamItemDetailOrders.ExamItemDetailCode:ORDER-2004-13-3"
     dump:
       expr: current.res.body
       out: ../Dump/EC2004-13.json

@@ -7,8 +7,6 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2002-03.json"
-  connectionCode1: "EX2002021"
-  connectionCode2: "EX2002022"
 steps:
   clearTable:
     desc: "関連テーブルのクリア"
@@ -53,8 +51,8 @@ steps:
         INSERT INTO
           resultcollector.consult
           (consult_id, consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
-        VALUES('c0002002-0000-0000-0003-000000000001', 'C2002021', 10, 11, 'a0002002-0000-0000-0003-000000000001','','e0002002-0000-0000-0003-000000000001','EX2002031', CURRENT_TIMESTAMP,'ec2002')
-        ,     ('c0002002-0000-0000-0003-000000000002', 'C2002022', 20, 11, 'a0002002-0000-0000-0003-000000000001','','e0002002-0000-0000-0003-000000000002','EX2002032', CURRENT_TIMESTAMP,'ec2002');
+        VALUES('c0002002-0000-0000-0003-000000000001', 'C2002031', 10, 11, 'a0002002-0000-0000-0003-000000000001','','e0002002-0000-0000-0003-000000000001','EX2002031', '2025-01-01T12:34:56.789', 'ec2002')
+        ,     ('c0002002-0000-0000-0003-000000000002', 'C2002032', 20, 11, 'a0002002-0000-0000-0003-000000000001','','e0002002-0000-0000-0003-000000000002','EX2002032', '2025-01-01T12:34:56.789', 'ec2002');
   getConsult:
     desc: "受診情報の取得"
     db:
@@ -79,7 +77,7 @@ steps:
             application/json:
               "{{ vars.request }}"
     test: |
-      current.res.status == 200
+      current.res.status == 207
       // レスポンスにErrorObjectが返されることを確認
       && len(current.res.body) == 3
       && current.res.body[0].code == "10001"
@@ -99,15 +97,9 @@ steps:
     db:
       query: |
         SELECT
-          t.ticket_number
-          , c.external_connection_code
-          , to_char(t.created_at, 'yyyymmdd') as created_at
-          , t.created_by
+          ticket_number
         FROM
-          resultcollector.tickets t
-        LEFT JOIN
-          resultcollector.consult c
-            on t.consult_id = c.consult_id
+          resultcollector.tickets;
     test: |
       // 受付が登録されないことを確認
       len(current.rows) == 0
@@ -118,7 +110,7 @@ steps:
         SELECT
           ticket_number
         FROM
-          resultcollector.tickets_histories
+          resultcollector.tickets_histories;
     test: |
       // 受付履歴が登録されないことを確認
       len(current.rows) == 0
@@ -140,12 +132,13 @@ steps:
       // 2件の受診情報が更新されていないことを確認
       len(current.rows) == 2
       && current.rows[0].consult_id == "c0002002-0000-0000-0003-000000000001"
-      && current.rows[0].external_connection_code == consultData[0].external_connection_code
-      && current.rows[0].progress_status == consultData[0].progress_status
+      && current.rows[0].external_connection_code == "EX2002031"
+      && current.rows[0].progress_status == 10
       && current.rows[0].created_at == consultData[0].created_at
       && current.rows[0].created_by == consultData[0].created_by
+      
       && current.rows[1].consult_id == "c0002002-0000-0000-0003-000000000002"
-      && current.rows[1].external_connection_code == consultData[1].external_connection_code
-      && current.rows[1].progress_status == consultData[1].progress_status
+      && current.rows[1].external_connection_code == "EX2002032"
+      && current.rows[1].progress_status == 20
       && current.rows[1].created_at == consultData[1].created_at
       && current.rows[1].created_by == consultData[1].created_by

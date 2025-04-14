@@ -23,7 +23,7 @@ class BtClassicSerialCommunicationPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final serialSettings = ref.watch(btClassicSettingsProvider);
-    final behaviorSettings = ref.read(behaviorSettingsProvider);
+    final behaviorSettings = ref.watch(behaviorSettingsProvider);
     final device = serialSettings.address != null
         ? BluetoothDevice(name: serialSettings.deviceName, address: serialSettings.address!)
         : null;

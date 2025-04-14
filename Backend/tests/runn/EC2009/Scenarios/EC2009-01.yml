@@ -71,63 +71,72 @@ steps:
     test: |
       current.res.status == 200
       // レスポンスにErrorObjectが返されないことを確認
-      && len(current.res.body) == 0
-    dump:
-      expr: current.res.body
-      out: ../Dump/EC2009-01.json
+      && current.res.body == null
   confirmExamNormalValueRange:
     desc: "検査基準値範囲を登録の登録を確認"
     db:
       query: |
         SELECT
-          threshold_id::text
-          , name
-          , exam_item_detail_id
-          , min_age
-          , max_age
-          , target_sex
-          , min_value::text
-          , max_value::text
-          , error_level
-          , to_char(created_at, 'yyyymmdd') as created_at
-          , created_by
+          e.threshold_id::text
+          , t.threshold_code
+          , e.name
+          , e.exam_item_detail_id
+          , e.min_age
+          , e.max_age
+          , e.target_sex
+          , e.min_value::text
+          , e.max_value::text
+          , e.error_level
+          , to_char(e.created_at, 'yyyymmdd') as created_at
+          , e.created_by
           , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
-          resultcollector.exam_normal_value_range
+          resultcollector.exam_normal_value_range e
+        LEFT JOIN
+          resultcollector.thresholds t
+            on t.threshold_id = e.threshold_id
         ORDER BY
-          exam_item_detail_id ASC;
+          e.exam_item_detail_id ASC;
     test: |
       len(current.rows) == 3
-      && current.rows[0].threshold_id == "e0002009-0000-0000-0000-000000000001"
-      && current.rows[0].exam_item_detail_id == 20091
       && current.rows[0].name == "白血球数"
-      && current.rows[0].min_age == "0400000"
+      && current.rows[0].threshold_id == "e0002009-0000-0000-0000-000000000001"
+      && current.rows[0].threshold_code == "EC2009"
+      // "examItemDetailCd": "EC2009WBC"
+      && current.rows[0].exam_item_detail_id == 20091
       && current.rows[0].max_age == "0750000"
+      && current.rows[0].min_age == "0400000"
       && current.rows[0].target_sex == 3
-      && current.rows[0].min_value == "3.3"
       && current.rows[0].max_value == "8.6"
+      && current.rows[0].min_value == "3.3"
       && current.rows[0].error_level == 1
       && current.rows[0].created_at == current.rows[0].now
       && current.rows[0].created_by == "ExternalConnection"
-      && current.rows[1].threshold_id == "e0002009-0000-0000-0000-000000000001"
-      && current.rows[1].exam_item_detail_id == 20092
+
       && current.rows[1].name == "赤血球数"
-      && current.rows[1].min_age == "0400000"
+      && current.rows[1].threshold_id == "e0002009-0000-0000-0000-000000000001"
+      && current.rows[1].threshold_code == "EC2009"
+      // "examItemDetailCd": "EC2009RBC"
+      && current.rows[1].exam_item_detail_id == 20092
       && current.rows[1].max_age == "0750000"
+      && current.rows[1].min_age == "0400000"
       && current.rows[1].target_sex == 1
-      && current.rows[1].min_value == "4.35"
       && current.rows[1].max_value == "5.55"
+      && current.rows[1].min_value == "4.35"
       && current.rows[1].error_level == 1
       && current.rows[1].created_at == current.rows[1].now
       && current.rows[1].created_by == "ExternalConnection"
-      && current.rows[2].threshold_id == "e0002009-0000-0000-0000-000000000001"
-      && current.rows[2].exam_item_detail_id == 20093
+
       && current.rows[2].name == "血小板数"
-      && current.rows[2].min_age == "0400000"
+      && current.rows[2].threshold_id == "e0002009-0000-0000-0000-000000000001"
+      && current.rows[2].threshold_code == "EC2009"
+      // "examItemDetailCd": "EC2009PLT"
+      && current.rows[2].exam_item_detail_id == 20093
       && current.rows[2].max_age == "0750000"
+      && current.rows[2].min_age == "0400000"
       && current.rows[2].target_sex == 2
-      && current.rows[2].min_value == "13.0"
       && current.rows[2].max_value == "36.9"
+      && current.rows[2].min_value == "13"
       && current.rows[2].error_level == 1
       && current.rows[2].created_at == current.rows[2].now
       && current.rows[2].created_by == "ExternalConnection"

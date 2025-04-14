@@ -6,12 +6,28 @@
         "placeCode": "P2004-10",
         "teamCode": "T2004-10",
         "examDate": "2025-03-03",
-        "consultNumber": "No-200410-1",
-        "examineeCd": "E2004101",
-        "note": "特記事項2004101",
+        "consultNumber": "No2004101",
+        "examineeCode": "E2004101",
+        "age": "0410302",
+        "note": "過去検査結果の検査項目明細IDが取得できない",
         "previousResults": [
             {
-                "examItemDetailCd": "PREVI-200401-10",
+                "examItemDetailCode": "PREVI-200401-10-1",
+                "examDate": "2024-11-22",
+                "value": "100"
+            },
+            {
+                "examItemDetailCode": "PREVI-200401-10-1",
+                "examDate": "2024-11-22",
+                "value": "100"
+            },
+            {
+                "examItemDetailCode": "PREVI-200401-10-2",
+                "examDate": "2024-11-22",
+                "value": "100"
+            },
+            {
+                "examItemDetailCode": "PREVI-200401-10-3",
                 "examDate": "2024-11-22",
                 "value": "100"
             }

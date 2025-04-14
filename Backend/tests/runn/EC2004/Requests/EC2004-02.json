@@ -7,7 +7,8 @@
         "teamCode": "",
         "examDate": "",
         "consultNumber": "",
-        "examineeCd": "",
+        "examineeCode": "",
+        "age": "",
         "note": "",
         "previousResults": [
         ],
@@ -26,12 +27,13 @@
         "placeCode": "P2004-02",
         "teamCode": "T2004-02",
         "examDate": "2025-03-23",
-        "consultNumber": "No-200402-100",
-        "examineeCd": "E2004024",
+        "consultNumber": "No200402100",
+        "examineeCode": "E2004024",
+        "age": "0550510",
         "note": "特記事項2004-02-1",
         "previousResults": [
             {
-                "examItemDetailCd": "PREVI-200402-3",
+                "examItemDetailCode": "PREVI-200402-3",
                 "examDate": "2024-06-20",
                 "value": "25"
             }
@@ -50,7 +52,12 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-200402-3"
+                "examItemDetailCode": "ORDER-200402-3_1",
+                "note": "comment-20040231"
+            },
+            {
+                "examItemDetailCode": "ORDER-200402-3_2",
+                "note": "comment-20040232"
             }
         ],
         "inputNote": "2004021"
@@ -63,7 +70,8 @@
         "teamCode": "",
         "examDate": "",
         "consultNumber": "",
-        "examineeCd": "",
+        "examineeCode": "",
+        "age": "",
         "note": "",
         "previousResults": [],
         "consultThresholds": [],
@@ -72,18 +80,19 @@
         "inputNote": "2004022"
     },
     {
-        "sortNo": 13,
+        "sortNo": 9,
         "connectionCode": "CCS-200402-3",
         "actionType": 0,
         "placeCode": "P2004-02",
         "teamCode": "T2004-02",
         "examDate": "2025-03-23",
-        "consultNumber": "No-200402-300",
-        "examineeCd": "E2004023",
+        "consultNumber": "No200402300",
+        "examineeCode": "E2004023",
+        "age": "0491111",
         "note": "特記事項2004-02-3",
         "previousResults": [
             {
-                "examItemDetailCd": "PREVI-200402-3",
+                "examItemDetailCode": "PREVI-200402-3",
                 "examDate": "2024-04-05",
                 "value": "80"
             }
@@ -102,9 +111,39 @@
         ],
         "examItemDetailOrders": [
             {
-                "examItemDetailCd": "ORDER-200402-3"
+                "examItemDetailCode": "ORDER-200402-4_1",
+                "note": "comment-20040241"
+            },
+            {
+                "examItemDetailCode": "ORDER-200402-5",
+                "note": "comment-2004025"
+            },
+            {
+                "examItemDetailCode": "ORDER-200402-4_2",
+                "note": "comment-20040242"
+            },
+            {
+                "examItemDetailCode": "ORDER-200402-4_3",
+                "note": "comment-20040243"
             }
         ],
         "inputNote": "20024023"
+    },
+    {
+        "sortNo": 5,
+        "connectionCode": "CCS-200402-4",
+        "actionType": 0,
+        "placeCode": "P2004-02",
+        "teamCode": "T2004-02",
+        "examDate": "2025-03-31",
+        "consultNumber": "No2004024",
+        "examineeCode": "E2004024",
+        "age": "0521110",
+        "note": "特記事項2004024",
+        "previousResults": [],
+        "consultThresholds": [],
+        "consultNotes": [],
+        "examItemDetailOrders": [],
+        "inputNote": "2004024"
     }
 ]

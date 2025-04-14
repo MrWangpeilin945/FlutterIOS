@@ -5,7 +5,12 @@ autonumber
   participant FE as フロントエンド
   participant KN as コンポーネント  
 
-  User->>KN:クリアボタンを押下
-  KN->>KN:左入力数値、右入力数値をクリア
-  KN-->>FE:引数.左変更イベントを呼び出す
-  KN-->>FE:引数.右変更イベントを呼び出す
+  User->>KN:クリアボタンの押下
+  KN->>KN:入力値を更新
+  alt onRegisterPressedがtrueの時
+  KN-->>KN:バリデーションチェック
+  alt バリデーションチェックでエラーあり
+  KN->>KN:エラーメッセージを表示
+  end
+  KN->>FE:引数.変更イベントを呼び出す
+end

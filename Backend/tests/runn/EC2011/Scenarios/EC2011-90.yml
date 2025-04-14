@@ -1,0 +1,89 @@
+desc: EC2011-90 職員の登録負荷テスト
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  recordCount: 10000
+steps:
+  clearTable:
+    desc: "職員テーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.staffs CASCADE;
+  createUniqueKeys:
+    desc: "ユニークなキーの作成"
+    db:
+      query: |
+        WITH RECURSIVE numbers AS (
+          SELECT 1 AS num
+          UNION ALL
+          SELECT num + 1
+          FROM numbers
+          WHERE num < {{ vars.recordCount}}
+        )
+        SELECT
+          'CD-' || lpad(cast(num as character varying), 6, '0') AS code
+          , 'ID' || lpad(cast(num as character varying), 6, '0') AS id
+        FROM
+          numbers;
+    bind:
+      uniqueCode: current.rows
+  createRequest:
+    desc: "リクエストデータの作成"
+    loop:
+      count: vars.recordCount
+    bind:
+      requestBody:
+        -
+          staffCode: uniqueCode[i].code
+          loginId:  uniqueCode[i].id
+          name: "'負荷テスト_職員'"
+          password: "'passW0rd'"
+          enabled: true
+          roleId: 10
+          inputNote: "'2011-90'"
+  startBatch:
+    desc: "処理の開始時間"
+    bind:
+      startTime: now()
+  post:
+    desc: "職員の登録"
+    req:
+      /api/v1/external/staffs:
+        post:
+          body:
+            application/json:
+              "{{ requestBody }}"
+    test: |
+      current.res.status == 200
+    bind:
+      endTime: now()
+  endBatch:
+    desc: "処理の終了時間"
+    bind:
+      timeKeeper:
+        startTime: startTime.Format("2006-01-02T15:04:05Z07:00")
+        endTime: endTime.Format("2006-01-02T15:04:05Z07:00")
+        interval: endTime.Sub(startTime).Seconds() 
+  confirmStaffs:
+    desc: "職員の登録を確認"
+    db:
+      query: |
+        SELECT
+          name
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.staffs;
+    test: |
+      len(current.rows) == vars.recordCount
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[vars.recordCount - 1].created_at == current.rows[vars.recordCount - 1].now
+      && current.rows[vars.recordCount - 1].created_by == "ExternalConnection"
+    dump:
+      expr: timeKeeper
+      out: ../Dump/EC2011-90.json

@@ -20,8 +20,8 @@ class WiredSerialCommunicationPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final deviceStream = ref.watch(wiredDevicesProvider);
     final firstDevice = deviceStream.value?.firstOrNull;
-    final serialSettings = ref.read(wiredSettingsProvider);
-    final behaviorSettings = ref.read(behaviorSettingsProvider);
+    final serialSettings = ref.watch(wiredSettingsProvider);
+    final behaviorSettings = ref.watch(behaviorSettingsProvider);
 
     final error = useState<String>("");
     final usbPort = useState<UsbPort?>(null);

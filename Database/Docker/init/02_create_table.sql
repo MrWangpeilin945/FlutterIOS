@@ -48,6 +48,9 @@ CREATE TABLE consult_thresholds (
   , CONSTRAINT consult_thresholds_PKC PRIMARY KEY (threshold_id,consult_id)
 );
 
+CREATE INDEX consult_thresholds_IX1
+  ON consult_thresholds(consult_id);
+
 CREATE TABLE correlation_rule_evaluations (
   correlation_rule_id integer NOT NULL
   , variable_number integer NOT NULL
@@ -159,7 +162,6 @@ CREATE TABLE exam_item_detail_options (
 CREATE TABLE exam_item_detail_orders (
   consult_id uuid NOT NULL
   , exam_item_detail_id integer NOT NULL
-  , external_exam_item_detail_code text NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT exam_item_detail_orders_PKC PRIMARY KEY (consult_id,exam_item_detail_id)
@@ -217,6 +219,16 @@ CREATE TABLE exam_normal_value_range (
 ALTER TABLE exam_normal_value_range ADD CONSTRAINT exam_normal_value_range_IX1
   UNIQUE (threshold_id,exam_item_detail_id,max_age,target_sex,max_value) ;
 
+CREATE TABLE exam_result_delete_histories (
+  id uuid DEFAULT gen_random_uuid () NOT NULL
+  , consult_id uuid NOT NULL
+  , exam_item_detail_id integer NOT NULL
+  , value text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT exam_result_delete_histories_PKC PRIMARY KEY (id)
+);
+
 CREATE TABLE exam_result_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_id uuid NOT NULL
@@ -242,6 +254,16 @@ CREATE TABLE export_history_details (
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
   , CONSTRAINT export_history_details_PKC PRIMARY KEY (id,consult_id)
+);
+
+CREATE TABLE external_exam_item_detail_orders (
+  consult_id uuid NOT NULL
+  , exam_item_detail_id integer NOT NULL
+  , external_exam_item_detail_code text NOT NULL
+  , external_note text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT external_exam_item_detail_orders_PKC PRIMARY KEY (consult_id,exam_item_detail_id,external_exam_item_detail_code)
 );
 
 CREATE TABLE external_exam_item_details (
@@ -288,13 +310,13 @@ CREATE TABLE organizations (
 ALTER TABLE organizations ADD CONSTRAINT organizations_IX1
   UNIQUE (organization_code) ;
 
-CREATE TABLE place_schedule_lock_histoies (
+CREATE TABLE place_schedule_lock_histories (
   id uuid DEFAULT gen_random_uuid () NOT NULL
   , place_schedule_id uuid NOT NULL
   , status integer NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
-  , CONSTRAINT place_schedule_lock_histoies_PKC PRIMARY KEY (id)
+  , CONSTRAINT place_schedule_lock_histories_PKC PRIMARY KEY (id)
 );
 
 CREATE TABLE previous_results (
@@ -322,7 +344,7 @@ CREATE TABLE refresh_tokens (
   , expires_at timestamp with time zone NOT NULL
   , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , created_by text NOT NULL
-  , CONSTRAINT refresh_tokens_PKC PRIMARY KEY (staff_id, sid)
+  , CONSTRAINT refresh_tokens_PKC PRIMARY KEY (staff_id,sid)
 );
 
 CREATE TABLE staff_login_histories (
@@ -400,6 +422,7 @@ CREATE TABLE cancel_reasons (
 CREATE TABLE consult (
   consult_id uuid DEFAULT gen_random_uuid () NOT NULL
   , consult_number text NOT NULL
+  , age varchar(7) NOT NULL
   , progress_status integer NOT NULL
   , export_status integer NOT NULL
   , place_schedule_id uuid NOT NULL
@@ -416,6 +439,12 @@ ALTER TABLE consult ADD CONSTRAINT consult_IX1
 
 CREATE UNIQUE INDEX consult_IX2
   ON consult(external_connection_code);
+
+CREATE INDEX consult_IX3
+  ON consult(place_schedule_id);
+
+CREATE INDEX consult_IX4
+  ON consult(examinee_id);
 
 CREATE TABLE exam_item_details (
   exam_item_detail_id integer NOT NULL
@@ -596,6 +625,82 @@ order by
 
 ;
 
+CREATE VIEW progress_exam_menus AS 
+with 明細結果 as ( 
+    select
+        c.consult_id
+        , c.place_schedule_id
+        , d.exam_item_id
+        , o.exam_item_detail_id
+        , case 
+            when r.exam_item_detail_id is not null -- 結果レコードがあれば実施済み
+                then 41 
+            when ca.exam_item_detail_id is not null -- 中止レコードがあれば検査中止
+                then 51 
+            else 11                             -- レコードがなければ未実施
+            end as detail_status                -- 明細ステータス
+    from
+        resultcollector.consult c 
+        inner join resultcollector.exam_item_detail_orders o 
+            on c.consult_id = o.consult_id 
+        left join resultcollector.exam_results r 
+            on o.exam_item_detail_id = r.exam_item_detail_id 
+            and o.consult_id = r.consult_id 
+        left join resultcollector.exam_cancels ca 
+            on o.exam_item_detail_id = ca.exam_item_detail_id 
+            and o.consult_id = ca.consult_id 
+        left join resultcollector.exam_item_details d 
+            on o.exam_item_detail_id = d.exam_item_detail_id
+) 
+, 検査メニュー状況 as ( 
+    select
+        明細結果.consult_id
+        , 明細結果.place_schedule_id
+        , m.exam_menu_id
+        , case 
+            when 11 = any (ARRAY_AGG(明細結果.detail_status)) -- 未実施が一つでもあれば未実施
+                then 11 
+            when 51 = all (ARRAY_AGG(明細結果.detail_status)) -- すべて検査中止であれば検査中止
+                then 51 
+            when 41 = any (ARRAY_AGG(明細結果.detail_status)) -- 上記以外で検査済みを含む場合は検査済み
+                then 41 
+            end as menu_status 
+    from
+        明細結果 
+        inner join resultcollector.exam_items i 
+            on 明細結果.exam_item_id = i.exam_item_id 
+        inner join resultcollector.exam_item_groups g 
+            on i.exam_item_group_id = g.exam_item_group_id 
+        inner join resultcollector.exam_menus m 
+            on g.exam_menu_id = m.exam_menu_id 
+    group by
+        consult_id
+        , place_schedule_id
+        , m.exam_menu_id
+) 
+select
+    検査メニュー状況.consult_id                 -- 受診ID
+    , 検査メニュー状況.place_schedule_id        -- 会場日程ID
+    , 検査メニュー状況.exam_menu_id             -- 検査メニューID
+    , 検査メニュー状況.menu_status              -- 検査進捗状況
+    , con.progress_status as consult_status     -- 受診進捗状況
+    , case 
+        when ((検査メニュー状況.menu_status = 11) and (con.progress_status = 11)) then 11
+        when ((検査メニュー状況.menu_status = 11) and (con.progress_status = 21)) then 21
+        when ((検査メニュー状況.menu_status = 41) and (con.progress_status = 11)) then 71
+        when ((検査メニュー状況.menu_status = 41) and (con.progress_status = 21)) then 41
+        when ((検査メニュー状況.menu_status = 41) and (con.progress_status = 41)) then 71
+        when ((検査メニュー状況.menu_status = 51) and (con.progress_status = 11)) then 71
+        when ((検査メニュー状況.menu_status = 51) and (con.progress_status = 21)) then 51
+        when ((検査メニュー状況.menu_status = 51) and (con.progress_status = 41)) then 71
+        else null::integer
+      end as aggregated_status
+from
+    検査メニュー状況 
+    inner join resultcollector.consult con 
+        on 検査メニュー状況.consult_id = con.consult_id;
+;
+
 ALTER TABLE affiliations
   ADD CONSTRAINT affiliations_FK1 FOREIGN KEY (examinee_id) REFERENCES examinees(examinee_id)
   ON DELETE RESTRICT
@@ -706,6 +811,11 @@ ALTER TABLE exam_item_detail_orders
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE exam_item_detail_orders
+  ADD CONSTRAINT exam_item_detail_orders_FK2 FOREIGN KEY (exam_item_detail_id) REFERENCES exam_item_details(exam_item_detail_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE exam_item_details
   ADD CONSTRAINT exam_item_details_FK1 FOREIGN KEY (exam_item_id) REFERENCES exam_items(exam_item_id)
   ON DELETE RESTRICT
@@ -766,6 +876,16 @@ ALTER TABLE export_history_details
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE external_exam_item_detail_orders
+  ADD CONSTRAINT external_exam_item_detail_orders_FK1 FOREIGN KEY (consult_id,exam_item_detail_id) REFERENCES exam_item_detail_orders(consult_id,exam_item_detail_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE external_exam_item_detail_orders
+  ADD CONSTRAINT external_exam_item_detail_orders_FK2 FOREIGN KEY (exam_item_detail_id,external_exam_item_detail_code) REFERENCES external_exam_item_details(exam_item_detail_id,external_exam_item_detail_code)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE home_menus
   ADD CONSTRAINT home_menus_FK1 FOREIGN KEY (home_menu_group_id) REFERENCES home_menu_groups(home_menu_group_id)
   ON DELETE RESTRICT
@@ -786,8 +906,8 @@ ALTER TABLE place_schedule
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
-ALTER TABLE place_schedule_lock_histoies
-  ADD CONSTRAINT place_schedule_lock_histoies_FK1 FOREIGN KEY (place_schedule_id) REFERENCES place_schedule(place_schedule_id)
+ALTER TABLE place_schedule_lock_histories
+  ADD CONSTRAINT place_schedule_lock_histories_FK1 FOREIGN KEY (place_schedule_id) REFERENCES place_schedule(place_schedule_id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -966,7 +1086,6 @@ COMMENT ON COLUMN exam_item_detail_options.created_by IS '作成者';
 COMMENT ON TABLE exam_item_detail_orders IS '検査項目明細依頼';
 COMMENT ON COLUMN exam_item_detail_orders.consult_id IS '受診ID';
 COMMENT ON COLUMN exam_item_detail_orders.exam_item_detail_id IS '検査項目明細ID';
-COMMENT ON COLUMN exam_item_detail_orders.external_exam_item_detail_code IS '外部コード検査項目明細CD';
 COMMENT ON COLUMN exam_item_detail_orders.created_at IS '作成日時';
 COMMENT ON COLUMN exam_item_detail_orders.created_by IS '作成者';
 
@@ -1008,6 +1127,14 @@ COMMENT ON COLUMN exam_normal_value_range.error_level IS 'エラーレベル';
 COMMENT ON COLUMN exam_normal_value_range.created_at IS '作成日時';
 COMMENT ON COLUMN exam_normal_value_range.created_by IS '作成者';
 
+COMMENT ON TABLE exam_result_delete_histories IS '検査結果削除履歴';
+COMMENT ON COLUMN exam_result_delete_histories.id IS 'ID';
+COMMENT ON COLUMN exam_result_delete_histories.consult_id IS '受診ID';
+COMMENT ON COLUMN exam_result_delete_histories.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN exam_result_delete_histories.value IS '値';
+COMMENT ON COLUMN exam_result_delete_histories.created_at IS '作成日時';
+COMMENT ON COLUMN exam_result_delete_histories.created_by IS '作成者';
+
 COMMENT ON TABLE exam_result_histories IS '検査結果履歴';
 COMMENT ON COLUMN exam_result_histories.id IS 'ID';
 COMMENT ON COLUMN exam_result_histories.consult_id IS '受診ID';
@@ -1028,6 +1155,14 @@ COMMENT ON COLUMN export_history_details.id IS 'ID';
 COMMENT ON COLUMN export_history_details.consult_id IS '受診ID';
 COMMENT ON COLUMN export_history_details.created_at IS '作成日時';
 COMMENT ON COLUMN export_history_details.created_by IS '作成者';
+
+COMMENT ON TABLE external_exam_item_detail_orders IS '外部検査項目明細依頼';
+COMMENT ON COLUMN external_exam_item_detail_orders.consult_id IS '受診ID';
+COMMENT ON COLUMN external_exam_item_detail_orders.exam_item_detail_id IS '検査項目明細ID';
+COMMENT ON COLUMN external_exam_item_detail_orders.external_exam_item_detail_code IS '外部コード検査項目明細CD';
+COMMENT ON COLUMN external_exam_item_detail_orders.external_note IS '外部コード検査項目明細備考';
+COMMENT ON COLUMN external_exam_item_detail_orders.created_at IS '作成日時';
+COMMENT ON COLUMN external_exam_item_detail_orders.created_by IS '作成者';
 
 COMMENT ON TABLE external_exam_item_details IS '外部検査項目明細';
 COMMENT ON COLUMN external_exam_item_details.exam_item_detail_id IS '検査項目明細ID';
@@ -1059,12 +1194,12 @@ COMMENT ON COLUMN organizations.order_number IS '表示順';
 COMMENT ON COLUMN organizations.created_at IS '作成日時';
 COMMENT ON COLUMN organizations.created_by IS '作成者';
 
-COMMENT ON TABLE place_schedule_lock_histoies IS '会場ロック履歴';
-COMMENT ON COLUMN place_schedule_lock_histoies.id IS 'ID';
-COMMENT ON COLUMN place_schedule_lock_histoies.place_schedule_id IS '会場日程ID';
-COMMENT ON COLUMN place_schedule_lock_histoies.status IS '状況';
-COMMENT ON COLUMN place_schedule_lock_histoies.created_at IS '作成日時';
-COMMENT ON COLUMN place_schedule_lock_histoies.created_by IS '作成者';
+COMMENT ON TABLE place_schedule_lock_histories IS '会場ロック履歴';
+COMMENT ON COLUMN place_schedule_lock_histories.id IS 'ID';
+COMMENT ON COLUMN place_schedule_lock_histories.place_schedule_id IS '会場日程ID';
+COMMENT ON COLUMN place_schedule_lock_histories.status IS '状況';
+COMMENT ON COLUMN place_schedule_lock_histories.created_at IS '作成日時';
+COMMENT ON COLUMN place_schedule_lock_histories.created_by IS '作成者';
 
 COMMENT ON TABLE previous_results IS '過去検査結果';
 COMMENT ON COLUMN previous_results.consult_id IS '受診ID';
@@ -1079,6 +1214,7 @@ COMMENT ON COLUMN prior_exam_menus.current_exam_menu_id IS '現在検査メニ�
 COMMENT ON COLUMN prior_exam_menus.prior_exam_menu_id IS '前提検査メニューID';
 COMMENT ON COLUMN prior_exam_menus.created_at IS '作成日時';
 COMMENT ON COLUMN prior_exam_menus.created_by IS '作成者';
+
 
 COMMENT ON TABLE refresh_tokens IS 'リフレッシュトークン';
 COMMENT ON COLUMN refresh_tokens.staff_id IS '職員ID';
@@ -1142,6 +1278,7 @@ COMMENT ON COLUMN cancel_reasons.created_by IS '作成者';
 COMMENT ON TABLE consult IS '受診';
 COMMENT ON COLUMN consult.consult_id IS '受診ID';
 COMMENT ON COLUMN consult.consult_number IS '受診番号';
+COMMENT ON COLUMN consult.age IS '年齢';
 COMMENT ON COLUMN consult.progress_status IS '進捗状況';
 COMMENT ON COLUMN consult.export_status IS '結果出力状況';
 COMMENT ON COLUMN consult.place_schedule_id IS '会場日程ID';

@@ -1,0 +1,42 @@
+[
+    {
+        "examineeCode": "",
+        "name": "岡山　一郎",
+        "kanaName": "オカヤマ　イチロウ",
+        "sex": 1,
+        "birthdate": "1985-12-21",
+        "affiliations": [],
+        "inputNote": "2001051"
+    },
+    {
+        "examineeCode": "EC2001052",
+        "name": "",
+        "kanaName": "オカヤマ　ジロウ",
+        "sex": 1,
+        "birthdate": "1985-12-22",
+        "affiliations": [],
+        "inputNote": "2001052"
+    },
+    {
+        "examineeCode": "EC2001053",
+        "name": "岡山　三郎",
+        "kanaName": "",
+        "sex": 1,
+        "birthdate": "1985-12-23",
+        "affiliations": [],
+        "inputNote": "2001053"
+    },
+    {
+        "examineeCode": "EC2001054",
+        "name": "岡山　四郎",
+        "kanaName": "オカヤマ　シロウ",
+        "sex": 1,
+        "birthdate": "1985-12-24",
+        "affiliations": [
+            {
+                "organizationCode": ""
+            }
+        ],
+        "inputNote": "2001054"
+    }
+]

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate } from "react-router";
 
 export default function Index() {
   const navigate = useNavigate();

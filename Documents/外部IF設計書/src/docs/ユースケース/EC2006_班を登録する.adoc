@@ -1,0 +1,239 @@
+== EC2006_班を登録する
+
+=== 概要
+
+* 外部連携で使用する
+* 引数の班をDBに登録する
+
+=== 処理フロー
+
+[mermaid]
+----
+flowchart TD
+    A[UseCase] --> ERROR{ERROR検証}
+    ERROR -- エラーあり --> C(ErrorObject生成、追加)
+    ERROR -- エラー無 --> WARNING{WARNING検証}    
+    WARNING -- ワーニングあり --> DROP(WARNINGレコードDrop)
+    DROP(WARNINGレコードDrop) --> DROP_REC(ErrorObject生成、追加)
+    DROP_REC --> D[[Repository]]
+    WARNING -- ワーニング無 --> D
+    C --> E(返却)
+    D --> E
+    E --> UseCaseEND(END)
+
+    F[[Repository]] --> G[BEGIN]
+    G --> H["Upsert(一括):[DB]teams(班)"]
+    H --> K[Commit]
+    H -.Exception.-> ROLLBACK[ROLLBACK]
+    K --> RepositoryEND[[END]]
+    ROLLBACK .-> RepositoryEND
+----
+
+=== 非機能
+
+* 1万レコードの登録を10秒以内に完了する
+* DB登録に失敗した場合、全てロールバックする
+
+=== UseCase
+
+[source]
+----
+StoreTeamsAsync
+----
+
+==== 引数
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Teams
+|Yes
+|List<Team>
+|登録する班のリスト
+
+|===
+
+==== 戻り値
+
+[source]
+----
+list<ErrorObject>
+----
+
+===== 正常登録
+
+[source]
+----
+list.Count() == 0
+----
+
+===== 異常有り
+
+[source]
+----
+list.Count()  <> 0
+----
+
+==== クラス
+
+===== Team
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|班コード
+
+|Name
+|Yes
+|string
+|班名
+
+|InputNote
+|No
+|string
+|エラーオブジェクトに登録する入力項目Noなど
+
+|===
+
+==== ErrorObject
+
+[cols="1,1,1,2" options="header"]
+|===
+|名称|必須|型|説明
+
+|Code
+|Yes
+|string
+|エラーコード
+
+|Message
+|Yes
+|string
+|エラーメッセージ
+
+|InputNote
+|No
+|string
+|入力項目Noなど
+
+|===
+
+==== 列挙型
+
+* None
+
+==== ERROR検証
+
+* None
+
+==== WARNING検証
+
+* 必須項目(Team.Code)が空値
+** `Team.Code` が `string.IsNullOrWhiteSpace` に該当する 
+*** Teamの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。Code`
+**** InputNote `Team.InputNote`
+
+* 必須項目(Team.Name)が空値
+** `Team.Name` が `string.IsNullOrWhiteSpace` に該当する 
+*** Teamの単位で該当を取り除く
+*** ErrorObject
+**** Code `10004`
+**** Message `必須項目が不足しています。Name`
+**** InputNote `Team.InputNote`
+
+* ユニークキー(Team.Code)が重複するレコードが存在する
+** Teamsを以下の条件でGroupByし、複数レコードが存在する
+**** `Team.Code`
+*** Teamの単位で該当を取り除く
+*** ErrorObject
+**** Code `10003`
+**** Message `キー項目が重複しています。Code:[Team.Code]`
+**** InputNote `Team.InputNote`
+
+==== 処理(Repository)
+
+* 下記の登録値は、呼びもとで指定する
+** `created_at` に登録する `system.datetime.now()`
+** `created_by` に登録する `'ExternalConnection'`
+
+===== Table
+
+* [DB]teams(班)
+
+====== Insert
+
+* 条件
+** `[DB]teams(班).team_code(班コード) == Team.Code` が存在しない
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|team_id
+|
+|DB:DEFAULT
+
+|team_code
+|Team.Code
+|
+
+|name
+|Team.Name
+|
+
+|order_number
+|max([DB]teams(班).order_number(表示順)) + 1
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===
+
+===== Update
+
+* 条件
+** `[DB]teams(班).team_code(班コード) == Team.Code` が存在する
+
+[cols="1,2,2" options="header"]
+|===
+|列|登録値|処理・変換
+
+|team_id
+|更新対象外
+|
+
+|team_code
+|更新対象外
+|
+
+|name
+|Team.Name
+|
+
+|order_number
+|更新対象外
+|
+
+|created_at
+|system.datetime.now()
+|
+
+|created_by
+|`'ExternalConnection'`
+|
+
+|===

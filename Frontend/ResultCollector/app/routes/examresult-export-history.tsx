@@ -15,8 +15,8 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import type { MetaFunction } from "@remix-run/node";
-import { useNavigate } from "@remix-run/react";
+import type { MetaFunction } from "react-router";
+import { useNavigate } from "react-router";
 import { isAxiosError } from "axios";
 import { format, parse, parseISO } from "date-fns";
 import { useAtom } from "jotai";
@@ -39,6 +39,7 @@ import CommonDialog from "~/components/CommonDialog";
 import CommonFooter from "~/components/CommonFooter";
 import CommonHeader from "~/components/CommonHeader";
 import type { ExportHistoryList } from "~/domain/wellship.schemas";
+import { IconType } from "~/domain/enums";
 import { staffState } from "~/store/store";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 import styles from "~/styles/common.module.css";
@@ -199,6 +200,7 @@ export default function ExamresultExportHistory() {
   const [exportHistory, setExportHistory] = useState<ExportHistoryList>();
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [iconType, setIconType] = useState<string>(IconType.未設定);
   const [resultsOutputConfirmDialog, setResultsOutputConfirmDialog] =
     useState<ResultsOutputConfirmDialogState | null>(null);
   const [staff] = useAtom(staffState);
@@ -254,11 +256,13 @@ export default function ExamresultExportHistory() {
               data: body,
             });
             if (result.status === 200) {
+              setIconType(IconType.正常);
               setMessage("未出力状態に変更しました。");
               open();
             }
           } catch (error) {
             if (isAxiosError(error) && error.response) {
+              setIconType(IconType.異常);
               if (error.response.status === 400) {
                 setMessage(
                   getErrorMessage(errorMessages.invalid, "パラメータ"),
@@ -330,7 +334,7 @@ export default function ExamresultExportHistory() {
                   </Table.Thead>
                   <Table.Tbody h={118} fz="xs" c="black01">
                     {exportHistory?.exportHistories?.map((eh) => (
-                      <Table.Tr key={eh.placeScheduleId}>
+                      <Table.Tr key={eh.exportId}>
                         <Table.Td ta="center" w={160}>
                           {eh.exportedAt &&
                             format(parseISO(eh.exportedAt), "yyyy/MM/dd HH:mm")}
@@ -392,6 +396,7 @@ export default function ExamresultExportHistory() {
                 onClose={close}
                 message={message || ""}
                 buttonMessage="閉じる"
+                iconType={iconType}
               />
               <ResultsOutputConfirmDialog ref={ref} title="検査結果出力履歴">
                 <Stack>

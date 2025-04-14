@@ -1,0 +1,250 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041601",
+        "examineeCode": "E20041601",
+        "age": "0450402",
+        "note": "連携キーが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041601"
+    },
+    {
+        "sortNo": 2,
+        "connectionCode": "C20211602",
+        "actionType": 0,
+        "placeCode": "",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041602",
+        "examineeCode": "E20041602",
+        "age": "0510102",
+        "note": "会場コードが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041602"
+    },
+    {
+        "sortNo": 3,
+        "connectionCode": "C20211603",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041603",
+        "examineeCode": "E20041603",
+        "age": "0390910",
+        "note": "班コードが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041603"
+    },
+    {
+        "sortNo": 4,
+        "connectionCode": "C20211604",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "",
+        "examineeCode": "E20041604",
+        "age": "0610203",
+        "note": "受診番号が空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041604"
+    },
+    {
+        "sortNo": 5,
+        "connectionCode": "C20211605",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041605",
+        "examineeCode": "",
+        "age": "0360510",
+        "note": "受診者コードが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041605"
+    },
+    {
+        "sortNo": 6,
+        "connectionCode": "",
+        "actionType": 0,
+        "placeCode": "",
+        "teamCode": "",
+        "examDate": "2025-03-03",
+        "consultNumber": "",
+        "examineeCode": "",
+        "age": "",
+        "note": "連携キー/会場コード/班コード/受診番号/受診者コード/年齢が空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041606"
+    },
+    {
+        "sortNo": 7,
+        "connectionCode": "C20211607",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041607",
+        "examineeCode": "E20041607",
+        "age": "0470809",
+        "note": "過去検査結果-検査項目明細CD/結果値が空値",
+        "previousResults": [
+            {
+                "examItemDetailCode": "",
+                "examDate": "2024-10-20",
+                "value": ""
+            }
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041607"
+    },
+    {
+        "sortNo": 8,
+        "connectionCode": "C20211608",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041608",
+        "examineeCode": "E20041608",
+        "age": "0480808",
+        "note": "基準値判定-基準値判定コードが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+            {
+                "thresholdCode": "",
+                "priority": 1
+            }
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041608"
+    },
+    {
+        "sortNo": 9,
+        "connectionCode": "C20211609",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041609",
+        "examineeCode": "E20041609",
+        "age": "0440203",
+        "note": "受診特記-検査特記コードが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+            {
+                "code": "",
+                "note": ""
+            }
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041609"
+    },
+    {
+        "sortNo": 10,
+        "connectionCode": "C20211610",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041610",
+        "examineeCode": "E20041610",
+        "age": "0590809",
+        "note": "検査項目明細依頼-検査項目明細CDが空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+            {
+                "examItemDetailCode": "",
+                "note": ""
+            }
+        ],
+        "inputNote": "20041610"
+    },
+    {
+        "sortNo": 11,
+        "connectionCode": "C20211611",
+        "actionType": 0,
+        "placeCode": "P2004-16",
+        "teamCode": "T2004-16",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041611",
+        "examineeCode": "E20041611",
+        "age": "",
+        "note": "年齢が空値",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041611"
+    }
+]

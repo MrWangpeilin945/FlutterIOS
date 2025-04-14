@@ -21,6 +21,7 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Middlewares;
 using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 using Ryobi.Wellship.WebAPI.ResultCollector.Utilities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Logger;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.BackgroundTasks;
 
 namespace Ryobi.Wellship.WebAPI;
 
@@ -59,6 +60,7 @@ public class Program
                             .AddPostgreSqlServices();
         }
         builder.Services.AddScoped<IDbConnectionProvider, DbConnectionProvider>();
+        builder.Services.AddScoped<IServiceScopeTaskRunner, ServiceScopeTaskRunner>();
         builder.Services.AddScoped<IStaffIdentityProvider, StaffIdentityFromHttpContextProvider>();
         builder.Services.AddScoped<ITenantProvider, TenantProvider>();
         builder.Services.AddSingleton(TimeProvider.System);
@@ -111,6 +113,17 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+
+        // TODO: 負荷テストによるエラーに対応するために暫定的に設定します。
+        // チューニングが必要です。
+
+        ThreadPool.GetMinThreads(out var workMin, out var ioMin);
+        ThreadPool.GetMaxThreads(out var workMax, out var ioMax);
+
+        Console.WriteLine($"MinThreads work={workMin}, i/o={ioMin}");
+        Console.WriteLine($"MaxThreads work={workMax}, i/o={ioMax}");
+
+        ThreadPool.SetMinThreads(100, 4);
 
         app.Run();
     }
@@ -172,6 +185,7 @@ public static class IServiceCollectionExtension
         services.AddScoped<IIntegrationUsecase, IntegrationUsecase>();
         services.AddScoped<IProgressUsecase, ProgressUsecase>();
         services.AddScoped<ICancelReasonUsecase, CancelReasonUsecase>();
+        services.AddScoped<IExamineeUsecase, ExamineeUsecase>();
         services.AddScoped<ExternalConnection.Usecases.Default.IOrganizationUsecase, ExternalConnection.Usecases.Default.OrganizationUsecase>();
         services.AddScoped<ExternalConnection.Usecases.Default.IExamineeUsecase, ExternalConnection.Usecases.Default.ExamineeUsecase>();
         services.AddScoped<ExternalConnection.Usecases.Default.ITeamUsecase, ExternalConnection.Usecases.Default.TeamUsecase>();
@@ -182,6 +196,8 @@ public static class IServiceCollectionExtension
         services.AddScoped<ExternalConnection.Usecases.Default.IPlaceScheduleUsecase, ExternalConnection.Usecases.Default.PlaceScheduleUsecase>();
         services.AddScoped<ExternalConnection.Usecases.Default.IStaffUsecase, ExternalConnection.Usecases.Default.StaffUsecase>();
         services.AddScoped<ExternalConnection.Usecases.Default.IExamNormalValueRangeUsecase, ExternalConnection.Usecases.Default.ExamNormalValueRangeUsecase>();
+        services.AddScoped<ExternalConnection.Usecases.Default.IDataImportUsecase, ExternalConnection.Usecases.KitashinagawaClinic.DataImportUsecase>();
+
         return services;
     }
     /// <summary>

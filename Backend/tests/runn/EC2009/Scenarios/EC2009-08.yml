@@ -1,0 +1,112 @@
+desc: EC2009-08 必須項目が空値
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2009-08.json"
+steps:
+  clearTable:
+    desc: "検査基準値範囲テーブルのクリア"
+    db:
+      query: |
+        -- 基準値パターン
+        TRUNCATE TABLE resultcollector.thresholds CASCADE;
+        -- 検査基準値範囲
+        TRUNCATE TABLE resultcollector.exam_normal_value_range CASCADE;
+        -- 外部検査項目明細
+        TRUNCATE TABLE resultcollector.external_exam_item_details CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
+  insertExamMenus:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 検査メニュー
+        INSERT INTO
+          resultcollector.exam_menus
+          (exam_menu_id, name, order_number, enabled, created_at, created_by)
+        VALUES(2009, '血液検査', 2009, true, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目グループ
+        INSERT INTO
+          resultcollector.exam_item_groups
+          (exam_item_group_id, name, exam_menu_id, type, order_number, created_at, created_by)
+        VALUES(2009, '血液検査', 2009, 1, 1, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目
+        INSERT INTO
+          resultcollector.exam_items
+          (exam_item_id, name, exam_item_group_id, position_number, unit, order_number, created_at, created_by)
+        VALUES(20091, '白血球数', 2009, 1, '1000/ul',1, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目明細
+        INSERT INTO
+          resultcollector.exam_item_details
+          (exam_item_detail_id, exam_item_id, name, order_number, position_number, type, keyboard_type, integer_length, decimal_length, equipment_label, created_at, created_by)
+        VALUES(20091, 20091, '白血球数', 1, 1, 1, 1, 3, 2, null, CURRENT_TIMESTAMP,'ec2009');
+        -- 外部検査項目明細
+        INSERT INTO
+          resultcollector.external_exam_item_details
+          (exam_item_detail_id, external_exam_item_detail_code, created_at, created_by)
+        VALUES(20091, 'EC2009WBC', CURRENT_TIMESTAMP,'ec2009');
+        -- 基準値パターン
+        INSERT INTO
+          resultcollector.thresholds
+          (threshold_id, threshold_code, name, order_number, created_at, created_by)
+        VALUES('e0002009-0000-0000-0000-000000000001', 'EC2009', 'EC2009血液検査', 1, CURRENT_TIMESTAMP,'ec2009');
+  post:
+    desc: "必須項目が空値が存在する"
+    req:
+      /api/v1/external/examNormalValueRange:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      // 必須エラーがErrorObjectで返される
+      && len(current.res.body) == 10
+      && current.res.body[0].code == "10004"
+      && current.res.body[0].inputNote == "2009081"
+      && current.res.body[0].message == "必須項目が不足しています。Name"
+      && current.res.body[1].code == "10004"
+      && current.res.body[1].inputNote == "2009082"
+      && current.res.body[1].message == "必須項目が不足しています。ThresholdCode"
+      && current.res.body[2].code == "10004"
+      && current.res.body[2].inputNote == "2009083"
+      && current.res.body[2].message == "必須項目が不足しています。ExamItemDetailCode"
+      && current.res.body[3].code == "10004"
+      && current.res.body[3].inputNote == "2009084"
+      && current.res.body[3].message == "必須項目が不足しています。MaxAge"
+      && current.res.body[4].code == "10004"
+      && current.res.body[4].inputNote == "2009085"
+      && current.res.body[4].message == "必須項目が不足しています。MinAge"
+      && current.res.body[5].code == "10006"
+      && current.res.body[5].inputNote == "2009084"
+      && current.res.body[5].message == "値の形式が無効です。MaxAge:"
+      && current.res.body[6].code == "10006"
+      && current.res.body[6].inputNote == "2009085"
+      && current.res.body[6].message == "値の形式が無効です。MinAge:"
+      && current.res.body[7].code == "10007"
+      && current.res.body[7].inputNote == "2009084"
+      && current.res.body[7].message == "値の範囲が無効です。MinAge:0000000/MaxAge:"
+      && current.res.body[8].code == "10001"
+      && current.res.body[8].inputNote == "2009082"
+      && current.res.body[8].message == "指定されたThresholdCodeがシステム上に存在しません。Code:"
+      && current.res.body[9].code == "10001"
+      && current.res.body[9].inputNote == "2009083"
+      && current.res.body[9].message == "指定されたExamItemDetailCodeがシステム上に存在しません。Code:"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2009-08.json
+  confirmExamNormalValueRange:
+    desc: "検査基準値範囲の登録を確認"
+    db:
+      query: |
+        SELECT
+          range_id::text
+        FROM
+          resultcollector.exam_normal_value_range
+    test: |
+      // 検査基準値範囲が登録されていないことを確認
+      len(current.rows) == 0

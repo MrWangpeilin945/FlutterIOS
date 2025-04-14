@@ -26,6 +26,12 @@ public class InputExamItems
     public required RelatedExamItem[] RelatedExamItems { get; init; }
 
     /// <summary>
+    /// 関連検査項目
+    /// </summary>
+    [JsonPropertyName("isComplete")]
+    public required bool IsComplete { get; init; }
+
+    /// <summary>
     /// 検査結果入力項目グループ
     /// </summary>
     [JsonPropertyName("examItemGroups")]

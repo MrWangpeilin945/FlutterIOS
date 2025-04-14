@@ -7,8 +7,8 @@ import {
   Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import type { MetaFunction } from "@remix-run/node";
-import { useSearchParams } from "@remix-run/react";
+import type { MetaFunction } from "react-router";
+import { useSearchParams } from "react-router";
 import { isAxiosError } from "axios";
 import { format } from "date-fns";
 import { useAtom } from "jotai";
@@ -23,7 +23,7 @@ import CommonFooter from "~/components/CommonFooter";
 import CommonHeader from "~/components/CommonHeader";
 import ConfirmDialog from "~/components/ConfirmDialog";
 import PlaceSchedule from "~/components/PlaceSchedule";
-import { PlaceScheduleLockingStatus } from "~/domain/enums";
+import { IconType, PlaceScheduleLockingStatus } from "~/domain/enums";
 import type {
   PlaceSchedule as PlaceScheduleType,
   PlaceScheduleLocking,
@@ -45,6 +45,7 @@ export default function PlaceScheduleLock() {
   const firstPlaceSchedule = useRef<PlaceScheduleType>(placeSchedule);
   const [opened, { open, close }] = useDisclosure(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [iconType, setIconType] = useState<string>(IconType.未設定);
   const [openedConfirm, { open: openConfirm, close: closeConfirm }] =
     useDisclosure(false);
   const [processStatus, setProcessStatus] =
@@ -74,11 +75,15 @@ export default function PlaceScheduleLock() {
   const { mutateAsync } = usePlaceScheduleUpdatePlaceScheduleLockingStatus();
 
   //AP1016_会場ロック状態を取得する
-  const fetchGetPlaceScheduleLocking = async () => {
+  const fetchGetPlaceScheduleLocking = async (isRefetch?: boolean) => {
+    setIconType(IconType.未設定);
     const result = await refetch();
     if (result.data) {
       setPlaceScheduleLock(result.data.data);
     } else if (result.error) {
+      if (isRefetch) {
+        setIconType(IconType.異常);
+      }
       if (result.error.status === 400) {
         setMessage(getErrorMessage(errorMessages.invalid, "パラメータ"));
       } else if (result.error.status === 404) {
@@ -124,17 +129,22 @@ export default function PlaceScheduleLock() {
       try {
         const result = await mutateAsync({
           version: "1",
-          placeScheduleId: placeScheduleId || firstPlaceSchedule.current?.placeScheduleId || "",
+          placeScheduleId:
+            placeScheduleId ||
+            firstPlaceSchedule.current?.placeScheduleId ||
+            "",
           data: body,
         });
         if (result.status === 200) {
           // AP1016を実行して画面再取得
-          await fetchGetPlaceScheduleLocking();
+          await fetchGetPlaceScheduleLocking(true);
+          setIconType(IconType.正常);
           setMessage("登録が完了しました。");
           open();
         }
       } catch (error) {
         if (isAxiosError(error) && error.response) {
+          setIconType(IconType.異常);
           if (error.response.status === 400) {
             setMessage(getErrorMessage(errorMessages.invalid, "パラメータ"));
           } else if (error.response.status === 404) {
@@ -247,6 +257,7 @@ export default function PlaceScheduleLock() {
               <CommonDialog
                 message={message || ""}
                 buttonMessage="閉じる"
+                iconType={iconType}
                 isOpen={opened}
                 onClose={close}
               />

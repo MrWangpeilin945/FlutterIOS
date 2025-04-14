@@ -12,8 +12,43 @@ steps:
     desc: "検査基準値範囲テーブルのクリア"
     db:
       query: |
+        -- 基準値パターン
+        TRUNCATE TABLE resultcollector.thresholds CASCADE;
         -- 検査基準値範囲
         TRUNCATE TABLE resultcollector.exam_normal_value_range CASCADE;
+        -- 外部検査項目明細
+        TRUNCATE TABLE resultcollector.external_exam_item_details CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
+  insertExamMenus:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 検査メニュー
+        INSERT INTO
+          resultcollector.exam_menus
+          (exam_menu_id, name, order_number, enabled, created_at, created_by)
+        VALUES(2009, '血液検査', 2009, true, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目グループ
+        INSERT INTO
+          resultcollector.exam_item_groups
+          (exam_item_group_id, name, exam_menu_id, type, order_number, created_at, created_by)
+        VALUES(2009, '血液検査', 2009, 1, 1, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目
+        INSERT INTO
+          resultcollector.exam_items
+          (exam_item_id, name, exam_item_group_id, position_number, unit, order_number, created_at, created_by)
+        VALUES(20091, '白血球数', 2009, 1, '1000/ul',1, CURRENT_TIMESTAMP,'ec2009');
+        -- 検査項目明細
+        INSERT INTO
+          resultcollector.exam_item_details
+          (exam_item_detail_id, exam_item_id, name, order_number, position_number, type, keyboard_type, integer_length, decimal_length, equipment_label, created_at, created_by)
+        VALUES(20091, 20091, '白血球数', 1, 1, 1, 1, 3, 2, null, CURRENT_TIMESTAMP,'ec2009');
+        -- 外部検査項目明細
+        INSERT INTO
+          resultcollector.external_exam_item_details
+          (exam_item_detail_id, external_exam_item_detail_code, created_at, created_by)
+        VALUES(20091, 'EC2009WBC', CURRENT_TIMESTAMP,'ec2009');
   post:
     desc: "基準値パターンが取得できない"
     req:
@@ -23,11 +58,12 @@ steps:
             application/json:
               "{{ vars.request }}"
     test: |
-      current.res.status == 200
+      current.res.status == 207
+      && len(current.res.body) == 1
       // 基準値パターンエラーがErrorObjectで返される
       && current.res.body[0].code == "10001"
       && current.res.body[0].inputNote == "2009031"
-      && current.res.body[0].message == "指定されたThresholdCdがシステム上に存在しません。Code:Dummy2009"
+      && current.res.body[0].message == "指定されたThresholdCodeがシステム上に存在しません。Code:Dummy2009"
     dump:
       expr: current.res.body
       out: ../Dump/EC2009-03.json

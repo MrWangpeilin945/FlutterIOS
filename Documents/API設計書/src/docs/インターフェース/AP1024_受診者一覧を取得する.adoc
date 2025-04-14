@@ -1,0 +1,95 @@
+== AP1024_受診者一覧を取得する
+
+=== 概要
+
+* 検査メニューの受診者一覧を取得して返却する
+* 受診者一覧画面から利用する
+
+=== URI
+
+[source]
+----
+[GET] /examinees/placeSchedules/{placeScheduleId}/examMenus/{examMenuId}
+----
+
+=== リクエストヘッダー
+
+=== パスパラメータ
+
+なし
+
+=== クエリパラメータ
+
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|status
+|No
+|number
+|進捗状況
+|11
+
+|===
+
+=== リクエストボディ
+
+なし
+
+=== レスポンスボディ
+
+[source,json]
+----
+{
+    "placeScheduleId": "ed282fd3-8ef5-426a-b1c3-c2a0fced1c13",
+    "placeName": "会場A",
+    "examDate": "2025-05-03",
+    "progress": {
+        "examMenuId": 3,
+        "examMenuName": "検査メニューA",
+        "details": [
+            {
+                "status": 11,
+                "statusName": "予定",
+                "count": 32
+            },
+            {
+                "status": 21,
+                "statusName": "来場",
+                "count": 8
+            },
+            {
+                "status": 41,
+                "statusName": "済",
+                "count": 20
+            },
+            {
+                "status": 51,
+                "statusName": "中止",
+                "count": 1
+            }
+        ]
+    },
+    "examinees": [
+        {
+            "consultNumber": "012345678",
+            "ticketNumber": "10",
+            "kanaName": "リョウビ　タロウ",
+            "sex" : 1,
+            "checkedInAt" : "2025-04-01T11:35:20+09:00"
+        }
+    ]
+}
+----
+
+=== ステータスコード
+
+* 200 OK
+* 401 Unauthorized
+** JWT認証に失敗
+* 404 NotFound
+** 指定した進捗状況が存在しない
+
+=== 並び順
+
+* 受診.受診番号の昇順

@@ -1,6 +1,6 @@
 import { Container, LoadingOverlay, Space, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import type { MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "react-router";
 import { format } from "date-fns";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
@@ -73,7 +73,7 @@ export default function Progress() {
                 <Stack gap={16} pt={24}>
                   {progressData?.progress?.map((p) => (
                     <ExamItemProgress
-                      key={p.examItemId}
+                      key={p.examMenuId}
                       progress={p}
                       onClick={() => {}}
                     />

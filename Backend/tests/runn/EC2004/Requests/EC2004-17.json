@@ -1,0 +1,164 @@
+[
+    {
+        "sortNo": 1,
+        "connectionCode": "C20211701",
+        "actionType": 0,
+        "placeCode": "P2004-17",
+        "teamCode": "T2004-17",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041701",
+        "examineeCode": "E20041701",
+        "age": "0530210",
+        "note": "処理順が重複",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041701"
+    },
+    {
+        "sortNo": 1,
+        "connectionCode": "C20211702",
+        "actionType": 0,
+        "placeCode": "P2004-17",
+        "teamCode": "T2004-17",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041702",
+        "examineeCode": "E20041702",
+        "age": "0520202",
+        "note": "処理順が重複",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041702"
+    },
+    {
+        "sortNo": 3,
+        "connectionCode": "C20211703",
+        "actionType": 0,
+        "placeCode": "P2004-17",
+        "teamCode": "T2004-17",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041703",
+        "examineeCode": "E20041703",
+        "age": "0530303",
+        "note": "基準値判定-基準値判定コードが重複",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+            {
+                "thresholdCode": "TID-EC2004-1",
+                "priority": 1
+            },
+            {
+                "thresholdCode": "TID-EC2004-1",
+                "priority": 2
+            }
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041703"
+    },
+    {
+        "sortNo": 4,
+        "connectionCode": "C20211704",
+        "actionType": 0,
+        "placeCode": "P2004-17",
+        "teamCode": "T2004-17",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041704",
+        "examineeCode": "E20041704",
+        "age": "0540404",
+        "note": "基準値判定-優先度が重複",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+            {
+                "thresholdCode": "TID-EC2004-1",
+                "priority": 1
+            },
+            {
+                "thresholdCode": "TID-EC2004-2",
+                "priority": 1
+            }
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041704"
+    },
+    {
+        "sortNo": 5,
+        "connectionCode": "C20211705",
+        "actionType": 0,
+        "placeCode": "P2004-17",
+        "teamCode": "T2004-17",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041705",
+        "examineeCode": "E20041705",
+        "age": "0550505",
+        "note": "受診特記-検査特記コードが重複",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+            {
+                "code": "NOTE-T200417-1",
+                "note": "受診特記01"
+            },
+            {
+                "code": "NOTE-T200417-1",
+                "note": "受診特記02"
+            },
+            {
+                "code": "NOTE-T200417-1",
+                "note": "受診特記03"
+            }
+        ],
+        "examItemDetailOrders": [
+        ],
+        "inputNote": "20041705"
+    },
+    {
+        "sortNo": 6,
+        "connectionCode": "C20211706",
+        "actionType": 0,
+        "placeCode": "P2004-17",
+        "teamCode": "T2004-17",
+        "examDate": "2025-03-03",
+        "consultNumber": "No20041706",
+        "examineeCode": "E20041706",
+        "age": "0560606",
+        "note": "検査項目明細依頼-検査項目明細CDが重複",
+        "previousResults": [
+        ],
+        "consultThresholds": [
+        ],
+        "consultNotes": [
+        ],
+        "examItemDetailOrders": [
+            {
+                "examItemDetailCode": "Order-200417",
+                "note": "comment-200417-1"
+            },
+            {
+                "examItemDetailCode": "Order-200417",
+                "note": "comment-200417-2"
+            }
+        ],
+        "inputNote": "20041706"
+    }
+]

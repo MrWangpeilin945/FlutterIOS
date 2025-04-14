@@ -7,8 +7,17 @@ runners:
     skipValidateResponse: false
 vars:
   request: "json://../Requests/EC2011-04.json"
-  staffCode: "201106"
 steps:
+  clearTable:
+    desc: "職員テーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.staffs CASCADE;
+  insertData:
+    desc: "職員テーブルに実行前データを登録"
+    db: 
+      query: |
+        insert into resultcollector.staffs(staff_code, login_id, name, password_hash, password_salt, enabled, role_id, created_at, created_by)
+            values('201106', 'S201106', '既存職員ID', '00', '00', true, 10, '2025-01-01T12:34:56.789', 'ex2011');
   getStaffs:
     desc: "リクエスト前の職員情報を取得"
     db:
@@ -21,10 +30,10 @@ steps:
           , role_id
           , password_hash::text 
           , password_salt::text
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
         FROM
           resultcollector.staffs
-        WHERE
-          staff_code = '{{ vars.staffCode }}'
     bind:
       staffData: current.rows[0]
   post:
@@ -37,9 +46,7 @@ steps:
               "{{ vars.request }}"
     test: |
       current.res.status == 200
-    dump:
-      expr: current.res.body
-      out: ../Dump/EC2011-04.json
+      && current.res.body == null
   confirmStaffs:
     desc: "職員情報のログインIDが変更されていることを確認"
     db:
@@ -52,17 +59,20 @@ steps:
           , role_id
           , password_hash::text
           , password_salt::text
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
           resultcollector.staffs
-        WHERE
-          staff_code = '{{ vars.staffCode }}'
     test: |
       len(current.rows) == 1
-      && current.rows[0].staff_code == staffData.staff_code
+      && current.rows[0].staff_code == "201106"
       && current.rows[0].login_id == "new201106"
-      && current.rows[0].name == staffData.name
-      && current.rows[0].enabled == staffData.enabled
-      && current.rows[0].role_id == staffData.role_id
+      && current.rows[0].name == "既存職員ID"
+      && current.rows[0].enabled == true
+      && current.rows[0].role_id == 10
       // パスワードハッシュ・ソルトは変更される
       && current.rows[0].password_hash != staffData.password_hash
       && current.rows[0].password_salt != staffData.password_salt
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"

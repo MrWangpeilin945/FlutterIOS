@@ -1,0 +1,174 @@
+desc: EC2004-19 文字形式のチェック
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2004-19.json"
+steps:
+  clearTable:
+    desc: "関連テーブルのクリア"
+    db:
+      query: |
+        -- 受診
+        TRUNCATE TABLE resultcollector.consult CASCADE;
+        -- 会場
+        TRUNCATE TABLE resultcollector.places CASCADE; 
+        -- 班
+        TRUNCATE TABLE resultcollector.teams CASCADE;
+        -- 受診者
+        TRUNCATE TABLE resultcollector.examinees CASCADE;
+        -- 検査メニュー
+        TRUNCATE TABLE resultcollector.exam_menus CASCADE;
+        -- 検査特記
+        TRUNCATE TABLE resultcollector.exam_menu_note_codes CASCADE;
+        -- 基準値パターン
+        TRUNCATE TABLE resultcollector.thresholds CASCADE;
+        -- 外部検査項目明細
+        TRUNCATE TABLE resultcollector.external_exam_item_details CASCADE;
+  insertData:
+    desc: "関連テーブルに実行前データを登録"
+    db:
+      query: |
+        -- 班
+        INSERT INTO
+          resultcollector.teams
+          (team_id, team_code, name, order_number, created_at, created_by)
+        VALUES('f0002004-0000-0000-0019-000000000001', 'T2004-19', '班', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 会場
+        INSERT INTO
+          resultcollector.places
+          (place_id, place_code, name, order_number, created_at, created_by)
+        VALUES('b0002004-0000-0000-0019-000000000001', 'P2004-19', '会場', 1, CURRENT_TIMESTAMP, 'ec2004');
+        -- 会場日程
+        INSERT INTO
+          resultcollector.place_schedule
+          (place_schedule_id, place_id, team_id, status, exam_date, start_time, created_at, created_by)
+        VALUES('a0002004-0000-0000-0019-000000000001', 'b0002004-0000-0000-0019-000000000001', 'f0002004-0000-0000-0019-000000000001', 31, '2025/03/03', '1500', CURRENT_TIMESTAMP, 'ec2004');
+        -- 受診者
+        INSERT INTO
+          resultcollector.examinees
+          (examinee_id, examinee_code, name, kana_name, sex, birthdate, created_at, created_by)
+        VALUES('e0002004-0000-0000-0019-000000000001', 'E20041901', '両備　一郎', 'リョウビ　イチロウ',   1, '1991-01-01', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0019-000000000002', 'E20041902', '両備　ニ郎', 'リョウビ　ジロウ',     1, '1992-02-02', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0019-000000000003', 'E20041903', '両備　三郎', 'リョウビ　サブロウ',   1, '1993-03-03', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0019-000000000004', 'E20041904', '両備　四郎', 'リョウビ　シロウ',     1, '1994-04-04', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0019-000000000005', 'E20041905', '両備　五郎', 'リョウビ　ゴロウ',     1, '1995-05-05', CURRENT_TIMESTAMP,'ec2004')
+        ,     ('e0002004-0000-0000-0019-000000000006', 'E20041906', '両備　六郎', 'リョウビ　ロクロウ',   1, '1996-06-06', CURRENT_TIMESTAMP,'ec2004');
+  post:
+    desc: "文字形式のチェック"
+    req:
+      /api/v1/external/consult:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 207
+      // レスポンスに5件のErrorObjectが返されることを確認
+      && len(current.res.body) == 4
+      // 受診番号
+      && current.res.body[0].code == "10006"
+      && current.res.body[0].inputNote == "20041901"
+      && current.res.body[0].message == "値の形式が無効です。ConsultNumber:No-1234567890$"
+      && current.res.body[1].code == "10006"
+      && current.res.body[1].inputNote == "20041902"
+      && current.res.body[1].message == "値の形式が無効です。ConsultNumber:No 123456780"
+      // 年齢
+      && current.res.body[2].code == "10006"
+      && current.res.body[2].inputNote == "20041904"
+      && current.res.body[2].message == "値の形式が無効です。Age:0541231"
+      && current.res.body[3].code == "10006"
+      && current.res.body[3].inputNote == "20041905"
+      && current.res.body[3].message == "値の形式が無効です。Age:-54a1-1"
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2004-19.json
+  confirmConsult:
+    desc: "受診の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+          , consult_number
+          , age
+          , progress_status
+          , export_status
+          , place_schedule_id::text
+          , note
+          , examinee_id::text
+          , external_connection_code
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.consult;
+    test: |
+      // 受診が2件登録されていることを確認
+      len(current.rows) == 2
+      && current.rows[0].consult_number == "No123456780a"
+      && current.rows[0].age == "0530303"
+      && current.rows[0].progress_status == 11
+      && current.rows[0].export_status == 11
+      && current.rows[0].place_schedule_id == "a0002004-0000-0000-0019-000000000001"
+      && current.rows[0].note == "受診番号が英字と数字のみで登録可"
+      && current.rows[0].examinee_id == "e0002004-0000-0000-0019-000000000003"
+      && current.rows[0].external_connection_code == "C20211903"
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+      && current.rows[1].consult_number == "No0006"
+      && current.rows[1].age == "0281002"
+      && current.rows[1].progress_status == 11
+      && current.rows[1].export_status == 11
+      && current.rows[1].place_schedule_id == "a0002004-0000-0000-0019-000000000001"
+      && current.rows[1].note == "年齢が数字のみで月数・日数が範囲内で登録可"
+      && current.rows[1].examinee_id == "e0002004-0000-0000-0019-000000000006"
+      && current.rows[1].external_connection_code == "C20211906"
+      && current.rows[1].created_at == current.rows[1].now
+      && current.rows[1].created_by == "ExternalConnection"
+  confirmConsultNotes:
+    desc: "受診特記の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.consult_notes;
+    test: |
+      // 受診特記が登録されていないことを確認
+      len(current.rows) == 0
+  confirmExamItemDetailOrders:
+    desc: "検査項目明細依頼の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.exam_item_detail_orders;
+    test: |
+      // 検査項目明細依頼が登録されていないことを確認
+      len(current.rows) == 0
+  confirmConsultThresholds:
+    desc: "基準値の登録を確認"
+    db:
+      query: |
+        SELECT
+          threshold_id::text
+        FROM
+          resultcollector.consult_thresholds;
+    test: |
+      // 基準値が登録されていないことを確認
+      len(current.rows) == 0
+  confirmPreviousResults:
+    desc: "過去検査結果の登録を確認"
+    db:
+      query: |
+        SELECT
+          consult_id::text
+        FROM
+          resultcollector.previous_results;
+    test: |
+      // 過去検査結果が登録されていないことを確認
+      len(current.rows) == 0
