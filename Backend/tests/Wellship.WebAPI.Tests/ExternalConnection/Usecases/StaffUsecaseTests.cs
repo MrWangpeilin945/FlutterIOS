@@ -290,4 +290,30 @@ public class StaffUsecaseTests
         // Assert
         errors.Should().BeEquivalentTo(expected);
     }
+
+    [Fact]
+    public async Task データのチェック_既存職員コードでログインIDが異なるエラーなし()
+    {
+        // Arrange
+        // 職員コード、ログインIDに紐づく職員情報を取得する
+        var staffEntities = new List<StaffEntity> {
+                                new StaffEntity(){ StaffCode = "S001", LoginId = "User01", Name = "職員Ａ",
+                                                PasswordHash = new byte[] { 0 }, PasswordSalt = new byte[] { 0 },
+                                                Enabled = true, RoleId  = (int)Ryobi.Wellship.Core.Enums.Role.User }
+                            };
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "admin" } )).ReturnsAsync(staffEntities);
+
+        // WARNING検証エラー
+        var usecase = new StaffUsecase(_staffRepositoryMock.Object, _timeProvider);
+        var request = new List<Staff>
+        {
+            new Staff { StaffCode = "S001", LoginId = "admin",  Name = "職員Ａ", Password = "P@ssw0rd",
+                        Enabled = true, RoleId = Ryobi.Wellship.Core.Enums.Role.Admin, InputNote = "UT2011" }
+        };
+        // Act
+        var errors = await usecase.StoreStaffsAsync(request);
+        // Assert
+        errors.Should().BeEmpty();
+    }
+
 }
