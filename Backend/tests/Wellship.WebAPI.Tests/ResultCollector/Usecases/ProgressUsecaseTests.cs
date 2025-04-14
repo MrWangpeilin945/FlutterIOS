@@ -24,9 +24,9 @@ public class ProgressUsecaseTests
                               {
                                   PlaceScheduleId = Guid.Parse("e1b9277a-c0a7-4de5-b36f-bc912e1189dd"),
                                   AggregatedProgressDetails = [
-                                    new AggregatedProgressDetail(){ExamMenuId = 1, ExamMenuName = "身長", Count11 = 10, Count21 = 8, Count41 = 0, Count51 = 0},
-                                    new AggregatedProgressDetail(){ExamMenuId = 2, ExamMenuName = "体重", Count11 = 11, Count21 = 9, Count41 = 1, Count51 = 0},
-                                    new AggregatedProgressDetail(){ExamMenuId = 3, ExamMenuName = "血圧", Count11 = 0, Count21 = 1, Count41 = 10, Count51 = 3}
+                                    new AggregatedProgressDetail(){ExamMenuId = 1, ExamMenuName = "身長", Count11 = 10, Count21 = 8, Count41 = 0, Count51 = 0, Count71 = 4},
+                                    new AggregatedProgressDetail(){ExamMenuId = 2, ExamMenuName = "体重", Count11 = 11, Count21 = 9, Count41 = 1, Count51 = 0, Count71 = 0},
+                                    new AggregatedProgressDetail(){ExamMenuId = 3, ExamMenuName = "血圧", Count11 = 0, Count21 = 1, Count41 = 10, Count51 = 3, Count71 = 2}
                                   ]
                               });
 
@@ -56,7 +56,8 @@ public class ProgressUsecaseTests
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.予定, StatusName = Core.Enums.AggregatedProgressStatus.予定.ToString(), Count = 10},
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.来場, StatusName = Core.Enums.AggregatedProgressStatus.来場.ToString(), Count = 8},
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.済, StatusName = Core.Enums.AggregatedProgressStatus.済.ToString(), Count = 0},
-                        new (){Status = (int)Core.Enums.AggregatedProgressStatus.中止, StatusName = Core.Enums.AggregatedProgressStatus.中止.ToString(), Count = 0}
+                        new (){Status = (int)Core.Enums.AggregatedProgressStatus.中止, StatusName = Core.Enums.AggregatedProgressStatus.中止.ToString(), Count = 0},
+                        new (){Status = (int)Core.Enums.AggregatedProgressStatus.その他, StatusName = Core.Enums.AggregatedProgressStatus.その他.ToString(), Count = 4}
                     ]
                 },
                 new APIModels.Responses.Progress(){
@@ -66,7 +67,8 @@ public class ProgressUsecaseTests
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.予定, StatusName = Core.Enums.AggregatedProgressStatus.予定.ToString(), Count = 11},
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.来場, StatusName = Core.Enums.AggregatedProgressStatus.来場.ToString(), Count = 9},
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.済, StatusName = Core.Enums.AggregatedProgressStatus.済.ToString(), Count = 1},
-                        new (){Status = (int)Core.Enums.AggregatedProgressStatus.中止, StatusName = Core.Enums.AggregatedProgressStatus.中止.ToString(), Count = 0}
+                        new (){Status = (int)Core.Enums.AggregatedProgressStatus.中止, StatusName = Core.Enums.AggregatedProgressStatus.中止.ToString(), Count = 0},
+                        new (){Status = (int)Core.Enums.AggregatedProgressStatus.その他, StatusName = Core.Enums.AggregatedProgressStatus.その他.ToString(), Count = 0}
                     ]
                 },
                 new APIModels.Responses.Progress(){
@@ -76,7 +78,8 @@ public class ProgressUsecaseTests
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.予定, StatusName = Core.Enums.AggregatedProgressStatus.予定.ToString(), Count = 0},
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.来場, StatusName = Core.Enums.AggregatedProgressStatus.来場.ToString(), Count = 1},
                         new (){Status = (int)Core.Enums.AggregatedProgressStatus.済, StatusName = Core.Enums.AggregatedProgressStatus.済.ToString(), Count = 10},
-                        new (){Status = (int)Core.Enums.AggregatedProgressStatus.中止, StatusName = Core.Enums.AggregatedProgressStatus.中止.ToString(), Count = 3}
+                        new (){Status = (int)Core.Enums.AggregatedProgressStatus.中止, StatusName = Core.Enums.AggregatedProgressStatus.中止.ToString(), Count = 3},
+                        new (){Status = (int)Core.Enums.AggregatedProgressStatus.その他, StatusName = Core.Enums.AggregatedProgressStatus.その他.ToString(), Count = 2}
                     ]
                 }
             ]

@@ -36,4 +36,9 @@ public class AggregatedProgressDetail
     /// 中止の件数
     /// </summary>
     public required int Count51 { get; init; }
+
+    /// <summary>
+    /// その他の件数
+    /// </summary>
+    public required int Count71 { get; init; }
 }
