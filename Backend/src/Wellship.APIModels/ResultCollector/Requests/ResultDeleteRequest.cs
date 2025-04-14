@@ -8,7 +8,7 @@ namespace Ryobi.Wellship.APIModels.Requests;
 public class ResultDeleteRequest
 {
     /// <summary>
-    /// 削除対象の検査明細項目ID
+    /// 削除対象の検査項目明細ID
     /// </summary>
     [JsonPropertyName("examItemDetailIds")]
     public required int[] ExamItemDetailIds { get; set; }
