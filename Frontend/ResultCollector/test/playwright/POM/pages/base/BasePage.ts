@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-import testSettings from "test/e2e/testSetting";
+import testSettings from "test/playwright/testSetting";
 
 export class BasePage {
   readonly page: Page;
