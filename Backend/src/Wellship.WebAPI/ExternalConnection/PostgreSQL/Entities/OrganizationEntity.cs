@@ -6,6 +6,11 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
     public class OrganizationEntity
     {
         /// <summary>
+        /// 団体ID
+        /// </summary>
+        public Guid OrganizationId { get; init; }
+
+        /// <summary>
         /// 団体コード
         /// </summary>
         public required string OrganizationCode { get; init; }

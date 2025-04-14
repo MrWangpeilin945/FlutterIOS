@@ -41,13 +41,42 @@
 [source,json]
 ----
 {
+    "placeScheduleId": "ed282fd3-8ef5-426a-b1c3-c2a0fced1c13",
+    "placeName": "会場A",
+    "examDate": "2025-05-03",
+    "progress": {
+        "examMenuId": 3,
+        "examMenuName": "検査メニューA",
+        "details": [
+            {
+                "status": 11,
+                "statusName": "予定",
+                "count": 32
+            },
+            {
+                "status": 21,
+                "statusName": "来場",
+                "count": 8
+            },
+            {
+                "status": 41,
+                "statusName": "済",
+                "count": 20
+            },
+            {
+                "status": 51,
+                "statusName": "中止",
+                "count": 1
+            }
+        ]
+    },
     "examinees": [
         {
             "consultNumber": "012345678",
             "ticketNumber": "10",
             "kanaName": "リョウビ　タロウ",
             "sex" : 1,
-            "createdAt" : "2025-04-01"
+            "checkedInAt" : "2025-04-01T11:35:20+09:00"
         }
     ]
 }
