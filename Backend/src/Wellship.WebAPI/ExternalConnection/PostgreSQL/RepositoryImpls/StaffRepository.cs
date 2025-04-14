@@ -134,5 +134,33 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
             var result = await connection.QueryAsync<StaffEntity>(selectSQL, parameters);
             return result.ToList();
         }
+
+        /// <summary>
+        /// 存在する職員情報を取得する
+        /// </summary>
+        /// <param name="loginIds">ログインID</param>
+        /// <returns></returns>
+        public async Task<List<StaffEntity>> GetStaffsInfoByLoginIdsAsync(List<string> loginIds)
+        {
+            var connection = await _dbConnectionProvider.GetOrOpenAsync();
+            var sql = @"
+                    select
+                        staff_id as StaffId, 
+                        staff_code as StaffCode,
+                        login_id as LoginId,
+                        name as Name,
+                        password_hash as PasswordHash,
+                        password_salt as PasswordSalt,
+                        enabled as Enabled,
+                        role_id as RoleId
+                    from
+                        resultcollector.staffs
+                    where
+                        login_id = any(@LoginIds);";
+
+            var result = await connection.QueryAsync<StaffEntity>(sql, new { LoginIds = loginIds });
+
+            return result.ToList();
+        }
     }
 }

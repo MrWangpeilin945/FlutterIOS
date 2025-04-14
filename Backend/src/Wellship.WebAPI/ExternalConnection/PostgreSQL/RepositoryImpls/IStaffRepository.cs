@@ -21,5 +21,12 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         /// <param name="staffCodesAndLoginIds"></param>
         /// <returns></returns>
         public Task<List<StaffEntity>> GetStaffsByLoginIdsAsync(List<(string staffCode, string loginId)> staffCodesAndLoginIds);
+        /// <summary>
+        /// 存在する職員情報を取得する
+        /// </summary>
+        /// <param name="loginIds">ログインID</param>
+        /// <returns></returns>
+        public Task<List<StaffEntity>> GetStaffsInfoByLoginIdsAsync(List<string> loginIds);
+
     }
 }

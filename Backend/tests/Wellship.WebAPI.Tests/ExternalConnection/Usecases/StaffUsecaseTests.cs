@@ -25,8 +25,7 @@ public class StaffUsecaseTests
     {
         // Arrange
         // 職員コード、ログインIDに紐づく職員情報を取得する
-        var staffList = new List<(string, string)> { ("", "User01") };
-        _staffRepositoryMock.Setup(x => x.GetStaffsByLoginIdsAsync(staffList)).ReturnsAsync(new List<StaffEntity>());
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "User01" } )).ReturnsAsync(new List<StaffEntity>());
 
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
@@ -45,12 +44,40 @@ public class StaffUsecaseTests
     }
 
     [Fact]
+    public async Task 空値のチェック_職員コード_ログインID登録済で2件のエラーが返る()
+    {
+        // Arrange
+        // 職員コード、ログインIDに紐づく職員情報を取得する
+        var staffEntities = new List<StaffEntity> {
+                                new StaffEntity(){ StaffCode = "S100", LoginId = "User01", Name = "職員Ａ",
+                                                PasswordHash = new byte[] { 0 }, PasswordSalt = new byte[] { 0 },
+                                                Enabled = true, RoleId  = (int)Ryobi.Wellship.Core.Enums.Role.User }
+                            };
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "User01" } )).ReturnsAsync(staffEntities);
+
+        // WARNING検証エラー
+        var expected = new List<ErrorObject>() {
+            new(){Code = "10004", Message = "必須項目が不足しています。StaffCode", InputNote  = "UT2011"},
+            new(){Code = "10002", Message = "指定されたLoginIdが既に登録済みです。Code:User01", InputNote  = "UT2011"}
+        };
+        var usecase = new StaffUsecase(_staffRepositoryMock.Object, _timeProvider);
+        var request = new List<Staff>
+        {
+            new Staff { StaffCode = "", LoginId = "User01",  Name = "職員Ａ", Password = "P@ssw0rd",
+                        Enabled = true, RoleId = Ryobi.Wellship.Core.Enums.Role.User, InputNote = "UT2011" }
+        };
+        // Act
+        var errors = await usecase.StoreStaffsAsync(request);
+        // Assert
+        errors.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
     public async Task 空値のチェック_ログインIDで2件のエラーが返る()
     {
         // Arrange
         // 職員コード、ログインIDに紐づく職員情報を取得する
-        var staffList = new List<(string, string)> { ("S001", "") };
-        _staffRepositoryMock.Setup(x => x.GetStaffsByLoginIdsAsync(staffList)).ReturnsAsync(new List<StaffEntity>());
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "" } )).ReturnsAsync(new List<StaffEntity>());
 
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
@@ -74,8 +101,7 @@ public class StaffUsecaseTests
     {
         // Arrange
         // 職員コード、ログインIDに紐づく職員情報を取得する
-        var staffList = new List<(string, string)> { ("S001", "User01") };
-        _staffRepositoryMock.Setup(x => x.GetStaffsByLoginIdsAsync(staffList)).ReturnsAsync(new List<StaffEntity>{});
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "User01" } )).ReturnsAsync(new List<StaffEntity>{});
 
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
@@ -98,8 +124,7 @@ public class StaffUsecaseTests
     {
         // Arrange
         // 職員コード、ログインIDに紐づく職員情報を取得する
-        var staffList = new List<(string, string)> { ("S001", "User01") };
-        _staffRepositoryMock.Setup(x => x.GetStaffsByLoginIdsAsync(staffList)).ReturnsAsync(new List<StaffEntity>{});
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "User01" } )).ReturnsAsync(new List<StaffEntity>{});
 
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
@@ -122,8 +147,7 @@ public class StaffUsecaseTests
     {
         // Arrange
         // 職員コード、ログインIDに紐づく職員情報を取得する
-        var staffList = new List<(string, string)> { ("S001", "User123456789012345678790") };
-        _staffRepositoryMock.Setup(x => x.GetStaffsByLoginIdsAsync(staffList)).ReturnsAsync(new List<StaffEntity>{});
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "User123456789012345678790" } )).ReturnsAsync(new List<StaffEntity>{});
 
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
@@ -146,8 +170,7 @@ public class StaffUsecaseTests
     {
         // Arrange
         // 職員コード、ログインIDに紐づく職員情報を取得する
-        var staffList = new List<(string, string)> { ("S001", "User01") };
-        _staffRepositoryMock.Setup(x => x.GetStaffsByLoginIdsAsync(staffList)).ReturnsAsync(new List<StaffEntity>{});
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "User01" } )).ReturnsAsync(new List<StaffEntity>{});
 
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
@@ -170,8 +193,7 @@ public class StaffUsecaseTests
     {
         // Arrange
         // 職員コード、ログインIDに紐づく職員情報を取得する
-        var staffList = new List<(string, string)> { ("S001", "User-001") };
-        _staffRepositoryMock.Setup(x => x.GetStaffsByLoginIdsAsync(staffList)).ReturnsAsync(new List<StaffEntity>{});
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "User-001" } )).ReturnsAsync(new List<StaffEntity>{});
 
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
@@ -194,8 +216,7 @@ public class StaffUsecaseTests
     {
         // Arrange
         // 職員コード、ログインIDに紐づく職員情報を取得する
-        var staffList = new List<(string, string)> { ("S001", "User01"), ("S001", "User02") };
-        _staffRepositoryMock.Setup(x => x.GetStaffsByLoginIdsAsync(staffList)).ReturnsAsync(new List<StaffEntity>{});
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "User01", "User02" } )).ReturnsAsync(new List<StaffEntity>{});
 
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
@@ -221,8 +242,7 @@ public class StaffUsecaseTests
     {
         // Arrange
         // 職員コード、ログインIDに紐づく職員情報を取得する
-        var staffList = new List<(string, string)> { ("S001", "User01"), ("S002", "User01") };
-        _staffRepositoryMock.Setup(x => x.GetStaffsByLoginIdsAsync(staffList)).ReturnsAsync(new List<StaffEntity>{});
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "User01" } )).ReturnsAsync(new List<StaffEntity>{});
 
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
@@ -248,13 +268,12 @@ public class StaffUsecaseTests
     {
         // Arrange
         // 職員コード、ログインIDに紐づく職員情報を取得する
-        var staffList = new List<(string, string)> { ("S001", "User01")};
         var staffEntities = new List<StaffEntity> {
                                 new StaffEntity(){ StaffCode = "S100", LoginId = "User01", Name = "職員Ａ",
                                                 PasswordHash = new byte[] { 0 }, PasswordSalt = new byte[] { 0 },
                                                 Enabled = true, RoleId  = (int)Ryobi.Wellship.Core.Enums.Role.User }
                             };
-        _staffRepositoryMock.Setup(x => x.GetStaffsByLoginIdsAsync(staffList)).ReturnsAsync(staffEntities);
+        _staffRepositoryMock.Setup(x => x.GetStaffsInfoByLoginIdsAsync(new List<string> { "User01" } )).ReturnsAsync(staffEntities);
 
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {

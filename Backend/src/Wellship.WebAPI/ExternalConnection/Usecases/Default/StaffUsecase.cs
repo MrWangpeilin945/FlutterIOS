@@ -32,8 +32,7 @@ public class StaffUsecase : IStaffUsecase
         List<ErrorObject> errorObjects = new List<ErrorObject>();
 
         // ログインIDに紐づく職員情報を取得する
-        var loginIdAndStaffCodePairs = staffs.Select(s => (s.StaffCode, s.LoginId)).ToList();
-        var existingStaffs = await _staffRepository.GetStaffsByLoginIdsAsync(loginIdAndStaffCodePairs);
+        var existingStaffs = await _staffRepository.GetStaffsInfoByLoginIdsAsync(staffs.Select(s => s.LoginId).Distinct().ToList());
 
         // WARNING検証
         var warningStaffs = new List<Staff>();
@@ -107,29 +106,10 @@ public class StaffUsecase : IStaffUsecase
         }
 
         // ログインIDが異なる職員コードのチェック
-        /*
         foreach (var warning in staffs.Where(x => existingStaffs.Any(staff => staff.LoginId == x.LoginId && staff.StaffCode != x.StaffCode)))
         {
             // エラーのオブジェクトをStaffにキャストしてワーニングリストに追加する
             if (warning is Staff staff)
-            {
-                warningStaffs.Add(staff);
-                errorObjects.Add(new ErrorObject
-                {
-                    Code = "10002",
-                    Message = $"指定されたLoginIdが既に登録済みです。Code:{staff.LoginId}",
-                    InputNote = staff.InputNote
-                });
-            }
-        }
-        */
-        foreach (var staff in staffs)
-        {
-            var matched = existingStaffs.Where(e => e.LoginId == staff.LoginId)
-                                        .FirstOrDefault();
-
-            // ログインIDが一致し、職員コードが異なる場合はエラー対象
-            if (matched != default && matched.StaffCode != staff.StaffCode)
             {
                 warningStaffs.Add(staff);
                 errorObjects.Add(new ErrorObject
