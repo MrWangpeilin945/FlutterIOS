@@ -60,7 +60,7 @@ public class IntegrationResultRepository : IIntegrationResultRepository
         })).ToList();
 
         const string parentsSql = @"
-         insert into resultcollector.integration_result_logs( 
+        insert into resultcollector.integration_result_logs( 
             id,
             result_code,
             log_level,
@@ -68,8 +68,8 @@ public class IntegrationResultRepository : IIntegrationResultRepository
             summary,
             created_at,
             created_by
-         ) 
-         values ( 
+        ) 
+        values ( 
             @Id,
             @ResultCode,
             @LogLevel,
@@ -77,7 +77,7 @@ public class IntegrationResultRepository : IIntegrationResultRepository
             @Summary,
             @CreatedAt,
             @CreatedBy
-         );";
+        );";
 
         const string childrenSql = @"
         insert into resultcollector.integration_result_log_details( 
