@@ -288,6 +288,30 @@ CREATE TABLE home_menus (
 ALTER TABLE home_menus ADD CONSTRAINT home_menus_IX1
   UNIQUE (path) ;
 
+CREATE TABLE integration_result_log_details (
+  integration_result_log_id uuid NOT NULL
+  , order_number integer NOT NULL
+  , function_code varchar(20) NOT NULL
+  , event_source text NOT NULL
+  , result_detail_code varchar(20) NOT NULL
+  , result_detail_message text NOT NULL
+  , properties jsonb NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT integration_result_log_details_PKC PRIMARY KEY (integration_result_log_id,order_number)
+);
+
+CREATE TABLE integration_result_logs (
+  id uuid DEFAULT gen_random_uuid () NOT NULL
+  , result_code varchar(20) NOT NULL
+  , log_level integer NOT NULL
+  , function_code varchar(20) NOT NULL
+  , summary text NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT integration_result_logs_PKC PRIMARY KEY (id)
+);
+
 CREATE TABLE keyboard_options (
   option_id integer NOT NULL
   , exam_item_detail_id integer NOT NULL
@@ -296,6 +320,54 @@ CREATE TABLE keyboard_options (
   , created_by text NOT NULL
   , CONSTRAINT keyboard_options_PKC PRIMARY KEY (option_id)
 );
+
+CREATE TABLE notification_recipients (
+  id integer NOT NULL
+  , name varchar(50) NOT NULL
+  , display_name varchar(50) NOT NULL
+  , email_address varchar(254) NOT NULL
+  , order_number integer NOT NULL
+  , notification_group_id integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT notification_recipients_PKC PRIMARY KEY (id)
+);
+
+ALTER TABLE notification_recipients ADD CONSTRAINT notification_recipients_IX1
+  UNIQUE (order_number,notification_group_id) ;
+
+CREATE TABLE notification_rules (
+  notification_group_id integer NOT NULL
+  , log_level integer NOT NULL
+  , enabled boolean DEFAULT true NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT notification_rules_PKC PRIMARY KEY (notification_group_id,log_level)
+);
+
+CREATE TABLE notification_send_history_recipients (
+  id uuid NOT NULL
+  , recipient_id integer NOT NULL
+  , recipient_address varchar(254) NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT notification_send_history_recipients_PKC PRIMARY KEY (id,recipient_id)
+);
+
+CREATE TABLE notification_templates (
+  id integer NOT NULL
+  , name varchar(50) NOT NULL
+  , subject varchar(70) NOT NULL
+  , body text NOT NULL
+  , sender_address varchar(254) NOT NULL
+  , notification_group_id integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT notification_templates_PKC PRIMARY KEY (id)
+);
+
+ALTER TABLE notification_templates ADD CONSTRAINT notification_templates_IX1
+  UNIQUE (notification_group_id) ;
 
 CREATE TABLE organizations (
   organization_id uuid DEFAULT gen_random_uuid () NOT NULL
@@ -543,6 +615,48 @@ CREATE TABLE places (
 
 ALTER TABLE places ADD CONSTRAINT places_IX1
   UNIQUE (place_code) ;
+
+
+CREATE TABLE integration_functions (
+  code varchar(20) NOT NULL
+  , name varchar(100) NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT integration_functions_PKC PRIMARY KEY (code)
+);
+
+CREATE TABLE integration_result_codes (
+  code varchar(20) NOT NULL
+  , name varchar(100) NOT NULL
+  , log_level integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT integration_result_codes_PKC PRIMARY KEY (code)
+);
+
+CREATE TABLE notification_groups (
+  id integer
+  , name varchar(50) NOT NULL
+  , order_number integer NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT notification_groups_PKC PRIMARY KEY (id)
+);
+
+ALTER TABLE notification_groups ADD CONSTRAINT notification_groups_IX1
+  UNIQUE (order_number) ;
+
+CREATE TABLE notification_send_histories (
+  id uuid DEFAULT gen_random_uuid () NOT NULL
+  , log_id uuid NOT NULL
+  , subject varchar(70) NOT NULL
+  , body text NOT NULL
+  , notification_group_id integer NOT NULL
+  , sender_address varchar(254) NOT NULL
+  , created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  , created_by text NOT NULL
+  , CONSTRAINT notification_send_histories_PKC PRIMARY KEY (id)
+);
 
 CREATE TABLE roles (
   role_id integer NOT NULL
@@ -891,8 +1005,48 @@ ALTER TABLE home_menus
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
+ALTER TABLE integration_result_log_details
+  ADD CONSTRAINT integration_result_log_details_FK1 FOREIGN KEY (integration_result_log_id) REFERENCES integration_result_logs(id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE integration_result_log_details
+  ADD CONSTRAINT integration_result_log_details_FK2 FOREIGN KEY (function_code) REFERENCES integration_functions(code)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE integration_result_logs
+  ADD CONSTRAINT integration_result_logs_FK1 FOREIGN KEY (result_code) REFERENCES integration_result_codes(code)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE integration_result_logs
+  ADD CONSTRAINT integration_result_logs_FK2 FOREIGN KEY (function_code) REFERENCES integration_functions(code)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
 ALTER TABLE keyboard_options
   ADD CONSTRAINT keyboard_options_FK1 FOREIGN KEY (exam_item_detail_id) REFERENCES exam_item_details(exam_item_detail_id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE notification_recipients
+  ADD CONSTRAINT notification_recipients_FK1 FOREIGN KEY (notification_group_id) REFERENCES notification_groups(id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE notification_rules
+  ADD CONSTRAINT notification_rules_FK1 FOREIGN KEY (notification_group_id) REFERENCES notification_groups(id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE notification_send_history_recipients
+  ADD CONSTRAINT notification_send_history_recipients_FK1 FOREIGN KEY (id) REFERENCES notification_send_histories(id)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE;
+
+ALTER TABLE notification_templates
+  ADD CONSTRAINT notification_templates_FK1 FOREIGN KEY (notification_group_id) REFERENCES notification_groups(id)
   ON DELETE RESTRICT
   ON UPDATE CASCADE;
 
@@ -1179,12 +1333,66 @@ COMMENT ON COLUMN home_menus.path IS 'パス';
 COMMENT ON COLUMN home_menus.created_at IS '作成日時';
 COMMENT ON COLUMN home_menus.created_by IS '作成者';
 
+COMMENT ON TABLE integration_result_log_details IS '連携処理結果ログ明細';
+COMMENT ON COLUMN integration_result_log_details.integration_result_log_id IS '連携処理結果ログID';
+COMMENT ON COLUMN integration_result_log_details.order_number IS '表示順';
+COMMENT ON COLUMN integration_result_log_details.function_code IS '機能コード';
+COMMENT ON COLUMN integration_result_log_details.event_source IS '発生源';
+COMMENT ON COLUMN integration_result_log_details.result_detail_code IS '詳細結果コード';
+COMMENT ON COLUMN integration_result_log_details.result_detail_message IS '詳細結果メッセージ';
+COMMENT ON COLUMN integration_result_log_details.properties IS 'プロパティ';
+COMMENT ON COLUMN integration_result_log_details.created_at IS '作成日時';
+COMMENT ON COLUMN integration_result_log_details.created_by IS '作成者';
+
+COMMENT ON TABLE integration_result_logs IS '連携処理結果ログ';
+COMMENT ON COLUMN integration_result_logs.id IS 'ID';
+COMMENT ON COLUMN integration_result_logs.result_code IS '処理結果コード';
+COMMENT ON COLUMN integration_result_logs.log_level IS 'ログレベル';
+COMMENT ON COLUMN integration_result_logs.function_code IS '機能コード';
+COMMENT ON COLUMN integration_result_logs.summary IS '概要';
+COMMENT ON COLUMN integration_result_logs.created_at IS '作成日時';
+COMMENT ON COLUMN integration_result_logs.created_by IS '作成者';
+
 COMMENT ON TABLE keyboard_options IS 'キーボード入力値リスト';
 COMMENT ON COLUMN keyboard_options.option_id IS 'ID';
 COMMENT ON COLUMN keyboard_options.exam_item_detail_id IS '検査項目明細ID';
 COMMENT ON COLUMN keyboard_options.value IS '入力値';
 COMMENT ON COLUMN keyboard_options.created_at IS '作成日時';
 COMMENT ON COLUMN keyboard_options.created_by IS '作成者';
+
+COMMENT ON TABLE notification_recipients IS '通知先';
+COMMENT ON COLUMN notification_recipients.id IS 'ID';
+COMMENT ON COLUMN notification_recipients.name IS '名称';
+COMMENT ON COLUMN notification_recipients.display_name IS '表示用名称';
+COMMENT ON COLUMN notification_recipients.email_address IS 'メールアドレス';
+COMMENT ON COLUMN notification_recipients.order_number IS '表示順';
+COMMENT ON COLUMN notification_recipients.notification_group_id IS '通知先グループID';
+COMMENT ON COLUMN notification_recipients.created_at IS '作成日時';
+COMMENT ON COLUMN notification_recipients.created_by IS '作成者';
+
+COMMENT ON TABLE notification_rules IS '通知ルール';
+COMMENT ON COLUMN notification_rules.notification_group_id IS '通知先グループID';
+COMMENT ON COLUMN notification_rules.log_level IS 'ログレベル:Info:2, Warn:3, Error:4';
+COMMENT ON COLUMN notification_rules.enabled IS '有効';
+COMMENT ON COLUMN notification_rules.created_at IS '作成日時';
+COMMENT ON COLUMN notification_rules.created_by IS '作成者';
+
+COMMENT ON TABLE notification_send_history_recipients IS '通知送信履歴宛先';
+COMMENT ON COLUMN notification_send_history_recipients.id IS 'ID';
+COMMENT ON COLUMN notification_send_history_recipients.recipient_id IS '通知先ID';
+COMMENT ON COLUMN notification_send_history_recipients.recipient_address IS 'メールアドレス';
+COMMENT ON COLUMN notification_send_history_recipients.created_at IS '作成日時';
+COMMENT ON COLUMN notification_send_history_recipients.created_by IS '作成者';
+
+COMMENT ON TABLE notification_templates IS '通知テンプレート';
+COMMENT ON COLUMN notification_templates.id IS 'ID';
+COMMENT ON COLUMN notification_templates.name IS '名称';
+COMMENT ON COLUMN notification_templates.subject IS '件名';
+COMMENT ON COLUMN notification_templates.body IS '本文';
+COMMENT ON COLUMN notification_templates.sender_address IS '差出人メールアドレス';
+COMMENT ON COLUMN notification_templates.notification_group_id IS '通知先グループID';
+COMMENT ON COLUMN notification_templates.created_at IS '作成日時';
+COMMENT ON COLUMN notification_templates.created_by IS '作成者';
 
 COMMENT ON TABLE organizations IS '団体';
 COMMENT ON COLUMN organizations.organization_id IS '団体ID';
@@ -1342,6 +1550,36 @@ COMMENT ON COLUMN home_menu_groups.name IS 'ホームメニューグループ名
 COMMENT ON COLUMN home_menu_groups.order_number IS '表示順';
 COMMENT ON COLUMN home_menu_groups.created_at IS '作成日時';
 COMMENT ON COLUMN home_menu_groups.created_by IS '作成者';
+
+COMMENT ON TABLE integration_functions IS '連携処理機能';
+COMMENT ON COLUMN integration_functions.code IS 'コード';
+COMMENT ON COLUMN integration_functions.name IS '名称';
+COMMENT ON COLUMN integration_functions.created_at IS '作成日時';
+COMMENT ON COLUMN integration_functions.created_by IS '作成者';
+
+COMMENT ON TABLE integration_result_codes IS '連携処理結果コード';
+COMMENT ON COLUMN integration_result_codes.code IS 'コード';
+COMMENT ON COLUMN integration_result_codes.name IS '名称';
+COMMENT ON COLUMN integration_result_codes.log_level IS 'ログレベル:Info:2, Warn:3, Error:4';
+COMMENT ON COLUMN integration_result_codes.created_at IS '作成日時';
+COMMENT ON COLUMN integration_result_codes.created_by IS '作成者';
+
+COMMENT ON TABLE notification_groups IS '通知先グループ';
+COMMENT ON COLUMN notification_groups.id IS 'ID';
+COMMENT ON COLUMN notification_groups.name IS '名称';
+COMMENT ON COLUMN notification_groups.order_number IS '表示順';
+COMMENT ON COLUMN notification_groups.created_at IS '作成日時';
+COMMENT ON COLUMN notification_groups.created_by IS '作成者';
+
+COMMENT ON TABLE notification_send_histories IS '通知送信履歴';
+COMMENT ON COLUMN notification_send_histories.id IS 'ID';
+COMMENT ON COLUMN notification_send_histories.log_id IS 'ログID';
+COMMENT ON COLUMN notification_send_histories.subject IS '件名';
+COMMENT ON COLUMN notification_send_histories.body IS '本文';
+COMMENT ON COLUMN notification_send_histories.notification_group_id IS '通知先グループID';
+COMMENT ON COLUMN notification_send_histories.sender_address IS '差出人メールアドレス';
+COMMENT ON COLUMN notification_send_histories.created_at IS '作成日時';
+COMMENT ON COLUMN notification_send_histories.created_by IS '作成者';
 
 COMMENT ON TABLE place_schedule IS '会場日程';
 COMMENT ON COLUMN place_schedule.place_schedule_id IS '会場日程ID';
