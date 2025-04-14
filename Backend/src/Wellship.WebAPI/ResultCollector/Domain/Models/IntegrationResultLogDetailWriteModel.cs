@@ -1,3 +1,7 @@
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 /// <summary>
@@ -5,10 +9,18 @@ namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 /// </summary>
 public sealed class IntegrationResultLogDetailWriteModel
 {
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new JsonStringEnumConverter() }
+    };
+
     /// <summary>
     /// 機能コード
     /// </summary>
-    public required string FuctionCode { get; init; }
+    public required string FunctionCode { get; init; }
 
     /// <summary>
     /// 発生源
@@ -30,4 +42,21 @@ public sealed class IntegrationResultLogDetailWriteModel
     /// 具体的な項目名と値です。
     /// </summary>
     public required Dictionary<string, string> Properties { get; init; }
+
+    /// <summary>
+    /// JSONシリアライズされたプロパティ
+    /// </summary>
+    public string PropertiesJsonString
+    {
+        get
+        {
+            if (Properties is null)
+            {
+                // 付加情報がnullなら、jsonの空オブジェクトとする
+                return "{}";
+            }
+
+            return JsonSerializer.Serialize(Properties, JsonSerializerOptions);
+        }
+    }
 }

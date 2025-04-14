@@ -33,7 +33,7 @@ public sealed class IntegrationResultLog
     /// <summary>
     /// 機能コード
     /// </summary>
-    public required string FuctionCode { get; init; }
+    public required string FunctionCode { get; init; }
 
     /// <summary>
     /// 機能名

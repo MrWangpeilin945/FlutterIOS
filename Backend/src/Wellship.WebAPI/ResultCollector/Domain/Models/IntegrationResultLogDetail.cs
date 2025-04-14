@@ -13,7 +13,7 @@ public sealed class IntegrationResultLogDetail
     /// <summary>
     /// 機能コード
     /// </summary>
-    public required string FuctionCode { get; init; }
+    public required string FunctionCode { get; init; }
 
     /// <summary>
     /// 発生源
