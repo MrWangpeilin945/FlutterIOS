@@ -42,10 +42,10 @@ steps:
       // 会場エラーと班エラーがErrorObjectで返される
       && current.res.body[0].code == "10003"
       && current.res.body[0].inputNote == "201208-01"
-      && current.res.body[0].message == "キー項目が重複しています。TeamCode:T2012-08/PlaceCode:P2012-08/ExamDate:2030/03/08 1:01:00"
+      && current.res.body[0].message == "キー項目が重複しています。TeamCode:T2012-08/PlaceCode:P2012-08/ExamDate:2030/03/08"
       && current.res.body[1].code == "10003"
       && current.res.body[1].inputNote == "201208-02"
-      && current.res.body[1].message == "キー項目が重複しています。TeamCode:T2012-08/PlaceCode:P2012-08/ExamDate:2030/03/08 2:01:00"
+      && current.res.body[1].message == "キー項目が重複しています。TeamCode:T2012-08/PlaceCode:P2012-08/ExamDate:2030/03/08"
     dump:
       expr: current.res.body
       out: ../Dump/EC2012-08.json

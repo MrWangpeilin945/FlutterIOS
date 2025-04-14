@@ -63,14 +63,14 @@ public class TeamUsecaseTests
         // Arrange
         // WARNING検証エラー
         var expected = new List<ErrorObject>() {
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2006"},
-            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2006"}
+            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2006-1"},
+            new(){Code = "10003", Message = "キー項目が重複しています。Code:5963", InputNote  = "UT2006-2"}
         };
         var usecase = new TeamUsecase(_teamRepositoryMock.Object, _timeProvider);
         var request = new List<Team>
         {
-            new Team { Code = "5963", Name = "一班", InputNote = "UT2006" },
-            new Team { Code = "5963", Name = "ニ班", InputNote = "UT2006" }
+            new Team { Code = "5963", Name = "一班", InputNote = "UT2006-1" },
+            new Team { Code = "5963", Name = "ニ班", InputNote = "UT2006-2" }
         };
         // Act
         var errors = await usecase.StoreTeamsAsync(request);
