@@ -154,4 +154,21 @@ public class ConsultController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// AP1025 検査結果を取り消す
+    /// </summary>
+    /// <param name="consultNumber">受診番号</param>
+    /// <param name="resultDeleteRequest">削除対象の検査項目明細ID一覧</param>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpPost]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/results/batchDelete")]
+    public async Task<IActionResult> BatchDeleteResults([FromRoute][Required] string consultNumber, [FromBody] ResultDeleteRequest resultDeleteRequest)
+    {
+        await _consultUsecase.BatchDeleteResultsAsync(consultNumber, resultDeleteRequest);
+        return NoContent();
+    }
 }
