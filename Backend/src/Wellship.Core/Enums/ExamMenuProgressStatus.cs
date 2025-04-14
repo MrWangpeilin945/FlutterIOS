@@ -2,9 +2,9 @@ namespace Ryobi.Wellship.Core.Enums;
 
 /// <summary>
 /// 検査進捗状況
-/// 検査項目単位の進捗ステータスです。
+/// 検査メニュー単位の進捗ステータスです。
 /// </summary>
-public enum ExamItemProgressStatus
+public enum ExamMenuProgressStatus
 {
     /// <summary>
     /// 未実施
