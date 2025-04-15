@@ -55,15 +55,15 @@
                             "currentExamResult": 120,
                             "pastExamResult": 125,
                             "pastExamDate": "2025-03-01",
-                            "is_recently": false
+                            "isRecent": false
                         },
                         {
-                            "examItemDetailId": 16010101,
+                            "examItemDetailId": 16010102,
                             "examItemDetailName": "血圧1回目　最低",
                             "currentExamResult": 80,
                             "pastExamResult": 85,
                             "pastExamDate": "2025-04-01",
-                            "is_recently": true
+                            "isRecent": true
                         }
                     ],
                 }
