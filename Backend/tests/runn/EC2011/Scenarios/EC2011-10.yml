@@ -1,0 +1,81 @@
+desc: EC2011-10 既存職員コードでログインIDが異なる登録されている [200]
+runners:
+  db: ${DB_HOST}
+  req:
+    endpoint: ${BACKEND_URL}
+    skipValidateRequest: false
+    skipValidateResponse: false
+vars:
+  request: "json://../Requests/EC2011-10.json"
+steps:
+  clearTable:
+    desc: "職員テーブルをクリア"
+    db:
+      query: TRUNCATE TABLE resultcollector.staffs CASCADE;
+  insertData:
+    desc: "職員テーブルに実行前データを登録"
+    db: 
+      query: |
+        insert into resultcollector.staffs(staff_code, login_id, name, password_hash, password_salt, enabled, role_id, created_at, created_by)
+            values('201110','S2011', '既存職員コード', '00', '00' , true, 10,  '2025-01-01T12:34:56.789', 'ex2011');
+  getStaffs:
+    desc: "リクエスト前の職員情報を取得"
+    db:
+      query: |
+        SELECT
+          staff_code
+          , login_id
+          , name
+          , enabled
+          , role_id
+          , password_hash::text 
+          , password_salt::text
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+        FROM
+          resultcollector.staffs
+    bind:
+      staffData: current.rows[0]
+  post:
+    desc: "ログインIDが異なる職員コードで登録されている"
+    req:
+      /api/v1/external/staffs:
+        post:
+          body:
+            application/json:
+              "{{ vars.request }}"
+    test: |
+      current.res.status == 200
+      && current.res.body == null
+    dump:
+      expr: current.res.body
+      out: ../Dump/EC2011-10.json
+  confirmStaffs:
+    desc: "職員情報が変更されていることを確認"
+    db:
+      query: |
+        SELECT
+          staff_code
+          , login_id
+          , name
+          , enabled
+          , role_id
+          , password_hash::text
+          , password_salt::text
+          , to_char(created_at, 'yyyymmdd') as created_at
+          , created_by
+          , to_char(CURRENT_DATE, 'yyyymmdd') as now
+        FROM
+          resultcollector.staffs
+    test: |
+      len(current.rows) == 1
+      && current.rows[0].staff_code == "201110"
+      && current.rows[0].login_id == "admin"
+      && current.rows[0].name == "既存職員コード"
+      && current.rows[0].enabled == true
+      && current.rows[0].role_id == 20
+      && current.rows[0].password_hash != staffData.password_hash
+      && current.rows[0].password_salt != staffData.password_salt
+      && current.rows[0].created_at == current.rows[0].now
+      && current.rows[0].created_by == "ExternalConnection"
+
