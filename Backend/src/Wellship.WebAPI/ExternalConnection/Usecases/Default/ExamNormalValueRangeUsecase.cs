@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
@@ -197,11 +195,8 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
             ErrorLevel = (int)examNormalValueRange.ErrorLevel
         }).ToList();
 
-        var createdAt = _timeProvider.GetUtcNow();
-        string createdBy = "ExternalConnection";
-
         // 基準値範囲を登録する
-        await _examNormalValueRangeRepository.UpsertExamNormalValueRangeAsync(examNormalValueRangeEntities, createdAt, createdBy);
+        await _examNormalValueRangeRepository.UpsertExamNormalValueRangeAsync(examNormalValueRangeEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
         return errorObjects;
     }
