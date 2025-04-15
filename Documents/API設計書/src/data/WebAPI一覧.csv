@@ -24,3 +24,4 @@ AP1022,検査の実施有無と中止理由を登録する,POST,/consult/{consul
 AP1023,ログイン状態を更新する,POST,/staff/login/refresh
 AP1024,受診者一覧を取得する,GET,/examinees/placeSchedules/{placeScheduleId}/examMenus/{examMenuId}
 AP1025,検査結果を取り消す,POST,/consult/{consultNumber}/results/batchDelete
+AP1026,検査結果を取得する,GET,/consult/{consultNumber}/results/

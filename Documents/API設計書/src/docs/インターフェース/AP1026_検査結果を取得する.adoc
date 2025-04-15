@@ -1,0 +1,84 @@
+== AP1026_検査結果を取得する
+
+=== 概要
+
+* 受診者の今回値と過去の検査情報を取得する
+
+=== URI
+
+[source]
+----
+[GET] /consult/{consultNumber}/results
+----
+
+=== リクエストヘッダー
+
+=== パスパラメータ
+
+[cols="2,1,1,4,2" options="header"]
+|===
+|名称|必須|型|説明|具体例
+
+|consultNumber
+|Yes
+|string
+|受診番号
+|00123
+
+|===
+
+=== クエリパラメータ
+
+なし
+
+=== リクエストボディ
+
+なし
+
+=== レスポンスボディ
+
+[source,json]
+----
+{
+    "examResults": [
+        {
+            "examMenuId": 16,
+            "examMenuName": "血圧",
+            "examMenuResults": [
+                {
+                    "examItemId": 160101,
+                    "examItemName": "血圧1",
+                    "examItemDetails": [
+                        {
+                            "examItemDetailId": 16010101,
+                            "examItemDetailName": "血圧1回目　最高",
+                            "currentExamResult": 120,
+                            "pastExamResult": 125,
+                            "pastExamDate": "2025-03-01",
+                            "is_recently": false
+                        },
+                        {
+                            "examItemDetailId": 16010101,
+                            "examItemDetailName": "血圧1回目　最低",
+                            "currentExamResult": 80,
+                            "pastExamResult": 85,
+                            "pastExamDate": "2025-04-01",
+                            "is_recently": true
+                        }
+                    ],
+                }
+            ]
+        }
+    ]
+}
+
+----
+
+
+=== ステータスコード
+
+* 200 OK
+* 401 Unauthorized
+** JWT認証に失敗
+* 404 NotFound
+** 指定した受診者が存在しない
