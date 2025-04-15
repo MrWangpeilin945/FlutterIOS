@@ -72,10 +72,11 @@ steps:
       query: |
         INSERT INTO
           resultcollector.consult
-            (consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
+            (consult_number, age, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
         VALUES
           (
             '{{ uniqueCode[i].code }}' 
+            , '0340301'
             , 11
             , 11
             , 'a0002002-0000-0000-0090-000000000001'
