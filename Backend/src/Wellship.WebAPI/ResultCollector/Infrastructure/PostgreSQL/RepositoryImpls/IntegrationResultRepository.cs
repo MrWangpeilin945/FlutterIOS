@@ -25,9 +25,9 @@ public class IntegrationResultRepository : IIntegrationResultRepository
     }
 
     /// <inheritdoc/>
-    public async Task SaveIntegrationResultLog(IEnumerable<IntegrationResultLogWriteModel> resultLogs)
+    public async Task SaveIntegrationResultLogAsync(IEnumerable<IntegrationResultLogWriteModel> resultLogs)
     {
-        const string createdBy = "NotificationSender";
+        const string createdBy = "ExternalConnection";
         var operationTime = _timeProvider.GetUtcNow();
 
         var connection = await _dbConnectionProvider.GetOrOpenAsync();

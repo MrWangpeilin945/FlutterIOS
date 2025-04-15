@@ -11,5 +11,5 @@ public interface IIntegrationResultRepository
     /// 連携処理結果ログを保存します。
     /// </summary>
     /// <param name="resultLogs">連携処理結果ログリスト</param>
-    public Task SaveIntegrationResultLog(IEnumerable<IntegrationResultLogWriteModel> resultLogs);
+    public Task SaveIntegrationResultLogAsync(IEnumerable<IntegrationResultLogWriteModel> resultLogs);
 }
