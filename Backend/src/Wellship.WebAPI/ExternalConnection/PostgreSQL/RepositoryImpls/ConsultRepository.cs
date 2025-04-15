@@ -4,7 +4,6 @@ using Ryobi.Wellship.Core.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
-using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Transaction;
 
@@ -376,8 +375,8 @@ public class ConsultRepository : IConsultRepository
                     );";
                     await connection.ExecuteAsync(insertPreviousResultsSql, previousResults);
                 }
-                scope.Complete();
             }
+            scope.Complete();
         }
     }
 

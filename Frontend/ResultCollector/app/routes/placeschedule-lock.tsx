@@ -78,8 +78,13 @@ export default function PlaceScheduleLock() {
   const fetchGetPlaceScheduleLocking = async (isRefetch?: boolean) => {
     setIconType(IconType.未設定);
     const result = await refetch();
-    if (result.data) {
+    if (result.data && result.status === "success") {
       setPlaceScheduleLock(result.data.data);
+      if (isRefetch) {
+        setIconType(IconType.正常);
+        setMessage("登録が完了しました。");
+        open();
+      }
     } else if (result.error) {
       if (isRefetch) {
         setIconType(IconType.異常);
@@ -138,9 +143,6 @@ export default function PlaceScheduleLock() {
         if (result.status === 200) {
           // AP1016を実行して画面再取得
           await fetchGetPlaceScheduleLocking(true);
-          setIconType(IconType.正常);
-          setMessage("登録が完了しました。");
-          open();
         }
       } catch (error) {
         if (isAxiosError(error) && error.response) {

@@ -103,35 +103,30 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         }
 
         /// <summary>
-        /// 職員コードとログインIDのペアを取得する
+        /// 存在する職員情報を取得する
         /// </summary>
-        /// <param name="staffCodesAndLoginIds"></param>
+        /// <param name="loginIds">ログインID</param>
         /// <returns></returns>
-        public async Task<List<StaffEntity>> GetStaffsByLoginIdsAsync(List<(string staffCode, string loginId)> staffCodesAndLoginIds)
+        public async Task<List<StaffEntity>> GetStaffsInfoByLoginIdsAsync(List<string> loginIds)
         {
             var connection = await _dbConnectionProvider.GetOrOpenAsync();
-            var loginIds = staffCodesAndLoginIds.Select(x => x.loginId).ToArray();
-            var parameters = new DynamicParameters();
-            parameters.Add("LoginIds", loginIds);
-            List<string> param = new List<string>();
-            for (int i = 0; i < staffCodesAndLoginIds.Count; i++)
-            {
-                var name = $"@Id{i + 1}";
-                param.Add(name);
-                parameters.Add(name, staffCodesAndLoginIds[i].loginId + '/' + staffCodesAndLoginIds[i].staffCode);
-            }
-            string placeholders = string.Join(",", param);
-            var selectSQL = $@"
-                SELECT
-                    login_id as LoginId
-                    , staff_code as StaffCode
-                FROM
-                    resultcollector.staffs
-                WHERE
-                    concat(login_id, '/', staff_code) not in ({placeholders})
-                    AND login_id = any (@LoginIds);";
-            // クエリ実行
-            var result = await connection.QueryAsync<StaffEntity>(selectSQL, parameters);
+            var sql = @"
+                    select
+                        staff_id as StaffId, 
+                        staff_code as StaffCode,
+                        login_id as LoginId,
+                        name as Name,
+                        password_hash as PasswordHash,
+                        password_salt as PasswordSalt,
+                        enabled as Enabled,
+                        role_id as RoleId
+                    from
+                        resultcollector.staffs
+                    where
+                        login_id = any(@LoginIds);";
+
+            var result = await connection.QueryAsync<StaffEntity>(sql, new { LoginIds = loginIds });
+
             return result.ToList();
         }
     }
