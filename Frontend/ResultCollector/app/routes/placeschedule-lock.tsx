@@ -142,7 +142,7 @@ export default function PlaceScheduleLock() {
         });
         if (result.status === 200) {
           // AP1016を実行して画面再取得
-          const status = await fetchGetPlaceScheduleLocking(true);
+          await fetchGetPlaceScheduleLocking(true);
         }
       } catch (error) {
         if (isAxiosError(error) && error.response) {
