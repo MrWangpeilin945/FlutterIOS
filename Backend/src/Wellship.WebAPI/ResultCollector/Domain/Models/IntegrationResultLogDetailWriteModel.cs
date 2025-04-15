@@ -41,7 +41,7 @@ public sealed class IntegrationResultLogDetailWriteModel
     /// プロパティ
     /// 具体的な項目名と値です。
     /// </summary>
-    public required Dictionary<string, string> Properties { get; init; }
+    public required IEnumerable<IntegrationResultLogDetailPropertyWriteModel> Properties { get; init; }
 
     /// <summary>
     /// JSONシリアライズされたプロパティ
@@ -50,12 +50,6 @@ public sealed class IntegrationResultLogDetailWriteModel
     {
         get
         {
-            if (Properties is null)
-            {
-                // 付加情報がnullなら、jsonの空オブジェクトとする
-                return "{}";
-            }
-
             return JsonSerializer.Serialize(Properties, JsonSerializerOptions);
         }
     }

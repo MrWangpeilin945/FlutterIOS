@@ -8,7 +8,7 @@ public sealed class IntegrationResultLogWriteModel
     /// <summary>
     /// ログID
     /// </summary>
-    public required Guid Id { get; init; }
+    public Guid Id { get; init; } = Guid.NewGuid();
 
     /// <summary>
     /// 処理結果コード
