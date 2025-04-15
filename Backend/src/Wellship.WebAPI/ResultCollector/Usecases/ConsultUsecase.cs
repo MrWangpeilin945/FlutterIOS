@@ -648,6 +648,15 @@ public class ConsultUsecase : IConsultUsecase
     }
 
     /// <summary>
+    /// AP1025_検査結果を取り消す
+    /// </summary>
+    public async Task BatchDeleteResultsAsync(string consultNumber, ResultDeleteRequest resultDeleteRequest)
+    {
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+        await _resultRepository.BatchDeleteResultsAsync(consult.ConsultId, resultDeleteRequest.ExamItemDetailIds);
+    }
+
+    /// <summary>
     /// 検査項目グループ情報を取得する
     /// </summary>
     private async Task<IEnumerable<APIModels.Responses.ExamItemGroup>> GetExamItemGroups(Guid consultId, Domain.Models.Age examAge, Sex sex, IEnumerable<Domain.Models.ExamItemGroup> examItemGroup,

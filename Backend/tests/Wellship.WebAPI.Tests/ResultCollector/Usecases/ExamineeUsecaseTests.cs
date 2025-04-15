@@ -37,16 +37,17 @@ public class ExamineeUsecaseTests
         Guid[] consultIds = new Guid[1];
         var examDate = DateOnly.FromDateTime(DateTime.Now);
         var checkedInAt = DateTimeOffset.Now;
-        var AggregatedProgressDetail = new AggregatedProgressDetail
+        var aggregatedProgressDetail = new AggregatedProgressDetail
         {
             ExamMenuId = examMenuId,
             ExamMenuName = "身体計測",
             Count11 = 10,
             Count21 = 10,
             Count41 = 10,
-            Count51 = 10
+            Count51 = 10,
+            Count71 = 2
         };
-        var PlaceSchedule = new PlaceSchedule
+        var placeSchedule = new PlaceSchedule
         {
             Id = placeScheduleId,
             Place = new Place
@@ -77,9 +78,9 @@ public class ExamineeUsecaseTests
         };
 
         _progressRepositoryMock.Setup(x => x.GetAggregatedProgressByMenuIdAsync(placeScheduleId, examMenuId))
-                               .ReturnsAsync(AggregatedProgressDetail);
+                               .ReturnsAsync(aggregatedProgressDetail);
         _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleAsync(placeScheduleId))
-                                    .ReturnsAsync(PlaceSchedule);
+                                    .ReturnsAsync(placeSchedule);
         _examineeRepositoryMock.Setup(x => x.GetConsultIdsAsync(placeScheduleId, examMenuId, status))
                                .ReturnsAsync(consultIds);
         _examineeRepositoryMock.Setup(x => x.GetConsultExamineesAsync(consultIds))
@@ -95,10 +96,11 @@ public class ExamineeUsecaseTests
                 ExamMenuId = examMenuId,
                 ExamMenuName = "身体計測",
                 Details = [
-                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.予定 , StatusName = AggregatedProgressStatus.予定.ToString(), Count = AggregatedProgressDetail.Count11},
-                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.来場 , StatusName = AggregatedProgressStatus.来場.ToString(), Count = AggregatedProgressDetail.Count21},
-                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.済 , StatusName = AggregatedProgressStatus.済.ToString(), Count = AggregatedProgressDetail.Count41},
-                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.中止 , StatusName = AggregatedProgressStatus.中止.ToString(), Count = AggregatedProgressDetail.Count51}
+                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.予定 , StatusName = AggregatedProgressStatus.予定.ToString(), Count = aggregatedProgressDetail.Count11},
+                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.来場 , StatusName = AggregatedProgressStatus.来場.ToString(), Count = aggregatedProgressDetail.Count21},
+                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.済 , StatusName = AggregatedProgressStatus.済.ToString(), Count = aggregatedProgressDetail.Count41},
+                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.中止 , StatusName = AggregatedProgressStatus.中止.ToString(), Count = aggregatedProgressDetail.Count51},
+                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.その他 , StatusName = AggregatedProgressStatus.その他.ToString(), Count = aggregatedProgressDetail.Count71}
                 ]
             },
             Examinees = [new APIModels.Responses.ConsultExaminee
@@ -129,16 +131,17 @@ public class ExamineeUsecaseTests
         var status = AggregatedProgressStatus.予定;
         Guid[] consultIds = new Guid[1];
         var examDate = DateOnly.FromDateTime(DateTime.Now);
-        var AggregatedProgressDetail = new AggregatedProgressDetail
+        var aggregatedProgressDetail = new AggregatedProgressDetail
         {
             ExamMenuId = examMenuId,
             ExamMenuName = "身体計測",
             Count11 = 10,
             Count21 = 10,
             Count41 = 10,
-            Count51 = 10
+            Count51 = 10,
+            Count71 = 7
         };
-        var PlaceSchedule = new PlaceSchedule
+        var placeSchedule = new PlaceSchedule
         {
             Id = placeScheduleId,
             Place = new Place
@@ -169,11 +172,11 @@ public class ExamineeUsecaseTests
         };
 
         _progressRepositoryMock.Setup(x => x.GetAggregatedProgressByMenuIdAsync(placeScheduleId, examMenuId))
-                                            .ReturnsAsync(AggregatedProgressDetail);
+                                            .ReturnsAsync(aggregatedProgressDetail);
         _progressRepositoryMock.Setup(x => x.GetAggregatedProgressByMenuIdAsync(placeScheduleId, examMenuId))
-                                            .ReturnsAsync(AggregatedProgressDetail);
+                                            .ReturnsAsync(aggregatedProgressDetail);
         _placeScheduleRepositoryMock.Setup(x => x.GetPlaceScheduleAsync(placeScheduleId))
-                                                 .ReturnsAsync(PlaceSchedule);
+                                                 .ReturnsAsync(placeSchedule);
         _examineeRepositoryMock.Setup(x => x.GetConsultIdsAsync(placeScheduleId, examMenuId, status))
                                             .ReturnsAsync(consultIds);
         _examineeRepositoryMock.Setup(x => x.GetConsultExamineesAsync(consultIds))
@@ -189,10 +192,11 @@ public class ExamineeUsecaseTests
                 ExamMenuId = examMenuId,
                 ExamMenuName = "身体計測",
                 Details = [
-                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.予定 , StatusName = AggregatedProgressStatus.予定.ToString(), Count = AggregatedProgressDetail.Count11},
-                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.来場 , StatusName = AggregatedProgressStatus.来場.ToString(), Count = AggregatedProgressDetail.Count21},
-                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.済 , StatusName = AggregatedProgressStatus.済.ToString(), Count = AggregatedProgressDetail.Count41},
-                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.中止 , StatusName = AggregatedProgressStatus.中止.ToString(), Count = AggregatedProgressDetail.Count51}
+                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.予定 , StatusName = AggregatedProgressStatus.予定.ToString(), Count = aggregatedProgressDetail.Count11},
+                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.来場 , StatusName = AggregatedProgressStatus.来場.ToString(), Count = aggregatedProgressDetail.Count21},
+                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.済 , StatusName = AggregatedProgressStatus.済.ToString(), Count = aggregatedProgressDetail.Count41},
+                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.中止 , StatusName = AggregatedProgressStatus.中止.ToString(), Count = aggregatedProgressDetail.Count51},
+                    new APIModels.Responses.ProgressDetail(){Status = (int)AggregatedProgressStatus.その他 , StatusName = AggregatedProgressStatus.その他.ToString(), Count = aggregatedProgressDetail.Count71}
                 ]
             },
             Examinees = [new APIModels.Responses.ConsultExaminee

@@ -357,7 +357,7 @@ public class ConsultUsecaseTests
         {
             ConsultId = Guid.Parse("7400c9cc-c2ee-48ef-a12e-5c3244631a6d"),
             ConsultNumber = "0001",
-            Age = new Age(40,1,1),
+            Age = new Age(40, 1, 1),
             ProgressStatus = ConsultProgressStatus.検査中,
             ExportStatus = ConsultResultExportStatus.未出力,
             PlaceScheduleId = Guid.Parse("8cdd7c4a-e196-438e-a02e-54cb1af932c1"),
@@ -2413,5 +2413,43 @@ public class ConsultUsecaseTests
 
         // Assert
         result.Should().BeEquivalentTo(expectedResults);
+    }
+
+    [Fact]
+    public async Task 検査結果が正しく取り消される()
+    {
+        // Arrange
+        var consultId = Guid.Parse("b2923570-2750-4a01-9924-34aa80da2b8b");
+        var consultNumber = "12345";
+        var examineeId = Guid.Parse("a890e7ef-ebb7-4ef6-9b67-dd8c2e0e84c6");
+        var consult = new Consult
+        {
+            ConsultId = consultId,
+            ConsultNumber = consultNumber,
+            Age = new Age(48, 3, 7),
+            ExamineeId = examineeId,
+            ProgressStatus = ConsultProgressStatus.来場待ち,
+            Note = "定期健康診断",
+            ExportStatus = ConsultResultExportStatus.未出力,
+            PlaceScheduleId = Guid.Parse("f67faab2-b00a-4672-ac6e-776555d94c1c"),
+            TicketNumber = "1192"
+        };
+
+        var resultDeleteRequest = new ResultDeleteRequest { ExamItemDetailIds = [1, 2, 3] };
+        _consultRepositoryMock.Setup(repo => repo.GetConsultAsync(consultNumber))
+                              .ReturnsAsync(consult);
+        _resultRepositoryMock.Setup(repo => repo.BatchDeleteResultsAsync(consult.ConsultId, resultDeleteRequest.ExamItemDetailIds))
+                             .Returns(Task.CompletedTask);
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
+                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                         _staffIdentityProviderMock.Object);
+
+        // Act
+        await usecase.BatchDeleteResultsAsync(consultNumber, resultDeleteRequest);
+
+        // Assert
+        // 削除処理はSQLで実行するため、ここではリポジトリのメソッドが呼び出されるところまで確認します。
+        _consultRepositoryMock.Verify(repo => repo.GetConsultAsync(consultNumber), Times.Once);
+        _resultRepositoryMock.Verify(repo => repo.BatchDeleteResultsAsync(consult.ConsultId, resultDeleteRequest.ExamItemDetailIds), Times.Once);
     }
 }
