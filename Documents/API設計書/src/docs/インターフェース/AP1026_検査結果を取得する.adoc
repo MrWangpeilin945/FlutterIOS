@@ -2,7 +2,7 @@
 
 === 概要
 
-* 受診者の今回値と過去の検査情報を取得する
+* 受診者情報と今回値・過去の検査情報を取得する
 
 === URI
 
@@ -40,6 +40,18 @@
 [source,json]
 ----
 {
+    "consultNumber": "012345678",
+    "consultName" : "定期健康健診",
+    "examinee" : {
+        "ticketNumber" : "10",
+        "name" : "両備 太郎",
+        "kanaName" : "リョウビ　タロウ",
+        "birthdate" : "1975-10-30",
+        "sex" : 1,
+        "organizations" : [ "両備システムズ" ],
+        "sameNameAlert" : false,
+        "examDateAge" : 49
+    },
     "examResults": [
         {
             "examMenuId": 16,
