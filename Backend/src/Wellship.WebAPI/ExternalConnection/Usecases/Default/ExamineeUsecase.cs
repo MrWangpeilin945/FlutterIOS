@@ -12,7 +12,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// </summary>
 public class ExamineeUsecase : IExamineeUsecase
 {
-    private readonly IDbConnectionProvider _dbConnectionProvider;
     private readonly List<ErrorObject> _errorObjects;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IExamineeRepository _examineeRepository;
@@ -22,16 +21,14 @@ public class ExamineeUsecase : IExamineeUsecase
     /// <summary>
     /// ユースケースを生成します。
     /// </summary>
-    /// <param name="dbConnectionProvider">dbConnectionProvider</param>
     /// <param name="organizationRepository">団体リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
     /// <param name="affiliationRepository">所属リポジトリ</param>
     /// <param name="timeProvider"></param>
-    public ExamineeUsecase(IDbConnectionProvider dbConnectionProvider, IOrganizationRepository organizationRepository,
+    public ExamineeUsecase(IOrganizationRepository organizationRepository,
                            IExamineeRepository examineeRepository, IAffiliationRepository affiliationRepository,
                            TimeProvider timeProvider)
     {
-        _dbConnectionProvider = dbConnectionProvider;
         _organizationRepository = organizationRepository;
         _examineeRepository = examineeRepository;
         _affiliationRepository = affiliationRepository;
@@ -71,26 +68,15 @@ public class ExamineeUsecase : IExamineeUsecase
             Birthdate = examinee.Birthdate
         }).ToList();
 
-        using var scope = TransactionScopeHelper.GetTransactionScope();
-        {
-            // トランザクション登録
-            using var connection = await _dbConnectionProvider.GetOrOpenAsync();
-            {
-                connection.EnlistTransaction(Transaction.Current);
 
-                var createdAt = _timeProvider.GetUtcNow();
-                string createdBy = "ExternalConnection";
+        var createdAt = _timeProvider.GetUtcNow();
+        string createdBy = "ExternalConnection";
 
-                // 受診者を登録する
-                await _examineeRepository.UpsertExamineesAsync(examineeEntities, createdAt, createdBy);
+        // 受診者を登録する
+        await _examineeRepository.UpsertExamineesAsync(examineeEntities, createdAt, createdBy);
 
-                // 所属を登録する
-                await _affiliationRepository.InsertAffiliationsAsync(insertExaminees, createdAt, createdBy);
-
-                // コミット
-                scope.Complete();
-            }
-        }
+        // 所属を登録する
+        await _affiliationRepository.InsertAffiliationsAsync(insertExaminees, createdAt, createdBy);
 
         return _errorObjects;
     }
