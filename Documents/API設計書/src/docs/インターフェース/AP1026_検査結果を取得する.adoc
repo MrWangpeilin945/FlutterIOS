@@ -56,7 +56,7 @@
         {
             "examMenuId": 16,
             "examMenuName": "血圧",
-            "examMenuResults": [
+            "examItems": [
                 {
                     "examItemId": 160101,
                     "examItemName": "血圧1",
@@ -64,17 +64,17 @@
                         {
                             "examItemDetailId": 16010101,
                             "examItemDetailName": "血圧1回目　最高",
-                            "currentExamResult": 120,
-                            "pastExamResult": 125,
-                            "pastExamDate": "2025-03-01",
+                            "currentResult": 120,
+                            "pastResult": 125,
+                            "pastDate": "2025-03-01",
                             "isRecent": false
                         },
                         {
                             "examItemDetailId": 16010102,
                             "examItemDetailName": "血圧1回目　最低",
-                            "currentExamResult": 80,
-                            "pastExamResult": 85,
-                            "pastExamDate": "2025-04-01",
+                            "currentResult": 80,
+                            "pastResult": 85,
+                            "pastDate": "2025-04-01",
                             "isRecent": true
                         }
                     ],
