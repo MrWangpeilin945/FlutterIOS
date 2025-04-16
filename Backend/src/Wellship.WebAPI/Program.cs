@@ -22,6 +22,8 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 using Ryobi.Wellship.WebAPI.ResultCollector.Utilities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Logger;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.BackgroundTasks;
+using Ryobi.Wellship.WebAPI.ResultCollector.Services;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Email;
 
 namespace Ryobi.Wellship.WebAPI;
 
@@ -158,6 +160,8 @@ public static class IServiceCollectionExtension
         services.AddScoped<IIntegrationResultRepository, IntegrationResultRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IOrganizationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.OrganizationRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IIntegrationResultRepository, IntegrationResultRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExamineeRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExamineeRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IAffiliationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.AffiliationRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.ITeamRepository, ExternalConnection.PostgreSQL.RepositoryImpls.TeamRepository>();
@@ -201,6 +205,17 @@ public static class IServiceCollectionExtension
 
         return services;
     }
+
+    /// <summary>
+    /// アプリケーション全体で使用するサービスを追加します。
+    /// </summary>
+    public static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IEmailSender, ResultCollector.Infrastructure.Email.AmazonSES.EmailSender>();
+        return services;
+    }
+
     /// <summary>
     /// ローカル環境で動作させる場合のみ使用するサービス群
     /// </summary>

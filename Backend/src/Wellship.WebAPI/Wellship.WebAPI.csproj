@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.412" />
+    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.7.402.77" />
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
     <PackageReference Include="nlog.Web.AspNetCore" Version="5.3.13" />
