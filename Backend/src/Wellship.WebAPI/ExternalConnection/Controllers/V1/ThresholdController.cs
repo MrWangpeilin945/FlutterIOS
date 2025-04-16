@@ -41,13 +41,13 @@ public class ThresholdController : ControllerBase
     public async Task<IActionResult> StoreThresholdsAsync([FromBody] Threshold[] request)
     {
         var result = await _thresholdUsecaseUsecase.StoreThresholdsAsync(request.ToList());
-        if (result.Any())
+        if (result.Count > 0)
         {
             return new ContentResult
             {
                 Content = JsonSerializer.Serialize(result),
                 ContentType = "application/json",
-                StatusCode = (int)StatusCodes.Status207MultiStatus,
+                StatusCode = StatusCodes.Status207MultiStatus,
             };
         }
         else

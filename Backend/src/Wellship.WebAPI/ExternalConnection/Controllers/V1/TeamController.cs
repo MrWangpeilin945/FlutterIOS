@@ -42,13 +42,13 @@ public class TeamController : ControllerBase
     {
         var result = await _teamUsecaseUsecase.StoreTeamsAsync(request.ToList());
 
-        if (result.Any())
+        if (result.Count > 0 )
         {
             return new ContentResult
             {
                 Content = JsonSerializer.Serialize(result),
                 ContentType = "application/json",
-                StatusCode = (int)StatusCodes.Status207MultiStatus,
+                StatusCode = StatusCodes.Status207MultiStatus,
             };
         }
         else
