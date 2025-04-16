@@ -36,6 +36,21 @@ public class ConsultAllResultEntity
     public required string ExamItemDetailName { get; set; }
 
     /// <summary>
+    /// メニュー表示順
+    /// </summary>
+    public required string MenuOrderNumber { get; set; }
+
+    /// <summary>
+    /// 項目表示順
+    /// </summary>
+    public required string ItemOrderNumber { get; set; }
+
+    /// <summary>
+    /// 項目明細表示順
+    /// </summary>
+    public required string ItemDetailOrderNumber { get; set; }
+
+    /// <summary>
     /// 今回値
     /// </summary>
     public string? CurrentResult { get; set; }

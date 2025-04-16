@@ -4,7 +4,7 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.Core.Exceptions;
-using Ryobi.Wellship.APIModels.Responses;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
 
@@ -212,6 +212,9 @@ public class ResultRepository : IResultRepository
                 , case when d.type = 2 then op.name else r.value end    as CurrentResult
                 , case when d.type = 2 then op.name else p.value end    as PastResult
                 , p.exam_date                                           as PastDate
+                , m.order_number                                        as MenuOrderNumber
+                , i.order_number                                        as ItemOrderNumber
+                , d.order_number                                        as ItemDetailOrderNumber
                 , case when p.exam_date = (
                     select max(p2.exam_date)
                     from resultcollector.previous_results p2
@@ -229,42 +232,49 @@ public class ResultRepository : IResultRepository
                     on d.exam_item_detail_id = o.exam_item_detail_id
                 left join resultcollector.consult c
                     on o.consult_id = c.consult_id
-                left join resultcollector.exam_results r
-                    on c.consult_id = r.consult_id
-                left join resultcollector.previous_results p
-                    on c.consult_id = p.consult_id
                 left join resultcollector.exam_item_detail_options op
                     on d.exam_item_detail_id = op.exam_item_detail_id
+                left join resultcollector.exam_results r
+                    on c.consult_id = r.consult_id
+                    and d.exam_item_detail_id = r.exam_item_detail_id
+                left join resultcollector.previous_results p
+                    on c.consult_id = p.consult_id
+                    and d.exam_item_detail_id = p.exam_item_detail_id
             where
                 c.consult_number = @ConsultNumber
             order by
                 m.order_number
-                , d.order_number";
+                , i.order_number
+                , d.order_number
+                , p.exam_date desc";
 
         var consultAllResults = await connection.QueryAsync<ConsultAllResultEntity>(sql, new { ConsultNumber = consultNumber });
 
         var displayExamResultMenus = consultAllResults
             .GroupBy(result => new { result.ExamMenuId, result.ExamMenuName })
+            .OrderBy(menuGroup => menuGroup.Key.ExamMenuId)
             .Select(menuGroup => new DisplayExamResultMenu
             {
                 ExamMenuId = menuGroup.Key.ExamMenuId,
                 ExamMenuName = menuGroup.Key.ExamMenuName,
-                ExamItems = menuGroup.GroupBy(result => new { result.ExamItemId, result.ExamItemName })
+                ExamItems = menuGroup.GroupBy(item => new { item.ExamItemId, item.ExamItemName })
+                                     .OrderBy(itemGroup => itemGroup.Key.ExamItemId)
                                      .Select(itemGroup => new DisplayExamResultItem
                                      {
                                          ExamItemId = itemGroup.Key.ExamItemId,
                                          ExamItemName = itemGroup.Key.ExamItemName,
-                                         ExamItemDetails = itemGroup.Select(result => new DisplayExamResultItemDetail
-                                         {
-                                             ExamItemDetailId = result.ExamItemDetailId,
-                                             ExamItemDetailName = result.ExamItemDetailName,
-                                             CurrentResult = result.CurrentResult?.ToString() ?? "",
-                                             PastResult = result.PastResult?.ToString() ?? "",
-                                             PastDate = result.PastDate ?? null,
-                                             IsRecent = result.IsRecent
-                                         }).OrderBy(detail => detail.ExamItemDetailId)
-                                     }).OrderBy(item => item.ExamItemId)
-            }).OrderBy(menu => menu.ExamMenuId);
+                                         ExamItemDetails = itemGroup.OrderBy(detail => detail.ItemDetailOrderNumber)
+                                                                    .Select(detail => new DisplayExamResultItemDetail
+                                                                    {
+                                                                        ExamItemDetailId = detail.ExamItemDetailId,
+                                                                        ExamItemDetailName = detail.ExamItemDetailName,
+                                                                        CurrentResult = detail.CurrentResult,
+                                                                        PastResult = detail.PastResult,
+                                                                        PastDate = detail.PastDate,
+                                                                        IsRecent = detail.IsRecent
+                                                                    }).ToArray()
+                                     }).ToArray()
+            }).ToArray();
 
         return displayExamResultMenus;
     }

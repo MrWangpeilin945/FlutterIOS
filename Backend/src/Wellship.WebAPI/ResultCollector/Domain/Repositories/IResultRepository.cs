@@ -1,3 +1,4 @@
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
@@ -28,5 +29,5 @@ public interface IResultRepository
     /// 全ての検査結果を取得する
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
-    public Task<IEnumerable<APIModels.Responses.DisplayExamResultMenu>> GetConsultAllResults(string consultNumber);
+    public Task<IEnumerable<DisplayExamResultMenu>> GetConsultAllResults(string consultNumber);
 }

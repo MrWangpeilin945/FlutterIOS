@@ -783,7 +783,25 @@ public class ConsultUsecase : IConsultUsecase
                 SameNameAlert = sameNameAlert,
                 ExamDateAge = examAge.Years
             },
-            ExamResults = consultAllResult
+            ExamResults = consultAllResult.Select(menu => new DisplayExamResultMenu
+            {
+                ExamMenuId = menu.ExamMenuId,
+                ExamMenuName = menu.ExamMenuName,
+                ExamItems = menu.ExamItems.Select(item => new DisplayExamResultItem
+                {
+                    ExamItemId = item.ExamItemId,
+                    ExamItemName = item.ExamItemName,
+                    ExamItemDetails = item.ExamItemDetails.Select(itemDetail => new DisplayExamResultItemDetail
+                    {
+                        ExamItemDetailId = itemDetail.ExamItemDetailId,
+                        ExamItemDetailName = itemDetail.ExamItemDetailName,
+                        CurrentResult = itemDetail.CurrentResult ?? "",
+                        PastResult = itemDetail.PastResult ?? "",
+                        PastDate = itemDetail.PastDate ?? null,
+                        IsRecent = itemDetail.IsRecent
+                    }).ToArray()
+                }).ToArray()
+            })
         };
     }
 }
