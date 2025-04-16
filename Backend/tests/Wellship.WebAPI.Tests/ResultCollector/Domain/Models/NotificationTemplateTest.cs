@@ -7,15 +7,15 @@ namespace Ryobi.Wellship.WebAPI.Tests.ResultCollector.Domain.Models;
 public class NotificationTemplateTests
 {
 
-    private const string DetailText = @"詳細機能ID: EC2009
+    private const string DetailText = @"詳細機能コード: EC2009
 基準値(範囲)_20250324.csv Row:2 指定されたコードがマスタに登録されていません。 ExamItemDetailCd
 
-詳細機能ID: EC2004
+詳細機能コード: EC2004
 予約情報_20250324.csv Row:4 指定されたコードがマスタに登録されていません。 TeamCode
 予約情報_20250324.csv Row:2 指定されたコードがマスタに登録されていません。 PlaceCode/TeamCode/ExamDate
 予約情報_20250324.csv Row:5 指定されたコードがマスタに登録されていません。 ExamineeCd
 
-詳細機能ID: EC2002
+詳細機能コード: EC2002
 受付情報_20250324.csv Row:3 値が登録されていません。 TicketNumber
 受付情報_20250324.csv Row:2 指定されたコードがマスタに登録されていません。 ConnectionCode";
     private readonly Dictionary<string, string> _placeholders = new Dictionary<string, string>
@@ -96,15 +96,15 @@ public class NotificationTemplateTests
 発生時刻：2025/03/28 15:03:55
 ---
 詳細：
-詳細機能ID: EC2009
+詳細機能コード: EC2009
 基準値(範囲)_20250324.csv Row:2 指定されたコードがマスタに登録されていません。 ExamItemDetailCd
 
-詳細機能ID: EC2004
+詳細機能コード: EC2004
 予約情報_20250324.csv Row:4 指定されたコードがマスタに登録されていません。 TeamCode
 予約情報_20250324.csv Row:2 指定されたコードがマスタに登録されていません。 PlaceCode/TeamCode/ExamDate
 予約情報_20250324.csv Row:5 指定されたコードがマスタに登録されていません。 ExamineeCd
 
-詳細機能ID: EC2002
+詳細機能コード: EC2002
 受付情報_20250324.csv Row:3 値が登録されていません。 TicketNumber
 受付情報_20250324.csv Row:2 指定されたコードがマスタに登録されていません。 ConnectionCode
 
