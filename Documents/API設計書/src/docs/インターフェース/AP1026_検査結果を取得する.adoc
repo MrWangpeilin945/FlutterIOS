@@ -68,7 +68,7 @@
                             "pastResult": 85,
                             "pastDate": "2025-04-01",
                             "isRecent": true,
-                            "ExamProgressStatus" : 41
+                            "examProgressStatus" : 41
                         },
                         {
                             "examItemDetailId": 16010102,
@@ -77,7 +77,7 @@
                             "pastResult": "",
                             "pastDate": null,
                             "isRecent": false,
-                            "ExamProgressStatus": 11
+                            "examProgressStatus": 11
                         }
                     ],
                 }
