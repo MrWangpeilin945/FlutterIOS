@@ -176,7 +176,7 @@ public class ConsultController : ControllerBase
     /// AP1026 検査結果を取得する
     /// </summary>
     /// <param name="consultNumber">受診番号</param>
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Object))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ConsultAllExamResult))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
