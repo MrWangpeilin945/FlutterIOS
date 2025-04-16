@@ -802,7 +802,7 @@ public class ConsultUsecase : IConsultUsecase
                         Status = (int)itemDetail.Status
                     }).ToArray()
                 }).ToArray()
-            })
+            }).ToArray()
         };
     }
 }
