@@ -64,18 +64,20 @@
                         {
                             "examItemDetailId": 16010101,
                             "examItemDetailName": "血圧1回目　最高",
-                            "currentResult": 120,
-                            "pastResult": 125,
-                            "pastDate": "2025-03-01",
-                            "isRecent": false
+                            "currentResult": 80,
+                            "pastResult": 85,
+                            "pastDate": "2025-04-01",
+                            "isRecent": true,
+                            "examProgressStatus" : 41
                         },
                         {
                             "examItemDetailId": 16010102,
                             "examItemDetailName": "血圧1回目　最低",
-                            "currentResult": 80,
-                            "pastResult": 85,
-                            "pastDate": "2025-04-01",
-                            "isRecent": true
+                            "currentResult": "",
+                            "pastResult": "",
+                            "pastDate": null,
+                            "isRecent": false,
+                            "examProgressStatus": 11
                         }
                     ],
                 }
