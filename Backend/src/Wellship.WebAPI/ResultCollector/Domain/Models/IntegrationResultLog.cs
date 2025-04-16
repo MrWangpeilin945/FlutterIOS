@@ -59,6 +59,8 @@ public sealed class IntegrationResultLog
     {
         get
         {
+            const int maxDetailsPerGroup = 1000;
+
             // DetailsをFunctionCodeでグループ化
             var groupedDetails = Details.GroupBy(d => d.FunctionCode);
 
@@ -66,8 +68,11 @@ public sealed class IntegrationResultLog
             var emailText = new StringBuilder();
             foreach (var group in groupedDetails)
             {
-                emailText.AppendLine($"詳細機能ID: {group.Key}");
-                foreach (var detail in group)
+                emailText.AppendLine($"詳細機能コード: {group.Key}");
+                // 詳細機能コードでグループ化して、グループあたりの明細件数を制限する
+                // 無制限だとメールの容量的に送信できない恐れがあるため
+                var limitedDetails = group.Take(maxDetailsPerGroup);
+                foreach (var detail in limitedDetails)
                 {
                     var propertiesText = string.Join("/", detail.Properties.Select(p => p.Name));
                     emailText.AppendLine($"{detail.EventSource} {detail.ResultDetailMessage} {propertiesText}");
