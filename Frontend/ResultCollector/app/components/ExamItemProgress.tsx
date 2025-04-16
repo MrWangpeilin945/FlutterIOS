@@ -1,19 +1,10 @@
 import { Box, Button, Divider, Group, Progress, Text } from "@mantine/core";
 import { AggregatedProgressStatus } from "~/domain/enums";
-
-type ProgressData = {
-  examItemId?: number;
-  examItemName?: string;
-  details?: {
-    status?: number;
-    statusName?: string;
-    count?: number;
-  }[];
-};
+import type { Progress as ProgressSchema } from "~/domain/wellship.schemas";
 
 interface ExamItemProgressProps {
-  progress: ProgressData;
-  onClick: () => void;
+  progress: ProgressSchema;
+  onClick: (status: number) => void;
 }
 
 export default function ExamItemProgress({
@@ -37,12 +28,17 @@ export default function ExamItemProgress({
     const detail = progress.details?.find((d) => d.status === status);
     const count = detail?.count || 0;
     return {
+      status,
       value: (count / total) * 100,
       color,
       label: detail?.statusName,
       count,
     };
   });
+
+  const handleSelectStatus = (status: number) => {
+    onClick(status);
+  };
 
   return (
     <Box bg="white01" py={24} px={32} style={{ borderRadius: 16 }}>
@@ -53,7 +49,15 @@ export default function ExamItemProgress({
       <Group>
         {sections.map((sections) => (
           <Box key={sections.label}>
-            <Button w={154} h={75} py={16} px={32} color={sections.color}>
+            <Button
+              w={154}
+              h={75}
+              py={16}
+              px={32}
+              value={sections.value}
+              color={sections.color}
+              onClick={() => handleSelectStatus(sections.status)}
+            >
               <Text size="lg" fw={700} c="white01">
                 {sections.label}
               </Text>
