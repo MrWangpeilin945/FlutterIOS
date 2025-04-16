@@ -36,13 +36,13 @@ public class ConsultRepository : IConsultRepository
         // ConnectionCodeでグループ化しSortNoの最大のレコードを絞り込む
         var actionConsults = consults.GroupBy(x => x.ConnectionCode,
                                              (y, z) => z.OrderByDescending(a => a.SortNo).First())
-                                     .ToArray();
+                                     .ToList();
         using var scope = TransactionScopeHelper.GetTransactionScope();
         {
             using var connection = await _dbConnectionProvider.GetOrOpenAsync();
             {
                 // 更新処理
-                if (actionConsults.Any(x => x.ActionType == ActionType.登録))
+                if (actionConsults.Exists(x => x.ActionType == ActionType.登録))
                 {
                     var upsertConsults = actionConsults.Where(x => x.ActionType == ActionType.登録)
                                                        .Select(x => new
@@ -126,7 +126,7 @@ public class ConsultRepository : IConsultRepository
                 }
 
                 // 削除処理
-                if (actionConsults.Any(x => x.ActionType == ActionType.削除))
+                if (actionConsults.Exists(x => x.ActionType == ActionType.削除))
                 {
                     // consult（受診）
                     var deleteConsults = actionConsults.Where(x => x.ActionType == ActionType.削除)
@@ -191,7 +191,7 @@ public class ConsultRepository : IConsultRepository
                     consult_id = any (@ConsultIds);";
                 await connection.ExecuteAsync(deletePreviousResultsSql, new { ConsultIds = consultIds });
 
-                if (actionConsults.Any(x => x.ActionType == ActionType.登録))
+                if (actionConsults.Exists(x => x.ActionType == ActionType.登録))
                 {
                     // 外部連携キーから受診IDを取得
                     var consultConnectionCodes = actionConsults.Where(x => x.ActionType == ActionType.登録)

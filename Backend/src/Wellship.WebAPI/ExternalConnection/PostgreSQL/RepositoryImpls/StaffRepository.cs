@@ -43,7 +43,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                         PasswordHash = s.PasswordHash,
                         PasswordSalt = s.PasswordSalt,
                         Enabled = s.Enabled,
-                        RoleId = (int)s.RoleId,
+                        RoleId = s.RoleId,
                         CreatedAt = createdAt,
                         CreatedBy = createdBy
                     }).ToArray();
