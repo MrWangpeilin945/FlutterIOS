@@ -198,10 +198,24 @@
             "description": "存在するか"
           },
           "400": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -246,7 +260,14 @@
             }
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -299,13 +320,34 @@
             }
           },
           "400": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "401": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -354,13 +396,44 @@
             "description": ""
           },
           "400": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "401": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -415,13 +488,34 @@
             }
           },
           "400": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "401": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -472,16 +566,44 @@
             "description": ""
           },
           "400": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "401": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -539,16 +661,132 @@
             }
           },
           "400": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "401": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v{version}/consult/{consultNumber}/results/batchDelete": {
+      "post": {
+        "tags": [
+          "Consult"
+        ],
+        "summary": "AP1025 検査結果を取り消す",
+        "operationId": "Consult_BatchDeleteResults",
+        "parameters": [
+          {
+            "name": "consultNumber",
+            "in": "path",
+            "required": true,
+            "description": "受診番号",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 3
+          }
+        ],
+        "requestBody": {
+          "x-name": "resultDeleteRequest",
+          "description": "削除対象の検査項目明細ID一覧",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResultDeleteRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
             "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -592,10 +830,105 @@
             }
           },
           "400": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "401": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v{version}/examinees/placeSchedules/{placeScheduleId}/examMenus/{examMenuId}": {
+      "get": {
+        "tags": [
+          "Examinee"
+        ],
+        "summary": "AP1024_受診者一覧を取得する",
+        "operationId": "Examinee_GetConsultExaminees",
+        "parameters": [
+          {
+            "name": "placeScheduleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "examMenuId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsultExamineeList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -638,6 +971,43 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v{version}/s3Event": {
+      "post": {
+        "tags": [
+          "HealthCheck"
+        ],
+        "summary": "S3イベントの中身を確認する",
+        "operationId": "HealthCheck_VerifyS3Event",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/S3EventRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
           }
         }
       }
@@ -787,7 +1157,14 @@
             }
           },
           "401": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -837,13 +1214,34 @@
             "description": ""
           },
           "400": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "401": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -878,7 +1276,14 @@
             }
           },
           "401": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -918,10 +1323,24 @@
             "description": ""
           },
           "400": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "401": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -1252,6 +1671,16 @@
             }
           },
           "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
             "description": "",
             "content": {
               "application/json": {
@@ -1692,6 +2121,10 @@
               "$ref": "#/components/schemas/RelatedExamItem"
             }
           },
+          "isComplete": {
+            "type": "boolean",
+            "description": "関連検査項目"
+          },
           "examItemGroups": {
             "type": "array",
             "description": "検査結果入力項目グループ",
@@ -2009,6 +2442,21 @@
           }
         }
       },
+      "ResultDeleteRequest": {
+        "type": "object",
+        "description": "検査結果を取り消すリクエストモデル",
+        "additionalProperties": false,
+        "properties": {
+          "examItemDetailIds": {
+            "type": "array",
+            "description": "削除対象の検査項目明細ID",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
       "EquipmentList": {
         "type": "object",
         "description": "検査機器リスト",
@@ -2047,6 +2495,116 @@
           }
         }
       },
+      "ConsultExamineeList": {
+        "type": "object",
+        "description": "受診者情報リスト",
+        "additionalProperties": false,
+        "properties": {
+          "placeScheduleId": {
+            "type": "string",
+            "description": "会場日程ID",
+            "format": "guid"
+          },
+          "placeName": {
+            "type": "string",
+            "description": "会場名"
+          },
+          "examDate": {
+            "type": "string",
+            "description": "健診日",
+            "format": "date"
+          },
+          "progress": {
+            "description": "進捗状況",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Progress"
+              }
+            ]
+          },
+          "examinees": {
+            "type": "array",
+            "description": "受診者情報リスト",
+            "items": {
+              "$ref": "#/components/schemas/ConsultExaminee"
+            }
+          }
+        }
+      },
+      "Progress": {
+        "type": "object",
+        "description": "進捗状況",
+        "additionalProperties": false,
+        "properties": {
+          "examMenuId": {
+            "type": "integer",
+            "description": "検査メニューID",
+            "format": "int32"
+          },
+          "examMenuName": {
+            "type": "string",
+            "description": "検査メニュー名"
+          },
+          "details": {
+            "type": "array",
+            "description": "進捗明細",
+            "items": {
+              "$ref": "#/components/schemas/ProgressDetail"
+            }
+          }
+        }
+      },
+      "ProgressDetail": {
+        "type": "object",
+        "description": "進捗明細",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "integer",
+            "description": "状態値",
+            "format": "int32"
+          },
+          "statusName": {
+            "type": "string",
+            "description": "状態名"
+          },
+          "count": {
+            "type": "integer",
+            "description": "対象者数",
+            "format": "int32"
+          }
+        }
+      },
+      "ConsultExaminee": {
+        "type": "object",
+        "description": "受診者情報",
+        "additionalProperties": false,
+        "properties": {
+          "consultNumber": {
+            "type": "string",
+            "description": "受診番号"
+          },
+          "ticketNumber": {
+            "type": "string",
+            "description": "受付番号"
+          },
+          "kanaName": {
+            "type": "string",
+            "description": "カナ氏名"
+          },
+          "sex": {
+            "type": "integer",
+            "description": "性別",
+            "format": "int32"
+          },
+          "checkedInAt": {
+            "type": "string",
+            "description": "受付日時",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
       "ExamMenuList": {
         "type": "object",
         "description": "検査メニューリスト",
@@ -2058,6 +2616,21 @@
             "items": {
               "$ref": "#/components/schemas/ExamMenu"
             }
+          }
+        }
+      },
+      "S3EventRequest": {
+        "type": "object",
+        "description": "S3イベントのリクエストモデル",
+        "additionalProperties": false,
+        "properties": {
+          "bucketName": {
+            "type": "string",
+            "description": "バケット名"
+          },
+          "objectKey": {
+            "type": "string",
+            "description": "オブジェクトキー"
           }
         }
       },
@@ -2469,50 +3042,6 @@
             "items": {
               "$ref": "#/components/schemas/Progress"
             }
-          }
-        }
-      },
-      "Progress": {
-        "type": "object",
-        "description": "進捗状況",
-        "additionalProperties": false,
-        "properties": {
-          "examItemId": {
-            "type": "integer",
-            "description": "検査項目ID",
-            "format": "int32"
-          },
-          "examItemName": {
-            "type": "string",
-            "description": "検査項目名"
-          },
-          "details": {
-            "type": "array",
-            "description": "進捗明細",
-            "items": {
-              "$ref": "#/components/schemas/ProgressDetail"
-            }
-          }
-        }
-      },
-      "ProgressDetail": {
-        "type": "object",
-        "description": "進捗明細",
-        "additionalProperties": false,
-        "properties": {
-          "status": {
-            "type": "integer",
-            "description": "状態値",
-            "format": "int32"
-          },
-          "statusName": {
-            "type": "string",
-            "description": "状態名"
-          },
-          "count": {
-            "type": "integer",
-            "description": "対象者数",
-            "format": "int32"
           }
         }
       },
