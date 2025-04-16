@@ -53,7 +53,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -134,7 +135,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -187,7 +189,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -247,7 +250,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -362,7 +366,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -422,7 +427,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -482,7 +488,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -543,7 +550,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -604,7 +612,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string> { "" })).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -665,7 +674,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -729,7 +739,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -794,7 +805,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -861,7 +873,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -930,7 +943,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         var examMenuNoteCodeEntities = new List<ExamMenuNoteCodeEntity> { new ExamMenuNoteCodeEntity() { Code = "CT001", Name = "受診特記" } };
@@ -994,7 +1008,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1059,7 +1074,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1123,7 +1139,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1190,7 +1207,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1254,7 +1272,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1319,7 +1338,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1402,7 +1422,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1454,7 +1475,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1508,7 +1530,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1621,7 +1644,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string> { "CN999" })).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1681,7 +1705,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1743,7 +1768,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1802,7 +1828,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1869,7 +1896,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());
@@ -1934,7 +1962,8 @@ public class ConsultUsecaseTests
         // 受診者コードに紐づく受診者IDを取得する
         var examineeEntities = new List<ExamineeEntity> {
             new ExamineeEntity() { ExamineeId = Guid.Parse("e0000000-0000-0000-0000-000000000001"), ExamineeCode= "E001",
-                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15")} };
+                                   Name = "受診　太郎", KanaName = "ジュシン　タロウ", Sex = 1, Birthdate = DateOnly.Parse("1975-08-15"),
+                                   Affiliations = new List<OrganizationEntity> {} }};
         _examineeRepositoryMock.Setup(r => r.GetExamineeInfoAsync(new List<string> { "E001" })).ReturnsAsync(examineeEntities);
         // 検査メニュー特記コードに紐づく情報を取得する
         _consultRepositoryMock.Setup(r => r.GetExamMenuNodeCodeInfoAsync(new List<string>())).ReturnsAsync(new List<ExamMenuNoteCodeEntity>());

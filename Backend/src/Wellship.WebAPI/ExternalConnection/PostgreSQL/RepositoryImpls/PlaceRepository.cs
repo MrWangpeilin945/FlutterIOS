@@ -43,53 +43,53 @@ public class PlaceRepository : IPlaceRepository
                 var result = await connection.QueryAsync<int>(selectOrderNumberSql);
                 int orderNumber = result.FirstOrDefault();
 
-                    var upsertPlaces = places.Select((x, index) => new
-                    {
-                        PlaceId = Guid.NewGuid(),
-                        PlaceCode = x.PlaceCode,
-                        Name = x.Name,
-                        OrderNumber = orderNumber + index,
-                        CreatedAt = createdAt,
-                        CreatedBy = createdBy,
-                    }).ToArray();
+                var upsertPlaces = places.Select((x, index) => new
+                {
+                    PlaceId = Guid.NewGuid(),
+                    PlaceCode = x.PlaceCode,
+                    Name = x.Name,
+                    OrderNumber = orderNumber + index,
+                    CreatedAt = createdAt,
+                    CreatedBy = createdBy,
+                }).ToArray();
 
-                    // teams（班）
-                    const string mergePlacesSql = @"
-                    merge
-                    into resultcollector.places as place
-                        using (values (@PlaceId, @PlaceCode, @Name, @OrderNumber,
-                                       @CreatedAt, @CreatedBy)) as new_data(
-                            place_id
-                            , place_code
-                            , name
-                            , order_number
-                            , created_at
-                            , created_by
-                        )
-                        on place.place_code = new_data.place_code
-                    when matched then 
-                        update set
-                            name = new_data.name
-                            , created_at = new_data.created_at
-                            , created_by = new_data.created_by 
-                    when not matched then
-                        insert (
-                            place_id
-                            , place_code
-                            , name
-                            , order_number
-                            , created_at
-                            , created_by
-                        )
-                        values (
-                            new_data.place_id
-                            , new_data.place_code
-                            , new_data.name
-                            , new_data.order_number
-                            , new_data.created_at
-                            , new_data.created_by
-                        );";
-                    await connection.ExecuteAsync(mergePlacesSql, upsertPlaces);
+                // teams（班）
+                const string mergePlacesSql = @"
+                merge
+                into resultcollector.places as place
+                    using (values (@PlaceId, @PlaceCode, @Name, @OrderNumber,
+                                    @CreatedAt, @CreatedBy)) as new_data(
+                        place_id
+                        , place_code
+                        , name
+                        , order_number
+                        , created_at
+                        , created_by
+                    )
+                    on place.place_code = new_data.place_code
+                when matched then 
+                    update set
+                        name = new_data.name
+                        , created_at = new_data.created_at
+                        , created_by = new_data.created_by 
+                when not matched then
+                    insert (
+                        place_id
+                        , place_code
+                        , name
+                        , order_number
+                        , created_at
+                        , created_by
+                    )
+                    values (
+                        new_data.place_id
+                        , new_data.place_code
+                        , new_data.name
+                        , new_data.order_number
+                        , new_data.created_at
+                        , new_data.created_by
+                    );";
+                await connection.ExecuteAsync(mergePlacesSql, upsertPlaces);
             }
             scope.Complete();                
         }

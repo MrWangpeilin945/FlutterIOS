@@ -1,6 +1,7 @@
 using Ryobi.Wellship.WebAPI.ExternalConnection.Model.Standard;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
+using Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -8,10 +9,8 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// </summary>
 public class ExamineeUsecase : IExamineeUsecase
 {
-    private readonly List<ErrorObject> _errorObjects;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IExamineeRepository _examineeRepository;
-    private readonly IAffiliationRepository _affiliationRepository;
     private readonly TimeProvider _timeProvider;
 
     /// <summary>
@@ -19,16 +18,13 @@ public class ExamineeUsecase : IExamineeUsecase
     /// </summary>
     /// <param name="organizationRepository">団体リポジトリ</param>
     /// <param name="examineeRepository">受診者リポジトリ</param>
-    /// <param name="affiliationRepository">所属リポジトリ</param>
     /// <param name="timeProvider"></param>
     public ExamineeUsecase(IOrganizationRepository organizationRepository,
-                           IExamineeRepository examineeRepository, IAffiliationRepository affiliationRepository,
+                           IExamineeRepository examineeRepository,
                            TimeProvider timeProvider)
     {
         _organizationRepository = organizationRepository;
         _examineeRepository = examineeRepository;
-        _affiliationRepository = affiliationRepository;
-        _errorObjects = new List<ErrorObject>();
         _timeProvider = timeProvider;
     }
 
@@ -39,256 +35,115 @@ public class ExamineeUsecase : IExamineeUsecase
     /// <returns>エラーオブジェクトリスト</returns>
     public async Task<List<ErrorObject>> StoreExamineesAsync(List<Examinee> examinees)
     {
-        // 必須チェック済みのリストを取得する
-        var insertExamineesByRequired = GetCheckedRequired(examinees);
+        List<ErrorObject> errorObjects = new List<ErrorObject>();
 
-        // キー重複の確認
-        var insertExamineesByDuplicated = GetCheckedDuplicateKey(examinees);
+        // 受診者コードに紐づく受診者情報を取得する
+        var existExaminees = await _examineeRepository.GetExamineeInfoAsync(
+                                  examinees.Select(x => x.ExamineeCode).Distinct().ToList());
 
-        // 団体の確認
-        var insertExamineesByOrganizations = await GetCheckedOrganizations(examinees);
+        // 団体コードに紐づく団体情報を取得する
+        var organizations = await _organizationRepository.GetOrganizationInfoAsync(
+                                examinees.SelectMany(x => x.Affiliations.Select(a => a.OrganizationCode)).Distinct().ToList());
 
-        var insertExaminees = insertExamineesByRequired.Intersect(insertExamineesByRequired)
-                                                       .Intersect(insertExamineesByDuplicated)
-                                                       .Intersect(insertExamineesByOrganizations)
-                                                       .ToList();
+        // WARNING検証
+        var warningExaminees = new List<Examinee>();
+
+        // 必須項目の空値のチェック
+        var spaceCheckProperties = new[]
+        {
+            "ExamineeCode",     // 受診者コード
+            "Name",             // 氏名
+            "KanaName",         // カナ氏名
+        };
+        // チェックするプロパティ一覧をメソッドに渡して空値チェックする
+        foreach (var warning in ValidationChecker.SpaceCheckProperties(examinees, spaceCheckProperties, errorObjects))
+        {
+            // エラーのオブジェクトをExamineeにキャストしてワーニングリストに追加する
+            if (warning is Examinee examinee)
+            {
+                warningExaminees.Add(examinee);
+            }
+        }
+        var spaceCheckChildrenProperties = new List<(string ParentProperty, string ChildProperty)>
+        {
+            ("Affiliations", "OrganizationCode")        // 所属->団体コード
+        };
+        // チェックするプロパティ一覧をメソッドに渡して空値チェックする
+        foreach (var warning in ValidationChecker.SpaceCheckChildrenProperties(examinees, spaceCheckChildrenProperties, errorObjects))
+        {
+            // エラーのオブジェクトをExamineeにキャストしてワーニングリストに追加する
+            if (warning is Examinee examinee)
+            {
+                warningExaminees.Add(examinee);
+            }
+        }
+
+        // キー重複チェック
+        var duplicateCheckProperties = new[]
+        {
+            "ExamineeCode"      // 受診者コード
+        };
+        // チェックするプロパティ一覧をメソッドに渡して重複チェックする
+        foreach (var warning in ValidationChecker.DuplicateCheckProperties(examinees, duplicateCheckProperties, errorObjects))
+        {
+            // エラーのオブジェクトをExamineeにキャストしてワーニングリストに追加する
+            if (warning is Examinee examinee)
+            {
+                warningExaminees.Add(examinee);
+            }
+        }
+        var duplicateCheckChildProperties = new List<(string ParentProperty, string ChildProperty)>
+        {
+            ("Affiliations", "OrganizationCode")        // 所属->団体コード
+        };
+        // チェックするプロパティ一覧をメソッドに渡して重複チェックする
+        foreach (var warning in ValidationChecker.DuplicateCheckChildrenProperties(examinees, duplicateCheckChildProperties, errorObjects))
+        {
+            // エラーのオブジェクトをExamineeにキャストしてワーニングリストに追加する
+            if (warning is Examinee examinee)
+            {
+                warningExaminees.Add(examinee);
+            }
+        }
+
+        foreach (var examinee in examinees)
+        {
+            foreach (var warning in examinee.Affiliations.Where(x => !organizations.Select(e => e.OrganizationCode).Contains(x.OrganizationCode)))
+            {
+                warningExaminees.Add(examinee);
+                errorObjects.Add(new ErrorObject
+                {
+                    Code = "10001",
+                    Message = $"指定されたOrganizationCodeがシステム上に存在しません。Code:{warning.OrganizationCode}",
+                    InputNote = examinee.InputNote
+                });
+            }
+        }
 
         // 受診者エンティティリストを生成
-        var examineeEntities = insertExaminees.Select(examinee => new ExamineeEntity
-        {
-            ExamineeId = Guid.NewGuid(),
-            ExamineeCode = examinee.ExamineeCode,
-            Name = examinee.Name,
-            KanaName = examinee.KanaName,
-            Sex = (int)examinee.Sex,
-            Birthdate = examinee.Birthdate
-        }).ToList();
-
-
-        var createdAt = _timeProvider.GetUtcNow();
-        string createdBy = "ExternalConnection";
+        var examineeEntities = examinees.Except(warningExaminees)
+                                        .Select(examinee => new ExamineeEntity
+                                        {
+                                            ExamineeId = existExaminees.Where(e => e.ExamineeCode == examinee.ExamineeCode)
+                                                                       .Select(e => e.ExamineeId).FirstOrDefault(),
+                                            ExamineeCode = examinee.ExamineeCode,
+                                            Name = examinee.Name,
+                                            KanaName = examinee.KanaName,
+                                            Sex = (int)examinee.Sex,
+                                            Birthdate = examinee.Birthdate,
+                                            Affiliations = examinee.Affiliations.Select(x => new OrganizationEntity
+                                            {
+                                                OrganizationId = organizations.Where(o => o.OrganizationCode == x.OrganizationCode)
+                                                                              .Select(o => o.OrganizationId).FirstOrDefault(),
+                                                OrganizationCode = x.OrganizationCode,
+                                                Name = organizations.Where(o => o.OrganizationCode == x.OrganizationCode)
+                                                                    .Select(o => o.Name).FirstOrDefault() ?? ""
+                                            }).ToList()
+                                        }).ToList();
 
         // 受診者を登録する
-        await _examineeRepository.UpsertExamineesAsync(examineeEntities, createdAt, createdBy);
+        await _examineeRepository.UpsertExamineesAsync(examineeEntities, _timeProvider.GetUtcNow(), "ExternalConnection");
 
-        // 所属を登録する
-        await _affiliationRepository.InsertAffiliationsAsync(insertExaminees, createdAt, createdBy);
-
-        return _errorObjects;
-    }
-
-    /// <summary>
-    /// 団体チェック処理済の受診者リストを取得する。
-    /// </summary>
-    /// <param name="examinees">受診者リスト</param>
-    /// <returns>受診者リスト</returns>
-    private async Task<List<Examinee>> GetCheckedOrganizations(List<Examinee> examinees)
-    {
-        var results = new List<Examinee>();
-
-        // WARINING検証
-        var errorOrganizationCodes = await OrganizationCodesExists(examinees);
-
-        // 存在しない団体コードが指定されている場合
-        if (errorOrganizationCodes.Count > 0)
-        {
-            // 返却用エラーオブジェクトに追加
-            AddErrorObjects(examinees, errorOrganizationCodes);
-            // 団体コードが存在する受診者のみ抽出
-            results = examinees
-                .Where(examinee => !examinee.Affiliations.Any(affiliation => errorOrganizationCodes.Contains(affiliation.OrganizationCode)))
-                .ToList();
-        }
-        else
-        {
-            results = new List<Examinee>(examinees);
-        }
-
-        return results;
-    }
-
-    /// <summary>
-    /// 団体の存在検証
-    /// </summary>
-    /// <param name="examinees">受診者リスト</param>
-    /// <returns>存在しない団体コードリスト</returns>
-    private async Task<List<string>> OrganizationCodesExists(List<Examinee> examinees)
-    {
-        var results = new List<string>();
-
-        // 団体コードを一意に抽出
-        var organizationCodes = examinees
-            .SelectMany(examinee => examinee.Affiliations)
-            .Select(affiliation => affiliation.OrganizationCode)
-            .Distinct()
-            .ToList();
-
-        // 団体コードを基に団体情報を取得する
-        var existOrganizationCodes = await _organizationRepository.GetOrganizationsByCodesAsync(organizationCodes);
-
-        // 存在しない団体コードを取得する
-        results = organizationCodes.Except(existOrganizationCodes).ToList();
-
-        return results;
-    }
-
-    /// <summary>
-    /// エラーオブジェクトに情報追加する
-    /// </summary>
-    /// <param name="examinees">受診者リスト</param>
-    /// <param name="errorOrganizationCodes">団体取得に失敗した団体コードリスト</param>
-    private void AddErrorObjects(IEnumerable<Examinee> examinees, List<string> errorOrganizationCodes)
-    {
-        // 団体が取得できないエラーを返却用エラーオブジェクトに追加
-        var errorObjects = examinees
-            .SelectMany(examinee => examinee.Affiliations
-            .Where(affiliation => errorOrganizationCodes.Contains(affiliation.OrganizationCode))
-            .Select(affiliation => new ErrorObject
-            {
-                Code = "10001",
-                Message = $"指定されたOrganizationCodeがシステム上に存在しません。Code:{affiliation.OrganizationCode}",
-                InputNote = examinee.InputNote
-            })).ToList();
-
-        _errorObjects.AddRange(errorObjects);
-    }
-
-    /// <summary>
-    /// 必須チェック済みのリストを取得する
-    /// </summary>
-    /// <param name="examinees"></param>
-    /// <returns></returns>
-    private List<Examinee> GetCheckedRequired(List<Examinee> examinees)
-    {
-        // WARNING検証
-        // 未入力
-        var requiredExamineeCodeData = examinees.Where(x => string.IsNullOrWhiteSpace(x.ExamineeCode));
-        if (requiredExamineeCodeData.Any())
-        {
-            // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredExamineeCodeData, "ExamineeCode");
-        }
-
-        // 未入力
-        var requiredNameData = examinees.Where(x => string.IsNullOrWhiteSpace(x.Name));
-        if (requiredNameData.Any())
-        {
-            // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredNameData, "Name");
-        }
-
-        // 未入力
-        var requiredKanaNameData = examinees.Where(x => string.IsNullOrWhiteSpace(x.KanaName));
-        if (requiredKanaNameData.Any())
-        {
-            // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredKanaNameData, "KanaName");
-        }
-
-        // 未入力
-        var requiredOrganizationCodeData = examinees.Where(x => x.Affiliations
-                                                                 .Any(a => string.IsNullOrWhiteSpace(a.OrganizationCode)));
-        if (requiredOrganizationCodeData.Any())
-        {
-            // 返却用エラーオブジェクトに追加
-            AddRequiredDataErrorObjects(requiredOrganizationCodeData, "Affiliations.OrganizationCode");
-        }
-
-        return examinees.Except(requiredExamineeCodeData)
-                        .Except(requiredNameData)
-                        .Except(requiredKanaNameData)
-                        .Except(requiredOrganizationCodeData)
-                        .ToList();
-    }
-
-    /// <summary>
-    /// エラーオブジェクトに情報追加する(必須項目エラー）
-    /// </summary>
-    /// <param name="requiredData"></param>
-    /// <param name="itemName"></param>
-    private void AddRequiredDataErrorObjects(IEnumerable<Examinee> requiredData, string itemName)
-    {
-        var errorObjects = requiredData
-            .Select(r => new ErrorObject
-            {
-                Code = "10004",
-                Message = $"必須項目が不足しています。{itemName}",
-                InputNote = r.InputNote
-            }).ToList();
-
-        _errorObjects.AddRange(errorObjects);
-    }
-
-    /// <summary>
-    /// キー重複の確認
-    /// </summary>
-    /// <param name="examinees"></param>
-    /// <returns></returns>
-    private List<Examinee> GetCheckedDuplicateKey(List<Examinee> examinees)
-    {
-        // キー重複
-        var duplicateExamineeCodes = examinees.GroupBy(x => x.ExamineeCode)
-                                              .Where(x => x.Count() > 1)
-                                              .SelectMany(x => x);
-        if (duplicateExamineeCodes.Any())
-        {
-            // 返却用エラーオブジェクトに追加
-            AddDuplicateExamineeCodeErrorObjects(duplicateExamineeCodes.ToList());
-        }
-
-        // キー重複
-        var duplicateOrganizationCodes = examinees.Where(x => x.Affiliations
-                                                               .GroupBy(a => a.OrganizationCode)
-                                                               .Any(g => g.Count() > 1));
-        if (duplicateOrganizationCodes.Any())
-        {
-            // 返却用エラーオブジェクトに追加
-            AddDuplicateOrganizationCodeErrorObjects(duplicateOrganizationCodes.ToList());
-        }
-
-        return examinees.Except(duplicateExamineeCodes)
-                        .Except(duplicateOrganizationCodes)
-                        .ToList();
-    }
-
-    /// <summary>
-    /// エラーオブジェクトに情報追加する(受診者コード重複エラー）
-    /// </summary>
-    /// <param name="duplicatedData"></param>
-    private void AddDuplicateExamineeCodeErrorObjects(IEnumerable<Examinee> duplicatedData)
-    {
-        var errorObjects = duplicatedData
-            .Select(d => new ErrorObject
-            {
-                Code = "10003",
-                Message = $"キー項目が重複しています。ExamineeCode:{d.ExamineeCode}",
-                InputNote = d.InputNote
-            }).ToList();
-
-        _errorObjects.AddRange(errorObjects);
-    }
-
-    /// <summary>
-    /// エラーオブジェクトに情報追加する(所属重複エラー）
-    /// </summary>
-    /// <param name="duplicatedData"></param>
-    private void AddDuplicateOrganizationCodeErrorObjects(IEnumerable<Examinee> duplicatedData)
-    {
-        // OrganizationCodeが重複したレコードをExamineeCode単位にマージする        
-        var duplicateWithExamineeCode = duplicatedData
-                                            .SelectMany(x => x.Affiliations.Select(a => new { x.ExamineeCode, x.InputNote, a.OrganizationCode }))
-                                            .GroupBy(x => new { x.ExamineeCode, x.InputNote, x.OrganizationCode })
-                                            .Where(x => x.Count() > 1)
-                                            .Select(x => new { x.Key.ExamineeCode, x.Key.InputNote, x.Key.OrganizationCode })
-                                            .Distinct();
-        var errorObjects = duplicateWithExamineeCode
-            .Select(d => new ErrorObject
-            {
-                Code = "10003",
-                Message = $"キー項目が重複しています。Affiliations.OrganizationCode:{d.OrganizationCode}",
-                InputNote = d.InputNote
-            }).ToList();
-
-        _errorObjects.AddRange(errorObjects);
+        return errorObjects;
     }
 }
