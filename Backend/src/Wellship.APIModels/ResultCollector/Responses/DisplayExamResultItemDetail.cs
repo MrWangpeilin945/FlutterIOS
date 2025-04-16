@@ -42,4 +42,10 @@ public class DisplayExamResultItemDetail
     /// </summary>
     [JsonPropertyName("isRecent")]
     public required bool IsRecent { get; init; }
+
+    /// <summary>
+    /// 検査進捗状況
+    /// </summary>
+    [JsonPropertyName("progressStatus")]
+    public required int Status { get; init; }
 }

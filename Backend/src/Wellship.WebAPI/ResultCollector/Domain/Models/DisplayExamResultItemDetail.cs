@@ -1,3 +1,5 @@
+using Ryobi.Wellship.Core.Enums;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 /// <summary>
@@ -35,4 +37,9 @@ public class DisplayExamResultItemDetail
     /// 直近判定
     /// </summary>
     public required bool IsRecent { get; init; }
+
+    /// <summary>
+    /// 検査進捗状況
+    /// </summary>
+    public required ExamProgressStatus Status { get; init; }
 }

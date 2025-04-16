@@ -5,6 +5,7 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.Core.Exceptions;
 using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+using Ryobi.Wellship.Core.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
 
@@ -209,17 +210,27 @@ public class ResultRepository : IResultRepository
                 , i.name                                                as ExamItemName
                 , d.exam_item_detail_id                                 as ExamItemDetailId
                 , d.name                                                as ExamItemDetailName
-                , case when d.type = 2 then op.name else r.value end    as CurrentResult
-                , case when d.type = 2 then op.name else p.value end    as PastResult
-                , p.exam_date                                           as PastDate
                 , m.order_number                                        as MenuOrderNumber
                 , i.order_number                                        as ItemOrderNumber
                 , d.order_number                                        as ItemDetailOrderNumber
-                , case when p.exam_date = (
-                    select max(p2.exam_date)
-                    from resultcollector.previous_results p2
-                    where p2.exam_item_detail_id = p.exam_item_detail_id
-                ) then true else false end                              as IsRecent -- 同じ検査項目明細IDの中で最も新しいものはtrue
+                , case when d.type = 2 then op.name else r.value end    as CurrentResult
+                , case when d.type = 2 then op.name else p.value end    as PastResult
+                , p.exam_date                                           as PastDate
+                , case
+                    when
+                        p.exam_date = (
+                        select max(p2.exam_date)
+                        from resultcollector.previous_results p2
+                        where p2.exam_item_detail_id = p.exam_item_detail_id)
+                    then true
+                    else false
+                end                                                   as IsRecent -- 同じ検査項目明細IDの中で日付が最新のものはtrue
+                , case
+                    when o.exam_item_detail_id is null then 10
+                    when o.exam_item_detail_id is not null and r.exam_item_detail_id is not null then 41
+                    when o.exam_item_detail_id is not null and ca.exam_item_detail_id is not null then 51
+                    when o.exam_item_detail_id is not null and r.exam_item_detail_id is null and ca.exam_item_detail_id is null then 11
+                end                                                   as Status
             from
                 resultcollector.exam_menus m
                 left join resultcollector.exam_item_groups g
@@ -234,6 +245,9 @@ public class ResultRepository : IResultRepository
                     on o.consult_id = c.consult_id
                 left join resultcollector.exam_item_detail_options op
                     on d.exam_item_detail_id = op.exam_item_detail_id
+                left join resultcollector.exam_cancels ca
+                    on o.consult_id = c.consult_id
+                    and o.exam_item_detail_id = ca.exam_item_detail_id
                 left join resultcollector.exam_results r
                     on c.consult_id = r.consult_id
                     and d.exam_item_detail_id = r.exam_item_detail_id
@@ -242,6 +256,7 @@ public class ResultRepository : IResultRepository
                     and d.exam_item_detail_id = p.exam_item_detail_id
             where
                 c.consult_number = @ConsultNumber
+                or o.exam_item_detail_id is null
             order by
                 m.order_number
                 , i.order_number
@@ -264,6 +279,7 @@ public class ResultRepository : IResultRepository
                                          ExamItemId = itemGroup.Key.ExamItemId,
                                          ExamItemName = itemGroup.Key.ExamItemName,
                                          ExamItemDetails = itemGroup.OrderBy(detail => detail.ItemDetailOrderNumber)
+                                                                    .ThenByDescending(detail => detail.PastDate)
                                                                     .Select(detail => new DisplayExamResultItemDetail
                                                                     {
                                                                         ExamItemDetailId = detail.ExamItemDetailId,
@@ -271,7 +287,8 @@ public class ResultRepository : IResultRepository
                                                                         CurrentResult = detail.CurrentResult,
                                                                         PastResult = detail.PastResult,
                                                                         PastDate = detail.PastDate,
-                                                                        IsRecent = detail.IsRecent
+                                                                        IsRecent = detail.IsRecent,
+                                                                        Status = (ExamProgressStatus)detail.Status
                                                                     }).ToArray()
                                      }).ToArray()
             }).ToArray();

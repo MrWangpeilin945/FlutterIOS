@@ -69,4 +69,9 @@ public class ConsultAllResultEntity
     /// 直近判定
     /// </summary>
     public required bool IsRecent { get; set; }
+
+    /// <summary>
+    /// 検査進捗状況
+    /// </summary>
+    public required int Status { get; set; }
 }

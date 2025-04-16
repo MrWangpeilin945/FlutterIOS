@@ -798,7 +798,8 @@ public class ConsultUsecase : IConsultUsecase
                         CurrentResult = itemDetail.CurrentResult ?? "",
                         PastResult = itemDetail.PastResult ?? "",
                         PastDate = itemDetail.PastDate ?? null,
-                        IsRecent = itemDetail.IsRecent
+                        IsRecent = itemDetail.IsRecent,
+                        Status = (int)itemDetail.Status
                     }).ToArray()
                 }).ToArray()
             })
