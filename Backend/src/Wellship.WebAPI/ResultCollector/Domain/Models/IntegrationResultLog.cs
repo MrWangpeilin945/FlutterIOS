@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
 
 /// <summary>
@@ -57,20 +59,22 @@ public sealed class IntegrationResultLog
     {
         get
         {
-            // TODO: 明細からメール表示用のテキストを組み立てる
-            // Details.GroupBy(d => d.FunctionCode)
-            return @"詳細機能ID: EC2009
-基準値(範囲)_20250324.csv Row:2 指定されたコードがマスタに登録されていません。ExamItemDetailCd
+            // DetailsをFunctionCodeでグループ化
+            var groupedDetails = Details.GroupBy(d => d.FunctionCode);
 
-詳細機能ID: EC2004
-予約情報_20250324.csv Row:4 指定されたコードがマスタに登録されていません。TeamCode
-予約情報_20250324.csv Row:2 指定されたコードがマスタに登録されていません。PlaceCode/TeamCode/ExamDate
-予約情報_20250324.csv Row:5 指定されたコードがマスタに登録されていません。ExamineeCd
-
-詳細機能ID: EC2002
-受付情報_20250324.csv Row:3 値が登録されていません。TicketNumber
-受付情報_20250324.csv Row:2 指定されたコードがマスタに登録されていません。ConnectionCode
-";
+            // メール表示用のテキストを組み立てる
+            var emailText = new StringBuilder();
+            foreach (var group in groupedDetails)
+            {
+                emailText.AppendLine($"詳細機能ID: {group.Key}");
+                foreach (var detail in group)
+                {
+                    var propertiesText = string.Join("/", detail.Properties.Select(p => p.Name));
+                    emailText.AppendLine($"{detail.EventSource} {detail.ResultDetailMessage} {propertiesText}");
+                }
+                emailText.AppendLine();
+            }
+            return emailText.ToString().TrimEnd(); ;
         }
     }
 }

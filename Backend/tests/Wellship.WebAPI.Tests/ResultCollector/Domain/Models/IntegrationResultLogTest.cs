@@ -16,9 +16,9 @@ public class IntegrationResultLogTest
             Summary = "取り込み処理にてワーニングが6件発生しています。",
             LogLevel = Microsoft.Extensions.Logging.LogLevel.Warning,
             ResultCode = "100002",
-            ResultCodeName = "",
-            FunctionCode = "",
-            FunctionName = "",
+            ResultCodeName = "除外レコード有",
+            FunctionCode = "AP6102",
+            FunctionName = "日次ファイル取り込み処理",
             Details = [
                 new IntegrationResultLogDetail(){
                     OrderNumber = 1,
@@ -30,8 +30,6 @@ public class IntegrationResultLogTest
                     Properties = [
                         new IntegrationResultLogDetailProperty(){Name = "ExamItemDetailCd", Value = "EIDC001"}
                     ]
-
-
                 },
                 new IntegrationResultLogDetail(){
                     OrderNumber = 2,
@@ -41,13 +39,57 @@ public class IntegrationResultLogTest
                     ResultDetailCode = "RDC001",
                     ResultDetailMessage = "指定されたコードがマスタに登録されていません。",
                     Properties = [
-                        new IntegrationResultLogDetailProperty(){Name = "ExamItemDetailCd", Value = "EIDC001"}
+                        new IntegrationResultLogDetailProperty(){Name = "TeamCode", Value = "TC001"}
                     ]
-
-
+                },
+                new IntegrationResultLogDetail(){
+                    OrderNumber = 3,
+                    FunctionCode = "EC2004",
+                    FunctionName = "EC2004の名称",
+                    EventSource = "予約情報_20250324.csv Row:2",
+                    ResultDetailCode = "RDC001",
+                    ResultDetailMessage = "指定されたコードがマスタに登録されていません。",
+                    Properties = [
+                        new IntegrationResultLogDetailProperty(){Name = "PlaceCode", Value = "PC001"},
+                        new IntegrationResultLogDetailProperty(){Name = "TeamCode", Value = "TC001"},
+                        new IntegrationResultLogDetailProperty(){Name = "ExamDate", Value = "2025-10-23"}
+                    ]
+                },
+                new IntegrationResultLogDetail(){
+                    OrderNumber = 4,
+                    FunctionCode = "EC2004",
+                    FunctionName = "EC2004の名称",
+                    EventSource = "予約情報_20250324.csv Row:5",
+                    ResultDetailCode = "RDC001",
+                    ResultDetailMessage = "指定されたコードがマスタに登録されていません。",
+                    Properties = [
+                        new IntegrationResultLogDetailProperty(){Name = "ExamineeCd", Value = "EX001"}
+                    ]
+                },
+                new IntegrationResultLogDetail(){
+                    OrderNumber = 5,
+                    FunctionCode = "EC2002",
+                    FunctionName = "EC2002の名称",
+                    EventSource = "受付情報_20250324.csv Row:3",
+                    ResultDetailCode = "RDC002",
+                    ResultDetailMessage = "値が登録されていません。",
+                    Properties = [
+                        new IntegrationResultLogDetailProperty(){Name = "TicketNumber", Value = "TN001"}
+                    ]
+                },
+                new IntegrationResultLogDetail(){
+                    OrderNumber = 6,
+                    FunctionCode = "EC2002",
+                    FunctionName = "EC2002の名称",
+                    EventSource = "受付情報_20250324.csv Row:2",
+                    ResultDetailCode = "RDC001",
+                    ResultDetailMessage = "指定されたコードがマスタに登録されていません。",
+                    Properties = [
+                        new IntegrationResultLogDetailProperty(){Name = "ConnectionCode", Value = "CC001"}
+                    ]
                 }
             ],
-            OccurredAt = DateTime.UtcNow,
+            OccurredAt = DateTimeOffset.Parse("2025/05/23T04:20:14"),
         };
 
         // Act
@@ -55,17 +97,16 @@ public class IntegrationResultLogTest
 
         // Assert
         string expected = @"詳細機能ID: EC2009
-基準値(範囲)_20250324.csv Row:2 指定されたコードがマスタに登録されていません。ExamItemDetailCd
+基準値(範囲)_20250324.csv Row:2 指定されたコードがマスタに登録されていません。 ExamItemDetailCd
 
 詳細機能ID: EC2004
-予約情報_20250324.csv Row:4 指定されたコードがマスタに登録されていません。TeamCode
-予約情報_20250324.csv Row:2 指定されたコードがマスタに登録されていません。PlaceCode/TeamCode/ExamDate
-予約情報_20250324.csv Row:5 指定されたコードがマスタに登録されていません。ExamineeCd
+予約情報_20250324.csv Row:4 指定されたコードがマスタに登録されていません。 TeamCode
+予約情報_20250324.csv Row:2 指定されたコードがマスタに登録されていません。 PlaceCode/TeamCode/ExamDate
+予約情報_20250324.csv Row:5 指定されたコードがマスタに登録されていません。 ExamineeCd
 
 詳細機能ID: EC2002
-受付情報_20250324.csv Row:3 値が登録されていません。TicketNumber
-受付情報_20250324.csv Row:2 指定されたコードがマスタに登録されていません。ConnectionCode
-";
+受付情報_20250324.csv Row:3 値が登録されていません。 TicketNumber
+受付情報_20250324.csv Row:2 指定されたコードがマスタに登録されていません。 ConnectionCode";
         emailDetailsText.Should().Be(expected);
     }
 }
