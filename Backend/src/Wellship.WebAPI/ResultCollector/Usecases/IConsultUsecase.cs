@@ -64,4 +64,9 @@ public interface IConsultUsecase
     /// AP1025_検査結果を取り消す
     /// </summary>
     public Task BatchDeleteResultsAsync(string consultNumber, ResultDeleteRequest resultDeleteRequest);
+
+    /// <summary>
+    /// AP1026_検査結果を取得する
+    /// </summary>
+    public Task<ConsultAllExamResult> GetConsultAllResult(string consultNumber);
 }

@@ -171,4 +171,20 @@ public class ConsultController : ControllerBase
         await _consultUsecase.BatchDeleteResultsAsync(consultNumber, resultDeleteRequest);
         return NoContent();
     }
+
+    /// <summary>
+    /// AP1026 検査結果を取得する
+    /// </summary>
+    /// <param name="consultNumber">受診番号</param>
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Object))]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpGet]
+    [Route("api/v{version:apiVersion}/consult/{consultNumber}/results")]
+    public async Task<IActionResult> GetConsultAllResult([FromRoute][Required] string consultNumber)
+    {
+        var response = await _consultUsecase.GetConsultAllResult(consultNumber);
+        return Ok(response);
+    }
 }

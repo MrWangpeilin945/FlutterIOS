@@ -4,6 +4,7 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.Core.Exceptions;
+using Ryobi.Wellship.APIModels.Responses;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
 
@@ -191,5 +192,80 @@ public class ResultRepository : IResultRepository
         commit;";
 
         await connection.ExecuteAsync(sql, param);
+    }
+
+    /// <summary>
+    /// 全ての検査結果を取得する
+    /// </summary>
+    /// <param name="consultNumber">受診番号</param>
+    public async Task<IEnumerable<DisplayExamResultMenu>> GetConsultAllResults(string consultNumber)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        const string sql = @"
+            select
+                m.exam_menu_id                                          as ExamMenuId
+                , m.name                                                as ExamMenuName
+                , i.exam_item_id                                        as ExamItemId
+                , i.name                                                as ExamItemName
+                , d.exam_item_detail_id                                 as ExamItemDetailId
+                , d.name                                                as ExamItemDetailName
+                , case when d.type = 2 then op.name else r.value end    as CurrentResult
+                , case when d.type = 2 then op.name else p.value end    as PastResult
+                , p.exam_date                                           as PastDate
+                , case when p.exam_date = (
+                    select max(p2.exam_date)
+                    from resultcollector.previous_results p2
+                    where p2.exam_item_detail_id = p.exam_item_detail_id
+                ) then true else false end                              as IsRecent -- 同じ検査項目明細IDの中で最も新しいものはtrue
+            from
+                resultcollector.exam_menus m
+                left join resultcollector.exam_item_groups g
+                    on m.exam_menu_id = g.exam_menu_id
+                left join resultcollector.exam_items i
+                    on g.exam_item_group_id = i.exam_item_group_id
+                left join resultcollector.exam_item_details d
+                    on i.exam_item_id = d.exam_item_id
+                left join resultcollector.exam_item_detail_orders o
+                    on d.exam_item_detail_id = o.exam_item_detail_id
+                left join resultcollector.consult c
+                    on o.consult_id = c.consult_id
+                left join resultcollector.exam_results r
+                    on c.consult_id = r.consult_id
+                left join resultcollector.previous_results p
+                    on c.consult_id = p.consult_id
+                left join resultcollector.exam_item_detail_options op
+                    on d.exam_item_detail_id = op.exam_item_detail_id
+            where
+                c.consult_number = @ConsultNumber
+            order by
+                m.order_number
+                , d.order_number";
+
+        var consultAllResults = await connection.QueryAsync<ConsultAllResultEntity>(sql, new { ConsultNumber = consultNumber });
+
+        var displayExamResultMenus = consultAllResults
+            .GroupBy(result => new { result.ExamMenuId, result.ExamMenuName })
+            .Select(menuGroup => new DisplayExamResultMenu
+            {
+                ExamMenuId = menuGroup.Key.ExamMenuId,
+                ExamMenuName = menuGroup.Key.ExamMenuName,
+                ExamItems = menuGroup.GroupBy(result => new { result.ExamItemId, result.ExamItemName })
+                                     .Select(itemGroup => new DisplayExamResultItem
+                                     {
+                                         ExamItemId = itemGroup.Key.ExamItemId,
+                                         ExamItemName = itemGroup.Key.ExamItemName,
+                                         ExamItemDetails = itemGroup.Select(result => new DisplayExamResultItemDetail
+                                         {
+                                             ExamItemDetailId = result.ExamItemDetailId,
+                                             ExamItemDetailName = result.ExamItemDetailName,
+                                             CurrentResult = result.CurrentResult?.ToString() ?? "",
+                                             PastResult = result.PastResult?.ToString() ?? "",
+                                             PastDate = result.PastDate ?? null,
+                                             IsRecent = result.IsRecent
+                                         }).OrderBy(detail => detail.ExamItemDetailId)
+                                     }).OrderBy(item => item.ExamItemId)
+            }).OrderBy(menu => menu.ExamMenuId);
+
+        return displayExamResultMenus;
     }
 }
