@@ -2481,29 +2481,93 @@ public class ConsultUsecaseTests
             Birthdate = new Birthdate(new DateOnly(1976, 6, 25)),
             Affiliations = []
         };
-        var consultAllResult = new DisplayExamResultMenu
+        var consultAllResults = new List<DisplayExamResultMenu>
         {
-            ExamMenuId = 1,
-            ExamMenuName = "身体計測",
-            ExamItems = [
-                new DisplayExamResultItem
-                {
-                    ExamItemId = 1,
-                    ExamItemName = "身長",
-                    ExamItemDetails = [
-                        new DisplayExamResultItemDetail
-                        {
-							ExamItemDetailId = 1,
-							ExamItemDetailName = "身長",
-							CurrentResult = "174",
-							PastResult = "173",
-							PastDate = new DateOnly(2025, 3, 25),
-							IsRecent = true,
-							Status = ExamProgressStatus.検査済み
-                        }
-                    ]
-                }
-            ]
+            new DisplayExamResultMenu
+            {
+                ExamMenuId = 1,
+                ExamMenuName = "身体計測",
+                ExamItems = [
+                    new DisplayExamResultItem
+                    {
+                        ExamItemId = 1,
+                        ExamItemName = "身長",
+                        ExamItemDetails = [
+                            new DisplayExamResultItemDetail
+                            {
+                                ExamItemDetailId = 1,
+                                ExamItemDetailName = "身長",
+                                CurrentResult = "174",
+                                PastResult = "173",
+                                PastDate = new DateOnly(2025, 3, 25),
+                                IsRecent = true,
+                                Status = ExamProgressStatus.検査済み
+                            }
+                        ]
+                    },
+                ],
+            },
+            new DisplayExamResultMenu
+            {
+                ExamMenuId = 7,
+                ExamMenuName = "血圧",
+                ExamItems = [
+                    new DisplayExamResultItem
+                    {
+                        ExamItemId = 71,
+                        ExamItemName = "血圧1",
+                        ExamItemDetails = [
+                            new DisplayExamResultItemDetail
+                            {
+                                ExamItemDetailId = 711,
+                                ExamItemDetailName = "血圧1_上",
+                                CurrentResult = "98",
+                                PastResult = "100",
+                                PastDate = new DateOnly(2025, 3, 25),
+                                IsRecent = true,
+                                Status = ExamProgressStatus.検査済み
+                            },
+                            new DisplayExamResultItemDetail
+                            {
+                                ExamItemDetailId = 712,
+                                ExamItemDetailName = "血圧1_下",
+                                CurrentResult = "72",
+                                PastResult = "70",
+                                PastDate = new DateOnly(2025, 3, 25),
+                                IsRecent = true,
+                                Status = ExamProgressStatus.検査済み
+                            }
+                        ]
+                    },
+                    new DisplayExamResultItem
+                    {
+                        ExamItemId = 72,
+                        ExamItemName = "血圧2",
+                        ExamItemDetails = [
+                            new DisplayExamResultItemDetail
+                            {
+                                ExamItemDetailId = 721,
+                                ExamItemDetailName = "血圧2_上",
+                                CurrentResult = "98",
+                                PastResult = "100",
+                                PastDate = new DateOnly(2025, 3, 25),
+                                IsRecent = true,
+                                Status = ExamProgressStatus.検査済み
+                            },
+                            new DisplayExamResultItemDetail
+                            {
+                                ExamItemDetailId = 722,
+                                ExamItemDetailName = "血圧2_下",
+                                CurrentResult = "72",
+                                PastResult = "70",
+                                PastDate = new DateOnly(2025, 3, 25),
+                                IsRecent = true,
+                                Status = ExamProgressStatus.検査済み
+                            }
+                        ]
+                    }
+                ],
+            }
         };
         
         _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber))
@@ -2513,7 +2577,7 @@ public class ConsultUsecaseTests
          _placeScheduleRepositoryMock.Setup(x => x.IsSamenameAsync(consultNumber))
                                      .ReturnsAsync(false);
         _resultRepositoryMock.Setup(x => x.GetConsultAllResults(consult.ConsultId))
-                             .ReturnsAsync([consultAllResult]);
+                             .ReturnsAsync(consultAllResults);
 
         var expected = new APIModels.Responses.ConsultAllExamResult
         {
@@ -2547,6 +2611,67 @@ public class ConsultUsecaseTests
                                     ExamItemDetailName = "身長",
                                     CurrentResult = "174",
                                     PastResult = "173",
+                                    PastDate = new DateOnly(2025, 3, 25),
+                                    IsRecent = true,
+                                    Status = (int)ExamProgressStatus.検査済み
+                                }
+                            ]
+                        }
+                    ]
+                },
+                new APIModels.Responses.DisplayExamResultMenu
+                {
+                    ExamMenuId = 7,
+                    ExamMenuName = "血圧",
+                    ExamItems = [
+                        new APIModels.Responses.DisplayExamResultItem
+                        {
+                            ExamItemId = 71,
+                            ExamItemName = "血圧1",
+                            ExamItemDetails = [
+                                new APIModels.Responses.DisplayExamResultItemDetail
+                                {
+                                    ExamItemDetailId = 711,
+                                    ExamItemDetailName = "血圧1_上",
+                                    CurrentResult = "98",
+                                    PastResult = "100",
+                                    PastDate = new DateOnly(2025, 3, 25),
+                                    IsRecent = true,
+                                    Status = (int)ExamProgressStatus.検査済み
+                                },
+                                new APIModels.Responses.DisplayExamResultItemDetail
+                                {
+                                    ExamItemDetailId = 712,
+                                    ExamItemDetailName = "血圧1_下",
+                                    CurrentResult = "72",
+                                    PastResult = "70",
+                                    PastDate = new DateOnly(2025, 3, 25),
+                                    IsRecent = true,
+                                    Status = (int)ExamProgressStatus.検査済み
+                                }
+                            ]
+                        },
+                        new APIModels.Responses.DisplayExamResultItem
+                        {
+                            ExamItemId = 72,
+                            ExamItemName = "血圧2",
+                            ExamItemDetails = [
+                                new APIModels.Responses.DisplayExamResultItemDetail
+                                {
+                                    ExamItemDetailId = 721,
+                                    ExamItemDetailName = "血圧2_上",
+                                    CurrentResult = "98",
+                                    PastResult = "100",
+                                    PastDate = new DateOnly(2025, 3, 25),
+                                    IsRecent = true,
+                                    Status = (int)ExamProgressStatus.検査済み
+                                },
+                                new APIModels.Responses.DisplayExamResultItemDetail
+                                {
+                                    ExamItemDetailId = 722,
+                                    ExamItemDetailName = "血圧2_下",
+                                    CurrentResult = "72",
+                                    PastResult = "70",
                                     PastDate = new DateOnly(2025, 3, 25),
                                     IsRecent = true,
                                     Status = (int)ExamProgressStatus.検査済み
