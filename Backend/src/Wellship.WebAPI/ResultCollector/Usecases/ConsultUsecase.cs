@@ -765,7 +765,7 @@ public class ConsultUsecase : IConsultUsecase
         var examAge = consult.Age;
 
         // 全ての検査結果を取得
-        var consultAllResult = await _resultRepository.GetConsultAllResults(consultNumber);
+        var consultAllResult = await _resultRepository.GetConsultAllResults(consult.ConsultId);
 
         return new ConsultAllExamResult
         {

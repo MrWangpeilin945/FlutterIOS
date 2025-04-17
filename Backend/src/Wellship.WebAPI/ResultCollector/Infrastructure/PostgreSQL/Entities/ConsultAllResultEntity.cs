@@ -41,6 +41,11 @@ public class ConsultAllResultEntity
     public required string MenuOrderNumber { get; set; }
 
     /// <summary>
+    /// 項目グループ表示順
+    /// </summary>
+    public required string ItemGroupOrderNumber { get; set; }
+
+    /// <summary>
     /// 項目表示順
     /// </summary>
     public required string ItemOrderNumber { get; set; }

@@ -28,6 +28,6 @@ public interface IResultRepository
     /// <summary>
     /// 全ての検査結果を取得する
     /// </summary>
-    /// <param name="consultNumber">受診番号</param>
-    public Task<IEnumerable<DisplayExamResultMenu>> GetConsultAllResults(string consultNumber);
+    /// <param name="consultId">受診番号</param>
+    public Task<IEnumerable<DisplayExamResultMenu>> GetConsultAllResults(Guid consultId);
 }
