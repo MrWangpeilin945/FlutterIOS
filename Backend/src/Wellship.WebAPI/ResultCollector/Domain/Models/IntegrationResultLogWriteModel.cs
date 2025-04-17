@@ -16,11 +16,6 @@ public sealed class IntegrationResultLogWriteModel
     public required string ResultCode { get; init; }
 
     /// <summary>
-    /// ログレベル
-    /// </summary>
-    public required LogLevel LogLevel { get; init; }
-
-    /// <summary>
     /// 機能コード
     /// </summary>
     public required string FunctionCode { get; init; }
