@@ -123,7 +123,7 @@ export default function Examinees() {
   }, [examMenuId, status]);
 
   //進捗ステータスボタン押下時
-  const resortExamineeList = (status: number) => {
+  const refetchExamineeList = (status: number) => {
     //進捗状況を再設定
     selectedStatus.current = status;
     //AP1024を再呼び出し
@@ -198,7 +198,7 @@ export default function Examinees() {
               />
               <ExamItemProgress
                 progress={examineesData?.progress ?? {}}
-                onClick={resortExamineeList}
+                onClick={refetchExamineeList}
               />
             </Stack>
             <Stack gap={0}>
