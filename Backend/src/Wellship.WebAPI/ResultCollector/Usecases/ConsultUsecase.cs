@@ -750,4 +750,59 @@ public class ConsultUsecase : IConsultUsecase
             }).ToArray()
         }).ToArray();
     }
+
+    /// <summary>
+    /// AP1026_検査結果を取得する
+    /// </summary>
+    public async Task<ConsultAllExamResult> GetConsultAllResult(string consultNumber)
+    {
+        // 受診情報を取得
+        var consult = await _consultRepository.GetConsultAsync(consultNumber);
+
+        // 受診者情報を取得
+        var examinee = await _examineeRepository.GetExamineeAsync(consult.ExamineeId);
+        var sameNameAlert = await _placeScheduleRepository.IsSamenameAsync(consultNumber);
+        var examAge = consult.Age;
+
+        // 全ての検査結果を取得
+        var consultAllResult = await _resultRepository.GetConsultAllResults(consult.ConsultId);
+
+        return new ConsultAllExamResult
+        {
+            ConsultNumber = consult.ConsultNumber,
+            ConsultName = consult.Note,
+            Examinee = new Examinee()
+            {
+                TicketNumber = consult.TicketNumber,
+                Name = examinee.Name,
+                KanaName = examinee.KanaName,
+                Birthdate = examinee.Birthdate.Value,
+                Sex = (int)examinee.Sex,
+                Organizations = examinee.Affiliations.OrderBy(x => x.OrderNumber)
+                                                     .Select(x => x.OrganizationName).ToArray(),
+                SameNameAlert = sameNameAlert,
+                ExamDateAge = examAge.Years
+            },
+            ExamResults = consultAllResult.Select(menu => new DisplayExamResultMenu
+            {
+                ExamMenuId = menu.ExamMenuId,
+                ExamMenuName = menu.ExamMenuName,
+                ExamItems = menu.ExamItems.Select(item => new DisplayExamResultItem
+                {
+                    ExamItemId = item.ExamItemId,
+                    ExamItemName = item.ExamItemName,
+                    ExamItemDetails = item.ExamItemDetails.Select(itemDetail => new DisplayExamResultItemDetail
+                    {
+                        ExamItemDetailId = itemDetail.ExamItemDetailId,
+                        ExamItemDetailName = itemDetail.ExamItemDetailName,
+                        CurrentResult = itemDetail.CurrentResult ?? "",
+                        PastResult = itemDetail.PastResult ?? "",
+                        PastDate = itemDetail.PastDate ?? null,
+                        IsRecent = itemDetail.IsRecent,
+                        Status = (int)itemDetail.Status
+                    }).ToArray()
+                }).ToArray()
+            }).ToArray()
+        };
+    }
 }
