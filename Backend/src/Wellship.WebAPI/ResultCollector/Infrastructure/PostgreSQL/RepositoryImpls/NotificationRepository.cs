@@ -201,7 +201,6 @@ public class NotificationRepository : INotificationRepository
         insert 
         into resultcollector.notification_send_history_recipients( 
             id
-            , log_id
             , recipient_id
             , recipient_address
             , created_at
@@ -209,7 +208,6 @@ public class NotificationRepository : INotificationRepository
         ) 
         values ( 
             @Id
-            , @LogId
             , @RecipientId
             , @RecipientAddress
             , @CreatedAt

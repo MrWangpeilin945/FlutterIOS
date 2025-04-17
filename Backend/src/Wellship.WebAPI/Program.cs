@@ -50,6 +50,7 @@ public class Program
                         .AddCheck<HealthCheck>("app");
         builder.Services.AddRepositories();
         builder.Services.AddUseCases();
+        builder.Services.AddServices();
 
         // 認証認可サービスのDI
         builder.Services.SetupAuth();
@@ -212,7 +213,7 @@ public static class IServiceCollectionExtension
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<INotificationService, NotificationService>();
-        services.AddScoped<IEmailSender, ResultCollector.Infrastructure.Email.AmazonSES.EmailSender>();
+        services.AddScoped<IEmailSender, ResultCollector.Infrastructure.Email.Test.EmailSender>();
         return services;
     }
 
