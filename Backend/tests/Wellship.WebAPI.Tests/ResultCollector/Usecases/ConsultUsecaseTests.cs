@@ -2611,8 +2611,8 @@ public class ConsultUsecaseTests
                         {
 							ExamItemDetailId = 1,
 							ExamItemDetailName = "身長",
-							CurrentResult = "",
-							PastResult = "",
+							CurrentResult = null,
+							PastResult = null,
 							PastDate = null,
 							IsRecent = false,
 							Status = ExamProgressStatus.未実施
