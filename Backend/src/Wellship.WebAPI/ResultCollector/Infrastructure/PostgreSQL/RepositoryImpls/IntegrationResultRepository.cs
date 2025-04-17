@@ -33,7 +33,7 @@ public class IntegrationResultRepository : IIntegrationResultRepository
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
 
         // 処理結果コードのログレベルを取得
-        var resultCodes = resultLogs.Select(log => log.ResultCode).Distinct();
+        var resultCodes = resultLogs.Select(log => log.ResultCode).Distinct().ToArray();
         const string logLevelSql = @"
         select
             code as ResultCode
