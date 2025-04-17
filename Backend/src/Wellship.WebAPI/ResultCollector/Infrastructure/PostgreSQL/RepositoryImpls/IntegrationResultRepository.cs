@@ -32,12 +32,25 @@ public class IntegrationResultRepository : IIntegrationResultRepository
 
         var connection = await _dbConnectionProvider.GetOrOpenAsync();
 
+        // 処理結果コードのログレベルを取得
+        var resultCodes = resultLogs.Select(log => log.ResultCode).Distinct();
+        const string logLevelSql = @"
+        select
+            code as ResultCode
+            , log_level as LogLevel 
+        from
+            resultcollector.integration_result_codes 
+        where
+            code = any (@ResultCodes);";
+        var logLevels = await connection.QueryAsync<(string ResultCode, int LogLevel)>(logLevelSql, new { ResultCodes = resultCodes });
+        var logLevelDict = logLevels.ToDictionary(x => x.ResultCode, x => x.LogLevel);
+
         // 親テーブルにインサートする内容
         var parentLogs = resultLogs.Select(log => new
         {
             Id = log.Id,
             ResultCode = log.ResultCode,
-            LogLevel = (int)log.LogLevel,
+            LogLevel = logLevelDict[log.ResultCode],
             FunctionCode = log.FunctionCode,
             Summary = log.Summary,
             CreatedAt = operationTime,
