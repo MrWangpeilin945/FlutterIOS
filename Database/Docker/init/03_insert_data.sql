@@ -338,3 +338,35 @@ INSERT INTO app_config(key,value,description,created_at,created_by) VALUES
     ('Auth.AccessTokenLifetime','3','アクセストークンの有効期限（分）',CURRENT_TIMESTAMP,'init')
   , ('Auth.RefreshTokenLifeTime','720','リフレッシュトークンの有効期限（分）',CURRENT_TIMESTAMP,'init')
   , ('Auth.SecretKey','qguSdqCvPiGwUceBYXWEfJKLNrakzsnblVjxRIApFhmQtOHoZDTy','トークンのシークレット',CURRENT_TIMESTAMP,'init');
+
+-- 連携処理機能
+INSERT INTO resultcollector.integration_functions(code,name,created_by) VALUES 
+    ('AP6201','受診者を登録する(WebAPI)','init')
+  , ('AP6202','受付を更新する(WebAPI)','init')
+  , ('AP6204','受診を更新する(WebAPI)','init')
+  , ('AP6206','班を登録する(WebAPI)','init')
+  , ('AP6207','会場を登録する(WebAPI)','init')
+  , ('AP6208','団体を登録する(WebAPI)','init')
+  , ('AP6209','基準値(範囲)を登録する(WebAPI)','init')
+  , ('AP6211','職員を登録する(WebAPI)','init')
+  , ('AP6212','会場日程を登録する(WebAPI)','init')
+  , ('AP6214','基準パターンを登録する(WebAPI)','init')
+  , ('EC1001','随時連携(ファイル連携)','init')
+  , ('EC1002','日次連携(ファイル連携)','init')
+  , ('EC2001','受診者を登録する','init')
+  , ('EC2002','受付を更新する','init')
+  , ('EC2004','受診を更新する','init')
+  , ('EC2006','班を登録する','init')
+  , ('EC2007','会場を登録する','init')
+  , ('EC2008','団体を登録する','init')
+  , ('EC2009','基準値(範囲)を登録する','init')
+  , ('EC2011','職員を登録する','init')
+  , ('EC2012','会場日程を登録する','init')
+  , ('EC2014','基準パターンを登録する','init');
+
+-- 連携処理結果コード
+INSERT INTO resultcollector.integration_result_codes(code,name,log_level,created_by) VALUES 
+    ('100000','正常終了',2,'init')
+  , ('100001','Zipファイルが存在しないためスキップ',3,'init')
+  , ('100002','取り込み除外レコード有',3,'init')
+  , ('199999','異常終了（ハンドリングできていない例外）',4,'init');
