@@ -171,7 +171,9 @@ public class NotificationRepository : INotificationRepository
             // データベース的には同じログIDの履歴コードを複数作成できる
             Id = mainParams.First(mp => mp.LogId == x.LogId).Id,
             RecipientId = r.RecipientId,
-            RecipientAddress = r.RecipientAddress
+            RecipientAddress = r.RecipientAddress,
+            CreatedAt = operationTime,
+            CreatedBy = createdBy
         })).ToList();
 
         const string mainSql = @"

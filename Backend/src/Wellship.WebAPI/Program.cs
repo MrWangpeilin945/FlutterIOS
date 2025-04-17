@@ -213,6 +213,8 @@ public static class IServiceCollectionExtension
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<INotificationService, NotificationService>();
+        // Amazon SESの代わりにメールを送信した想定で標準出力にアウトプットする
+        // TODO: SESの構築後に切り替えること
         services.AddScoped<IEmailSender, ResultCollector.Infrastructure.Email.Test.EmailSender>();
         return services;
     }
