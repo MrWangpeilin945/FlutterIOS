@@ -54,6 +54,7 @@ import ExamSelectLR from "~/components/ExamSelectLR";
 import ExamBody from "~/components/ExamBody";
 import ExamVision from "~/components/ExamVision";
 import ExamHearing from "~/components/ExamHearing";
+import ExamNumericRepeatWithSameValue from "~/components/ExamNumericRepeatWithSameValue";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
 export const meta: MetaFunction = () => {
@@ -767,6 +768,16 @@ export default function ConsultInput() {
       case ExamItemGroupType.数値_左右:
         return (
           <ExamNumericLR
+            ref={examItemRefs.current[groupIndex]}
+            key={groupIndex}
+            examItems={examItems}
+            onRegisterPressed={isRegisterPressed}
+            onChange={handleChange}
+          />
+        );
+      case ExamItemGroupType.数値_繰り返し_同一値:
+        return (
+          <ExamNumericRepeatWithSameValue
             ref={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
