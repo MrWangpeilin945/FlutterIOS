@@ -255,7 +255,7 @@ public class ResultRepository : IResultRepository
                 left join resultcollector.exam_item_detail_options op
                     on d.exam_item_detail_id = op.exam_item_detail_id
                 left join resultcollector.exam_cancels ca
-                    on o.consult_id = c.consult_id
+                    on o.consult_id = ca.consult_id
                     and o.exam_item_detail_id = ca.exam_item_detail_id
                 left join resultcollector.exam_results r
                     on c.consult_id = r.consult_id
