@@ -2,6 +2,7 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useRef,
   useState,
 } from "react";
 import {
@@ -65,12 +66,12 @@ const ExamNumericRepeatWithSameValue = forwardRef<
 
     //登録ボタンプレスフラグを制御するための変数
     let isRegisterPressed = onRegisterPressed;
-
     //エラー状態管理
     const [errorMap, setErrorMap] = useState<ErrorMap>({});
-
     //同一値チェックフラグ
     const [isSameValue, setIsSameValue] = useState(true);
+    //テキストボックスフォーカス制御
+    const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     // キーボードの表示インデックスを状態として管理する
     const [activeKeyboard, setActiveKeyboard] = useState<number | null>(null);
@@ -259,7 +260,7 @@ const ExamNumericRepeatWithSameValue = forwardRef<
         w={1038}
         gap={16}
       >
-        {firstItem?.examItemDetails?.map((detail) => {
+        {firstItem?.examItemDetails?.map((detail,index) => {
           // グレーアウト表示判定
           const isDisabled = !detail?.hasOrder || !!detail?.cancelReasonId;
           const detailErrors = errorMap[detail.positionNumber ?? 0] ?? [];
@@ -317,6 +318,15 @@ const ExamNumericRepeatWithSameValue = forwardRef<
                   }
                   onClick={() => toggleKeyboard(detail.positionNumber ?? 0)}
                   disabled={isDisabled}
+                  ref={(el) => {(inputRefs.current[index] = el)}}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const next = inputRefs.current[index + 1];
+                      next?.focus(); // 次の入力にフォーカス
+                      e.preventDefault(); 
+                      setActiveKeyboard(null);
+                    }
+                  }}
                 />
 
                 <Button
@@ -382,31 +392,31 @@ const ExamNumericRepeatWithSameValue = forwardRef<
           );
         })}
         <Stack gap={0}>
-        {/* エラーメッセージ（同一値） */}
-        {!isSameValue && (
-          <Group c="error">
-            <IconSquareRoundedXFilled size={32} />
-            <Text size="sm" fw={700}>
-              入力された値が一致していません。
-            </Text>
-          </Group>
-        )}
-        {/* エラーメッセージ（項目） */}
-        {firstItem?.examRegistResults?.map((error, idx) => {
-          const isWarning = error.errorLevel === InputErrorLevel.警告;
-          return (
-            <Group key={idx} c={isWarning ? "warning" : "error"}>
-              {isWarning ? (
-                <IconExclamationCircleFilled size={32} />
-              ) : (
-                <IconSquareRoundedXFilled size={32} />
-              )}
+          {/* エラーメッセージ（同一値） */}
+          {!isSameValue && (
+            <Group c="error">
+              <IconSquareRoundedXFilled size={32} />
               <Text size="sm" fw={700}>
-                {error.description}
+                入力された値が一致していません。
               </Text>
             </Group>
-          );
-        })}
+          )}
+          {/* エラーメッセージ（項目） */}
+          {firstItem?.examRegistResults?.map((error, idx) => {
+            const isWarning = error.errorLevel === InputErrorLevel.警告;
+            return (
+              <Group key={idx} c={isWarning ? "warning" : "error"}>
+                {isWarning ? (
+                  <IconExclamationCircleFilled size={32} />
+                ) : (
+                  <IconSquareRoundedXFilled size={32} />
+                )}
+                <Text size="sm" fw={700}>
+                  {error.description}
+                </Text>
+              </Group>
+            );
+          })}
         </Stack>
       </Flex>
     );
