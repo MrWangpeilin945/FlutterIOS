@@ -50,9 +50,9 @@ steps:
         -- 受診
         INSERT INTO
           resultcollector.consult
-          (consult_id, consult_number, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
-        VALUES('c0002002-0000-0000-0002-000000000001', 'C2002021', 21, 11, 'a0002002-0000-0000-0002-000000000001','','e0002002-0000-0000-0002-000000000001','EX2002021', CURRENT_TIMESTAMP,'ec2002')
-        ,     ('c0002002-0000-0000-0002-000000000002', 'C2002022', 11, 11, 'a0002002-0000-0000-0002-000000000001','','e0002002-0000-0000-0002-000000000002','EX2002022', CURRENT_TIMESTAMP,'ec2002');
+          (consult_id, consult_number, age, progress_status, export_status, place_schedule_id, note, examinee_id, external_connection_code, created_at, created_by)
+        VALUES('c0002002-0000-0000-0002-000000000001', 'C2002021', '0340301', 21, 11, 'a0002002-0000-0000-0002-000000000001','','e0002002-0000-0000-0002-000000000001','EX2002021', CURRENT_TIMESTAMP,'ec2002')
+        ,     ('c0002002-0000-0000-0002-000000000002', 'C2002022', '0360115', 11, 11, 'a0002002-0000-0000-0002-000000000001','','e0002002-0000-0000-0002-000000000002','EX2002022', CURRENT_TIMESTAMP,'ec2002');
         -- 受付
         INSERT INTO
           resultcollector.tickets
