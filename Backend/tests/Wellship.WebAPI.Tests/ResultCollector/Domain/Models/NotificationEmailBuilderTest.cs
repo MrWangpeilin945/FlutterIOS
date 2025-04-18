@@ -51,7 +51,7 @@ public class NotificationEmailBuilderTest
                 Subject = "[WELLSHIP連携G1] [{{LogLevel}}] {{Summary}}",
                 Body = "本文（組み立てのテストは割愛）"
             },
-                        new NotificationTemplate
+            new NotificationTemplate
             {
                 Id = 2,
                 Name = "エラーのみテンプレート",
