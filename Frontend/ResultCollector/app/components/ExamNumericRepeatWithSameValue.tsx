@@ -2,13 +2,11 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
-  useRef,
   useState,
 } from "react";
 import {
   Box,
   Button,
-  Center,
   Flex,
   Group,
   Paper,
@@ -37,11 +35,6 @@ type ExamNumericRepeatWithSameValueProps = {
   onRegisterPressed: boolean;
   onChange: (updatedExamItem: InputExamItem[] | undefined) => void;
 };
-
-interface BackendValidation {
-  itemPositionNumber: number;
-  examRegistResults: ExamRegistResult[];
-}
 
 export type ValidationHandle = {
   triggerValidation: () => { hasError: boolean };
