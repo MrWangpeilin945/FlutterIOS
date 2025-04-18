@@ -20,7 +20,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         public Task UpsertExamineesAsync(List<ExamineeEntity> examineeEntities, DateTimeOffset createdAt, string createdBy);
 
         /// <summary>
-        /// 存在する受診者情報（ID、コード）を取得する
+        /// 存在する受診者情報を取得する
         /// </summary>
         /// <param name="examinees">受診者コードのリスト</param>
         /// <returns></returns>

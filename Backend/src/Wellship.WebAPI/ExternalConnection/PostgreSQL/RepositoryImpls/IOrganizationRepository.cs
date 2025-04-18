@@ -16,10 +16,10 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         public Task UpsertOrganizationsAsync(List<OrganizationEntity> organizations, DateTimeOffset createdAt, string createdBy);
 
         /// <summary>
-        /// 存在する団体コードを取得する
+        /// 存在する団体情報を取得する
         /// </summary>
         /// <param name="organizationCodes">団体コードリスト</param>
-        /// <returns>存在する団体コードリスト</returns>
-        public Task<List<string>> GetOrganizationsByCodesAsync(List<string> organizationCodes);
+        /// <returns></returns>
+        public Task<List<OrganizationEntity>> GetOrganizationInfoAsync(List<string> organizationCodes);
     }
 }

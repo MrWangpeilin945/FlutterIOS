@@ -95,7 +95,9 @@ steps:
           , created_by
           , to_char(CURRENT_DATE, 'yyyymmdd') as now
         FROM
-          resultcollector.examinees;
+          resultcollector.examinees
+        ORDER BY
+          examinee_code ASC;
     test: |
       len(current.rows) == vars.recordCount
       && current.rows[0].examinee_code == uniqueCode[0].code

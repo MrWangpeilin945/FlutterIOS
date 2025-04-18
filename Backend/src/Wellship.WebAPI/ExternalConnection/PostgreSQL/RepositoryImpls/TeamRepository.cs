@@ -2,8 +2,6 @@ using Dapper;
 
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
-using Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
-using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Helper;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Transaction;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
@@ -33,66 +31,64 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         public async Task UpsertTeamsAsync(List<TeamEntity> teams, DateTimeOffset createdAt, string createdBy)
         {
             using var scope = TransactionScopeHelper.GetTransactionScope();
+            using var connection = await _dbConnectionProvider.GetOrOpenAsync();
             {
-                using var connection = await _dbConnectionProvider.GetOrOpenAsync();
+                // 表示順を取得する
+                const string selectOrderNumberSql = @"
+                select 
+                    coalesce(max(order_number), 0) + 1
+                from 
+                    resultcollector.teams";
+                var result = await connection.QueryAsync<int>(selectOrderNumberSql);
+                int orderNumber = result.FirstOrDefault();
+
+                var upsertTeams = teams.Select((x, index) => new
                 {
-                    // 表示順を取得する
-                    const string selectOrderNumberSql = @"
-                    select 
-                        coalesce(max(order_number), 0) + 1
-                    from 
-                        resultcollector.teams";
-                    var result = await connection.QueryAsync<int>(selectOrderNumberSql);
-                    int orderNumber = result.FirstOrDefault();
+                    TeamId = Guid.NewGuid(),
+                    TeamCode = x.TeamCode,
+                    Name = x.Name,
+                    OrderNumber = orderNumber + index,
+                    CreatedAt = createdAt,
+                    CreatedBy = createdBy,
+                }).ToArray();
 
-                    var upsertTeams = teams.Select((x, index) => new
-                    {
-                        TeamId = Guid.NewGuid(),
-                        TeamCode = x.TeamCode,
-                        Name = x.Name,
-                        OrderNumber = orderNumber + index,
-                        CreatedAt = createdAt,
-                        CreatedBy = createdBy,
-                    }).ToArray();
-
-                    // teams（班）
-                    const string mergeTeamsSql = @"
-                    merge
-                    into resultcollector.teams as team
-                        using (values (@TeamId, @TeamCode, @Name, @OrderNumber,
-                                       @CreatedAt, @CreatedBy)) as new_data(
-                            team_id
-                            , team_code
-                            , name
-                            , order_number
-                            , created_at
-                            , created_by
-                        )
-                        on team.team_code = new_data.team_code
-                    when matched then 
-                        update set
-                            name = new_data.name
-                            , created_at = new_data.created_at
-                            , created_by = new_data.created_by 
-                    when not matched then
-                        insert (
-                            team_id
-                            , team_code
-                            , name
-                            , order_number
-                            , created_at
-                            , created_by
-                        )
-                        values (
-                            new_data.team_id
-                            , new_data.team_code
-                            , new_data.name
-                            , new_data.order_number
-                            , new_data.created_at
-                            , new_data.created_by
-                        );";
-                    await connection.ExecuteAsync(mergeTeamsSql, upsertTeams);
-                }
+                // teams（班）
+                const string mergeTeamsSql = @"
+                merge
+                into resultcollector.teams as team
+                    using (values (@TeamId, @TeamCode, @Name, @OrderNumber,
+                                    @CreatedAt, @CreatedBy)) as new_data(
+                        team_id
+                        , team_code
+                        , name
+                        , order_number
+                        , created_at
+                        , created_by
+                    )
+                    on team.team_code = new_data.team_code
+                when matched then 
+                    update set
+                        name = new_data.name
+                        , created_at = new_data.created_at
+                        , created_by = new_data.created_by 
+                when not matched then
+                    insert (
+                        team_id
+                        , team_code
+                        , name
+                        , order_number
+                        , created_at
+                        , created_by
+                    )
+                    values (
+                        new_data.team_id
+                        , new_data.team_code
+                        , new_data.name
+                        , new_data.order_number
+                        , new_data.created_at
+                        , new_data.created_by
+                    );";
+                await connection.ExecuteAsync(mergeTeamsSql, upsertTeams);
                 scope.Complete();
             }
         }

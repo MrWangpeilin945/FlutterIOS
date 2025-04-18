@@ -34,5 +34,10 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities
         /// 生年月日
         /// </summary>
         public required DateOnly Birthdate { get; init; }
+
+        /// <summary>
+        /// 所属
+        /// </summary>
+        public required List<OrganizationEntity> Affiliations { get; init; }
     }
 }
