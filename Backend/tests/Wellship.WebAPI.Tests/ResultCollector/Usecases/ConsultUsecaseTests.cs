@@ -2452,4 +2452,361 @@ public class ConsultUsecaseTests
         _consultRepositoryMock.Verify(repo => repo.GetConsultAsync(consultNumber), Times.Once);
         _resultRepositoryMock.Verify(repo => repo.BatchDeleteResultsAsync(consult.ConsultId, resultDeleteRequest.ExamItemDetailIds), Times.Once);
     }
+
+    [Fact]
+    public async Task 全ての検査結果を取得する()
+    {
+        // Arrange
+        var consultNumber = "0001";
+        var examineeId = Guid.Parse("a890e7ef-ebb7-4ef6-9b67-dd8c2e0e84c6");
+        var consult = new Consult
+        {
+            ConsultId = Guid.Parse("b2923570-2750-4a01-9924-34aa80da2b8b"),
+            ConsultNumber = consultNumber,
+            Age = new Age(48, 3, 7),
+            ExamineeId = examineeId,
+            ProgressStatus = ConsultProgressStatus.検査中,
+            Note = "定期健康診断",
+            ExportStatus = ConsultResultExportStatus.未出力,
+            PlaceScheduleId = Guid.Parse("f67faab2-b00a-4672-ac6e-776555d94c1c"),
+            TicketNumber = "001"
+        };
+        var examinee = new Examinee
+        {
+            ExamineeId = examineeId,
+            ExamineeCode = "100001",
+            Name = "両備　花子",
+            KanaName = "リョウビ　ハナコ",
+            Sex = Sex.女,
+            Birthdate = new Birthdate(new DateOnly(1976, 6, 25)),
+            Affiliations = []
+        };
+        var consultAllResults = new List<DisplayExamResultMenu>
+        {
+            new DisplayExamResultMenu
+            {
+                ExamMenuId = 1,
+                ExamMenuName = "身体計測",
+                ExamItems = [
+                    new DisplayExamResultItem
+                    {
+                        ExamItemId = 1,
+                        ExamItemName = "身長",
+                        ExamItemDetails = [
+                            new DisplayExamResultItemDetail
+                            {
+                                ExamItemDetailId = 1,
+                                ExamItemDetailName = "身長",
+                                CurrentResult = "174",
+                                PastResult = "173",
+                                PastDate = new DateOnly(2025, 3, 25),
+                                IsRecent = true,
+                                Status = ExamProgressStatus.検査済み
+                            }
+                        ]
+                    },
+                ],
+            },
+            new DisplayExamResultMenu
+            {
+                ExamMenuId = 7,
+                ExamMenuName = "血圧",
+                ExamItems = [
+                    new DisplayExamResultItem
+                    {
+                        ExamItemId = 71,
+                        ExamItemName = "血圧1",
+                        ExamItemDetails = [
+                            new DisplayExamResultItemDetail
+                            {
+                                ExamItemDetailId = 711,
+                                ExamItemDetailName = "血圧1_上",
+                                CurrentResult = "98",
+                                PastResult = "100",
+                                PastDate = new DateOnly(2025, 3, 25),
+                                IsRecent = true,
+                                Status = ExamProgressStatus.検査済み
+                            },
+                            new DisplayExamResultItemDetail
+                            {
+                                ExamItemDetailId = 712,
+                                ExamItemDetailName = "血圧1_下",
+                                CurrentResult = "72",
+                                PastResult = "70",
+                                PastDate = new DateOnly(2025, 3, 25),
+                                IsRecent = true,
+                                Status = ExamProgressStatus.検査済み
+                            }
+                        ]
+                    },
+                    new DisplayExamResultItem
+                    {
+                        ExamItemId = 72,
+                        ExamItemName = "血圧2",
+                        ExamItemDetails = [
+                            new DisplayExamResultItemDetail
+                            {
+                                ExamItemDetailId = 721,
+                                ExamItemDetailName = "血圧2_上",
+                                CurrentResult = "98",
+                                PastResult = "100",
+                                PastDate = new DateOnly(2025, 3, 25),
+                                IsRecent = true,
+                                Status = ExamProgressStatus.検査済み
+                            },
+                            new DisplayExamResultItemDetail
+                            {
+                                ExamItemDetailId = 722,
+                                ExamItemDetailName = "血圧2_下",
+                                CurrentResult = "72",
+                                PastResult = "70",
+                                PastDate = new DateOnly(2025, 3, 25),
+                                IsRecent = true,
+                                Status = ExamProgressStatus.検査済み
+                            }
+                        ]
+                    }
+                ],
+            }
+        };
+        
+        _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber))
+                              .ReturnsAsync(consult);;
+         _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(examineeId))
+                                .ReturnsAsync(examinee);
+         _placeScheduleRepositoryMock.Setup(x => x.IsSamenameAsync(consultNumber))
+                                     .ReturnsAsync(false);
+        _resultRepositoryMock.Setup(x => x.GetConsultAllResults(consult.ConsultId))
+                             .ReturnsAsync(consultAllResults);
+
+        var expected = new APIModels.Responses.ConsultAllExamResult
+        {
+            ConsultNumber = consultNumber,
+            ConsultName = "定期健康診断",
+            Examinee = new APIModels.Responses.Examinee
+            {
+                TicketNumber = "001",
+                Name = "両備　花子",
+                KanaName = "リョウビ　ハナコ",
+                Birthdate = new DateOnly(1976, 6, 25),
+                Sex = 2,
+                Organizations = [],
+                SameNameAlert = false,
+                ExamDateAge = consult.Age.Years
+            },
+            ExamResults = [
+                new APIModels.Responses.DisplayExamResultMenu
+                {
+                    ExamMenuId = 1,
+                    ExamMenuName = "身体計測",
+                    ExamItems = [
+                        new APIModels.Responses.DisplayExamResultItem
+                        {
+                            ExamItemId = 1,
+                            ExamItemName = "身長",
+                            ExamItemDetails = [
+                                new APIModels.Responses.DisplayExamResultItemDetail
+                                {
+                                    ExamItemDetailId = 1,
+                                    ExamItemDetailName = "身長",
+                                    CurrentResult = "174",
+                                    PastResult = "173",
+                                    PastDate = new DateOnly(2025, 3, 25),
+                                    IsRecent = true,
+                                    Status = (int)ExamProgressStatus.検査済み
+                                }
+                            ]
+                        }
+                    ]
+                },
+                new APIModels.Responses.DisplayExamResultMenu
+                {
+                    ExamMenuId = 7,
+                    ExamMenuName = "血圧",
+                    ExamItems = [
+                        new APIModels.Responses.DisplayExamResultItem
+                        {
+                            ExamItemId = 71,
+                            ExamItemName = "血圧1",
+                            ExamItemDetails = [
+                                new APIModels.Responses.DisplayExamResultItemDetail
+                                {
+                                    ExamItemDetailId = 711,
+                                    ExamItemDetailName = "血圧1_上",
+                                    CurrentResult = "98",
+                                    PastResult = "100",
+                                    PastDate = new DateOnly(2025, 3, 25),
+                                    IsRecent = true,
+                                    Status = (int)ExamProgressStatus.検査済み
+                                },
+                                new APIModels.Responses.DisplayExamResultItemDetail
+                                {
+                                    ExamItemDetailId = 712,
+                                    ExamItemDetailName = "血圧1_下",
+                                    CurrentResult = "72",
+                                    PastResult = "70",
+                                    PastDate = new DateOnly(2025, 3, 25),
+                                    IsRecent = true,
+                                    Status = (int)ExamProgressStatus.検査済み
+                                }
+                            ]
+                        },
+                        new APIModels.Responses.DisplayExamResultItem
+                        {
+                            ExamItemId = 72,
+                            ExamItemName = "血圧2",
+                            ExamItemDetails = [
+                                new APIModels.Responses.DisplayExamResultItemDetail
+                                {
+                                    ExamItemDetailId = 721,
+                                    ExamItemDetailName = "血圧2_上",
+                                    CurrentResult = "98",
+                                    PastResult = "100",
+                                    PastDate = new DateOnly(2025, 3, 25),
+                                    IsRecent = true,
+                                    Status = (int)ExamProgressStatus.検査済み
+                                },
+                                new APIModels.Responses.DisplayExamResultItemDetail
+                                {
+                                    ExamItemDetailId = 722,
+                                    ExamItemDetailName = "血圧2_下",
+                                    CurrentResult = "72",
+                                    PastResult = "70",
+                                    PastDate = new DateOnly(2025, 3, 25),
+                                    IsRecent = true,
+                                    Status = (int)ExamProgressStatus.検査済み
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
+                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                         _staffIdentityProviderMock.Object);
+
+        // Act
+        var result = await usecase.GetConsultAllResult(consultNumber);
+
+        // Assert
+        result.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task 全ての検査結果を取得する_過去検査結果がない()
+    {
+        // Arrange
+        var consultNumber = "0001";
+        var examineeId = Guid.Parse("a890e7ef-ebb7-4ef6-9b67-dd8c2e0e84c6");
+        var consult = new Consult
+        {
+            ConsultId = Guid.Parse("b2923570-2750-4a01-9924-34aa80da2b8b"),
+            ConsultNumber = consultNumber,
+            Age = new Age(48, 3, 7),
+            ExamineeId = examineeId,
+            ProgressStatus = ConsultProgressStatus.検査中,
+            Note = "定期健康診断",
+            ExportStatus = ConsultResultExportStatus.未出力,
+            PlaceScheduleId = Guid.Parse("f67faab2-b00a-4672-ac6e-776555d94c1c"),
+            TicketNumber = "001"
+        };
+        var examinee = new Examinee
+        {
+            ExamineeId = examineeId,
+            ExamineeCode = "100001",
+            Name = "両備　花子",
+            KanaName = "リョウビ　ハナコ",
+            Sex = Sex.女,
+            Birthdate = new Birthdate(new DateOnly(1976, 6, 25)),
+            Affiliations = []
+        };
+        var consultAllResult = new DisplayExamResultMenu
+        {
+            ExamMenuId = 1,
+            ExamMenuName = "身体計測",
+            ExamItems = [
+                new DisplayExamResultItem
+                {
+                    ExamItemId = 1,
+                    ExamItemName = "身長",
+                    ExamItemDetails = [
+                        new DisplayExamResultItemDetail
+                        {
+							ExamItemDetailId = 1,
+							ExamItemDetailName = "身長",
+							CurrentResult = null,
+							PastResult = null,
+							PastDate = null,
+							IsRecent = false,
+							Status = ExamProgressStatus.未実施
+                        }
+                    ]
+                }
+            ]
+        };
+        
+        _consultRepositoryMock.Setup(x => x.GetConsultAsync(consultNumber))
+                              .ReturnsAsync(consult);;
+         _examineeRepositoryMock.Setup(x => x.GetExamineeAsync(examineeId))
+                                .ReturnsAsync(examinee);
+         _placeScheduleRepositoryMock.Setup(x => x.IsSamenameAsync(consultNumber))
+                                     .ReturnsAsync(false);
+        _resultRepositoryMock.Setup(x => x.GetConsultAllResults(consult.ConsultId))
+                             .ReturnsAsync([consultAllResult]);
+
+        var expected = new APIModels.Responses.ConsultAllExamResult
+        {
+            ConsultNumber = consultNumber,
+            ConsultName = "定期健康診断",
+            Examinee = new APIModels.Responses.Examinee
+            {
+                TicketNumber = "001",
+                Name = "両備　花子",
+                KanaName = "リョウビ　ハナコ",
+                Birthdate = new DateOnly(1976, 6, 25),
+                Sex = 2,
+                Organizations = [],
+                SameNameAlert = false,
+                ExamDateAge = consult.Age.Years
+            },
+            ExamResults = [
+                new APIModels.Responses.DisplayExamResultMenu
+                {
+                    ExamMenuId = 1,
+                    ExamMenuName = "身体計測",
+                    ExamItems = [
+                        new APIModels.Responses.DisplayExamResultItem
+                        {
+                            ExamItemId = 1,
+                            ExamItemName = "身長",
+                            ExamItemDetails = [
+                                new APIModels.Responses.DisplayExamResultItemDetail
+                                {
+                                    ExamItemDetailId = 1,
+                                    ExamItemDetailName = "身長",
+                                    CurrentResult = "",
+                                    PastResult = "",
+                                    PastDate = null,
+                                    IsRecent = false,
+                                    Status = (int)ExamProgressStatus.未実施
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        var usecase = new ConsultUsecase(_consultRepositoryMock.Object, _examineeRepositoryMock.Object, _examMenuRepositoryMock.Object,
+                         _examItemRepositoryMock.Object, _placeScheduleRepositoryMock.Object, _resultRepositoryMock.Object,
+                         _staffIdentityProviderMock.Object);
+
+        // Act
+        var result = await usecase.GetConsultAllResult(consultNumber);
+
+        // Assert
+        result.Should().BeEquivalentTo(expected);
+    }
 }

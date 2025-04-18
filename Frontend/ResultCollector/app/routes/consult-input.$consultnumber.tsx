@@ -63,7 +63,7 @@ export const meta: MetaFunction = () => {
 export default function ConsultInput() {
   const theme = useMantineTheme();
   const navigate = useNavigate();
-  const examData = useRef<InputExamItems>();
+  const examData = useRef<InputExamItems | undefined>(undefined);
   // パスパラメータの取得
   const consultNumber = useParams().consultnumber ?? undefined;
   // クエリパラメータの取得
@@ -82,7 +82,7 @@ export default function ConsultInput() {
   //機器連携の状態管理
   const [connectionEquipment] = useAtom(connectionEquipmentState);
   const targetConnectionEquipment = connectionEquipment?.find(
-    (item) => item.examMenuId === examMenuId
+    (item) => item.examMenuId === examMenuId,
   )?.equipment;
   //ローディング管理
   const [isLoading, setIsLoading] = useState(true);
@@ -113,7 +113,7 @@ export default function ConsultInput() {
   const [initialDisplay, setInitialDisplay] = useState(true);
   //コンポーネント由来のエラー管理
   const examItemRefs = useRef<{
-    [key: string]: React.RefObject<ValidationHandle>;
+    [key: string]: React.RefObject<ValidationHandle | null>;
   }>({});
 
   //共通ダイアログ表示
@@ -134,7 +134,7 @@ export default function ConsultInput() {
     apiVersion,
     consultNumber ?? "",
     { examMenuId: examMenuId },
-    { query: { enabled: false } }
+    { query: { enabled: false } },
   );
 
   useEffect(() => {
@@ -157,7 +157,7 @@ export default function ConsultInput() {
         const responseData = result.data.data;
         // examItemGroups 内のすべての examItems が空でないことを確認
         const hasExamItems = responseData.examItemGroups?.some((group) =>
-          group.examItems?.some((item) => Object.keys(item).length > 0)
+          group.examItems?.some((item) => Object.keys(item).length > 0),
         );
         //examItemGroupsとexamItemsに要素が存在するかをチェック
         if (
@@ -211,9 +211,9 @@ export default function ConsultInput() {
               detail.hasOrder &&
               !detail.cancelReasonId &&
               detail.equipmentLabel &&
-              detail.value === ""
-          )
-        )
+              detail.value === "",
+          ),
+        ),
       ) || false
     );
   };
@@ -226,26 +226,26 @@ export default function ConsultInput() {
         disabledRemeasurement.current.disabled = true;
         disabledRemeasurement.current.style.backgroundColor = getThemeColor(
           "gray03",
-          theme
+          theme,
         );
         disabledRemeasurement.current.style.color = getThemeColor(
           "gray02",
-          theme
+          theme,
         );
         disabledRemeasurement.current.style.border = "";
       } else {
         disabledRemeasurement.current.disabled = false;
         disabledRemeasurement.current.style.backgroundColor = getThemeColor(
           "white01",
-          theme
+          theme,
         );
         disabledRemeasurement.current.style.color = getThemeColor(
           "black01",
-          theme
+          theme,
         );
         disabledRemeasurement.current.style.border = `2px solid ${getThemeColor(
           "gray03",
-          theme
+          theme,
         )}`;
       }
     }
@@ -300,7 +300,7 @@ export default function ConsultInput() {
       // 解析js呼び出し処理
       const analyzedData = await dynamicScriptExecute(
         base64Data,
-        scriptUrl ?? ""
+        scriptUrl ?? "",
       );
 
       if (analyzedData === null) {
@@ -378,7 +378,7 @@ export default function ConsultInput() {
   //値変更用
   const callbackChangeValue = (
     newExamItems: InputExamItem[] | undefined,
-    groupIndex: number
+    groupIndex: number,
   ) => {
     if (newExamItems) {
       examData.current = {
@@ -390,7 +390,7 @@ export default function ConsultInput() {
                   ...group,
                   examItems: newExamItems.map((newItem) => {
                     const existingItem = group.examItems?.find(
-                      (item) => item.examItemId === newItem.examItemId
+                      (item) => item.examItemId === newItem.examItemId,
                     );
                     return {
                       ...newItem,
@@ -398,7 +398,7 @@ export default function ConsultInput() {
                     };
                   }),
                 }
-              : group
+              : group,
           ) ?? [],
       };
     }
@@ -424,7 +424,7 @@ export default function ConsultInput() {
                           ...detail,
                           value: passValue, // 新しい値をセット
                         }
-                      : detail
+                      : detail,
                   ),
                 };
               }
@@ -458,14 +458,14 @@ export default function ConsultInput() {
                     ? examItem.examItemDetails
                         .filter(
                           (itemDetail) =>
-                            itemDetail.hasOrder && !itemDetail.cancelReasonId
+                            itemDetail.hasOrder && !itemDetail.cancelReasonId,
                         )
                         .map((itemDetail) => ({
                           examItemDetailId: itemDetail.examItemDetailId,
                           value: itemDetail.value || "",
                         }))
                     : [],
-                })) ?? []
+                })) ?? [],
             )
           : [],
       };
@@ -488,7 +488,7 @@ export default function ConsultInput() {
   //現在のデータと新しいデータを結合
   const mergeExamData = (
     prevData: InputExamItems,
-    newData: VerifyExamItems
+    newData: VerifyExamItems,
   ) => {
     if (!prevData || !newData) return;
     // レスポンスを今回値のvalueで更新
@@ -503,14 +503,14 @@ export default function ConsultInput() {
           examItems: newGroup.examItems?.map((newItem) => {
             const prevItem =
               prevGroup?.examItems?.find(
-                (i) => i.examItemId === newItem.examItemId
+                (i) => i.examItemId === newItem.examItemId,
               ) || {};
             return {
               ...newItem,
               examItemDetails: newItem.examItemDetails?.map((newDetail) => {
                 const prevDetail =
                   (prevItem.examItemDetails || []).find(
-                    (d) => d.examItemDetailId === newDetail.examItemDetailId
+                    (d) => d.examItemDetailId === newDetail.examItemDetailId,
                   ) || {};
                 return { ...newDetail, value: prevDetail.value };
               }),
@@ -562,11 +562,11 @@ export default function ConsultInput() {
                   group.examItems?.flatMap(
                     (item) =>
                       item.examRegistResults?.map(
-                        (result) => result.errorLevel ?? 0
-                      ) || []
-                  ) || []
+                        (result) => result.errorLevel ?? 0,
+                      ) || [],
+                  ) || [],
               ) || []),
-              0 // データがない場合のデフォルト値
+              0, // データがない場合のデフォルト値
             );
             // 今回値とレスポンスを結合
             const prevData = examData.current ?? {};
@@ -821,7 +821,7 @@ export default function ConsultInput() {
         const detailValue = examItems
           ?.find((item) => item.positionNumber === 1)
           ?.examItemDetails?.find(
-            (detail) => detail.positionNumber === 1
+            (detail) => detail.positionNumber === 1,
           )?.value;
         // 設定するvalueをset
         const 実施済み = "1";
@@ -881,7 +881,7 @@ export default function ConsultInput() {
                 groupIndex={index}
                 examItemGroup={examItemGroup}
               />
-            )
+            ),
           )}
           {/* 登録ボタン */}
           <Button w={860} h={75} mt={24} onClick={handleVerify}>

@@ -4,6 +4,8 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Repositories;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Auth;
 using Ryobi.Wellship.Core.Exceptions;
+using Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+using Ryobi.Wellship.Core.Enums;
 
 namespace Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.PostgreSQL.RepositoryImpls;
 
@@ -191,5 +193,116 @@ public class ResultRepository : IResultRepository
         commit;";
 
         await connection.ExecuteAsync(sql, param);
+    }
+
+    /// <summary>
+    /// 全ての検査結果を取得する
+    /// </summary>
+    /// <param name="consultId">受診番号</param>
+    public async Task<IEnumerable<DisplayExamResultMenu>> GetConsultAllResults(Guid consultId)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+
+        const string sql = @"
+            with 過去検査結果 as (
+                select
+                    consult_id,
+                    exam_item_detail_id,
+                    exam_date,
+                    value,
+                    rank() over (partition by consult_id, exam_item_detail_id order by exam_date desc) as rank
+                from resultcollector.previous_results
+                where consult_id = @ConsultId
+            )
+            select
+                m.exam_menu_id                                          as ExamMenuId
+                , m.name                                                as ExamMenuName
+                , i.exam_item_id                                        as ExamItemId
+                , i.name                                                as ExamItemName
+                , d.exam_item_detail_id                                 as ExamItemDetailId
+                , d.name                                                as ExamItemDetailName
+                , m.order_number                                        as MenuOrderNumber
+                , g.order_number                                        as ItemGroupOrderNumber
+                , i.order_number                                        as ItemOrderNumber
+                , d.order_number                                        as ItemDetailOrderNumber
+                , case when d.type = 2 then op.name else r.value end    as CurrentResult
+                , case when d.type = 2 then op.name else p.value end    as PastResult
+                , p.exam_date                                           as PastDate
+                , case
+                    when
+                        p.exam_date = (select max(exam_date) from 過去検査結果)
+                    then true
+                    else false
+                  end                                                   as IsRecent -- 過去検査結果の最新の日付と一致するものはtrue
+                , case
+                    when o.exam_item_detail_id is null then 10
+                    when o.exam_item_detail_id is not null and r.exam_item_detail_id is not null then 41
+                    when o.exam_item_detail_id is not null and ca.exam_item_detail_id is not null then 51
+                    when o.exam_item_detail_id is not null and r.exam_item_detail_id is null and ca.exam_item_detail_id is null then 11
+                  end                                                   as Status
+            from
+                resultcollector.exam_menus m
+                left join resultcollector.exam_item_groups g
+                    on m.exam_menu_id = g.exam_menu_id
+                left join resultcollector.exam_items i
+                    on g.exam_item_group_id = i.exam_item_group_id
+                left join resultcollector.exam_item_details d
+                    on i.exam_item_id = d.exam_item_id
+                left join resultcollector.exam_item_detail_orders o
+                    on d.exam_item_detail_id = o.exam_item_detail_id
+                left join resultcollector.consult c
+                    on o.consult_id = c.consult_id
+                left join resultcollector.exam_item_detail_options op
+                    on d.exam_item_detail_id = op.exam_item_detail_id
+                left join resultcollector.exam_cancels ca
+                    on o.consult_id = c.consult_id
+                    and o.exam_item_detail_id = ca.exam_item_detail_id
+                left join resultcollector.exam_results r
+                    on c.consult_id = r.consult_id
+                    and d.exam_item_detail_id = r.exam_item_detail_id
+                left join 過去検査結果 p
+                    on c.consult_id = p.consult_id
+                    and d.exam_item_detail_id = p.exam_item_detail_id
+                    and p.rank = 1
+            where
+                c.consult_Id = @ConsultId
+                or o.exam_item_detail_id is null
+            order by
+                m.order_number
+                , g.order_number
+                , i.order_number
+                , d.order_number";
+
+        var consultAllResults = await connection.QueryAsync<ConsultAllResultEntity>(sql, new { ConsultId = consultId });
+
+        var displayExamResultMenus = consultAllResults
+            .GroupBy(result => result.ExamMenuId)
+            .OrderBy(menuGroup => menuGroup.First().MenuOrderNumber)
+            .Select(menuGroup => new DisplayExamResultMenu
+            {
+                ExamMenuId = menuGroup.First().ExamMenuId,
+                ExamMenuName = menuGroup.First().ExamMenuName,
+                ExamItems = menuGroup.GroupBy(item => item.ExamItemId)
+                                     .OrderBy(itemGroup => itemGroup.First().ItemGroupOrderNumber)
+                                     .ThenBy(item => item.First().ItemOrderNumber)
+                                     .Select(itemGroup => new DisplayExamResultItem
+                                     {
+                                         ExamItemId = itemGroup.First().ExamItemId,
+                                         ExamItemName = itemGroup.First().ExamItemName,
+                                         ExamItemDetails = itemGroup.OrderBy(detail => detail.ItemDetailOrderNumber)
+                                                                    .Select(detail => new DisplayExamResultItemDetail
+                                                                    {
+                                                                        ExamItemDetailId = detail.ExamItemDetailId,
+                                                                        ExamItemDetailName = detail.ExamItemDetailName,
+                                                                        CurrentResult = detail.CurrentResult,
+                                                                        PastResult = detail.PastResult,
+                                                                        PastDate = detail.PastDate,
+                                                                        IsRecent = detail.IsRecent,
+                                                                        Status = (ExamProgressStatus)detail.Status
+                                                                    }).ToArray()
+                                     }).ToArray()
+            }).ToArray();
+
+        return displayExamResultMenus;
     }
 }

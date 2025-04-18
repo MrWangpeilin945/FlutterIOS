@@ -1,6 +1,6 @@
 import { Container, LoadingOverlay, Space, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import type { MetaFunction } from "react-router";
+import { useNavigate, type MetaFunction } from "react-router";
 import { format } from "date-fns";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
@@ -20,6 +20,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Progress() {
+  const navigate = useNavigate();
   const [progressData, setProgressData] = useState<PlaceScheduleProgress>();
   const [opened, { open, close }] = useDisclosure(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -43,10 +44,12 @@ export default function Progress() {
         setProgressData(result.data.data);
       } else if (result.error) {
         if (result.error.status === 400) {
-          setErrorMessage(getErrorMessage(errorMessages.invalid,"パラメータ"));
+          setErrorMessage(getErrorMessage(errorMessages.invalid, "パラメータ"));
         }
         if (result.error.status === 404) {
-          setErrorMessage(getErrorMessage(errorMessages.notFound,"該当する会場日程"));
+          setErrorMessage(
+            getErrorMessage(errorMessages.notFound, "該当する会場日程"),
+          );
         }
         if (result.error.status === 500) {
           setErrorMessage(getErrorMessage(errorMessages.serverError));
@@ -75,7 +78,11 @@ export default function Progress() {
                     <ExamItemProgress
                       key={p.examMenuId}
                       progress={p}
-                      onClick={() => {}}
+                      onClick={(status) => {
+                        navigate(
+                          `/examinees?exammenuid=${p.examMenuId}&status=${status}`,
+                        );
+                      }}
                     />
                   ))}
                 </Stack>
