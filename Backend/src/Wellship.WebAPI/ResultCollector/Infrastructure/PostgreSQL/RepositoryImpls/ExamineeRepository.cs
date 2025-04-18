@@ -116,7 +116,7 @@ public class ExamineeRepository : IExamineeRepository
             , t.ticket_number as TicketNumber
             , e.kana_name as KanaName
             , e.sex as Sex
-            , t.created_at as CreatedAt
+            , t.created_at as CheckedInAt
         from
             resultcollector.consult c
             left join resultcollector.tickets t
