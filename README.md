@@ -19,9 +19,9 @@
 
 - Node.js v22.9.0
 - npm v
-- React v18.2.0
-- Mantine v7.12.0
-- Remix SPA Mode 2.12.1
+- React v19.1.0
+- Mantine v7.17.4
+- React Router 7.5.0
 
 ### バックエンド・CLIツール
 
