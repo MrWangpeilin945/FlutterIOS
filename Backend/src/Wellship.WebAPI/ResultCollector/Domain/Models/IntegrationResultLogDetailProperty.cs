@@ -1,0 +1,17 @@
+namespace Ryobi.Wellship.WebAPI.ResultCollector.Domain.Models;
+
+/// <summary>
+/// 連携処理結果ログ明細プロパティ
+/// </summary>
+public sealed class IntegrationResultLogDetailProperty
+{
+    /// <summary>
+    /// 項目名
+    /// </summary>
+    public required string Name { get; init; }
+
+    /// <summary>
+    /// 値
+    /// </summary>
+    public required string Value { get; init; }
+}

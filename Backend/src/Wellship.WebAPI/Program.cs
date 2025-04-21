@@ -22,6 +22,8 @@ using Ryobi.Wellship.WebAPI.ResultCollector.Usecases;
 using Ryobi.Wellship.WebAPI.ResultCollector.Utilities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Logger;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.BackgroundTasks;
+using Ryobi.Wellship.WebAPI.ResultCollector.Services;
+using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Email;
 
 namespace Ryobi.Wellship.WebAPI;
 
@@ -48,6 +50,7 @@ public class Program
                         .AddCheck<HealthCheck>("app");
         builder.Services.AddRepositories();
         builder.Services.AddUseCases();
+        builder.Services.AddServices();
 
         // 認証認可サービスのDI
         builder.Services.SetupAuth();
@@ -155,8 +158,11 @@ public static class IServiceCollectionExtension
         services.AddScoped<IResultRepository, ResultRepository>();
         services.AddScoped<IAppConfigRepository, AppConfigRepository>();
         services.AddScoped<ILogRepository, LogRepository>();
+        services.AddScoped<IIntegrationResultRepository, IntegrationResultRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IOrganizationRepository, ExternalConnection.PostgreSQL.RepositoryImpls.OrganizationRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IIntegrationResultRepository, IntegrationResultRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IExamineeRepository, ExternalConnection.PostgreSQL.RepositoryImpls.ExamineeRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.ITeamRepository, ExternalConnection.PostgreSQL.RepositoryImpls.TeamRepository>();
         services.AddScoped<ExternalConnection.PostgreSQL.RepositoryImpls.IPlaceRepository, ExternalConnection.PostgreSQL.RepositoryImpls.PlaceRepository>();
@@ -199,6 +205,19 @@ public static class IServiceCollectionExtension
 
         return services;
     }
+
+    /// <summary>
+    /// アプリケーション全体で使用するサービスを追加します。
+    /// </summary>
+    public static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddScoped<INotificationService, NotificationService>();
+        // Amazon SESの代わりにメールを送信した想定で標準出力にアウトプットする
+        // TODO: SESの構築後に切り替えること
+        services.AddScoped<IEmailSender, ResultCollector.Infrastructure.Email.Test.EmailSender>();
+        return services;
+    }
+
     /// <summary>
     /// ローカル環境で動作させる場合のみ使用するサービス群
     /// </summary>

@@ -4,128 +4,125 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure;
 using Ryobi.Wellship.WebAPI.ResultCollector.Infrastructure.Transaction;
 
-namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
+namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
+
+/// <summary>
+/// 職員リポジトリ
+/// </summary>
+public class StaffRepository : IStaffRepository
 {
+    private readonly IDbConnectionProvider _dbConnectionProvider;
+
     /// <summary>
-    /// 職員リポジトリ
+    /// リポジトリの生成
     /// </summary>
-    public class StaffRepository : IStaffRepository
+    /// <param name="dbConnectionProvider"></param>
+    public StaffRepository(IDbConnectionProvider dbConnectionProvider)
     {
-        private readonly IDbConnectionProvider _dbConnectionProvider;
+        _dbConnectionProvider = dbConnectionProvider;
+    }
 
-        /// <summary>
-        /// リポジトリの生成
-        /// </summary>
-        /// <param name="dbConnectionProvider"></param>
-        public StaffRepository(IDbConnectionProvider dbConnectionProvider)
+    /// <summary>
+    /// 職員を登録する
+    /// </summary>
+    /// <param name="staffEntities"></param>
+    /// <param name="createdAt"></param>
+    /// <param name="createdBy"></param>
+    /// <returns></returns>
+    public async Task UpsertStaffAsync(List<StaffEntity> staffEntities, DateTimeOffset createdAt, string createdBy)
+    {
+        using var scope = TransactionScopeHelper.GetTransactionScope();
+        using var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        var upsertItems = staffEntities.Select(s => new
         {
-            _dbConnectionProvider = dbConnectionProvider;
-        }
+            StaffCode = s.StaffCode,
+            LoginId = s.LoginId,
+            Name = s.Name,
+            PasswordHash = s.PasswordHash,
+            PasswordSalt = s.PasswordSalt,
+            Enabled = s.Enabled,
+            RoleId = s.RoleId,
+            CreatedAt = createdAt,
+            CreatedBy = createdBy
+        }).ToArray();
 
-        /// <summary>
-        /// 職員を登録する
-        /// </summary>
-        /// <param name="staffEntities"></param>
-        /// <param name="createdAt"></param>
-        /// <param name="createdBy"></param>
-        /// <returns></returns>
-        public async Task UpsertStaffAsync(List<StaffEntity> staffEntities, DateTimeOffset createdAt, string createdBy)
-        {
-            using var scope = TransactionScopeHelper.GetTransactionScope();
-            using var connection = await _dbConnectionProvider.GetOrOpenAsync();
-            {
-                var upsertItems = staffEntities.Select(s => new
-                {
-                    StaffCode = s.StaffCode,
-                    LoginId = s.LoginId,
-                    Name = s.Name,
-                    PasswordHash = s.PasswordHash,
-                    PasswordSalt = s.PasswordSalt,
-                    Enabled = s.Enabled,
-                    RoleId = s.RoleId,
-                    CreatedAt = createdAt,
-                    CreatedBy = createdBy
-                }).ToArray();
+        // Upsert文を実行
+        string mergeSql = @"
+                merge
+                into resultcollector.staffs as s
+                    using (values (@StaffCode, @LoginId, @Name, @PasswordHash, @PasswordSalt, @Enabled, @RoleId, @CreatedAt, @CreatedBy)) as new_data (
+                        staff_code,
+                        login_id,
+                        name,
+                        password_hash,
+                        password_salt,
+                        enabled,
+                        role_id,
+                        created_at,
+                        created_by
+                    )
+                        on s.staff_code = new_data.staff_code
+                when matched then update
+                set
+                    login_id = new_data.login_id,
+                    name = new_data.name,
+                    password_hash = new_data.password_hash,
+                    password_salt = new_data.password_salt,
+                    enabled = new_data.enabled,
+                    role_id = new_data.role_id,
+                    created_at = new_data.created_at,
+                    created_by = new_data.created_by when not matched then
+                insert (
+                    staff_code,
+                    login_id,
+                    name,
+                    password_hash,
+                    password_salt,
+                    enabled,
+                    role_id,
+                    created_at,
+                    created_by
+                )
+                values (
+                    new_data.staff_code,
+                    new_data.login_id,
+                    new_data.name,
+                    new_data.password_hash,
+                    new_data.password_salt,
+                    new_data.enabled,
+                    new_data.role_id,
+                    new_data.created_at,
+                    new_data.created_by
+                );";
+        await connection.ExecuteAsync(mergeSql, upsertItems);
+        scope.Complete();
+    }
 
-                // Upsert文を実行
-                string mergeSql = @"
-                        merge
-                        into resultcollector.staffs as s
-                            using (values (@StaffCode, @LoginId, @Name, @PasswordHash, @PasswordSalt, @Enabled, @RoleId, @CreatedAt, @CreatedBy)) as new_data (
-                                staff_code,
-                                login_id,
-                                name,
-                                password_hash,
-                                password_salt,
-                                enabled,
-                                role_id,
-                                created_at,
-                                created_by
-                            )
-                                on s.staff_code = new_data.staff_code
-                        when matched then update
-                        set
-                            login_id = new_data.login_id,
-                            name = new_data.name,
-                            password_hash = new_data.password_hash,
-                            password_salt = new_data.password_salt,
-                            enabled = new_data.enabled,
-                            role_id = new_data.role_id,
-                            created_at = new_data.created_at,
-                            created_by = new_data.created_by when not matched then
-                        insert (
-                            staff_code,
-                            login_id,
-                            name,
-                            password_hash,
-                            password_salt,
-                            enabled,
-                            role_id,
-                            created_at,
-                            created_by
-                        )
-                        values (
-                            new_data.staff_code,
-                            new_data.login_id,
-                            new_data.name,
-                            new_data.password_hash,
-                            new_data.password_salt,
-                            new_data.enabled,
-                            new_data.role_id,
-                            new_data.created_at,
-                            new_data.created_by
-                        );";
-                await connection.ExecuteAsync(mergeSql, upsertItems);
-                scope.Complete();
-            }
-        }
+    /// <summary>
+    /// 存在する職員情報を取得する
+    /// </summary>
+    /// <param name="loginIds">ログインID</param>
+    /// <returns></returns>
+    public async Task<List<StaffEntity>> GetStaffsInfoByLoginIdsAsync(List<string> loginIds)
+    {
+        var connection = await _dbConnectionProvider.GetOrOpenAsync();
+        var sql = @"
+                select
+                    staff_id as StaffId, 
+                    staff_code as StaffCode,
+                    login_id as LoginId,
+                    name as Name,
+                    password_hash as PasswordHash,
+                    password_salt as PasswordSalt,
+                    enabled as Enabled,
+                    role_id as RoleId
+                from
+                    resultcollector.staffs
+                where
+                    login_id = any(@LoginIds);";
 
-        /// <summary>
-        /// 存在する職員情報を取得する
-        /// </summary>
-        /// <param name="loginIds">ログインID</param>
-        /// <returns></returns>
-        public async Task<List<StaffEntity>> GetStaffsInfoByLoginIdsAsync(List<string> loginIds)
-        {
-            var connection = await _dbConnectionProvider.GetOrOpenAsync();
-            var sql = @"
-                    select
-                        staff_id as StaffId, 
-                        staff_code as StaffCode,
-                        login_id as LoginId,
-                        name as Name,
-                        password_hash as PasswordHash,
-                        password_salt as PasswordSalt,
-                        enabled as Enabled,
-                        role_id as RoleId
-                    from
-                        resultcollector.staffs
-                    where
-                        login_id = any(@LoginIds);";
+        var result = await connection.QueryAsync<StaffEntity>(sql, new { LoginIds = loginIds });
 
-            var result = await connection.QueryAsync<StaffEntity>(sql, new { LoginIds = loginIds });
-
-            return result.ToList();
-        }
+        return result.ToList();
     }
 }

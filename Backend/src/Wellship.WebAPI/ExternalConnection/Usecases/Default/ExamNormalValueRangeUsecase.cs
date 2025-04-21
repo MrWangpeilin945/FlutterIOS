@@ -158,11 +158,11 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
                                               y.MaxValue,
                                               y.ExamItemDetailCode
                                           })).ToList();
-        if (duplicateKeys.Any())
+        if (duplicateKeys.Count > 0)
         {
             // PKが重複したレコードを取得する
             var duplicatedData = examNormalValueRanges.Where(x => 
-                                                        duplicateKeys.Any(duplicateKey =>
+                                                        duplicateKeys.Exists(duplicateKey =>
                                                             duplicateKey.ExamItemDetailCode == x.ExamItemDetailCode && 
                                                             duplicateKey.ThresholdCode == x.ThresholdCode &&
                                                             duplicateKey.TargetSex == x.TargetSex &&
