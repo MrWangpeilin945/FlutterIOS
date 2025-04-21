@@ -3,6 +3,7 @@ using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls;
 using Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.Entities;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Enums;
 using Ryobi.Wellship.WebAPI.ExternalConnection.Utilities;
+using System.Globalization;
 
 namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// <summary>
@@ -58,7 +59,7 @@ public class ConsultUsecase : IConsultUsecase
         var teams = await _teamRepository.GetTeamInfoAsync(teamCodes);
         // 会場コード、班コード、健診日に紐づく会場日程情報を取得する
         var examDate = consults.Where(x => x.ActionType == ActionType.登録 && !string.IsNullOrWhiteSpace(x.ExamDate))
-                               .Select(x => DateOnly.Parse(x.ExamDate)).Distinct().ToList();
+                               .Select(x => DateOnly.Parse(x.ExamDate, CultureInfo.CurrentCulture)).Distinct().ToList();
         var placeSchedules = await _placeScheduleRepository.GetPlaceScheduleInfoAsync(placeCodes, teamCodes, examDate);
         // 受診者コードに紐づく受診者IDを取得する
         var examinees = await _examineeRepository.GetExamineeInfoAsync(consults.Select(x => x.ExamineeCode).Distinct().ToList());
@@ -236,10 +237,10 @@ public class ConsultUsecase : IConsultUsecase
             });
         }
         // 会場日程IDが取得できない
-        foreach (var warning in registeConsults.Where(x => !placeSchedules.Any(ps => x.PlaceCode == ps.PlaceCode &&
+        foreach (var warning in registeConsults.Where(x => !placeSchedules.Exists(ps => x.PlaceCode == ps.PlaceCode &&
                                                         x.TeamCode == ps.TeamCode &&
                                                         !string.IsNullOrWhiteSpace(x.ExamDate) &&
-                                                        DateOnly.Parse(x.ExamDate) == ps.ExamDate)))
+                                                        DateOnly.Parse(x.ExamDate, CultureInfo.CurrentCulture) == ps.ExamDate)))
         {
             warningConsults.Add(warning);
             errorObjects.Add(new ErrorObject
