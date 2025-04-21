@@ -11,7 +11,6 @@ namespace Wellship.WebAPI.Tests.ExternalConnection.Usecases;
 
 public class PlaceScheduleUsecaseTests
 {
-    private readonly Mock<IDbConnectionProvider> _dbConnectionProviderMock;
     private readonly Mock<IPlaceScheduleRepository> _placeScheduleRepositoryMock;
     private readonly Mock<IPlaceRepository> _placeRepositoryMock;
     private readonly Mock<ITeamRepository> _teamRepositoryMock;
@@ -19,7 +18,6 @@ public class PlaceScheduleUsecaseTests
 
     public PlaceScheduleUsecaseTests()
     {
-        _dbConnectionProviderMock = new Mock<IDbConnectionProvider>();
         _placeScheduleRepositoryMock = new Mock<IPlaceScheduleRepository>();
         _placeRepositoryMock = new Mock<IPlaceRepository>();
         _teamRepositoryMock = new Mock<ITeamRepository>();
@@ -42,7 +40,7 @@ public class PlaceScheduleUsecaseTests
             new(){Code = "10004", Message = "必須項目が不足しています。TeamCode", InputNote  = "UT2012"},
             new(){Code = "10001", Message = "指定されたTeamCodeがシステム上に存在しません。Code:", InputNote  = "UT2012"}
         };
-        var usecase = new PlaceScheduleUsecase(_dbConnectionProviderMock.Object, _placeScheduleRepositoryMock.Object,
+        var usecase = new PlaceScheduleUsecase(_placeScheduleRepositoryMock.Object,
                                                _placeRepositoryMock.Object, _teamRepositoryMock.Object, _timeProvider);
         var request = new List<PlaceSchedule>
         {
@@ -70,7 +68,7 @@ public class PlaceScheduleUsecaseTests
             new(){Code = "10004", Message = "必須項目が不足しています。PlaceCode", InputNote  = "UT2012"},
             new(){Code = "10001", Message = "指定されたPlaceCodeがシステム上に存在しません。Code:", InputNote  = "UT2012"}
         };
-        var usecase = new PlaceScheduleUsecase(_dbConnectionProviderMock.Object, _placeScheduleRepositoryMock.Object,
+        var usecase = new PlaceScheduleUsecase(_placeScheduleRepositoryMock.Object,
                                                _placeRepositoryMock.Object, _teamRepositoryMock.Object, _timeProvider);
         var request = new List<PlaceSchedule>
         {
@@ -100,7 +98,7 @@ public class PlaceScheduleUsecaseTests
             new(){Code = "10003", Message = "キー項目が重複しています。TeamCode:T001/PlaceCode:P001/ExamDate:2025/04/30", InputNote  = "UT2012-1"},
             new(){Code = "10003", Message = "キー項目が重複しています。TeamCode:T001/PlaceCode:P001/ExamDate:2025/04/30", InputNote  = "UT2012-2"}
         };
-        var usecase = new PlaceScheduleUsecase(_dbConnectionProviderMock.Object, _placeScheduleRepositoryMock.Object,
+        var usecase = new PlaceScheduleUsecase(_placeScheduleRepositoryMock.Object,
                                                _placeRepositoryMock.Object, _teamRepositoryMock.Object, _timeProvider);
         var request = new List<PlaceSchedule>
         {
@@ -128,7 +126,7 @@ public class PlaceScheduleUsecaseTests
         var expected = new List<ErrorObject>() {
             new(){Code = "10001", Message = "指定されたPlaceCodeがシステム上に存在しません。Code:P001", InputNote  = "UT2012"}
         };
-        var usecase = new PlaceScheduleUsecase(_dbConnectionProviderMock.Object, _placeScheduleRepositoryMock.Object,
+        var usecase = new PlaceScheduleUsecase(_placeScheduleRepositoryMock.Object,
                                                _placeRepositoryMock.Object, _teamRepositoryMock.Object, _timeProvider);
         var request = new List<PlaceSchedule>
         {
@@ -155,7 +153,7 @@ public class PlaceScheduleUsecaseTests
         var expected = new List<ErrorObject>() {
             new(){Code = "10001", Message = "指定されたTeamCodeがシステム上に存在しません。Code:T001", InputNote  = "UT2012"}
         };
-        var usecase = new PlaceScheduleUsecase(_dbConnectionProviderMock.Object, _placeScheduleRepositoryMock.Object,
+        var usecase = new PlaceScheduleUsecase(_placeScheduleRepositoryMock.Object,
                                                _placeRepositoryMock.Object, _teamRepositoryMock.Object, _timeProvider);
         var request = new List<PlaceSchedule>
         {

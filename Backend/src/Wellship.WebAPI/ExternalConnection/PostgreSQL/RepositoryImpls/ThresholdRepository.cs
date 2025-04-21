@@ -31,66 +31,64 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         public async Task UpsertThresholdsAsync(List<ThresholdEntity> thresholds, DateTimeOffset createdAt, string createdBy)
         {
             using var scope = TransactionScopeHelper.GetTransactionScope();
+            using var connection = await _dbConnectionProvider.GetOrOpenAsync();
             {
-                using var connection = await _dbConnectionProvider.GetOrOpenAsync();
+            // 表示順を取得する
+            const string selectOrderNumberSql = @"
+            select 
+                coalesce(max(order_number), 0) + 1
+            from 
+                resultcollector.thresholds";
+            var result = await connection.QueryAsync<int>(selectOrderNumberSql);
+            int orderNumber = result.FirstOrDefault();
+
+                var upsertThresholds = thresholds.Select((x, index) => new
                 {
-                // 表示順を取得する
-                const string selectOrderNumberSql = @"
-                select 
-                    coalesce(max(order_number), 0) + 1
-                from 
-                    resultcollector.thresholds";
-                var result = await connection.QueryAsync<int>(selectOrderNumberSql);
-                int orderNumber = result.FirstOrDefault();
+                    ThresholdId = Guid.NewGuid(),
+                    ThresholdCode = x.ThresholdCode,
+                    Name = x.Name,
+                    OrderNumber = orderNumber + index,
+                    CreatedAt = createdAt,
+                    CreatedBy = createdBy,
+                }).ToArray();
 
-                    var upsertThresholds = thresholds.Select((x, index) => new
-                    {
-                        ThresholdId = Guid.NewGuid(),
-                        ThresholdCode = x.ThresholdCode,
-                        Name = x.Name,
-                        OrderNumber = orderNumber + index,
-                        CreatedAt = createdAt,
-                        CreatedBy = createdBy,
-                    }).ToArray();
-
-                    // thresholds（基準値パターン）
-                    const string mergeThresholdSql = @"
-                    merge
-                    into resultcollector.thresholds as threshold
-                        using (values (@ThresholdId, @ThresholdCode, @Name, @OrderNumber,
-                                       @CreatedAt, @CreatedBy)) as new_data(
-                            threshold_id
-                            , threshold_code
-                            , name
-                            , order_number
-                            , created_at
-                            , created_by
-                        )
-                        on threshold.threshold_code = new_data.threshold_code
-                    when matched then 
-                        update set
-                            name = new_data.name
-                            , created_at = new_data.created_at
-                            , created_by = new_data.created_by 
-                    when not matched then
-                        insert (
-                            threshold_id
-                            , threshold_code
-                            , name
-                            , order_number
-                            , created_at
-                            , created_by
-                        )
-                        values (
-                            new_data.threshold_id
-                            , new_data.threshold_code
-                            , new_data.name
-                            , new_data.order_number
-                            , new_data.created_at
-                            , new_data.created_by
-                        );";
-                    await connection.ExecuteAsync(mergeThresholdSql, upsertThresholds);
-                }
+                // thresholds（基準値パターン）
+                const string mergeThresholdSql = @"
+                merge
+                into resultcollector.thresholds as threshold
+                    using (values (@ThresholdId, @ThresholdCode, @Name, @OrderNumber,
+                                    @CreatedAt, @CreatedBy)) as new_data(
+                        threshold_id
+                        , threshold_code
+                        , name
+                        , order_number
+                        , created_at
+                        , created_by
+                    )
+                    on threshold.threshold_code = new_data.threshold_code
+                when matched then 
+                    update set
+                        name = new_data.name
+                        , created_at = new_data.created_at
+                        , created_by = new_data.created_by 
+                when not matched then
+                    insert (
+                        threshold_id
+                        , threshold_code
+                        , name
+                        , order_number
+                        , created_at
+                        , created_by
+                    )
+                    values (
+                        new_data.threshold_id
+                        , new_data.threshold_code
+                        , new_data.name
+                        , new_data.order_number
+                        , new_data.created_at
+                        , new_data.created_by
+                    );";
+                await connection.ExecuteAsync(mergeThresholdSql, upsertThresholds);
                 scope.Complete();
             }
         }

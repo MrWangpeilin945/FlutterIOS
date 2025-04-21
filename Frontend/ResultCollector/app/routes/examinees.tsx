@@ -300,10 +300,12 @@ export default function Examinees() {
                           {examinee.kanaName}
                         </Table.Td>
                         <Table.Td w="27.5%" ta="center">
-                          {format(
-                            parseISO(examinee.checkedInAt ?? ""),
-                            "yyyy/M/d HH:mm:ss",
-                          )}
+                          {examinee.checkedInAt
+                            ? format(
+                                parseISO(examinee.checkedInAt),
+                                "yyyy/M/d HH:mm:ss",
+                              )
+                            : ""}
                         </Table.Td>
                       </Table.Tr>
                     ))}

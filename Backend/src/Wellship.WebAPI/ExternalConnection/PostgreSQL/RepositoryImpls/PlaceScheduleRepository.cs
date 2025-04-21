@@ -32,41 +32,24 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
         public async Task UpsertPlaceScheduleAsync(List<PlaceScheduleEntity> placeScheduleEntities, DateTimeOffset createdAt, string createdBy)
         {
             using var scope = TransactionScopeHelper.GetTransactionScope();
+            using var connection = await _dbConnectionProvider.GetOrOpenAsync();
             {
-                using var connection = await _dbConnectionProvider.GetOrOpenAsync();
+                var upsertItems = placeScheduleEntities.Select(p => new
                 {
-                    var upsertItems = placeScheduleEntities.Select(p => new
-                    {
-                        PlaceId = p.PlaceId,
-                        TeamId = p.TeamId,
-                        Status = p.Status,
-                        ExamDate = p.ExamDate,
-                        StartTime = p.StartTime,
-                        CreatedAt = createdAt,
-                        CreatedBy = createdBy
-                    }).ToArray();
+                    PlaceId = p.PlaceId,
+                    TeamId = p.TeamId,
+                    Status = p.Status,
+                    ExamDate = p.ExamDate,
+                    StartTime = p.StartTime,
+                    CreatedAt = createdAt,
+                    CreatedBy = createdBy
+                }).ToArray();
 
-                    // Upsert文を実行
-                    string mergeSql = @"
-                        merge
-                        into resultcollector.place_schedule as ps
-                            using (values (@PlaceId, @TeamId, @Status, @ExamDate, @StartTime, @CreatedAt, @CreatedBy)) as new_data (
-                                place_id,
-                                team_id,
-                                status,
-                                exam_date,
-                                start_time,
-                                created_at,
-                                created_by
-                            )
-                                on ps.place_id = new_data.place_id
-                                and ps.team_id = new_data.team_id
-                                and cast(ps.exam_date as date) = cast(new_data.exam_date as date) when matched then update
-                        set
-                            start_time = new_data.start_time,
-                            created_at = new_data.created_at,
-                            created_by = new_data.created_by when not matched then
-                        insert (
+                // Upsert文を実行
+                string mergeSql = @"
+                    merge
+                    into resultcollector.place_schedule as ps
+                        using (values (@PlaceId, @TeamId, @Status, @ExamDate, @StartTime, @CreatedAt, @CreatedBy)) as new_data (
                             place_id,
                             team_id,
                             status,
@@ -75,18 +58,33 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.PostgreSQL.RepositoryImpls
                             created_at,
                             created_by
                         )
-                        values (
-                            new_data.place_id,
-                            new_data.team_id,
-                            new_data.status,
-                            new_data.exam_date,
-                            new_data.start_time,
-                            new_data.created_at,
-                            new_data.created_by
-                        );";
+                            on ps.place_id = new_data.place_id
+                            and ps.team_id = new_data.team_id
+                            and cast(ps.exam_date as date) = cast(new_data.exam_date as date) when matched then update
+                    set
+                        start_time = new_data.start_time,
+                        created_at = new_data.created_at,
+                        created_by = new_data.created_by when not matched then
+                    insert (
+                        place_id,
+                        team_id,
+                        status,
+                        exam_date,
+                        start_time,
+                        created_at,
+                        created_by
+                    )
+                    values (
+                        new_data.place_id,
+                        new_data.team_id,
+                        new_data.status,
+                        new_data.exam_date,
+                        new_data.start_time,
+                        new_data.created_at,
+                        new_data.created_by
+                    );";
 
-                    await connection.ExecuteAsync(mergeSql, upsertItems);
-                }
+                await connection.ExecuteAsync(mergeSql, upsertItems);
                 scope.Complete();
             }
         }
