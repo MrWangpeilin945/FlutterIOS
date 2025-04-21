@@ -1,4 +1,4 @@
-import { type JSX, useEffect, useRef, useState } from "react";
+import { type JSX, useEffect, useState } from "react";
 import { useNavigate, useSearchParams, type MetaFunction } from "react-router";
 import {
   Badge,
@@ -49,7 +49,7 @@ export default function Examinees() {
   const [searchParams] = useSearchParams();
   const examMenuId = Number(searchParams.get("exammenuid"));
   const status = Number(searchParams.get("status"));
-  const selectedStatus = useRef<number>(status);
+  const [selectedStatus,setSelectedStatus] = useState<number>(status);
   //職員の状態管理
   const [staffData] = useAtom(staffState);
   //会場の状態管理
@@ -81,7 +81,7 @@ export default function Examinees() {
     "1",
     placeData?.placeScheduleId ?? "",
     examMenuId,
-    { status: selectedStatus.current },
+    { status: selectedStatus },
     { query: { enabled: false } },
   );
 
@@ -120,14 +120,12 @@ export default function Examinees() {
       return;
     }
     getExamineesData();
-  }, [examMenuId, status]);
+  }, [examMenuId, selectedStatus]);
 
   //進捗ステータスボタン押下時
   const refetchExamineeList = (status: number) => {
     //進捗状況を再設定
-    selectedStatus.current = status;
-    //AP1024を再呼び出し
-    getExamineesData();
+    setSelectedStatus(status);
   };
 
   //共通ダイアログのボタン押下時
@@ -179,7 +177,7 @@ export default function Examinees() {
   };
 
   const targetStatus = examineesData?.progress?.details?.find(
-    (d) => d.status === selectedStatus.current,
+    (d) => d.status === selectedStatus,
   );
   return (
     <>
@@ -262,7 +260,7 @@ export default function Examinees() {
                         key={examinee.consultNumber}
                         onClick={() => {
                           navigate(
-                            `/examorder-confirm/${examinee.consultNumber}?exammenuid=${examMenuId}&status=${selectedStatus.current}`,
+                            `/examorder-confirm/${examinee.consultNumber}?exammenuid=${examMenuId}&status=${selectedStatus}`,
                           );
                         }}
                       >
