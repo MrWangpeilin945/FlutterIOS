@@ -5,6 +5,7 @@ import {
   useParams,
   useSearchParams,
 } from "react-router";
+import { useLocation } from "react-router-dom";
 import {
   Button,
   LoadingOverlay,
@@ -13,6 +14,7 @@ import {
   Text,
   getThemeColor,
   useMantineTheme,
+  Box,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useAtom } from "jotai";
@@ -21,6 +23,7 @@ import {
   useConsultGetInputExamItemsExaminee,
   useConsultRegisterResults,
   useConsultVerifyResults,
+  useConsultBatchDeleteResults,
 } from "~/api/wellship";
 import type {
   ExamItemGroup,
@@ -28,6 +31,7 @@ import type {
   InputExamItems,
   ResultsRequest,
   VerifyExamItems,
+  ResultDeleteRequest,
 } from "~/domain/wellship.schemas";
 import {
   InputErrorLevel,
@@ -56,6 +60,7 @@ import ExamVision from "~/components/ExamVision";
 import ExamHearing from "~/components/ExamHearing";
 import ExamNumericRepeatWithSameValue from "~/components/ExamNumericRepeatWithSameValue";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
+import { group } from "console";
 
 export const meta: MetaFunction = () => {
   return [{ title: "検査結果入力" }];
@@ -104,6 +109,8 @@ export default function ConsultInput() {
   // 通過用
   const [hasPass, setHasPass] = useState(false);
   const [passValue, setPassValue] = useState("");
+  // 取り消すボタンか押下されたかのフラグ
+  const [isDeletePressed, setisDeletePressed] = useState(false);
   //機器が選択されているかのフラグ（測定するボタンの表示制御に使用）
   const [hasConnectionEquipment, setHasConnectionEquipment] = useState(true);
   //測定ボタンの無効切り替え
@@ -674,8 +681,97 @@ export default function ConsultInput() {
   // 登録処理
   const callbackRegister = () => {
     closeConfirm();
-    // AP1014_検査結果を登録する
-    registerResults();
+    if (isDeletePressed) {
+      // AP1025_検査結果を取り消す
+      batchDeleteResults();
+    } else {
+      // AP1014_検査結果を登録する
+      registerResults();
+    }
+  };
+
+  // AP1025_検査結果を取り消す
+  const deleteMutateAsync = useConsultBatchDeleteResults().mutateAsync;
+  const batchDeleteResults = async () => {
+    setIsLoading(false);
+    let result: AxiosResponse;
+
+    // リクエストボディ生成
+    const makedeleteBody = (): ResultDeleteRequest => {
+      const updatedExamData = { ...examData.current };
+      if (updatedExamData) {
+        const converted: ResultDeleteRequest = {
+          examItemDetailIds:
+            updatedExamData.examItemGroups?.flatMap(
+              (group) =>
+                group.examItems?.flatMap((examItem) =>
+                  (examItem.examItemDetails || [])
+                    .map((itemDetail) => itemDetail.examItemDetailId)
+                    .filter((id) => typeof id === "number"),
+                ) || [],
+            ) || [],
+        };
+
+        return converted;
+      }
+      return {};
+    };
+    const deletebody = makedeleteBody();
+    if (!consultNumber) return;
+
+    // APIの送信、レスポンス後の挙動
+    const postMutateAsync = async () => {
+      setIsLoading(true);
+      try {
+        result = await deleteMutateAsync({
+          version: apiVersion,
+          consultNumber: consultNumber,
+          data: deletebody,
+        });
+        if (result.status === 204) {
+          // 正常時の処理
+          const location = useLocation();
+          const source =
+            new URLSearchParams(location.search).get("status") || undefined;
+          // 進捗画面を経由した画面遷移の場合、受診者一覧画面に遷移
+          if (source) {
+            navigate("/examinees");
+          } else {
+            // そうでない場合、受診番号入力画面に遷移
+            navigate("/consultnumber-input");
+          }
+          // navigate(0);
+        }
+      } catch (error) {
+        let errorMessage = "";
+        // AxiosErrorかどうかを確認
+        if (isAxiosError(error) && error.response) {
+          const status = error.response.status;
+          // エラー処理
+          if (status === 400) {
+            errorMessage = getErrorMessage(errorMessages.invalid, "回答登録");
+          } else if (status === 403) {
+            errorMessage = "会場ロック中です。管理者のみ更新可能です。";
+          } else if (status === 404) {
+            errorMessage = getErrorMessage(errorMessages.notFound, "受診番号");
+          } else if (status === 500) {
+            errorMessage = getErrorMessage(errorMessages.serverError);
+          }
+        }
+        // 共通ダイアログにエラーメッセージを表示
+        openCommonDialog(errorMessage, "閉じる");
+        setisDeletePressed(false);
+      }
+    };
+    postMutateAsync();
+  };
+
+  // 検査結果取り消し処理
+  const handleDeleate = () => {
+    setisDeletePressed(true);
+    openConfirmDialog(
+      "検査結果を取り消します。削除したデータは元に戻りませんがよろしいですか？",
+    );
   };
 
   // 共通ダイアログ：閉じる処理
@@ -869,21 +965,38 @@ export default function ConsultInput() {
           relatedExamItems={examData.current?.relatedExamItems ?? []}
         />
         <Stack align="center" gap={32} px={32} mt={32}>
-          {/* 測定ボタン */}
-          {hasConnectionEquipment && (
-            <Button
-              ml="auto"
-              ref={disabledRemeasurement}
-              w={184}
-              h={75}
-              size="lg"
-              fw={700}
-              variant="outline"
-              onClick={handleRemeasurement}
-            >
-              測定する
-            </Button>
-          )}
+          <Box display="flex" w="100%">
+            {/* 検査結果取り消しボタン */}
+            {!hasPass && (
+              <Button
+                mr="auto"
+                w={280}
+                h={75}
+                size="sm"
+                fw={700}
+                bg="warning"
+                c="white"
+                onClick={handleDeleate}
+              >
+                検査結果を取り消す
+              </Button>
+            )}
+            {/* 測定ボタン */}
+            {!hasConnectionEquipment && (
+              <Button
+                ml="auto"
+                ref={disabledRemeasurement}
+                w={184}
+                h={75}
+                size="lg"
+                fw={700}
+                variant="outline"
+                onClick={handleRemeasurement}
+              >
+                測定する
+              </Button>
+            )}
+          </Box>
           {/* 検査項目コンポーネント */}
           {examData.current?.examItemGroups?.map(
             (examItemGroup: ExamItemGroup, index: number) => (
