@@ -26,9 +26,9 @@ https://reactrouter.com/[React Router] +
 |===
 |[green]#ライブラリ#| [green]#バージョン#
 |https://nodejs.jp/[Node.js]| 22.9.0
-|https://ja.react.dev/[React]| 19.0.0
-|https://reactrouter.com/[React Router]| 7.1.5
-|https://mantine.dev/[Mantine]| 7.16.3
+|https://ja.react.dev/[React]| 19.1.0
+|https://reactrouter.com/[React Router]| 7.5.0
+|https://mantine.dev/[Mantine]| 7.17.4
 |===
 
 == ディレクトリ構造
