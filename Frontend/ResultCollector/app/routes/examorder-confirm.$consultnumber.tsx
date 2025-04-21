@@ -178,6 +178,10 @@ export default function ExamOrderConfirm() {
   );
   const paramExamMenuId = queryParams.get("exammenuid");
   const examMenuId = paramExamMenuId ? Number(paramExamMenuId) : undefined;
+  const paramProgressStatus = queryParams.get("status");
+  const progressStatus = paramProgressStatus
+    ? Number(paramProgressStatus)
+    : undefined;
 
   // AP1010_検査内容を取得する
   const {
@@ -415,7 +419,13 @@ export default function ExamOrderConfirm() {
       (x) => x.id === examMenuId,
     );
 
-    if (examMenuIndex === -1 || examMenuIndex === undefined) {
+    if (progressStatus) {
+      // クエリパラメータに進捗ステータスが設定されている時
+      // 受診者一覧画面に遷移する
+      navigate(
+        `/examinees?exammenuid=${paramExamMenuId}&status=${paramProgressStatus}`,
+      );
+    } else if (examMenuIndex === -1 || examMenuIndex === undefined) {
       // パラメータの検査メニューIDが状態管理で選択している検査メニューIDに存在しない時
       // 受診番号入力画面に遷移
       navigate("/consultnumber-input");
@@ -464,7 +474,14 @@ export default function ExamOrderConfirm() {
         // 正常終了時
         if (result.status === 200) {
           // 遷移先の画面を判定する
-          if (examItems.some((x) => x.isPerforming)) {
+          if (progressStatus) {
+            // クエリパラメータに進捗ステータスが設定されている時
+            // 受診者一覧画面に遷移する
+            console.log(progressStatus);
+            navigate(
+              `/consult-input/${paramConsultNumber}?exammenuid=${paramExamMenuId}&status=${paramProgressStatus}`,
+            );
+          } else if (examItems.some((x) => x.isPerforming)) {
             // 「実施する」が選択されている検査項目がある時
             // 検査結果入力画面に遷移する
             navigate(
@@ -1167,7 +1184,26 @@ export default function ExamOrderConfirm() {
             </>
           )}
           {/* 共通フッター */}
-          <CommonFooter />
+          {(() => {
+            const footerItems = [
+              { label: "", action: () => {} },
+              { label: "", action: () => {} },
+              {
+                label: "受診者一覧",
+                action: () => {
+                  navigate(
+                    `/examinees?exammenuid=${paramExamMenuId}&status=${paramProgressStatus}`,
+                  );
+                },
+              },
+            ];
+
+            return (
+              <CommonFooter
+                {...(progressStatus ? { items: footerItems } : {})}
+              />
+            );
+          })()}
           {/* 共通ダイアログ */}
           <CommonDialog
             isOpen={showCommonDialog}
