@@ -106,7 +106,7 @@ public class StaffUsecase : IStaffUsecase
         }
 
         // ログインIDが異なる職員コードのチェック
-        foreach (var warning in staffs.Where(x => existingStaffs.Any(staff => staff.LoginId == x.LoginId && staff.StaffCode != x.StaffCode)))
+        foreach (var warning in staffs.Where(x => existingStaffs.Exists(staff => staff.LoginId == x.LoginId && staff.StaffCode != x.StaffCode)))
         {
             // エラーのオブジェクトをStaffにキャストしてワーニングリストに追加する
             if (warning is Staff staff)

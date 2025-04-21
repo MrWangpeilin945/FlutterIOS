@@ -74,7 +74,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
                                                 .GroupBy(x => new { x.PlaceCode, x.TeamCode, ExamDate = DateOnly.FromDateTime(x.ExamDate) })
                                                 .Where(x => x.Count() > 1)
                                                 .Select(x => x.Key).ToHashSet();
-        if (duplicatePlaceScheduleKeys.Any())
+        if (duplicatePlaceScheduleKeys.Count > 0)
         {
             // PKが重複したレコードを取得する
             var duplicatePlaceSchedules = placeSchedules.Where(x => duplicatePlaceScheduleKeys.Any(duplicateKey =>

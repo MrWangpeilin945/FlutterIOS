@@ -9,7 +9,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// </summary>
 public class PlaceUsecase : IPlaceUsecase
 {
-    private readonly List<ErrorObject> _errorObjects;
     private readonly IPlaceRepository _placeRepository;
     private readonly TimeProvider _timeProvider;
 
@@ -21,7 +20,6 @@ public class PlaceUsecase : IPlaceUsecase
     public PlaceUsecase(IPlaceRepository placeRepository, TimeProvider timeProvider)
     {
         _placeRepository = placeRepository;
-        _errorObjects = new List<ErrorObject>();
         _timeProvider = timeProvider;
     }
 
