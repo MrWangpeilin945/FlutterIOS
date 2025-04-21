@@ -338,3 +338,111 @@ INSERT INTO app_config(key,value,description,created_at,created_by) VALUES
     ('Auth.AccessTokenLifetime','3','アクセストークンの有効期限（分）',CURRENT_TIMESTAMP,'init')
   , ('Auth.RefreshTokenLifeTime','720','リフレッシュトークンの有効期限（分）',CURRENT_TIMESTAMP,'init')
   , ('Auth.SecretKey','qguSdqCvPiGwUceBYXWEfJKLNrakzsnblVjxRIApFhmQtOHoZDTy','トークンのシークレット',CURRENT_TIMESTAMP,'init');
+
+-- 連携処理機能
+INSERT INTO resultcollector.integration_functions(code,name,created_by) VALUES 
+    ('AP6201','受診者を登録する(WebAPI)','init')
+  , ('AP6202','受付を更新する(WebAPI)','init')
+  , ('AP6204','受診を更新する(WebAPI)','init')
+  , ('AP6206','班を登録する(WebAPI)','init')
+  , ('AP6207','会場を登録する(WebAPI)','init')
+  , ('AP6208','団体を登録する(WebAPI)','init')
+  , ('AP6209','基準値(範囲)を登録する(WebAPI)','init')
+  , ('AP6211','職員を登録する(WebAPI)','init')
+  , ('AP6212','会場日程を登録する(WebAPI)','init')
+  , ('AP6214','基準パターンを登録する(WebAPI)','init')
+  , ('EC1001','随時連携(ファイル連携)','init')
+  , ('EC1002','日次連携(ファイル連携)','init')
+  , ('EC2001','受診者を登録する','init')
+  , ('EC2002','受付を更新する','init')
+  , ('EC2004','受診を更新する','init')
+  , ('EC2006','班を登録する','init')
+  , ('EC2007','会場を登録する','init')
+  , ('EC2008','団体を登録する','init')
+  , ('EC2009','基準値(範囲)を登録する','init')
+  , ('EC2011','職員を登録する','init')
+  , ('EC2012','会場日程を登録する','init')
+  , ('EC2014','基準パターンを登録する','init');
+
+-- 連携処理結果コード
+INSERT INTO resultcollector.integration_result_codes(code,name,log_level,created_by) VALUES 
+    ('100000','正常終了',2,'init')
+  , ('100001','Zipファイルが存在しないためスキップ',3,'init')
+  , ('100002','取り込み除外レコード有',3,'init')
+  , ('199999','異常終了（ハンドリングできていない例外）',4,'init');
+
+-- 通知先グループ
+INSERT INTO resultcollector.notification_groups(id,name,order_number,created_by) VALUES 
+    (1,'通知先グループ1',1,'init')
+  , (2,'通知先グループ2',2,'init');
+
+-- 通知先
+INSERT INTO resultcollector.notification_recipients(id,name,display_name,email_address,order_number,notification_group_id,created_by) VALUES 
+    (11,'通知先1-1','通知先1-1_表示名','target11@example.com',1,1,'init')
+  , (12,'通知先1-2','通知先1-2_表示名','target12@example.com',2,1,'init')
+  , (13,'通知先1-3','通知先1-3_表示名','target13@example.com',3,1,'init')
+  , (21,'通知先2-1','通知先2-1_表示名','target21@example.com',1,2,'init')
+  , (22,'通知先2-2','通知先2-2_表示名','target22@example.com',2,2,'init');
+
+-- 通知テンプレート
+INSERT INTO resultcollector.notification_templates(id,name,subject,body,sender_address,notification_group_id,created_by) VALUES 
+    (1,'通知先グループ1用テンプレート','[WELLSHIP連携G1] [{{LogLevel}}] {{Summary}}','宛先）
+{{RecipientNameList}}
+
+---
+処理結果コード：{{ResultCode}}
+処理結果名：{{ResultName}}
+機能コード：{{FunctionCode}}
+機能名：{{FunctionName}}
+ログレベル：{{LogLevel}}
+概要：{{Summary}}
+---
+発生時刻：{{OccurredAt}}
+---
+詳細：
+{{Details}}
+
+以上
+','no-reply@example.com',1,'init')
+  , (2,'通知先グループ2用テンプレート','[WELLSHIP連携G2] [{{LogLevel}}] {{Summary}}','宛先）
+{{RecipientNameList}}
+
+---
+処理結果コード：{{ResultCode}}
+処理結果名：{{ResultName}}
+機能コード：{{FunctionCode}}
+機能名：{{FunctionName}}
+ログレベル：{{LogLevel}}
+概要：{{Summary}}
+---
+発生時刻：{{OccurredAt}}
+---
+詳細：
+{{Details}}
+
+以上
+','no-reply@example.com',2,'init');
+
+-- 通知ルール
+INSERT INTO resultcollector.notification_rules(notification_group_id,log_level,enabled,created_by) VALUES 
+    (1,2,True,'init')
+  , (1,3,True,'init')
+  , (1,4,True,'init')
+  , (2,2,True,'init')
+  , (2,3,True,'init')
+  , (2,4,True,'init');
+
+-- 連携処理結果ログ
+INSERT INTO resultcollector.integration_result_logs(id,result_code,log_level,function_code,summary,created_by) VALUES 
+    ('{b0bea66a-a7e7-4182-a1d5-e9fc0f7f8368}','100002',3,'AP6206','取り込み除外レコードが存在します。','ExternalConnection')
+  , ('{d6bcc11b-c9b0-4dcd-9fe2-9771d36f4e25}','100000',2,'AP6201','受診者登録が正常に完了しました。','ExternalConnection')
+  , ('{dc721a35-d230-4eac-b799-4e1a39c53ec4}','100001',3,'AP6204','Zipファイルが存在しないためスキップされました。','ExternalConnection')
+  , ('{ec3290b2-efa2-4b8b-b645-87724779fff0}','199999',4,'EC1001','異常終了（ハンドリングできていない例外）。','ExternalConnection');
+
+-- 連携処理結果ログ明細
+INSERT INTO resultcollector.integration_result_log_details(integration_result_log_id,order_number,function_code,event_source,result_detail_code,result_detail_message,properties,created_by) VALUES 
+    ('{b0bea66a-a7e7-4182-a1d5-e9fc0f7f8368}',1,'AP6206','WebAPI','100002','取り込み除外レコードが存在します。','[{"name": "PlaceCode", "value": "P0002"}, {"name": "TeamCode", "value": "T0002"}, {"name": "ExamDate", "value": "2025-04-18"}]','ExternalConnection')
+  , ('{d6bcc11b-c9b0-4dcd-9fe2-9771d36f4e25}',1,'AP6201','WebAPI','100000','受診者登録が正常に完了しました。','[]','ExternalConnection')
+  , ('{d6bcc11b-c9b0-4dcd-9fe2-9771d36f4e25}',2,'AP6202','WebAPI','100000','受付更新が正常に完了しました。','[{"name": "PlaceCode", "value": "P0001"}, {"name": "TeamCode", "value": "T0001"}, {"name": "ExamDate", "value": "2025-04-17"}]','ExternalConnection')
+  , ('{dc721a35-d230-4eac-b799-4e1a39c53ec4}',1,'AP6204','WebAPI','100001','Zipファイルが存在しないためスキップされました。','[]','ExternalConnection')
+  , ('{ec3290b2-efa2-4b8b-b645-87724779fff0}',1,'EC1001','ファイル連携','199999','異常終了（ハンドリングできていない例外）。','[]','ExternalConnection');
