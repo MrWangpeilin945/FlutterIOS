@@ -5,7 +5,6 @@ import {
   useParams,
   useSearchParams,
 } from "react-router";
-import { useLocation } from "react-router-dom";
 import {
   Button,
   LoadingOverlay,
@@ -74,7 +73,12 @@ export default function ConsultInput() {
   const consultNumber = useParams().consultnumber ?? undefined;
   // クエリパラメータの取得
   const [searchParams] = useSearchParams();
-  const examMenuId = Number(searchParams.get("exammenuid"));
+  const paramExamMenuId = searchParams.get("exammenuid");
+  const examMenuId = paramExamMenuId ? Number(paramExamMenuId) : undefined;
+  const paramProgressStatus = searchParams.get("status");
+  const progressStatus = paramProgressStatus
+    ? Number(paramProgressStatus)
+    : undefined;
   // 登録ボタンフラグ
   const [isRegisterPressed, setIsRegisterPressed] = useState(false);
   //初期表示フラグ
@@ -730,17 +734,15 @@ export default function ConsultInput() {
         });
         if (result.status === 204) {
           // 正常時の処理
-          const location = useLocation();
-          const source =
-            new URLSearchParams(location.search).get("status") || undefined;
-          // 進捗画面を経由した画面遷移の場合、受診者一覧画面に遷移
-          if (source) {
-            navigate("/examinees");
+          // クエリパラメータに進捗ステータスが設定されている場合、受診者一覧画面に遷移
+          if (progressStatus) {
+            navigate(
+              `/examinees?exammenuid=${examMenuId}&status=${progressStatus}`,
+            );
           } else {
             // そうでない場合、受診番号入力画面に遷移
-            navigate("/consultnumber-input");
+            navigate("/consult-input");
           }
-          // navigate(0);
         }
       } catch (error) {
         let errorMessage = "";
@@ -749,7 +751,7 @@ export default function ConsultInput() {
           const status = error.response.status;
           // エラー処理
           if (status === 400) {
-            errorMessage = getErrorMessage(errorMessages.invalid, "回答登録");
+            errorMessage = "入力形式が間違っています。";
           } else if (status === 403) {
             errorMessage = "会場ロック中です。管理者のみ更新可能です。";
           } else if (status === 404) {
@@ -764,6 +766,7 @@ export default function ConsultInput() {
       }
     };
     postMutateAsync();
+    setIsLoading(false);
   };
 
   // 検査結果取り消し処理
