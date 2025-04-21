@@ -12,7 +12,6 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Usecases.Default;
 /// </summary>
 public class PlaceScheduleUsecase : IPlaceScheduleUsecase
 {
-    private readonly IDbConnectionProvider _dbConnectionProvider;
     private readonly IPlaceScheduleRepository _placeScheduleRepository;
     private readonly IPlaceRepository _placeRepository;
     private readonly ITeamRepository _teamRepository;
@@ -21,16 +20,14 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
     /// <summary>
     /// ユースケースを作成する
     /// </summary>
-    /// <param name="dbConnectionProvider"></param>
     /// <param name="placeScheduleRepository"></param>
     /// <param name="placeRepository"></param>
     /// <param name="teamRepository"></param>
     /// <param name="timeProvider"></param>
-    public PlaceScheduleUsecase(IDbConnectionProvider dbConnectionProvider, IPlaceScheduleRepository placeScheduleRepository,
+    public PlaceScheduleUsecase(IPlaceScheduleRepository placeScheduleRepository,
                                 IPlaceRepository placeRepository, ITeamRepository teamRepository,
                                 TimeProvider timeProvider)
     {
-        _dbConnectionProvider = dbConnectionProvider;
         _placeScheduleRepository = placeScheduleRepository;
         _placeRepository = placeRepository;
         _teamRepository = teamRepository;
