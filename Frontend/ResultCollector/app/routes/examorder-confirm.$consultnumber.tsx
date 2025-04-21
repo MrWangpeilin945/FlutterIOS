@@ -476,8 +476,7 @@ export default function ExamOrderConfirm() {
           // 遷移先の画面を判定する
           if (progressStatus) {
             // クエリパラメータに進捗ステータスが設定されている時
-            // 受診者一覧画面に遷移する
-            console.log(progressStatus);
+            // 検査結果入力画面に遷移する
             navigate(
               `/consult-input/${paramConsultNumber}?exammenuid=${paramExamMenuId}&status=${paramProgressStatus}`,
             );
