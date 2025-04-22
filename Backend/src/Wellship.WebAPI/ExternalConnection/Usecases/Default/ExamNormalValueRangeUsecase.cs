@@ -62,10 +62,7 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
         foreach (var warning in ValidationChecker.SpaceCheckProperties(examNormalValueRanges, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをexamNormalValueRangeにキャストしてワーニングリストに追加する
-            if (warning is ExamNormalValueRange examNormalValueRange)
-            {
-                warningExamNormalValueRanges.Add(examNormalValueRange);
-            }
+            warningExamNormalValueRanges.Add((ExamNormalValueRange)warning);
         }
 
         // 年齢の形式確認
@@ -78,10 +75,7 @@ public class ExamNormalValueRangeUsecase : IExamNormalValueRangeUsecase
         foreach (var warning in ValidationChecker.StringPatternCheckProperties(examNormalValueRanges, stringPatternCheckProperties, patterns, errorObjects))
         {
             // エラーのオブジェクトをexamNormalValueRangeにキャストしてワーニングリストに追加する
-            if (warning is ExamNormalValueRange examNormalValueRange)
-            {
-                warningExamNormalValueRanges.Add(examNormalValueRange);
-            }
+            warningExamNormalValueRanges.Add((ExamNormalValueRange)warning);
         }
 
         // 年齢の大小確認

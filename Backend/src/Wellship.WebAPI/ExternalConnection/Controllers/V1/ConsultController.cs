@@ -14,6 +14,7 @@ namespace Ryobi.Wellship.WebAPI.ExternalConnection.Controllers.V1;
 /// </summary>
 [ApiController]
 [ApiVersion("1")]
+[OpenApiIgnore]
 public class ConsultController : ControllerBase
 {
     private readonly IConsultUsecase _consultUsecase;

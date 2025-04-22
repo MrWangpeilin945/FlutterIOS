@@ -45,10 +45,7 @@ public class TeamUsecase : ITeamUsecase
         foreach (var warning in ValidationChecker.SpaceCheckProperties(teams, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをTeamにキャストしてワーニングリストに追加する
-            if (warning is Team team)
-            {
-                warningTeams.Add(team);
-            }
+            warningTeams.Add((Team)warning);
         }
 
         // キー重複チェック
@@ -60,10 +57,7 @@ public class TeamUsecase : ITeamUsecase
         foreach (var warning in ValidationChecker.DuplicateCheckProperties(teams, duplicateCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをTeamにキャストしてワーニングリストに追加する
-            if (warning is Team team)
-            {
-                warningTeams.Add(team);
-            }
+            warningTeams.Add((Team)warning);
         }
 
         // 班エンティティリスト生成

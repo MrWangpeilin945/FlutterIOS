@@ -59,10 +59,7 @@ public class ExamineeUsecase : IExamineeUsecase
         foreach (var warning in ValidationChecker.SpaceCheckProperties(examinees, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをExamineeにキャストしてワーニングリストに追加する
-            if (warning is Examinee examinee)
-            {
-                warningExaminees.Add(examinee);
-            }
+            warningExaminees.Add((Examinee)warning);
         }
         var spaceCheckChildrenProperties = new List<(string ParentProperty, string ChildProperty)>
         {
@@ -72,10 +69,7 @@ public class ExamineeUsecase : IExamineeUsecase
         foreach (var warning in ValidationChecker.SpaceCheckChildrenProperties(examinees, spaceCheckChildrenProperties, errorObjects))
         {
             // エラーのオブジェクトをExamineeにキャストしてワーニングリストに追加する
-            if (warning is Examinee examinee)
-            {
-                warningExaminees.Add(examinee);
-            }
+            warningExaminees.Add((Examinee)warning);
         }
 
         // キー重複チェック
@@ -87,10 +81,7 @@ public class ExamineeUsecase : IExamineeUsecase
         foreach (var warning in ValidationChecker.DuplicateCheckProperties(examinees, duplicateCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをExamineeにキャストしてワーニングリストに追加する
-            if (warning is Examinee examinee)
-            {
-                warningExaminees.Add(examinee);
-            }
+            warningExaminees.Add((Examinee)warning);
         }
         var duplicateCheckChildProperties = new List<(string ParentProperty, string ChildProperty)>
         {
@@ -100,10 +91,7 @@ public class ExamineeUsecase : IExamineeUsecase
         foreach (var warning in ValidationChecker.DuplicateCheckChildrenProperties(examinees, duplicateCheckChildProperties, errorObjects))
         {
             // エラーのオブジェクトをExamineeにキャストしてワーニングリストに追加する
-            if (warning is Examinee examinee)
-            {
-                warningExaminees.Add(examinee);
-            }
+            warningExaminees.Add((Examinee)warning);
         }
 
         foreach (var examinee in examinees)

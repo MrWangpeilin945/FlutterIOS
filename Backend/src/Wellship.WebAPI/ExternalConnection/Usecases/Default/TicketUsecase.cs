@@ -48,10 +48,7 @@ public class TicketUsecase : ITicketUsecase
         foreach (var warning in ValidationChecker.SpaceCheckProperties(tickets, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをTicketにキャストしてワーニングリストに追加する
-            if (warning is Ticket ticket)
-            {
-                warningTickets.Add(ticket);
-            }
+            warningTickets.Add((Ticket)warning);
         }
 
         // キー重複チェック
@@ -63,10 +60,7 @@ public class TicketUsecase : ITicketUsecase
         foreach (var warning in ValidationChecker.DuplicateCheckProperties(tickets, duplicateCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをTicketにキャストしてワーニングリストに追加する
-            if (warning is Ticket ticket)
-            {
-                warningTickets.Add(ticket);
-            }
+            warningTickets.Add((Ticket)warning);
         }
 
         // 会場IDが取得できない
