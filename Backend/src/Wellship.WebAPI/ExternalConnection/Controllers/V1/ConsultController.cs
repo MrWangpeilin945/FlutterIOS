@@ -36,7 +36,7 @@ public class ConsultController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
-    [Route("api/v{version:apiVersion}/external/consult")]
+    [Route("api/v{apiVersion}/external/consult")]
     public async Task<IActionResult> StoreConsultAsync([FromBody] Consult[] request)
     {
         var result = await _consultUsecase.StoreConsultAsync(request.ToList());
