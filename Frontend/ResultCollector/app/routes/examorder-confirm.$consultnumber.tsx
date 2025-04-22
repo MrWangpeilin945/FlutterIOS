@@ -517,9 +517,9 @@ export default function ExamOrderConfirm() {
       }
     };
 
-      // 検査実施有無と中止理由を登録する
-      postConsultExamExecutionsAsync();
-    };
+    // 検査実施有無と中止理由を登録する
+    postConsultExamExecutionsAsync();
+  };
   
 
   // 入力チェック
