@@ -37,7 +37,7 @@ public class PlaceScheduleController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
-    [Route("api/v{apiVersion}/external/placeSchedules")]
+    [Route("api/v{version:apiVersion}/external/placeSchedules")]
     public async Task<IActionResult> StorePlaceSchedulesAsync([FromBody] PlaceSchedule[] request)
     {
         var result = await _placeScheduleUsecase.StorePlaceSchedulesAsync(request.ToList());

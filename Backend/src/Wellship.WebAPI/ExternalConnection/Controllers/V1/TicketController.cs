@@ -37,7 +37,7 @@ public class TicketController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
-    [Route("api/v{apiVersion}/external/tickets")]
+    [Route("api/v{version:apiVersion}/external/tickets")]
     public async Task<IActionResult> StoreTicketsAsync([FromBody] Ticket[] request)
     {
         var result = await _ticketUsecase.StoreTicketsAsync(request.ToList());

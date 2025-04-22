@@ -36,7 +36,7 @@ public class ExamineeController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
-    [Route("api/v{apiVersion}/external/examinees")]
+    [Route("api/v{version:apiVersion}/external/examinees")]
     public async Task<IActionResult> StoreExamineesAsync([FromBody] Examinee[] request)
     {
         var result = await _examineeUsecases.StoreExamineesAsync(request.ToList());
