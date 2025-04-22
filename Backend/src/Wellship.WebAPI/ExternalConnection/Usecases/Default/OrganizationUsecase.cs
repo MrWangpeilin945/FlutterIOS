@@ -45,10 +45,7 @@ public class OrganizationUsecase : IOrganizationUsecase
         foreach (var warning in ValidationChecker.SpaceCheckProperties(organizations, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをOrganizationにキャストしてワーニングリストに追加する
-            if (warning is Organization organization)
-            {
-                warningOrganizations.Add(organization);
-            }
+            warningOrganizations.Add((Organization)warning);
         }
 
         // キー重複チェック
@@ -60,10 +57,7 @@ public class OrganizationUsecase : IOrganizationUsecase
         foreach (var warning in ValidationChecker.DuplicateCheckProperties(organizations, duplicateCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをOrganizationにキャストしてワーニングリストに追加する
-            if (warning is Organization organization)
-            {
-                warningOrganizations.Add(organization);
-            }
+            warningOrganizations.Add((Organization)warning);
         }
 
         // 団体エンティティリスト生成

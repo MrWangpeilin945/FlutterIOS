@@ -49,10 +49,7 @@ public class StaffUsecase : IStaffUsecase
         foreach (var warning in ValidationChecker.SpaceCheckProperties(staffs, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをStaffにキャストしてワーニングリストに追加する
-            if (warning is Staff staff)
-            {
-                warningStaffs.Add(staff);
-            }
+            warningStaffs.Add((Staff)warning);
         }
 
         // 文字数のチェック
@@ -67,10 +64,7 @@ public class StaffUsecase : IStaffUsecase
         foreach (var warning in ValidationChecker.StringLengthCheckProperties(staffs, stringLengthCheckProperties, stringLengths, compars, errorObjects))
         {
             // エラーのオブジェクトをStaffにキャストしてワーニングリストに追加する
-            if (warning is Staff staff)
-            {
-                warningStaffs.Add(staff);
-            }
+            warningStaffs.Add((Staff)warning);
         }
 
         // 文字形式のチェック
@@ -83,10 +77,7 @@ public class StaffUsecase : IStaffUsecase
         foreach (var warning in ValidationChecker.StringPatternCheckProperties(staffs, stringPatternCheckProperties, patterns, errorObjects))
         {
             // エラーのオブジェクトをStaffにキャストしてワーニングリストに追加する
-            if (warning is Staff staff)
-            {
-                warningStaffs.Add(staff);
-            }
+            warningStaffs.Add((Staff)warning);
         }
 
         // キー重複チェック
@@ -99,10 +90,7 @@ public class StaffUsecase : IStaffUsecase
         foreach (var warning in ValidationChecker.DuplicateCheckProperties(staffs, duplicateCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをStaffにキャストしてワーニングリストに追加する
-            if (warning is Staff staff)
-            {
-                warningStaffs.Add(staff);
-            }
+            warningStaffs.Add((Staff)warning);
         }
 
         // ログインIDが異なる職員コードのチェック

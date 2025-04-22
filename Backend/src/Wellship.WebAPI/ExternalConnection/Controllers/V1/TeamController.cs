@@ -37,7 +37,7 @@ public class TeamController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
-    [Route("api/v{version:apiVersion}/external/teams")]
+    [Route("api/v{apiVersion}/external/teams")]
     public async Task<IActionResult> StoreTeamsAsync([FromBody] Team[] request)
     {
         var result = await _teamUsecaseUsecase.StoreTeamsAsync(request.ToList());

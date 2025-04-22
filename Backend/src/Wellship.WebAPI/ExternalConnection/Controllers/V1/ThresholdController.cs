@@ -37,7 +37,7 @@ public class ThresholdController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
-    [Route("api/v{version:apiVersion}/external/thresholds")]
+    [Route("api/v{apiVersion}/external/thresholds")]
     public async Task<IActionResult> StoreThresholdsAsync([FromBody] Threshold[] request)
     {
         var result = await _thresholdUsecaseUsecase.StoreThresholdsAsync(request.ToList());

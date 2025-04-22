@@ -37,6 +37,7 @@ import {
   ExamItemGroupType,
   ExamItemDetailType,
 } from "~/domain/enums";
+import type { NumberIdNamedEntity } from "~/interfaces/interfaces";
 import {
   connectionEquipmentState,
   examMenuState,
@@ -628,11 +629,23 @@ export default function ConsultInput() {
 
   // 検査継続処理
   const continuingExam = () => {
-    if (!examMenus) return;
-    const currentIndex = examMenus.findIndex((menu) => menu.id === examMenuId);
-    if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
+    const selectedExamMenu = examMenus?.filter(
+      Boolean,
+    ) as NumberIdNamedEntity[];
+    const currentIndex = selectedExamMenu?.findIndex(
+      (menu) => menu.id === examMenuId,
+    );
+    if (progressStatus) {
+      //クエリパラメータに進捗ステータスが設定されている場合、受診者一覧画面に遷移
+      navigate(
+        `/examinees?exammenuid=${examMenuId}&status=${progressStatus}`,
+      );
+    } else if (
+      currentIndex !== -1 &&
+      currentIndex < selectedExamMenu?.length - 1
+    ) {
       //次の検査メニューIDが存在する場合、検査内容確認画面へ遷移
-      const nextExam = examMenus[currentIndex + 1];
+      const nextExam = selectedExamMenu?.[currentIndex + 1];
       navigate(`/examorder-confirm/${consultNumber}?exammenuid=${nextExam.id}`);
     } else {
       //最後の検査メニューの場合、受診番号入力画面へ遷移

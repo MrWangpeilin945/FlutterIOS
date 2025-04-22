@@ -88,13 +88,14 @@ public class ConsultUsecase : IConsultUsecase
         // 必須項目の空値のチェック
         // 連携キー（共通）
         // チェックするプロパティ一覧をメソッドに渡してチェックエラーのconsultを取得する
-        foreach (var warning in ValidationChecker.SpaceCheckProperties(consults, new string[] { "ConnectionCode" }, errorObjects))
+        var spaceCheckCommonProperties = new[]
+        {
+            "ConnectionCode"     // 連携キー
+        };
+        foreach (var warning in ValidationChecker.SpaceCheckProperties(consults, spaceCheckCommonProperties, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
-            if (warning is Consult consult)
-            {
-                warningConsults.Add(consult);
-            }
+            warningConsults.Add((Consult)warning);
         }
         var spaceCheckProperties = new[]
         {
@@ -108,10 +109,7 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var warning in ValidationChecker.SpaceCheckProperties(registeConsults, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
-            if (warning is Consult consult)
-            {
-                warningConsults.Add(consult);
-            }
+            warningConsults.Add((Consult)warning);
         }
         var spaceCheckChildrenProperties = new List<(string ParentProperty, string ChildProperty)>
         {
@@ -125,10 +123,7 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var warning in ValidationChecker.SpaceCheckChildrenProperties(registeConsults, spaceCheckChildrenProperties, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
-            if (warning is Consult consult)
-            {
-                warningConsults.Add(consult);
-            }
+            warningConsults.Add((Consult)warning);
         }
 
         // キー重複チェック
@@ -140,10 +135,7 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var warning in ValidationChecker.DuplicateCheckProperties(registeConsults, duplicateCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
-            if (warning is Consult consult)
-            {
-                warningConsults.Add(consult);
-            }
+            warningConsults.Add((Consult)warning);
         }
         var duplicateCheckChildProperties = new List<(string ParentProperty, string ChildProperty)>
         {
@@ -156,10 +148,7 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var warning in ValidationChecker.DuplicateCheckChildrenProperties(registeConsults, duplicateCheckChildProperties, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
-            if (warning is Consult consult)
-            {
-                warningConsults.Add(consult);
-            }
+            warningConsults.Add((Consult)warning);
         }
 
         // 文字数のチェック
@@ -174,10 +163,7 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var warning in ValidationChecker.StringLengthCheckProperties(registeConsults, stringLengthCheckProperties, stringLengths, compars, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
-            if (warning is Consult consult)
-            {
-                warningConsults.Add(consult);
-            }
+            warningConsults.Add((Consult)warning);
         }
 
         // 文字形式のチェック
@@ -190,10 +176,7 @@ public class ConsultUsecase : IConsultUsecase
         foreach (var warning in ValidationChecker.StringPatternCheckProperties(registeConsults, stringPatternCheckProperties, patterns, errorObjects))
         {
             // エラーのオブジェクトをconsultにキャストしてワーニングリストに追加する
-            if (warning is Consult consult)
-            {
-                warningConsults.Add(consult);
-            }
+            warningConsults.Add((Consult)warning);
         }
 
         // 受診番号が異なる連携キーで登録されている
@@ -309,13 +292,13 @@ public class ConsultUsecase : IConsultUsecase
                                                     .GroupBy(x => new { x.ExamItemDetailCode, x.ExamDate })
                                                     .Where(x => x.Count() > 1)
                                                     .Select(x => x);
-            foreach (var warning in duplicateExamItemDetailCds)
+            foreach (var key in duplicateExamItemDetailCds.Select(warning => warning.Key))
             {
                 warningConsults.Add(consult);
                 errorObjects.Add(new ErrorObject
                 {
                     Code = "10003",
-                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{warning.Key.ExamItemDetailCode}/PreviousResults.ExamDate:{warning.Key.ExamDate.ToString("yyyy/MM/dd")}",
+                    Message = $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{key.ExamItemDetailCode}/PreviousResults.ExamDate:{key.ExamDate.ToString("yyyy/MM/dd")}",
                     InputNote = consult.InputNote
                 });
             }
@@ -387,7 +370,7 @@ public class ConsultUsecase : IConsultUsecase
                                         PlaceScheduleId = placeSchedules.Where(ps => ps.PlaceCode == x.PlaceCode)
                                                                         .Where(ps => ps.TeamCode == x.TeamCode)
                                                                         .Where(ps => !string.IsNullOrWhiteSpace(x.ExamDate) &&
-                                                                                     ps.ExamDate == DateOnly.Parse(x.ExamDate))
+                                                                                     ps.ExamDate == DateOnly.Parse(x.ExamDate, CultureInfo.CurrentCulture))
                                                                         .Select(ps => ps.PlaceScheduleId).FirstOrDefault(),
                                         Note = x.Note,
                                         ExamineeId = examinees.Where(e => e.ExamineeCode == x.ExamineeCode)

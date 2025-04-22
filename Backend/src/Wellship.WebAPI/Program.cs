@@ -62,6 +62,12 @@ public class Program
             builder.Services.AddLocalServices()
                             .AddPostgreSqlServices();
         }
+        builder.Services.AddSingleton<IDbAccessRetryPolicyProvider, DbAccessRetryPolicyProvider>();
+        builder.Services.AddSingleton<BackoffSettings>((_) => new()
+        {
+            RetryCount = 4,
+            ExponentialBase = 2
+        });
         builder.Services.AddScoped<IDbConnectionProvider, DbConnectionProvider>();
         builder.Services.AddScoped<IServiceScopeTaskRunner, ServiceScopeTaskRunner>();
         builder.Services.AddScoped<IStaffIdentityProvider, StaffIdentityFromHttpContextProvider>();

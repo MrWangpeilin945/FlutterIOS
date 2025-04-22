@@ -45,10 +45,7 @@ public class PlaceUsecase : IPlaceUsecase
         foreach (var warning in ValidationChecker.SpaceCheckProperties(places, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをPlaceにキャストしてワーニングリストに追加する
-            if (warning is Place place)
-            {
-                warningPlaces.Add(place);
-            }
+            warningPlaces.Add((Place)warning);
         }
 
         // キー重複チェック
@@ -60,10 +57,7 @@ public class PlaceUsecase : IPlaceUsecase
         foreach (var warning in ValidationChecker.DuplicateCheckProperties(places, duplicateCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをPlaceにキャストしてワーニングリストに追加する
-            if (warning is Place place)
-            {
-                warningPlaces.Add(place);
-            }
+            warningPlaces.Add((Place)warning);
         }
 
         // エンティティリスト生成
