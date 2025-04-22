@@ -37,7 +37,7 @@ public class ExamNormalValueRangeController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
-    [Route("api/v{version:apiVersion}/external/examNormalValueRange")]
+    [Route("api/v{apiVersion}/external/examNormalValueRange")]
     public async Task<IActionResult> StoreExamNormalValueRangeAsync([FromBody] ExamNormalValueRange[] request)
     {
         var result = await _examNormalValueRange.StoreExamNormalValueRangeAsync(request.ToList());

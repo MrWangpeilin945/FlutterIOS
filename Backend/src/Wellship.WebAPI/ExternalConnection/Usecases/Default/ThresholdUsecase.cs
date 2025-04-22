@@ -45,10 +45,7 @@ public class ThresholdUsecase : IThresholdUsecase
         foreach (var warning in ValidationChecker.SpaceCheckProperties(thresholds, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをThresholdにキャストしてワーニングリストに追加する
-            if (warning is Threshold threshold)
-            {
-                warningThresholds.Add(threshold);
-            }
+            warningThresholds.Add((Threshold)warning);
         }
 
         // キー重複チェック
@@ -60,10 +57,7 @@ public class ThresholdUsecase : IThresholdUsecase
         foreach (var warning in ValidationChecker.DuplicateCheckProperties(thresholds, duplicateCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをThresholdにキャストしてワーニングリストに追加する
-            if (warning is Threshold threshold)
-            {
-                warningThresholds.Add(threshold);
-            }
+            warningThresholds.Add((Threshold)warning);
         }
 
         // エンティティリスト生成

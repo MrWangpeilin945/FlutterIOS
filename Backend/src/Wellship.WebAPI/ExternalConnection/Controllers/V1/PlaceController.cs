@@ -37,7 +37,7 @@ public class PlaceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
-    [Route("api/v{version:apiVersion}/external/places")]
+    [Route("api/v{apiVersion}/external/places")]
     public async Task<IActionResult> StorePlacesAsync([FromBody] Place[] request)
     {
         var result = await _placeUsecaseUsecase.StorePlacesAsync(request.ToList());
