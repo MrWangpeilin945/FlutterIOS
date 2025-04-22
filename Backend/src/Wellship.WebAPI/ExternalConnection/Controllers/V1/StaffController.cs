@@ -37,7 +37,7 @@ public class StaffController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
-    [Route("api/v{apiVersion}/external/staffs")]
+    [Route("api/v{version:apiVersion}/external/staffs")]
     public async Task<IActionResult> StoreStaffsAsync([FromBody] Staff[] request)
     {
         var result = await _staffUsecase.StoreStaffsAsync(request.ToList());

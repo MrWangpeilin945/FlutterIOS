@@ -37,7 +37,7 @@ public class OrganizationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status207MultiStatus, Type = typeof(ErrorObject))]
     [HttpPost]
-    [Route("api/v{apiVersion}/external/organizations")]
+    [Route("api/v{version:apiVersion}/external/organizations")]
     public async Task<IActionResult> StoreOrganizationsAsync([FromBody] Organization[] request)
     {
         var result = await _organizationUsecases.StoreOrganizationsAsync(request.ToList());
