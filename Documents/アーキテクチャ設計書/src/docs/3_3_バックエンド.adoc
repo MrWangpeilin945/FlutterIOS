@@ -40,7 +40,9 @@
                     ├── Usecases
                     └── Domain
 
-プロダクトコードとテストコードで大きく分割する。メインはWellship.WebAPIに実装するが、APIモデルや例外は他のアプリ（CLIアプリ）から参照することもあるため、プロジェクトを分離して参照可能にする。第二弾以降ではWELLSHIP共通機能となるものが出てくるが、初期開発時に分割するのは難しいため「結果収集（ResultCollector）」配下に配置する。
+プロダクトコードとテストコードで大きく分割する。 +
+メインはWellship.WebAPIに実装するが、APIモデルや例外は他のアプリ（CLIアプリ）から参照することもあるため、プロジェクトを分離して参照可能にする。 +
+第二弾以降ではWELLSHIP共通機能となるものが出てくるが、初期開発時に分割するのは難しいため「結果収集（ResultCollector）」配下に配置する。
 
 [cols="1,3,8" options="header"]
 |===
@@ -113,10 +115,11 @@ image::../images/BackendLayer.drawio.png[バックエンドレイヤー]
 
 ASP.NET Coreのミドルウェアでキャッチするため、個別のメソッド内にTry-Catchを記述しない。
 
-System.Exceptionをそのまま利用するのはNG。
+System.Exceptionをそのまま利用するのはNG。 +
 例外の種類に応じて、抽象クラスであるWellshipExceptionを継承したカスタム例外を定義する。
 
-HTTPステータスコードを設定することで、Usecaseのメソッド内で例外送出した際、クライアント側に設定したHTTPステータスコードが伝わる。
+HTTPステータスコードを設定することで、Usecaseのメソッド内で例外送出した際、 +
+クライアント側に設定したHTTPステータスコードが伝わる。
 
 image::../images/BackendCustomException.drawio.png[カスタム例外]
 
@@ -126,14 +129,15 @@ image::../images/BackendCustomException.drawio.png[カスタム例外]
 
 PostgreSQLにはNpgsqlを使用してアクセスする。
 
-SQLと.NETオブジェクト間のマッピングにはマイクロORMであるDapperを使用する。
+SQLと.NETオブジェクト間のマッピングにはマイクロORMであるDapperを使用する。 +
 EFCoreの場合とは異なり、クエリビルダ機能はないため開発者自身でSQLを記述する。
 
 各リポジトリは、接続共通部品であるIDbConnectionProviderをコンストラクタからDIする。
 
 === リトライ
 
-アプリからPostgreSQLへの接続が瞬断した場合でも自動復旧できるよう、データベース接続に関する処理にリトライ処理を実装する。リトライ処理はPolly.Coreライブラリを使用する。
+アプリからPostgreSQLへの接続が瞬断した場合でも自動復旧できるよう、データベース接続に関する処理にリトライ処理を実装する。 +
+リトライ処理はPolly.Coreライブラリを使用する。
 
 ==== Resilience
 
@@ -155,7 +159,7 @@ EFCoreの場合とは異なり、クエリビルダ機能はないため開発�
 
 ==== カスタムログ
 
-処理の進行状況や警告などを任意のタイミングで記録する。
+処理の進行状況や警告などを任意のタイミングで記録する。 +
 すべてデータベースに記録して、ERROR以上の場合はNLog経由で標準出力にも出力する。
 
 === ログの保存先
@@ -262,7 +266,8 @@ Amazon ECSから標準出力すると、CloudWatchに転送されるためマネ
 
 === ログレベル
 
-アプリケーション内部のログレベルは `Microsoft.Extensions.Logging.LogLevel` を使用するが、標準出力とカスタムログのログレベルは `NLog` のログレベル文字列として出力する。
+アプリケーション内部のログレベルは `Microsoft.Extensions.Logging.LogLevel` を使用するが、 +
+標準出力とカスタムログのログレベルは `NLog` のログレベル文字列として出力する。
 以下に対応表を示す。
 
 [cols="1,1,3a,3a", options="header"]
@@ -314,14 +319,18 @@ AWS上ではError以上のログに限り、NLog経由で出力する。
 
 === カスタムログサービスの設計
 
-カスタムログサービスのinterfaceを定義して、実装するclassを作成する。
+カスタムログサービスのinterfaceを定義して、実装するclassを作成する。 +
 ログを書き込むメソッドをログレベルごとに3種類用意する。
 
-メッセージ以外に付加的な情報を書き込みたい場合は、details（ `<string, object>` 型の辞書）に値をセットする。detailsがある場合は、app_logsテーブルのdetailsカラムにJSON文字列化して保存する。
+メッセージ以外に付加的な情報を書き込みたい場合は、details（ `<string, object>` 型の辞書）に値をセットする。 +
+detailsがある場合は、app_logsテーブルのdetailsカラムにJSON文字列化して保存する。
 
-WarnとErrorの場合は、エラーコードを指定して書き込む。エラーコードはEnumで管理する。Enumを文字列に変換して記録する。
+WarnとErrorの場合は、エラーコードを指定して書き込む。エラーコードはEnumで管理する。 +
+Enumを文字列に変換して記録する。
 
-エラーコードはNLogのプロパティとapp_logsテーブルのdetailsカラムに記録する。つまり任意のパラメータdetailsにerrorCodeを設定してはならない。もし設定した場合は、メソッド引数のerrorCodeで上書きする。
+エラーコードはNLogのプロパティとapp_logsテーブルのdetailsカラムに記録する。 +
+つまり任意のパラメータdetailsにerrorCodeを設定してはならない。 +
+もし設定した場合は、メソッド引数のerrorCodeで上書きする。
 
 [mermaid,ICustomLoggingService-cd,png]
 ----
@@ -412,8 +421,8 @@ image::../images/BackendDevFlow.drawio.png[バックエンド開発フロー]
 
 === サンプルのJSONからC#のClassを生成する
 
-API設計書に記載したリクエストおよびレスポンスのJSON文字列をC#のClassに変換する必要がある。
-手動で変換すると時間がかかるため、 https://quicktype.io/[quicktype] というツールを使用する。
+API設計書に記載したリクエストおよびレスポンスのJSON文字列をC#のClassに変換する必要がある。 +
+手動で変換すると時間がかかるため、 https://quicktype.io/[quicktype] というツールを使用する。 +
 CLIツールやVSCode拡張機能もあるが、最も簡単に使えるのは https://app.quicktype.io/[Webアプリ] である。
 
 JSON文字列を貼り付けると自動でC#のコードが生成される。
@@ -434,7 +443,7 @@ ____
 * Usecase
 ** リポジトリに依存する部分はMoqを使ってモッキングする
 
-生成AI（LLM）を活用して、プロダクトコードに対するテストコードの生成を省力化する。
+生成AI（LLM）を活用して、プロダクトコードに対するテストコードの生成を省力化する。 +
 業務コードのためプライベートLLMを利用する必要がある。ビジネス戦略本部が提供している https://azurechat.rsoa.ryobi.co.jp/chat[AzureChat]を利用することが望ましい。
 
 以下にプロンプトの例を示すので、参考にされたい。
@@ -478,7 +487,8 @@ WebAPI一覧に以下の情報がある。
 
 WebAPI一覧をインプットにしてControllerのスケルトンができると便利である。
 
-表形式のデータを一足飛びにC#のコードにすると修正があった場合の手間が大きい。そこでプレーンテキストでUMLのクラス図を出力させて中間生成物とするのがよい。
+表形式のデータを一足飛びにC#のコードにすると修正があった場合の手間が大きい。 +
+そこでプレーンテキストでUMLのクラス図を出力させて中間生成物とするのがよい。
 
 . WebAPI一覧を作成する
 . WebAPI一覧をAzureChatに投入してPlantUMLまたはMermaid.jsのクラス図を出力させる
