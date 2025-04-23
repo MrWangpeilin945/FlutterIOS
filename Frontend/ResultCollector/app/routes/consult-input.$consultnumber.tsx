@@ -730,7 +730,7 @@ export default function ConsultInput() {
       }
       return {};
     };
-    const deletebody = makeDeleteBody();
+    const deleteBody = makeDeleteBody();
     if (!consultNumber) return;
 
     // APIの送信、レスポンス後の挙動
@@ -740,7 +740,7 @@ export default function ConsultInput() {
         result = await deleteMutateAsync({
           version: apiVersion,
           consultNumber: consultNumber,
-          data: deletebody,
+          data: deleteBody,
         });
         if (result.status === 204) {
           // 正常時の処理
