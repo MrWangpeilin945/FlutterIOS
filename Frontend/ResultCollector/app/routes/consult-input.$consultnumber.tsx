@@ -45,7 +45,7 @@ import ExamineeHeader from "~/components/ExamineeHeader";
 import BoothNote from "~/components/BoothNote";
 import CommonDialog from "~/components/CommonDialog";
 import ConfirmDialog from "~/components/ConfirmDialog";
-import ExamNumeric, { type ValidationHandle } from "~/components/ExamNumeric";
+import ExamNumeric from "~/components/ExamNumeric";
 import ExamSelect from "~/components/ExamSelect";
 import ExamBP2 from "~/components/ExamBP2";
 import ExamFreeInput from "~/components/ExamFreeInput";
@@ -59,6 +59,10 @@ import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
 
 export const meta: MetaFunction = () => {
   return [{ title: "検査結果入力" }];
+};
+
+export type ValidationHandle = {
+  triggerValidation: () => { hasError: boolean };
 };
 
 export default function ConsultInput() {
@@ -591,7 +595,7 @@ export default function ConsultInput() {
 
   const handleComponentValidationCheck = () => {
     let hasCompError = false; // 初期状態では全てバリデーションが成功と仮定
-
+    
     // `examItemRefs` 内の全ての `ref` に対して `triggerValidation` を実行
     for (const ref of Object.values(examItemRefs.current)) {
       const result = ref.current?.triggerValidation();
@@ -718,7 +722,7 @@ export default function ConsultInput() {
     // コンポーネントのレンダリング時にrefを管理
     // `ref` がまだ作成されていない場合は作成
     if (!examItemRefs.current[groupIndex]) {
-      examItemRefs.current[groupIndex] = React.createRef();
+      examItemRefs.current[groupIndex] = React.createRef<ValidationHandle>();
     }
 
     // typeによるコンポーネントの切り替え
@@ -726,7 +730,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.数値:
         return (
           <ExamNumeric
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -736,7 +740,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.選択:
         return (
           <ExamSelect
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -746,7 +750,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.血圧2回:
         return (
           <ExamBP2
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -758,7 +762,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.自由入力:
         return (
           <ExamFreeInput
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -768,7 +772,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.数値_左右:
         return (
           <ExamNumericLR
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -778,7 +782,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.数値_繰り返し_同一値:
         return (
           <ExamNumericRepeatWithSameValue
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -788,7 +792,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.選択_左右:
         return (
           <ExamSelectLR
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -798,7 +802,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.身体計測:
         return (
           <ExamBody
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -809,7 +813,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.視力:
         return (
           <ExamVision
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -819,7 +823,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.聴力:
         return (
           <ExamHearing
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
