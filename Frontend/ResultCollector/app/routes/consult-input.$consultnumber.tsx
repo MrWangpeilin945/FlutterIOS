@@ -60,7 +60,6 @@ import ExamVision from "~/components/ExamVision";
 import ExamHearing from "~/components/ExamHearing";
 import ExamNumericRepeatWithSameValue from "~/components/ExamNumericRepeatWithSameValue";
 import { errorMessages, getErrorMessage } from "~/utils/getErrorMessage";
-import { group } from "console";
 
 export const meta: MetaFunction = () => {
   return [{ title: "検査結果入力" }];
@@ -115,7 +114,7 @@ export default function ConsultInput() {
   const [hasPass, setHasPass] = useState(false);
   const [passValue, setPassValue] = useState("");
   // 取り消すボタンか押下されたかのフラグ
-  const [isDeletePressed, setisDeletePressed] = useState(false);
+  const [isDeletePressed, setIsDeletePressed] = useState(false);
   //機器が選択されているかのフラグ（測定するボタンの表示制御に使用）
   const [hasConnectionEquipment, setHasConnectionEquipment] = useState(true);
   //測定ボタンの無効切り替え
@@ -637,9 +636,7 @@ export default function ConsultInput() {
     );
     if (progressStatus) {
       //クエリパラメータに進捗ステータスが設定されている場合、受診者一覧画面に遷移
-      navigate(
-        `/examinees?exammenuid=${examMenuId}&status=${progressStatus}`,
-      );
+      navigate(`/examinees?exammenuid=${examMenuId}&status=${progressStatus}`);
     } else if (
       currentIndex !== -1 &&
       currentIndex < selectedExamMenu?.length - 1
@@ -714,7 +711,7 @@ export default function ConsultInput() {
     let result: AxiosResponse;
 
     // リクエストボディ生成
-    const makedeleteBody = (): ResultDeleteRequest => {
+    const makeDeleteBody = (): ResultDeleteRequest => {
       const updatedExamData = { ...examData.current };
       if (updatedExamData) {
         const converted: ResultDeleteRequest = {
@@ -733,7 +730,7 @@ export default function ConsultInput() {
       }
       return {};
     };
-    const deletebody = makedeleteBody();
+    const deletebody = makeDeleteBody();
     if (!consultNumber) return;
 
     // APIの送信、レスポンス後の挙動
@@ -747,15 +744,7 @@ export default function ConsultInput() {
         });
         if (result.status === 204) {
           // 正常時の処理
-          // クエリパラメータに進捗ステータスが設定されている場合、受診者一覧画面に遷移
-          if (progressStatus) {
-            navigate(
-              `/examinees?exammenuid=${examMenuId}&status=${progressStatus}`,
-            );
-          } else {
-            // そうでない場合、受診番号入力画面に遷移
-            navigate("/consult-input");
-          }
+          continuingExam();
         }
       } catch (error) {
         let errorMessage = "";
@@ -775,7 +764,7 @@ export default function ConsultInput() {
         }
         // 共通ダイアログにエラーメッセージを表示
         openCommonDialog(errorMessage, "閉じる");
-        setisDeletePressed(false);
+        setIsDeletePressed(false);
       }
     };
     postMutateAsync();
@@ -783,8 +772,8 @@ export default function ConsultInput() {
   };
 
   // 検査結果取り消し処理
-  const handleDeleate = () => {
-    setisDeletePressed(true);
+  const handleDelete = () => {
+    setIsDeletePressed(true);
     openConfirmDialog(
       "検査結果を取り消します。削除したデータは元に戻りませんがよろしいですか？",
     );
@@ -992,7 +981,7 @@ export default function ConsultInput() {
                 fw={700}
                 bg="warning"
                 c="white"
-                onClick={handleDeleate}
+                onClick={handleDelete}
               >
                 検査結果を取り消す
               </Button>
