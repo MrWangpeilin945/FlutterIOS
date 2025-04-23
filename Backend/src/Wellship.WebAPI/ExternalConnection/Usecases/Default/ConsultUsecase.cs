@@ -58,8 +58,11 @@ public class ConsultUsecase : IConsultUsecase
         // 班コードに紐づく班IDを取得する
         var teams = await _teamRepository.GetTeamInfoAsync(teamCodes);
         // 会場コード、班コード、健診日に紐づく会場日程情報を取得する
-        var examDate = consults.Where(x => x.ActionType == ActionType.登録 && !string.IsNullOrWhiteSpace(x.ExamDate))
-                               .Select(x => DateOnly.Parse(x.ExamDate, CultureInfo.CurrentCulture)).Distinct().ToList();
+        var examDate = consults.Where(x => x.ActionType == ActionType.登録 &&
+                                      !string.IsNullOrWhiteSpace(x.ExamDate))
+                               .Select(x => DateOnly.Parse(x.ExamDate, CultureInfo.CurrentCulture))
+                               .Distinct()
+                               .ToList();
         var placeSchedules = await _placeScheduleRepository.GetPlaceScheduleInfoAsync(placeCodes, teamCodes, examDate);
         // 受診者コードに紐づく受診者IDを取得する
         var examinees = await _examineeRepository.GetExamineeInfoAsync(consults.Select(x => x.ExamineeCode).Distinct().ToList());
@@ -159,61 +162,37 @@ public class ConsultUsecase : IConsultUsecase
             }
         }
         // 会場IDが取得できない
-        foreach (var warning in registeConsults.Where(x => !places.Select(p => p.PlaceCode).Contains(x.PlaceCode)))
-        {
-            warningConsults.Add(warning);
-            AddErrorObjects(errorObjects, "10001", $"指定されたPlaceCodeがシステム上に存在しません。Code:{warning.PlaceCode}", warning.InputNote);
-        }
+        var notPlaces = registeConsults.Where(x => !places.Select(p => p.PlaceCode).Contains(x.PlaceCode));
+        ValidateCodes(notPlaces, warningConsults, errorObjects,
+                        (warning) => $"指定されたPlaceCodeがシステム上に存在しません。Code:{warning.PlaceCode}");
         // 班IDが取得できない
-        foreach (var warning in registeConsults.Where(x => !teams.Select(p => p.TeamCode).Contains(x.TeamCode)))
-        {
-            warningConsults.Add(warning);
-            AddErrorObjects(errorObjects, "10001", $"指定されたTeamCodeがシステム上に存在しません。Code:{warning.TeamCode}", warning.InputNote);
-        }
+        var notTeams = registeConsults.Where(x => !teams.Select(p => p.TeamCode).Contains(x.TeamCode));
+        ValidateCodes(notTeams, warningConsults, errorObjects,
+                        (warning) => $"指定されたTeamCodeがシステム上に存在しません。Code:{warning.TeamCode}");
         // 会場日程IDが取得できない
-        foreach (var warning in registeConsults.Where(x => !placeSchedules.Exists(ps => x.PlaceCode == ps.PlaceCode &&
+        var notPlaceSchedules = registeConsults.Where(x => !placeSchedules.Exists(ps => x.PlaceCode == ps.PlaceCode &&
                                                         x.TeamCode == ps.TeamCode &&
                                                         !string.IsNullOrWhiteSpace(x.ExamDate) &&
-                                                        DateOnly.Parse(x.ExamDate, CultureInfo.CurrentCulture) == ps.ExamDate)))
-        {
-            warningConsults.Add(warning);
-            AddErrorObjects(errorObjects, "10001", 
-                $"指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:{warning.PlaceCode}/TeamCode:{warning.TeamCode}/ExamDate:{warning.ExamDate}", 
-                warning.InputNote);
-        }
+                                                        DateOnly.Parse(x.ExamDate, CultureInfo.CurrentCulture) == ps.ExamDate));
+        ValidateCodes(notPlaceSchedules, warningConsults, errorObjects,
+                        (warning) => $"指定されたPlaceScheduleがシステム上に存在しません。Code:PlaceCode:{warning.PlaceCode}/TeamCode:{warning.TeamCode}/ExamDate:{warning.ExamDate}");
+
         // 受診者IDが取得できない
-        foreach (var warning in registeConsults.Where(x => !examinees.Select(e => e.ExamineeCode).Contains(x.ExamineeCode)))
-        {
-            warningConsults.Add(warning);
-            AddErrorObjects(errorObjects, "10001", $"指定されたExamineeCodeがシステム上に存在しません。Code:{warning.ExamineeCode}", warning.InputNote);
-        }
+        var notExaminees = registeConsults.Where(x => !examinees.Select(e => e.ExamineeCode).Contains(x.ExamineeCode));
+        ValidateCodes(notExaminees, warningConsults, errorObjects,
+                        (warning) => $"指定されたExamineeCodeがシステム上に存在しません。Code:{warning.ExamineeCode}");
         // 検査特記が存在しない
-        foreach (var consult in registeConsults)
-        {
-            foreach (var warning in consult.ConsultNotes.Where(x => !examMenuNodeCodes.Select(e => e.Code).Contains(x.Code)))
-            {
-                warningConsults.Add(consult);
-                AddErrorObjects(errorObjects, "10001", $"指定されたConsultNotes.Codeがシステム上に存在しません。Code:{warning.Code}", consult.InputNote);
-            }
-        }
+        ValidateChildCodes(registeConsults, x => x.ConsultNotes, x => x.Code, examMenuNodeCodes?.Select(e => e.Code).ToList() ?? new List<string>(),
+                            warningConsults, errorObjects, (warning) => $"指定されたConsultNotes.Codeがシステム上に存在しません。Code:{warning.Code}");
         // 基準値パターンが取得できない
-        foreach (var consult in registeConsults)
-        {
-            foreach (var warning in consult.ConsultThresholds.Where(x => !thresholds.Select(t => t.ThresholdCode).Contains(x.ThresholdCode)))
-            {
-                warningConsults.Add(consult);
-                AddErrorObjects(errorObjects, "10001", $"指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:{warning.ThresholdCode}", consult.InputNote);
-            }
-        }
+        ValidateChildCodes(registeConsults, x => x.ConsultThresholds, x => x.ThresholdCode, thresholds?.Select(e => e.ThresholdCode).ToList() ?? new List<string>(),
+                            warningConsults, errorObjects, (warning) => $"指定されたConsultThresholds.ThresholdCodeがシステム上に存在しません。Code:{warning.ThresholdCode}");
+        // 検査項目明細IDが取得できない
+        ValidateChildCodes(registeConsults, x => x.PreviousResults, x => x.ExamItemDetailCode, externalExamItemDetails?.Select(e => e.ExternalExamItemDetailCode).ToList() ?? new List<string>(),
+                            warningConsults, errorObjects, (warning) => $"指定されたPreviousResults.ExamItemDetailCodeがシステム上に存在しません。Code:{warning.ExamItemDetailCode}");
         // 検査項目明細ID（PreviousResults）
         foreach (var consult in registeConsults)
         {
-            // 検査項目明細IDが取得できない
-            foreach (var warning in consult.PreviousResults.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCode)))
-            {
-                warningConsults.Add(consult);
-                AddErrorObjects(errorObjects, "10001", $"指定されたPreviousResults.ExamItemDetailCodeがシステム上に存在しません。Code:{warning.ExamItemDetailCode}", consult.InputNote);
-            }
             // PKが重複するレコードが存在する
             // ExamItemDetailCode+ExamDateで重複する
             var duplicateExamItemDetailCds = consult.PreviousResults
@@ -223,13 +202,13 @@ public class ConsultUsecase : IConsultUsecase
             foreach (var key in duplicateExamItemDetailCds.Select(warning => warning.Key))
             {
                 warningConsults.Add(consult);
-                AddErrorObjects(errorObjects, "10003", 
-                    $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{key.ExamItemDetailCode}/PreviousResults.ExamDate:{key.ExamDate.ToString("yyyy/MM/dd")}", 
+                AddErrorObjects(errorObjects, "10003",
+                    $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{key.ExamItemDetailCode}/PreviousResults.ExamDate:{key.ExamDate.ToString("yyyy/MM/dd")}",
                     consult.InputNote);
             }
             // ExamItemDetailId+ExamDateで重複する
             var examItemDetail = from p in consult.PreviousResults
-                                 join e in externalExamItemDetails
+                                 join e in externalExamItemDetails ?? new List<ExternalExamItemDetailEntity>()
                                  on p.ExamItemDetailCode equals e.ExternalExamItemDetailCode
                                  select new
                                  {
@@ -249,28 +228,20 @@ public class ConsultUsecase : IConsultUsecase
             foreach (var warning in duplicateExamItemDetailIds)
             {
                 warningConsults.Add(consult);
-                AddErrorObjects(errorObjects, "10003", 
-                    $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{warning.ExamItemDetailCode}/PreviousResults.ExamDate:{warning.ExamDate.ToString("yyyy/MM/dd")}", 
+                AddErrorObjects(errorObjects, "10003",
+                    $"キー項目が重複しています。PreviousResults.ExamItemDetailCode:{warning.ExamItemDetailCode}/PreviousResults.ExamDate:{warning.ExamDate.ToString("yyyy/MM/dd")}",
                     consult.InputNote);
             }
         }
         // 検査項目明細ID（ExamItemDetailOrders）
-        foreach (var consult in registeConsults)
-        {
-            // 検査項目明細IDが取得できない
-            foreach (var warning in consult.ExamItemDetailOrders.Where(x => !externalExamItemDetails.Select(e => e.ExternalExamItemDetailCode).Contains(x.ExamItemDetailCode)))
-            {
-                warningConsults.Add(consult);
-                AddErrorObjects(errorObjects, "10001", $"指定されたExamItemDetailOrders.ExamItemDetailCodeがシステム上に存在しません。Code:{warning.ExamItemDetailCode}", consult.InputNote);
-            }
-        }
+        ValidateChildCodes(registeConsults, x => x.ExamItemDetailOrders, x => x.ExamItemDetailCode, externalExamItemDetails?.Select(e => e.ExternalExamItemDetailCode).ToList() ?? new List<string>(),
+                            warningConsults, errorObjects, (warning) => $"指定されたExamItemDetailOrders.ExamItemDetailCodeがシステム上に存在しません。Code:{warning.ExamItemDetailCode}");
         // 削除
-        foreach (var warning in consults.Where(x => x.ActionType == ActionType.削除)
-                                        .Where(x => !externalConnectionCodes.Select(x => x.ConnectionCode).Contains(x.ConnectionCode)))
-        {
-            warningConsults.Add(warning);
-            AddErrorObjects(errorObjects, "10001", $"指定されたConnectionCodeがシステム上に存在しません。Code:{warning.ConnectionCode}", warning.InputNote);
-        }
+        var notExternalConnections = consults.Where(x => x.ActionType == ActionType.削除)
+                                             .Where(x => !externalConnectionCodes.Select(x => x.ConnectionCode).Contains(x.ConnectionCode));
+        ValidateCodes(notExternalConnections, warningConsults, errorObjects,
+                     (warning) => $"指定されたConnectionCodeがシステム上に存在しません。Code:{warning.ConnectionCode}");
+
         // 受診を更新するエンティティを作成する
         var validConsults = consults.Except(warningConsults)
                                     .Select(x => new ConsultEntity
@@ -297,22 +268,25 @@ public class ConsultUsecase : IConsultUsecase
                                         }).ToList(),
                                         ExamItemDetailOrders = x.ExamItemDetailOrders.Select(eo => new ExamItemDetailOrderEntity
                                         {
-                                            ExamItemDetailId = externalExamItemDetails.Where(ed => ed.ExternalExamItemDetailCode == eo.ExamItemDetailCode)
-                                                                                      .Select(ed => ed.ExamItemDetailId).FirstOrDefault(),
+                                            ExamItemDetailId = (externalExamItemDetails ?? new List<ExternalExamItemDetailEntity>())
+                                                                    .Where(ed => ed.ExternalExamItemDetailCode == eo.ExamItemDetailCode)
+                                                                    .Select(ed => ed.ExamItemDetailId).FirstOrDefault(),
                                             ExamItemDetailCode = eo.ExamItemDetailCode,
                                             Note = eo.Note
                                         }).ToList(),
                                         ConsultThresholds = x.ConsultThresholds.Select(ct => new ConsultThresholdEntity
                                         {
-                                            ThresholdId = thresholds.Where(th => th.ThresholdCode == ct.ThresholdCode)
-                                                                    .Select(th => th.ThresholdId).FirstOrDefault(),
+                                            ThresholdId = (thresholds ?? new List<ThresholdEntity>())
+                                                                .Where(th => th.ThresholdCode == ct.ThresholdCode)
+                                                                .Select(th => th.ThresholdId).FirstOrDefault(),
                                             Priority = ct.Priority
                                         }).ToList(),
                                         PreviousResults = x.PreviousResults.Select(pr => new PreviousResultEntity
                                         {
                                             ExamDate = pr.ExamDate,
-                                            ExamItemDetailId = externalExamItemDetails.Where(ed => ed.ExternalExamItemDetailCode == pr.ExamItemDetailCode)
-                                                                                      .Select(ed => ed.ExamItemDetailId).FirstOrDefault(),
+                                            ExamItemDetailId = (externalExamItemDetails ?? new List<ExternalExamItemDetailEntity>())
+                                                                    .Where(ed => ed.ExternalExamItemDetailCode == pr.ExamItemDetailCode)
+                                                                    .Select(ed => ed.ExamItemDetailId).FirstOrDefault(),
                                             Value = pr.Value
                                         }).ToList()
                                     }).ToList();
@@ -325,7 +299,7 @@ public class ConsultUsecase : IConsultUsecase
     /// </summary>
     /// <param name="warningConsults"></param>
     /// <param name="warnings"></param>    
-    private void AddWarningConsults(List<Consult> warningConsults, IEnumerable<object> warnings)
+    private static void AddWarningConsults(List<Consult> warningConsults, IEnumerable<object> warnings)
     {
         foreach (var warning in warnings)
         {
@@ -339,7 +313,7 @@ public class ConsultUsecase : IConsultUsecase
     /// <param name="code"></param>
     /// <param name="message"></param>
     /// <param name="inputNote"></param>
-    private void AddErrorObjects(List<ErrorObject> errorObjects, string code, string message, string inputNote)
+    private static void AddErrorObjects(List<ErrorObject> errorObjects, string code, string message, string inputNote)
     {
         errorObjects.Add(new ErrorObject
         {
@@ -347,5 +321,45 @@ public class ConsultUsecase : IConsultUsecase
             Message = message,
             InputNote = inputNote
         });
+    }
+    /// <summary>
+    /// 存在しないデータを含むconsultをエラーオブジェクトに追加する
+    /// </summary>
+    /// <param name="consults"></param>
+    /// <param name="warningConsults"></param>
+    /// <param name="errorObjects"></param>
+    /// <param name="messageGenerator"></param>
+    private static void ValidateCodes(IEnumerable<Consult> consults, List<Consult> warningConsults,
+                                      List<ErrorObject> errorObjects, Func<Consult, string> messageGenerator)
+    {
+        foreach (var warning in consults)
+        {
+            warningConsults.Add(warning);
+            AddErrorObjects(errorObjects, "10001", messageGenerator(warning), warning.InputNote);
+        }
+    }
+    /// <summary>
+    /// 子プロパティの存在しないデータを含むconsultをエラーオブジェクトに追加する
+    /// </summary>
+    /// <typeparam name="TChild"></typeparam>
+    /// <param name="consults"></param>
+    /// <param name="childSelector"></param>
+    /// <param name="codeSelector"></param>
+    /// <param name="validCodes"></param>
+    /// <param name="warningConsults"></param>
+    /// <param name="errorObjects"></param>
+    /// <param name="messageGenerator"></param>
+    private static void ValidateChildCodes<TChild>(IEnumerable<Consult> consults, Func<Consult, IEnumerable<TChild>> childSelector,
+                                                   Func<TChild, string> codeSelector, List<string> validCodes, List<Consult> warningConsults,
+                                                   List<ErrorObject> errorObjects, Func<TChild, string> messageGenerator)
+    {
+        foreach (var consult in consults)
+        {
+            foreach (var warning in childSelector(consult).Where(x => !validCodes.Contains(codeSelector(x))))
+            {
+                warningConsults.Add(consult);
+                AddErrorObjects(errorObjects, "10001", messageGenerator(warning), consult.InputNote);
+            }
+        }
     }
 }
