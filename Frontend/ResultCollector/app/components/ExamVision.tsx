@@ -331,7 +331,7 @@ const ExamVision = forwardRef<ValidationHandle, ExamVisionProps>(
           detail.positionNumber ?? 0,
           detail.value ?? "",
           detail.hasOrder ?? false,
-          detail.cancelReasonId ?? 1,
+          detail.cancelReasonId ?? 0,
         );
         if (result !== undefined) {
           componentErrorMessage.push(result);
