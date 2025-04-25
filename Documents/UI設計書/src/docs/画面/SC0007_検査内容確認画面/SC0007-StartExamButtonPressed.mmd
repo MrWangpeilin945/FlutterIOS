@@ -12,6 +12,18 @@ autonumber
     fr ->> co: [CP0015]共通ダイアログ表示
     fr -x fr: 処理中断
   end
+  fr ->> fr: 検査未実施・実施済チェック
+  opt 検査実施済の時
+    fr ->> co: [CP0016]確認ダイアログ表示
+    Note over fr,co: 「結果が既に登録されています。<br>検査結果入力画面に移動して<br>よろしいですか？」
+    alt キャンセルボタン押下時
+    co ->> fr:[キャンセル]
+    fr -x fr:確認ダイアログを閉じる・処理中断
+    else OKボタン押下時
+    co ->> fr:[OK]
+    fr ->> fr:確認ダイアログを閉じる
+    end
+  end
   fr ->> ba: AP1022_実施有無を登録<br>[POST] /consult/{consultNumber}/executions
   ba -->> fr:レスポンスを取得
   opt HTTPステータスコードが200以外の時

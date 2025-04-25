@@ -57,6 +57,7 @@ import {
 import AuthWrapper from "~/components/AuthWrapper";
 import CommonDialog from "~/components/CommonDialog";
 import CommonHeader from "~/components/CommonHeader";
+import ConfirmDialog from "~/components/ConfirmDialog";
 import { isAxiosError } from "axios";
 import { InputErrorLevel, Sex } from "~/domain/enums";
 
@@ -128,6 +129,13 @@ export default function ExamOrderConfirm() {
   ] = useDisclosure(false);
   // 共通ダイアログを閉じた時の処理を切り替えるフラグ
   const [isNavigateOnClose, setIsNavigateOnClose] = useState(false);
+  //確認ダイアログ表示管理
+  const [
+    showConfirmDialog,
+    { open: openConfirmDialog, close: closeConfirmDialog },
+  ] = useDisclosure(false);
+  // 確認ダイアログで表示するメッセージ
+  const [confirmMessage, setConfirmMessage] = useState<string | null>(null);
 
   // 機器選択の状態管理
   const [connectionEquipments, setConnectionEquipments] = useAtom(
@@ -449,7 +457,17 @@ export default function ExamOrderConfirm() {
     if (!validate()) {
       return;
     }
-
+    // 検査未実施・実施済チェック
+    if (examContent?.isComplete) {
+      // 確認ダイアログ表示
+      startupConfirmDialog("結果が既に登録されています。検査結果入力画面に移動してよろしいですか？");
+      return;
+    };
+    registerExam();
+  };
+    
+  // 検査実施有無の登録・画面遷移処理
+  const registerExam = (): void => {
     setIsLoading(true);
 
     // POSTするデータを取得する
@@ -518,6 +536,7 @@ export default function ExamOrderConfirm() {
     // 検査実施有無と中止理由を登録する
     postConsultExamExecutionsAsync();
   };
+  
 
   // 入力チェック
   const validate = (): boolean => {
@@ -714,6 +733,12 @@ export default function ExamOrderConfirm() {
     setMessage(message);
     openCommonDialog();
   };
+
+  //確認ダイアログを起動する
+  const startupConfirmDialog = (message: string) => {
+    setConfirmMessage(message);
+    openConfirmDialog();
+  };  
 
   return (
     <>
@@ -1213,6 +1238,18 @@ export default function ExamOrderConfirm() {
             }
             message={message ?? ""}
             buttonMessage="閉じる"
+          />
+          {/* 確認ダイアログ */}
+          <ConfirmDialog
+            isOpen={showConfirmDialog}
+            onCancel={() => {
+              closeConfirmDialog();
+            }}
+            onConfirm={() => {
+              closeConfirmDialog();
+              registerExam();
+            }}
+            message={confirmMessage ?? ""}
           />
         </>
       </AuthWrapper>
