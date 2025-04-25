@@ -329,18 +329,18 @@ const ExamVision = ({
         }
       }
 
-        // 矯正チェック
-        const result = collectionCheck(
-          item,
-          detail.positionNumber ?? 0,
-          detail.value ?? "",
-          detail.hasOrder ?? false,
-          detail.cancelReasonId ?? 0,
-        );
-        if (result !== undefined) {
-          componentErrorMessage.push(result);
-        }
+      // 矯正チェック
+      const result = collectionCheck(
+        item,
+        detail.positionNumber ?? 0,
+        detail.value ?? "",
+        detail.hasOrder ?? false,
+        detail.cancelReasonId ?? 0,
+      );
+      if (result !== undefined) {
+        componentErrorMessage.push(result);
       }
+    }
 
     // 基準値によるエラーメッセージを追加
     componentErrorMessage.push(...(setRangesErrorMessage(item) ?? []));
