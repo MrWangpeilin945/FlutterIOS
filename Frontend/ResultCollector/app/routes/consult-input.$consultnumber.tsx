@@ -13,6 +13,7 @@ import {
   Text,
   getThemeColor,
   useMantineTheme,
+  Box,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useAtom } from "jotai";
@@ -21,6 +22,7 @@ import {
   useConsultGetInputExamItemsExaminee,
   useConsultRegisterResults,
   useConsultVerifyResults,
+  useConsultBatchDeleteResults,
 } from "~/api/wellship";
 import type {
   ExamItemGroup,
@@ -28,12 +30,14 @@ import type {
   InputExamItems,
   ResultsRequest,
   VerifyExamItems,
+  ResultDeleteRequest,
 } from "~/domain/wellship.schemas";
 import {
   InputErrorLevel,
   ExamItemGroupType,
   ExamItemDetailType,
 } from "~/domain/enums";
+import type { NumberIdNamedEntity } from "~/interfaces/interfaces";
 import {
   connectionEquipmentState,
   examMenuState,
@@ -45,7 +49,7 @@ import ExamineeHeader from "~/components/ExamineeHeader";
 import BoothNote from "~/components/BoothNote";
 import CommonDialog from "~/components/CommonDialog";
 import ConfirmDialog from "~/components/ConfirmDialog";
-import ExamNumeric, { type ValidationHandle } from "~/components/ExamNumeric";
+import ExamNumeric from "~/components/ExamNumeric";
 import ExamSelect from "~/components/ExamSelect";
 import ExamBP2 from "~/components/ExamBP2";
 import ExamFreeInput from "~/components/ExamFreeInput";
@@ -61,6 +65,10 @@ export const meta: MetaFunction = () => {
   return [{ title: "検査結果入力" }];
 };
 
+export type ValidationHandle = {
+  triggerValidation: () => { hasError: boolean };
+};
+
 export default function ConsultInput() {
   const theme = useMantineTheme();
   const navigate = useNavigate();
@@ -69,7 +77,12 @@ export default function ConsultInput() {
   const consultNumber = useParams().consultnumber ?? undefined;
   // クエリパラメータの取得
   const [searchParams] = useSearchParams();
-  const examMenuId = Number(searchParams.get("exammenuid"));
+  const paramExamMenuId = searchParams.get("exammenuid");
+  const examMenuId = paramExamMenuId ? Number(paramExamMenuId) : undefined;
+  const paramProgressStatus = searchParams.get("status");
+  const progressStatus = paramProgressStatus
+    ? Number(paramProgressStatus)
+    : undefined;
   // 登録ボタンフラグ
   const [isRegisterPressed, setIsRegisterPressed] = useState(false);
   //初期表示フラグ
@@ -104,6 +117,8 @@ export default function ConsultInput() {
   // 通過用
   const [hasPass, setHasPass] = useState(false);
   const [passValue, setPassValue] = useState("");
+  // 取り消すボタンか押下されたかのフラグ
+  const [isDeletePressed, setIsDeletePressed] = useState(false);
   //機器が選択されているかのフラグ（測定するボタンの表示制御に使用）
   const [hasConnectionEquipment, setHasConnectionEquipment] = useState(true);
   //測定ボタンの無効切り替え
@@ -591,7 +606,7 @@ export default function ConsultInput() {
 
   const handleComponentValidationCheck = () => {
     let hasCompError = false; // 初期状態では全てバリデーションが成功と仮定
-
+    
     // `examItemRefs` 内の全ての `ref` に対して `triggerValidation` を実行
     for (const ref of Object.values(examItemRefs.current)) {
       const result = ref.current?.triggerValidation();
@@ -617,11 +632,21 @@ export default function ConsultInput() {
 
   // 検査継続処理
   const continuingExam = () => {
-    if (!examMenus) return;
-    const currentIndex = examMenus.findIndex((menu) => menu.id === examMenuId);
-    if (currentIndex !== -1 && currentIndex < examMenus.length - 1) {
+    const selectedExamMenu = examMenus?.filter(
+      Boolean,
+    ) as NumberIdNamedEntity[];
+    const currentIndex = selectedExamMenu?.findIndex(
+      (menu) => menu.id === examMenuId,
+    );
+    if (progressStatus) {
+      //クエリパラメータに進捗ステータスが設定されている場合、受診者一覧画面に遷移
+      navigate(`/examinees?exammenuid=${examMenuId}&status=${progressStatus}`);
+    } else if (
+      currentIndex !== -1 &&
+      currentIndex < selectedExamMenu?.length - 1
+    ) {
       //次の検査メニューIDが存在する場合、検査内容確認画面へ遷移
-      const nextExam = examMenus[currentIndex + 1];
+      const nextExam = selectedExamMenu?.[currentIndex + 1];
       navigate(`/examorder-confirm/${consultNumber}?exammenuid=${nextExam.id}`);
     } else {
       //最後の検査メニューの場合、受診番号入力画面へ遷移
@@ -674,8 +699,88 @@ export default function ConsultInput() {
   // 登録処理
   const callbackRegister = () => {
     closeConfirm();
-    // AP1014_検査結果を登録する
-    registerResults();
+    if (isDeletePressed) {
+      // AP1025_検査結果を取り消す
+      batchDeleteResults();
+    } else {
+      // AP1014_検査結果を登録する
+      registerResults();
+    }
+  };
+
+  // AP1025_検査結果を取り消す
+  const deleteMutateAsync = useConsultBatchDeleteResults().mutateAsync;
+  const batchDeleteResults = async () => {
+    setIsLoading(false);
+    let result: AxiosResponse;
+
+    // リクエストボディ生成
+    const makeDeleteBody = (): ResultDeleteRequest => {
+      const updatedExamData = { ...examData.current };
+      if (updatedExamData) {
+        const converted: ResultDeleteRequest = {
+          examItemDetailIds:
+            updatedExamData.examItemGroups?.flatMap(
+              (group) =>
+                group.examItems?.flatMap((examItem) =>
+                  (examItem.examItemDetails || [])
+                    .map((itemDetail) => itemDetail.examItemDetailId)
+                    .filter((id) => typeof id === "number"),
+                ) || [],
+            ) || [],
+        };
+
+        return converted;
+      }
+      return {};
+    };
+    const deleteBody = makeDeleteBody();
+    if (!consultNumber) return;
+
+    // APIの送信、レスポンス後の挙動
+    const postMutateAsync = async () => {
+      setIsLoading(true);
+      try {
+        result = await deleteMutateAsync({
+          version: apiVersion,
+          consultNumber: consultNumber,
+          data: deleteBody,
+        });
+        if (result.status === 204) {
+          // 正常時の処理
+          continuingExam();
+        }
+      } catch (error) {
+        let errorMessage = "";
+        // AxiosErrorかどうかを確認
+        if (isAxiosError(error) && error.response) {
+          const status = error.response.status;
+          // エラー処理
+          if (status === 400) {
+            errorMessage = "入力形式が間違っています。";
+          } else if (status === 403) {
+            errorMessage = "会場ロック中です。管理者のみ更新可能です。";
+          } else if (status === 404) {
+            errorMessage = getErrorMessage(errorMessages.notFound, "受診番号");
+          } else if (status === 500) {
+            errorMessage = getErrorMessage(errorMessages.serverError);
+          }
+        }
+        // 共通ダイアログにエラーメッセージを表示
+        openCommonDialog(errorMessage, "閉じる");
+        setIsDeletePressed(false);
+      }
+    };
+    postMutateAsync();
+    setIsLoading(false);
+  };
+
+  // 検査結果取り消し処理
+  const handleDelete = () => {
+    setIsDeletePressed(true);
+    openConfirmDialog(
+      "検査結果を取り消します。削除したデータは元に戻りませんがよろしいですか？",
+    );
   };
 
   // 共通ダイアログ：閉じる処理
@@ -718,7 +823,7 @@ export default function ConsultInput() {
     // コンポーネントのレンダリング時にrefを管理
     // `ref` がまだ作成されていない場合は作成
     if (!examItemRefs.current[groupIndex]) {
-      examItemRefs.current[groupIndex] = React.createRef();
+      examItemRefs.current[groupIndex] = React.createRef<ValidationHandle>();
     }
 
     // typeによるコンポーネントの切り替え
@@ -726,7 +831,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.数値:
         return (
           <ExamNumeric
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -736,7 +841,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.選択:
         return (
           <ExamSelect
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -746,7 +851,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.血圧2回:
         return (
           <ExamBP2
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -758,7 +863,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.自由入力:
         return (
           <ExamFreeInput
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -768,7 +873,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.数値_左右:
         return (
           <ExamNumericLR
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -778,7 +883,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.数値_繰り返し_同一値:
         return (
           <ExamNumericRepeatWithSameValue
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -788,7 +893,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.選択_左右:
         return (
           <ExamSelectLR
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -798,7 +903,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.身体計測:
         return (
           <ExamBody
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -809,7 +914,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.視力:
         return (
           <ExamVision
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -819,7 +924,7 @@ export default function ConsultInput() {
       case ExamItemGroupType.聴力:
         return (
           <ExamHearing
-            ref={examItemRefs.current[groupIndex]}
+            validationRef={examItemRefs.current[groupIndex]}
             key={groupIndex}
             examItems={examItems}
             onRegisterPressed={isRegisterPressed}
@@ -869,21 +974,38 @@ export default function ConsultInput() {
           relatedExamItems={examData.current?.relatedExamItems ?? []}
         />
         <Stack align="center" gap={32} px={32} mt={32}>
-          {/* 測定ボタン */}
-          {hasConnectionEquipment && (
-            <Button
-              ml="auto"
-              ref={disabledRemeasurement}
-              w={184}
-              h={75}
-              size="lg"
-              fw={700}
-              variant="outline"
-              onClick={handleRemeasurement}
-            >
-              測定する
-            </Button>
-          )}
+          <Box display="flex" w="100%">
+            {/* 検査結果取り消しボタン */}
+            {!hasPass && (
+              <Button
+                mr="auto"
+                w={280}
+                h={75}
+                size="sm"
+                fw={700}
+                bg="warning"
+                c="white"
+                onClick={handleDelete}
+              >
+                検査結果を取り消す
+              </Button>
+            )}
+            {/* 測定ボタン */}
+            {!hasConnectionEquipment && (
+              <Button
+                ml="auto"
+                ref={disabledRemeasurement}
+                w={184}
+                h={75}
+                size="lg"
+                fw={700}
+                variant="outline"
+                onClick={handleRemeasurement}
+              >
+                測定する
+              </Button>
+            )}
+          </Box>
           {/* 検査項目コンポーネント */}
           {examData.current?.examItemGroups?.map(
             (examItemGroup: ExamItemGroup, index: number) => (

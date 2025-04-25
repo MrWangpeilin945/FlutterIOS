@@ -259,8 +259,8 @@ export default function Hoge() {
 *** AITEL同様送信→401確認→リフレッシュでも良いかも…（問題があれば）
 * JWT・リフレッシュトークンの取得・更新・破棄について（認識合わせ）
 ** 認証→localstorageに保存
-** ページ遷移→localstrageのJWTの有効期限チェック
-** APIアクセス→localstrageのJWTの有効期限チェック
+** ページ遷移→localstorageのJWTの有効期限チェック
+** APIアクセス→localstorageのJWTの有効期限チェック
 ** 有効期限チェックに失敗→リフレッシュ（できればロックしておきたい）
 ** リフレッシュ→（401：JWT/RefreshTokenがおかしいorリフレッシュトークン期限切れ）→破棄・ログアウト
 * JWT/RefreshTokenの渡し方

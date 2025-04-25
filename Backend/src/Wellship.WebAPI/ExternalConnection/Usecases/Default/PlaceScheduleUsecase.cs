@@ -62,10 +62,7 @@ public class PlaceScheduleUsecase : IPlaceScheduleUsecase
         foreach (var warning in ValidationChecker.SpaceCheckProperties(placeSchedules, spaceCheckProperties, errorObjects))
         {
             // エラーのオブジェクトをPlaceScheduleにキャストしてワーニングリストに追加する
-            if (warning is PlaceSchedule placeSchedule)
-            {
-                warningPlaceSchedules.Add(placeSchedule);
-            }
+            warningPlaceSchedules.Add((PlaceSchedule)warning);
         }
 
         // ユニークキーが重複するレコードのチェック

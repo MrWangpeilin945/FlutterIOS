@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Group, Text, Flex, Paper } from "@mantine/core";
 import {
   IconExclamationCircleFilled,
@@ -11,11 +11,13 @@ import type {
   InputExamItem,
 } from "~/domain/wellship.schemas";
 import { InputErrorLevel } from "~/domain/enums";
+import type { ValidationHandle } from "~/routes/consult-input.$consultnumber";
 
 type ExamSelectProps = {
   examItems: InputExamItem[];
   onRegisterPressed: boolean;
   onClick: (updatedExamItem: InputExamItem[] | undefined) => void;
+  validationRef:React.RefObject<ValidationHandle | null>;
 };
 
 interface BackendValidation {
@@ -23,264 +25,260 @@ interface BackendValidation {
   examRegistResults: ExamRegistResult[];
 }
 
-export type ValidationHandle = {
-  triggerValidation: () => { hasError: boolean };
-};
+const ExamSelect = ({
+  examItems,
+  onRegisterPressed,
+  onClick,
+  validationRef,
+}: ExamSelectProps) => {
+  if (!examItems || examItems.length === 0) {
+    return null;
+  }
 
-const ExamSelect = forwardRef<ValidationHandle, ExamSelectProps>(
-  ({ examItems, onRegisterPressed, onClick }: ExamSelectProps, ref) => {
-    if (!examItems || examItems.length === 0) {
-      return null;
-    }
+  //登録ボタンプレスフラグを制御するための変数
+  let isRegisterPressed = onRegisterPressed;
 
-    //登録ボタンプレスフラグを制御するための変数
-    let isRegisterPressed = onRegisterPressed;
+  const [examItemsData, setExamItemsData] = useState(examItems);
+  const examItem = examItemsData.find((item) => item.positionNumber === 1);
+  if (!examItem?.examItemDetails?.length) {
+    return null; // examItemDetailsが空の場合は何も表示しない
+  }
 
-    const [examItemsData, setExamItemsData] = useState(examItems);
-    const examItem = examItemsData.find((item) => item.positionNumber === 1);
-    if (!examItem?.examItemDetails?.length) {
-      return null; // examItemDetailsが空の場合は何も表示しない
-    }
+  const examItemDetail = examItem.examItemDetails.find(
+    (detail) => detail.positionNumber === 1,
+  );
+  if (!examItemDetail) {
+    return null; // examItemDetailがundefinedの場合は何も表示しない
+  }
 
-    const examItemDetail = examItem.examItemDetails.find(
-      (detail) => detail.positionNumber === 1,
-    );
-    if (!examItemDetail) {
-      return null; // examItemDetailがundefinedの場合は何も表示しない
-    }
+  const [selected, setSelected] = useState(examItemDetail.value);
 
-    const [selected, setSelected] = useState(examItemDetail.value);
-
-    // 画面からバリデーションチェックを行う
-    useImperativeHandle(ref, () => ({
-      triggerValidation: () => {
-        isRegisterPressed = true;
-        let hasError = false;
-        for (const item of examItemsData) {
-          const { hasCallback } = validationCheck(item);
-          if (!hasCallback) {
-            hasError = true;
-            break;
+  // 画面からバリデーションチェックを行う
+  useEffect(() => {
+    if (validationRef) {
+      validationRef.current = {
+        triggerValidation: () => {
+          isRegisterPressed = true;
+          let hasError = false;
+          for (const item of examItemsData) {
+            const { hasCallback } = validationCheck(item);
+            if (!hasCallback) {
+              hasError = true;
+              break;
+            }
           }
-        }
-        return { hasError };
-      },
-    }));
+          return { hasError };
+        },
+      };
+    }
+  }, [validationRef]);
 
-    // APIからのエラーメッセージを保存する
-    const [backendValidation, setBackendValidation] = useState<
-      BackendValidation[]
-    >([]);
+  // APIからのエラーメッセージを保存する
+  const [backendValidation, setBackendValidation] = useState<
+    BackendValidation[]
+  >([]);
 
-    const sortErrorMessage = (item: InputExamItem): InputExamItem => {
-      if (item.examRegistResults) {
-        // エラーレベルが高い順にソート
-        item.examRegistResults.sort((a, b) => {
-          const levelA = a.errorLevel ?? 0;
-          const levelB = b.errorLevel ?? 0;
-          return levelB - levelA;
+  const sortErrorMessage = (item: InputExamItem): InputExamItem => {
+    if (item.examRegistResults) {
+      // エラーレベルが高い順にソート
+      item.examRegistResults.sort((a, b) => {
+        const levelA = a.errorLevel ?? 0;
+        const levelB = b.errorLevel ?? 0;
+        return levelB - levelA;
+      });
+    }
+    return item;
+  };
+
+  // APIのエラーメッセージで更新する
+  const resetErrorMessages = (item: InputExamItem) => {
+    const targetError = backendValidation.find(
+      (error) => error.itemPositionNumber === item.positionNumber,
+    );
+    if (targetError) {
+      item.examRegistResults = targetError.examRegistResults;
+    }
+    return item;
+  };
+
+  const validationCheck = (item: InputExamItem) => {
+    // APIエラーメッセージで初期化
+    resetErrorMessages(item);
+    // コールバック判断用のコンポーネントのエラーメッセージ
+    const componentErrorMessage: ExamRegistResult[] = [];
+    // detailsのpositionNumberが1のものについてバリデーションチェックを行う
+    for (const {
+      positionNumber,
+      value,
+      hasOrder,
+      cancelReasonId,
+    } of item.examItemDetails ?? []) {
+      if (positionNumber !== 1) {
+        continue; // 対象のpositionNumberでない場合、処理をスキップする
+      }
+
+      const requiredMessage = getErrorMessage(
+        errorMessages.required,
+        item.name ? `${item.name}は` : "",
+      );
+
+      // バリデーションが失敗した場合
+      if (hasOrder && !cancelReasonId && !value && isRegisterPressed) {
+        componentErrorMessage.push({
+          description: requiredMessage,
+          errorLevel: InputErrorLevel.異常,
         });
       }
-      return item;
+    }
+    // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
+    const isCallback = !componentErrorMessage.some(
+      (error) => error.errorLevel === InputErrorLevel.異常,
+    );
+    // エラーメッセージをexamItemに保存
+    const resultItem: InputExamItem = {
+      ...item,
+      examRegistResults: item.examRegistResults
+        ? item.examRegistResults.concat(componentErrorMessage)
+        : componentErrorMessage,
     };
+    // バリデーションチェックを行ったexamItemと、
+    // コールバックを判断するフラグを返す
+    const ValidationResult = {
+      validateResult: sortErrorMessage(resultItem),
+      hasCallback: isCallback,
+    };
+    return ValidationResult;
+  };
 
-    // APIのエラーメッセージで更新する
-    const resetErrorMessages = (item: InputExamItem) => {
-      const targetError = backendValidation.find(
-        (error) => error.itemPositionNumber === item.positionNumber,
-      );
-      if (targetError) {
-        item.examRegistResults = targetError.examRegistResults;
+  // 初回読み込み時にAPIのエラーメッセージを保存する
+  useEffect(() => {
+    const backendErrorMessages: BackendValidation[] = examItems.map((item) => ({
+      itemPositionNumber: item.positionNumber ?? 0,
+      examRegistResults: item.examRegistResults ?? [],
+    }));
+    setBackendValidation(backendErrorMessages);
+  }, []);
+
+  useEffect(() => {
+    const updatedItems = examItems.map((item) => {
+      let validatedData = item;
+      // validationCheckを実行
+      validatedData = validationCheck(validatedData)?.validateResult;
+
+      return validatedData;
+    });
+    setExamItemsData(updatedItems);
+  }, [onRegisterPressed, examItems]);
+
+  // 選択ボタン押下時
+  const onSelect = (selector: ExamItemDetailOption) => {
+    const newSelected = selected === selector.code ? "" : selector.code;
+
+    setSelected(newSelected);
+
+    // examItemsのvalueを更新
+    const updatedExamItems: InputExamItem[] = examItems.map((item) => {
+      if (item.positionNumber === 1) {
+        // 値を更新
+        const updatedExamItem = {
+          ...item,
+          examItemDetails: item.examItemDetails?.map((detail) =>
+            detail.positionNumber === 1
+              ? {
+                  ...detail,
+                  value: newSelected,
+                }
+              : detail,
+          ),
+        };
+
+        // バリデーションチェックを実施
+        const { validateResult } = validationCheck(updatedExamItem);
+
+        // バリデーション結果を反映
+        return {
+          ...updatedExamItem,
+          ...validateResult,
+        };
       }
+
       return item;
-    };
+    });
+    // 更新されたデータをステートに設定
+    setExamItemsData(updatedExamItems);
+    onClick(updatedExamItems);
+  };
 
-    const validationCheck = (item: InputExamItem) => {
-      // APIエラーメッセージで初期化
-      resetErrorMessages(item);
-      // コールバック判断用のコンポーネントのエラーメッセージ
-      const componentErrorMessage: ExamRegistResult[] = [];
-      // detailsのpositionNumberが1のものについてバリデーションチェックを行う
-      for (const {
-        positionNumber,
-        value,
-        hasOrder,
-        cancelReasonId,
-      } of item.examItemDetails ?? []) {
-        if (positionNumber !== 1) {
-          continue; // 対象のpositionNumberでない場合、処理をスキップする
-        }
+  const selectors = examItemDetail.examItemDetailOptions || [];
 
-        const requiredMessage = getErrorMessage(
-          errorMessages.required,
-          item.name ? `${item.name}は` : "",
-        );
-
-        // バリデーションが失敗した場合
-        if (hasOrder && !cancelReasonId && !value && isRegisterPressed) {
-          componentErrorMessage.push({
-            description: requiredMessage,
-            errorLevel: InputErrorLevel.異常,
-          });
-        }
-      }
-      // コンポーネント由来のエラーメッセージに異常メッセージがあるかチェック
-      const isCallback = !componentErrorMessage.some(
-        (error) => error.errorLevel === InputErrorLevel.異常,
-      );
-      // エラーメッセージをexamItemに保存
-      const resultItem: InputExamItem = {
-        ...item,
-        examRegistResults: item.examRegistResults
-          ? item.examRegistResults.concat(componentErrorMessage)
-          : componentErrorMessage,
-      };
-      // バリデーションチェックを行ったexamItemと、
-      // コールバックを判断するフラグを返す
-      const ValidationResult = {
-        validateResult: sortErrorMessage(resultItem),
-        hasCallback: isCallback,
-      };
-      return ValidationResult;
-    };
-
-    // 初回読み込み時にAPIのエラーメッセージを保存する
-    useEffect(() => {
-      const backendErrorMessages: BackendValidation[] = examItems.map(
-        (item) => ({
-          itemPositionNumber: item.positionNumber ?? 0,
-          examRegistResults: item.examRegistResults ?? [],
-        }),
-      );
-      setBackendValidation(backendErrorMessages);
-    }, []);
-
-    useEffect(() => {
-      const updatedItems = examItems.map((item) => {
-        let validatedData = item;
-        // validationCheckを実行
-        validatedData = validationCheck(validatedData)?.validateResult;
-
-        return validatedData;
-      });
-      setExamItemsData(updatedItems);
-    }, [onRegisterPressed, examItems]);
-
-    // 選択ボタン押下時
-    const onSelect = (selector: ExamItemDetailOption) => {
-      const newSelected = selected === selector.code ? "" : selector.code;
-
-      setSelected(newSelected);
-
-      // examItemsのvalueを更新
-      const updatedExamItems: InputExamItem[] = examItems.map((item) => {
-        if (item.positionNumber === 1) {
-          // 値を更新
-          const updatedExamItem = {
-            ...item,
-            examItemDetails: item.examItemDetails?.map((detail) =>
-              detail.positionNumber === 1
-                ? {
-                    ...detail,
-                    value: newSelected,
-                  }
-                : detail,
-            ),
-          };
-
-          // バリデーションチェックを実施
-          const { validateResult } = validationCheck(updatedExamItem);
-
-          // バリデーション結果を反映
-          return {
-            ...updatedExamItem,
-            ...validateResult,
-          };
-        }
-
-        return item;
-      });
-      // 更新されたデータをステートに設定
-      setExamItemsData(updatedExamItems);
-      onClick(updatedExamItems);
-    };
-
-    const selectors = examItemDetail.examItemDetailOptions || [];
-
-    return (
-      <Flex
-        maw={1350}
-        justify="flex-start"
-        align="flex-start"
-        direction="column"
-      >
-        <Flex mb={16} gap={16}>
-          <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
-            <Text size="lg" fw={700} ta="center">
-              {examItem.name?.slice(0, 8)}
-            </Text>
-          </Paper>
-          {examItemDetail.prevValue &&
-            (() => {
-              const prevName =
-                examItemDetail.examItemDetailOptions?.find(
-                  (option) => option.code === examItemDetail.prevValue,
-                )?.name || examItemDetail.prevValue;
-              return (
-                <Text ml="auto" fw={700} maw={271}>
-                  (前回：{prevName})
-                </Text>
-              );
-            })()}
-        </Flex>
-
-        <Group>
-          {selectors.map((selector) => {
-            // グレーアウト表示判定
-            const isDisabled =
-              !examItemDetail.hasOrder || !!examItemDetail.cancelReasonId;
-            const isSelected = selected === selector.code;
-
+  return (
+    <Flex maw={1350} justify="flex-start" align="flex-start" direction="column">
+      <Flex mb={16} gap={16}>
+        <Paper w={274} h={80} bg="gray02" c="white" radius="itemName" py={16}>
+          <Text size="lg" fw={700} ta="center">
+            {examItem.name?.slice(0, 8)}
+          </Text>
+        </Paper>
+        {examItemDetail.prevValue &&
+          (() => {
+            const prevName =
+              examItemDetail.examItemDetailOptions?.find(
+                (option) => option.code === examItemDetail.prevValue,
+              )?.name || examItemDetail.prevValue;
             return (
-              <Button
-                w={320}
-                h={78}
-                size="xl"
-                fw={700}
-                key={selector.orderNumber}
-                onClick={() => onSelect(selector)}
-                variant="outline"
-                bd={`2px solid ${
-                  isDisabled ? "" : isSelected ? "primary" : "gray03"
-                }`}
-                bg={isDisabled ? "gray03" : isSelected ? "green03" : "white"}
-                c={isDisabled ? "gray02" : isSelected ? "primary" : "black01"}
-                disabled={isDisabled}
-              >
-                {selector.name?.slice(0, 8)}
-              </Button>
-            );
-          })}
-        </Group>
-
-        {(examItem.examRegistResults || []).map((error, index) => {
-          const isWarning = error.errorLevel === InputErrorLevel.警告;
-          return (
-            <Group key={index} c={isWarning ? "warning" : "error"}>
-              {isWarning ? (
-                <IconExclamationCircleFilled size={32} />
-              ) : (
-                <IconSquareRoundedXFilled size={32} />
-              )}
-              <Text size="sm" fw={700}>
-                {error.description}
+              <Text ml="auto" fw={700} maw={271}>
+                (前回：{prevName})
               </Text>
-            </Group>
+            );
+          })()}
+      </Flex>
+
+      <Group>
+        {selectors.map((selector) => {
+          // グレーアウト表示判定
+          const isDisabled =
+            !examItemDetail.hasOrder || !!examItemDetail.cancelReasonId;
+          const isSelected = selected === selector.code;
+
+          return (
+            <Button
+              w={320}
+              h={78}
+              size="xl"
+              fw={700}
+              key={selector.orderNumber}
+              onClick={() => onSelect(selector)}
+              variant="outline"
+              bd={`2px solid ${
+                isDisabled ? "" : isSelected ? "primary" : "gray03"
+              }`}
+              bg={isDisabled ? "gray03" : isSelected ? "green03" : "white"}
+              c={isDisabled ? "gray02" : isSelected ? "primary" : "black01"}
+              disabled={isDisabled}
+            >
+              {selector.name?.slice(0, 8)}
+            </Button>
           );
         })}
-      </Flex>
-    );
-  },
-);
+      </Group>
+
+      {(examItem.examRegistResults || []).map((error, index) => {
+        const isWarning = error.errorLevel === InputErrorLevel.警告;
+        return (
+          <Group key={index} c={isWarning ? "warning" : "error"}>
+            {isWarning ? (
+              <IconExclamationCircleFilled size={32} />
+            ) : (
+              <IconSquareRoundedXFilled size={32} />
+            )}
+            <Text size="sm" fw={700}>
+              {error.description}
+            </Text>
+          </Group>
+        );
+      })}
+    </Flex>
+  );
+};
 
 export default ExamSelect;
