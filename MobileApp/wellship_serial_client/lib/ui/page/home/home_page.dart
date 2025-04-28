@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wellship_serial_client/data/handler/bluetooth_permission_handler.dart';
 import 'package:wellship_serial_client/data/handler/location_permission_handler.dart';
-import 'package:wellship_serial_client/data/serial/serial_api.g.dart';
+import 'package:wellship_serial_client/data/serial/serial_platform.dart';
 import 'package:wellship_serial_client/ui/component/wsc_menu_button.dart';
 import 'package:wellship_serial_client/ui/route/app_route.dart';
 import 'package:wellship_serial_client/ui/route/app_route.gr.dart';
@@ -60,16 +60,14 @@ class HomePage extends ConsumerWidget {
                     WscMenuButton(
                       onPressed: () async {
                         try {
-                          // 正确调用方式 - 创建实例后调用实例方法
-                          final serialApi = SerialApi();
-                          final result = await serialApi.open();
+                          final result = await SerialPlatform.open();
                           debugPrint('MethodChannel open() 返回: $result');
                           if (context.mounted) {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
                                 title: const Text('open()调用结果'),
-                                content: Text(result),
+                                content: Text(result.toString()),
                               ),
                             );
                           }
@@ -86,7 +84,7 @@ class HomePage extends ConsumerWidget {
                           }
                         }
                       },
-                      text: 'open()テスト呼び出し',
+                      text: 'Android/IOS open()テスト呼び出し',
                     ),
                   ],
                 ),

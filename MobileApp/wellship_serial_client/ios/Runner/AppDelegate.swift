@@ -9,18 +9,30 @@ import UIKit
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
 	
-	// 获取 Flutter 根视图控制器
-    let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
+    // let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
 
-    SerialApiSetup.setUp(binaryMessenger: controller.binaryMessenger, api: SerialApiImpl())
+    // SerialApiSetup.setUp(binaryMessenger: controller.binaryMessenger, api: SerialApiImpl())
+
+    let controller = window?.rootViewController as! FlutterViewController
+    let channel = FlutterMethodChannel(name: "wellship.serial.channel", binaryMessenger: controller.binaryMessenger)
+
+    channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
+      switch call.method {
+      case "open":
+        print("🔌 iOS 原生接收到 open 方法调用")
+        result("iOS Open Done")  // 可返回给 Flutter
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
 	
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
 
-// 实现 SerialApi 协议
-class SerialApiImpl: NSObject, SerialApi {
-    func open() -> String {
-        return "iOS側のopen()が呼ばれました！"
-    }
-}
+// // 实现 SerialApi 协议
+// class SerialApiImpl: NSObject, SerialApi {
+//     func open() -> String {
+//         return "iOS側のopen()が呼ばれました！"
+//     }
+// }
