@@ -8,6 +8,19 @@ import UIKit
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
+	
+	// 获取 Flutter 根视图控制器
+    let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
+
+    SerialApiSetup.setUp(binaryMessenger: controller.binaryMessenger, api: SerialApiImpl())
+	
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
+}
+
+// 实现 SerialApi 协议
+class SerialApiImpl: NSObject, SerialApi {
+    func open() -> String {
+        return "iOS側のopen()が呼ばれました！"
+    }
 }
