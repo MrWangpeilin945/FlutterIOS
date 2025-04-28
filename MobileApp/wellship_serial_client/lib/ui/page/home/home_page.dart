@@ -66,7 +66,7 @@ class HomePage extends ConsumerWidget {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: const Text('open()调用结果'),
+                                title: const Text('open () の呼び出し結果'),
                                 content: Text(result.toString()),
                               ),
                             );
@@ -84,7 +84,7 @@ class HomePage extends ConsumerWidget {
                           }
                         }
                       },
-                      text: 'Android/IOS open()テスト呼び出し',
+                      text: 'open()テスト呼び出し',
                     ),
                   ],
                 ),
