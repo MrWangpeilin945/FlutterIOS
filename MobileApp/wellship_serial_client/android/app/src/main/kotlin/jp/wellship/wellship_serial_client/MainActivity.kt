@@ -1,44 +1,39 @@
 package jp.wellship.wellship_serial_client
 
-import android.os.Bundle
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.content.Context
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    // override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-    //     super.configureFlutterEngine(flutterEngine)
-
-    //     SerialApi.setUp(flutterEngine.dartExecutor.binaryMessenger, SerialApiImpl())
-    // }
 
     private val CHANNEL = "wellship.serial.channel"
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
 
-        // 获取已初始化的 FlutterEngine 实例
-        val flutterEngine: FlutterEngine = flutterEngine ?: return
-
-        // 设置 MethodChannel 处理逻辑
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler {
-                call,
-                result ->
-            if (call.method == "open") {
-                // 在这里处理 'open' 方法
-                // 执行实际的操作（如打开串口或其他设备）
-                // 返回成功结果
-                result.success("Android Open Done") // 这里返回一个成功的消息
-            } else {
-                result.notImplemented() // 如果 Flutter 端调用了一个未实现的方法
+        MethodChannel(flutterEngine.dartExecutor, CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "isBluetoothEnabled" -> {
+                    val isBluetoothEnabled = isBluetoothEnabled()
+                    result.success(isBluetoothEnabled)
+                }
+                else -> result.notImplemented()
             }
         }
     }
-}
 
-// // 实现 SerialApi 接口
-// class SerialApiImpl : SerialApi {
-//     override fun open(): String {
-//         return "Android側のopen()が呼ばれました！"
-//     }
-// }
+    // 检查蓝牙是否开启
+    private fun isBluetoothEnabled(): Boolean {
+        val bluetoothAdapter = getBluetoothAdapter()
+        return bluetoothAdapter?.isEnabled ?: false
+    }
+
+    // 使用 BluetoothManager 获取 BluetoothAdapter
+    private fun getBluetoothAdapter(): BluetoothAdapter? {
+        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
+        return bluetoothManager?.adapter
+    }
+}

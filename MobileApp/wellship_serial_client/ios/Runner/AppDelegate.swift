@@ -14,29 +14,15 @@ import CoreBluetooth
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
 	
-    // let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
-
-    // SerialApiSetup.setUp(binaryMessenger: controller.binaryMessenger, api: SerialApiImpl())
-
     let controller = window?.rootViewController as! FlutterViewController
     let channel = FlutterMethodChannel(name: "wellship.serial.channel", binaryMessenger: controller.binaryMessenger)
-
-    // channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
-    //   switch call.method {
-    //   case "open":
-    //     print("🔌 iOS 原生接收到 open 方法调用")
-    //     result("iOS Open Done")  // 可返回给 Flutter
-    //   default:
-    //     result(FlutterMethodNotImplemented)
-    //   }
-    // }
 
     channel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
       guard let self = self else { return }
 
       switch call.method {
-      case "open":
-        print("🔌 iOS 原生接收到 open 方法调用")
+      case "isBluetoothEnabled":
+        print("🔌 iOS 原生接收到 isBluetoothEnabled 方法调用")
         
         // 初始化 CoreBluetooth
         self.flutterResult = result
@@ -50,7 +36,7 @@ import CoreBluetooth
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
-    // CBCentralManagerDelegate 回调
+  // CBCentralManagerDelegate 回调
   func centralManagerDidUpdateState(_ central: CBCentralManager) {
     switch central.state {
     case .poweredOn:
@@ -71,10 +57,5 @@ import CoreBluetooth
       flutterResult?("Bluetooth state: \(central.state.rawValue)")
       flutterResult = nil
     }
+  }
 }
-// // 实现 SerialApi 协议
-// class SerialApiImpl: NSObject, SerialApi {
-//     func open() -> String {
-//         return "iOS側のopen()が呼ばれました！"
-//     }
-// }

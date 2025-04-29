@@ -58,33 +58,8 @@ class HomePage extends ConsumerWidget {
                       text: '無線接続 (BLE)',
                     ),
                     WscMenuButton(
-                      onPressed: () async {
-                        try {
-                          final result = await SerialPlatform.open();
-                          debugPrint('MethodChannel open() 返回: $result');
-                          if (context.mounted) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('open () の呼び出し結果'),
-                                content: Text(result.toString()),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          debugPrint('调用 open() 时发生错误: $e');
-                          if (context.mounted) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('调用 open() 时发生错误'),
-                                content: Text('错误: $e'),
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      text: 'open()テスト呼び出し',
+                      onPressed: () => _showBluetoothTestDialog(context),
+                      text: '测试蓝牙状态',
                     ),
                   ],
                 ),
@@ -107,5 +82,59 @@ class HomePage extends ConsumerWidget {
     return locationPermission == PermissionStatus.granted &&
         bluetoothScanPermission == PermissionStatus.granted &&
         bluetoothConnectPermission == PermissionStatus.granted;
+  }
+
+  Future<void> _showBluetoothTestDialog(BuildContext context) async {
+    try {
+      debugPrint('显示蓝牙测试对话框');
+
+      // 调用 SerialPlatform 的方法来检查蓝牙是否开启
+      debugPrint('正在检查蓝牙是否开启...');
+      final isBluetoothEnabled = await SerialPlatform.isBluetoothEnabled();
+      debugPrint('蓝牙状态检查完成，蓝牙是否开启: $isBluetoothEnabled'); // 打印蓝牙的状态
+
+      // 弹出对话框，显示蓝牙是否开启
+      showDialog(
+        // ignore: use_build_context_synchronously
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('蓝牙功能测试结果'), // 这里是更新后的标题
+            content: Text(isBluetoothEnabled ? '蓝牙已开启' : '蓝牙未开启'), // 更新提示内容
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  debugPrint('关闭蓝牙测试对话框'); // 按钮点击时输出日志
+                },
+                child: const Text('关闭'),
+              ),
+            ],
+          );
+        },
+      );
+    } on Exception catch (e) {
+      debugPrint('检查蓝牙状态失败: $e');
+      // 处理异常，弹出错误信息
+      showDialog(
+        // ignore: use_build_context_synchronously
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('错误'), // 这里是错误对话框的标题
+            content: Text('检查蓝牙状态失败: $e'), // 错误信息内容
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  debugPrint('关闭错误对话框');
+                },
+                child: const Text('关闭'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
