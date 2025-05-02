@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -173,7 +169,7 @@ const ExamNumericRepeatWithSameValue = ({
             message: getErrorMessage(errorMessages.numericString, label) ?? "",
           });
 
-      const result = schema.safeParse(value);
+      const result = schema.safeParse(value ?? "");
 
       if (!result.success) {
         hasComponentError = true;
@@ -196,14 +192,20 @@ const ExamNumericRepeatWithSameValue = ({
             }
             if (
               numericValue >= range.minValue &&
-              numericValue <= range.maxValue &&
-              range.errorLevel === InputErrorLevel.異常
+              numericValue <= range.maxValue
             ) {
               hasComponentError = true;
-              componentErrorMessage.push({
-                description: "入力に誤りがあります。",
-                errorLevel: range.errorLevel,
-              });
+              if (range.errorLevel === InputErrorLevel.異常) {
+                componentErrorMessage.push({
+                  description: "入力に誤りがあります。",
+                  errorLevel: range.errorLevel,
+                });
+              } else if (range.errorLevel === InputErrorLevel.警告) {
+                componentErrorMessage.push({
+                  description: "入力値を確認してください。",
+                  errorLevel: range.errorLevel,
+                });
+              }
             }
           }
         }
@@ -286,7 +288,7 @@ const ExamNumericRepeatWithSameValue = ({
                 py={16}
               >
                 <Text size="lg" fw={700} ta="center">
-                  {detail.name ?? ""}
+                  {detail.name?.slice(0, 8)}
                 </Text>
               </Paper>
 
@@ -362,7 +364,8 @@ const ExamNumericRepeatWithSameValue = ({
             {/* キーボード表示 */}
             {activeKeyboard === detail.positionNumber && (
               <Box ref={closeKeyBoard} mx="auto">
-                {detail?.keyboard?.keyboardType === KeyboardType.テンキー ? (
+                {detail?.keyboard?.keyboardType === KeyboardType.テンキー ||
+                !detail.keyboard?.keyboardType ? (
                   <NumericKeyboard
                     value={detail?.value ?? ""}
                     integerLength={detail?.integerLength}
