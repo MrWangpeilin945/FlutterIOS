@@ -196,7 +196,7 @@ const ExamVision = ({
         getErrorMessage(errorMessages.numericString, message),
       );
 
-    const result = schema.safeParse(detail.value);
+    const result = schema.safeParse(detail.value ?? "");
 
     if (!result.success) {
       // メッセージを追加
@@ -250,7 +250,7 @@ const ExamVision = ({
       targetDetail.hasOrder &&
       !targetDetail.cancelReasonId
     ) {
-      const result = collectionSchema.safeParse(targetDetail?.value); // 矯正の入力値または矯正区分を必須チェック
+      const result = collectionSchema.safeParse(targetDetail?.value ?? ""); // 矯正の入力値または矯正区分を必須チェック
 
       if (!result.success) {
         const error = result.error.errors[0];

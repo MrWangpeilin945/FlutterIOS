@@ -210,7 +210,7 @@ const ExamNumericLR = ({
           });
 
       // バリデーション対象データを取得
-      const valueToValidate = value;
+      const valueToValidate = value ?? "";
       const result = schema.safeParse(valueToValidate);
 
       // バリデーションが失敗した場合

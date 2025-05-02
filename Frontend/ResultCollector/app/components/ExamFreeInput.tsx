@@ -156,7 +156,7 @@ const ExamFreeInput = ({
       : z.string(); // バリデーションなし
     // バリデーション対象データを取得
     const valueToValidate =
-      item.examItemDetails?.find((item) => item.positionNumber === 1)?.value ||
+      item.examItemDetails?.find((item) => item.positionNumber === 1)?.value ??
       "";
     const result = schema.safeParse(valueToValidate);
 
