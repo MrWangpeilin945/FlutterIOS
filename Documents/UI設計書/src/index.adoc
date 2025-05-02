@@ -1,7 +1,7 @@
 = WELLSHIP UI設計書
 :author: 両備システムズ ヘルスケアソリューションカンパニー ウェルネスビジネス事業部
-:revdate: 2025-03-28
-:revnumber: 0.6
+:revdate: 2025-04-22
+:revnumber: 0.7
 :doctype: book
 :lang: ja
 :toc: left
