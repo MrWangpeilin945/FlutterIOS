@@ -21,6 +21,7 @@ export default function ExamItemProgress({
     { status: AggregatedProgressStatus.中止, color: "blue04" },
     { status: AggregatedProgressStatus.来場, color: "blue02" },
     { status: AggregatedProgressStatus.予定, color: "blue03" },
+    { status: AggregatedProgressStatus.その他, color: "green02" },
   ];
 
   // 各項目の設定と割合を算出

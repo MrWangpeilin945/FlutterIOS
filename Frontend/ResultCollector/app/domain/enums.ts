@@ -46,6 +46,7 @@ export enum AggregatedProgressStatus {
   来場 = 21,
   済 = 41,
   中止 = 51,
+  その他 = 71,
 }
 
 /**
