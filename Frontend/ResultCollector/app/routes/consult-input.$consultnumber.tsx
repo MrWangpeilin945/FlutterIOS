@@ -474,11 +474,13 @@ export default function ConsultInput() {
                     ? examItem.examItemDetails
                         .filter(
                           (itemDetail) =>
-                            itemDetail.hasOrder && !itemDetail.cancelReasonId,
+                            itemDetail.hasOrder &&
+                            !itemDetail.cancelReasonId &&
+                            itemDetail.value,
                         )
                         .map((itemDetail) => ({
                           examItemDetailId: itemDetail.examItemDetailId,
-                          value: itemDetail.value || "",
+                          value: itemDetail.value,
                         }))
                     : [],
                 })) ?? [],
