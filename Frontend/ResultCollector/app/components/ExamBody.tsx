@@ -1,7 +1,4 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -218,7 +215,7 @@ const ExamBody = ({
     const targetDetail = item.examItemDetails?.find(
       (item) => item.positionNumber === 1,
     );
-    const result = schema.safeParse(targetDetail?.value);
+    const result = schema.safeParse(targetDetail?.value ?? "");
 
     // バリデーションが失敗した場合
     if (
