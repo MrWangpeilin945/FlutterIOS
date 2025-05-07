@@ -1,0 +1,2 @@
+E:/WELLSHIP/Git/sinka20250506/WELLSHIP/MobileApp/wellship_serial_client/android/app/.cxx/Debug/1o66632i/x86_64/CMakeFiles/edit_cache.dir
+E:/WELLSHIP/Git/sinka20250506/WELLSHIP/MobileApp/wellship_serial_client/android/app/.cxx/Debug/1o66632i/x86_64/CMakeFiles/rebuild_cache.dir
